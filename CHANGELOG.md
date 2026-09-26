@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Corrected (Round 00 research audit)
+
+- 更正 TapTap app 28348 的来源归属：这是后作《英雄群侠传》的介绍页及其第一人称回忆，不是独立玩家评测；撤销其对《白金英雄坛说》自由探索/养成机制的证据映射，并进一步限定 go1980 来源所描述的早期《英雄坛说》范围。
+
 ### Added (Round 07)
 
 - 新增 draft-07 `quest-set` 契约、manifest 可选任务资源和两项原创差事；任务资料声明发布 NPC、前置任务、收集/击败目标、败北失败条件与经验/银两奖励。NPC 新增可选 `questGiver` 标记和原创发布人马尚义。
