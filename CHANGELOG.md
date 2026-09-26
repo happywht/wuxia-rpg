@@ -32,6 +32,11 @@
 ### Added (Round 00 research follow-up)
 
 - 为原作对照补入一条有明确范围的《白金英雄坛说》开发者证言：go1980 报道称参与开发者将“击杀不同人物影响结局”作为白金版新增要素。因该信息仅见于单篇媒体采访转述，标为中等置信度并明确未获独立印证；只将其映射为本作原创行为驱动多结局设计，不引用原作人物、名单或结局内容。
+- 登记 ZOL 问答页中的白金版玩家指南转载，新增低置信度 A6 摘要，限于方向键行走、NPC 动作菜单与回合制战斗等高层交互信息；来源称指南转自百度贴吧，未作官方规格或独立验证，不复述专名与路线细节。
+
+### Verification (Round 00 research follow-up)
+
+- `npm run build` 通过：TypeScript 检查与 Vite 生产构建成功（97 模块）；`git diff --check` 通过。Vite 有主 bundle 超过 500 kB 的非阻断建议。
 
 ### Corrected (Round 00 research audit)
 
