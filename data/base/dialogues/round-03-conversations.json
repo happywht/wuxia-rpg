@@ -50,7 +50,7 @@
                 { "kind": "takeItem", "itemId": "item.xisui-canpian", "quantity": 1 },
                 { "kind": "adjustRelationship", "npcId": "char.shen-mohan", "delta": -10 },
                 { "kind": "adjustMorality", "delta": -10 },
-                { "kind": "adjustRenown", "delta": 2 }
+                { "kind": "adjustRenown", "delta": -2 }
               ]
             }
           ]

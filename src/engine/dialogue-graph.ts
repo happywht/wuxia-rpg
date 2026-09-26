@@ -259,7 +259,10 @@ function parseEffect(raw: unknown): DialogueEffectData | null {
     }
     case 'adjustRenown': {
       if (!hasOnlyKeys(source, ['kind', 'delta'])) return null;
-      const delta = requireIntegerInRange(source.delta, RENOWN_BOUND.min, RENOWN_BOUND.max);
+      // Renown itself is non-negative, but an adjustment is signed. Keep
+      // the schema/parser protocol aligned while the runtime clamps the
+      // resulting value back into RENOWN_BOUND.
+      const delta = requireIntegerInRange(source.delta, -RENOWN_BOUND.max, RENOWN_BOUND.max);
       return delta !== null && delta !== 0 ? { kind: 'adjustRenown', delta } : null;
     }
     case 'adjustRelationship': {
