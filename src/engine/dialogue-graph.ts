@@ -3,21 +3,79 @@
  * conversation graph validation, id indexing and playback state.
  *
  * A conversation is a plain node graph: every node carries speaker text and
- * optional player options; a node without options is an end node. Conditions
- * and effects are deliberately out of scope until Round 08 — the engine only
- * understands ids and node transitions, and every visible string stays in
- * the JSON data (see docs/ARCHITECTURE.md).
+ * optional player options; a node without options is an end node. Round 08
+ * adds data-driven conditions (an option is only offered while every
+ * condition holds) and effects (executed atomically when the option is
+ * confirmed — see `dialogue-runtime.ts`); this module owns their wire
+ * protocol and defensive parsing only. Every visible string stays in the
+ * JSON data (see docs/ARCHITECTURE.md).
  *
  * `data/schema/dialogue-set.schema.json` pins down static structure; the
  * per-conversation validation here adds the graph semantics a schema cannot
  * express (start node exists, option targets resolve, node ids unique) so a
  * single broken conversation disables exactly itself, not the whole set.
+ * Cross-resource id checks (quest/item/NPC references inside conditions and
+ * effects) run in `assembleDialogueReferences` after world assembly and
+ * drop only the offending option.
  */
+
+import {
+  MORALITY_RANGE,
+  RELATIONSHIP_RANGE,
+  RENOWN_RANGE,
+} from './social-state';
+
+/**
+ * Condition-bound mirrors of the social ranges (single source of truth in
+ * `social-state.ts`; these aliases keep the condition parser readable).
+ */
+const MORALITY_BOUND = MORALITY_RANGE;
+const RENOWN_BOUND = RENOWN_RANGE;
+const RELATIONSHIP_BOUND = RELATIONSHIP_RANGE;
+
+// ---------------------------------------------------------------------------
+// Round 08 condition / effect protocols
+// ---------------------------------------------------------------------------
+
+/** Quest lifecycle values a `questStatus` condition may compare against. */
+export type DialogueQuestStatusValue = 'locked' | 'offered' | 'active' | 'completed' | 'failed';
+
+/**
+ * One condition on an option. Options carrying several conditions are only
+ * visible while **every** one of them holds. `morality` / `renown` /
+ * `npcRelationship` declare at least one of `minValue` / `maxValue`
+ * (inclusive bounds).
+ */
+export type DialogueConditionData =
+  | { kind: 'questStatus'; questId: string; status: DialogueQuestStatusValue }
+  | { kind: 'itemCount'; itemId: string; minCount: number }
+  | { kind: 'morality'; minValue?: number; maxValue?: number }
+  | { kind: 'renown'; minValue?: number; maxValue?: number }
+  | { kind: 'npcRelationship'; npcId: string; minValue?: number; maxValue?: number };
+
+/**
+ * One effect executed when its option is confirmed. The runtime validates
+ * every effect of an option first and commits them together — a refused
+ * effect changes nothing (atomicity, `dialogue-runtime.ts`). A missing
+ * `npcId` on `adjustRelationship` targets the NPC being talked to.
+ */
+export type DialogueEffectData =
+  | { kind: 'acceptQuest'; questId: string }
+  | { kind: 'abandonQuest'; questId: string }
+  | { kind: 'giveItem'; itemId: string; quantity: number }
+  | { kind: 'takeItem'; itemId: string; quantity: number }
+  | { kind: 'adjustMorality'; delta: number }
+  | { kind: 'adjustRenown'; delta: number }
+  | { kind: 'adjustRelationship'; npcId?: string; delta: number };
 
 /** One player-selectable branch leading to another node. */
 export interface DialogueOptionData {
   text: string;
   nextNodeId: string;
+  /** All must hold for the option to be offered; missing = unconditional. */
+  conditions?: readonly DialogueConditionData[];
+  /** Executed atomically on confirm; missing = plain transition. */
+  effects?: readonly DialogueEffectData[];
 }
 
 /** A dialogue node; omitted or empty `options` marks an end node. */
@@ -47,16 +105,224 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+/** True only when a protocol object contains no undeclared keys. */
+function hasOnlyKeys(source: Record<string, unknown>, allowed: readonly string[]): boolean {
+  return Object.keys(source).every((key) => allowed.includes(key));
+}
+
 /** Returns the value when non-empty, null otherwise (enables TS narrowing). */
 function requireNonEmptyString(value: unknown): string | null {
   return typeof value === 'string' && value.length > 0 ? value : null;
+}
+
+/** Returns the value when it is a finite integer inside [min, max]. */
+function requireIntegerInRange(value: unknown, min: number, max: number): number | null {
+  if (typeof value !== 'number' || !Number.isInteger(value) || value < min || value > max) {
+    return null;
+  }
+  return value;
+}
+
+const QUEST_STATUS_VALUES: readonly DialogueQuestStatusValue[] = [
+  'locked',
+  'offered',
+  'active',
+  'completed',
+  'failed',
+];
+
+/**
+ * Reads the optional inclusive bounds shared by the morality / renown /
+ * npcRelationship conditions. Returns `[min, max]` where each entry may be
+ * undefined but at least one must exist, or `null` when invalid.
+ */
+function requireRangeBounds(
+  source: Record<string, unknown>,
+  min: number,
+  max: number,
+): [number | undefined, number | undefined] | null {
+  const hasMin = source.minValue !== undefined;
+  const hasMax = source.maxValue !== undefined;
+  if (!hasMin && !hasMax) {
+    return null;
+  }
+  let minValue: number | undefined;
+  let maxValue: number | undefined;
+  if (hasMin) {
+    const parsed: number | null = requireIntegerInRange(source.minValue, min, max);
+    if (parsed === null) {
+      return null;
+    }
+    minValue = parsed;
+  }
+  if (hasMax) {
+    const parsed: number | null = requireIntegerInRange(source.maxValue, min, max);
+    if (parsed === null) {
+      return null;
+    }
+    maxValue = parsed;
+  }
+  if (minValue !== undefined && maxValue !== undefined && minValue > maxValue) {
+    return null;
+  }
+  return [minValue, maxValue];
+}
+
+/**
+ * Defensive parse of one condition entry; `null` marks an unknown kind or an
+ * out-of-protocol value (the schema rejects these earlier at load time).
+ */
+function parseCondition(raw: unknown): DialogueConditionData | null {
+  const source = isPlainObject(raw) ? raw : null;
+  if (source === null) {
+    return null;
+  }
+  switch (source.kind) {
+    case 'questStatus': {
+      if (!hasOnlyKeys(source, ['kind', 'questId', 'status'])) return null;
+      const questId = requireNonEmptyString(source.questId);
+      const status = QUEST_STATUS_VALUES.find((value) => value === source.status);
+      return questId !== null && status !== undefined
+        ? { kind: 'questStatus', questId, status }
+        : null;
+    }
+    case 'itemCount': {
+      if (!hasOnlyKeys(source, ['kind', 'itemId', 'minCount'])) return null;
+      const itemId = requireNonEmptyString(source.itemId);
+      const minCount = requireIntegerInRange(source.minCount, 1, 999);
+      return itemId !== null && minCount !== null
+        ? { kind: 'itemCount', itemId, minCount }
+        : null;
+    }
+    case 'morality': {
+      if (!hasOnlyKeys(source, ['kind', 'minValue', 'maxValue'])) return null;
+      const bounds = requireRangeBounds(source, MORALITY_BOUND.min, MORALITY_BOUND.max);
+      if (bounds === null) {
+        return null;
+      }
+      const [minValue, maxValue] = bounds;
+      return { kind: 'morality', ...(minValue !== undefined ? { minValue } : {}), ...(maxValue !== undefined ? { maxValue } : {}) };
+    }
+    case 'renown': {
+      if (!hasOnlyKeys(source, ['kind', 'minValue', 'maxValue'])) return null;
+      const bounds = requireRangeBounds(source, RENOWN_BOUND.min, RENOWN_BOUND.max);
+      if (bounds === null) {
+        return null;
+      }
+      const [minValue, maxValue] = bounds;
+      return { kind: 'renown', ...(minValue !== undefined ? { minValue } : {}), ...(maxValue !== undefined ? { maxValue } : {}) };
+    }
+    case 'npcRelationship': {
+      if (!hasOnlyKeys(source, ['kind', 'npcId', 'minValue', 'maxValue'])) return null;
+      const npcId = requireNonEmptyString(source.npcId);
+      const bounds = requireRangeBounds(source, RELATIONSHIP_BOUND.min, RELATIONSHIP_BOUND.max);
+      if (npcId === null || bounds === null) {
+        return null;
+      }
+      const [minValue, maxValue] = bounds;
+      return { kind: 'npcRelationship', npcId, ...(minValue !== undefined ? { minValue } : {}), ...(maxValue !== undefined ? { maxValue } : {}) };
+    }
+    default:
+      return null;
+  }
+}
+
+/**
+ * Defensive parse of one effect entry; `null` marks an unknown kind or an
+ * out-of-protocol value (the schema rejects these earlier at load time).
+ */
+function parseEffect(raw: unknown): DialogueEffectData | null {
+  const source = isPlainObject(raw) ? raw : null;
+  if (source === null) {
+    return null;
+  }
+  switch (source.kind) {
+    case 'acceptQuest':
+    case 'abandonQuest': {
+      if (!hasOnlyKeys(source, ['kind', 'questId'])) return null;
+      const questId = requireNonEmptyString(source.questId);
+      return questId !== null ? ({ kind: source.kind, questId } as DialogueEffectData) : null;
+    }
+    case 'giveItem':
+    case 'takeItem': {
+      if (!hasOnlyKeys(source, ['kind', 'itemId', 'quantity'])) return null;
+      const itemId = requireNonEmptyString(source.itemId);
+      const quantity = requireIntegerInRange(source.quantity, 1, 99);
+      return itemId !== null && quantity !== null
+        ? ({ kind: source.kind, itemId, quantity } as DialogueEffectData)
+        : null;
+    }
+    case 'adjustMorality': {
+      if (!hasOnlyKeys(source, ['kind', 'delta'])) return null;
+      const delta = requireIntegerInRange(source.delta, MORALITY_BOUND.min, MORALITY_BOUND.max);
+      return delta !== null && delta !== 0 ? { kind: 'adjustMorality', delta } : null;
+    }
+    case 'adjustRenown': {
+      if (!hasOnlyKeys(source, ['kind', 'delta'])) return null;
+      const delta = requireIntegerInRange(source.delta, RENOWN_BOUND.min, RENOWN_BOUND.max);
+      return delta !== null && delta !== 0 ? { kind: 'adjustRenown', delta } : null;
+    }
+    case 'adjustRelationship': {
+      if (!hasOnlyKeys(source, ['kind', 'npcId', 'delta'])) return null;
+      const delta = requireIntegerInRange(source.delta, RELATIONSHIP_BOUND.min, RELATIONSHIP_BOUND.max);
+      if (delta === null || delta === 0) {
+        return null;
+      }
+      const npcId = source.npcId === undefined ? undefined : requireNonEmptyString(source.npcId);
+      if (npcId === null) {
+        return null;
+      }
+      return { kind: 'adjustRelationship', ...(npcId !== undefined ? { npcId } : {}), delta };
+    }
+    default:
+      return null;
+  }
+}
+
+/** Parses a condition list; `undefined` when the field is absent. */
+function parseConditions(raw: unknown): readonly DialogueConditionData[] | null | undefined {
+  if (raw === undefined) {
+    return undefined;
+  }
+  if (!Array.isArray(raw) || raw.length === 0) {
+    return null; // Empty condition lists are meaningless — require omission.
+  }
+  const parsed: DialogueConditionData[] = [];
+  for (const entry of raw) {
+    const condition = parseCondition(entry);
+    if (condition === null) {
+      return null;
+    }
+    parsed.push(condition);
+  }
+  return parsed;
+}
+
+/** Parses an effect list; `undefined` when the field is absent. */
+function parseEffects(raw: unknown): readonly DialogueEffectData[] | null | undefined {
+  if (raw === undefined) {
+    return undefined;
+  }
+  if (!Array.isArray(raw) || raw.length === 0) {
+    return null; // Empty effect lists are meaningless — require omission.
+  }
+  const parsed: DialogueEffectData[] = [];
+  for (const entry of raw) {
+    const effect = parseEffect(entry);
+    if (effect === null) {
+      return null;
+    }
+    parsed.push(effect);
+  }
+  return parsed;
 }
 
 /**
  * Parses one node's `options` field.
  * - `undefined` when the field is absent (an end node — valid);
  * - an empty list when the field is `[]` (also an end node — valid);
- * - a validated option list when every entry has `text` and `nextNodeId`;
+ * - a validated option list when every entry has `text` and `nextNodeId`
+ *   plus structurally valid optional `conditions` / `effects`;
  * - `null` when the field exists but is structurally invalid.
  */
 function parseOptions(raw: unknown): DialogueOptionData[] | null | undefined {
@@ -72,12 +338,22 @@ function parseOptions(raw: unknown): DialogueOptionData[] | null | undefined {
   const parsed: DialogueOptionData[] = [];
   for (const option of raw) {
     const source = isPlainObject(option) ? option : null;
-    const text = source === null ? null : requireNonEmptyString(source.text);
-    const nextNodeId = source === null ? null : requireNonEmptyString(source.nextNodeId);
-    if (text === null || nextNodeId === null) {
+    if (source !== null && !hasOnlyKeys(source, ['text', 'nextNodeId', 'conditions', 'effects'])) {
       return null;
     }
-    parsed.push({ text, nextNodeId });
+    const text = source === null ? null : requireNonEmptyString(source.text);
+    const nextNodeId = source === null ? null : requireNonEmptyString(source.nextNodeId);
+    const conditions = source === null ? undefined : parseConditions(source.conditions);
+    const effects = source === null ? undefined : parseEffects(source.effects);
+    if (text === null || nextNodeId === null || conditions === null || effects === null) {
+      return null;
+    }
+    parsed.push({
+      text,
+      nextNodeId,
+      ...(conditions !== undefined ? { conditions } : {}),
+      ...(effects !== undefined ? { effects } : {}),
+    });
   }
   return parsed;
 }
@@ -88,7 +364,11 @@ function parseOptions(raw: unknown): DialogueOptionData[] | null | undefined {
  * against unvalidated values and yields readable per-entry errors.
  */
 export function parseDialogueSet(raw: unknown): DialogueSetParseResult {
-  if (!isPlainObject(raw) || !Array.isArray(raw.conversations)) {
+  if (
+    !isPlainObject(raw) ||
+    !hasOnlyKeys(raw, ['conversations']) ||
+    !Array.isArray(raw.conversations)
+  ) {
     return { ok: false, errors: ['conversations：应为对话条目数组'] };
   }
 
@@ -98,6 +378,10 @@ export function parseDialogueSet(raw: unknown): DialogueSetParseResult {
     const label = `conversations[${index}]`;
     if (!isPlainObject(entry)) {
       errors.push(`${label}：应为对象`);
+      return;
+    }
+    if (!hasOnlyKeys(entry, ['id', 'startNodeId', 'nodes'])) {
+      errors.push(`${label}：含有未声明字段`);
       return;
     }
 
@@ -125,6 +409,10 @@ export function parseDialogueSet(raw: unknown): DialogueSetParseResult {
       const nodeLabel = `${label}.nodes[${nodeIndex}]`;
       if (!isPlainObject(node)) {
         errors.push(`${nodeLabel}：应为对象`);
+        return;
+      }
+      if (!hasOnlyKeys(node, ['id', 'text', 'options'])) {
+        errors.push(`${nodeLabel}：含有未声明字段`);
         return;
       }
       const nodeId = requireNonEmptyString(node.id);

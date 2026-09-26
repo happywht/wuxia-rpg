@@ -8,6 +8,21 @@
 
 - 更正 TapTap app 28348 的来源归属：这是后作《英雄群侠传》的介绍页及其第一人称回忆，不是独立玩家评测；撤销其对《白金英雄坛说》自由探索/养成机制的证据映射，并进一步限定 go1980 来源所描述的早期《英雄坛说》范围。
 
+### Added (Round 08)
+
+- 扩展 draft-07 `dialogue-set` 契约：选项新增可选 `conditions`（questStatus/itemCount/morality/renown/npcRelationship 五种封闭枚举，全满足才可见）与 `effects`（acceptQuest/abandonQuest/giveItem/takeItem/adjustMorality/adjustRenown/adjustRelationship 七种，先全量验证再统一提交）；未知字段/kind 与越界值在 Ajv 与防御解析两级被拒，旧无条件对话完全兼容，坏跨资源引用只剔除相应选项。
+- 新增 Phaser 无关 `src/engine/social-state.ts`：运行时善恶（±100）、声望（0–1000）与逐 NPC 关系（±100）标量及边界钳制；新增 `src/engine/dialogue-runtime.ts`：条件求值、可见选项过滤、装配期引用隔离与跨任务/背包/社会状态的原子效果事务（任一效果被拒则零变更、不转移节点），物品变动同步活动任务收集目标（进度可回退）。
+- 示例对话扩展覆盖任务接取/进度/放弃/交付、物品赠予与残篇交付（善/恶两种）、声望门槛与 NPC 关系渐进解锁分支；任务发布人保留 E 名录并新增 F 键直接交谈，交互提示双入口并列显示。
+
+### Changed (Round 08)
+
+- `DialoguePanel` 支持场景注入的条件过滤与效果执行钩子，节点文本下新增效果反馈行（成功绿/拒绝黄）；全部选项被过滤的节点按结束节点处理（Enter/Esc 正常收束，不锁输入）。`item-system` 公开 grantItems/removeItems 提交原语供对话效果在验证后调用；GridScene 持有社会状态并按对话效果结算任务奖励/HUD 提示。社会状态、关系与对话产生的任务变动均为运行时内存态，持久化留给 Round 09。
+
+### Verification (Round 08)
+
+- `npm run build` 通过（92 模块，bundle 1,608.58 kB / gzip 424.53 kB）；临时 Node/Rolldown/Ajv 冒烟检查 42 项全部通过（旧数据兼容、未知字段/kind/值域拒绝、条件过滤、接取/放弃/交付、背包容量与物品不足拒绝、组合失败零变更回滚、收集目标回退、善恶上界钳制、隐式关系目标、坏引用选项剔除），脚本已删除。Vite 仍报告 Phaser 主包超过 500 kB 建议阈值。
+- 浏览器手动验证：地图加载无资料警告；邻接任务发布人提示"按 E 查看差事 · F 交谈"；F 对话仅显示 offered 任务选项（active/completed/关系分支正确隐藏），接取后反馈"已接取「巷口送药」"且 HUD 跟踪 2/3；E 名录仍可用；顾夜尘带话后反馈关系 +10，再对话解锁关系≥10 新选项；面板打开时移动锁定。
+
 ### Added (Round 07)
 
 - 新增 draft-07 `quest-set` 契约、manifest 可选任务资源和两项原创差事；任务资料声明发布 NPC、前置任务、收集/击败目标、败北失败条件与经验/银两奖励。NPC 新增可选 `questGiver` 标记和原创发布人马尚义。

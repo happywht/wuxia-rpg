@@ -4,6 +4,34 @@
 
 ---
 
+## Round 08 — 2026-09-27
+
+### 计划与实现
+
+- 开工前编写 `iterations/round-08/plan.md`，估算人类工程师工时 10–14 小时；分成协议/Schema/解析、运行时状态与事务执行、UI/场景/原创内容接线、文档验证四个可验证子任务。
+- 扩展 `dialogue-set` draft-07 Schema 与 `dialogue-graph.ts`：选项可选 `conditions`（questStatus/itemCount/morality/renown/npcRelationship）与 `effects`（acceptQuest/abandonQuest/giveItem/takeItem/adjustMorality/adjustRenown/adjustRelationship），oneOf + `additionalProperties: false` 封闭协议，未知字段/kind 与越界值两级拒绝；旧无条件对话与既有节点图校验完全兼容。
+- 新增 `src/engine/social-state.ts`（善恶 ±100、声望 0–1000、逐 NPC 关系 ±100，钳制即时生效）与 `src/engine/dialogue-runtime.ts`（条件求值、可见选项过滤、装配期跨资源引用校验——坏引用只剔除相应选项、效果两阶段事务——先全量验证可行性再统一提交，任一被拒零变更且不转移节点）。`item-system.ts` 公开 `grantItems`/`removeItems` 提交原语；物品变动经 `item-count` 信号同步活动任务收集目标（进度可回退，文档明示）。
+- `dialogue-ui.ts` 支持场景注入的过滤/执行控制器与效果反馈行，无控制器时按纯跳转播放（向后兼容）；全部选项被过滤的节点按结束节点收束。GridScene 持有社会状态、接线对话装配第二遍引用校验，新增 F 键直接交谈，任务发布人 E 名录/F 对话双入口并在提示行并列显示。
+- 示例数据扩展（全原创）：马尚义对话按任务 offered/active/completed + 物品数量分支（接取、进度、放弃、交付回春膏并提升关系与声望）；沈墨涵残篇温和/强硬双交付（善恶分岔）；陆贞娘声望门槛与关系寒暄；顾夜尘带话提升关系（省略 npcId 的隐式目标）后解锁新选项；姜百味帮忙获赠清心丸。
+- 更新 README、ROADMAP、CHANGELOG、GDD、ARCHITECTURE 与 DATA-GUIDE（对话条件/效果规范、坏选项隔离与降级行为）。
+
+### 验证
+
+- `npm run build`：`tsc --noEmit` 与 Vite 生产构建通过，92 个模块；最终 JavaScript bundle 1,610.57 kB（gzip 424.95 kB），Vite 仍发出主 chunk 超过 500 kB 的建议。
+- 临时 Node/Rolldown/Ajv 冒烟检查 42 项全部通过：旧数据与新协议数据通过 Schema、未知字段/未知 kind/delta 0/越界值/空数组/缺失上下界被拒；正式对话图校验与条件/效果解析；开局 board 仅显示 2 个 offered 选项、对话接取快照收集进度 1/3、接取后选项集合切换；已激活任务再接取组合被拒且背包/任务零变更（回滚）；物品不足交付被拒；交付后活动任务收集目标 1→0 回退；满背包 giveItem 被拒；善恶 100+50 钳制 100；省略 npcId 的关系效果作用于对话对象；悬空引用选项剔除后节点变结束节点；对话放弃任务终态 failed。检查脚本与临时打包产物验证后删除，未新增正式自动化测试文件（基线计划为 Round 38）。
+- 主代理独立复核：再次运行 `npm run typecheck` 与 `npm run build` 均通过；新增 13 项临时 Rolldown 引擎回归，使用 `node_modules/.bin/rolldown tmp-r08-review-smoke.ts --platform node --format esm --file tmp-r08-review-smoke.mjs` 打包，再用 `node tmp-r08-review-smoke.mjs` 执行，检查正式 JSON Ajv/解析兼容、解析器拒绝未知条件/选项字段、重复接取/交付/发放时整组拒绝且任务/背包/社交状态零变更、悬空选项隔离与条件隐藏；13/13 通过，临时源码和 bundle 已删除。
+- 浏览器手动回归（本机 dev 5173 + Playwright）：地图加载无资料警告（仅历史存在的 favicon 404）；走到 (13,1) 提示"按 E 向「马尚义」查看差事 · F 交谈"；F 打开对话 greet 仅 2 选项（关系≥10 分支隐藏），board 仅 2 个 offered 接取（active/completed/交付分支隐藏），Enter 接取显示反馈"—— 已接取「巷口送药」"且 HUD 跟踪"备齐三份回春膏 2/3"；Esc 后 E 打开名录仍显示进行中 2/3（R07 行为保留）；顾夜尘带话显示"—— 与「顾夜尘」关系 +10"，再开对话 blade 节点出现关系≥10 的第三个选项（渐进解锁）。
+
+- 主代理独立浏览器复测（Codex 内置浏览器）：从开局沿走廊到马尚义 (11,1)，F 打开对话并通过 offered 分支接取「巷口送药」，反馈和任务 HUD 同步显示 2/3；Esc 后 E 仍打开任务名录并显示该任务进行中 2/3；重开 F 后 board 只显示 active 进度与另一项 offered 任务。随后在顾夜尘对话中完成带话选择，界面反馈关系 +10；重开对话后 blade 节点出现关系≥10 专属第三选项。浏览器控制台 error/warning 查询为空。
+
+### 未做与风险
+
+- 善恶/声望/关系与对话产生的任务、物品变动均为运行时内存态，刷新后回到新局；存档接入留给 Round 09。
+- 门派级声望统一规则、声望对商店价格/战斗的影响留给 Round 18；条件/效果协议目前不覆盖世界状态、时间与知识图谱（R11 起）。
+- 示例地图中姜百味 (9,1) 所在行1 中段被 (4,1) 沈墨涵与 (12,1) 马尚义两个占格 NPC 封锁、当前不可步行到达（历史布局遗留，非本轮改动引入）；其 giveItem 对话效果已由引擎冒烟覆盖，地图布局调整留给后续内容轮次。
+
+---
+
 ## Round 07 — 2026-09-27
 
 ### 计划与实现

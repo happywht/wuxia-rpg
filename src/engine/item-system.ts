@@ -702,6 +702,38 @@ function takeItem(inventory: InventoryState, itemId: string, quantity: number): 
 }
 
 // ---------------------------------------------------------------------------
+// Dialogue-effect commit primitives (Round 08)
+// ---------------------------------------------------------------------------
+
+/**
+ * Commit half of a pre-validated item grant (used by dialogue effects):
+ * callers verify headroom with {@link additionalCapacityFor} first, so this
+ * insert cannot overflow stacks or capacity. Mirrors the trade operations'
+ * split of "validate everything, then commit everything".
+ */
+export function grantItems(
+  inventory: InventoryState,
+  item: ItemRecordData,
+  quantity: number,
+): void {
+  insertItem(inventory, item, quantity);
+}
+
+/**
+ * Commit half of a pre-validated item removal (used by dialogue effects):
+ * callers verify ownership (and the one equipped instance being locked out)
+ * with {@link countItem} / {@link isEquipped} first, so this removal cannot
+ * go negative or strip an equipped item's stack.
+ */
+export function removeItems(
+  inventory: InventoryState,
+  itemId: string,
+  quantity: number,
+): void {
+  takeItem(inventory, itemId, quantity);
+}
+
+// ---------------------------------------------------------------------------
 // Equipment rules
 // ---------------------------------------------------------------------------
 

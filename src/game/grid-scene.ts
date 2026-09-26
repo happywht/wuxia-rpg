@@ -11,10 +11,18 @@ import { GridMap, parseGridMap } from '../engine/grid-map';
 import { cellCenterOffset, renderGridMap } from '../engine/grid-map-renderer';
 import {
   type DialogueData,
+  type DialogueSession,
   indexConversations,
   parseDialogueSet,
   validateConversation,
 } from '../engine/dialogue-graph';
+import {
+  type DialogueRuntimeContext,
+  applyDialogueEffects,
+  assembleDialogueReferences,
+  getVisibleOptions,
+} from '../engine/dialogue-runtime';
+import { type SocialState, createSocialState } from '../engine/social-state';
 import {
   assembleNpcPlacements,
   type NpcSetData,
@@ -71,7 +79,10 @@ import {
   createQuestJournal,
   parseQuestSet,
 } from '../engine/quest-system';
-import { DialoguePanel } from './dialogue-ui';
+import {
+  type DialogueConfirmOutcome,
+  DialoguePanel,
+} from './dialogue-ui';
 import { BattlePanel } from './combat-ui';
 import { InventoryPanel } from './inventory-ui';
 import { ShopPanel } from './shop-ui';
@@ -79,7 +90,8 @@ import { QuestPanel } from './quest-ui';
 
 /**
  * Round 03 grid scene, extended with the Round 04 progression datasets,
- * the Round 05 battle slice, Round 06 item/trade slice and Round 07 quests.
+ * the Round 05 battle slice, Round 06 item/trade slice, Round 07 quests and
+ * the Round 08 dialogue condition/effect runtime.
  *
  * The required map still loads through the generic data loader exactly like
  * Round 02 — manifest/schema/map failures remain fatal and land in the
@@ -91,7 +103,7 @@ import { QuestPanel } from './quest-ui';
  * registered at all, which shows the empty-interaction hint).
  *
  * NPCs are rendered at their data-declared walkable cells, block player
- * movement, and can be talked to with E while four-way adjacent. While the
+ * movement, and can be talked to while four-way adjacent. While the
  * dialogue panel is open, movement input is ignored and restored on close.
  * Every name and line of dialogue comes from `data/` — never from code.
  *
@@ -112,6 +124,14 @@ import { QuestPanel } from './quest-ui';
  * keep their dialogue; a dangling shop reference falls back to dialogue
  * with a warning). While either overlay is open, movement input stays
  * locked and is restored on close.
+ *
+ * Round 08 adds the in-memory social state (morality/renown/per-NPC
+ * relationships) and wires dialogue options through the Phaser-free
+ * condition/effect runtime: options whose conditions fail stay hidden, a
+ * node with no visible option closes like an end node, and confirming an
+ * option executes its effects atomically before the node transition (a
+ * refusal changes nothing). Quest givers keep their E quest board while F
+ * opens their dialogue directly, so both entry points coexist.
  */
 
 /** Stable resource ids from data/base/manifest.json — never hard-coded URLs. */
@@ -271,6 +291,9 @@ export class GridScene extends Phaser.Scene {
   /** Valid quest catalog and per-run journal (persistence arrives in R09). */
   private quests: ReadonlyMap<string, QuestData> = new Map();
   private questJournal: QuestJournal = { states: new Map(), trackedQuestId: null };
+
+  /** Round 08 social state (morality/renown/NPC relationships, in-memory). */
+  private social: SocialState = createSocialState();
 
   private dialoguePanel: DialoguePanel | null = null;
   private battlePanel: BattlePanel | null = null;
@@ -601,9 +624,29 @@ export class GridScene extends Phaser.Scene {
       });
     }
 
+    // Round 08: resolve condition/effect references now that quests, items
+    // and placed NPCs are all known. A dangling reference drops exactly its
+    // option; the conversation (and its referencing NPC) stays playable.
+    const placedNpcIds = new Set(placement.npcs.map((npc) => npc.record.id));
+    const dialogueReferences = assembleDialogueReferences({
+      conversations: dialogues,
+      quests: questAssembly.quests,
+      items: itemAssembly.items,
+      placedNpcIds,
+    });
+    for (const message of dialogueReferences.warnings) {
+      warnings.push({
+        resource: DIALOGUE_RESOURCE_ID,
+        origin: 'dialogue-assembly',
+        severity: 'warning',
+        message,
+        details: [],
+      });
+    }
+
     return {
       npcs: placement.npcs,
-      dialogues,
+      dialogues: dialogueReferences.conversations,
       progression: progressionAssembled.assembly,
       encounters,
       items: itemAssembly.items,
@@ -805,6 +848,7 @@ export class GridScene extends Phaser.Scene {
     this.shops = assembly.shops;
     this.quests = assembly.quests;
     this.questJournal = createQuestJournal(this.quests);
+    this.social = createSocialState();
     this.shopStocks.clear();
     for (const shop of this.shops.values()) {
       this.shopStocks.set(shop.record.id, createShopStockRuntime(shop));
@@ -1018,7 +1062,7 @@ export class GridScene extends Phaser.Scene {
     modWarnings: readonly Diagnostic[],
   ): void {
     this.add
-      .text(16, 14, '方向键 / WASD 移动 · 每次一格 · 墙体、边界与人物不可通行 · 邻近人物按 E · B 背包 · Q 任务', {
+      .text(16, 14, '方向键 / WASD 移动 · 每次一格 · 墙体、边界与人物不可通行 · 邻近人物按 E 交互 · F 交谈 · B 背包 · Q 任务', {
         fontFamily: UI.fontFamily,
         fontSize: '13px',
         color: UI.textMuted,
@@ -1117,9 +1161,9 @@ export class GridScene extends Phaser.Scene {
         npcTarget.record.questGiver &&
         [...this.quests.values()].some((quest) => quest.giverNpcId === npcTarget.record.id);
       const prompt = keepsShop
-        ? `按 E 与「${npcTarget.record.name}」交易`
+        ? `按 E 与「${npcTarget.record.name}」交易 · F 交谈`
         : keepsQuests
-          ? `按 E 向「${npcTarget.record.name}」查看差事`
+          ? `按 E 向「${npcTarget.record.name}」查看差事 · F 交谈`
           : `按 E 与「${npcTarget.record.name}」交谈`;
       this.interactText.setText(prompt);
       return;
@@ -1314,6 +1358,10 @@ export class GridScene extends Phaser.Scene {
     const onQuestJournal = (): void => this.toggleQuestJournal();
     questKey.on('down', onQuestJournal);
 
+    const talkKey = keyboard.addKey(KeyCodes.F);
+    const onTalk = (): void => this.tryTalk();
+    talkKey.on('down', onTalk);
+
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       for (const { key, onDown } of listeners) {
         key.off('down', onDown);
@@ -1321,6 +1369,7 @@ export class GridScene extends Phaser.Scene {
       interactKey.off('down', onInteract);
       backpackKey.off('down', onBackpack);
       questKey.off('down', onQuestJournal);
+      talkKey.off('down', onTalk);
       this.dialoguePanel?.destroy();
       this.dialoguePanel = null;
       this.battlePanel?.destroy();
@@ -1380,16 +1429,99 @@ export class GridScene extends Phaser.Scene {
         this.updateInteractHint();
         return;
       }
-      const panel = this.dialoguePanel;
-      const conversation = this.dialogues.get(target.record.dialogueId);
-      if (panel === null || conversation === undefined) {
-        return; // Defensive: placement already guarantees resolution.
-      }
-      panel.open(conversation, target.record.name);
-      this.updateInteractHint();
+      this.openDialogueWith(target);
       return;
     }
     this.tryStartBattle();
+  }
+
+  /**
+   * F key: talk to the four-way adjacent NPC directly. E keeps opening the
+   * quest board for quest givers (and the shop for shopkeepers), so both
+   * entry points stay reachable at the same time (Round 08).
+   */
+  private tryTalk(): void {
+    if (this.anyOverlayOpen()) {
+      return; // Whichever overlay is open owns the keyboard.
+    }
+    if (this.map === null) {
+      return;
+    }
+    const target = selectInteractionTarget(this.placedNpcs, {
+      col: this.playerCol,
+      row: this.playerRow,
+    });
+    if (target === null) {
+      return;
+    }
+    this.openDialogueWith(target);
+  }
+
+  /** Opens the dialogue panel for `target` with the runtime controller. */
+  private openDialogueWith(target: PlacedNpc): void {
+    const panel = this.dialoguePanel;
+    const conversation = this.dialogues.get(target.record.dialogueId);
+    if (panel === null || conversation === undefined) {
+      return; // Defensive: placement already guarantees resolution.
+    }
+    panel.open(conversation, target.record.name, {
+      visibleOptions: (node) =>
+        getVisibleOptions(node, this.dialogueContextFor(target.record.id)),
+      confirmOption: (session, visibleIndex) =>
+        this.confirmDialogueOption(target.record.id, session, visibleIndex),
+    });
+    this.updateInteractHint();
+  }
+
+  /** Assembles the runtime context one conversation runs against. */
+  private dialogueContextFor(speakerNpcId: string): DialogueRuntimeContext {
+    return {
+      quests: this.quests,
+      journal: this.questJournal,
+      items: this.items,
+      inventory: this.inventory,
+      social: this.social,
+      speakerNpcId,
+      npcNames: new Map(this.placedNpcs.map((npc) => [npc.record.id, npc.record.name])),
+    };
+  }
+
+  /**
+   * Controller confirm hook: validates the option's effects against the
+   * context, executes them atomically and advances the session only when
+   * everything committed. Quest transitions settle through the shared HUD
+   * path (experience, currency, notices); feedback lines surface in the
+   * dialogue panel. A refused effect leaves node, inventory, quests and
+   * social state untouched.
+   */
+  private confirmDialogueOption(
+    speakerNpcId: string,
+    session: DialogueSession,
+    visibleIndex: number,
+  ): DialogueConfirmOutcome {
+    const context = this.dialogueContextFor(speakerNpcId);
+    const visible = getVisibleOptions(session.currentNode, context);
+    const choice = visible[visibleIndex];
+    if (choice === undefined) {
+      return { advanced: false, feedback: null };
+    }
+    const effects = choice.option.effects ?? [];
+    if (effects.length > 0) {
+      const result = applyDialogueEffects(effects, context);
+      if (!result.ok) {
+        console.info('[dialogue] 效果被拒绝：%s', result.reason);
+        return { advanced: false, feedback: result.reason };
+      }
+      if (result.summary.questUpdate.changed) {
+        this.applyQuestUpdate(result.summary.questUpdate);
+      }
+      const feedback =
+        result.summary.lines.length > 0 ? result.summary.lines.join(' · ') : null;
+      session.choose(choice.index);
+      return { advanced: true, feedback };
+    }
+    session.choose(choice.index);
+    return { advanced: true, feedback: null };
   }
 
   /** Opens the battle overlay for the four-way adjacent encounter, if any. */

@@ -9,7 +9,18 @@
           "text": "小客官今日又来啦。新到的徽墨磨好了，正适合抄经——只是我看你眉间带雾，可是遇上了什么事？",
           "options": [
             { "text": "掌柜的，我想打听一册残缺的抄本。", "nextNodeId": "about-scroll" },
-            { "text": "没什么，随便看看。", "nextNodeId": "browse" }
+            { "text": "没什么，随便看看。", "nextNodeId": "browse" },
+            {
+              "text": "镇上有人托我，向你问声好。",
+              "nextNodeId": "goodwill",
+              "conditions": [{ "kind": "morality", "minValue": 5 }],
+              "effects": [{ "kind": "adjustRelationship", "npcId": "char.shen-mohan", "delta": 5 }]
+            },
+            {
+              "text": "（旁人正低声议论你做下的事）……掌柜的，墨多少钱一锭？",
+              "nextNodeId": "wary",
+              "conditions": [{ "kind": "morality", "maxValue": -5 }]
+            }
           ]
         },
         {
@@ -17,7 +28,31 @@
           "text": "残本？……你是说那册《洗髓残篇》？嘘——这话不能在铺子里讲。今夜子时，后巷灯下，我等你。",
           "options": [
             { "text": "好，子时见。", "nextNodeId": "agree" },
-            { "text": "掌柜的为何这般谨慎？", "nextNodeId": "why-careful" }
+            { "text": "掌柜的为何这般谨慎？", "nextNodeId": "why-careful" },
+            {
+              "text": "掌柜的，残篇就在我身上，现在交给你。",
+              "nextNodeId": "scroll-honest",
+              "conditions": [{ "kind": "itemCount", "itemId": "item.xisui-canpian", "minCount": 1 }],
+              "effects": [
+                { "kind": "takeItem", "itemId": "item.xisui-canpian", "quantity": 1 },
+                { "kind": "adjustRelationship", "npcId": "char.shen-mohan", "delta": 15 },
+                { "kind": "adjustMorality", "delta": 5 }
+              ]
+            },
+            {
+              "text": "（把残篇拍在柜上）少废话。这东西值多少，开个价。",
+              "nextNodeId": "scroll-bully",
+              "conditions": [
+                { "kind": "itemCount", "itemId": "item.xisui-canpian", "minCount": 1 },
+                { "kind": "morality", "maxValue": -5 }
+              ],
+              "effects": [
+                { "kind": "takeItem", "itemId": "item.xisui-canpian", "quantity": 1 },
+                { "kind": "adjustRelationship", "npcId": "char.shen-mohan", "delta": -10 },
+                { "kind": "adjustMorality", "delta": -10 },
+                { "kind": "adjustRenown", "delta": 2 }
+              ]
+            }
           ]
         },
         {
@@ -27,6 +62,22 @@
         {
           "id": "agree",
           "text": "记得独身前来，别叫人瞧见你与我同行。"
+        },
+        {
+          "id": "scroll-honest",
+          "text": "（沈墨涵双手接过残篇，指尖微微发颤，随即把它收进柜底的暗格）……你既肯亲手交还，我便信得过你。这份心，我记下了。子时之约作罢——有些话，倒不必非等到夜里说了。"
+        },
+        {
+          "id": "scroll-bully",
+          "text": "（他盯着你半晌，从柜底摸出几粒碎银丢在柜面上）……拿去。东西我收了，话说在前头——往后我这铺子，不招待你这样的客。"
+        },
+        {
+          "id": "goodwill",
+          "text": "镇口受伤的船家说，是位不肯留名的先生垫了药钱。……是你吧？抄书人眼睛毒，骗不过我。（他取下一筒新墨搁在柜上）这筒徽墨，算我谢你。"
+        },
+        {
+          "id": "wary",
+          "text": "……近来镇上有人夜里失了银钱。（他把算盘拨得脆响）我不问是谁做的，只劝一句：墨是黑的，写在纸上尚能洗心；刀口上沾的黑，洗不掉。"
         },
         {
           "id": "browse",
@@ -43,7 +94,20 @@
           "text": "客官走累了吧？粗茶两文一碗，坐下歇歇脚。今儿湖上雾重，怕是散不开了。",
           "options": [
             { "text": "来一碗。顺便问问，镇上近来可有生面孔？", "nextNodeId": "strangers" },
-            { "text": "多谢，我不渴。这雾是常有的么？", "nextNodeId": "fog" }
+            { "text": "多谢，我不渴。这雾是常有的么？", "nextNodeId": "fog" },
+            {
+              "text": "老板娘，近来镇上可有人提起我？",
+              "nextNodeId": "renowned",
+              "conditions": [{ "kind": "renown", "minValue": 5 }],
+              "effects": [{ "kind": "adjustRelationship", "npcId": "char.lu-zhenniang", "delta": 10 }]
+            },
+            {
+              "text": "贞娘，上回多谢你提点那背刀客的去向。",
+              "nextNodeId": "warm",
+              "conditions": [
+                { "kind": "npcRelationship", "npcId": "char.lu-zhenniang", "minValue": 10 }
+              ]
+            }
           ]
         },
         {
@@ -61,6 +125,14 @@
         {
           "id": "fog",
           "text": "入秋就这样。老辈人讲，雾锁湖面，是湖底下的人想上来透气呢——客官别当真，喝茶喝茶。"
+        },
+        {
+          "id": "renowned",
+          "text": "哟，可不是嘛！镇口那几家伤号的药钱，说是位年轻先生张罗的——茶棚里都传遍了。（她往你碗里又续了勺热水）这碗，算我请的。"
+        },
+        {
+          "id": "warm",
+          "text": "（她笑起来）你倒是记着。背刀的那位早走了，你放心——往后再有生面孔过镇，我先给你递个信儿。"
         },
         {
           "id": "thanks",
@@ -85,7 +157,18 @@
           "text": "三流剪径的毛贼，也敢挡路？……你身上有墨味，是镇上书铺的学徒？",
           "options": [
             { "text": "正是。阁下找的，可是书铺的人？", "nextNodeId": "search" },
-            { "text": "阁下为何守在这条路上？", "nextNodeId": "why-here" }
+            { "text": "阁下为何守在这条路上？", "nextNodeId": "why-here" },
+            {
+              "text": "顾兄，上回带的话，掌柜的已经收到了。",
+              "nextNodeId": "ally",
+              "conditions": [
+                { "kind": "npcRelationship", "npcId": "char.gu-yechen", "minValue": 10 }
+              ],
+              "effects": [
+                { "kind": "adjustRelationship", "npcId": "char.gu-yechen", "delta": 5 },
+                { "kind": "adjustRenown", "delta": 2 }
+              ]
+            }
           ]
         },
         {
@@ -93,7 +176,11 @@
           "text": "算你机灵。听着，替我带句话给你家掌柜：「旧账，过了今夜子时便要收了。」一个字都不许错。",
           "options": [
             { "text": "他到底欠了谁的账？", "nextNodeId": "debt" },
-            { "text": "……我一定带到。", "nextNodeId": "deliver" }
+            {
+              "text": "……我一定带到。",
+              "nextNodeId": "deliver",
+              "effects": [{ "kind": "adjustRelationship", "delta": 10 }]
+            }
           ]
         },
         {
@@ -103,6 +190,10 @@
         {
           "id": "deliver",
           "text": "嗯。去罢。"
+        },
+        {
+          "id": "ally",
+          "text": "（顾夜尘把刀归了鞘，抱拳一礼）话带到了，账便清了。你这份信义，比许多提刀的都硬。往后雾大路黑，报我的名字，好使。"
         },
         {
           "id": "why-here",
@@ -128,7 +219,22 @@
         },
         {
           "id": "wait",
-          "text": "好嘞！隔壁书铺的沈掌柜是个妙人，客官要寻章摘句，只管去他那儿坐坐。"
+          "text": "（货担斜在路边，几只木匣的盖子还敞着）唉，这副老骨头，越发的颠不得了。",
+          "options": [
+            {
+              "text": "我帮你把货担扶起来。",
+              "nextNodeId": "help-done",
+              "effects": [
+                { "kind": "giveItem", "itemId": "item.qingxin-wan", "quantity": 1 },
+                { "kind": "adjustRelationship", "npcId": "char.jiang-baiwei", "delta": 5 }
+              ]
+            },
+            { "text": "那我先去别处逛逛，回头再来。", "nextNodeId": "farewell" }
+          ]
+        },
+        {
+          "id": "help-done",
+          "text": "（货郎把担子稳稳落了肩，又从怀里摸出一粒蜡封的小丸塞给你）拿好拿好！清心丸，提神醒脑的——走方郎中的谢礼，不值几个钱，是个心意！"
         },
         {
           "id": "prized",
@@ -152,10 +258,95 @@
           "text": "马尚义把一卷新旧不一的告示压在石上：「镇里大事小事，都有人托我问个明白。你若想替人跑腿，看看有没有合意的差事。」",
           "options": [
             { "text": "我看看告示。", "nextNodeId": "board" },
-            { "text": "今日不接差事。", "nextNodeId": "leave" }
+            { "text": "今日不接差事。", "nextNodeId": "leave" },
+            {
+              "text": "马叔，镇上近来可还太平？",
+              "nextNodeId": "friendly",
+              "conditions": [
+                { "kind": "npcRelationship", "npcId": "char.ma-shangyi", "minValue": 10 }
+              ]
+            }
           ]
         },
-        { "id": "board", "text": "有劳。做成做不成，都请回来告我一声。" },
+        {
+          "id": "board",
+          "text": "有劳。做成做不成，都请回来告我一声。",
+          "options": [
+            {
+              "text": "巷口伤者缺药的事，我来跑腿。",
+              "nextNodeId": "quest-accepted",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.round-07-medicine-run", "status": "offered" }
+              ],
+              "effects": [
+                { "kind": "acceptQuest", "questId": "quest.round-07-medicine-run" }
+              ]
+            },
+            {
+              "text": "送药的差事，办得怎么样了？",
+              "nextNodeId": "quest-progress",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.round-07-medicine-run", "status": "active" }
+              ]
+            },
+            {
+              "text": "回春膏备齐了，这就交给你带去。",
+              "nextNodeId": "quest-delivered",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.round-07-medicine-run", "status": "completed" },
+                { "kind": "itemCount", "itemId": "item.huichun-gao", "minCount": 3 }
+              ],
+              "effects": [
+                { "kind": "takeItem", "itemId": "item.huichun-gao", "quantity": 3 },
+                { "kind": "adjustRelationship", "npcId": "char.ma-shangyi", "delta": 10 },
+                { "kind": "adjustRenown", "delta": 5 }
+              ]
+            },
+            {
+              "text": "疤脸刀客堵巷口的事，也交给我。",
+              "nextNodeId": "quest-accepted",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.round-07-clear-alley", "status": "offered" }
+              ],
+              "effects": [
+                { "kind": "acceptQuest", "questId": "quest.round-07-clear-alley" }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "quest-accepted",
+          "text": "好！有劳你了。要办的事方才都说清楚了，办成回来知会一声，酬金分文不少。"
+        },
+        {
+          "id": "quest-progress",
+          "text": "药还没备齐？不急。姜百味的担子里就有回春膏，银两一时不凑手，也先赊着——回头我替你补上。",
+          "options": [
+            { "text": "好，我再想想办法。", "nextNodeId": "board" },
+            {
+              "text": "这趟差事我怕是办不成了，抱歉。",
+              "nextNodeId": "quest-abandoned",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.round-07-medicine-run", "status": "active" }
+              ],
+              "effects": [
+                { "kind": "abandonQuest", "questId": "quest.round-07-medicine-run" }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "quest-abandoned",
+          "text": "……也罢，强扭的瓜不甜。差事我再托旁人，你自去忙你的。"
+        },
+        {
+          "id": "quest-delivered",
+          "text": "（马尚义接过药，掂了掂分量）齐了！我这就给人送去。你这份心意，镇上的乡邻都记着——往后有什么难处，尽管来寻我。"
+        },
+        {
+          "id": "friendly",
+          "text": "托你的福，巷口清净多了，孩子们又敢出门追跑了。你这样的年轻人，镇上多几个就好。"
+        },
         { "id": "leave", "text": "不妨事，路上留神便好。" }
       ]
     }

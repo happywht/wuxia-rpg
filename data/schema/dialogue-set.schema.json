@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://wuxia-rpg.invalid/schema/dialogue-set",
   "title": "对话集合",
-  "description": "对话集合 JSON 的静态结构契约：字段名、类型与长度。图语义（startNodeId 是否存在于 nodes、每个选项 nextNodeId 是否指向有效节点、节点 id 是否重复）由运行时的逐段对话校验补足，使单段坏对话只禁用自身而不拖垮整个集合。无 options 的节点是结束节点。",
+  "description": "对话集合 JSON 的静态结构契约：字段名、类型与长度。图语义（startNodeId 是否存在于 nodes、每个选项 nextNodeId 是否指向有效节点、节点 id 是否重复）由运行时的逐段对话校验补足，使单段坏对话只禁用自身而不拖垮整个集合。无 options 的节点是结束节点。Round 08 起选项可声明 conditions（全部满足才可见）与 effects（确认时原子执行）；条件/效果 kind 与字段为封闭枚举，未知字段或类型一律拒绝；跨资源 id（questId/itemId/npcId）由装配期校验，坏引用只剔除相应选项。",
   "type": "object",
   "additionalProperties": false,
   "required": ["conversations"],
@@ -64,6 +64,18 @@
                         "type": "string",
                         "minLength": 1,
                         "maxLength": 64
+                      },
+                      "conditions": {
+                        "type": "array",
+                        "description": "全部满足时该选项才可见；省略表示无条件。空数组无意义、被拒绝。",
+                        "minItems": 1,
+                        "items": { "$ref": "#/definitions/condition" }
+                      },
+                      "effects": {
+                        "type": "array",
+                        "description": "确认该选项时原子执行的效果（先全量校验后统一提交，任一失败不转移节点、不产生部分变更）；省略表示纯跳转。空数组无意义、被拒绝。",
+                        "minItems": 1,
+                        "items": { "$ref": "#/definitions/effect" }
                       }
                     }
                   }
@@ -73,6 +85,163 @@
           }
         }
       }
+    }
+  },
+  "definitions": {
+    "condition": {
+      "oneOf": [
+        {
+          "description": "指定任务处于该状态时成立。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "questId", "status"],
+          "properties": {
+            "kind": { "const": "questStatus" },
+            "questId": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "status": { "enum": ["locked", "offered", "active", "completed", "failed"] }
+          }
+        },
+        {
+          "description": "背包内指定物品数量不少于 minCount 时成立。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "itemId", "minCount"],
+          "properties": {
+            "kind": { "const": "itemCount" },
+            "itemId": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "minCount": { "type": "integer", "minimum": 1, "maximum": 999 }
+          }
+        },
+        {
+          "description": "玩家善恶值位于闭区间 [minValue, maxValue]（-100 至 100，正为善名）；minValue/maxValue 至少声明其一。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": {
+            "kind": { "const": "morality" },
+            "minValue": { "type": "integer", "minimum": -100, "maximum": 100 },
+            "maxValue": { "type": "integer", "minimum": -100, "maximum": 100 }
+          },
+          "anyOf": [{ "required": ["minValue"] }, { "required": ["maxValue"] }]
+        },
+        {
+          "description": "玩家声望位于闭区间 [minValue, maxValue]（0 至 1000）；至少声明其一。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": {
+            "kind": { "const": "renown" },
+            "minValue": { "type": "integer", "minimum": 0, "maximum": 1000 },
+            "maxValue": { "type": "integer", "minimum": 0, "maximum": 1000 }
+          },
+          "anyOf": [{ "required": ["minValue"] }, { "required": ["maxValue"] }]
+        },
+        {
+          "description": "与指定 NPC 的关系值位于闭区间 [minValue, maxValue]（-100 至 100）；至少声明其一。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "npcId"],
+          "properties": {
+            "kind": { "const": "npcRelationship" },
+            "npcId": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "minValue": { "type": "integer", "minimum": -100, "maximum": 100 },
+            "maxValue": { "type": "integer", "minimum": -100, "maximum": 100 }
+          },
+          "anyOf": [{ "required": ["minValue"] }, { "required": ["maxValue"] }]
+        }
+      ]
+    },
+    "effect": {
+      "oneOf": [
+        {
+          "description": "接取任务（要求其当前为 offered）。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "questId"],
+          "properties": {
+            "kind": { "const": "acceptQuest" },
+            "questId": { "type": "string", "minLength": 1, "maxLength": 64 }
+          }
+        },
+        {
+          "description": "放弃任务（要求其当前为 active，终态记为 failed）。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "questId"],
+          "properties": {
+            "kind": { "const": "abandonQuest" },
+            "questId": { "type": "string", "minLength": 1, "maxLength": 64 }
+          }
+        },
+        {
+          "description": "给予玩家物品（校验背包容量后入库）。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "itemId", "quantity"],
+          "properties": {
+            "kind": { "const": "giveItem" },
+            "itemId": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "quantity": { "type": "integer", "minimum": 1, "maximum": 99 }
+          }
+        },
+        {
+          "description": "从玩家背包扣除物品（校验数量；装备中的唯一实例不可被对话收走）。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "itemId", "quantity"],
+          "properties": {
+            "kind": { "const": "takeItem" },
+            "itemId": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "quantity": { "type": "integer", "minimum": 1, "maximum": 99 }
+          }
+        },
+        {
+          "description": "修善良恶值（-100 至 100，非零；结果按边界钳制）。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "delta"],
+          "properties": {
+            "kind": { "const": "adjustMorality" },
+            "delta": {
+              "allOf": [
+                { "type": "integer", "minimum": -100, "maximum": 100 },
+                { "not": { "enum": [0] } }
+              ]
+            }
+          }
+        },
+        {
+          "description": "修改声望（-1000 至 1000，非零；结果按边界钳制）。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "delta"],
+          "properties": {
+            "kind": { "const": "adjustRenown" },
+            "delta": {
+              "allOf": [
+                { "type": "integer", "minimum": -1000, "maximum": 1000 },
+                { "not": { "enum": [0] } }
+              ]
+            }
+          }
+        },
+        {
+          "description": "修改与 NPC 的关系值（-100 至 100，非零；结果按边界钳制）；省略 npcId 时作用于当前对话对象。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "delta"],
+          "properties": {
+            "kind": { "const": "adjustRelationship" },
+            "npcId": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "delta": {
+              "allOf": [
+                { "type": "integer", "minimum": -100, "maximum": 100 },
+                { "not": { "enum": [0] } }
+              ]
+            }
+          }
+        }
+      ]
     }
   }
 }

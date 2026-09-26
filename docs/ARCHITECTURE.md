@@ -1,6 +1,6 @@
 # 架构说明（ARCHITECTURE）
 
-- 状态：Round 03–06 的地图/NPC/对话、成长、战斗与物品/商店系统，以及 Round 07 的数据驱动任务集、Phaser 无关任务状态机和地图名录/日志接线均已落地；对话条件与效果仍按 Round 08 实现。
+- 状态：Round 03–07 的地图/NPC/对话、成长、战斗、物品/商店与任务系统，以及 Round 08 的对话条件/效果协议、社会状态（善恶/声望/NPC 关系）与跨系统原子效果运行时均已落地。
 - 关联：`docs/ADR.md`（技术选型依据）、`docs/DATA-GUIDE.md`（数据面细节）
 
 ---
@@ -43,6 +43,7 @@ Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id
 | 可选资源（NPC/对话/角色模板/门派/武学/战斗遭遇/物品/商店/任务）或其 schema 缺失、不可解析、schema 不符、未通过语义校验 | 降级为警告；场景继续装配其余内容 | 地图与移动不受影响；HUD 显示"已禁用相应内容"警告行，控制台保留结构化诊断 |
 | 单条 NPC 记录坏（引用不存在、坐标越界/阻挡、压出生点、同格冲突、id 重复） | 只禁用该 NPC，其余照常放置 | 同上；警告消息点名被禁用的 NPC 与原因 |
 | 单段对话坏（起始节点/选项引用断裂、节点 id 重复）或对话 id 重复 | 只禁用该对话及引用它的 NPC，其余照常 | 同上 |
+| 单个对话选项的条件/效果引用坏（questId/itemId/npcId 悬空） | 只剔除该选项；其所在节点可能因此成为结束节点，对话与其余选项照常 | 同上；警告点名对话、节点与被剔除的选项 |
 | 角色模板/门派条目 id 重复 | 保留先声明者并警告 | 同上；警告点名重复 id |
 | 单条武学坏（引用的门派不存在或已被禁用） | 只禁用该武学，其余照常索引 | 同上；警告点名被禁用的武学与悬空门派 id |
 | 单条遭遇坏（地图/模板/敌人武学引用断、触发格越界/阻挡/压出生点/NPC/其他遭遇格、id 重复） | 只禁用该遭遇，其余照常放置 | 同上；警告点名被禁用的遭遇与原因 |
@@ -61,7 +62,7 @@ Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id
 
 - 当前 schema 使用 draft-07：`manifest.schema.json`、`grid-map.schema.json`、`npc-set.schema.json`、`dialogue-set.schema.json`、`character-profiles.schema.json`、`faction-set.schema.json`、`martial-arts-set.schema.json`、`battle-encounters.schema.json`、`items-set.schema.json`、`shops-set.schema.json` 与 `quest-set.schema.json`；后续数据族各自补充契约。
 - Ajv 8.x 在加载期校验 manifest、基础资源和每份 MOD 覆盖（开发/生产相同），不在游戏循环内反复校验。
-- 跨字段规则分两层：单文件语义（地图尺寸/出生点；角色模板成长与起始资源；武学初始熟练度；消耗品必须恢复生命或内力）由按 schema id 注册的语义校验器补足；跨资源语义（NPC 的地图/对话；武学的门派；遭遇的地图/模板/武学；物品的起始模板引用；商店 NPC 与库存物品引用；任务发布 NPC、目标、前置任务及失败遭遇）由装配层逐条校验补足（`npc-placement.ts`、`dialogue-graph.ts`、`character-progression.ts`、`turn-based-combat.ts`、`item-system.ts`、`quest-system.ts`），失败只禁用受影响的最小条目。正式校验细节见 `docs/ADR.md` ADR-0004。
+- 跨字段规则分两层：单文件语义（地图尺寸/出生点；角色模板成长与起始资源；武学初始熟练度；消耗品必须恢复生命或内力）由按 schema id 注册的语义校验器补足；对话条件/效果的封闭 kind 枚举、字段白名单与值域由 Ajv schema（`additionalProperties: false` + 枚举/范围）拒绝、引擎防御解析（`parseDialogueSet`）二次兜底。跨资源语义（NPC 的地图/对话；武学的门派；遭遇的地图/模板/武学；物品的起始模板引用；商店 NPC 与库存物品引用；任务发布 NPC、目标、前置任务及失败遭遇；对话选项条件/效果对任务/物品/NPC 的引用）由装配层逐条校验补足（`npc-placement.ts`、`dialogue-graph.ts`、`character-progression.ts`、`turn-based-combat.ts`、`item-system.ts`、`quest-system.ts`、`dialogue-runtime.ts`），失败只禁用受影响的最小条目。正式校验细节见 `docs/ADR.md` ADR-0004。
 - 错误输出为结构化诊断（来源、资源、消息和字段路径），可被事件总线订阅并显示在场景。
 
 ## 4. mod 覆盖：同名文件优先级（Round 02 已提供基础能力，Round 35 增强作者工具）
@@ -93,6 +94,7 @@ Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id
 - Round 05 的 `turn-based-combat.ts` 是与 Phaser 无关的战斗引擎：遭遇集合解析与跨资源装配（单条失败只禁用该遭遇）、固定协议的伤害/治疗公式、`CombatSession` 交替回合状态机（玩家行动 + 确定性敌方回应在一次调用内完成）、行动可用性校验（无效/内力不足不偷回合）、胜利经验经 Round 04 API 恰好一次结算、失败按数据比例恢复、撤退零奖励，全部输出为可读战报条目。Phaser 呈现只出现在 `src/game/combat-ui.ts`（资源条、行动列表、战报）与场景装配中：遭遇敌人占格阻挡、四方向邻接 E 开战、面板打开期间移动锁定、一次性遭遇完成后本次运行休眠（刷新重置）。
 - Round 06 的 `item-system.ts` 与 Phaser 无关，负责物品/商店解析、引用装配、背包、容量/堆叠、消耗、装备、角色属性同步与原子买卖；`CharacterState.baseAttributes` 保存成长值，`attributes` 为叠加装备后的有效值，升级只改基础值后重算装备效果。`inventory-ui.ts` / `shop-ui.ts` 与 GridScene 负责背包/商店呈现、NPC 交互和移动锁。运行状态仅在内存中，持久化留到 Round 09。
 - Round 07 的 `quest-system.ts` 与 Phaser 无关，负责任务集合防御解析、重复 id 与 NPC/物品/遭遇/前置引用校验、前置循环隔离、状态机、目标进度、失败/放弃、单一跟踪目标和完成奖励结果。`collectItem` 目标在接取时以当前物品数量初始化，之后按背包变化的绝对数量同步；`defeatEncounter` 仅响应胜利信号，配置的失败遭遇在战斗失败时终止任务。完成状态保证奖励只生成一次；奖励由 GridScene 通过成长引擎和库存货币更新。`quest-ui.ts` 与 GridScene 负责 E 键发布人名录、Q 键任务日志和移动锁。任务状态/奖励不持久化，刷新重置，存档留到 Round 09。
+- Round 08 的 `social-state.ts` 与 `dialogue-runtime.ts` 同样与 Phaser 无关：前者持有运行时善恶（±100）、声望（0–1000）与逐 NPC 关系（±100）标量并提供边界钳制；后者提供对话选项的条件求值（任务状态/物品数量/善恶/声望/NPC 关系，全满足才可见）、装配期引用校验（坏引用只剔除相应选项）与效果事务执行（接取/放弃任务、给予/扣除物品、修善良恶/声望/关系——先全量验证可行性，再统一提交，任一被拒即零变更且不转移节点）。物品增减经 `item-system.ts` 公开的提交原语并按 `item-count` 信号同步活动任务收集目标（进度可随交付回退）；对话接取走 `quest-system.ts` 既有原子路径。`dialogue-ui.ts` 支持场景注入的条件过滤与效果执行钩子，无控制器的旧对话按纯跳转播放；GridScene 新增 F 键直接交谈，任务发布人保留 E 名录双入口。社会状态不持久化，刷新重置，存档留到 Round 09；门派级声望统一规则留到 Round 18。
 
 ## 变更记录
 
@@ -106,3 +108,4 @@ Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id
 | 2026-09-27 | Round 05 | 武学战斗作用与起始武学契约、战斗遭遇契约与资料、Phaser 无关战斗会话引擎、遭遇逐条隔离与战斗面板/地图接线 |
 | 2026-09-27 | Round 06 | 物品/商店 Schema 与资料、背包/装备/交易规则引擎、角色装备属性同步、背包与地图商店 UI |
 | 2026-09-27 | Round 07 | 任务集契约与跨引用校验、Phaser 无关任务状态机、发布人名录/任务日志及物品/战斗联动 |
+| 2026-09-27 | Round 08 | 对话条件/效果协议与逐选项隔离、社会状态标量引擎、跨系统原子效果事务及 F 键交谈双入口 |
