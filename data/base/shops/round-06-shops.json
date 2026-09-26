@@ -1,0 +1,19 @@
+{
+  "shops": [
+    {
+      "id": "shop.jiang-baiwei-peddler-cart",
+      "name": "姜百味百宝担",
+      "npcId": "char.jiang-baiwei",
+      "greeting": "客官留步——伤药丸散、防身的家伙什，担子里百样俱全，童叟无欺！看中哪样，言语一声便是。",
+      "sellRate": 0.6,
+      "stock": [
+        { "itemId": "item.huichun-gao", "quantity": -1 },
+        { "itemId": "item.qingxin-wan", "quantity": 5 },
+        { "itemId": "item.wuji-dan", "quantity": 2 },
+        { "itemId": "item.qingtong-bijian", "quantity": 1 },
+        { "itemId": "item.fanbu-duanhe", "quantity": 2 },
+        { "itemId": "item.suwen-yupei", "quantity": 1 }
+      ]
+    }
+  ]
+}

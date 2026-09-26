@@ -22,6 +22,12 @@
  * martial-art list, validated per reference by
  * {@link resolveStartingMartialArts} against the indexed arts.
  *
+ * Round 06 splits runtime attributes into `baseAttributes` (level-up growth,
+ * capped) and `attributes` (effective = base + equipment bonuses, what combat
+ * reads), adds `equipmentBonuses` to the state and the profile's starting
+ * economy (`startingCurrency`/`inventoryCapacity`/`startingItems` — validated
+ * per reference by the item system at assembly time).
+ *
  * Joining, practicing and persistence remain out of scope (Rounds 09/13+):
  * character state lives in runtime objects only.
  */
@@ -81,6 +87,19 @@ export interface CharacterProfileData {
   /** Martial-art ids the character starts with (validated per reference at
    * assembly time by {@link resolveStartingMartialArts}). */
   startingMartialArtIds: string[];
+  /** Starting money for the Round 06 item economy (0 allowed). */
+  startingCurrency: number;
+  /** Backpack capacity in distinct item stacks (Round 06). */
+  inventoryCapacity: number;
+  /** Starting item declarations (Round 06); references and quantities are
+   * validated per entry at assembly time by the item system. */
+  startingItems: StartingItemDeclarationData[];
+}
+
+/** Wire format of one `startingItems` entry (Round 06). */
+export interface StartingItemDeclarationData {
+  itemId: string;
+  quantity: number;
 }
 
 /** Wire format of a character-profiles JSON file under `data/base/characters/`. */
@@ -347,6 +366,25 @@ export function parseCharacterProfileSet(raw: unknown): SetParseResult<Character
         })()
       : null;
 
+    // Round 06: starting economy and backpack declaration.
+    const startingCurrency = requireIntegerInRange(entry.startingCurrency, 0, 999_999);
+    const inventoryCapacity = requireIntegerInRange(entry.inventoryCapacity, 1, 99);
+    const startingItems = Array.isArray(entry.startingItems)
+      ? (() => {
+          const declarations: StartingItemDeclarationData[] = [];
+          for (const declaration of entry.startingItems) {
+            const source = isPlainObject(declaration) ? declaration : null;
+            const itemId = source === null ? null : requireNonEmptyString(source.itemId);
+            const quantity = source === null ? null : requireIntegerInRange(source.quantity, 1, 999);
+            if (itemId === null || quantity === null) {
+              return null;
+            }
+            declarations.push({ itemId, quantity });
+          }
+          return declarations;
+        })()
+      : null;
+
     const progressionSource = isPlainObject(entry.progression) ? entry.progression : null;
     const baseExperience =
       progressionSource === null
@@ -396,6 +434,17 @@ export function parseCharacterProfileSet(raw: unknown): SetParseResult<Character
     if (startingMartialArtIds === null) {
       problems.push(`${label}.startingMartialArtIds：应为武学 id 字符串数组（可为空数组）`);
     }
+    if (startingCurrency === null) {
+      problems.push(`${label}.startingCurrency：应为 0–999999 的整数`);
+    }
+    if (inventoryCapacity === null) {
+      problems.push(`${label}.inventoryCapacity：应为 1–99 的整数（按物品堆数计）`);
+    }
+    if (startingItems === null) {
+      problems.push(
+        `${label}.startingItems：应为起始物品声明数组（itemId 非空字符串、quantity 1–999 整数）`,
+      );
+    }
     if (baseExperience === null || experiencePerLevel === null) {
       problems.push(`${label}.progression：应含 baseExperience（正整数）与 experiencePerLevel（非负整数）`);
     }
@@ -427,6 +476,9 @@ export function parseCharacterProfileSet(raw: unknown): SetParseResult<Character
       startingExperience === null ||
       attributeCap === null ||
       startingMartialArtIds === null ||
+      startingCurrency === null ||
+      inventoryCapacity === null ||
+      startingItems === null ||
       baseExperience === null ||
       experiencePerLevel === null ||
       problems.length > 0
@@ -449,6 +501,9 @@ export function parseCharacterProfileSet(raw: unknown): SetParseResult<Character
       growth,
       derivedStats,
       startingMartialArtIds,
+      startingCurrency,
+      inventoryCapacity,
+      startingItems,
     });
   });
 
@@ -795,15 +850,33 @@ export interface CharacterVitals {
   max: number;
 }
 
+/** Equipment-granted bonuses (Round 06); maintained by the item system. */
+export interface EquipmentBonusData {
+  attributes: PartialAttributeMap;
+  health: number;
+  qi: number;
+}
+
 /** Runtime-only state (this round never persists it; saves arrive in Round 09). */
 export interface CharacterState {
   profileId: string;
   level: number;
   /** Cumulative experience; level-ups settle whenever experience is granted. */
   experience: number;
+  /**
+   * Base attributes: level-up growth accumulates here (capped by
+   * `attributeCap`), never mixed with equipment bonuses.
+   */
+  baseAttributes: AttributeMap;
+  /**
+   * Effective attributes: base + equipment bonuses (Round 06). Combat and all
+   * other consumers read these; without equipment they equal the base values.
+   */
   attributes: AttributeMap;
   health: CharacterVitals;
   qi: CharacterVitals;
+  /** Equipment bonuses currently applied to {@link attributes} and the maxima. */
+  equipmentBonuses: EquipmentBonusData;
   /**
    * Martial-art ids the character has mastered. Copied verbatim from the
    * profile's declared starting list; callers validate the references first
@@ -819,6 +892,7 @@ export interface CharacterState {
  * both vitals full. The declared starting point is taken verbatim — if the
  * data happens to declare enough starting experience for a level-up, that
  * settles on the next {@link grantExperience} call, not implicitly here.
+ * Equipment bonuses start at zero (nothing equipped).
  */
 export function createCharacterState(profile: CharacterProfileData): CharacterState {
   const { healthMax, qiMax } = computeVitalMaxima(
@@ -830,11 +904,32 @@ export function createCharacterState(profile: CharacterProfileData): CharacterSt
     profileId: profile.id,
     level: profile.startingLevel,
     experience: profile.startingExperience,
+    baseAttributes: { ...profile.attributes },
     attributes: { ...profile.attributes },
     health: { current: healthMax, max: healthMax },
     qi: { current: qiMax, max: qiMax },
+    equipmentBonuses: { attributes: {}, health: 0, qi: 0 },
     martialArtIds: [...profile.startingMartialArtIds],
   };
+}
+
+/**
+ * Applies a new set of equipment bonuses (Round 06): stores them on the state
+ * and recomputes the effective attributes from the untouched base values, so
+ * re-equipping never compounds and level-up growth is never rolled back. The
+ * caller owns vital-maximum adjustment and current-value clamping (see the
+ * item system); level-ups refresh both through this same function.
+ */
+export function applyEquipmentBonuses(state: CharacterState, bonuses: EquipmentBonusData): void {
+  state.equipmentBonuses = {
+    attributes: { ...bonuses.attributes },
+    health: bonuses.health,
+    qi: bonuses.qi,
+  };
+  for (const attributeId of ATTRIBUTE_IDS) {
+    state.attributes[attributeId] =
+      state.baseAttributes[attributeId] + (bonuses.attributes[attributeId] ?? 0);
+  }
 }
 
 /**
@@ -874,13 +969,14 @@ export interface ExperienceGainResult {
 
 /**
  * Grants experience and settles every resulting level-up in one pass:
- * attributes grow by the profile's per-level amounts (capped at
- * `attributeCap`), vital maxima recompute from the data formulas, and the
- * maxima delta heals into the current values (a fully healthy character
- * stays fully healthy). Experience beyond the max-level threshold is
- * discarded — max level does not bank experience. Non-positive or non-finite
- * amounts are no-ops. Mutates `state`; the same profile that created it must
- * be supplied on every call.
+ * base attributes grow by the profile's per-level amounts (capped at
+ * `attributeCap` — equipment bonuses never eat into the cap), effective
+ * attributes resynchronize as base + equipment, vital maxima recompute from
+ * the data formulas plus the equipment bonuses, and the maxima delta heals
+ * into the current values (a fully healthy character stays fully healthy).
+ * Experience beyond the max-level threshold is discarded — max level does not
+ * bank experience. Non-positive or non-finite amounts are no-ops. Mutates
+ * `state`; the same profile that created it must be supplied on every call.
  */
 export function grantExperience(
   profile: CharacterProfileData,
@@ -905,8 +1001,8 @@ export function grantExperience(
     state.level += 1;
     levelsGained += 1;
     for (const attributeId of ATTRIBUTE_IDS) {
-      state.attributes[attributeId] = Math.min(
-        state.attributes[attributeId] + profile.growth[attributeId],
+      state.baseAttributes[attributeId] = Math.min(
+        state.baseAttributes[attributeId] + profile.growth[attributeId],
         profile.attributeCap,
       );
     }
@@ -922,11 +1018,17 @@ export function grantExperience(
   }
 
   if (levelsGained > 0) {
+    applyEquipmentBonuses(state, state.equipmentBonuses); // Resync effective attributes.
     const { healthMax, qiMax } = computeVitalMaxima(profile, state.level, state.attributes);
-    state.health.max = healthMax;
-    state.qi.max = qiMax;
-    state.health.current = Math.min(state.health.current + (healthMax - previousHealthMax), healthMax);
-    state.qi.current = Math.min(state.qi.current + (qiMax - previousQiMax), qiMax);
+    const newHealthMax = healthMax + state.equipmentBonuses.health;
+    const newQiMax = qiMax + state.equipmentBonuses.qi;
+    state.health.max = newHealthMax;
+    state.qi.max = newQiMax;
+    state.health.current = Math.min(
+      state.health.current + (newHealthMax - previousHealthMax),
+      newHealthMax,
+    );
+    state.qi.current = Math.min(state.qi.current + (newQiMax - previousQiMax), newQiMax);
   }
 
   return { levelsGained, discardedExperience };

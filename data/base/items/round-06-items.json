@@ -1,0 +1,97 @@
+{
+  "items": [
+    {
+      "id": "item.huichun-gao",
+      "name": "回春膏",
+      "description": "走方郎中按古法熬制的黑色药膏，敷在伤口上凉丝丝的，是江湖人抡刀弄棒之余的保命恩物。",
+      "category": "consumable",
+      "stackLimit": 9,
+      "buyPrice": 15,
+      "sellPrice": 6,
+      "consumable": {
+        "healthRestore": 25,
+        "qiRestore": 0
+      }
+    },
+    {
+      "id": "item.qingxin-wan",
+      "name": "清心丸",
+      "description": "以薄荷、远志等清浅药材合成的褐色小丸，含在舌下微微发麻，能帮行气之人凝神续力。",
+      "category": "consumable",
+      "stackLimit": 9,
+      "buyPrice": 12,
+      "sellPrice": 5,
+      "consumable": {
+        "healthRestore": 0,
+        "qiRestore": 15
+      }
+    },
+    {
+      "id": "item.wuji-dan",
+      "name": "无极丹",
+      "description": "药担底层压箱的丸药，朱砂色的外壳上印着一个圈。据说服下后气血脉络一齐暖开，伤疲俱轻。",
+      "category": "consumable",
+      "stackLimit": 9,
+      "buyPrice": 25,
+      "sellPrice": 10,
+      "consumable": {
+        "healthRestore": 15,
+        "qiRestore": 15
+      }
+    },
+    {
+      "id": "item.qingtong-bijian",
+      "name": "青铜笔剑",
+      "description": "形如一管放大了的紫毫笔，笔杆中灌铅、锋端开刃，是读书人遮遮掩掩的防身巧器，握在手里竟颇为趁手。",
+      "category": "equipment",
+      "stackLimit": 1,
+      "buyPrice": 60,
+      "sellPrice": 24,
+      "equipment": {
+        "slot": "weapon",
+        "attributeBonuses": { "force": 2 },
+        "healthBonus": 0,
+        "qiBonus": 0
+      }
+    },
+    {
+      "id": "item.fanbu-duanhe",
+      "name": "帆布短褐",
+      "description": "双层粗帆布纳成的短打，针脚密得像账房先生的字。挡不得兵刃，却能让寻常拳脚卸去三分力。",
+      "category": "equipment",
+      "stackLimit": 1,
+      "buyPrice": 40,
+      "sellPrice": 16,
+      "equipment": {
+        "slot": "garment",
+        "attributeBonuses": { "body": 2 },
+        "healthBonus": 10,
+        "qiBonus": 0
+      }
+    },
+    {
+      "id": "item.suwen-yupei",
+      "name": "素纹玉佩",
+      "description": "一角带云纹的青白玉佩，入手温润。佩久了人说心神安定、气息绵长，真假无从考证，戴着总归体面。",
+      "category": "equipment",
+      "stackLimit": 1,
+      "buyPrice": 80,
+      "sellPrice": 32,
+      "equipment": {
+        "slot": "ornament",
+        "attributeBonuses": { "resolve": 1 },
+        "healthBonus": 0,
+        "qiBonus": 10
+      }
+    },
+    {
+      "id": "item.xisui-canpian",
+      "name": "洗髓残篇",
+      "description": "半册水渍斑斑的旧抄本，字迹残缺难辨，只依稀认得出几行经脉走向的图谱。书铺掌柜叮嘱过：不可示人。",
+      "category": "misc",
+      "stackLimit": 1,
+      "buyPrice": 0,
+      "sellPrice": 0
+    }
+  ]
+}

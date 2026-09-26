@@ -23,6 +23,10 @@ export interface NpcRecordData {
   mapResourceId: string;
   position: CellPosition;
   dialogueId: string;
+  /** Optional shop this NPC keeps (Round 06); null = dialogue-only NPC.
+   * Resolution against assembled shops happens at interaction time, so a
+   * dangling reference simply falls back to `dialogueId` with a warning. */
+  shopId: string | null;
 }
 
 /** Wire format of an npc-set JSON file under `data/base/characters/`. */
@@ -72,6 +76,9 @@ export function parseNpcSet(raw: unknown): NpcSetParseResult {
     const name = requireNonEmptyString(entry.name);
     const mapResourceId = requireNonEmptyString(entry.mapResourceId);
     const dialogueId = requireNonEmptyString(entry.dialogueId);
+    // Round 06: optional shop reference; anything but a non-empty string is
+    // treated as "no shop" rather than a per-NPC failure.
+    const shopId = requireNonEmptyString(entry.shopId);
     const position = isPlainObject(entry.position) ? entry.position : null;
     const col = position === null ? null : requireInteger(position.col);
     const row = position === null ? null : requireInteger(position.row);
@@ -109,6 +116,7 @@ export function parseNpcSet(raw: unknown): NpcSetParseResult {
       name,
       mapResourceId,
       dialogueId,
+      shopId,
       position: { col, row },
     });
   });

@@ -34,6 +34,16 @@
       "id": "encounter.round-05-set",
       "path": "battles/round-05-encounters.json",
       "schema": "battle-encounters"
+    },
+    {
+      "id": "item.round-06-set",
+      "path": "items/round-06-items.json",
+      "schema": "items-set"
+    },
+    {
+      "id": "shop.round-06-set",
+      "path": "shops/round-06-shops.json",
+      "schema": "shops-set"
     }
   ],
   "enabledMods": []

@@ -20,6 +20,14 @@
       "mapResourceId": "map.round-01-grid",
       "position": { "col": 12, "row": 3 },
       "dialogueId": "dlg.gu-yechen-roadside"
+    },
+    {
+      "id": "char.jiang-baiwei",
+      "name": "姜百味",
+      "mapResourceId": "map.round-01-grid",
+      "position": { "col": 9, "row": 1 },
+      "dialogueId": "dlg.jiang-baiwei-peddler",
+      "shopId": "shop.jiang-baiwei-peddler-cart"
     }
   ]
 }

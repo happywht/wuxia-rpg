@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wuxia-rpg.invalid/schema/shops-set",
+  "title": "商店集合",
+  "description": "商店集合 JSON 的静态结构契约：字段名、类型与取值范围。商店名称、欢迎文案、卖出比例与货架库存全部由数据表达。跨资源语义（npcId 指向有效且已放置的 NPC、stock 的 itemId 指向有效物品、货架内 itemId 不重复）由场景装配层逐条校验，坏引用只剔除对应商店或货架条目。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["shops"],
+  "properties": {
+    "shops": {
+      "type": "array",
+      "description": "商店条目列表；允许空数组表达暂无商店。id 在集合内应保持唯一。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "npcId", "greeting", "sellRate", "stock"],
+        "properties": {
+          "id": {
+            "description": "稳定商店 id，建议前缀 shop.，如 shop.jiang-baiwei-peddler-cart。",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+          },
+          "name": {
+            "description": "商店显示名称（原创名称）。",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32
+          },
+          "npcId": {
+            "description": "开店 NPC 的 id；须为已加载且放置成功的 NPC。玩家与该 NPC 相邻按 E 打开本商店。",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+          },
+          "greeting": {
+            "description": "进店欢迎文案（原创文本）。",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "sellRate": {
+            "description": "出售比率：实际所得 = floor(物品 sellPrice × sellRate)。1 表示原价回收，通常低于 1。",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "stock": {
+            "description": "货架库存，按物品 id 声明；quantity 为本局剩余可购数量，-1 表示无限供应。",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["itemId", "quantity"],
+              "properties": {
+                "itemId": {
+                  "description": "物品 id，须存在于已加载的物品集合。",
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+                },
+                "quantity": {
+                  "description": "本局库存数量；-1 表示无限供应，0–999999 为有限库存（买入减一、卖回加一）。",
+                  "type": "integer",
+                  "minimum": -1,
+                  "maximum": 999999
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

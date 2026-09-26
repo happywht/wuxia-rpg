@@ -45,21 +45,37 @@ import {
   type PlacedEncounter,
   selectEncounterTarget,
 } from '../engine/turn-based-combat';
+import {
+  type AssembledShop,
+  type InventoryState,
+  type ItemRecordData,
+  type ShopSetData,
+  type ShopStockRuntime,
+  assembleShops,
+  createInventoryState,
+  createShopStockRuntime,
+  indexItems,
+  parseItemSet,
+  parseShopSet,
+  resolveStartingItems,
+} from '../engine/item-system';
 import { DialoguePanel } from './dialogue-ui';
 import { BattlePanel } from './combat-ui';
+import { InventoryPanel } from './inventory-ui';
+import { ShopPanel } from './shop-ui';
 
 /**
- * Round 03 grid scene, extended with the Round 04 progression datasets and
- * the Round 05 battle slice.
+ * Round 03 grid scene, extended with the Round 04 progression datasets,
+ * the Round 05 battle slice and the Round 06 item/trade slice.
  *
  * The required map still loads through the generic data loader exactly like
  * Round 02 — manifest/schema/map failures remain fatal and land in the
  * readable error panel. NPC, dialogue, character-profile, faction,
- * martial-art and battle-encounter resources are *optional* content on top
- * of that: each failing NPC, conversation, dataset, single martial art or
- * single encounter is disabled individually with a warning, and the map
- * stays fully playable without them (or with none registered at all, which
- * shows an explicit "no one to talk to" hint).
+ * martial-art, battle-encounter, item and shop resources are *optional*
+ * content on top of that: each failing NPC, conversation, dataset, single
+ * martial art, single encounter, item or shop is disabled individually with
+ * a warning, and the map stays fully playable without them (or with none
+ * registered at all, which shows an explicit "no one to talk to" hint).
  *
  * NPCs are rendered at their data-declared walkable cells, block player
  * movement, and can be talked to with E while four-way adjacent. While the
@@ -69,12 +85,20 @@ import { BattlePanel } from './combat-ui';
  * Round 05 places data-declared encounters the same way: the enemy marker
  * blocks its cell, the approach prompt shows while four-way adjacent, and E
  * opens the battle overlay (movement locked while it is open, restored on
- * close). The player's runtime state is created from the first valid
- * encounter's profile with its starting martial arts validated; victory
- * experience settles through the Round 04 progression engine, defeat
- * restores by the encounter's declared ratios, and a completed
- * non-repeatable encounter stays dormant until the page reloads (saves
- * arrive in Round 09).
+ * close). Victory experience settles through the Round 04 progression
+ * engine, defeat restores by the encounter's declared ratios, and a
+ * completed non-repeatable encounter stays dormant until the page reloads
+ * (saves arrive in Round 09).
+ *
+ * Round 06 creates the player's runtime state from the first valid
+ * character profile — independent of encounters — together with a runtime
+ * inventory (starting money, capacity and per-reference-validated starting
+ * stacks) and per-run shop stock. B toggles a keyboard backpack (use
+ * consumables, equip/unequip with attribute/vital effects flowing into
+ * combat); an adjacent NPC keeping a valid shop opens it with E (other NPCs
+ * keep their dialogue; a dangling shop reference falls back to dialogue
+ * with a warning). While either overlay is open, movement input stays
+ * locked and is restored on close.
  */
 
 /** Stable resource ids from data/base/manifest.json — never hard-coded URLs. */
@@ -85,6 +109,8 @@ const CHARACTER_PROFILE_RESOURCE_ID = 'character-profile.round-04-set';
 const FACTION_RESOURCE_ID = 'faction.round-04-set';
 const MARTIAL_ART_RESOURCE_ID = 'martial-art.round-04-set';
 const ENCOUNTER_RESOURCE_ID = 'encounter.round-05-set';
+const ITEM_RESOURCE_ID = 'item.round-06-set';
+const SHOP_RESOURCE_ID = 'shop.round-06-set';
 
 const VIEW_WIDTH = 960;
 const VIEW_HEIGHT = 540;
@@ -119,7 +145,7 @@ const UI = {
   fontFamily: 'sans-serif',
 } as const;
 
-/** Optional resources (NPC/dialogue/progression/battle content) this scene can lose without dying. */
+/** Optional resources (NPC/dialogue/progression/battle/trade content) this scene can lose without dying. */
 const OPTIONAL_RESOURCE_IDS = new Set([
   NPC_RESOURCE_ID,
   DIALOGUE_RESOURCE_ID,
@@ -127,6 +153,8 @@ const OPTIONAL_RESOURCE_IDS = new Set([
   FACTION_RESOURCE_ID,
   MARTIAL_ART_RESOURCE_ID,
   ENCOUNTER_RESOURCE_ID,
+  ITEM_RESOURCE_ID,
+  SHOP_RESOURCE_ID,
 ]);
 
 /** Optional-content schemas; schema-level failures carry no resource id, so match by origin. */
@@ -137,6 +165,8 @@ const OPTIONAL_SCHEMA_ORIGINS = new Set([
   'schema:faction-set',
   'schema:martial-arts-set',
   'schema:battle-encounters',
+  'schema:items-set',
+  'schema:shops-set',
 ]);
 
 function isOptionalContentDiagnostic(diagnostic: Diagnostic): boolean {
@@ -175,6 +205,8 @@ interface WorldAssembly {
   dialogues: ReadonlyMap<string, DialogueData>;
   progression: ProgressionAssembly;
   encounters: PlacedEncounter[];
+  items: ReadonlyMap<string, ItemRecordData>;
+  shops: ReadonlyMap<string, AssembledShop>;
   warnings: Diagnostic[];
 }
 
@@ -207,12 +239,22 @@ export class GridScene extends Phaser.Scene {
   /** Marker graphics per encounter id, removed when a foe is defeated. */
   private encounterMarkers = new Map<string, Phaser.GameObjects.GameObject[]>();
 
-  /** Player runtime state; created from the first valid encounter's profile. */
+  /** Player runtime state; created from the first valid character profile
+   * (Round 06: independent of encounters, so the backpack works even when
+   * battle data is missing or invalid). */
   private playerProfile: CharacterProfileData | null = null;
   private playerState: CharacterState | null = null;
 
+  /** Validated item/shop datasets and per-run trade state (Round 06). */
+  private items: ReadonlyMap<string, ItemRecordData> = new Map();
+  private shops: ReadonlyMap<string, AssembledShop> = new Map();
+  private readonly shopStocks = new Map<string, ShopStockRuntime>();
+  private inventory: InventoryState | null = null;
+
   private dialoguePanel: DialoguePanel | null = null;
   private battlePanel: BattlePanel | null = null;
+  private inventoryPanel: InventoryPanel | null = null;
+  private shopPanel: ShopPanel | null = null;
   private activeSession: CombatSession | null = null;
   private activeEncounter: PlacedEncounter | null = null;
 
@@ -270,6 +312,14 @@ export class GridScene extends Phaser.Scene {
           },
           'battle-encounters': (value) => {
             const parsed = parseBattleEncounterSet(value);
+            return parsed.ok ? [] : parsed.errors;
+          },
+          'items-set': (value) => {
+            const parsed = parseItemSet(value);
+            return parsed.ok ? [] : parsed.errors;
+          },
+          'shops-set': (value) => {
+            const parsed = parseShopSet(value);
             return parsed.ok ? [] : parsed.errors;
           },
         },
@@ -415,6 +465,41 @@ export class GridScene extends Phaser.Scene {
     const progressionAssembled = this.assembleProgressionContent(resources);
     warnings.push(...progressionAssembled.warnings);
 
+    // Items first, then shops: shop stock references resolve against the
+    // indexed items, and NPC shop references resolve against assembled shops.
+    const itemAssembly = this.assembleItemContent(resources);
+    warnings.push(...itemAssembly.warnings);
+
+    const shopAssembly = assembleShops({
+      shopSet: itemAssembly.shopSet,
+      placedNpcIds: new Set(placement.npcs.map((npc) => npc.record.id)),
+      items: itemAssembly.items,
+    });
+    for (const message of shopAssembly.warnings) {
+      warnings.push({
+        resource: SHOP_RESOURCE_ID,
+        origin: 'shop-assembly',
+        severity: 'warning',
+        message,
+        details: [],
+      });
+    }
+
+    // A shopkeeper NPC whose shopId fails to resolve falls back to its
+    // dialogue — worth a warning so authors can fix the reference.
+    for (const npc of placement.npcs) {
+      if (npc.record.shopId !== null && !shopAssembly.shops.has(npc.record.shopId)) {
+        warnings.push({
+          resource: NPC_RESOURCE_ID,
+          origin: 'shop-assembly',
+          severity: 'warning',
+          message: `NPC "${npc.record.id}"（${npc.record.name}）引用的商店 "${npc.record.shopId}" 不存在或已因校验失败被禁用，交互回落到对话`,
+          details: [],
+        });
+      }
+    }
+
+
     // Encounters resolve against the map, placed NPCs, profiles and arts.
     let encounters: PlacedEncounter[] = [];
     let encounterSet: BattleEncounterSetData | null = null;
@@ -458,6 +543,8 @@ export class GridScene extends Phaser.Scene {
       dialogues,
       progression: progressionAssembled.assembly,
       encounters,
+      items: itemAssembly.items,
+      shops: shopAssembly.shops,
       warnings,
     };
   }
@@ -571,6 +658,66 @@ export class GridScene extends Phaser.Scene {
     return { assembly: { profiles, factions, martialArts }, warnings };
   }
 
+  /**
+   * Assembles the optional Round 06 item dataset and parses the shop set.
+   * Structural failures disable the whole resource with a warning; duplicate
+   * item ids keep the first declaration. A missing (unregistered) resource
+   * is legitimate — the world then simply has no items or shops. Nothing
+   * here can block the map. Shop cross-references run in
+   * {@link assembleOptionalContent} once NPC placement is known.
+   */
+  private assembleItemContent(
+    resources: ReadonlyMap<string, LoadedResource>,
+  ): { items: ReadonlyMap<string, ItemRecordData>; shopSet: ShopSetData | null; warnings: Diagnostic[] } {
+    const warnings: Diagnostic[] = [];
+
+    let items = new Map<string, ItemRecordData>();
+    const itemResource = resources.get(ITEM_RESOURCE_ID);
+    if (itemResource !== undefined) {
+      const parsed = parseItemSet(itemResource.value);
+      if (!parsed.ok) {
+        warnings.push({
+          resource: ITEM_RESOURCE_ID,
+          origin: 'item-assembly',
+          severity: 'warning',
+          message: '物品资料结构不合规，本轮禁用全部物品与交易',
+          details: parsed.errors,
+        });
+      } else {
+        const index = indexItems(parsed.set);
+        for (const id of index.duplicateIds) {
+          warnings.push({
+            resource: ITEM_RESOURCE_ID,
+            origin: 'item-assembly',
+            severity: 'warning',
+            message: `物品 id "${id}" 重复，保留先声明者`,
+            details: [],
+          });
+        }
+        items = index.byId;
+      }
+    }
+
+    let shopSet: ShopSetData | null = null;
+    const shopResource = resources.get(SHOP_RESOURCE_ID);
+    if (shopResource !== undefined) {
+      const parsed = parseShopSet(shopResource.value);
+      if (!parsed.ok) {
+        warnings.push({
+          resource: SHOP_RESOURCE_ID,
+          origin: 'shop-assembly',
+          severity: 'warning',
+          message: '商店资料结构不合规，本轮禁用全部商店',
+          details: parsed.errors,
+        });
+      } else {
+        shopSet = parsed.set;
+      }
+    }
+
+    return { items, shopSet, warnings };
+  }
+
   private setupWorld(
     map: GridMap,
     assembly: WorldAssembly,
@@ -590,26 +737,37 @@ export class GridScene extends Phaser.Scene {
         encounter,
       ]),
     );
+    this.items = assembly.items;
+    this.shops = assembly.shops;
+    this.shopStocks.clear();
+    for (const shop of this.shops.values()) {
+      this.shopStocks.set(shop.record.id, createShopStockRuntime(shop));
+    }
 
-    // The player's runtime state is created from the first valid encounter's
-    // profile, with the profile's starting martial arts validated per
-    // reference (broken ones drop with a warning). Profiles differing from
-    // the first encounter's are reported so authors can fix the data.
+    // The player's runtime state is created from the first valid character
+    // profile (Round 06: independent of encounters, so the backpack works
+    // even when battle data is missing or invalid). Starting martial arts
+    // and starting items are validated per reference — broken ones drop
+    // with a warning. Encounters declaring a different profile are reported
+    // so authors can fix the data.
     const playerWarnings: string[] = [];
-    const firstEncounter = assembly.encounters[0];
-    if (firstEncounter !== undefined) {
-      this.playerProfile = firstEncounter.profile;
-      this.playerState = createCharacterState(firstEncounter.profile);
-      const starting = resolveStartingMartialArts(
-        firstEncounter.profile,
+    const firstProfile = assembly.progression.profiles.values().next().value ?? null;
+    if (firstProfile !== null && firstProfile !== undefined) {
+      this.playerProfile = firstProfile;
+      this.playerState = createCharacterState(firstProfile);
+      const startingArts = resolveStartingMartialArts(
+        firstProfile,
         assembly.progression.martialArts,
       );
-      this.playerState.martialArtIds = [...starting.ids];
-      playerWarnings.push(...starting.warnings);
-      for (const encounter of assembly.encounters.slice(1)) {
-        if (encounter.profile.id !== firstEncounter.profile.id) {
+      this.playerState.martialArtIds = [...startingArts.ids];
+      playerWarnings.push(...startingArts.warnings);
+      const startingItems = resolveStartingItems(firstProfile, assembly.items);
+      this.inventory = createInventoryState(firstProfile, startingItems.stacks);
+      playerWarnings.push(...startingItems.warnings);
+      for (const encounter of assembly.encounters) {
+        if (encounter.profile.id !== firstProfile.id) {
           playerWarnings.push(
-            `遭遇 "${encounter.record.id}" 声明的角色模板 "${encounter.profile.id}" 与首次创建玩家所用模板 "${firstEncounter.profile.id}" 不同，仍沿用后者`,
+            `遭遇 "${encounter.record.id}" 声明的角色模板 "${encounter.profile.id}" 与首次创建玩家所用模板 "${firstProfile.id}" 不同，仍沿用后者`,
           );
         }
       }
@@ -621,11 +779,13 @@ export class GridScene extends Phaser.Scene {
     // Progression datasets surface their loaded counts in the console so
     // authors can confirm their JSON actually landed.
     console.info(
-      '[progression] 已加载角色模板 %d 个、门派 %d 个、武学 %d 种、战斗遭遇 %d 处',
+      '[progression] 已加载角色模板 %d 个、门派 %d 个、武学 %d 种、战斗遭遇 %d 处、物品 %d 种、商店 %d 家',
       this.progression.profiles.size,
       this.progression.factions.size,
       this.progression.martialArts.size,
       this.encounters.length,
+      this.items.size,
+      this.shops.size,
     );
 
     this.mapOrigin.set(
@@ -656,6 +816,12 @@ export class GridScene extends Phaser.Scene {
     });
     this.battlePanel = new BattlePanel(this, {
       onClose: () => this.settleBattleClose(),
+    });
+    this.inventoryPanel = new InventoryPanel(this, {
+      onClose: () => this.updateInteractHint(), // Movement is keyed off isOpen.
+    });
+    this.shopPanel = new ShopPanel(this, {
+      onClose: () => this.updateInteractHint(), // Movement is keyed off isOpen.
     });
     this.updateInteractHint();
   }
@@ -767,7 +933,7 @@ export class GridScene extends Phaser.Scene {
     modWarnings: readonly Diagnostic[],
   ): void {
     this.add
-      .text(16, 14, '方向键 / WASD 移动 · 每次一格 · 墙体、边界与人物不可通行 · 邻近人物按 E 交谈', {
+      .text(16, 14, '方向键 / WASD 移动 · 每次一格 · 墙体、边界与人物不可通行 · 邻近人物按 E 交谈 · B 背包', {
         fontFamily: UI.fontFamily,
         fontSize: '13px',
         color: UI.textMuted,
@@ -784,7 +950,7 @@ export class GridScene extends Phaser.Scene {
 
     const lines: { text: string; shown: boolean }[] = [
       {
-        text: '部分可选资料（NPC/对话/角色模板/门派/武学/战斗遭遇）无效，已禁用相应内容（详情见控制台）',
+        text: '部分可选资料（NPC/对话/角色模板/门派/武学/战斗遭遇/物品/商店）无效，已禁用相应内容（详情见控制台）',
         shown: optionalWarnings.length > 0,
       },
       {
@@ -836,11 +1002,7 @@ export class GridScene extends Phaser.Scene {
     if (this.interactText === null) {
       return;
     }
-    if (this.dialoguePanel !== null && this.dialoguePanel.isOpen) {
-      this.interactText.setText('');
-      return;
-    }
-    if (this.battlePanel !== null && this.battlePanel.isOpen) {
+    if (this.anyOverlayOpen()) {
       this.interactText.setText('');
       return;
     }
@@ -855,7 +1017,13 @@ export class GridScene extends Phaser.Scene {
             row: this.playerRow,
           });
     if (npcTarget !== null) {
-      this.interactText.setText(`按 E 与「${npcTarget.record.name}」交谈`);
+      const keepsShop =
+        npcTarget.record.shopId !== null && this.shops.has(npcTarget.record.shopId);
+      this.interactText.setText(
+        keepsShop
+          ? `按 E 与「${npcTarget.record.name}」交易`
+          : `按 E 与「${npcTarget.record.name}」交谈`,
+      );
       return;
     }
     const encounterTarget = selectEncounterTarget(this.activeEncounters(), {
@@ -871,6 +1039,41 @@ export class GridScene extends Phaser.Scene {
       return;
     }
     this.interactText.setText('');
+  }
+
+  /** True while any keyboard overlay owns the input (dialogue/battle/backpack/shop). */
+  private anyOverlayOpen(): boolean {
+    return (
+      (this.dialoguePanel !== null && this.dialoguePanel.isOpen) ||
+      (this.battlePanel !== null && this.battlePanel.isOpen) ||
+      (this.inventoryPanel !== null && this.inventoryPanel.isOpen) ||
+      (this.shopPanel !== null && this.shopPanel.isOpen)
+    );
+  }
+
+  /** B key: open the backpack while free, close it while it is open. */
+  private toggleBackpack(): void {
+    const panel = this.inventoryPanel;
+    if (panel === null) {
+      return;
+    }
+    if (panel.isOpen) {
+      panel.close();
+      return;
+    }
+    if (this.anyOverlayOpen()) {
+      return; // Another overlay owns the keyboard right now.
+    }
+    if (this.playerProfile === null || this.playerState === null || this.inventory === null) {
+      return; // No playable profile this run: no backpack.
+    }
+    panel.open({
+      profile: this.playerProfile,
+      character: this.playerState,
+      inventory: this.inventory,
+      items: this.items,
+    });
+    this.updateInteractHint();
   }
 
   private bindMovementKeys(): void {
@@ -903,39 +1106,59 @@ export class GridScene extends Phaser.Scene {
     const onInteract = (): void => this.handleInteraction();
     interactKey.on('down', onInteract);
 
+    const backpackKey = keyboard.addKey(KeyCodes.B);
+    const onBackpack = (): void => this.toggleBackpack();
+    backpackKey.on('down', onBackpack);
+
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       for (const { key, onDown } of listeners) {
         key.off('down', onDown);
       }
       interactKey.off('down', onInteract);
+      backpackKey.off('down', onBackpack);
       this.dialoguePanel?.destroy();
       this.dialoguePanel = null;
       this.battlePanel?.destroy();
       this.battlePanel = null;
+      this.inventoryPanel?.destroy();
+      this.inventoryPanel = null;
+      this.shopPanel?.destroy();
+      this.shopPanel = null;
       this.activeSession = null;
       this.activeEncounter = null;
     });
   }
 
   /**
-   * E key: talk to the four-way adjacent NPC, if any (nearest, id
-   * tie-break); otherwise start the four-way adjacent encounter, if any.
+   * E key: the four-way adjacent NPC opens its shop when it keeps a valid
+   * one (nearest, id tie-break) and otherwise talks; with no NPC adjacent,
+   * the four-way adjacent encounter starts, if any.
    */
   private handleInteraction(): void {
-    const panel = this.dialoguePanel;
-    if (panel === null || panel.isOpen) {
-      return; // Never re-open or switch conversations while one is open.
-    }
-    if (this.battlePanel !== null && this.battlePanel.isOpen) {
-      return; // The battle overlay owns the keyboard while it is open.
+    if (this.anyOverlayOpen()) {
+      return; // Whichever overlay is open owns the keyboard.
     }
     const target = selectInteractionTarget(this.placedNpcs, {
       col: this.playerCol,
       row: this.playerRow,
     });
     if (target !== null) {
+      const shop =
+        target.record.shopId === null ? undefined : this.shops.get(target.record.shopId);
+      const stock = shop === undefined ? undefined : this.shopStocks.get(shop.record.id);
+      if (shop !== undefined && stock !== undefined && this.inventory !== null) {
+        this.shopPanel?.open({
+          shop,
+          stock,
+          inventory: this.inventory,
+          items: this.items,
+        });
+        this.updateInteractHint();
+        return;
+      }
+      const panel = this.dialoguePanel;
       const conversation = this.dialogues.get(target.record.dialogueId);
-      if (conversation === undefined) {
+      if (panel === null || conversation === undefined) {
         return; // Defensive: placement already guarantees resolution.
       }
       panel.open(conversation, target.record.name);
@@ -973,14 +1196,8 @@ export class GridScene extends Phaser.Scene {
   private tryMove(dCol: number, dRow: number): void {
     const map = this.map;
     const marker = this.marker;
-    if (
-      map === null ||
-      marker === null ||
-      this.moving ||
-      (this.dialoguePanel !== null && this.dialoguePanel.isOpen) ||
-      (this.battlePanel !== null && this.battlePanel.isOpen)
-    ) {
-      return; // Also locked while a dialogue or battle panel is open.
+    if (map === null || marker === null || this.moving || this.anyOverlayOpen()) {
+      return; // Also locked while a dialogue, battle, backpack or shop panel is open.
     }
 
     const targetCol = this.playerCol + dCol;

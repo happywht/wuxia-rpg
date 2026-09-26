@@ -1,0 +1,139 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wuxia-rpg.invalid/schema/items-set",
+  "title": "物品集合",
+  "description": "物品集合 JSON 的静态结构契约：字段名、类型与取值范围。五项核心属性键（body/force/agility/insight/resolve）与装备槽枚举（weapon/garment/ornament）属于通用协议；名称、说明、价格、叠加上限与消耗/装备效果数值全部由数据表达。跨字段语义（consumable 类至少一项恢复为正、效果字段与类别匹配）由 if/then 与运行时解析器补足；跨资源语义（商店货架、角色起始物品对物品 id 的引用）由场景装配层逐条校验。",
+  "definitions": {
+    "attributeBonusMap": {
+      "description": "部分核心属性到装备加成的映射；省略的属性加成为 0。",
+      "type": "object",
+      "propertyNames": {
+        "enum": ["body", "force", "agility", "insight", "resolve"]
+      },
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 99
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["items"],
+  "properties": {
+    "items": {
+      "type": "array",
+      "description": "物品条目列表；允许空数组表达暂无物品定义。id 在集合内应保持唯一。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "description", "category", "stackLimit", "buyPrice", "sellPrice"],
+        "properties": {
+          "id": {
+            "description": "稳定物品 id，建议前缀 item.，如 item.huichun-gao。",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+          },
+          "name": {
+            "description": "物品显示名称（原创名称）。",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32
+          },
+          "description": {
+            "description": "物品说明（原创文本）。",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "category": {
+            "description": "物品类别（通用协议）：consumable 可使用恢复生命/内力；equipment 可装备到槽位并生效加成；misc 既不可使用也不可装备（任务物、材料等）。",
+            "type": "string",
+            "enum": ["consumable", "equipment", "misc"]
+          },
+          "stackLimit": {
+            "description": "同格堆叠上限；同一物品最多持有该数量（装备类通常为 1）。",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 999
+          },
+          "buyPrice": {
+            "description": "商店买入基价（每件）；0 表示不出售给玩家的定价参考，商店是否上架由 shops 资料的 stock 决定。",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 999999
+          },
+          "sellPrice": {
+            "description": "出售基价（每件）；实际所得 = floor(sellPrice × 商店 sellRate)。0 表示不可出售。",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 999999
+          },
+          "consumable": {
+            "description": "消耗效果（category 为 consumable 时必填）；使用一件恢复对应数值，受当前上限钳制。至少一项为正由运行时解析器校验。",
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["healthRestore", "qiRestore"],
+            "properties": {
+              "healthRestore": {
+                "description": "每件恢复的生命值。",
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9999
+              },
+              "qiRestore": {
+                "description": "每件恢复的内力值。",
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9999
+              }
+            }
+          },
+          "equipment": {
+            "description": "装备效果（category 为 equipment 时必填）；装备到声明的槽位后按数值提升角色有效属性与生命/内力上限。",
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["slot", "attributeBonuses", "healthBonus", "qiBonus"],
+            "properties": {
+              "slot": {
+                "description": "装备槽（通用协议）：weapon 兵刃、garment 衣装、ornament 配饰；每槽同时只装一件。",
+                "type": "string",
+                "enum": ["weapon", "garment", "ornament"]
+              },
+              "attributeBonuses": {
+                "description": "装备提供的属性加成。",
+                "$ref": "#/definitions/attributeBonusMap"
+              },
+              "healthBonus": {
+                "description": "装备提供的生命上限加成。",
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9999
+              },
+              "qiBonus": {
+                "description": "装备提供的内力上限加成。",
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9999
+              }
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": { "category": { "const": "consumable" } }
+            },
+            "then": { "required": ["consumable"] }
+          },
+          {
+            "if": {
+              "properties": { "category": { "const": "equipment" } }
+            },
+            "then": { "required": ["equipment"] }
+          }
+        ]
+      }
+    }
+  }
+}

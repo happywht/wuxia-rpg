@@ -47,7 +47,12 @@
             }
           },
           "dialogueId": {
-            "description": "NPC 默认对话的 id，须存在于已加载的对话集合资源中。",
+            "description": "NPC 默认对话的 id，须存在于已加载的对话集合资源中；当 NPC 的 shopId 无效或商店被禁用时，交互回落到这段对话。",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+          },
+          "shopId": {
+            "description": "可选：该 NPC 经营的商店 id（Round 06）。玩家与 NPC 相邻按 E 打开该商店；引用须指向已装配的有效商店，坏引用回落到 dialogueId 对话并给出可读警告。",
             "type": "string",
             "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
           }

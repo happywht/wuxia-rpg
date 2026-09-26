@@ -121,7 +121,10 @@
           "progression",
           "growth",
           "derivedStats",
-          "startingMartialArtIds"
+          "startingMartialArtIds",
+          "startingCurrency",
+          "inventoryCapacity",
+          "startingItems"
         ],
         "properties": {
           "id": {
@@ -215,6 +218,38 @@
             "items": {
               "type": "string",
               "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+            }
+          },
+          "startingCurrency": {
+            "description": "起始银两数（Round 06）。",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 999999
+          },
+          "inventoryCapacity": {
+            "description": "背包容量（Round 06）：按不同物品的堆数计，相同物品叠满 stackLimit 仍只占一堆。",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 99
+          },
+          "startingItems": {
+            "description": "起始物品声明（Round 06）：itemId 须指向已加载的有效物品、数量为 1–999 的正整数；引用存在性、数量不超过 stackLimit 与堆数不超过 inventoryCapacity 由运行时装配逐条校验，坏引用只跳过该条。",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["itemId", "quantity"],
+              "properties": {
+                "itemId": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+                },
+                "quantity": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 999
+                }
+              }
             }
           }
         }

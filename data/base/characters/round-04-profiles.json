@@ -48,6 +48,13 @@
       "startingMartialArtIds": [
         "skill.jianghu-sanshou",
         "skill.tuna-yangqi-jue"
+      ],
+      "startingCurrency": 120,
+      "inventoryCapacity": 12,
+      "startingItems": [
+        { "itemId": "item.xisui-canpian", "quantity": 1 },
+        { "itemId": "item.huichun-gao", "quantity": 2 },
+        { "itemId": "item.qingxin-wan", "quantity": 1 }
       ]
     }
   ]

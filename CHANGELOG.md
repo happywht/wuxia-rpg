@@ -4,6 +4,23 @@
 
 ## [Unreleased]
 
+### Added (Round 06)
+
+- 物品/商店资料契约：新增 draft-07 `items-set` / `shops-set` Schema 与 manifest 资源，原创 7 件物品（3 消耗品、3 装备、1 不可交易杂物）及 1 家数据驱动商店/地图货郎；角色模板声明 120 银两、12 堆背包容量与 4 件起始物品。
+- Phaser 无关物品引擎 `src/engine/item-system.ts`：物品与商店解析/索引/跨引用装配、坏库存条目和重复 id 隔离、起始物品逐条校验、容量与堆叠上限、消耗品恢复生命/内力、装备槽与属性/生命/内力加成、有效属性与等级成长分离、购买/出售原子校验及商店库存变动；拒绝非正交易数量，防止异常数量污染货币/库存。
+- 键盘 UI 与地图接线：B 打开背包（查看银两/容量/属性/装备/物品，Enter 使用或装备/卸下）；与数据声明的相邻商人按 E 开店，可在购买/出售页签间切换并逐件交易；所有覆盖层打开时移动锁定、关闭后恢复。玩家状态改由角色模板独立创建，不再依赖有效战斗遭遇；无遭遇数据时背包仍可运行。坏商店引用回退到 NPC 原对话并给出警告。
+
+### Changed (Round 06)
+
+- 扩展角色模板 Schema/运行时状态：新增 `startingCurrency`、`inventoryCapacity`、`startingItems`；`CharacterState` 分离基础属性与装备后的有效属性，升级只增长基础属性并重新应用装备加成。
+- 扩展 NPC `shopId` 可选字段及 Schema；原 NPC 对话字段不变，商店引用有效时 E 打开商店，无效时仍可交谈。
+- 可选内容警告涵盖物品和商店；两类资源/schema 缺失或错误不会阻断地图、NPC、对话、成长或战斗。
+
+### Verification (Round 06)
+
+- `npm run build` 通过（88 模块）；临时 Node/Ajv 冒烟 70 项通过（正式数据 schema、坏输入、起始物品、堆叠/容量、消耗、装备与升级、交易原子性、购买/出售非正数量、装备后的战斗属性），脚本已删除。
+- 浏览器手动回归：背包显示初始银两/物品/属性；使用恢复品、装备并查看属性变化；相邻商人购买/出售；面板打开锁定移动且关闭后恢复。Phaser 主 bundle 仍高于 Vite 的 500 kB 建议阈值，详见 DEVLOG。
+
 ### Added (Round 05)
 
 - 战斗数据契约与资料：martial-arts Schema 新增必填 `combat`（kind: attack/heal、power 1–999、qiCost 0–99），六种既有武学全部补上战斗作用（江湖散手攻击 8/耗 0、吐纳养气诀恢复 12/耗 6、拦门刀法攻击 14/耗 4、听雨剑法攻击 22/耗 10、铁嶂桩功攻击 18/耗 8、云隐身法攻击 10/耗 3）；character-profiles Schema 新增必填 `startingMartialArtIds`（唯一 id 数组，可为空），初始模板声明「江湖散手 + 吐纳养气诀」两式起始武学；新增 draft-07 `battle-encounters` Schema 与首份原创遭遇资料 `data/base/battles/round-05-encounters.json`（`encounter.round-05-set` 登记进 manifest）：「巷口拦路刀客」驻守 (1, 7) 可走格，敌人「疤脸刀客」五项属性/生命 60/内力 16/两式武学、胜利经验 40、失败恢复比例 0.6/0.6、repeatable false 与接近/开战/胜利/失败/撤退五条原创提示文本全部来自 JSON。
