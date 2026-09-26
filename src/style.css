@@ -1,0 +1,14 @@
+/* Round 00: minimal shell styling — the Phaser canvas fills the viewport. */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #0b0e14;
+}
+
+#app {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}

@@ -1,0 +1,23 @@
+{
+  "name": "wuxia-rpg",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "description": "原创中文武侠 RPG（数据优先架构；受文曲星系列掌上 RPG 广泛玩法原则启发的独立新作，不含任何原作内容）",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "phaser": "^4.2.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^8.3.1"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}
