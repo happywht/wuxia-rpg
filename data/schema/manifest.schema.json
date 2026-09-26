@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wuxia-rpg.invalid/schema/manifest",
+  "title": "资料清单（manifest）",
+  "description": "枚举基础资源与启用的 MOD。path 是 data/base/ 下的相对路径；modId 通过同样的路径段规则约束。跨字段的动态校验（如 MOD 文件是否存在）由运行时加载器负责。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["resources", "enabledMods"],
+  "properties": {
+    "resources": {
+      "type": "array",
+      "minItems": 1,
+      "description": "基础资源条目；id 在清单内应保持稳定，供代码按 id 取用。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "path", "schema"],
+        "properties": {
+          "id": {
+            "description": "稳定资源 id，如 map.round-01-grid。",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+          },
+          "path": {
+            "description": "data/base/ 下的相对 JSON 路径，段首字符不能是点（拒绝 ../ 穿越、隐藏文件），不允许反斜杠与空段。",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_\\-\\u4e00-\\u9fff][A-Za-z0-9._\\-\\u4e00-\\u9fff]*(/[A-Za-z0-9_\\-\\u4e00-\\u9fff][A-Za-z0-9._\\-\\u4e00-\\u9fff]*)*$"
+          },
+          "schema": {
+            "description": "JSON Schema 短 id；加载器会请求 data/schema/<id>.schema.json。",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+          }
+        }
+      }
+    },
+    "enabledMods": {
+      "type": "array",
+      "description": "按声明顺序叠加的 MOD id 列表；后启用的 MOD 覆盖先启用的。",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9_\\-\\u4e00-\\u9fff][A-Za-z0-9._\\-\\u4e00-\\u9fff]*$"
+      }
+    }
+  }
+}

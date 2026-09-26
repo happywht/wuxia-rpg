@@ -4,12 +4,12 @@
 
 - 设计文档：`docs/GDD.md`
 - 逐轮路线图（R00–R50）：`ROADMAP.md`
-- 当前进度：**Round 01 完成；下一轮 Round 02（数据加载器、正式 Schema 校验与事件总线）**
+- 当前进度：**Round 02 完成；下一轮 Round 03（NPC 放置、交互与基础对话）**
 
 ## 范围
 
-- ✅ 已完成（R00–R01）：可构建工程、设计基线、数据驱动网格地图、方向键/WASD 单格移动、墙体与边界碰撞；缺失或无效地图会显示可读错误。
-- ❌ 后续轮次：通用数据加载器、正式 JSON Schema 校验与事件总线（Round 02 起）；测试基线（Round 38 起）。Round 01 仅对地图契约做必要的运行时结构检查。
+- ✅ 已完成（R00–R02）：可构建工程、设计基线、数据驱动网格地图与移动、manifest 资料加载、Ajv JSON Schema 校验、typed EventBus、同路径 MOD 覆盖；缺失或无效关键资料会显示可读错误。
+- ❌ 后续轮次：NPC、对话及其余玩法按路线图逐轮实现；测试基线（Round 38 起）。
 - 永久边界：不做多人联网；不含原作内容；mod 仅限同名 JSON 覆盖（见 `docs/DATA-GUIDE.md`）。
 
 ## 技术栈（版本已核验并冻结，见 `docs/ADR.md`）
@@ -19,7 +19,8 @@
 | TypeScript | `^5.9.3` | 5.x 成熟线；升 6/7 另立 ADR |
 | Phaser | `^4.2.1` | 官方 v3.90 已宣告"很可能为 v3 末版"，活跃线在 v4 |
 | Vite | `^8.3.1` | 要求 Node `^20.19.0 \|\| >=22.12.0` |
-| Ajv（后续） | `^8.20.0` | R02 接入数据校验 |
+| Ajv | `^8.20.0` | R02 起校验 manifest、基础资源与 MOD |
+| `@types/node` | `^26.6.3` | Vite MOD 静态分发插件的开发期类型 |
 | Vitest（后续） | `^4.1.11` | R38 接入测试 |
 
 ## 前提条件
@@ -37,7 +38,7 @@ npm run preview    # 预览生产构建
 npm run typecheck  # 仅类型检查
 ```
 
-> Round 01 验证：`npm run build` 与浏览器手动操作已成功；生产构建提示 Phaser 主包 chunk 超过 500 kB，后续性能/打包轮次再评估拆分。地图 JSON 位于 `data/base/maps/round-01-grid.json`，由 Vite 作为静态文件发布。
+> Round 02 验证：`npm run build`、浏览器 MOD 覆盖/回退和事件总线手动检查成功；生产构建提示 Phaser 主包 chunk 超过 500 kB，后续性能/打包轮次再评估拆分。基础数据与 schema 位于 `data/`，启用 MOD 列表见 `data/base/manifest.json`。
 
 ## 目录结构
 
@@ -46,14 +47,14 @@ npm run typecheck  # 仅类型检查
 ├── src/
 │   ├── main.ts           # Phaser 启动与场景注册
 │   ├── style.css         # 页面外壳样式
-│   ├── engine/           # 通用网格地图协议、校验查询与渲染
-│   └── game/              # 网格移动切片场景
+│   ├── engine/           # 网格地图、数据加载器、事件总线与渲染
+│   └── game/             # 网格移动切片场景
 ├── data/
-│   ├── base/             # 原创世界数据；当前含 Round 01 网格地图 JSON
-│   └── schema/           # JSON Schema 契约（R02 起）
-├── mods/                 # mod 同名覆盖层（R02 起）
+│   ├── base/             # 原创世界数据及 manifest
+│   └── schema/           # manifest、网格地图 JSON Schema
+├── mods/                 # mod 同名覆盖层（含未启用的 example）
 ├── docs/                 # 设计与规范文档
-├── iterations/           # 逐轮计划（Round 00、Round 01）
+├── iterations/           # 逐轮计划（Round 00–Round 02）
 ├── ROADMAP.md            # R00–R50 路线图
 ├── CHANGELOG.md          # 变更日志
 └── DEVLOG.md             # 开发日志（含核验记录）

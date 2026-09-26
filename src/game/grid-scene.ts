@@ -1,20 +1,23 @@
 import Phaser from 'phaser';
 
+import { type Diagnostic, type DataLoaderEventMap, loadGameData } from '../engine/data-loader';
+import { EventBus } from '../engine/event-bus';
 import { GridMap, parseGridMap } from '../engine/grid-map';
 import { cellCenterOffset, renderGridMap } from '../engine/grid-map-renderer';
 
 /**
- * Round 01 vertical slice scene.
+ * Round 02 grid scene.
  *
- * Fetches a grid-map JSON at runtime, renders it with the generic engine
- * renderer and drives one-tile-at-a-time movement. Every failure path
- * (network, HTTP, malformed JSON, invalid structure) lands in a readable
- * in-game panel — the scene stays alive, never a blank canvas or an
- * uncaught error.
+ * The map is no longer fetched by URL: the generic data loader resolves it
+ * by resource id from the manifest (schema-validated base data plus enabled
+ * MOD overrides). Every failure path (network, HTTP, malformed JSON, schema
+ * or semantic violations) lands in a readable in-game panel — the scene
+ * stays alive, never a blank canvas or an uncaught error. Movement behavior
+ * is unchanged from Round 01.
  */
 
-/** Map file is static data, never bundled: fetched relative to the deployment base. */
-const MAP_URL = `${import.meta.env.BASE_URL}base/maps/round-01-grid.json`;
+/** Stable resource id from data/base/manifest.json — never a hard-coded URL. */
+const RESOURCE_ID = 'map.round-01-grid';
 
 const VIEW_WIDTH = 960;
 const VIEW_HEIGHT = 540;
@@ -39,6 +42,18 @@ const UI = {
   fontFamily: 'sans-serif',
 } as const;
 
+/** Flattens loader diagnostics into readable panel lines, one block each. */
+function formatDiagnostics(diagnostics: readonly Diagnostic[]): string[] {
+  return diagnostics.map((diagnostic) => {
+    const scope =
+      diagnostic.resource === undefined
+        ? diagnostic.origin
+        : `${diagnostic.origin}（资源 ${diagnostic.resource}）`;
+    const details = diagnostic.details.length > 0 ? `\n${diagnostic.details.join('\n')}` : '';
+    return `${scope}：${diagnostic.message}${details}`;
+  });
+}
+
 export class GridScene extends Phaser.Scene {
   private map: GridMap | null = null;
   private mapOrigin = new Phaser.Math.Vector2(0, 0);
@@ -50,6 +65,7 @@ export class GridScene extends Phaser.Scene {
   private moving = false;
 
   private coordsText: Phaser.GameObjects.Text | null = null;
+  private loadWarnings: Diagnostic[] = [];
 
   constructor() {
     super('grid');
@@ -68,32 +84,59 @@ export class GridScene extends Phaser.Scene {
   }
 
   private async loadMap(): Promise<void> {
+    // Data events mirror the structured diagnostics in the devtools console;
+    // the readable error panel below is what players actually see.
+    const bus = new EventBus<DataLoaderEventMap>();
+    const offLoaded = bus.on('data:resource-loaded', (event) => {
+      const origin = event.source.kind === 'base' ? 'base' : `mod:${event.source.modId}`;
+      console.info(`[data] 资源 ${event.id} 加载自 ${origin}`);
+    });
+    const offError = bus.on('data:resource-error', (event) => {
+      console.warn(`[data] ${event.origin}: ${event.message}`, event.details);
+    });
+
     try {
-      const response = await fetch(MAP_URL);
-      if (!response.ok) {
-        this.showErrorState(`地图数据请求失败（HTTP ${response.status}）`, [
-          MAP_URL,
-          '请确认 data/base/ 目录已随应用发布，且文件可访问。',
+      const result = await loadGameData({
+        baseUrl: import.meta.env.BASE_URL,
+        bus,
+        semanticValidators: {
+          'grid-map': (value) => {
+            const parsed = parseGridMap(value);
+            return parsed.ok ? [] : parsed.errors;
+          },
+        },
+      });
+      const blockingDiagnostics = result.diagnostics.filter(
+        (diagnostic) => (diagnostic.severity ?? 'error') === 'error',
+      );
+      if (blockingDiagnostics.length > 0) {
+        this.showErrorState('资料加载诊断', formatDiagnostics(blockingDiagnostics));
+        return;
+      }
+      this.loadWarnings = result.diagnostics.filter((diagnostic) => diagnostic.severity === 'warning');
+
+      const resource = result.resources.get(RESOURCE_ID);
+      if (resource === undefined) {
+        this.showErrorState('地图资源缺失', [
+          `清单中没有 id 为 "${RESOURCE_ID}" 的资源，请检查 data/base/manifest.json。`,
         ]);
         return;
       }
-      const contentType = response.headers.get('content-type') ?? '';
-      if (!contentType.toLowerCase().includes('json')) {
-        this.showErrorState('地图数据响应格式错误', [
-          `${MAP_URL} 返回了 ${contentType || '未知内容类型'}，预期为 JSON。`,
-        ]);
+
+      const parsed = parseGridMap(resource.value);
+      if (!parsed.ok) {
+        this.showErrorState('地图数据结构不合规', parsed.errors);
         return;
       }
-      const raw: unknown = await response.json();
-      const result = parseGridMap(raw);
-      if (!result.ok) {
-        this.showErrorState('地图数据结构不合规', result.errors);
-        return;
-      }
-      this.setupWorld(result.map);
+      this.setupWorld(parsed.map);
     } catch (error) {
+      // loadGameData converts its own failures to diagnostics; this guard
+      // only catches the truly unexpected (e.g. a programming error).
       const reason = error instanceof Error ? error.message : String(error);
-      this.showErrorState('地图数据加载失败', [reason, MAP_URL]);
+      this.showErrorState('地图数据加载失败', [reason]);
+    } finally {
+      offLoaded();
+      offError();
     }
   }
 
@@ -139,6 +182,16 @@ export class GridScene extends Phaser.Scene {
         color: UI.textPrimary,
       })
       .setOrigin(0.5, 0);
+
+    if (this.loadWarnings.length > 0) {
+      this.add
+        .text(VIEW_WIDTH / 2, 34, '部分 MOD 覆盖无效，已回退到上一有效数据（详情见控制台）', {
+          fontFamily: UI.fontFamily,
+          fontSize: '11px',
+          color: UI.textWarn,
+        })
+        .setOrigin(0.5, 0);
+    }
 
     this.coordsText = this.add
       .text(VIEW_WIDTH - 16, 14, '', {
@@ -237,7 +290,7 @@ export class GridScene extends Phaser.Scene {
     const body = [
       ...details,
       '',
-      '请检查 data/base/maps/ 下的地图 JSON 后刷新页面。',
+      '请检查 data/ 下的清单、schema 与地图 JSON，或 mods/ 中的覆盖文件，然后刷新页面。',
     ].join('\n');
     this.add
       .text(VIEW_WIDTH / 2, VIEW_HEIGHT / 2 + 8, body, {

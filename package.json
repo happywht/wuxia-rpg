@@ -11,9 +11,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "ajv": "^8.20.0",
     "phaser": "^4.2.1"
   },
   "devDependencies": {
+    "@types/node": "^26.6.3",
     "typescript": "^5.9.3",
     "vite": "^8.3.1"
   },

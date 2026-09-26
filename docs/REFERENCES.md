@@ -1,12 +1,12 @@
 # 参考来源与使用边界（REFERENCES）
 
-核验日期：2026-09-26。本清单区分：**历史/回忆类来源**（用于理解原作系列的背景，证据力有限）与**官方技术文档**（用于工程决策）。
+核验日期：2026-09-27。本清单区分：**历史/回忆类来源**（用于理解原作系列的背景，证据力有限）与**官方技术文档**（用于工程决策）。
 
 ---
 
 ## 一、总体声明（必读）
 
-1. **本项目不包含任何原作游戏资产**：不复制、不嵌入、不改编文曲星系列或《白金英雄坛说》的角色、地名、对话、剧情、源代码、美术、音频或其他游戏文件。本仓库 Round 00 亦**不含任何图片/音频素材**。
+1. **本项目不包含任何原作游戏资产**：不复制、不嵌入、不改编文曲星系列或《白金英雄坛说》的角色、地名、对话、剧情、源代码、美术、音频或其他游戏文件。本仓库当前亦**不含任何图片/音频素材**。
 2. **历史类来源的内容授权未经验证**：go1980.org 文章未声明许可证；其余历史/回忆/第三方页面同样未确认授权。因此本项目仅以"事实摘要 + 链接引用"的方式使用，**不转载原文、不复制页面文字**。
 3. **证据分级诚实原则**：可检索的《白金英雄坛说》资料多为玩家回忆、攻略或衍生作品说明，未发现可作为完整官方规格的公开资料。凡属二手、单一来源或回忆性信息，均在 `docs/ORIGINAL-FIDELITY.md` 中标注置信度，不冒充定论。
 
@@ -27,19 +27,20 @@
 | 6 | [Phaser 官方安装文档](https://docs.phaser.io/phaser/getting-started/installation) | Phaser 接入方式参考 | 未复制文档文字或示例代码 |
 | 7 | [Vite 官方指南](https://vite.dev/guide/) | 构建配置与 Node 兼容条件参考（ADR-0003） | 未复制文档文字或示例代码 |
 | 8 | [TypeScript 官方文档](https://www.typescriptlang.org/docs/) | 语言与编译器选项参考（ADR-0002） | 未复制文档文字或示例代码 |
-| 9 | [Ajv 官方文档](https://ajv.js.org/) | 后续 JSON Schema 校验管线参考（ADR-0004） | 未复制文档文字或示例代码 |
+| 9 | [Ajv 官方文档](https://ajv.js.org/) | Round 02 JSON Schema 校验管线参考（ADR-0004） | 未复制文档文字或示例代码 |
 | 10 | [Vitest 官方指南](https://vitest.dev/guide/) | 后续测试体系参考（ADR-0005） | 未复制文档文字或示例代码 |
 
 ## 四、软件包许可核验（npm 元数据）
 
-下表记录被选用/规划的软件包许可。Round 00 只安装 Phaser、Vite 与 TypeScript；Ajv 和 Vitest 留给路线图中的后续轮次。软件包许可不代表对应网站文档内容使用同一许可。本项目目前没有复制或提交第三方库源码；发布时仍需随构建物提供适用的第三方许可声明。
+下表记录被选用/规划的软件包许可。Round 02 已安装 Ajv 与 Node 类型声明；Vitest 仍留给路线图中的测试轮次。软件包许可不代表对应网站文档内容使用同一许可。本项目目前没有复制或提交第三方库源码；发布时仍需随构建物提供适用的第三方许可声明。
 
-| 软件包 | Registry 元数据 URL | 许可 | 计划用途 |
+| 软件包 | Registry 元数据 URL | 许可 | 用途 |
 |---|---|---|---|
 | `phaser@4.2.1` | https://registry.npmjs.org/phaser/4.2.1 | MIT | Round 00 起的 2D 渲染与场景运行时 |
 | `vite@8.3.1` | https://registry.npmjs.org/vite/8.3.1 | MIT | 开发服务器与生产构建 |
 | `typescript@5.9.3` | https://registry.npmjs.org/typescript/5.9.3 | Apache-2.0 | 类型检查与语言工具链 |
-| `ajv@8.20.0` | https://registry.npmjs.org/ajv/8.20.0 | MIT | 后续 JSON Schema 数据校验 |
+| `ajv@8.20.0` | https://registry.npmjs.org/ajv/8.20.0 | MIT | Round 02 起 JSON Schema 数据校验 |
+| `@types/node@26.6.3` | https://registry.npmjs.org/@types/node/26.6.3 | MIT | Round 02 Vite 配置的 Node API 开发期类型 |
 | `vitest@4.1.11` | https://registry.npmjs.org/vitest/4.1.11 | MIT | 后续自动化测试 |
 
 > 版本号核验方式：npm registry（`registry.npmjs.org`）元数据查询，结果记录于 `docs/ADR.md` 版本冻结总表与 `DEVLOG.md`（2026-09-26 条目）。

@@ -1,0 +1,10 @@
+{
+  "resources": [
+    {
+      "id": "map.round-01-grid",
+      "path": "maps/round-01-grid.json",
+      "schema": "grid-map"
+    }
+  ],
+  "enabledMods": []
+}
