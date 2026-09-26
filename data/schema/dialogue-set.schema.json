@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wuxia-rpg.invalid/schema/dialogue-set",
+  "title": "对话集合",
+  "description": "对话集合 JSON 的静态结构契约：字段名、类型与长度。图语义（startNodeId 是否存在于 nodes、每个选项 nextNodeId 是否指向有效节点、节点 id 是否重复）由运行时的逐段对话校验补足，使单段坏对话只禁用自身而不拖垮整个集合。无 options 的节点是结束节点。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["conversations"],
+  "properties": {
+    "conversations": {
+      "type": "array",
+      "description": "对话条目列表；允许空数组。id 在集合内应保持唯一。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "startNodeId", "nodes"],
+        "properties": {
+          "id": {
+            "description": "稳定对话 id，建议前缀 dlg.，如 dlg.shen-mohan-bookshop。",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+          },
+          "startNodeId": {
+            "description": "进入对话时显示的首节点 id，须存在于本对话的 nodes 中。",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "nodes": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["id", "text"],
+              "properties": {
+                "id": {
+                  "description": "对话内局部节点 id，如 greet。",
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 64
+                },
+                "text": {
+                  "description": "节点台词文本；结束节点同样有 text。",
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                },
+                "options": {
+                  "type": "array",
+                  "description": "玩家可选分支；省略或空数组表示结束节点。",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["text", "nextNodeId"],
+                    "properties": {
+                      "text": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100
+                      },
+                      "nextNodeId": {
+                        "description": "选择后进入的节点 id，须存在于本对话的 nodes 中。",
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 64
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

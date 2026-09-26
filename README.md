@@ -4,12 +4,12 @@
 
 - 设计文档：`docs/GDD.md`
 - 逐轮路线图（R00–R50）：`ROADMAP.md`
-- 当前进度：**Round 02 完成；下一轮 Round 03（NPC 放置、交互与基础对话）**
+- 当前进度：**Round 03 完成；下一轮 Round 04（角色属性与成长、门派与武学数据模型）**
 
 ## 范围
 
-- ✅ 已完成（R00–R02）：可构建工程、设计基线、数据驱动网格地图与移动、manifest 资料加载、Ajv JSON Schema 校验、typed EventBus、同路径 MOD 覆盖；缺失或无效关键资料会显示可读错误。
-- ❌ 后续轮次：NPC、对话及其余玩法按路线图逐轮实现；测试基线（Round 38 起）。
+- ✅ 已完成（R00–R03）：可构建工程、设计基线、数据驱动网格地图与移动、manifest 资料加载、Ajv JSON Schema 校验、typed EventBus、同路径 MOD 覆盖、数据驱动 NPC 放置与占用格阻挡、E 键四方向邻接交谈、可分支的键盘对话 UI，以及可选内容（NPC/对话）故障隔离——坏资料只禁用相应人物并告警，地图保持可玩。
+- ❌ 后续轮次：属性/门派/武学、战斗、物品、任务及其余玩法按路线图逐轮实现；测试基线（Round 38 起）。
 - 永久边界：不做多人联网；不含原作内容；mod 仅限同名 JSON 覆盖（见 `docs/DATA-GUIDE.md`）。
 
 ## 技术栈（版本已核验并冻结，见 `docs/ADR.md`）
@@ -38,7 +38,7 @@ npm run preview    # 预览生产构建
 npm run typecheck  # 仅类型检查
 ```
 
-> Round 02 验证：`npm run build`、浏览器 MOD 覆盖/回退和事件总线手动检查成功；生产构建提示 Phaser 主包 chunk 超过 500 kB，后续性能/打包轮次再评估拆分。基础数据与 schema 位于 `data/`，启用 MOD 列表见 `data/base/manifest.json`。
+> Round 03 验证：`npm run build` 通过（82 模块）；引擎纯逻辑 48 项临时 Node 冒烟检查与 7 项 Ajv schema 检查通过。生产构建提示 Phaser 主包 chunk 超过 500 kB，后续性能/打包轮次再评估拆分。基础数据与 schema 位于 `data/`，启用 MOD 列表见 `data/base/manifest.json`。
 
 ## 目录结构
 
@@ -50,11 +50,11 @@ npm run typecheck  # 仅类型检查
 │   ├── engine/           # 网格地图、数据加载器、事件总线与渲染
 │   └── game/             # 网格移动切片场景
 ├── data/
-│   ├── base/             # 原创世界数据及 manifest
-│   └── schema/           # manifest、网格地图 JSON Schema
+│   ├── base/             # 原创世界数据及 manifest（地图、NPC、对话）
+│   └── schema/           # manifest、网格地图、NPC、对话 JSON Schema
 ├── mods/                 # mod 同名覆盖层（含未启用的 example）
 ├── docs/                 # 设计与规范文档
-├── iterations/           # 逐轮计划（Round 00–Round 02）
+├── iterations/           # 逐轮计划（Round 00–Round 03）
 ├── ROADMAP.md            # R00–R50 路线图
 ├── CHANGELOG.md          # 变更日志
 └── DEVLOG.md             # 开发日志（含核验记录）

@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wuxia-rpg.invalid/schema/npc-set",
+  "title": "NPC 集合",
+  "description": "NPC 集合 JSON 的静态结构契约：字段名、类型与取值范围。跨资源语义（mapResourceId/dialogueId 引用是否存在、坐标是否在地图内且可走、NPC 是否占用同一格、是否压住玩家出生点）由运行时的跨资源校验补足，schema 无法表达跨文件约束。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["npcs"],
+  "properties": {
+    "npcs": {
+      "type": "array",
+      "description": "NPC 条目列表；允许空数组表达当前地图无人可交互。id 在集合内应保持唯一。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "mapResourceId", "position", "dialogueId"],
+        "properties": {
+          "id": {
+            "description": "稳定 NPC id，建议前缀 char.，如 char.shen-mohan。",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+          },
+          "name": {
+            "description": "NPC 显示名称（原创人物名）。",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32
+          },
+          "mapResourceId": {
+            "description": "NPC 所在地图的 manifest 资源 id，如 map.round-01-grid。",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+          },
+          "position": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["col", "row"],
+            "properties": {
+              "col": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "row": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "dialogueId": {
+            "description": "NPC 默认对话的 id，须存在于已加载的对话集合资源中。",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+          }
+        }
+      }
+    }
+  }
+}

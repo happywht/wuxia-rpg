@@ -1,0 +1,25 @@
+{
+  "npcs": [
+    {
+      "id": "char.shen-mohan",
+      "name": "沈墨涵",
+      "mapResourceId": "map.round-01-grid",
+      "position": { "col": 4, "row": 1 },
+      "dialogueId": "dlg.shen-mohan-bookshop"
+    },
+    {
+      "id": "char.lu-zhenniang",
+      "name": "陆贞娘",
+      "mapResourceId": "map.round-01-grid",
+      "position": { "col": 5, "row": 5 },
+      "dialogueId": "dlg.lu-zhenniang-teastall"
+    },
+    {
+      "id": "char.gu-yechen",
+      "name": "顾夜尘",
+      "mapResourceId": "map.round-01-grid",
+      "position": { "col": 12, "row": 3 },
+      "dialogueId": "dlg.gu-yechen-roadside"
+    }
+  ]
+}

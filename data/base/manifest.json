@@ -4,6 +4,16 @@
       "id": "map.round-01-grid",
       "path": "maps/round-01-grid.json",
       "schema": "grid-map"
+    },
+    {
+      "id": "npc.round-03-set",
+      "path": "characters/round-03-npcs.json",
+      "schema": "npc-set"
+    },
+    {
+      "id": "dialogue.round-03-set",
+      "path": "dialogues/round-03-conversations.json",
+      "schema": "dialogue-set"
     }
   ],
   "enabledMods": []

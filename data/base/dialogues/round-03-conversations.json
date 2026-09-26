@@ -1,0 +1,118 @@
+{
+  "conversations": [
+    {
+      "id": "dlg.shen-mohan-bookshop",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "小客官今日又来啦。新到的徽墨磨好了，正适合抄经——只是我看你眉间带雾，可是遇上了什么事？",
+          "options": [
+            { "text": "掌柜的，我想打听一册残缺的抄本。", "nextNodeId": "about-scroll" },
+            { "text": "没什么，随便看看。", "nextNodeId": "browse" }
+          ]
+        },
+        {
+          "id": "about-scroll",
+          "text": "残本？……你是说那册《洗髓残篇》？嘘——这话不能在铺子里讲。今夜子时，后巷灯下，我等你。",
+          "options": [
+            { "text": "好，子时见。", "nextNodeId": "agree" },
+            { "text": "掌柜的为何这般谨慎？", "nextNodeId": "why-careful" }
+          ]
+        },
+        {
+          "id": "why-careful",
+          "text": "近半月，镇上外乡刀客多了七八个，个个都在打听旧书旧账。我卖墨的惹不起，只好把话压低些说。"
+        },
+        {
+          "id": "agree",
+          "text": "记得独身前来，别叫人瞧见你与我同行。"
+        },
+        {
+          "id": "browse",
+          "text": "行，慢慢看。看中了唤我一声便是。"
+        }
+      ]
+    },
+    {
+      "id": "dlg.lu-zhenniang-teastall",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "客官走累了吧？粗茶两文一碗，坐下歇歇脚。今儿湖上雾重，怕是散不开了。",
+          "options": [
+            { "text": "来一碗。顺便问问，镇上近来可有生面孔？", "nextNodeId": "strangers" },
+            { "text": "多谢，我不渴。这雾是常有的么？", "nextNodeId": "fog" }
+          ]
+        },
+        {
+          "id": "strangers",
+          "text": "有倒是有。前日来了个背刀的，把镇口船家问了个遍，像是在找什么人。客官出门在外，多留个心眼。",
+          "options": [
+            { "text": "多谢提醒，这就告辞。", "nextNodeId": "thanks" },
+            { "text": "那背刀的往哪儿去了？", "nextNodeId": "where" }
+          ]
+        },
+        {
+          "id": "where",
+          "text": "往东边废渡口去了。那条路年久失修，寻常人不肯走，他倒走得急，靴子上全是泥。"
+        },
+        {
+          "id": "fog",
+          "text": "入秋就这样。老辈人讲，雾锁湖面，是湖底下的人想上来透气呢——客官别当真，喝茶喝茶。"
+        },
+        {
+          "id": "thanks",
+          "text": "哎，慢走。碗搁在这儿就好，回头我来收。"
+        }
+      ]
+    },
+    {
+      "id": "dlg.gu-yechen-roadside",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "站住——别再近了。刀还没归鞘，我这手不听使唤。",
+          "options": [
+            { "text": "阁下好身手。方才那是……", "nextNodeId": "blade" },
+            { "text": "在下无意冒犯，这就绕道。", "nextNodeId": "leave" }
+          ]
+        },
+        {
+          "id": "blade",
+          "text": "三流剪径的毛贼，也敢挡路？……你身上有墨味，是镇上书铺的学徒？",
+          "options": [
+            { "text": "正是。阁下找的，可是书铺的人？", "nextNodeId": "search" },
+            { "text": "阁下为何守在这条路上？", "nextNodeId": "why-here" }
+          ]
+        },
+        {
+          "id": "search",
+          "text": "算你机灵。听着，替我带句话给你家掌柜：「旧账，过了今夜子时便要收了。」一个字都不许错。",
+          "options": [
+            { "text": "他到底欠了谁的账？", "nextNodeId": "debt" },
+            { "text": "……我一定带到。", "nextNodeId": "deliver" }
+          ]
+        },
+        {
+          "id": "debt",
+          "text": "问得多，命就短。话带到，你我都省事。"
+        },
+        {
+          "id": "deliver",
+          "text": "嗯。去罢。"
+        },
+        {
+          "id": "why-here",
+          "text": "等一个该来的人。你既从镇里来，便当我没拦过你。"
+        },
+        {
+          "id": "leave",
+          "text": "……雾大，走稳些。"
+        }
+      ]
+    }
+  ]
+}

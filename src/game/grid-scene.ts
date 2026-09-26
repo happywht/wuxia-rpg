@@ -1,29 +1,56 @@
 import Phaser from 'phaser';
 
-import { type Diagnostic, type DataLoaderEventMap, loadGameData } from '../engine/data-loader';
+import {
+  type Diagnostic,
+  type DataLoaderEventMap,
+  type LoadedResource,
+  loadGameData,
+} from '../engine/data-loader';
 import { EventBus } from '../engine/event-bus';
 import { GridMap, parseGridMap } from '../engine/grid-map';
 import { cellCenterOffset, renderGridMap } from '../engine/grid-map-renderer';
+import {
+  type DialogueData,
+  indexConversations,
+  parseDialogueSet,
+  validateConversation,
+} from '../engine/dialogue-graph';
+import {
+  assembleNpcPlacements,
+  type NpcSetData,
+  NpcOccupancyIndex,
+  parseNpcSet,
+  type PlacedNpc,
+  selectInteractionTarget,
+} from '../engine/npc-placement';
+import { DialoguePanel } from './dialogue-ui';
 
 /**
- * Round 02 grid scene.
+ * Round 03 grid scene.
  *
- * The map is no longer fetched by URL: the generic data loader resolves it
- * by resource id from the manifest (schema-validated base data plus enabled
- * MOD overrides). Every failure path (network, HTTP, malformed JSON, schema
- * or semantic violations) lands in a readable in-game panel — the scene
- * stays alive, never a blank canvas or an uncaught error. Movement behavior
- * is unchanged from Round 01.
+ * The required map still loads through the generic data loader exactly like
+ * Round 02 — manifest/schema/map failures remain fatal and land in the
+ * readable error panel. NPC and dialogue resources are *optional* content on
+ * top of that: each failing NPC or conversation is disabled individually
+ * with a warning, and the map stays fully playable without them (or with
+ * none registered at all, which shows an explicit "no one to talk to" hint).
+ *
+ * NPCs are rendered at their data-declared walkable cells, block player
+ * movement, and can be talked to with E while four-way adjacent. While the
+ * dialogue panel is open, movement input is ignored and restored on close.
+ * Every name and line of dialogue comes from `data/` — never from code.
  */
 
-/** Stable resource id from data/base/manifest.json — never a hard-coded URL. */
-const RESOURCE_ID = 'map.round-01-grid';
+/** Stable resource ids from data/base/manifest.json — never hard-coded URLs. */
+const MAP_RESOURCE_ID = 'map.round-01-grid';
+const NPC_RESOURCE_ID = 'npc.round-03-set';
+const DIALOGUE_RESOURCE_ID = 'dialogue.round-03-set';
 
 const VIEW_WIDTH = 960;
 const VIEW_HEIGHT = 540;
 
-/** Vertical space reserved for the HUD strip above the map. */
-const HUD_HEIGHT = 56;
+/** Vertical space reserved for the HUD strip above the map (two warning lines). */
+const HUD_HEIGHT = 64;
 
 const MOVE_DURATION_MS = 110;
 
@@ -31,6 +58,11 @@ const MOVE_DURATION_MS = 110;
 const MARKER_COLOR = 0xe8b04b;
 const MARKER_BORDER = 0x3a2c12;
 const MARKER_RADIUS_RATIO = 0.3;
+
+/** Presentation-only NPC palette, cycled by placement order (content stays in data). */
+const NPC_PALETTE = [0x7ec8a9, 0xc89fd4, 0x8fb7e8, 0xe89f8f] as const;
+const NPC_BORDER = 0x1c2430;
+const NPC_SIZE_RATIO = 0.62;
 
 const UI = {
   background: '#0b0e14',
@@ -41,6 +73,17 @@ const UI = {
   textWarn: '#e8b04b',
   fontFamily: 'sans-serif',
 } as const;
+
+/** Optional NPC/dialogue content this scene can lose without dying. */
+function isOptionalContentDiagnostic(diagnostic: Diagnostic): boolean {
+  if (diagnostic.resource === NPC_RESOURCE_ID || diagnostic.resource === DIALOGUE_RESOURCE_ID) {
+    return true;
+  }
+  // Schema-level failures carry no resource id; match them by origin.
+  return (
+    diagnostic.origin === 'schema:npc-set' || diagnostic.origin === 'schema:dialogue-set'
+  );
+}
 
 /** Flattens loader diagnostics into readable panel lines, one block each. */
 function formatDiagnostics(diagnostics: readonly Diagnostic[]): string[] {
@@ -54,6 +97,13 @@ function formatDiagnostics(diagnostics: readonly Diagnostic[]): string[] {
   });
 }
 
+/** Everything the playable world needs after optional-content assembly. */
+interface WorldAssembly {
+  npcs: PlacedNpc[];
+  dialogues: ReadonlyMap<string, DialogueData>;
+  warnings: Diagnostic[];
+}
+
 export class GridScene extends Phaser.Scene {
   private map: GridMap | null = null;
   private mapOrigin = new Phaser.Math.Vector2(0, 0);
@@ -64,8 +114,15 @@ export class GridScene extends Phaser.Scene {
   /** Movement lock: while a tween is in flight every input is ignored. */
   private moving = false;
 
+  /** NPCs placed on the current map and their occupied cells. */
+  private placedNpcs: PlacedNpc[] = [];
+  private occupancy = new NpcOccupancyIndex();
+  private dialogues: ReadonlyMap<string, DialogueData> = new Map();
+
+  private dialoguePanel: DialoguePanel | null = null;
+
   private coordsText: Phaser.GameObjects.Text | null = null;
-  private loadWarnings: Diagnostic[] = [];
+  private interactText: Phaser.GameObjects.Text | null = null;
 
   constructor() {
     super('grid');
@@ -80,10 +137,10 @@ export class GridScene extends Phaser.Scene {
         color: UI.textMuted,
       })
       .setOrigin(0.5);
-    void this.loadMap();
+    void this.loadWorld();
   }
 
-  private async loadMap(): Promise<void> {
+  private async loadWorld(): Promise<void> {
     // Data events mirror the structured diagnostics in the devtools console;
     // the readable error panel below is what players actually see.
     const bus = new EventBus<DataLoaderEventMap>();
@@ -106,29 +163,46 @@ export class GridScene extends Phaser.Scene {
           },
         },
       });
-      const blockingDiagnostics = result.diagnostics.filter(
-        (diagnostic) => (diagnostic.severity ?? 'error') === 'error',
+
+      // Optional NPC/dialogue problems degrade to warnings; everything else
+      // (manifest, schemas, the required map) stays fatal like Round 02.
+      const blocking = result.diagnostics.filter(
+        (diagnostic) =>
+          (diagnostic.severity ?? 'error') === 'error' && !isOptionalContentDiagnostic(diagnostic),
       );
-      if (blockingDiagnostics.length > 0) {
-        this.showErrorState('资料加载诊断', formatDiagnostics(blockingDiagnostics));
+      if (blocking.length > 0) {
+        this.showErrorState('资料加载诊断', formatDiagnostics(blocking));
         return;
       }
-      this.loadWarnings = result.diagnostics.filter((diagnostic) => diagnostic.severity === 'warning');
+      const modWarnings = result.diagnostics.filter(
+        (diagnostic) => diagnostic.severity === 'warning',
+      );
+      const optionalWarnings = result.diagnostics.filter(
+        (diagnostic) =>
+          (diagnostic.severity ?? 'error') === 'error' && isOptionalContentDiagnostic(diagnostic),
+      );
 
-      const resource = result.resources.get(RESOURCE_ID);
-      if (resource === undefined) {
+      const mapResource = result.resources.get(MAP_RESOURCE_ID);
+      if (mapResource === undefined) {
         this.showErrorState('地图资源缺失', [
-          `清单中没有 id 为 "${RESOURCE_ID}" 的资源，请检查 data/base/manifest.json。`,
+          `清单中没有 id 为 "${MAP_RESOURCE_ID}" 的资源，请检查 data/base/manifest.json。`,
         ]);
         return;
       }
 
-      const parsed = parseGridMap(resource.value);
+      const parsed = parseGridMap(mapResource.value);
       if (!parsed.ok) {
         this.showErrorState('地图数据结构不合规', parsed.errors);
         return;
       }
-      this.setupWorld(parsed.map);
+
+      const assembly = this.assembleOptionalContent(result.resources, parsed.map);
+      this.setupWorld(
+        parsed.map,
+        assembly,
+        [...optionalWarnings, ...assembly.warnings],
+        modWarnings,
+      );
     } catch (error) {
       // loadGameData converts its own failures to diagnostics; this guard
       // only catches the truly unexpected (e.g. a programming error).
@@ -140,9 +214,107 @@ export class GridScene extends Phaser.Scene {
     }
   }
 
-  private setupWorld(map: GridMap): void {
+  /**
+   * Assembles optional NPC/dialogue content. Every failure disables the
+   * smallest possible unit — one conversation or one NPC — and becomes a
+   * warning instead of killing the scene. Missing (unregistered) resources
+   * are legitimate: the world then simply has no one to talk to.
+   */
+  private assembleOptionalContent(
+    resources: ReadonlyMap<string, LoadedResource>,
+    map: GridMap,
+  ): WorldAssembly {
+    const warnings: Diagnostic[] = [];
+
+    // Conversations first: NPC validation resolves against the valid set.
+    let dialogues = new Map<string, DialogueData>();
+    const dialogueResource = resources.get(DIALOGUE_RESOURCE_ID);
+    if (dialogueResource !== undefined) {
+      const parsed = parseDialogueSet(dialogueResource.value);
+      if (!parsed.ok) {
+        warnings.push({
+          resource: DIALOGUE_RESOURCE_ID,
+          origin: 'dialogue-assembly',
+          severity: 'warning',
+          message: '对话资料结构不合规，本轮禁用全部对话',
+          details: parsed.errors,
+        });
+      } else {
+        const index = indexConversations(parsed.set);
+        for (const id of index.duplicateIds) {
+          warnings.push({
+            resource: DIALOGUE_RESOURCE_ID,
+            origin: 'dialogue-assembly',
+            severity: 'warning',
+            message: `对话 id "${id}" 重复，保留先声明者`,
+            details: [],
+          });
+        }
+        for (const [id, conversation] of index.byId) {
+          const problems = validateConversation(conversation);
+          if (problems.length > 0) {
+            warnings.push({
+              resource: DIALOGUE_RESOURCE_ID,
+              origin: 'dialogue-assembly',
+              severity: 'warning',
+              message: `对话 "${id}" 已禁用：${problems.join('；')}`,
+              details: [],
+            });
+          } else {
+            dialogues.set(id, conversation);
+          }
+        }
+      }
+    }
+
+    let npcSet: NpcSetData | null = null;
+    const npcResource = resources.get(NPC_RESOURCE_ID);
+    if (npcResource !== undefined) {
+      const parsed = parseNpcSet(npcResource.value);
+      if (!parsed.ok) {
+        warnings.push({
+          resource: NPC_RESOURCE_ID,
+          origin: 'npc-assembly',
+          severity: 'warning',
+          message: 'NPC 资料结构不合规，本轮禁用全部人物',
+          details: parsed.errors,
+        });
+      } else {
+        npcSet = parsed.set;
+      }
+    }
+
+    const placement = assembleNpcPlacements({
+      npcSet,
+      knownResourceIds: new Set(resources.keys()),
+      maps: new Map([[MAP_RESOURCE_ID, map]]),
+      currentMapResourceId: MAP_RESOURCE_ID,
+      dialogueIds: new Set(dialogues.keys()),
+    });
+    for (const message of placement.warnings) {
+      warnings.push({
+        resource: NPC_RESOURCE_ID,
+        origin: 'npc-assembly',
+        severity: 'warning',
+        message,
+        details: [],
+      });
+    }
+
+    return { npcs: placement.npcs, dialogues, warnings };
+  }
+
+  private setupWorld(
+    map: GridMap,
+    assembly: WorldAssembly,
+    optionalWarnings: readonly Diagnostic[],
+    modWarnings: readonly Diagnostic[],
+  ): void {
     this.children.removeAll(true); // Drop the transient loading hint.
     this.map = map;
+    this.placedNpcs = assembly.npcs;
+    this.dialogues = assembly.dialogues;
+    this.occupancy = new NpcOccupancyIndex(this.placedNpcs);
 
     this.mapOrigin.set(
       (VIEW_WIDTH - map.pixelWidth) / 2,
@@ -162,13 +334,47 @@ export class GridScene extends Phaser.Scene {
     );
     this.marker.setStrokeStyle(3, MARKER_BORDER);
 
-    this.buildHud(map);
+    this.renderNpcs(map);
+    this.buildHud(map, optionalWarnings, modWarnings);
     this.updateCoordsHud();
+
+    this.dialoguePanel = new DialoguePanel(this, {
+      onClose: () => this.updateInteractHint(), // Movement is keyed off isOpen.
+    });
+    this.updateInteractHint();
   }
 
-  private buildHud(map: GridMap): void {
+  /** Draws every placed NPC and its data-driven name label. */
+  private renderNpcs(map: GridMap): void {
+    this.placedNpcs.forEach((npc, index) => {
+      const center = cellCenterOffset(map, npc.col, npc.row);
+      const size = map.tileSize * NPC_SIZE_RATIO;
+      const body = this.add.rectangle(
+        this.mapOrigin.x + center.x,
+        this.mapOrigin.y + center.y,
+        size,
+        size,
+        NPC_PALETTE[index % NPC_PALETTE.length] ?? NPC_PALETTE[0],
+      );
+      body.setStrokeStyle(3, NPC_BORDER);
+
+      this.add
+        .text(this.mapOrigin.x + center.x, this.mapOrigin.y + center.y - size / 2 - 4, npc.record.name, {
+          fontFamily: UI.fontFamily,
+          fontSize: '10px',
+          color: UI.textPrimary,
+        })
+        .setOrigin(0.5, 1);
+    });
+  }
+
+  private buildHud(
+    map: GridMap,
+    optionalWarnings: readonly Diagnostic[],
+    modWarnings: readonly Diagnostic[],
+  ): void {
     this.add
-      .text(16, 14, '方向键 / WASD 移动 · 每次一格 · 墙体与边界不可通行', {
+      .text(16, 14, '方向键 / WASD 移动 · 每次一格 · 墙体、边界与人物不可通行 · 邻近人物按 E 交谈', {
         fontFamily: UI.fontFamily,
         fontSize: '13px',
         color: UI.textMuted,
@@ -183,14 +389,30 @@ export class GridScene extends Phaser.Scene {
       })
       .setOrigin(0.5, 0);
 
-    if (this.loadWarnings.length > 0) {
+    const lines: { text: string; shown: boolean }[] = [
+      {
+        text: '部分 NPC/对话资料无效，已禁用相应人物（详情见控制台）',
+        shown: optionalWarnings.length > 0,
+      },
+      {
+        text: '部分 MOD 覆盖无效，已回退到上一有效数据（详情见控制台）',
+        shown: modWarnings.length > 0,
+      },
+    ];
+    lines.forEach((line, index) => {
+      if (!line.shown) {
+        return;
+      }
       this.add
-        .text(VIEW_WIDTH / 2, 34, '部分 MOD 覆盖无效，已回退到上一有效数据（详情见控制台）', {
+        .text(VIEW_WIDTH / 2, 33 + index * 15, line.text, {
           fontFamily: UI.fontFamily,
           fontSize: '11px',
           color: UI.textWarn,
         })
         .setOrigin(0.5, 0);
+    });
+    for (const diagnostic of optionalWarnings) {
+      console.warn(`[npc/dialogue] ${diagnostic.message}`, diagnostic.details);
     }
 
     this.coordsText = this.add
@@ -200,10 +422,45 @@ export class GridScene extends Phaser.Scene {
         color: UI.textPrimary,
       })
       .setOrigin(1, 0);
+
+    // Interaction status line under the map: adjacent-NPC prompt or the
+    // explicit empty-state hint required when no NPC is interactable.
+    this.interactText = this.add
+      .text(VIEW_WIDTH / 2, VIEW_HEIGHT - 14, '', {
+        fontFamily: UI.fontFamily,
+        fontSize: '12px',
+        color: UI.textWarn,
+      })
+      .setOrigin(0.5, 1);
   }
 
   private updateCoordsHud(): void {
     this.coordsText?.setText(`位置 (${this.playerCol}, ${this.playerRow})`);
+  }
+
+  /** Refreshes the bottom status line from the current adjacency state. */
+  private updateInteractHint(): void {
+    if (this.interactText === null) {
+      return;
+    }
+    if (this.dialoguePanel !== null && this.dialoguePanel.isOpen) {
+      this.interactText.setText('');
+      return;
+    }
+    if (this.placedNpcs.length === 0) {
+      this.interactText.setText('暂无可交互人物');
+      return;
+    }
+    const target =
+      this.map === null
+        ? null
+        : selectInteractionTarget(this.placedNpcs, {
+            col: this.playerCol,
+            row: this.playerRow,
+          });
+    this.interactText.setText(
+      target === null ? '' : `按 E 与「${target.record.name}」交谈`,
+    );
   }
 
   private bindMovementKeys(): void {
@@ -232,18 +489,51 @@ export class GridScene extends Phaser.Scene {
       return { key, onDown };
     });
 
+    const interactKey = keyboard.addKey(KeyCodes.E);
+    const onInteract = (): void => this.handleInteraction();
+    interactKey.on('down', onInteract);
+
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       for (const { key, onDown } of listeners) {
         key.off('down', onDown);
       }
+      interactKey.off('down', onInteract);
+      this.dialoguePanel?.destroy();
+      this.dialoguePanel = null;
     });
+  }
+
+  /** E key: talk to the four-way adjacent NPC, if any (nearest, id tie-break). */
+  private handleInteraction(): void {
+    const panel = this.dialoguePanel;
+    if (panel === null || panel.isOpen) {
+      return; // Never re-open or switch conversations while one is open.
+    }
+    const target = selectInteractionTarget(this.placedNpcs, {
+      col: this.playerCol,
+      row: this.playerRow,
+    });
+    if (target === null) {
+      return; // Not adjacent to anyone: E does nothing.
+    }
+    const conversation = this.dialogues.get(target.record.dialogueId);
+    if (conversation === undefined) {
+      return; // Defensive: placement already guarantees resolution.
+    }
+    panel.open(conversation, target.record.name);
+    this.updateInteractHint();
   }
 
   private tryMove(dCol: number, dRow: number): void {
     const map = this.map;
     const marker = this.marker;
-    if (map === null || marker === null || this.moving) {
-      return;
+    if (
+      map === null ||
+      marker === null ||
+      this.moving ||
+      (this.dialoguePanel !== null && this.dialoguePanel.isOpen)
+    ) {
+      return; // Also locked while a dialogue is open.
     }
 
     const targetCol = this.playerCol + dCol;
@@ -251,10 +541,14 @@ export class GridScene extends Phaser.Scene {
     if (!map.canEnter(targetCol, targetRow)) {
       return; // Solid tile or outside the grid: the move silently does nothing.
     }
+    if (this.occupancy.isOccupied(targetCol, targetRow)) {
+      return; // An NPC stands there: occupied cells are not enterable.
+    }
 
     this.playerCol = targetCol;
     this.playerRow = targetRow;
     this.updateCoordsHud();
+    this.updateInteractHint();
 
     const target = cellCenterOffset(map, targetCol, targetRow);
     this.moving = true;
@@ -272,6 +566,7 @@ export class GridScene extends Phaser.Scene {
   private showErrorState(title: string, details: string[]): void {
     this.children.removeAll(true); // Destroy leftover objects (frees Text canvas textures).
     this.moving = false;
+    this.dialoguePanel = null;
 
     const panelWidth = VIEW_WIDTH - 96;
     const panelHeight = 320;
