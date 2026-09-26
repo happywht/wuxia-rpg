@@ -1,0 +1,214 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wuxia-rpg.invalid/schema/character-profiles",
+  "title": "角色模板集合",
+  "description": "角色模板集合 JSON 的静态结构契约：字段名、类型与取值范围。五项核心属性键（body/force/agility/insight/resolve）与 1–999 的属性值域属于通用协议；属性显示名称、成长数值、经验曲线与生命/内力派生公式全部由数据表达。跨字段语义（最高等级高于起始等级、属性起点不超过上限、初始熟练度不超过上限）由运行时解析器补足，schema 无法表达跨字段比较。",
+  "definitions": {
+    "attributeValue": {
+      "description": "核心属性数值（通用协议范围）。",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 999
+    },
+    "growthValue": {
+      "description": "每级属性增量。",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 99
+    },
+    "weightValue": {
+      "description": "派生公式中的属性权重。",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 99
+    },
+    "attributeStartMap": {
+      "description": "五项核心属性到起始数值的完整映射。",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["body", "force", "agility", "insight", "resolve"],
+      "properties": {
+        "body": { "$ref": "#/definitions/attributeValue" },
+        "force": { "$ref": "#/definitions/attributeValue" },
+        "agility": { "$ref": "#/definitions/attributeValue" },
+        "insight": { "$ref": "#/definitions/attributeValue" },
+        "resolve": { "$ref": "#/definitions/attributeValue" }
+      }
+    },
+    "attributeGrowthMap": {
+      "description": "五项核心属性到每级增量的完整映射。",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["body", "force", "agility", "insight", "resolve"],
+      "properties": {
+        "body": { "$ref": "#/definitions/growthValue" },
+        "force": { "$ref": "#/definitions/growthValue" },
+        "agility": { "$ref": "#/definitions/growthValue" },
+        "insight": { "$ref": "#/definitions/growthValue" },
+        "resolve": { "$ref": "#/definitions/growthValue" }
+      }
+    },
+    "attributeLabelMap": {
+      "description": "五项核心属性到显示名称的完整映射（显示文本位于数据，不在引擎代码）。",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["body", "force", "agility", "insight", "resolve"],
+      "properties": {
+        "body": { "$ref": "#/definitions/attributeLabelValue" },
+        "force": { "$ref": "#/definitions/attributeLabelValue" },
+        "agility": { "$ref": "#/definitions/attributeLabelValue" },
+        "insight": { "$ref": "#/definitions/attributeLabelValue" },
+        "resolve": { "$ref": "#/definitions/attributeLabelValue" }
+      }
+    },
+    "attributeLabelValue": {
+      "description": "属性显示名称，如 体魄/内息/身法/悟性/定力。",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16
+    },
+    "attributeWeightMap": {
+      "description": "部分核心属性到权重的映射；省略的属性权重为 0。",
+      "type": "object",
+      "propertyNames": {
+        "enum": ["body", "force", "agility", "insight", "resolve"]
+      },
+      "additionalProperties": { "$ref": "#/definitions/weightValue" }
+    },
+    "derivedFormula": {
+      "description": "派生上限公式参数：max = base + perLevel × (level − 1) + Σ(权重 × 属性值)。",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base", "perLevel", "attributeWeights"],
+      "properties": {
+        "base": {
+          "description": "等级 1 时的基础值。",
+          "type": "integer",
+          "minimum": 0
+        },
+        "perLevel": {
+          "description": "每升一级增加的数值（自等级 2 起生效）。",
+          "type": "integer",
+          "minimum": 0
+        },
+        "attributeWeights": {
+          "description": "参与该派生值的属性权重。",
+          "$ref": "#/definitions/attributeWeightMap"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["profiles"],
+  "properties": {
+    "profiles": {
+      "type": "array",
+      "description": "角色模板条目列表；允许空数组表达暂无可用模板。id 在集合内应保持唯一。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "description",
+          "attributeLabels",
+          "attributes",
+          "startingLevel",
+          "startingExperience",
+          "maxLevel",
+          "attributeCap",
+          "progression",
+          "growth",
+          "derivedStats"
+        ],
+        "properties": {
+          "id": {
+            "description": "稳定模板 id，建议前缀 char.，如 char.scribe-apprentice。",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+          },
+          "name": {
+            "description": "模板显示名称（原创称号）。",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32
+          },
+          "description": {
+            "description": "模板背景简介（原创文本）。",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "attributeLabels": {
+            "description": "五项核心属性的显示名称。",
+            "$ref": "#/definitions/attributeLabelMap"
+          },
+          "attributes": {
+            "description": "创建角色时的属性起点。",
+            "$ref": "#/definitions/attributeStartMap"
+          },
+          "startingLevel": {
+            "description": "初始等级。",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 99
+          },
+          "startingExperience": {
+            "description": "初始累计经验（运行时状态的起点；存档由后续轮次负责）。",
+            "type": "integer",
+            "minimum": 0
+          },
+          "maxLevel": {
+            "description": "最高等级；必须大于 startingLevel（由运行时解析器校验）。",
+            "type": "integer",
+            "minimum": 2,
+            "maximum": 99
+          },
+          "attributeCap": {
+            "description": "任一属性的数值上限；属性起点不得超过该值（由运行时解析器校验）。",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 999
+          },
+          "progression": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["baseExperience", "experiencePerLevel"],
+            "properties": {
+              "baseExperience": {
+                "description": "升第一级所需经验；此后每升一级所需经验增加 experiencePerLevel。",
+                "type": "integer",
+                "minimum": 1
+              },
+              "experiencePerLevel": {
+                "description": "每级经验需求的递增量；0 表示每级需求恒定。",
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "growth": {
+            "description": "每次升级各属性的增量；应用后受 attributeCap 封顶。",
+            "$ref": "#/definitions/attributeGrowthMap"
+          },
+          "derivedStats": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["health", "qi"],
+            "properties": {
+              "health": {
+                "description": "生命上限公式参数。",
+                "$ref": "#/definitions/derivedFormula"
+              },
+              "qi": {
+                "description": "内力上限公式参数。",
+                "$ref": "#/definitions/derivedFormula"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

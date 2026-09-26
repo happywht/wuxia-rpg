@@ -1,0 +1,50 @@
+{
+  "profiles": [
+    {
+      "id": "char.scribe-apprentice",
+      "name": "抄书学徒",
+      "description": "江南小镇上替书铺抄书糊口的年轻人。经年伏案让他手稳心细、目力过人，也从往来江湖客的只言片语里窥见了书页之外的另一个世界。",
+      "attributeLabels": {
+        "body": "体魄",
+        "force": "力道",
+        "agility": "身法",
+        "insight": "悟性",
+        "resolve": "定力"
+      },
+      "attributes": {
+        "body": 9,
+        "force": 6,
+        "agility": 7,
+        "insight": 8,
+        "resolve": 7
+      },
+      "startingLevel": 1,
+      "startingExperience": 0,
+      "maxLevel": 30,
+      "attributeCap": 80,
+      "progression": {
+        "baseExperience": 40,
+        "experiencePerLevel": 20
+      },
+      "growth": {
+        "body": 2,
+        "force": 2,
+        "agility": 1,
+        "insight": 1,
+        "resolve": 1
+      },
+      "derivedStats": {
+        "health": {
+          "base": 50,
+          "perLevel": 10,
+          "attributeWeights": { "body": 3, "force": 1 }
+        },
+        "qi": {
+          "base": 30,
+          "perLevel": 8,
+          "attributeWeights": { "insight": 2, "resolve": 1 }
+        }
+      }
+    }
+  ]
+}

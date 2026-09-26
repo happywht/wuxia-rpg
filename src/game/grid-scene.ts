@@ -23,15 +23,27 @@ import {
   type PlacedNpc,
   selectInteractionTarget,
 } from '../engine/npc-placement';
+import {
+  type CharacterProfileData,
+  type FactionData,
+  indexFactions,
+  indexMartialArts,
+  indexProfiles,
+  type MartialArtData,
+  parseCharacterProfileSet,
+  parseFactionSet,
+  parseMartialArtSet,
+} from '../engine/character-progression';
 import { DialoguePanel } from './dialogue-ui';
 
 /**
- * Round 03 grid scene.
+ * Round 03 grid scene, extended with the Round 04 progression datasets.
  *
  * The required map still loads through the generic data loader exactly like
  * Round 02 — manifest/schema/map failures remain fatal and land in the
- * readable error panel. NPC and dialogue resources are *optional* content on
- * top of that: each failing NPC or conversation is disabled individually
+ * readable error panel. NPC, dialogue, character-profile, faction and
+ * martial-art resources are *optional* content on top of that: each failing
+ * NPC, conversation, dataset or single martial art is disabled individually
  * with a warning, and the map stays fully playable without them (or with
  * none registered at all, which shows an explicit "no one to talk to" hint).
  *
@@ -39,12 +51,19 @@ import { DialoguePanel } from './dialogue-ui';
  * movement, and can be talked to with E while four-way adjacent. While the
  * dialogue panel is open, movement input is ignored and restored on close.
  * Every name and line of dialogue comes from `data/` — never from code.
+ *
+ * The Round 04 datasets are parsed and cross-validated at startup and kept
+ * on the scene for the coming rounds (character creation, joining, combat);
+ * this round deliberately adds no progression UI.
  */
 
 /** Stable resource ids from data/base/manifest.json — never hard-coded URLs. */
 const MAP_RESOURCE_ID = 'map.round-01-grid';
 const NPC_RESOURCE_ID = 'npc.round-03-set';
 const DIALOGUE_RESOURCE_ID = 'dialogue.round-03-set';
+const CHARACTER_PROFILE_RESOURCE_ID = 'character-profile.round-04-set';
+const FACTION_RESOURCE_ID = 'faction.round-04-set';
+const MARTIAL_ART_RESOURCE_ID = 'martial-art.round-04-set';
 
 const VIEW_WIDTH = 960;
 const VIEW_HEIGHT = 540;
@@ -74,14 +93,28 @@ const UI = {
   fontFamily: 'sans-serif',
 } as const;
 
-/** Optional NPC/dialogue content this scene can lose without dying. */
+/** Optional resources (NPC/dialogue/progression content) this scene can lose without dying. */
+const OPTIONAL_RESOURCE_IDS = new Set([
+  NPC_RESOURCE_ID,
+  DIALOGUE_RESOURCE_ID,
+  CHARACTER_PROFILE_RESOURCE_ID,
+  FACTION_RESOURCE_ID,
+  MARTIAL_ART_RESOURCE_ID,
+]);
+
+/** Optional-content schemas; schema-level failures carry no resource id, so match by origin. */
+const OPTIONAL_SCHEMA_ORIGINS = new Set([
+  'schema:npc-set',
+  'schema:dialogue-set',
+  'schema:character-profiles',
+  'schema:faction-set',
+  'schema:martial-arts-set',
+]);
+
 function isOptionalContentDiagnostic(diagnostic: Diagnostic): boolean {
-  if (diagnostic.resource === NPC_RESOURCE_ID || diagnostic.resource === DIALOGUE_RESOURCE_ID) {
-    return true;
-  }
-  // Schema-level failures carry no resource id; match them by origin.
   return (
-    diagnostic.origin === 'schema:npc-set' || diagnostic.origin === 'schema:dialogue-set'
+    (diagnostic.resource !== undefined && OPTIONAL_RESOURCE_IDS.has(diagnostic.resource)) ||
+    OPTIONAL_SCHEMA_ORIGINS.has(diagnostic.origin)
   );
 }
 
@@ -97,10 +130,22 @@ function formatDiagnostics(diagnostics: readonly Diagnostic[]): string[] {
   });
 }
 
+/**
+ * Validated Round 04 progression datasets. Assembled and cross-checked at
+ * startup so bad data warns early; consumed by the coming rounds (character
+ * creation, joining, combat) — this round renders no progression UI.
+ */
+interface ProgressionAssembly {
+  profiles: ReadonlyMap<string, CharacterProfileData>;
+  factions: ReadonlyMap<string, FactionData>;
+  martialArts: ReadonlyMap<string, MartialArtData>;
+}
+
 /** Everything the playable world needs after optional-content assembly. */
 interface WorldAssembly {
   npcs: PlacedNpc[];
   dialogues: ReadonlyMap<string, DialogueData>;
+  progression: ProgressionAssembly;
   warnings: Diagnostic[];
 }
 
@@ -118,6 +163,13 @@ export class GridScene extends Phaser.Scene {
   private placedNpcs: PlacedNpc[] = [];
   private occupancy = new NpcOccupancyIndex();
   private dialogues: ReadonlyMap<string, DialogueData> = new Map();
+
+  /** Validated progression datasets, kept for the coming rounds (no UI yet). */
+  private progression: ProgressionAssembly = {
+    profiles: new Map(),
+    factions: new Map(),
+    martialArts: new Map(),
+  };
 
   private dialoguePanel: DialoguePanel | null = null;
 
@@ -159,6 +211,18 @@ export class GridScene extends Phaser.Scene {
         semanticValidators: {
           'grid-map': (value) => {
             const parsed = parseGridMap(value);
+            return parsed.ok ? [] : parsed.errors;
+          },
+          'character-profiles': (value) => {
+            const parsed = parseCharacterProfileSet(value);
+            return parsed.ok ? [] : parsed.errors;
+          },
+          'faction-set': (value) => {
+            const parsed = parseFactionSet(value);
+            return parsed.ok ? [] : parsed.errors;
+          },
+          'martial-arts-set': (value) => {
+            const parsed = parseMartialArtSet(value);
             return parsed.ok ? [] : parsed.errors;
           },
         },
@@ -301,7 +365,124 @@ export class GridScene extends Phaser.Scene {
       });
     }
 
-    return { npcs: placement.npcs, dialogues, warnings };
+    const progressionAssembled = this.assembleProgressionContent(resources);
+    warnings.push(...progressionAssembled.warnings);
+
+    return {
+      npcs: placement.npcs,
+      dialogues,
+      progression: progressionAssembled.assembly,
+      warnings,
+    };
+  }
+
+  /**
+   * Assembles the optional Round 04 character/faction/martial-art datasets.
+   * Structural failures disable the whole resource with a warning; duplicate
+   * ids keep the first declaration; a martial art referencing a missing or
+   * disabled faction drops out alone. Missing (unregistered) resources are
+   * legitimate — later rounds then simply have no progression data. Nothing
+   * here can block the map.
+   */
+  private assembleProgressionContent(
+    resources: ReadonlyMap<string, LoadedResource>,
+  ): { assembly: ProgressionAssembly; warnings: Diagnostic[] } {
+    const warnings: Diagnostic[] = [];
+
+    let profiles = new Map<string, CharacterProfileData>();
+    const profileResource = resources.get(CHARACTER_PROFILE_RESOURCE_ID);
+    if (profileResource !== undefined) {
+      const parsed = parseCharacterProfileSet(profileResource.value);
+      if (!parsed.ok) {
+        warnings.push({
+          resource: CHARACTER_PROFILE_RESOURCE_ID,
+          origin: 'progression-assembly',
+          severity: 'warning',
+          message: '角色模板资料结构不合规，本轮禁用全部角色模板',
+          details: parsed.errors,
+        });
+      } else {
+        const index = indexProfiles(parsed.set);
+        for (const id of index.duplicateIds) {
+          warnings.push({
+            resource: CHARACTER_PROFILE_RESOURCE_ID,
+            origin: 'progression-assembly',
+            severity: 'warning',
+            message: `角色模板 id "${id}" 重复，保留先声明者`,
+            details: [],
+          });
+        }
+        profiles = index.byId;
+      }
+    }
+
+    let factions = new Map<string, FactionData>();
+    const factionResource = resources.get(FACTION_RESOURCE_ID);
+    if (factionResource !== undefined) {
+      const parsed = parseFactionSet(factionResource.value);
+      if (!parsed.ok) {
+        warnings.push({
+          resource: FACTION_RESOURCE_ID,
+          origin: 'progression-assembly',
+          severity: 'warning',
+          message: '门派资料结构不合规，本轮禁用全部门派',
+          details: parsed.errors,
+        });
+      } else {
+        const index = indexFactions(parsed.set);
+        for (const id of index.duplicateIds) {
+          warnings.push({
+            resource: FACTION_RESOURCE_ID,
+            origin: 'progression-assembly',
+            severity: 'warning',
+            message: `门派 id "${id}" 重复，保留先声明者`,
+            details: [],
+          });
+        }
+        factions = index.byId;
+      }
+    }
+
+    let martialArts = new Map<string, MartialArtData>();
+    const martialArtResource = resources.get(MARTIAL_ART_RESOURCE_ID);
+    if (martialArtResource !== undefined) {
+      const parsed = parseMartialArtSet(martialArtResource.value);
+      if (!parsed.ok) {
+        warnings.push({
+          resource: MARTIAL_ART_RESOURCE_ID,
+          origin: 'progression-assembly',
+          severity: 'warning',
+          message: '武学资料结构不合规，本轮禁用全部武学',
+          details: parsed.errors,
+        });
+      } else {
+        const index = indexMartialArts({
+          set: parsed.set,
+          factionIds: new Set(factions.keys()),
+        });
+        for (const id of index.duplicateIds) {
+          warnings.push({
+            resource: MARTIAL_ART_RESOURCE_ID,
+            origin: 'progression-assembly',
+            severity: 'warning',
+            message: `武学 id "${id}" 重复，保留先声明者`,
+            details: [],
+          });
+        }
+        for (const message of index.warnings) {
+          warnings.push({
+            resource: MARTIAL_ART_RESOURCE_ID,
+            origin: 'progression-assembly',
+            severity: 'warning',
+            message,
+            details: [],
+          });
+        }
+        martialArts = index.byId;
+      }
+    }
+
+    return { assembly: { profiles, factions, martialArts }, warnings };
   }
 
   private setupWorld(
@@ -314,7 +495,17 @@ export class GridScene extends Phaser.Scene {
     this.map = map;
     this.placedNpcs = assembly.npcs;
     this.dialogues = assembly.dialogues;
+    this.progression = assembly.progression;
     this.occupancy = new NpcOccupancyIndex(this.placedNpcs);
+
+    // Progression datasets have no UI this round; surface the loaded counts
+    // in the console so authors can confirm their JSON actually landed.
+    console.info(
+      '[progression] 已加载角色模板 %d 个、门派 %d 个、武学 %d 种',
+      this.progression.profiles.size,
+      this.progression.factions.size,
+      this.progression.martialArts.size,
+    );
 
     this.mapOrigin.set(
       (VIEW_WIDTH - map.pixelWidth) / 2,
@@ -391,7 +582,7 @@ export class GridScene extends Phaser.Scene {
 
     const lines: { text: string; shown: boolean }[] = [
       {
-        text: '部分 NPC/对话资料无效，已禁用相应人物（详情见控制台）',
+        text: '部分可选资料（NPC/对话/角色模板/门派/武学）无效，已禁用相应内容（详情见控制台）',
         shown: optionalWarnings.length > 0,
       },
       {
@@ -412,7 +603,7 @@ export class GridScene extends Phaser.Scene {
         .setOrigin(0.5, 0);
     });
     for (const diagnostic of optionalWarnings) {
-      console.warn(`[npc/dialogue] ${diagnostic.message}`, diagnostic.details);
+      console.warn(`[optional] ${diagnostic.message}`, diagnostic.details);
     }
 
     this.coordsText = this.add

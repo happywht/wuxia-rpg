@@ -1,0 +1,70 @@
+{
+  "martialArts": [
+    {
+      "id": "skill.jianghu-sanshou",
+      "name": "江湖散手",
+      "category": "拳脚",
+      "style": "市井搏斗中磨出的朴实拳脚",
+      "description": "无门无派的实用搏击术，谈不上精妙，胜在随手可用；走江湖的人多少都得会两手。",
+      "factionIds": [],
+      "requirements": { "level": 1, "attributes": {} },
+      "initialProficiency": 0,
+      "proficiencyCap": 100
+    },
+    {
+      "id": "skill.tuna-yangqi-jue",
+      "name": "吐纳养气诀",
+      "category": "内功",
+      "style": "流传极广的入门吐纳法",
+      "description": "清晨面东、缓吸缓吐，日积月累可壮内息、安心神；各派弟子也常以此打底。",
+      "factionIds": [],
+      "requirements": { "level": 2, "attributes": { "resolve": 8 } },
+      "initialProficiency": 0,
+      "proficiencyCap": 120
+    },
+    {
+      "id": "skill.lanmen-daofa",
+      "name": "拦门刀法",
+      "category": "刀法",
+      "style": "市井刀客的看家刀法",
+      "description": "护院镖师与游侠儿惯用的大开大合刀路：一刀拦门、二刀夺路，讲究势大力沉、不留后手。",
+      "factionIds": [],
+      "requirements": { "level": 3, "attributes": { "body": 10, "agility": 9 } },
+      "initialProficiency": 0,
+      "proficiencyCap": 150
+    },
+    {
+      "id": "skill.tingyu-jianfa",
+      "name": "听雨剑法",
+      "category": "剑法",
+      "style": "听雨剑阁镇派剑法",
+      "description": "剑随雨势、连绵不绝；先以静制动窥敌破绽，再后发先至。剑阁弟子入门必修。",
+      "factionIds": ["faction.tingyu-jiange"],
+      "requirements": { "level": 5, "attributes": { "insight": 14, "agility": 12 } },
+      "initialProficiency": 0,
+      "proficiencyCap": 300
+    },
+    {
+      "id": "skill.tiezhang-zhuanggong",
+      "name": "铁嶂桩功",
+      "category": "外功",
+      "style": "铁嶂派筑基桩功",
+      "description": "立于桩上负重吐纳，皮糙骨坚；练成之后挨打如挠痒，反击如山崩。",
+      "factionIds": ["faction.tiezhang-pai"],
+      "requirements": { "level": 4, "attributes": { "body": 16, "resolve": 10 } },
+      "initialProficiency": 0,
+      "proficiencyCap": 300
+    },
+    {
+      "id": "skill.yunyin-shenfa",
+      "name": "云隐身法",
+      "category": "身法",
+      "style": "云隐山庄轻身功夫",
+      "description": "提气纵跃如云随风走，落地无声；山庄弟子用以采药避兽，江湖中人用以保命脱身。",
+      "factionIds": ["faction.yunyin-shanzhuang"],
+      "requirements": { "level": 6, "attributes": { "agility": 16, "insight": 12 } },
+      "initialProficiency": 0,
+      "proficiencyCap": 300
+    }
+  ]
+}

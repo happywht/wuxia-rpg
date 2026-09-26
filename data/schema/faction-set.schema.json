@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wuxia-rpg.invalid/schema/faction-set",
+  "title": "门派集合",
+  "description": "门派集合 JSON 的静态结构契约：字段名、类型与长度。门派是纯资料条目——立场、宗旨与武学风格全部来自数据；成员资格变更、声望与拜师流程不在本契约范围（由后续轮次扩展）。id 在集合内的唯一性与被武学引用的可达性由运行时索引补足。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["factions"],
+  "properties": {
+    "factions": {
+      "type": "array",
+      "description": "门派条目列表；允许空数组表达暂无门派资料。id 在集合内应保持唯一。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "stance", "philosophy", "martialStyle"],
+        "properties": {
+          "id": {
+            "description": "稳定门派 id，建议前缀 faction.，如 faction.tingyu-jiange。",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+          },
+          "name": {
+            "description": "门派显示名称（原创门派名）。",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32
+          },
+          "stance": {
+            "description": "立场描述：所在地域、出身构成与江湖态度。",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "philosophy": {
+            "description": "宗旨表述：门训或行事准则。",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "martialStyle": {
+            "description": "武学风格说明：与武学类别/门槛相呼应的路数描述。",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        }
+      }
+    }
+  }
+}

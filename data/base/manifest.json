@@ -14,6 +14,21 @@
       "id": "dialogue.round-03-set",
       "path": "dialogues/round-03-conversations.json",
       "schema": "dialogue-set"
+    },
+    {
+      "id": "character-profile.round-04-set",
+      "path": "characters/round-04-profiles.json",
+      "schema": "character-profiles"
+    },
+    {
+      "id": "faction.round-04-set",
+      "path": "factions/round-04-factions.json",
+      "schema": "faction-set"
+    },
+    {
+      "id": "martial-art.round-04-set",
+      "path": "skills/round-04-martial-arts.json",
+      "schema": "martial-arts-set"
     }
   ],
   "enabledMods": []

@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wuxia-rpg.invalid/schema/martial-arts-set",
+  "title": "武学集合",
+  "description": "武学集合 JSON 的静态结构契约：字段名、类型与取值范围。名称、类别、简介、门槛与熟练度参数全部来自数据；factionIds 为空数组表示不限门派。跨资源语义（factionIds 是否指向已加载的有效门派）由运行时索引逐条校验；招式效果与战斗消耗不在本契约范围（Round 05 扩展）。",
+  "definitions": {
+    "attributeRequirementMap": {
+      "description": "部分核心属性到最低要求数值的映射；省略的属性不设门槛。",
+      "type": "object",
+      "propertyNames": {
+        "enum": ["body", "force", "agility", "insight", "resolve"]
+      },
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 999
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["martialArts"],
+  "properties": {
+    "martialArts": {
+      "type": "array",
+      "description": "武学条目列表；允许空数组表达暂无武学资料。id 在集合内应保持唯一。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "category",
+          "style",
+          "description",
+          "factionIds",
+          "requirements",
+          "initialProficiency",
+          "proficiencyCap"
+        ],
+        "properties": {
+          "id": {
+            "description": "稳定武学 id，建议前缀 skill.，如 skill.tingyu-jianfa。",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+          },
+          "name": {
+            "description": "武学显示名称（原创武学名）。",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32
+          },
+          "category": {
+            "description": "武学类别（枚举构成协议，语义与内容来自资料）。",
+            "type": "string",
+            "enum": ["拳脚", "剑法", "刀法", "身法", "内功", "外功"]
+          },
+          "style": {
+            "description": "风格短语，如「听雨剑阁镇派剑法」。",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "description": {
+            "description": "武学简介（原创文本）。",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "factionIds": {
+            "description": "适用门派 id 列表；空数组表示不限门派。每个 id 须存在于已加载的门派集合（运行时逐条校验，坏引用只禁用该武学）。",
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+            }
+          },
+          "requirements": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["level", "attributes"],
+            "properties": {
+              "level": {
+                "description": "修习所需的最低角色等级。",
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 99
+              },
+              "attributes": {
+                "description": "修习所需的最低属性；空对象表示无属性门槛。",
+                "$ref": "#/definitions/attributeRequirementMap"
+              }
+            }
+          },
+          "initialProficiency": {
+            "description": "初次习得时的熟练度。",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 999
+          },
+          "proficiencyCap": {
+            "description": "熟练度上限；不得低于 initialProficiency（由运行时解析器校验）。",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 999
+          }
+        }
+      }
+    }
+  }
+}
