@@ -11,6 +11,7 @@ import {
   isEquipped,
   sellItem,
 } from '../engine/item-system';
+import { uiFontSize } from './settings';
 
 /**
  * Generic keyboard-driven merchant panel (Round 06).
@@ -285,7 +286,7 @@ export class ShopPanel {
     const nameText = this.scene.add
       .text(panelLeft + PADDING, panelTop + 16, model.shop.record.name, {
         fontFamily: UI.fontFamily,
-        fontSize: '18px',
+        fontSize: uiFontSize(18),
         color: UI.accent,
       })
       .setOrigin(0, 0);
@@ -298,7 +299,7 @@ export class ShopPanel {
         `${this.tab === 'buy' ? '▶' : '　'}${LABELS.buyTab}　｜　${this.tab === 'sell' ? '▶' : '　'}${LABELS.sellTab}`,
         {
           fontFamily: UI.fontFamily,
-          fontSize: '13px',
+          fontSize: uiFontSize(13),
           color: UI.textPrimary,
         },
       )
@@ -308,7 +309,7 @@ export class ShopPanel {
     const moneyText = this.scene.add
       .text(panelLeft + PANEL_WIDTH - PADDING, panelTop + 20, `${LABELS.currency} ${model.inventory.currency}`, {
         fontFamily: UI.fontFamily,
-        fontSize: '13px',
+        fontSize: uiFontSize(13),
         color: UI.textWarn,
       })
       .setOrigin(1, 0);
@@ -318,7 +319,7 @@ export class ShopPanel {
     const greetingText = this.scene.add
       .text(panelLeft + PADDING, panelTop + 44, model.shop.record.greeting, {
         fontFamily: UI.fontFamily,
-        fontSize: '12px',
+        fontSize: uiFontSize(12),
         color: UI.textMuted,
         wordWrap: { width: contentWidth },
         lineSpacing: 3,
@@ -333,7 +334,7 @@ export class ShopPanel {
       const emptyText = this.scene.add
         .text(panelLeft + PADDING, listTop, this.tab === 'buy' ? EMPTY_SHELF : EMPTY_BAG, {
           fontFamily: UI.fontFamily,
-          fontSize: '13px',
+          fontSize: uiFontSize(13),
           color: UI.textMuted,
         })
         .setOrigin(0, 0);
@@ -357,7 +358,7 @@ export class ShopPanel {
             `${index === this.selection ? CURSOR_ACTIVE : CURSOR_IDLE}${line.text}`,
             {
               fontFamily: UI.fontFamily,
-              fontSize: '13px',
+              fontSize: uiFontSize(13),
               color: line.color,
             },
           )
@@ -368,7 +369,7 @@ export class ShopPanel {
         const moreText = this.scene.add
           .text(panelLeft + PADDING + 6, listTop + VISIBLE_ROWS * ROW_HEIGHT, LABELS.stocksHidden, {
             fontFamily: UI.fontFamily,
-            fontSize: '11px',
+            fontSize: uiFontSize(11),
             color: UI.textMuted,
           })
           .setOrigin(0, 0);
@@ -383,7 +384,7 @@ export class ShopPanel {
       const detailText = this.scene.add
         .text(panelLeft + PADDING, detailTop, selectedItem.description, {
           fontFamily: UI.fontFamily,
-          fontSize: '12px',
+          fontSize: uiFontSize(12),
           color: UI.textMuted,
           wordWrap: { width: contentWidth },
           lineSpacing: 4,
@@ -397,7 +398,7 @@ export class ShopPanel {
       const statusText = this.scene.add
         .text(panelLeft + PADDING, panelTop + PANEL_HEIGHT - 44, this.status, {
           fontFamily: UI.fontFamily,
-          fontSize: '12px',
+          fontSize: uiFontSize(12),
           color: UI.textWarn,
           wordWrap: { width: contentWidth },
         })
@@ -408,7 +409,7 @@ export class ShopPanel {
     const hintText = this.scene.add
       .text(panelLeft + PANEL_WIDTH - PADDING, panelTop + PANEL_HEIGHT - 20, LABELS.selectHint, {
         fontFamily: UI.fontFamily,
-        fontSize: '10px',
+        fontSize: uiFontSize(10),
         color: UI.textMuted,
       })
       .setOrigin(1, 1);

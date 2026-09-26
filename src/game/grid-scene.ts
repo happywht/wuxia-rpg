@@ -1,56 +1,32 @@
 import Phaser from 'phaser';
 
-import {
-  type Diagnostic,
-  type DataLoaderEventMap,
-  type LoadedResource,
-  loadGameData,
-} from '../engine/data-loader';
-import { EventBus } from '../engine/event-bus';
-import { GridMap, parseGridMap } from '../engine/grid-map';
+import type { Diagnostic } from '../engine/data-loader';
+import { GridMap } from '../engine/grid-map';
 import { cellCenterOffset, renderGridMap } from '../engine/grid-map-renderer';
 import {
   type DialogueData,
   type DialogueSession,
-  indexConversations,
-  parseDialogueSet,
-  validateConversation,
 } from '../engine/dialogue-graph';
 import {
   type DialogueRuntimeContext,
   applyDialogueEffects,
-  assembleDialogueReferences,
   getVisibleOptions,
 } from '../engine/dialogue-runtime';
 import { type SocialState, createSocialState } from '../engine/social-state';
 import {
-  assembleNpcPlacements,
-  type NpcSetData,
   NpcOccupancyIndex,
-  parseNpcSet,
   type PlacedNpc,
   selectInteractionTarget,
 } from '../engine/npc-placement';
 import {
   type CharacterProfileData,
   type CharacterState,
-  type FactionData,
   createCharacterState,
-  indexFactions,
-  indexMartialArts,
-  indexProfiles,
   grantExperience,
-  type MartialArtData,
-  parseCharacterProfileSet,
-  parseFactionSet,
-  parseMartialArtSet,
   resolveStartingMartialArts,
 } from '../engine/character-progression';
 import {
-  assembleBattleEncounters,
-  type BattleEncounterSetData,
   CombatSession,
-  parseBattleEncounterSet,
   type PlacedEncounter,
   selectEncounterTarget,
 } from '../engine/turn-based-combat';
@@ -58,27 +34,31 @@ import {
   type AssembledShop,
   type InventoryState,
   type ItemRecordData,
-  type ShopSetData,
   type ShopStockRuntime,
-  assembleShops,
   createInventoryState,
   createShopStockRuntime,
   countItem,
-  indexItems,
-  parseItemSet,
-  parseShopSet,
   resolveStartingItems,
 } from '../engine/item-system';
 import {
   type QuestData,
   type QuestJournal,
-  type QuestSetData,
   type QuestUpdateResult,
   applyQuestSignal,
-  assembleQuests,
   createQuestJournal,
-  parseQuestSet,
 } from '../engine/quest-system';
+import {
+  type SaveSlotId,
+  type SaveSnapshotV1,
+  type SaveStorage,
+  captureSaveSnapshot,
+  createBrowserSaveStorage,
+  planSnapshotRestore,
+  readSaveSlot,
+  type RestoredRunState,
+  restoreRunState,
+  writeSaveSlot,
+} from '../engine/save-system';
 import {
   type DialogueConfirmOutcome,
   DialoguePanel,
@@ -87,64 +67,46 @@ import { BattlePanel } from './combat-ui';
 import { InventoryPanel } from './inventory-ui';
 import { ShopPanel } from './shop-ui';
 import { QuestPanel } from './quest-ui';
+import { PauseMenuPanel } from './pause-menu';
+import { type GameSettings, applyGameSettings, loadGameSettings, uiFontSize } from './settings';
+import { type GridStartupData } from './menu-scene';
+import {
+  MAP_RESOURCE_ID,
+  type LoadedWorld,
+  type ProgressionAssembly,
+  loadWorldData,
+} from './world-loader';
 
 /**
  * Round 03 grid scene, extended with the Round 04 progression datasets,
- * the Round 05 battle slice, Round 06 item/trade slice, Round 07 quests and
- * the Round 08 dialogue condition/effect runtime.
+ * the Round 05 battle slice, Round 06 item/trade slice, Round 07 quests,
+ * the Round 08 dialogue condition/effect runtime and the Round 09
+ * menu/save/settings flow.
  *
- * The required map still loads through the generic data loader exactly like
- * Round 02 — manifest/schema/map failures remain fatal and land in the
- * readable error panel. NPC, dialogue, character-profile, faction,
- * martial-art, battle-encounter, item, shop and quest resources are *optional*
- * content on top of that: each failing NPC, conversation, dataset, single
- * martial art, single encounter, item, shop or quest is disabled individually with
- * a warning, and the map stays fully playable without them (or with none
- * registered at all, which shows the empty-interaction hint).
+ * Since Round 09 the scene starts from {@link GridStartupData} handed over
+ * by the menu scene: either a fresh character (`kind:'new'` with the chosen
+ * template id and display name) or a save slot to restore (`kind:'load'`).
+ * World data loads through the shared `world-loader` (same manifest/schema/
+ * optional-content pipeline as before — manifest/schema/map failures stay
+ * fatal, every optional dataset degrades per smallest unit). A save load
+ * runs the full parse → world preflight → restore pipeline *before* any
+ * scene field changes, so a refused save (corrupt, wrong version, dangling
+ * profile, unloadable position) shows a readable panel and leaves nothing
+ * half-applied; the player returns to the menu with Escape.
  *
- * NPCs are rendered at their data-declared walkable cells, block player
- * movement, and can be talked to while four-way adjacent. While the
- * dialogue panel is open, movement input is ignored and restored on close.
- * Every name and line of dialogue comes from `data/` — never from code.
+ * Escape opens the Round 09 pause menu while exploring (movement locks like
+ * every other overlay): continue, save to one of the three slots (explicit
+ * success/failure feedback), settings (volume + text scale, applied live)
+ * and returning to the main menu behind an explicit confirm. Saving
+ * captures the complete Round 06–08 run state through the Phaser-free save
+ * engine; the scene keeps zero save-format knowledge of its own.
  *
- * Round 05 places data-declared encounters the same way: the enemy marker
- * blocks its cell, the approach prompt shows while four-way adjacent, and E
- * opens the battle overlay (movement locked while it is open, restored on
- * close). Victory experience settles through the Round 04 progression
- * engine, defeat restores by the encounter's declared ratios, and a
- * completed non-repeatable encounter stays dormant until the page reloads
- * (saves arrive in Round 09).
- *
- * Round 06 creates the player's runtime state from the first valid
- * character profile — independent of encounters — together with a runtime
- * inventory (starting money, capacity and per-reference-validated starting
- * stacks) and per-run shop stock. B toggles a keyboard backpack (use
- * consumables, equip/unequip with attribute/vital effects flowing into
- * combat); an adjacent NPC keeping a valid shop opens it with E (other NPCs
- * keep their dialogue; a dangling shop reference falls back to dialogue
- * with a warning). While either overlay is open, movement input stays
- * locked and is restored on close.
- *
- * Round 08 adds the in-memory social state (morality/renown/per-NPC
- * relationships) and wires dialogue options through the Phaser-free
- * condition/effect runtime: options whose conditions fail stay hidden, a
- * node with no visible option closes like an end node, and confirming an
- * option executes its effects atomically before the node transition (a
- * refusal changes nothing). Quest givers keep their E quest board while F
- * opens their dialogue directly, so both entry points coexist.
+ * Everything else is unchanged from Round 08: NPCs block cells and talk
+ * four-way adjacent (E), quest givers keep the E board while F talks
+ * directly, encounters block their cells until beaten (one-shots stay
+ * dormant *for the run*, now including across save/load), and B/Q open the
+ * backpack/journal. All names and lines come from `data/` — never code.
  */
-
-/** Stable resource ids from data/base/manifest.json — never hard-coded URLs. */
-const MAP_RESOURCE_ID = 'map.round-01-grid';
-const NPC_RESOURCE_ID = 'npc.round-03-set';
-const DIALOGUE_RESOURCE_ID = 'dialogue.round-03-set';
-const CHARACTER_PROFILE_RESOURCE_ID = 'character-profile.round-04-set';
-const FACTION_RESOURCE_ID = 'faction.round-04-set';
-const MARTIAL_ART_RESOURCE_ID = 'martial-art.round-04-set';
-const ENCOUNTER_RESOURCE_ID = 'encounter.round-05-set';
-const ITEM_RESOURCE_ID = 'item.round-06-set';
-const SHOP_RESOURCE_ID = 'shop.round-06-set';
-const QUEST_RESOURCE_ID = 'quest.round-07-set';
 
 const VIEW_WIDTH = 960;
 const VIEW_HEIGHT = 540;
@@ -179,80 +141,18 @@ const UI = {
   fontFamily: 'sans-serif',
 } as const;
 
-/** Optional resources (NPC/dialogue/progression/battle/trade content) this scene can lose without dying. */
-const OPTIONAL_RESOURCE_IDS = new Set([
-  NPC_RESOURCE_ID,
-  DIALOGUE_RESOURCE_ID,
-  CHARACTER_PROFILE_RESOURCE_ID,
-  FACTION_RESOURCE_ID,
-  MARTIAL_ART_RESOURCE_ID,
-  ENCOUNTER_RESOURCE_ID,
-  ITEM_RESOURCE_ID,
-  SHOP_RESOURCE_ID,
-  QUEST_RESOURCE_ID,
-]);
-
-/** Optional-content schemas; schema-level failures carry no resource id, so match by origin. */
-const OPTIONAL_SCHEMA_ORIGINS = new Set([
-  'schema:npc-set',
-  'schema:dialogue-set',
-  'schema:character-profiles',
-  'schema:faction-set',
-  'schema:martial-arts-set',
-  'schema:battle-encounters',
-  'schema:items-set',
-  'schema:shops-set',
-  'schema:quest-set',
-]);
-
-function isOptionalContentDiagnostic(diagnostic: Diagnostic): boolean {
-  return (
-    (diagnostic.resource !== undefined && OPTIONAL_RESOURCE_IDS.has(diagnostic.resource)) ||
-    OPTIONAL_SCHEMA_ORIGINS.has(diagnostic.origin)
-  );
-}
-
-/** Flattens loader diagnostics into readable panel lines, one block each. */
-function formatDiagnostics(diagnostics: readonly Diagnostic[]): string[] {
-  return diagnostics.map((diagnostic) => {
-    const scope =
-      diagnostic.resource === undefined
-        ? diagnostic.origin
-        : `${diagnostic.origin}（资源 ${diagnostic.resource}）`;
-    const details = diagnostic.details.length > 0 ? `\n${diagnostic.details.join('\n')}` : '';
-    return `${scope}：${diagnostic.message}${details}`;
-  });
-}
-
-/**
- * Validated Round 04 progression datasets. Assembled and cross-checked at
- * startup so bad data warns early; consumed by the coming rounds (character
- * creation, joining, combat) — this round renders no progression UI.
- */
-interface ProgressionAssembly {
-  profiles: ReadonlyMap<string, CharacterProfileData>;
-  factions: ReadonlyMap<string, FactionData>;
-  martialArts: ReadonlyMap<string, MartialArtData>;
-}
-
-/** Everything the playable world needs after optional-content assembly. */
-interface WorldAssembly {
-  npcs: PlacedNpc[];
-  dialogues: ReadonlyMap<string, DialogueData>;
-  progression: ProgressionAssembly;
-  encounters: PlacedEncounter[];
-  items: ReadonlyMap<string, ItemRecordData>;
-  shops: ReadonlyMap<string, AssembledShop>;
-  quests: ReadonlyMap<string, QuestData>;
-  warnings: Diagnostic[];
-}
-
 export class GridScene extends Phaser.Scene {
   private map: GridMap | null = null;
   private mapOrigin = new Phaser.Math.Vector2(0, 0);
   private marker: Phaser.GameObjects.Arc | null = null;
   private playerCol = 0;
   private playerRow = 0;
+
+  /** Round 09 startup payload from the menu scene (null = defensive default new game). */
+  private startup: GridStartupData | null = null;
+
+  /** Player-chosen display name (kept for HUD and save snapshots). */
+  private playerDisplayName = '';
 
   /** Movement lock: while a tween is in flight every input is ignored. */
   private moving = false;
@@ -262,7 +162,7 @@ export class GridScene extends Phaser.Scene {
   private occupancy = new NpcOccupancyIndex();
   private dialogues: ReadonlyMap<string, DialogueData> = new Map();
 
-  /** Validated progression datasets, kept for the coming rounds (no UI yet). */
+  /** Validated progression datasets (assembled by the shared world loader). */
   private progression: ProgressionAssembly = {
     profiles: new Map(),
     factions: new Map(),
@@ -276,9 +176,9 @@ export class GridScene extends Phaser.Scene {
   /** Marker graphics per encounter id, removed when a foe is defeated. */
   private encounterMarkers = new Map<string, Phaser.GameObjects.GameObject[]>();
 
-  /** Player runtime state; created from the first valid character profile
+  /** Player runtime state; created from the chosen character profile
    * (Round 06: independent of encounters, so the backpack works even when
-   * battle data is missing or invalid). */
+   * battle data is missing or invalid; Round 09: or restored from a save). */
   private playerProfile: CharacterProfileData | null = null;
   private playerState: CharacterState | null = null;
 
@@ -288,11 +188,11 @@ export class GridScene extends Phaser.Scene {
   private readonly shopStocks = new Map<string, ShopStockRuntime>();
   private inventory: InventoryState | null = null;
 
-  /** Valid quest catalog and per-run journal (persistence arrives in R09). */
+  /** Valid quest catalog and per-run journal (persisted since Round 09). */
   private quests: ReadonlyMap<string, QuestData> = new Map();
   private questJournal: QuestJournal = { states: new Map(), trackedQuestId: null };
 
-  /** Round 08 social state (morality/renown/NPC relationships, in-memory). */
+  /** Round 08 social state (morality/renown/NPC relationships). */
   private social: SocialState = createSocialState();
 
   private dialoguePanel: DialoguePanel | null = null;
@@ -300,8 +200,20 @@ export class GridScene extends Phaser.Scene {
   private inventoryPanel: InventoryPanel | null = null;
   private shopPanel: ShopPanel | null = null;
   private questPanel: QuestPanel | null = null;
+  private pauseMenu: PauseMenuPanel | null = null;
   private activeSession: CombatSession | null = null;
   private activeEncounter: PlacedEncounter | null = null;
+
+  /** Round 09 storage/settings plumbing (storage null = browser disallows it). */
+  private storage: SaveStorage | null = null;
+  private settings: GameSettings = { volume: 8, textScaleIndex: 1 };
+  /**
+   * Timestamp of the most recent overlay close. Escape closes whichever
+   * overlay owns it AND fires this scene's Escape key in the same DOM
+   * event, so the pause toggle ignores Escape for a short window after any
+   * overlay closed — closing a dialogue must not pop the pause menu.
+   */
+  private lastOverlayCloseAt = -Infinity;
 
   private coordsText: Phaser.GameObjects.Text | null = null;
   private interactText: Phaser.GameObjects.Text | null = null;
@@ -313,12 +225,29 @@ export class GridScene extends Phaser.Scene {
     super('grid');
   }
 
+  /** Receives the menu scene's startup payload before create() runs. */
+  init(data: object): void {
+    const payload = data as Partial<GridStartupData>;
+    if (payload.kind === 'new' || payload.kind === 'load') {
+      this.startup = {
+        kind: payload.kind,
+        profileId: typeof payload.profileId === 'string' ? payload.profileId : undefined,
+        displayName: typeof payload.displayName === 'string' ? payload.displayName : undefined,
+        slotId: payload.slotId,
+      };
+    }
+  }
+
   create(): void {
+    this.storage = createBrowserSaveStorage();
+    this.settings = loadGameSettings(this.storage ?? unavailableStorage());
+    applyGameSettings(this.game, this.settings);
+
     this.bindMovementKeys();
     this.add
       .text(VIEW_WIDTH / 2, VIEW_HEIGHT / 2, '正在加载地图数据…', {
         fontFamily: UI.fontFamily,
-        fontSize: '14px',
+        fontSize: uiFontSize(14),
         color: UI.textMuted,
       })
       .setOrigin(0.5);
@@ -326,511 +255,42 @@ export class GridScene extends Phaser.Scene {
   }
 
   private async loadWorld(): Promise<void> {
-    // Data events mirror the structured diagnostics in the devtools console;
-    // the readable error panel below is what players actually see.
-    const bus = new EventBus<DataLoaderEventMap>();
-    const offLoaded = bus.on('data:resource-loaded', (event) => {
-      const origin = event.source.kind === 'base' ? 'base' : `mod:${event.source.modId}`;
-      console.info(`[data] 资源 ${event.id} 加载自 ${origin}`);
-    });
-    const offError = bus.on('data:resource-error', (event) => {
-      console.warn(`[data] ${event.origin}: ${event.message}`, event.details);
-    });
-
-    try {
-      const result = await loadGameData({
-        baseUrl: import.meta.env.BASE_URL,
-        bus,
-        semanticValidators: {
-          'grid-map': (value) => {
-            const parsed = parseGridMap(value);
-            return parsed.ok ? [] : parsed.errors;
-          },
-          'character-profiles': (value) => {
-            const parsed = parseCharacterProfileSet(value);
-            return parsed.ok ? [] : parsed.errors;
-          },
-          'faction-set': (value) => {
-            const parsed = parseFactionSet(value);
-            return parsed.ok ? [] : parsed.errors;
-          },
-          'martial-arts-set': (value) => {
-            const parsed = parseMartialArtSet(value);
-            return parsed.ok ? [] : parsed.errors;
-          },
-          'battle-encounters': (value) => {
-            const parsed = parseBattleEncounterSet(value);
-            return parsed.ok ? [] : parsed.errors;
-          },
-          'items-set': (value) => {
-            const parsed = parseItemSet(value);
-            return parsed.ok ? [] : parsed.errors;
-          },
-          'shops-set': (value) => {
-            const parsed = parseShopSet(value);
-            return parsed.ok ? [] : parsed.errors;
-          },
-          'quest-set': (value) => {
-            const parsed = parseQuestSet(value);
-            return parsed.ok ? [] : parsed.errors;
-          },
-        },
-      });
-
-      // Optional NPC/dialogue problems degrade to warnings; everything else
-      // (manifest, schemas, the required map) stays fatal like Round 02.
-      const blocking = result.diagnostics.filter(
-        (diagnostic) =>
-          (diagnostic.severity ?? 'error') === 'error' && !isOptionalContentDiagnostic(diagnostic),
-      );
-      if (blocking.length > 0) {
-        this.showErrorState('资料加载诊断', formatDiagnostics(blocking));
-        return;
-      }
-      const modWarnings = result.diagnostics.filter(
-        (diagnostic) => diagnostic.severity === 'warning',
-      );
-      const optionalWarnings = result.diagnostics.filter(
-        (diagnostic) =>
-          (diagnostic.severity ?? 'error') === 'error' && isOptionalContentDiagnostic(diagnostic),
-      );
-
-      const mapResource = result.resources.get(MAP_RESOURCE_ID);
-      if (mapResource === undefined) {
-        this.showErrorState('地图资源缺失', [
-          `清单中没有 id 为 "${MAP_RESOURCE_ID}" 的资源，请检查 data/base/manifest.json。`,
-        ]);
-        return;
-      }
-
-      const parsed = parseGridMap(mapResource.value);
-      if (!parsed.ok) {
-        this.showErrorState('地图数据结构不合规', parsed.errors);
-        return;
-      }
-
-      const assembly = this.assembleOptionalContent(result.resources, parsed.map);
-      this.setupWorld(
-        parsed.map,
-        assembly,
-        [...optionalWarnings, ...assembly.warnings],
-        modWarnings,
-      );
-    } catch (error) {
-      // loadGameData converts its own failures to diagnostics; this guard
-      // only catches the truly unexpected (e.g. a programming error).
-      const reason = error instanceof Error ? error.message : String(error);
-      this.showErrorState('地图数据加载失败', [reason]);
-    } finally {
-      offLoaded();
-      offError();
+    const outcome = await loadWorldData();
+    if (!outcome.ok) {
+      this.showErrorState(outcome.title, outcome.lines, true);
+      return;
     }
+    this.setupWorld(outcome.world);
   }
 
   /**
-   * Assembles optional NPC/dialogue content. Every failure disables the
-   * smallest possible unit — one conversation or one NPC — and becomes a
-   * warning instead of killing the scene. Missing (unregistered) resources
-   * are legitimate: the world then has no optional interactions or quests.
+   * Adopts the loaded world and initializes the run state: either restored
+   * from the requested save slot (parse → world preflight → restore, all
+   * *before* any field changes) or freshly created from the chosen/first
+   * valid character template.
    */
-  private assembleOptionalContent(
-    resources: ReadonlyMap<string, LoadedResource>,
-    map: GridMap,
-  ): WorldAssembly {
-    const warnings: Diagnostic[] = [];
+  private setupWorld(world: LoadedWorld): void {
+    const { map, assembly } = world;
+    // ---- Run-state resolution first: a refused save must leave this scene
+    // untouched (the error panel below then offers Escape back to the menu).
+    const playerWarnings: string[] = [];
+    let restoredRun:
+      | (RestoredRunState & {
+          profileId: string;
+          displayName: string;
+          playerPosition: { col: number; row: number };
+        })
+      | null = null;
 
-    // Conversations first: NPC validation resolves against the valid set.
-    let dialogues = new Map<string, DialogueData>();
-    const dialogueResource = resources.get(DIALOGUE_RESOURCE_ID);
-    if (dialogueResource !== undefined) {
-      const parsed = parseDialogueSet(dialogueResource.value);
-      if (!parsed.ok) {
-        warnings.push({
-          resource: DIALOGUE_RESOURCE_ID,
-          origin: 'dialogue-assembly',
-          severity: 'warning',
-          message: '对话资料结构不合规，本轮禁用全部对话',
-          details: parsed.errors,
-        });
-      } else {
-        const index = indexConversations(parsed.set);
-        for (const id of index.duplicateIds) {
-          warnings.push({
-            resource: DIALOGUE_RESOURCE_ID,
-            origin: 'dialogue-assembly',
-            severity: 'warning',
-            message: `对话 id "${id}" 重复，保留先声明者`,
-            details: [],
-          });
-        }
-        for (const [id, conversation] of index.byId) {
-          const problems = validateConversation(conversation);
-          if (problems.length > 0) {
-            warnings.push({
-              resource: DIALOGUE_RESOURCE_ID,
-              origin: 'dialogue-assembly',
-              severity: 'warning',
-              message: `对话 "${id}" 已禁用：${problems.join('；')}`,
-              details: [],
-            });
-          } else {
-            dialogues.set(id, conversation);
-          }
-        }
+    if (this.startup?.kind === 'load' && this.startup.slotId !== undefined) {
+      const restoration = this.restoreFromSlot(world, this.startup.slotId);
+      if (restoration === null) {
+        return; // The readable failure panel is already on screen.
       }
+      restoredRun = restoration.run;
+      playerWarnings.push(...restoration.warnings);
     }
 
-    let npcSet: NpcSetData | null = null;
-    const npcResource = resources.get(NPC_RESOURCE_ID);
-    if (npcResource !== undefined) {
-      const parsed = parseNpcSet(npcResource.value);
-      if (!parsed.ok) {
-        warnings.push({
-          resource: NPC_RESOURCE_ID,
-          origin: 'npc-assembly',
-          severity: 'warning',
-          message: 'NPC 资料结构不合规，本轮禁用全部人物',
-          details: parsed.errors,
-        });
-      } else {
-        npcSet = parsed.set;
-      }
-    }
-
-    const placement = assembleNpcPlacements({
-      npcSet,
-      knownResourceIds: new Set(resources.keys()),
-      maps: new Map([[MAP_RESOURCE_ID, map]]),
-      currentMapResourceId: MAP_RESOURCE_ID,
-      dialogueIds: new Set(dialogues.keys()),
-    });
-    for (const message of placement.warnings) {
-      warnings.push({
-        resource: NPC_RESOURCE_ID,
-        origin: 'npc-assembly',
-        severity: 'warning',
-        message,
-        details: [],
-      });
-    }
-
-    const progressionAssembled = this.assembleProgressionContent(resources);
-    warnings.push(...progressionAssembled.warnings);
-
-    // Items first, then shops: shop stock references resolve against the
-    // indexed items, and NPC shop references resolve against assembled shops.
-    const itemAssembly = this.assembleItemContent(resources);
-    warnings.push(...itemAssembly.warnings);
-
-    const shopAssembly = assembleShops({
-      shopSet: itemAssembly.shopSet,
-      placedNpcIds: new Set(placement.npcs.map((npc) => npc.record.id)),
-      items: itemAssembly.items,
-    });
-    for (const message of shopAssembly.warnings) {
-      warnings.push({
-        resource: SHOP_RESOURCE_ID,
-        origin: 'shop-assembly',
-        severity: 'warning',
-        message,
-        details: [],
-      });
-    }
-
-    // A shopkeeper NPC whose shopId fails to resolve falls back to its
-    // dialogue — worth a warning so authors can fix the reference.
-    for (const npc of placement.npcs) {
-      if (npc.record.shopId !== null && !shopAssembly.shops.has(npc.record.shopId)) {
-        warnings.push({
-          resource: NPC_RESOURCE_ID,
-          origin: 'shop-assembly',
-          severity: 'warning',
-          message: `NPC "${npc.record.id}"（${npc.record.name}）引用的商店 "${npc.record.shopId}" 不存在或已因校验失败被禁用，交互回落到对话`,
-          details: [],
-        });
-      }
-    }
-
-
-    // Encounters resolve against the map, placed NPCs, profiles and arts.
-    let encounters: PlacedEncounter[] = [];
-    let encounterSet: BattleEncounterSetData | null = null;
-    const encounterResource = resources.get(ENCOUNTER_RESOURCE_ID);
-    if (encounterResource !== undefined) {
-      const parsed = parseBattleEncounterSet(encounterResource.value);
-      if (!parsed.ok) {
-        warnings.push({
-          resource: ENCOUNTER_RESOURCE_ID,
-          origin: 'encounter-assembly',
-          severity: 'warning',
-          message: '遭遇资料结构不合规，本轮禁用全部战斗遭遇',
-          details: parsed.errors,
-        });
-      } else {
-        encounterSet = parsed.set;
-      }
-    }
-    const encounterPlacement = assembleBattleEncounters({
-      encounterSet,
-      knownResourceIds: new Set(resources.keys()),
-      maps: new Map([[MAP_RESOURCE_ID, map]]),
-      currentMapResourceId: MAP_RESOURCE_ID,
-      npcCells: new Set(placement.npcs.map((npc) => `${npc.col},${npc.row}`)),
-      profiles: progressionAssembled.assembly.profiles,
-      martialArts: progressionAssembled.assembly.martialArts,
-    });
-    for (const message of encounterPlacement.warnings) {
-      warnings.push({
-        resource: ENCOUNTER_RESOURCE_ID,
-        origin: 'encounter-assembly',
-        severity: 'warning',
-        message,
-        details: [],
-      });
-    }
-    encounters = encounterPlacement.encounters;
-
-    let questSet: QuestSetData | null = null;
-    const questResource = resources.get(QUEST_RESOURCE_ID);
-    if (questResource !== undefined) {
-      const parsed = parseQuestSet(questResource.value);
-      if (!parsed.ok) {
-        warnings.push({
-          resource: QUEST_RESOURCE_ID,
-          origin: 'quest-assembly',
-          severity: 'warning',
-          message: '任务资料结构不合规，本轮禁用全部任务',
-          details: parsed.errors,
-        });
-      } else {
-        questSet = parsed.set;
-      }
-    }
-    const questAssembly = assembleQuests({
-      questSet,
-      questGiverNpcIds: new Set(
-        placement.npcs.filter((npc) => npc.record.questGiver).map((npc) => npc.record.id),
-      ),
-      itemIds: new Set(itemAssembly.items.keys()),
-      encounterIds: new Set(encounters.map((encounter) => encounter.record.id)),
-    });
-    for (const message of questAssembly.warnings) {
-      warnings.push({
-        resource: QUEST_RESOURCE_ID,
-        origin: 'quest-assembly',
-        severity: 'warning',
-        message,
-        details: [],
-      });
-    }
-
-    // Round 08: resolve condition/effect references now that quests, items
-    // and placed NPCs are all known. A dangling reference drops exactly its
-    // option; the conversation (and its referencing NPC) stays playable.
-    const placedNpcIds = new Set(placement.npcs.map((npc) => npc.record.id));
-    const dialogueReferences = assembleDialogueReferences({
-      conversations: dialogues,
-      quests: questAssembly.quests,
-      items: itemAssembly.items,
-      placedNpcIds,
-    });
-    for (const message of dialogueReferences.warnings) {
-      warnings.push({
-        resource: DIALOGUE_RESOURCE_ID,
-        origin: 'dialogue-assembly',
-        severity: 'warning',
-        message,
-        details: [],
-      });
-    }
-
-    return {
-      npcs: placement.npcs,
-      dialogues: dialogueReferences.conversations,
-      progression: progressionAssembled.assembly,
-      encounters,
-      items: itemAssembly.items,
-      shops: shopAssembly.shops,
-      quests: questAssembly.quests,
-      warnings,
-    };
-  }
-
-  /**
-   * Assembles the optional Round 04 character/faction/martial-art datasets.
-   * Structural failures disable the whole resource with a warning; duplicate
-   * ids keep the first declaration; a martial art referencing a missing or
-   * disabled faction drops out alone. Missing (unregistered) resources are
-   * legitimate — later rounds then simply have no progression data. Nothing
-   * here can block the map.
-   */
-  private assembleProgressionContent(
-    resources: ReadonlyMap<string, LoadedResource>,
-  ): { assembly: ProgressionAssembly; warnings: Diagnostic[] } {
-    const warnings: Diagnostic[] = [];
-
-    let profiles = new Map<string, CharacterProfileData>();
-    const profileResource = resources.get(CHARACTER_PROFILE_RESOURCE_ID);
-    if (profileResource !== undefined) {
-      const parsed = parseCharacterProfileSet(profileResource.value);
-      if (!parsed.ok) {
-        warnings.push({
-          resource: CHARACTER_PROFILE_RESOURCE_ID,
-          origin: 'progression-assembly',
-          severity: 'warning',
-          message: '角色模板资料结构不合规，本轮禁用全部角色模板',
-          details: parsed.errors,
-        });
-      } else {
-        const index = indexProfiles(parsed.set);
-        for (const id of index.duplicateIds) {
-          warnings.push({
-            resource: CHARACTER_PROFILE_RESOURCE_ID,
-            origin: 'progression-assembly',
-            severity: 'warning',
-            message: `角色模板 id "${id}" 重复，保留先声明者`,
-            details: [],
-          });
-        }
-        profiles = index.byId;
-      }
-    }
-
-    let factions = new Map<string, FactionData>();
-    const factionResource = resources.get(FACTION_RESOURCE_ID);
-    if (factionResource !== undefined) {
-      const parsed = parseFactionSet(factionResource.value);
-      if (!parsed.ok) {
-        warnings.push({
-          resource: FACTION_RESOURCE_ID,
-          origin: 'progression-assembly',
-          severity: 'warning',
-          message: '门派资料结构不合规，本轮禁用全部门派',
-          details: parsed.errors,
-        });
-      } else {
-        const index = indexFactions(parsed.set);
-        for (const id of index.duplicateIds) {
-          warnings.push({
-            resource: FACTION_RESOURCE_ID,
-            origin: 'progression-assembly',
-            severity: 'warning',
-            message: `门派 id "${id}" 重复，保留先声明者`,
-            details: [],
-          });
-        }
-        factions = index.byId;
-      }
-    }
-
-    let martialArts = new Map<string, MartialArtData>();
-    const martialArtResource = resources.get(MARTIAL_ART_RESOURCE_ID);
-    if (martialArtResource !== undefined) {
-      const parsed = parseMartialArtSet(martialArtResource.value);
-      if (!parsed.ok) {
-        warnings.push({
-          resource: MARTIAL_ART_RESOURCE_ID,
-          origin: 'progression-assembly',
-          severity: 'warning',
-          message: '武学资料结构不合规，本轮禁用全部武学',
-          details: parsed.errors,
-        });
-      } else {
-        const index = indexMartialArts({
-          set: parsed.set,
-          factionIds: new Set(factions.keys()),
-        });
-        for (const id of index.duplicateIds) {
-          warnings.push({
-            resource: MARTIAL_ART_RESOURCE_ID,
-            origin: 'progression-assembly',
-            severity: 'warning',
-            message: `武学 id "${id}" 重复，保留先声明者`,
-            details: [],
-          });
-        }
-        for (const message of index.warnings) {
-          warnings.push({
-            resource: MARTIAL_ART_RESOURCE_ID,
-            origin: 'progression-assembly',
-            severity: 'warning',
-            message,
-            details: [],
-          });
-        }
-        martialArts = index.byId;
-      }
-    }
-
-    return { assembly: { profiles, factions, martialArts }, warnings };
-  }
-
-  /**
-   * Assembles the optional Round 06 item dataset and parses the shop set.
-   * Structural failures disable the whole resource with a warning; duplicate
-   * item ids keep the first declaration. A missing (unregistered) resource
-   * is legitimate — the world then simply has no items or shops. Nothing
-   * here can block the map. Shop cross-references run in
-   * {@link assembleOptionalContent} once NPC placement is known.
-   */
-  private assembleItemContent(
-    resources: ReadonlyMap<string, LoadedResource>,
-  ): { items: ReadonlyMap<string, ItemRecordData>; shopSet: ShopSetData | null; warnings: Diagnostic[] } {
-    const warnings: Diagnostic[] = [];
-
-    let items = new Map<string, ItemRecordData>();
-    const itemResource = resources.get(ITEM_RESOURCE_ID);
-    if (itemResource !== undefined) {
-      const parsed = parseItemSet(itemResource.value);
-      if (!parsed.ok) {
-        warnings.push({
-          resource: ITEM_RESOURCE_ID,
-          origin: 'item-assembly',
-          severity: 'warning',
-          message: '物品资料结构不合规，本轮禁用全部物品与交易',
-          details: parsed.errors,
-        });
-      } else {
-        const index = indexItems(parsed.set);
-        for (const id of index.duplicateIds) {
-          warnings.push({
-            resource: ITEM_RESOURCE_ID,
-            origin: 'item-assembly',
-            severity: 'warning',
-            message: `物品 id "${id}" 重复，保留先声明者`,
-            details: [],
-          });
-        }
-        items = index.byId;
-      }
-    }
-
-    let shopSet: ShopSetData | null = null;
-    const shopResource = resources.get(SHOP_RESOURCE_ID);
-    if (shopResource !== undefined) {
-      const parsed = parseShopSet(shopResource.value);
-      if (!parsed.ok) {
-        warnings.push({
-          resource: SHOP_RESOURCE_ID,
-          origin: 'shop-assembly',
-          severity: 'warning',
-          message: '商店资料结构不合规，本轮禁用全部商店',
-          details: parsed.errors,
-        });
-      } else {
-        shopSet = parsed.set;
-      }
-    }
-
-    return { items, shopSet, warnings };
-  }
-
-  private setupWorld(
-    map: GridMap,
-    assembly: WorldAssembly,
-    optionalWarnings: readonly Diagnostic[],
-    modWarnings: readonly Diagnostic[],
-  ): void {
     this.children.removeAll(true); // Drop the transient loading hint.
     this.map = map;
     this.placedNpcs = assembly.npcs;
@@ -847,40 +307,81 @@ export class GridScene extends Phaser.Scene {
     this.items = assembly.items;
     this.shops = assembly.shops;
     this.quests = assembly.quests;
-    this.questJournal = createQuestJournal(this.quests);
-    this.social = createSocialState();
-    this.shopStocks.clear();
-    for (const shop of this.shops.values()) {
-      this.shopStocks.set(shop.record.id, createShopStockRuntime(shop));
-    }
+    this.encounterMarkers.clear();
+    this.completedEncounters.clear();
 
-    // The player's runtime state is created from the first valid character
-    // profile (Round 06: independent of encounters, so the backpack works
-    // even when battle data is missing or invalid). Starting martial arts
-    // and starting items are validated per reference — broken ones drop
-    // with a warning. Encounters declaring a different profile are reported
-    // so authors can fix the data.
-    const playerWarnings: string[] = [];
-    const firstProfile = assembly.progression.profiles.values().next().value ?? null;
-    if (firstProfile !== null && firstProfile !== undefined) {
-      this.playerProfile = firstProfile;
-      this.playerState = createCharacterState(firstProfile);
-      const startingArts = resolveStartingMartialArts(
-        firstProfile,
-        assembly.progression.martialArts,
-      );
-      this.playerState.martialArtIds = [...startingArts.ids];
-      playerWarnings.push(...startingArts.warnings);
-      const startingItems = resolveStartingItems(firstProfile, assembly.items);
-      this.inventory = createInventoryState(firstProfile, startingItems.stacks);
-      playerWarnings.push(...startingItems.warnings);
-      for (const encounter of assembly.encounters) {
-        if (encounter.profile.id !== firstProfile.id) {
-          playerWarnings.push(
-            `遭遇 "${encounter.record.id}" 声明的角色模板 "${encounter.profile.id}" 与首次创建玩家所用模板 "${firstProfile.id}" 不同，仍沿用后者`,
-          );
+    if (restoredRun !== null) {
+      // ---- Save path: adopt the fully restored objects atomically.
+      this.playerProfile = assembly.progression.profiles.get(restoredRun.profileId) ?? null;
+      this.playerState = restoredRun.character;
+      this.inventory = restoredRun.inventory;
+      this.questJournal = restoredRun.journal;
+      this.social = restoredRun.social;
+      this.playerDisplayName = restoredRun.displayName;
+      this.shopStocks.clear();
+      for (const [shopId, stock] of restoredRun.shopStocks) {
+        this.shopStocks.set(shopId, stock);
+      }
+      for (const encounterId of restoredRun.completedEncounters) {
+        this.completedEncounters.add(encounterId);
+        const encounter = assembly.encounters.find(
+          (candidate) => candidate.record.id === encounterId,
+        );
+        if (encounter !== undefined) {
+          this.encounterCells.delete(`${encounter.col},${encounter.row}`);
         }
       }
+      this.playerCol = restoredRun.playerPosition.col;
+      this.playerRow = restoredRun.playerPosition.row;
+    } else {
+      // ---- New-game path: the run starts from the chosen template (the
+      // menu validated it against the same loaded datasets) or, defensively,
+      // from the first valid profile. Starting martial arts and items are
+      // validated per reference — broken ones drop with a warning.
+      // Encounters declaring a different profile are reported so authors
+      // can fix the data.
+      this.playerProfile = null;
+      this.playerState = null;
+      this.inventory = null;
+      this.playerDisplayName = '';
+      this.questJournal = createQuestJournal(this.quests);
+      this.social = createSocialState();
+      this.shopStocks.clear();
+      for (const shop of this.shops.values()) {
+        this.shopStocks.set(shop.record.id, createShopStockRuntime(shop));
+      }
+
+      const requestedId = this.startup?.kind === 'new' ? this.startup.profileId : undefined;
+      const profile =
+        (requestedId !== undefined ? assembly.progression.profiles.get(requestedId) : undefined) ??
+        assembly.progression.profiles.values().next().value ??
+        null;
+      if (profile !== null) {
+        this.playerProfile = profile;
+        this.playerState = createCharacterState(profile);
+        const startingArts = resolveStartingMartialArts(
+          profile,
+          assembly.progression.martialArts,
+        );
+        this.playerState.martialArtIds = [...startingArts.ids];
+        playerWarnings.push(...startingArts.warnings);
+        const startingItems = resolveStartingItems(profile, assembly.items);
+        this.inventory = createInventoryState(profile, startingItems.stacks);
+        playerWarnings.push(...startingItems.warnings);
+        const requestedName =
+          this.startup?.kind === 'new' ? (this.startup.displayName ?? '') : '';
+        this.playerDisplayName =
+          requestedName.trim().length > 0 ? requestedName.trim() : profile.name;
+        for (const encounter of assembly.encounters) {
+          if (encounter.profile.id !== profile.id) {
+            playerWarnings.push(
+              `遭遇 "${encounter.record.id}" 声明的角色模板 "${encounter.profile.id}" 与创建玩家所用模板 "${profile.id}" 不同，仍沿用后者`,
+            );
+          }
+        }
+      }
+      this.playerCol = map.playerStart.col;
+      this.playerRow = map.playerStart.row;
     }
     for (const message of playerWarnings) {
       console.warn(`[optional] ${message}`);
@@ -905,9 +406,6 @@ export class GridScene extends Phaser.Scene {
     );
     renderGridMap(this, map, this.mapOrigin.x, this.mapOrigin.y);
 
-    this.playerCol = map.playerStart.col;
-    this.playerRow = map.playerStart.row;
-
     const startOffset = cellCenterOffset(map, this.playerCol, this.playerRow);
     this.marker = this.add.circle(
       this.mapOrigin.x + startOffset.x,
@@ -919,28 +417,217 @@ export class GridScene extends Phaser.Scene {
 
     this.renderNpcs(map);
     this.renderEncounterMarkers(map);
-    this.buildHud(map, optionalWarnings, modWarnings);
+    this.buildHud(map, world.optionalWarnings, world.modWarnings);
     this.updateCoordsHud();
 
     this.dialoguePanel = new DialoguePanel(this, {
-      onClose: () => this.updateInteractHint(), // Movement is keyed off isOpen.
+      onClose: () => this.noteOverlayClosed(), // Also refreshes the hint.
     });
     this.battlePanel = new BattlePanel(this, {
       onClose: () => this.settleBattleClose(),
     });
     this.inventoryPanel = new InventoryPanel(this, {
-      onClose: () => this.updateInteractHint(), // Movement is keyed off isOpen.
+      onClose: () => this.noteOverlayClosed(),
       onChange: () => this.refreshQuestCollectObjectives(),
     });
     this.shopPanel = new ShopPanel(this, {
-      onClose: () => this.updateInteractHint(), // Movement is keyed off isOpen.
+      onClose: () => this.noteOverlayClosed(),
       onChange: () => this.refreshQuestCollectObjectives(),
     });
     this.questPanel = new QuestPanel(this, {
-      onClose: () => this.updateInteractHint(),
+      onClose: () => this.noteOverlayClosed(),
       onUpdate: (update) => this.applyQuestUpdate(update),
     });
+    this.pauseMenu = new PauseMenuPanel(this, {
+      storage: this.storage,
+      save: (slotId) => this.saveToSlot(slotId),
+      returnToMenu: () => this.returnToMenu(),
+      onClose: () => this.noteOverlayClosed(),
+    });
     this.updateQuestTrackerHud();
+    this.updateInteractHint();
+  }
+
+  // -------------------------------------------------------------------------
+  // Round 09 save/restore plumbing
+  // -------------------------------------------------------------------------
+
+  /**
+   * Reads, parses, preflights and restores the requested slot against the
+   * loaded world. Returns null (with the readable failure panel on screen
+   * and Escape bound back to the menu) on any refusal — this scene's live
+   * fields are guaranteed untouched because nothing is assigned before the
+   * whole pipeline succeeded.
+   */
+  private restoreFromSlot(
+    world: LoadedWorld,
+    slotId: SaveSlotId,
+  ): {
+    run: RestoredRunState & {
+      profileId: string;
+      displayName: string;
+      playerPosition: { col: number; row: number };
+    };
+    warnings: string[];
+  } | null {
+    if (this.storage === null) {
+      this.showErrorState('读档失败', ['浏览器本地存储不可用，无法读取存档。'], true);
+      return null;
+    }
+    const read = readSaveSlot(this.storage, slotId);
+    if (!read.ok) {
+      this.showErrorState(
+        read.reason === 'empty' ? '读档失败：槽位为空' : '读档失败：存档无法使用',
+        [read.message, ...read.errors, '', '按 Esc 返回主菜单。'],
+        true,
+      );
+      return null;
+    }
+
+    const plan = planSnapshotRestore(
+      read.snapshot,
+      this.saveWorldReferences(world, read.snapshot),
+    );
+    if (!plan.ok) {
+      this.showErrorState('读档失败：存档与当前资料不兼容', [...plan.errors, '', '按 Esc 返回主菜单。'], true);
+      return null;
+    }
+    for (const warning of plan.warnings) {
+      console.warn(`[save] ${warning}`);
+    }
+
+    const profile = world.assembly.progression.profiles.get(read.snapshot.profileId);
+    if (profile === undefined) {
+      // Defensive: the preflight above already guarantees this exists.
+      this.showErrorState('读档失败', [`存档引用的角色模板 "${read.snapshot.profileId}" 不可用。`], true);
+      return null;
+    }
+    const restored = restoreRunState({
+      profile,
+      items: world.assembly.items,
+      quests: world.assembly.quests,
+      shops: world.assembly.shops,
+      snapshot: plan.snapshot,
+    });
+    console.info(
+      '[save] 已从 %s 读档：%s Lv.%d（位置 %d,%d，银两 %d）',
+      slotId,
+      read.snapshot.displayName,
+      restored.character.level,
+      read.snapshot.playerPosition.col,
+      read.snapshot.playerPosition.row,
+      restored.inventory.currency,
+    );
+    return {
+      run: {
+        ...restored,
+        profileId: read.snapshot.profileId,
+        displayName: read.snapshot.displayName,
+        playerPosition: { ...read.snapshot.playerPosition },
+      },
+      warnings: plan.warnings,
+    };
+  }
+
+  /** Assembles the world id/geometry index a save preflight checks against. */
+  private saveWorldReferences(world: LoadedWorld, snapshot: SaveSnapshotV1) {
+    const map = world.map;
+    const occupiedCells = new Set(
+      world.assembly.npcs.map((npc) => `${npc.col},${npc.row}`),
+    );
+    const completedEncounters = new Set(snapshot.completedEncounters);
+    for (const encounter of world.assembly.encounters) {
+      if (encounter.record.repeatable || !completedEncounters.has(encounter.record.id)) {
+        occupiedCells.add(`${encounter.col},${encounter.row}`);
+      }
+    }
+    const questObjectives = new Map<string, ReadonlySet<string>>();
+    for (const quest of world.assembly.quests.values()) {
+      questObjectives.set(quest.id, new Set(quest.objectives.map((objective) => objective.id)));
+    }
+    return {
+      profileIds: new Set(world.assembly.progression.profiles.keys()),
+      profileRecords: world.assembly.progression.profiles,
+      mapResourceId: world.mapResourceId,
+      isWalkableCell: (col: number, row: number) => map.canEnter(col, row),
+      isCellOccupied: (col: number, row: number) => occupiedCells.has(`${col},${row}`),
+      itemIds: new Set(world.assembly.items.keys()),
+      itemRecords: world.assembly.items,
+      martialArtIds: new Set(world.assembly.progression.martialArts.keys()),
+      questIds: new Set(world.assembly.quests.keys()),
+      questObjectiveIds: questObjectives,
+      encounterIds: new Set(
+        world.assembly.encounters.map((encounter) => encounter.record.id),
+      ),
+      shopIds: new Set(world.assembly.shops.keys()),
+      shopRecords: world.assembly.shops,
+      questRecords: world.assembly.quests,
+      npcIds: new Set(world.assembly.npcs.map((npc) => npc.record.id)),
+    };
+  }
+
+  /** Captures the live run into one slot; readable feedback for the pause menu. */
+  private saveToSlot(slotId: SaveSlotId): { ok: boolean; message: string } {
+    if (this.storage === null || this.playerState === null || this.inventory === null) {
+      return { ok: false, message: '浏览器本地存储不可用或当前无可保存的进度' };
+    }
+    const snapshot = captureSaveSnapshot({
+      displayName: this.playerDisplayName,
+      mapResourceId: MAP_RESOURCE_ID,
+      playerCol: this.playerCol,
+      playerRow: this.playerRow,
+      character: this.playerState,
+      inventory: this.inventory,
+      shopStocks: this.shopStocks,
+      journal: this.questJournal,
+      social: this.social,
+      completedEncounters: this.completedEncounters,
+    });
+    const result = writeSaveSlot(this.storage, slotId, snapshot);
+    if (result.ok) {
+      console.info('[save] 已保存到 %s（%s）', slotId, result.savedAt);
+      return { ok: true, message: `保存成功（${snapshot.displayName} Lv.${snapshot.player.level}）` };
+    }
+    console.warn('[save] 保存失败：', result.message);
+    return { ok: false, message: result.message };
+  }
+
+  /** Leaves the run and hands control back to the main menu scene. */
+  private returnToMenu(): void {
+    this.scene.start('menu');
+  }
+
+  /**
+   * Overlay-close hook: refresh the hint line (movement keys off `isOpen`)
+   * and arm the short window during which the scene-level Escape ignores
+   * keypresses, so closing a dialogue with Escape never opens the pause
+   * menu in the same keypress.
+   */
+  private noteOverlayClosed(): void {
+    this.lastOverlayCloseAt = this.time.now;
+    this.updateInteractHint();
+  }
+
+  /** Escape while exploring: toggle the pause menu (never over another overlay). */
+  private togglePauseMenu(): void {
+    const panel = this.pauseMenu;
+    if (panel === null) {
+      return;
+    }
+    if (panel.isOpen) {
+      panel.close();
+      this.noteOverlayClosed();
+      return;
+    }
+    if (this.anyOverlayOpen()) {
+      return; // Another overlay owns the keyboard right now.
+    }
+    // An overlay closed by this same Escape press must not count as "free".
+    if (this.time.now - this.lastOverlayCloseAt < 150) {
+      return;
+    }
+    panel.open(this.settings);
+    this.settings = panel.currentSettings();
     this.updateInteractHint();
   }
 
@@ -966,7 +653,7 @@ export class GridScene extends Phaser.Scene {
           encounter.record.enemy.name,
           {
             fontFamily: UI.fontFamily,
-            fontSize: '10px',
+            fontSize: uiFontSize(10),
             color: UI.textPrimary,
           },
         )
@@ -978,8 +665,8 @@ export class GridScene extends Phaser.Scene {
 
   /**
    * Encounters still standing this run: repeatable ones always, one-shot
-   * ones only until their first victory. Completion lives in memory only —
-   * a page refresh resets it, matching the pre-save boundary of Round 09.
+   * ones only until their first victory. One-shot completion persists in
+   * versioned save snapshots.
    */
   private activeEncounters(): PlacedEncounter[] {
     return this.encounters.filter(
@@ -1029,7 +716,7 @@ export class GridScene extends Phaser.Scene {
     }
     this.activeSession = null;
     this.activeEncounter = null;
-    this.updateInteractHint();
+    this.noteOverlayClosed();
   }
 
   /** Draws every placed NPC and its data-driven name label. */
@@ -1049,7 +736,7 @@ export class GridScene extends Phaser.Scene {
       this.add
         .text(this.mapOrigin.x + center.x, this.mapOrigin.y + center.y - size / 2 - 4, npc.record.name, {
           fontFamily: UI.fontFamily,
-          fontSize: '10px',
+          fontSize: uiFontSize(10),
           color: UI.textPrimary,
         })
         .setOrigin(0.5, 1);
@@ -1062,9 +749,9 @@ export class GridScene extends Phaser.Scene {
     modWarnings: readonly Diagnostic[],
   ): void {
     this.add
-      .text(16, 14, '方向键 / WASD 移动 · 每次一格 · 墙体、边界与人物不可通行 · 邻近人物按 E 交互 · F 交谈 · B 背包 · Q 任务', {
+      .text(16, 14, '方向键 / WASD 移动 · 每次一格 · 邻近人物按 E 交互 · F 交谈 · B 背包 · Q 任务 · Esc 暂停', {
         fontFamily: UI.fontFamily,
-        fontSize: '13px',
+        fontSize: uiFontSize(13),
         color: UI.textMuted,
       })
       .setOrigin(0, 0);
@@ -1072,7 +759,7 @@ export class GridScene extends Phaser.Scene {
     this.questTrackerText = this.add
       .text(16, 34, '', {
         fontFamily: UI.fontFamily,
-        fontSize: '11px',
+        fontSize: uiFontSize(11),
         color: UI.textMuted,
         wordWrap: { width: 360 },
       })
@@ -1081,7 +768,7 @@ export class GridScene extends Phaser.Scene {
     this.add
       .text(VIEW_WIDTH / 2, 14, map.data.name, {
         fontFamily: UI.fontFamily,
-        fontSize: '14px',
+        fontSize: uiFontSize(14),
         color: UI.textPrimary,
       })
       .setOrigin(0.5, 0);
@@ -1103,7 +790,7 @@ export class GridScene extends Phaser.Scene {
       this.add
         .text(VIEW_WIDTH / 2, 33 + index * 15, line.text, {
           fontFamily: UI.fontFamily,
-          fontSize: '11px',
+          fontSize: uiFontSize(11),
           color: UI.textWarn,
         })
         .setOrigin(0.5, 0);
@@ -1115,7 +802,7 @@ export class GridScene extends Phaser.Scene {
     this.coordsText = this.add
       .text(VIEW_WIDTH - 16, 14, '', {
         fontFamily: UI.fontFamily,
-        fontSize: '13px',
+        fontSize: uiFontSize(13),
         color: UI.textPrimary,
       })
       .setOrigin(1, 0);
@@ -1125,14 +812,15 @@ export class GridScene extends Phaser.Scene {
     this.interactText = this.add
       .text(VIEW_WIDTH / 2, VIEW_HEIGHT - 14, '', {
         fontFamily: UI.fontFamily,
-        fontSize: '12px',
+        fontSize: uiFontSize(12),
         color: UI.textWarn,
       })
       .setOrigin(0.5, 1);
   }
 
   private updateCoordsHud(): void {
-    this.coordsText?.setText(`位置 (${this.playerCol}, ${this.playerRow})`);
+    const name = this.playerDisplayName.length > 0 ? `${this.playerDisplayName} · ` : '';
+    this.coordsText?.setText(`${name}位置 (${this.playerCol}, ${this.playerRow})`);
   }
 
   /** Refreshes the bottom status line from the current adjacency state. */
@@ -1183,14 +871,15 @@ export class GridScene extends Phaser.Scene {
     this.interactText.setText('');
   }
 
-  /** True while any keyboard overlay owns the input (dialogue/battle/backpack/shop). */
+  /** True while any keyboard overlay owns the input (dialogue/battle/backpack/shop/quest/pause). */
   private anyOverlayOpen(): boolean {
     return (
       (this.dialoguePanel !== null && this.dialoguePanel.isOpen) ||
       (this.battlePanel !== null && this.battlePanel.isOpen) ||
       (this.inventoryPanel !== null && this.inventoryPanel.isOpen) ||
       (this.shopPanel !== null && this.shopPanel.isOpen) ||
-      (this.questPanel !== null && this.questPanel.isOpen)
+      (this.questPanel !== null && this.questPanel.isOpen) ||
+      (this.pauseMenu !== null && this.pauseMenu.isOpen)
     );
   }
 
@@ -1362,6 +1051,10 @@ export class GridScene extends Phaser.Scene {
     const onTalk = (): void => this.tryTalk();
     talkKey.on('down', onTalk);
 
+    const pauseKey = keyboard.addKey(KeyCodes.ESC);
+    const onPause = (): void => this.togglePauseMenu();
+    pauseKey.on('down', onPause);
+
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       for (const { key, onDown } of listeners) {
         key.off('down', onDown);
@@ -1370,6 +1063,7 @@ export class GridScene extends Phaser.Scene {
       backpackKey.off('down', onBackpack);
       questKey.off('down', onQuestJournal);
       talkKey.off('down', onTalk);
+      pauseKey.off('down', onPause);
       this.dialoguePanel?.destroy();
       this.dialoguePanel = null;
       this.battlePanel?.destroy();
@@ -1380,6 +1074,8 @@ export class GridScene extends Phaser.Scene {
       this.shopPanel = null;
       this.questPanel?.destroy();
       this.questPanel = null;
+      this.pauseMenu?.destroy();
+      this.pauseMenu = null;
       this.activeSession = null;
       this.activeEncounter = null;
     });
@@ -1586,7 +1282,12 @@ export class GridScene extends Phaser.Scene {
     });
   }
 
-  private showErrorState(title: string, details: string[]): void {
+  /**
+   * Replaces the canvas with a readable failure panel. `escToMenu` binds
+   * Escape back to the menu scene (Round 09 load failures); data failures
+   * keep the classic refresh advice.
+   */
+  private showErrorState(title: string, details: string[], escToMenu = false): void {
     this.children.removeAll(true); // Destroy leftover objects (frees Text canvas textures).
     this.moving = false;
     this.dialoguePanel = null;
@@ -1600,25 +1301,52 @@ export class GridScene extends Phaser.Scene {
     this.add
       .text(VIEW_WIDTH / 2, VIEW_HEIGHT / 2 - panelHeight / 2 + 36, title, {
         fontFamily: UI.fontFamily,
-        fontSize: '20px',
+        fontSize: uiFontSize(20),
         color: UI.textWarn,
       })
       .setOrigin(0.5);
 
-    const body = [
-      ...details,
-      '',
-      '请检查 data/ 下的清单、schema 与地图 JSON，或 mods/ 中的覆盖文件，然后刷新页面。',
-    ].join('\n');
+    const tail = escToMenu
+      ? ['', '按 Esc 返回主菜单。']
+      : ['', '请检查 data/ 下的清单、schema 与地图 JSON，或 mods/ 中的覆盖文件，然后刷新页面。'];
+    const body = [...details, ...tail].join('\n');
     this.add
       .text(VIEW_WIDTH / 2, VIEW_HEIGHT / 2 + 8, body, {
         fontFamily: UI.fontFamily,
-        fontSize: '13px',
+        fontSize: uiFontSize(13),
         color: UI.textMuted,
         align: 'center',
         lineSpacing: 6,
         wordWrap: { width: panelWidth - 48 },
       })
       .setOrigin(0.5);
+
+    if (escToMenu) {
+      const keyboard = this.input.keyboard;
+      if (keyboard !== null) {
+        const KeyCodes = Phaser.Input.Keyboard.KeyCodes;
+        keyboard.addCapture(KeyCodes.ESC);
+        const key = keyboard.addKey(KeyCodes.ESC);
+        key.once('down', () => {
+          this.scene.start('menu');
+        });
+      }
+    }
   }
+}
+
+/**
+ * Fallback storage used when the browser disallows localStorage: reads miss
+ * and writes are refused, so settings stay session-only and never crash.
+ */
+function unavailableStorage(): SaveStorage {
+  return {
+    read: () => null,
+    write: () => {
+      throw new Error('浏览器本地存储不可用');
+    },
+    remove: () => {
+      throw new Error('浏览器本地存储不可用');
+    },
+  };
 }

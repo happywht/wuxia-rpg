@@ -15,6 +15,7 @@ import {
   useConsumable,
   equipItem,
 } from '../engine/item-system';
+import { uiFontSize } from './settings';
 
 /**
  * Generic keyboard-driven backpack panel (Round 06).
@@ -325,7 +326,7 @@ export class InventoryPanel {
     const title = this.scene.add
       .text(panelLeft + PADDING, panelTop + 16, LABELS.title, {
         fontFamily: UI.fontFamily,
-        fontSize: '18px',
+        fontSize: uiFontSize(18),
         color: UI.accent,
       })
       .setOrigin(0, 0);
@@ -335,7 +336,7 @@ export class InventoryPanel {
     const moneyText = this.scene.add
       .text(panelLeft + PANEL_WIDTH - PADDING, panelTop + 20, moneyLine, {
         fontFamily: UI.fontFamily,
-        fontSize: '13px',
+        fontSize: uiFontSize(13),
         color: UI.textWarn,
       })
       .setOrigin(1, 0);
@@ -350,7 +351,7 @@ export class InventoryPanel {
     const vitalsText = this.scene.add
       .text(panelLeft + PADDING, panelTop + 44, vitalLine, {
         fontFamily: UI.fontFamily,
-        fontSize: '12px',
+        fontSize: uiFontSize(12),
         color: UI.textPrimary,
       })
       .setOrigin(0, 0);
@@ -359,7 +360,7 @@ export class InventoryPanel {
     const attributesText = this.scene.add
       .text(panelLeft + PADDING, panelTop + 64, attributeParts.join('　'), {
         fontFamily: UI.fontFamily,
-        fontSize: '12px',
+        fontSize: uiFontSize(12),
         color: UI.textPrimary,
       })
       .setOrigin(0, 0);
@@ -374,7 +375,7 @@ export class InventoryPanel {
     const slotsText = this.scene.add
       .text(panelLeft + PADDING, panelTop + 84, `${LABELS.equippedTitle}　${slotParts.join('　')}`, {
         fontFamily: UI.fontFamily,
-        fontSize: '12px',
+        fontSize: uiFontSize(12),
         color: UI.rowEquipped,
         wordWrap: { width: contentWidth },
       })
@@ -388,7 +389,7 @@ export class InventoryPanel {
       const emptyText = this.scene.add
         .text(panelLeft + PADDING, listTop, LABELS.emptySlots, {
           fontFamily: UI.fontFamily,
-          fontSize: '13px',
+          fontSize: uiFontSize(13),
           color: UI.textMuted,
         })
         .setOrigin(0, 0);
@@ -410,7 +411,7 @@ export class InventoryPanel {
             `${active ? CURSOR_ACTIVE : CURSOR_IDLE}${stackLineText(item, stack.quantity, equipped)}`,
             {
               fontFamily: UI.fontFamily,
-              fontSize: '13px',
+              fontSize: uiFontSize(13),
               color: equipped ? UI.rowEquipped : active ? UI.rowActive : UI.rowIdle,
             },
           )
@@ -421,7 +422,7 @@ export class InventoryPanel {
         const moreText = this.scene.add
           .text(panelLeft + PADDING + 6, listTop + VISIBLE_ROWS * ROW_HEIGHT, LABELS.stacksHidden, {
             fontFamily: UI.fontFamily,
-            fontSize: '11px',
+            fontSize: uiFontSize(11),
             color: UI.textMuted,
           })
           .setOrigin(0, 0);
@@ -438,7 +439,7 @@ export class InventoryPanel {
       const detailText = this.scene.add
         .text(panelLeft + PADDING, detailTop, selectedItem.description, {
           fontFamily: UI.fontFamily,
-          fontSize: '12px',
+          fontSize: uiFontSize(12),
           color: UI.textMuted,
           wordWrap: { width: contentWidth },
           lineSpacing: 4,
@@ -453,7 +454,7 @@ export class InventoryPanel {
           actionHintFor(selectedItem, isEquipped(model.inventory, selectedItem.id)),
           {
             fontFamily: UI.fontFamily,
-            fontSize: '12px',
+            fontSize: uiFontSize(12),
             color: UI.accent,
           },
         )
@@ -466,7 +467,7 @@ export class InventoryPanel {
       const statusText = this.scene.add
         .text(panelLeft + PADDING, panelTop + PANEL_HEIGHT - 44, this.status, {
           fontFamily: UI.fontFamily,
-          fontSize: '12px',
+          fontSize: uiFontSize(12),
           color: UI.textWarn,
           wordWrap: { width: contentWidth },
         })
@@ -477,7 +478,7 @@ export class InventoryPanel {
     const hintText = this.scene.add
       .text(panelLeft + PANEL_WIDTH - PADDING, panelTop + PANEL_HEIGHT - 20, LABELS.selectHint, {
         fontFamily: UI.fontFamily,
-        fontSize: '10px',
+        fontSize: uiFontSize(10),
         color: UI.textMuted,
       })
       .setOrigin(1, 1);

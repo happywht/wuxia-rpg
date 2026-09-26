@@ -5,6 +5,7 @@ import {
   type CombatSession,
   type PlayerActionView,
 } from '../engine/turn-based-combat';
+import { uiFontSize } from './settings';
 
 /**
  * Generic keyboard-driven battle overlay.
@@ -283,7 +284,7 @@ export class BattlePanel {
     const nameText = this.scene.add
       .text(centerX, top, view.name, {
         fontFamily: UI.fontFamily,
-        fontSize: '16px',
+        fontSize: uiFontSize(16),
         color: UI.combatantName,
       })
       .setOrigin(0.5, 0);
@@ -306,7 +307,7 @@ export class BattlePanel {
     const labelText = this.scene.add
       .text(centerX - BAR_WIDTH / 2, top, `${label}  ${vital.current}/${vital.max}`, {
         fontFamily: UI.fontFamily,
-        fontSize: '11px',
+        fontSize: uiFontSize(11),
         color: UI.textMuted,
       })
       .setOrigin(0, 0);
@@ -373,7 +374,7 @@ export class BattlePanel {
       const line = this.scene.add
         .text(left, 0, entry.text, {
           fontFamily: UI.fontFamily,
-          fontSize: '12px',
+          fontSize: uiFontSize(12),
           color,
           wordWrap: { width: contentWidth },
           lineSpacing: 3,
@@ -408,7 +409,7 @@ export class BattlePanel {
       const noticeLine = this.scene.add
         .text(left, cursorY, this.notice, {
           fontFamily: UI.fontFamily,
-          fontSize: '12px',
+          fontSize: uiFontSize(12),
           color: UI.textWarn,
           wordWrap: { width: contentWidth },
         })
@@ -428,7 +429,7 @@ export class BattlePanel {
       const line = this.scene.add
         .text(left, cursorY, actionLineText(action, active), {
           fontFamily: UI.fontFamily,
-          fontSize: '13px',
+          fontSize: uiFontSize(13),
           color: !action.affordable
             ? UI.actionDisabled
             : active
@@ -444,7 +445,7 @@ export class BattlePanel {
     const fleeLine = this.scene.add
       .text(left, cursorY, `${fleeActive ? CURSOR_ACTIVE : CURSOR_IDLE}${LABELS.fleeAction}`, {
         fontFamily: UI.fontFamily,
-        fontSize: '13px',
+        fontSize: uiFontSize(13),
         color: fleeActive ? UI.actionActive : UI.actionIdle,
       })
       .setOrigin(0, 0);
@@ -456,7 +457,7 @@ export class BattlePanel {
     const hint = this.scene.add
       .text(right, bottom, text, {
         fontFamily: UI.fontFamily,
-        fontSize: '10px',
+        fontSize: uiFontSize(10),
         color: UI.textMuted,
       })
       .setOrigin(1, 1);

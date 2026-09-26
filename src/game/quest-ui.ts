@@ -10,6 +10,7 @@ import {
   getQuestObjectiveProgress,
   toggleTrackedQuest,
 } from '../engine/quest-system';
+import { uiFontSize } from './settings';
 
 /** Generic data-driven quest board and journal overlay. */
 
@@ -327,7 +328,7 @@ export class QuestPanel {
   ): void {
     const node = this.scene.add.text(x, y, text, {
       fontFamily: UI.fontFamily,
-      fontSize: `${fontSize}px`,
+      fontSize: uiFontSize(fontSize),
       color,
       align,
     }).setOrigin(align === 'right' ? 1 : 0, 0);
@@ -337,7 +338,7 @@ export class QuestPanel {
   private addWrappedText(text: string, x: number, y: number, maxWidth: number, fontSize: number, color: string): void {
     const node = this.scene.add.text(x, y, text, {
       fontFamily: UI.fontFamily,
-      fontSize: `${fontSize}px`,
+      fontSize: uiFontSize(fontSize),
       color,
       wordWrap: { width: maxWidth },
       lineSpacing: 3,

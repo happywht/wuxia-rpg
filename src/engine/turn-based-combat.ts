@@ -23,8 +23,8 @@
  * consumes neither turn nor resources. Victory experience is granted exactly
  * once through the Round 04 progression API; defeat restores the player by
  * the encounter's declared ratios (always to at least 1 health); fleeing
- * awards nothing. Persistence is out of scope (Round 09): completion flags
- * live with the caller.
+ * awards nothing. One-shot completion flags live with the caller and are
+ * serialized by the separate Round 09 save protocol.
  */
 
 import {

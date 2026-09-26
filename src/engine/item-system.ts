@@ -495,7 +495,7 @@ export interface InventoryStackData {
   quantity: number;
 }
 
-/** Runtime-only player inventory; never persisted this round (Round 09). */
+/** Runtime inventory; the versioned save engine serializes its plain data fields. */
 export interface InventoryState {
   currency: number;
   /** Maximum number of distinct stacks (capacity counts stacks, not units). */

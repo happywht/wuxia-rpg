@@ -28,8 +28,9 @@
  * economy (`startingCurrency`/`inventoryCapacity`/`startingItems` — validated
  * per reference by the item system at assembly time).
  *
- * Joining, practicing and persistence remain out of scope (Rounds 09/13+):
- * character state lives in runtime objects only.
+ * Joining and practicing remain out of scope (Round 13+). Runtime state is
+ * serialized by the separate, versioned save protocol rather than by this
+ * progression engine.
  */
 
 /** Canonical attribute ids (protocol; display names and values stay in data). */
@@ -857,7 +858,7 @@ export interface EquipmentBonusData {
   qi: number;
 }
 
-/** Runtime-only state (this round never persists it; saves arrive in Round 09). */
+/** Runtime state; the versioned save engine snapshots its pure data fields. */
 export interface CharacterState {
   profileId: string;
   level: number;

@@ -6,6 +6,7 @@ import {
   DialogueSession,
 } from '../engine/dialogue-graph';
 import type { VisibleDialogueOption } from '../engine/dialogue-runtime';
+import { uiFontSize } from './settings';
 
 /**
  * Generic keyboard-driven dialogue panel.
@@ -247,7 +248,7 @@ export class DialoguePanel {
     const nodeText = this.scene.add
       .text(0, 0, session.currentNode.text, {
         fontFamily: UI.fontFamily,
-        fontSize: '14px',
+        fontSize: uiFontSize(14),
         color: UI.textPrimary,
         lineSpacing: 6,
         wordWrap: { width: contentWidth },
@@ -283,7 +284,7 @@ export class DialoguePanel {
     const nameText = this.scene.add
       .text(left + PADDING, top + PADDING, this.speakerName, {
         fontFamily: UI.fontFamily,
-        fontSize: '15px',
+        fontSize: uiFontSize(15),
         color: UI.speaker,
       })
       .setOrigin(0, 0);
@@ -296,7 +297,7 @@ export class DialoguePanel {
       const feedbackText = this.scene.add
         .text(left + PADDING, cursorY + HINT_GAP / 2, `—— ${this.feedback}`, {
           fontFamily: UI.fontFamily,
-          fontSize: '12px',
+          fontSize: uiFontSize(12),
           color: this.feedbackWarn ? UI.feedbackWarn : UI.feedback,
           wordWrap: { width: contentWidth },
         })
@@ -310,7 +311,7 @@ export class DialoguePanel {
       const optionText = this.scene.add
         .text(left + PADDING + 8, cursorY, `${index === this.selection ? CURSOR_ACTIVE : CURSOR_IDLE}${option.text}`, {
           fontFamily: UI.fontFamily,
-          fontSize: '13px',
+          fontSize: uiFontSize(13),
           color: index === this.selection ? UI.optionActive : UI.optionIdle,
         })
         .setOrigin(0, 0);
@@ -324,7 +325,7 @@ export class DialoguePanel {
     const hint = this.scene.add
       .text(left + panelWidth - PADDING, top + panelHeight - PADDING - 4, hintText, {
         fontFamily: UI.fontFamily,
-        fontSize: '10px',
+        fontSize: uiFontSize(10),
         color: UI.textMuted,
       })
       .setOrigin(1, 1);

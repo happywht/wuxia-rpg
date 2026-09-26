@@ -67,7 +67,7 @@ export interface QuestProgressState {
   objectiveCounts: Map<string, number>;
 }
 
-/** Runtime-only journal, reset when the current game page is refreshed. */
+/** Runtime journal; a versioned save snapshot carries its statuses and progress. */
 export interface QuestJournal {
   states: Map<string, QuestProgressState>;
   trackedQuestId: string | null;

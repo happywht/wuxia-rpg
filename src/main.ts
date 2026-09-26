@@ -1,12 +1,17 @@
 import Phaser from 'phaser';
 import './style.css';
 
+import { MenuScene } from './game/menu-scene';
 import { GridScene } from './game/grid-scene';
+import { createBrowserSaveStorage } from './engine/save-system';
+import { applyGameSettings, loadGameSettings } from './game/settings';
 
 /**
- * Round 01 boot: starts the grid-map gameplay scene in a responsive canvas.
- * World content is not bundled here — the scene fetches it from `data/` at
- * runtime and degrades to a readable message when the data is unavailable.
+ * Round 09 boot: the menu scene starts first (new game / continue / settings)
+ * and hands over to the grid scene with a startup payload. Persistent
+ * settings (volume, text scale) load and apply before any scene renders.
+ * World content is not bundled here — scenes fetch it from `data/` at
+ * runtime and degrade to a readable message when it is unavailable.
  */
 const game = new Phaser.Game({
   type: Phaser.AUTO,
@@ -18,10 +23,25 @@ const game = new Phaser.Game({
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [GridScene],
+  scene: [MenuScene, GridScene],
 });
+
+applyGameSettings(game, loadGameSettings(createBrowserSaveStorage() ?? unavailableStorage()));
 
 // Give keyboard-only players and browser automation a clear focus target.
 game.canvas.tabIndex = 0;
 game.canvas.setAttribute('aria-label', '网格地图游戏画面');
 game.canvas.focus();
+
+/** Reads miss and writes refuse when the browser disallows storage. */
+function unavailableStorage() {
+  return {
+    read: () => null,
+    write: () => {
+      throw new Error('浏览器本地存储不可用');
+    },
+    remove: () => {
+      throw new Error('浏览器本地存储不可用');
+    },
+  };
+}

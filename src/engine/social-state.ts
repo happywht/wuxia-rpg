@@ -6,7 +6,8 @@
  * The module knows only the numeric protocol — what "morality" or "renown"
  * *means* in the world is authored in dialogue JSON effects, and every
  * visible consequence line stays out of here (see docs/ARCHITECTURE.md).
- * Values live in memory for the current run only; persistence is Round 09.
+ * Values live in memory during play; the separate Round 09 save engine
+ * serializes them as JSON-safe scalar and entry-array data.
  * Unified faction-level renown rules arrive in Round 18 — this module keeps
  * a single global scalar until then.
  */
@@ -26,7 +27,7 @@ export const RENOWN_RANGE: SocialRange = { min: 0, max: 1000 };
 /** Relationship: how one specific NPC feels about the player. */
 export const RELATIONSHIP_RANGE: SocialRange = { min: -100, max: 100 };
 
-/** Runtime-only social state; reset when the current game page refreshes. */
+/** Runtime social values; the save protocol stores them without Map objects. */
 export interface SocialState {
   morality: number;
   renown: number;
