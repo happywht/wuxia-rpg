@@ -1,8 +1,9 @@
-/* Round 00: minimal shell styling — the Phaser canvas fills the viewport. */
+/* Round 01: shell styling — the Phaser canvas (Scale.FIT) centers and fills the viewport. */
 html,
 body {
   margin: 0;
   padding: 0;
+  height: 100%;
   background: #0b0e14;
 }
 
@@ -11,4 +12,10 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  overflow: hidden;
+}
+
+canvas:focus-visible {
+  outline: 2px solid #e8b04b;
+  outline-offset: 2px;
 }

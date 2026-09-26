@@ -4,12 +4,12 @@
 
 - 设计文档：`docs/GDD.md`
 - 逐轮路线图（R00–R50）：`ROADMAP.md`
-- 当前进度：**Round 00（工程脚手架与文档基线）**
+- 当前进度：**Round 01 完成；下一轮 Round 02（数据加载器、正式 Schema 校验与事件总线）**
 
 ## 范围
 
-- ✅ 当前（R00）：可安装可构建的工程起点、引擎引导占位画面、设计/架构/数据规范文档、51 轮路线图。
-- ❌ 当前不做：游戏玩法（Round 01 起）、数据加载与 schema 校验（Round 02 起）、测试（Round 38 起）。
+- ✅ 已完成（R00–R01）：可构建工程、设计基线、数据驱动网格地图、方向键/WASD 单格移动、墙体与边界碰撞；缺失或无效地图会显示可读错误。
+- ❌ 后续轮次：通用数据加载器、正式 JSON Schema 校验与事件总线（Round 02 起）；测试基线（Round 38 起）。Round 01 仅对地图契约做必要的运行时结构检查。
 - 永久边界：不做多人联网；不含原作内容；mod 仅限同名 JSON 覆盖（见 `docs/DATA-GUIDE.md`）。
 
 ## 技术栈（版本已核验并冻结，见 `docs/ADR.md`）
@@ -37,23 +37,23 @@ npm run preview    # 预览生产构建
 npm run typecheck  # 仅类型检查
 ```
 
-> R00 验证：`npm install` 与 `npm run build` 已成功；本轮仍只有引擎引导占位画面，没有玩法内容。生产构建提示 Phaser 主包 chunk 超过 500 kB，后续性能/打包轮次再评估拆分。
+> Round 01 验证：`npm run build` 与浏览器手动操作已成功；生产构建提示 Phaser 主包 chunk 超过 500 kB，后续性能/打包轮次再评估拆分。地图 JSON 位于 `data/base/maps/round-01-grid.json`，由 Vite 作为静态文件发布。
 
 ## 目录结构
 
 ```
 ├── index.html            # 入口页面
 ├── src/
-│   ├── main.ts           # Phaser 引导占位（无玩法、无设定文本）
+│   ├── main.ts           # Phaser 启动与场景注册
 │   ├── style.css         # 页面外壳样式
-│   ├── engine/           # 引擎运行时（后续轮次填充）
-│   └── game/             # 游戏胶水层（后续轮次填充）
+│   ├── engine/           # 通用网格地图协议、校验查询与渲染
+│   └── game/              # 网格移动切片场景
 ├── data/
-│   ├── base/             # 十大世界数据族（后续轮次填充 JSON）
+│   ├── base/             # 原创世界数据；当前含 Round 01 网格地图 JSON
 │   └── schema/           # JSON Schema 契约（R02 起）
 ├── mods/                 # mod 同名覆盖层（R02 起）
 ├── docs/                 # 设计与规范文档
-├── iterations/round-00/  # 逐轮计划（保留原样）
+├── iterations/           # 逐轮计划（Round 00、Round 01）
 ├── ROADMAP.md            # R00–R50 路线图
 ├── CHANGELOG.md          # 变更日志
 └── DEVLOG.md             # 开发日志（含核验记录）
