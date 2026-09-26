@@ -28,6 +28,14 @@
       "position": { "col": 9, "row": 1 },
       "dialogueId": "dlg.jiang-baiwei-peddler",
       "shopId": "shop.jiang-baiwei-peddler-cart"
+    },
+    {
+      "id": "char.ma-shangyi",
+      "name": "马尚义",
+      "mapResourceId": "map.round-01-grid",
+      "position": { "col": 12, "row": 1 },
+      "dialogueId": "dlg.ma-shangyi-notice-board",
+      "questGiver": true
     }
   ]
 }

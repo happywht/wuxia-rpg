@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：Round 03–05 地图/NPC/对话、成长/武学/战斗契约与引擎已落地；Round 06 新增物品/商店 Schema、JSON 资料、背包/装备/交易引擎与 UI。任务及其他数据族 schema 随后续内容轮次补充。
+- 状态：Round 03–07 已落地地图/NPC/对话、成长/武学/战斗、物品/商店及任务数据契约与运行时；任务含独立状态机、发布人名录、日志和物品/战斗事件联动。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -26,11 +26,11 @@ data/
 │   ├── factions/            # 门派：立场、声望规则、成员关系
 │   ├── battles/             # 战斗：遭遇触发点、敌人、奖励与提示文本
 │   └── endings/             # 结局：触发条件与结局文本
-├── schema/                  # JSON Schema（当前含 manifest、grid-map、npc-set、dialogue-set、character-profiles、faction-set、martial-arts-set、battle-encounters、items-set、shops-set）
+├── schema/                  # JSON Schema（当前含 manifest、grid-map、npc-set、dialogue-set、character-profiles、faction-set、martial-arts-set、battle-encounters、items-set、shops-set、quest-set）
 mods/                        # mod 覆盖层：mods/<modId>/ 镜像 data/base/ 相对路径
 ```
 
-Round 06 状态：manifest 除地图/NPC/对话/角色/门派/武学/战斗遭遇外，还登记 `item.round-06-set` → `items/round-06-items.json`（`items-set`）与 `shop.round-06-set` → `shops/round-06-shops.json`（`shops-set`）。角色模板资料声明初始货币、背包容量和起始物品，NPC 可声明可选 `shopId`。基础资料包含 7 件原创物品与 1 家原创商店；其余数据族仍按后续轮次逐步加入。Vite 把整个 `data/` 目录作为静态资源目录，开发期可从站点根路径读取，生产构建时复制到 `dist/`。`mods/example/` 提供未启用的同路径覆盖示例。启用 MOD 只需把其单段 id 按优先顺序加入 manifest 的 `enabledMods` 数组。
+Round 07 状态：manifest 另登记可选资源 `quest.round-07-set` → `quests/round-07-quests.json`（`quest-set`）。基础资料提供两项原创差事，NPC 可声明可选 `questGiver`（缺省为 false）；Q 打开任务日志，邻接任务发布人按 E 打开只列出其任务的名录。任务状态及当前物品/战斗进度只在运行时内存中，刷新后重置，存档留待 Round 09。此前角色模板、NPC 商店字段与物品数据仍按 Round 06 契约使用。Vite 把整个 `data/` 目录作为静态资源目录，开发期可从站点根路径读取，生产构建时复制到 `dist/`。`mods/example/` 提供未启用的同路径覆盖示例。启用 MOD 只需把其单段 id 按优先顺序加入 manifest 的 `enabledMods` 数组。
 
 ## 3. 文件与命名约定
 
@@ -47,7 +47,8 @@ Round 06 状态：manifest 除地图/NPC/对话/角色/门派/武学/战斗遭�
 - **跨资源校验（Round 04）**：角色模板/门派/武学集合内的 id 唯一性（重复保留先声明者）与武学 `factionIds` 对有效门派集合的引用，由场景装配层用引擎 `indexProfiles`/`indexFactions`/`indexMartialArts` 逐条校验；悬空门派引用只禁用该武学。单文件语义（maxLevel 高于起始等级、属性起点不超 attributeCap、初始熟练度不超上限）由按 schema 注册的语义校验器在加载期拒绝整资源。经验为累计阈值制：升第 k 级成本 = `baseExperience + experiencePerLevel×(k−1)`，升级不消耗经验、满级丢弃溢出；生命/内力上限 = `base + perLevel×(level−1) + Σ(权重×属性)`。
 - **跨资源校验（Round 05）**：战斗遭遇的地图/角色模板/敌人武学引用、触发格在图内且可走、不压玩家出生点/NPC/其他遭遇格与 id 唯一，由场景装配层用引擎 `assembleBattleEncounters` 逐条校验，坏遭遇只禁用自身；角色模板 `startingMartialArtIds` 的存在性/起始资格/重复声明由 `resolveStartingMartialArts` 逐条校验，坏引用只剔除该武学。战斗公式为固定协议：攻击伤害 = `max(1, power + 攻击者 force − floor(防守者 body / 3))`，治疗量 = `power + floor(施放者 resolve / 2)`（封顶生命上限）；内力不足的行动不可用且不消耗回合；敌方回合在可用攻击中选威力最高者（平手按武学 id 升序）；失败按遭遇 `defeatRecovery` 比例恢复（生命保底 1 点，内力不低于现值）；胜利经验恰好发放一次，`repeatable: false` 的遭遇胜利后本次运行不再触发（刷新重置）。
 - **物品与商店（Round 06）**：`items-set` 定义 consumable/equipment/misc、堆叠上限、买卖基价与恢复/装备效果；`shops-set` 定义 NPC、文案、卖出比率和有限库存（`-1` 表示无限）。角色模板的 `startingCurrency` / `inventoryCapacity` / `startingItems` 确定开局背包，坏起始引用逐条剔除；商店对 NPC 与物品 id 做跨资源校验，悬空物品/重复库存行只剔除该货架条，失效 NPC 禁用商店，坏 NPC `shopId` 回退原对话。背包容量按不同物品堆数计，买卖/使用/装备均先校验再提交；消耗品恢复量受当前上限钳制；装备属性加到有效属性与派生资源上限并实时作用于战斗；出售价 = `floor(sellPrice × sellRate)`，装备中的唯一实例与 `sellPrice: 0` 物品不可售。状态只在内存中，刷新后恢复到模板/商店声明起点。
-- **未登记的数据族**：地图是当前场景的关键资源，缺失时加载器会生成错误诊断并显示修复说明。NPC/对话、角色成长/武学/战斗、物品和商店均为可选资源：未登记或有效集合为空时地图正常显示（NPC 空集提示“暂无可交互人物”，背包可显示空状态）；玩家运行状态只要求有有效角色模板，不要求遭遇数据。其余空目录尚未进入运行时资料集。
+- **任务（Round 07）**：`quest-set` 声明 `quests`，每项含稳定 id、名称/说明、`giverNpcId`、可选 `prerequisiteQuestIds`、非空 `objectives`、可选 `failOnEncounterIds` 与 experience/currency 奖励；目标 kind 为 `collectItem` 或 `defeatEncounter`。解析后逐项检查发布人须为已放置且声明 `questGiver` 的 NPC、目标物品/遭遇及前置 id 必须有效、前置依赖不可循环；坏任务与依赖它的任务禁用，其他内容继续运行。无前置任务初始为 offered，有前置任务为 locked，前置全部完成后解锁；接取时收集目标快照当前背包数量，此后按物品数量变化同步，击败目标响应战斗胜利事件；配置的失败遭遇只在玩家败北时使任务失败，玩家可主动放弃活动任务。每个活动任务完成时一次性发放其 JSON 经验/银两奖励并刷新可解锁前置任务。任务面板列出状态、进度和奖励，日志可跟踪一项活动任务。任务状态不持久化，刷新后重置。
+- **未登记的数据族**：地图是当前场景的关键资源，缺失时加载器会生成错误诊断并显示修复说明。NPC/对话、角色成长/武学/战斗、物品/商店和任务均为可选资源：未登记或有效集合为空时地图正常显示（NPC 空集提示“暂无可交互人物”，背包/任务日志可显示空状态）；玩家运行状态只要求有有效角色模板，不要求遭遇或任务数据。其余空目录尚未进入运行时资料集。
 - **关键单点缺失**（如出生点地图缺失）：启动失败，输出单一明确错误（缺什么、去哪补）。
 
 ## 5. mod 覆盖规则（同名文件优先）
@@ -77,6 +78,7 @@ Round 06 状态：manifest 除地图/NPC/对话/角色/门派/武学/战斗遭�
 - 新增战斗遭遇：在 battle-encounters JSON 里加条目（id 建议 `encounter.` 前缀；`mapResourceId` 用已登记地图资源 id，`position` 填可走格且不压出生点/NPC/其他遭遇格——玩家四方向相邻时按 E 开战，敌人占格阻挡通行；`profileId` 指向有效角色模板（玩家状态以首个有效遭遇的模板创建）；`enemy` 直接给五项属性与生命/内力数值（不走派生公式）及武学 id 列表（须为有效武学）；`victoryExperience` 胜利发放一次，`defeatRecovery` 两项 0–1 比例控制失败恢复，`repeatable` 声明胜利后可否再战；`texts` 五条提示文本全部原创）。坏引用/坏坐标只禁用该遭遇并点名警告。
 - 新增物品：在 items-set JSON 中新增条目（id 建议 `item.` 前缀，`category` 选 consumable/equipment/misc；填写原创名称/说明、`stackLimit`、`buyPrice`/`sellPrice`；消耗品声明 `healthRestore`/`qiRestore` 至少一项为正，装备声明槽位、属性加成和生命/内力上限加成；`sellPrice: 0` 表示不可售）。
 - 新增商店：在 shops-set JSON 中声明稳定 shop id、`npcId`（指向可放置 NPC）、原创 `name`/`greeting`、`sellRate` 及 `stock`（`itemId` 必须存在，quantity 为 -1 无限或非负余量）；在 NPC 条目加 `shopId` 后，玩家四方向相邻按 E 开店，否则仍走其对话。货币与背包起点在角色模板的 `startingCurrency`、`inventoryCapacity` 和 `startingItems` 中配置。
+- 新增任务：在 quest-set JSON 的 `quests` 数组新增任务（`id` 建议 `quest.` 前缀；`giverNpcId` 必须指向有效 NPC，并在 NPC 条目声明 `questGiver: true`；`prerequisiteQuestIds` 只能引用无环任务；目标 `kind` 选 `collectItem`/`defeatEncounter`，`targetId` 分别引用有效物品/遭遇，`requiredCount` 为正整数；`failOnEncounterIds` 声明败北失败的遭遇；`rewards` 声明非负 experience/currency）。收集目标接取时以当前背包数量为起点，物品变化后同步目标数量；击败目标在战斗胜利后推进；任务奖励恰发一次。E 打开发布人名录，Q 打开日志，A 放弃活动任务；运行状态暂不持久化。
 - 所有内容必须原创（红线见 `docs/ORIGINAL-FIDELITY.md`）；命名避开任何原作专有名称。
 
 ## 变更记录
@@ -89,3 +91,4 @@ Round 06 状态：manifest 除地图/NPC/对话/角色/门派/武学/战斗遭�
 | 2026-09-27 | Round 04 | 登记角色模板/门派/武学资源与 schema，记录成长协议语义（累计经验、派生公式、属性上限）与逐条隔离规则 |
 | 2026-09-27 | Round 05 | 登记 battles 数据族与遭遇资源/schema，记录武学 combat、起始武学契约、战斗公式、失败恢复与遭遇逐条隔离规则 |
 | 2026-09-27 | Round 06 | 登记 items/shops 数据族、schema 与角色/NPC 新字段，记录堆叠容量、装备加成、起始背包及商店交易规则 |
+| 2026-09-27 | Round 07 | 登记 quest 数据族与 NPC 发布人字段，记录目标进度、失败/奖励生命周期及任务空集行为 |

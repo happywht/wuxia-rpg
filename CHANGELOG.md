@@ -4,6 +4,22 @@
 
 ## [Unreleased]
 
+### Added (Round 07)
+
+- 新增 draft-07 `quest-set` 契约、manifest 可选任务资源和两项原创差事；任务资料声明发布 NPC、前置任务、收集/击败目标、败北失败条件与经验/银两奖励。NPC 新增可选 `questGiver` 标记和原创发布人马尚义。
+- 新增 Phaser 无关 `src/engine/quest-system.ts`：任务解析、重复 id 与 NPC/物品/遭遇/前置引用校验、循环依赖隔离、locked/offered/active/completed/failed 生命周期、目标事件推进、主动放弃与恰好一次完成奖励。
+- 新增任务名录/日志面板：邻接发布人按 E 查看和接取，Q 随时打开日志；Enter 接取或跟踪/取消跟踪，A 放弃，覆盖层锁定探索移动。
+
+### Changed (Round 07)
+
+- NPC Schema 与运行时记录增加可选 `questGiver` 布尔字段，旧 NPC 缺省为 false；manifest 将任务集作为可选资源登记，坏任务与坏前置只隔离相应任务链，不阻断其余世界。
+- 背包数量变化驱动收集目标，战斗胜败驱动任务目标与失败条件；任务完成后统一发放经验和银两并刷新可解锁前置任务。任务进度为运行时状态，持久化留给 Round 09。
+
+### Verification (Round 07)
+
+- `npm run build` 通过（90 模块，bundle 1,598.33 kB / gzip 421.58 kB）；临时 Node/Rolldown/Ajv 任务与 Schema 冒烟检查通过，脚本已删除。Vite 仍报告 Phaser 主包超过 500 kB 建议阈值。
+- 浏览器手动验证：从发布人名录接取、日志显示开局收集进度 2/3、商店补足物品后完成并显示经验/银两奖励、接取击败目标并胜利完成、A 放弃后状态为失败；面板打开时玩家不能移动。
+
 ### Added (Round 06)
 
 - 物品/商店资料契约：新增 draft-07 `items-set` / `shops-set` Schema 与 manifest 资源，原创 7 件物品（3 消耗品、3 装备、1 不可交易杂物）及 1 家数据驱动商店/地图货郎；角色模板声明 120 银两、12 堆背包容量与 4 件起始物品。

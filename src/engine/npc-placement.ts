@@ -27,6 +27,8 @@ export interface NpcRecordData {
    * Resolution against assembled shops happens at interaction time, so a
    * dangling reference simply falls back to `dialogueId` with a warning. */
   shopId: string | null;
+  /** Whether this NPC publishes quests (Round 07); missing means false. */
+  questGiver: boolean;
 }
 
 /** Wire format of an npc-set JSON file under `data/base/characters/`. */
@@ -79,6 +81,7 @@ export function parseNpcSet(raw: unknown): NpcSetParseResult {
     // Round 06: optional shop reference; anything but a non-empty string is
     // treated as "no shop" rather than a per-NPC failure.
     const shopId = requireNonEmptyString(entry.shopId);
+    const questGiver = entry.questGiver === undefined ? false : entry.questGiver === true;
     const position = isPlainObject(entry.position) ? entry.position : null;
     const col = position === null ? null : requireInteger(position.col);
     const row = position === null ? null : requireInteger(position.row);
@@ -95,6 +98,9 @@ export function parseNpcSet(raw: unknown): NpcSetParseResult {
     }
     if (dialogueId === null) {
       problems.push(`${label}.dialogueId：应为非空字符串`);
+    }
+    if (entry.questGiver !== undefined && typeof entry.questGiver !== 'boolean') {
+      problems.push(`${label}.questGiver：应为布尔值`);
     }
     if (position === null || col === null || row === null) {
       problems.push(`${label}.position：应含整数 col 与 row`);
@@ -117,6 +123,7 @@ export function parseNpcSet(raw: unknown): NpcSetParseResult {
       mapResourceId,
       dialogueId,
       shopId,
+      questGiver,
       position: { col, row },
     });
   });

@@ -1,0 +1,37 @@
+{
+  "quests": [
+    {
+      "id": "quest.round-07-medicine-run",
+      "name": "巷口送药",
+      "description": "镇西几户人家被巷口的刀客惊扰，伤者缺药。替马尚义备齐回春膏，他会把药送去安置伤者。",
+      "giverNpcId": "char.ma-shangyi",
+      "objectives": [
+        {
+          "id": "objective.round-07-three-ointments",
+          "kind": "collectItem",
+          "targetId": "item.huichun-gao",
+          "requiredCount": 3,
+          "text": "备齐三份回春膏"
+        }
+      ],
+      "rewards": { "experience": 15, "currency": 18 }
+    },
+    {
+      "id": "quest.round-07-clear-alley",
+      "name": "巷口除患",
+      "description": "疤脸刀客堵在巷口多日。将他击退，乡邻才敢重新出门；若在交手中落败，这趟差事便算失手。",
+      "giverNpcId": "char.ma-shangyi",
+      "objectives": [
+        {
+          "id": "objective.round-07-defeat-blade",
+          "kind": "defeatEncounter",
+          "targetId": "encounter.alley-blade-bully",
+          "requiredCount": 1,
+          "text": "击退巷口的疤脸刀客"
+        }
+      ],
+      "failOnEncounterIds": ["encounter.alley-blade-bully"],
+      "rewards": { "experience": 30, "currency": 25 }
+    }
+  ]
+}

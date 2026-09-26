@@ -86,6 +86,8 @@ type PanelKeyBinding = {
 export interface ShopPanelOptions {
   /** Invoked after the panel closed; the scene unlocks movement here. */
   onClose?: () => void;
+  /** Invoked after a successful trade so collect-objectives can be refreshed. */
+  onChange?: () => void;
 }
 
 export class ShopPanel {
@@ -93,6 +95,7 @@ export class ShopPanel {
   private readonly container: Phaser.GameObjects.Container;
   private readonly bindings: PanelKeyBinding[] = [];
   private readonly onClose?: () => void;
+  private readonly onChange?: () => void;
 
   private model: ShopPanelModel | null = null;
   private tab: ShopTab = 'buy';
@@ -103,6 +106,7 @@ export class ShopPanel {
   constructor(scene: Phaser.Scene, options: ShopPanelOptions = {}) {
     this.scene = scene;
     this.onClose = options.onClose;
+    this.onChange = options.onChange;
     this.container = scene.add.container(0, 0).setVisible(false).setDepth(1150);
   }
 
@@ -220,6 +224,7 @@ export class ShopPanel {
       this.status = outcome.ok
         ? `购入「${item.name}」：${LABELS.currency} -${outcome.outcome.cost}`
         : outcome.message;
+      if (outcome.ok) this.onChange?.();
       this.render();
       return;
     }
@@ -234,6 +239,7 @@ export class ShopPanel {
       ? `售出「${item.name}」：${LABELS.currency} +${outcome.outcome.revenue}`
       : outcome.message;
     this.clampSelection();
+    if (outcome.ok) this.onChange?.();
     this.render();
   }
 

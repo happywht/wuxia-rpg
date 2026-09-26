@@ -142,6 +142,22 @@
           "text": "去去去，改日担子归置好了，管挑管换，亏待不了你！"
         }
       ]
+    },
+    {
+      "id": "dlg.ma-shangyi-notice-board",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "马尚义把一卷新旧不一的告示压在石上：「镇里大事小事，都有人托我问个明白。你若想替人跑腿，看看有没有合意的差事。」",
+          "options": [
+            { "text": "我看看告示。", "nextNodeId": "board" },
+            { "text": "今日不接差事。", "nextNodeId": "leave" }
+          ]
+        },
+        { "id": "board", "text": "有劳。做成做不成，都请回来告我一声。" },
+        { "id": "leave", "text": "不妨事，路上留神便好。" }
+      ]
     }
   ]
 }

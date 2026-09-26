@@ -44,6 +44,11 @@
       "id": "shop.round-06-set",
       "path": "shops/round-06-shops.json",
       "schema": "shops-set"
+    },
+    {
+      "id": "quest.round-07-set",
+      "path": "quests/round-07-quests.json",
+      "schema": "quest-set"
     }
   ],
   "enabledMods": []

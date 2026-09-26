@@ -1,6 +1,6 @@
 # 架构说明（ARCHITECTURE）
 
-- 状态：Round 03 资料管线与 NPC/对话、Round 04 角色成长、Round 05 回合制战斗，以及 Round 06 数据驱动物品/背包/装备/商店交易（Phaser 无关规则引擎 + 可选 JSON 契约 + 地图 UI 接线）已落地；任务等领域系统仍按后续轮次实现。
+- 状态：Round 03–06 的地图/NPC/对话、成长、战斗与物品/商店系统，以及 Round 07 的数据驱动任务集、Phaser 无关任务状态机和地图名录/日志接线均已落地；对话条件与效果仍按 Round 08 实现。
 - 关联：`docs/ADR.md`（技术选型依据）、`docs/DATA-GUIDE.md`（数据面细节）
 
 ---
@@ -33,14 +33,14 @@
 
 Round 01 已实现地图加载切片：Vite 将 `data/` 作为静态目录服务，场景请求 `/base/maps/round-01-grid.json`（部署使用 `BASE_URL` 前缀）。地图文件随生产构建复制到输出目录。缺失/HTTP 错误、JSON 无法解析或结构检查失败时，场景保留画布并显示可读错误面板。当前结构检查只覆盖网格地图所需字段，不等同于正式 Schema 管线。
 
-Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id、相对路径、schema id 和按顺序启用的 MOD。加载顺序为：Ajv 校验 manifest → 加载并编译被引用的 schema → 加载并校验基础资源 → 按启用顺序读取同路径 MOD 覆盖并重复校验 → 通过事件总线广播结果 → 场景消费资源。Round 03 起 manifest 注册地图/NPC/对话，Round 04 登记角色/门派/武学，Round 05 登记战斗遭遇，Round 06 登记物品/商店；地图为必需资源，其余均按可选内容装配与降级。
+Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id、相对路径、schema id 和按顺序启用的 MOD。加载顺序为：Ajv 校验 manifest → 加载并编译被引用的 schema → 加载并校验基础资源 → 按启用顺序读取同路径 MOD 覆盖并重复校验 → 通过事件总线广播结果 → 场景消费资源。Round 03 起 manifest 注册地图/NPC/对话，Round 04 登记角色/门派/武学，Round 05 登记战斗遭遇，Round 06 登记物品/商店，Round 07 登记任务；地图为必需资源，其余均按可选内容装配与降级。
 
 缺数据/坏数据的行为按严重度分级：
 
 | 情况 | 行为 | 用户所见 |
 |---|---|---|
 | manifest、manifest/grid-map schema 或当前关键地图缺失/不可解析 | 资源不进入运行状态；场景显示诊断面板并停止装配 | 来源路径、HTTP/解析/schema 原因及修复提示 |
-| 可选资源（NPC/对话/角色模板/门派/武学/战斗遭遇/物品/商店）或其 schema 缺失、不可解析、schema 不符、未通过语义校验 | 降级为警告；场景继续装配其余内容 | 地图与移动不受影响；HUD 显示"已禁用相应内容"警告行，控制台保留结构化诊断 |
+| 可选资源（NPC/对话/角色模板/门派/武学/战斗遭遇/物品/商店/任务）或其 schema 缺失、不可解析、schema 不符、未通过语义校验 | 降级为警告；场景继续装配其余内容 | 地图与移动不受影响；HUD 显示"已禁用相应内容"警告行，控制台保留结构化诊断 |
 | 单条 NPC 记录坏（引用不存在、坐标越界/阻挡、压出生点、同格冲突、id 重复） | 只禁用该 NPC，其余照常放置 | 同上；警告消息点名被禁用的 NPC 与原因 |
 | 单段对话坏（起始节点/选项引用断裂、节点 id 重复）或对话 id 重复 | 只禁用该对话及引用它的 NPC，其余照常 | 同上 |
 | 角色模板/门派条目 id 重复 | 保留先声明者并警告 | 同上；警告点名重复 id |
@@ -48,7 +48,8 @@ Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id
 | 单条遭遇坏（地图/模板/敌人武学引用断、触发格越界/阻挡/压出生点/NPC/其他遭遇格、id 重复） | 只禁用该遭遇，其余照常放置 | 同上；警告点名被禁用的遭遇与原因 |
 | 角色模板 `startingMartialArtIds` 含悬空引用/不满足起始条件/重复声明 | 只剔除该起始武学，模板保留可用 | 同上；控制台警告点名模板与武学 |
 | 起始物品引用悬空、商店引用悬空或货架物品无效 | 起始物品只剔除该声明；坏货架条目只剔除该条；无有效 NPC 的商店禁用并警告 | 背包/其余有效商店与地图仍可用；坏 `shopId` 回退到 NPC 对话 |
-| 战斗遭遇、物品、商店/角色模板资源完全未登记或有效集合为空 | 无相应领域数据进入运行状态；玩家状态由首个有效角色模板独立创建 | 地图正常显示；没有有效物品时背包为空，没有有效商店时 NPC 仍可交谈；控制台汇总已加载数量（可为 0） |
+| 单条任务有坏发布 NPC、目标物品/遭遇、前置引用或前置循环 | 只禁用该任务及依赖它的任务；重复任务 id 保留首声明者 | 其他任务、NPC、背包、战斗与地图仍可运行；警告列出任务 id 和原因 |
+| 战斗遭遇、物品、商店、任务或角色模板资源完全未登记或有效集合为空 | 无相应领域数据进入运行状态；玩家状态由首个有效角色模板独立创建 | 地图正常显示；没有有效物品时背包为空，没有有效商店/任务时 NPC 仍可交谈或显示空名录；控制台汇总已加载数量（可为 0） |
 | NPC/对话资源完全未登记或有效集合为空 | 无可选内容进入运行状态 | 地图正常显示，底部状态行显示"暂无可交互人物" |
 | 角色模板/门派/武学资源完全未登记或有效集合为空 | 无成长数据进入运行状态（后续系统按空集处理） | 地图正常显示；控制台汇总已加载数量（可为 0） |
 | MOD 没有某资源的同路径文件 | 保留当前有效版本，无诊断 | 玩家不受影响 |
@@ -58,9 +59,9 @@ Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id
 
 ## 3. JSON Schema 校验（Ajv，Round 02 已接入）
 
-- 当前 schema 使用 draft-07：`manifest.schema.json`、`grid-map.schema.json`、`npc-set.schema.json`、`dialogue-set.schema.json`、`character-profiles.schema.json`、`faction-set.schema.json`、`martial-arts-set.schema.json`、`battle-encounters.schema.json`、`items-set.schema.json` 与 `shops-set.schema.json`；后续数据族各自补充契约。
+- 当前 schema 使用 draft-07：`manifest.schema.json`、`grid-map.schema.json`、`npc-set.schema.json`、`dialogue-set.schema.json`、`character-profiles.schema.json`、`faction-set.schema.json`、`martial-arts-set.schema.json`、`battle-encounters.schema.json`、`items-set.schema.json`、`shops-set.schema.json` 与 `quest-set.schema.json`；后续数据族各自补充契约。
 - Ajv 8.x 在加载期校验 manifest、基础资源和每份 MOD 覆盖（开发/生产相同），不在游戏循环内反复校验。
-- 跨字段规则分两层：单文件语义（地图尺寸/出生点；角色模板成长与起始资源；武学初始熟练度；消耗品必须恢复生命或内力）由按 schema id 注册的语义校验器补足；跨资源语义（NPC 的地图/对话；武学的门派；遭遇的地图/模板/武学；物品的起始模板引用；商店 NPC 与库存物品引用）由装配层逐条校验补足（`npc-placement.ts`、`dialogue-graph.ts`、`character-progression.ts`、`turn-based-combat.ts`、`item-system.ts`），失败只禁用受影响的最小条目。正式校验细节见 `docs/ADR.md` ADR-0004。
+- 跨字段规则分两层：单文件语义（地图尺寸/出生点；角色模板成长与起始资源；武学初始熟练度；消耗品必须恢复生命或内力）由按 schema id 注册的语义校验器补足；跨资源语义（NPC 的地图/对话；武学的门派；遭遇的地图/模板/武学；物品的起始模板引用；商店 NPC 与库存物品引用；任务发布 NPC、目标、前置任务及失败遭遇）由装配层逐条校验补足（`npc-placement.ts`、`dialogue-graph.ts`、`character-progression.ts`、`turn-based-combat.ts`、`item-system.ts`、`quest-system.ts`），失败只禁用受影响的最小条目。正式校验细节见 `docs/ADR.md` ADR-0004。
 - 错误输出为结构化诊断（来源、资源、消息和字段路径），可被事件总线订阅并显示在场景。
 
 ## 4. mod 覆盖：同名文件优先级（Round 02 已提供基础能力，Round 35 增强作者工具）
@@ -91,6 +92,7 @@ Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id
 - Round 04 的 `character-progression.ts` 同样与 Phaser 无关：五项核心属性协议、三类集合解析/索引（重复 id 与门派引用逐条隔离）、运行时角色状态、累计经验阈值与跨级成长（属性上限封顶）、生命/内力派生公式计算和武学资格判定；Round 05 扩展武学战斗作用（`combat`：attack/heal、power、qiCost）、模板起始武学声明与 `resolveStartingMartialArts` 逐条资格校验。角色状态只存在于运行时对象。
 - Round 05 的 `turn-based-combat.ts` 是与 Phaser 无关的战斗引擎：遭遇集合解析与跨资源装配（单条失败只禁用该遭遇）、固定协议的伤害/治疗公式、`CombatSession` 交替回合状态机（玩家行动 + 确定性敌方回应在一次调用内完成）、行动可用性校验（无效/内力不足不偷回合）、胜利经验经 Round 04 API 恰好一次结算、失败按数据比例恢复、撤退零奖励，全部输出为可读战报条目。Phaser 呈现只出现在 `src/game/combat-ui.ts`（资源条、行动列表、战报）与场景装配中：遭遇敌人占格阻挡、四方向邻接 E 开战、面板打开期间移动锁定、一次性遭遇完成后本次运行休眠（刷新重置）。
 - Round 06 的 `item-system.ts` 与 Phaser 无关，负责物品/商店解析、引用装配、背包、容量/堆叠、消耗、装备、角色属性同步与原子买卖；`CharacterState.baseAttributes` 保存成长值，`attributes` 为叠加装备后的有效值，升级只改基础值后重算装备效果。`inventory-ui.ts` / `shop-ui.ts` 与 GridScene 负责背包/商店呈现、NPC 交互和移动锁。运行状态仅在内存中，持久化留到 Round 09。
+- Round 07 的 `quest-system.ts` 与 Phaser 无关，负责任务集合防御解析、重复 id 与 NPC/物品/遭遇/前置引用校验、前置循环隔离、状态机、目标进度、失败/放弃、单一跟踪目标和完成奖励结果。`collectItem` 目标在接取时以当前物品数量初始化，之后按背包变化的绝对数量同步；`defeatEncounter` 仅响应胜利信号，配置的失败遭遇在战斗失败时终止任务。完成状态保证奖励只生成一次；奖励由 GridScene 通过成长引擎和库存货币更新。`quest-ui.ts` 与 GridScene 负责 E 键发布人名录、Q 键任务日志和移动锁。任务状态/奖励不持久化，刷新重置，存档留到 Round 09。
 
 ## 变更记录
 
@@ -103,3 +105,4 @@ Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id
 | 2026-09-27 | Round 04 | 角色模板/门派/武学三份契约与原创资料、可选分类扩展、Phaser 无关成长与资格引擎及空集降级 |
 | 2026-09-27 | Round 05 | 武学战斗作用与起始武学契约、战斗遭遇契约与资料、Phaser 无关战斗会话引擎、遭遇逐条隔离与战斗面板/地图接线 |
 | 2026-09-27 | Round 06 | 物品/商店 Schema 与资料、背包/装备/交易规则引擎、角色装备属性同步、背包与地图商店 UI |
+| 2026-09-27 | Round 07 | 任务集契约与跨引用校验、Phaser 无关任务状态机、发布人名录/任务日志及物品/战斗联动 |

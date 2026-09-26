@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wuxia-rpg.invalid/schema/quest-set",
+  "title": "任务集合",
+  "description": "任务集合静态契约。NPC、物品、遭遇与前置任务的跨资源引用由运行时装配层逐条校验；任务名称、说明、目标描述与奖励数值均来自数据。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["quests"],
+  "properties": {
+    "quests": {
+      "type": "array",
+      "description": "任务条目；允许为空，id 应唯一。",
+      "items": { "$ref": "#/definitions/quest" }
+    }
+  },
+  "definitions": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+    },
+    "quest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "description", "giverNpcId", "objectives", "rewards"],
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 48 },
+        "description": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "giverNpcId": { "$ref": "#/definitions/id" },
+        "prerequisiteQuestIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/definitions/id" }
+        },
+        "objectives": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              { "$ref": "#/definitions/collect-objective" },
+              { "$ref": "#/definitions/defeat-objective" }
+            ]
+          }
+        },
+        "failOnEncounterIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/definitions/id" }
+        },
+        "rewards": { "$ref": "#/definitions/rewards" }
+      }
+    },
+    "collect-objective": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "targetId", "requiredCount", "text"],
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "kind": { "const": "collectItem" },
+        "targetId": { "$ref": "#/definitions/id" },
+        "requiredCount": { "type": "integer", "minimum": 1, "maximum": 999 },
+        "text": { "type": "string", "minLength": 1, "maxLength": 160 }
+      }
+    },
+    "defeat-objective": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "targetId", "requiredCount", "text"],
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "kind": { "const": "defeatEncounter" },
+        "targetId": { "$ref": "#/definitions/id" },
+        "requiredCount": { "type": "integer", "minimum": 1, "maximum": 99 },
+        "text": { "type": "string", "minLength": 1, "maxLength": 160 }
+      }
+    },
+    "rewards": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["experience", "currency"],
+      "properties": {
+        "experience": { "type": "integer", "minimum": 0, "maximum": 999999 },
+        "currency": { "type": "integer", "minimum": 0, "maximum": 999999 }
+      }
+    }
+  }
+}

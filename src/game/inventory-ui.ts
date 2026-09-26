@@ -142,6 +142,8 @@ type PanelKeyBinding = {
 export interface InventoryPanelOptions {
   /** Invoked after the panel closed; the scene unlocks movement here. */
   onClose?: () => void;
+  /** Invoked after an operation succeeds and changes player item counts. */
+  onChange?: () => void;
 }
 
 export class InventoryPanel {
@@ -149,6 +151,7 @@ export class InventoryPanel {
   private readonly container: Phaser.GameObjects.Container;
   private readonly bindings: PanelKeyBinding[] = [];
   private readonly onClose?: () => void;
+  private readonly onChange?: () => void;
 
   private model: InventoryPanelModel | null = null;
   private selection = 0;
@@ -158,6 +161,7 @@ export class InventoryPanel {
   constructor(scene: Phaser.Scene, options: InventoryPanelOptions = {}) {
     this.scene = scene;
     this.onClose = options.onClose;
+    this.onChange = options.onChange;
     this.container = scene.add.container(0, 0).setVisible(false).setDepth(1050);
   }
 
@@ -253,6 +257,7 @@ export class InventoryPanel {
         ? `${item.name}：${LABELS.health}+${outcome.outcome.healthHealed} · ${LABELS.qi}+${outcome.outcome.qiRestored}`
         : outcome.message;
       this.clampSelection();
+      if (outcome.ok) this.onChange?.();
       this.render();
       return;
     }
@@ -270,6 +275,7 @@ export class InventoryPanel {
         ? `${item.name}：${slotLabel(outcome.slot)}${isEquipped(model.inventory, item.id) ? ' 已装备' : ' 已卸下'}`
         : outcome.message;
       this.clampSelection();
+      if (outcome.ok) this.onChange?.();
       this.render();
       return;
     }

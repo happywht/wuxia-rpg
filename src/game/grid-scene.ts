@@ -31,6 +31,7 @@ import {
   indexFactions,
   indexMartialArts,
   indexProfiles,
+  grantExperience,
   type MartialArtData,
   parseCharacterProfileSet,
   parseFactionSet,
@@ -54,28 +55,40 @@ import {
   assembleShops,
   createInventoryState,
   createShopStockRuntime,
+  countItem,
   indexItems,
   parseItemSet,
   parseShopSet,
   resolveStartingItems,
 } from '../engine/item-system';
+import {
+  type QuestData,
+  type QuestJournal,
+  type QuestSetData,
+  type QuestUpdateResult,
+  applyQuestSignal,
+  assembleQuests,
+  createQuestJournal,
+  parseQuestSet,
+} from '../engine/quest-system';
 import { DialoguePanel } from './dialogue-ui';
 import { BattlePanel } from './combat-ui';
 import { InventoryPanel } from './inventory-ui';
 import { ShopPanel } from './shop-ui';
+import { QuestPanel } from './quest-ui';
 
 /**
  * Round 03 grid scene, extended with the Round 04 progression datasets,
- * the Round 05 battle slice and the Round 06 item/trade slice.
+ * the Round 05 battle slice, Round 06 item/trade slice and Round 07 quests.
  *
  * The required map still loads through the generic data loader exactly like
  * Round 02 — manifest/schema/map failures remain fatal and land in the
  * readable error panel. NPC, dialogue, character-profile, faction,
- * martial-art, battle-encounter, item and shop resources are *optional*
+ * martial-art, battle-encounter, item, shop and quest resources are *optional*
  * content on top of that: each failing NPC, conversation, dataset, single
- * martial art, single encounter, item or shop is disabled individually with
+ * martial art, single encounter, item, shop or quest is disabled individually with
  * a warning, and the map stays fully playable without them (or with none
- * registered at all, which shows an explicit "no one to talk to" hint).
+ * registered at all, which shows the empty-interaction hint).
  *
  * NPCs are rendered at their data-declared walkable cells, block player
  * movement, and can be talked to with E while four-way adjacent. While the
@@ -111,6 +124,7 @@ const MARTIAL_ART_RESOURCE_ID = 'martial-art.round-04-set';
 const ENCOUNTER_RESOURCE_ID = 'encounter.round-05-set';
 const ITEM_RESOURCE_ID = 'item.round-06-set';
 const SHOP_RESOURCE_ID = 'shop.round-06-set';
+const QUEST_RESOURCE_ID = 'quest.round-07-set';
 
 const VIEW_WIDTH = 960;
 const VIEW_HEIGHT = 540;
@@ -155,6 +169,7 @@ const OPTIONAL_RESOURCE_IDS = new Set([
   ENCOUNTER_RESOURCE_ID,
   ITEM_RESOURCE_ID,
   SHOP_RESOURCE_ID,
+  QUEST_RESOURCE_ID,
 ]);
 
 /** Optional-content schemas; schema-level failures carry no resource id, so match by origin. */
@@ -167,6 +182,7 @@ const OPTIONAL_SCHEMA_ORIGINS = new Set([
   'schema:battle-encounters',
   'schema:items-set',
   'schema:shops-set',
+  'schema:quest-set',
 ]);
 
 function isOptionalContentDiagnostic(diagnostic: Diagnostic): boolean {
@@ -207,6 +223,7 @@ interface WorldAssembly {
   encounters: PlacedEncounter[];
   items: ReadonlyMap<string, ItemRecordData>;
   shops: ReadonlyMap<string, AssembledShop>;
+  quests: ReadonlyMap<string, QuestData>;
   warnings: Diagnostic[];
 }
 
@@ -251,15 +268,23 @@ export class GridScene extends Phaser.Scene {
   private readonly shopStocks = new Map<string, ShopStockRuntime>();
   private inventory: InventoryState | null = null;
 
+  /** Valid quest catalog and per-run journal (persistence arrives in R09). */
+  private quests: ReadonlyMap<string, QuestData> = new Map();
+  private questJournal: QuestJournal = { states: new Map(), trackedQuestId: null };
+
   private dialoguePanel: DialoguePanel | null = null;
   private battlePanel: BattlePanel | null = null;
   private inventoryPanel: InventoryPanel | null = null;
   private shopPanel: ShopPanel | null = null;
+  private questPanel: QuestPanel | null = null;
   private activeSession: CombatSession | null = null;
   private activeEncounter: PlacedEncounter | null = null;
 
   private coordsText: Phaser.GameObjects.Text | null = null;
   private interactText: Phaser.GameObjects.Text | null = null;
+  private questTrackerText: Phaser.GameObjects.Text | null = null;
+  private questNotice: string | null = null;
+  private questNoticeTimer: Phaser.Time.TimerEvent | null = null;
 
   constructor() {
     super('grid');
@@ -322,6 +347,10 @@ export class GridScene extends Phaser.Scene {
             const parsed = parseShopSet(value);
             return parsed.ok ? [] : parsed.errors;
           },
+          'quest-set': (value) => {
+            const parsed = parseQuestSet(value);
+            return parsed.ok ? [] : parsed.errors;
+          },
         },
       });
 
@@ -379,7 +408,7 @@ export class GridScene extends Phaser.Scene {
    * Assembles optional NPC/dialogue content. Every failure disables the
    * smallest possible unit — one conversation or one NPC — and becomes a
    * warning instead of killing the scene. Missing (unregistered) resources
-   * are legitimate: the world then simply has no one to talk to.
+   * are legitimate: the world then has no optional interactions or quests.
    */
   private assembleOptionalContent(
     resources: ReadonlyMap<string, LoadedResource>,
@@ -538,6 +567,40 @@ export class GridScene extends Phaser.Scene {
     }
     encounters = encounterPlacement.encounters;
 
+    let questSet: QuestSetData | null = null;
+    const questResource = resources.get(QUEST_RESOURCE_ID);
+    if (questResource !== undefined) {
+      const parsed = parseQuestSet(questResource.value);
+      if (!parsed.ok) {
+        warnings.push({
+          resource: QUEST_RESOURCE_ID,
+          origin: 'quest-assembly',
+          severity: 'warning',
+          message: '任务资料结构不合规，本轮禁用全部任务',
+          details: parsed.errors,
+        });
+      } else {
+        questSet = parsed.set;
+      }
+    }
+    const questAssembly = assembleQuests({
+      questSet,
+      questGiverNpcIds: new Set(
+        placement.npcs.filter((npc) => npc.record.questGiver).map((npc) => npc.record.id),
+      ),
+      itemIds: new Set(itemAssembly.items.keys()),
+      encounterIds: new Set(encounters.map((encounter) => encounter.record.id)),
+    });
+    for (const message of questAssembly.warnings) {
+      warnings.push({
+        resource: QUEST_RESOURCE_ID,
+        origin: 'quest-assembly',
+        severity: 'warning',
+        message,
+        details: [],
+      });
+    }
+
     return {
       npcs: placement.npcs,
       dialogues,
@@ -545,6 +608,7 @@ export class GridScene extends Phaser.Scene {
       encounters,
       items: itemAssembly.items,
       shops: shopAssembly.shops,
+      quests: questAssembly.quests,
       warnings,
     };
   }
@@ -739,6 +803,8 @@ export class GridScene extends Phaser.Scene {
     );
     this.items = assembly.items;
     this.shops = assembly.shops;
+    this.quests = assembly.quests;
+    this.questJournal = createQuestJournal(this.quests);
     this.shopStocks.clear();
     for (const shop of this.shops.values()) {
       this.shopStocks.set(shop.record.id, createShopStockRuntime(shop));
@@ -779,13 +845,14 @@ export class GridScene extends Phaser.Scene {
     // Progression datasets surface their loaded counts in the console so
     // authors can confirm their JSON actually landed.
     console.info(
-      '[progression] 已加载角色模板 %d 个、门派 %d 个、武学 %d 种、战斗遭遇 %d 处、物品 %d 种、商店 %d 家',
+      '[progression] 已加载角色模板 %d 个、门派 %d 个、武学 %d 种、战斗遭遇 %d 处、物品 %d 种、商店 %d 家、任务 %d 项',
       this.progression.profiles.size,
       this.progression.factions.size,
       this.progression.martialArts.size,
       this.encounters.length,
       this.items.size,
       this.shops.size,
+      this.quests.size,
     );
 
     this.mapOrigin.set(
@@ -819,10 +886,17 @@ export class GridScene extends Phaser.Scene {
     });
     this.inventoryPanel = new InventoryPanel(this, {
       onClose: () => this.updateInteractHint(), // Movement is keyed off isOpen.
+      onChange: () => this.refreshQuestCollectObjectives(),
     });
     this.shopPanel = new ShopPanel(this, {
       onClose: () => this.updateInteractHint(), // Movement is keyed off isOpen.
+      onChange: () => this.refreshQuestCollectObjectives(),
     });
+    this.questPanel = new QuestPanel(this, {
+      onClose: () => this.updateInteractHint(),
+      onUpdate: (update) => this.applyQuestUpdate(update),
+    });
+    this.updateQuestTrackerHud();
     this.updateInteractHint();
   }
 
@@ -880,6 +954,17 @@ export class GridScene extends Phaser.Scene {
     const encounter = this.activeEncounter;
     if (session !== null && encounter !== null) {
       const result = session.finalResult;
+      if (result?.outcome === 'victory') {
+        this.applyQuestUpdate(applyQuestSignal(this.quests, this.questJournal, {
+          type: 'encounter-victory',
+          encounterId: encounter.record.id,
+        }));
+      } else if (result?.outcome === 'defeat') {
+        this.applyQuestUpdate(applyQuestSignal(this.quests, this.questJournal, {
+          type: 'encounter-defeat',
+          encounterId: encounter.record.id,
+        }));
+      }
       if (result?.outcome === 'victory' && !encounter.record.repeatable) {
         this.completedEncounters.add(encounter.record.id);
         this.encounterCells.delete(`${encounter.col},${encounter.row}`);
@@ -933,10 +1018,19 @@ export class GridScene extends Phaser.Scene {
     modWarnings: readonly Diagnostic[],
   ): void {
     this.add
-      .text(16, 14, '方向键 / WASD 移动 · 每次一格 · 墙体、边界与人物不可通行 · 邻近人物按 E 交谈 · B 背包', {
+      .text(16, 14, '方向键 / WASD 移动 · 每次一格 · 墙体、边界与人物不可通行 · 邻近人物按 E · B 背包 · Q 任务', {
         fontFamily: UI.fontFamily,
         fontSize: '13px',
         color: UI.textMuted,
+      })
+      .setOrigin(0, 0);
+
+    this.questTrackerText = this.add
+      .text(16, 34, '', {
+        fontFamily: UI.fontFamily,
+        fontSize: '11px',
+        color: UI.textMuted,
+        wordWrap: { width: 360 },
       })
       .setOrigin(0, 0);
 
@@ -1019,11 +1113,15 @@ export class GridScene extends Phaser.Scene {
     if (npcTarget !== null) {
       const keepsShop =
         npcTarget.record.shopId !== null && this.shops.has(npcTarget.record.shopId);
-      this.interactText.setText(
-        keepsShop
-          ? `按 E 与「${npcTarget.record.name}」交易`
-          : `按 E 与「${npcTarget.record.name}」交谈`,
-      );
+      const keepsQuests =
+        npcTarget.record.questGiver &&
+        [...this.quests.values()].some((quest) => quest.giverNpcId === npcTarget.record.id);
+      const prompt = keepsShop
+        ? `按 E 与「${npcTarget.record.name}」交易`
+        : keepsQuests
+          ? `按 E 向「${npcTarget.record.name}」查看差事`
+          : `按 E 与「${npcTarget.record.name}」交谈`;
+      this.interactText.setText(prompt);
       return;
     }
     const encounterTarget = selectEncounterTarget(this.activeEncounters(), {
@@ -1047,8 +1145,110 @@ export class GridScene extends Phaser.Scene {
       (this.dialoguePanel !== null && this.dialoguePanel.isOpen) ||
       (this.battlePanel !== null && this.battlePanel.isOpen) ||
       (this.inventoryPanel !== null && this.inventoryPanel.isOpen) ||
-      (this.shopPanel !== null && this.shopPanel.isOpen)
+      (this.shopPanel !== null && this.shopPanel.isOpen) ||
+      (this.questPanel !== null && this.questPanel.isOpen)
     );
+  }
+
+  /** Q key: open the journal anywhere, or close it while it owns input. */
+  private toggleQuestJournal(): void {
+    const panel = this.questPanel;
+    if (panel === null) return;
+    if (panel.isOpen) {
+      panel.close();
+      return;
+    }
+    if (this.anyOverlayOpen() || this.quests.size === 0 || this.inventory === null) return;
+    panel.open({
+      quests: this.quests,
+      journal: this.questJournal,
+      itemCounts: this.questItemCounts(),
+    });
+    this.updateInteractHint();
+  }
+
+  private questItemCounts(): ReadonlyMap<string, number> {
+    const counts = new Map<string, number>();
+    if (this.inventory === null) return counts;
+    for (const quest of this.quests.values()) {
+      for (const objective of quest.objectives) {
+        if (objective.kind === 'collectItem') {
+          counts.set(objective.targetId, countItem(this.inventory, objective.targetId));
+        }
+      }
+    }
+    return counts;
+  }
+
+  /** Reconciles collect goals after any successful use or shop transaction. */
+  private refreshQuestCollectObjectives(): void {
+    if (this.inventory === null) return;
+    const completed: QuestUpdateResult['completed'][number][] = [];
+    const failedQuestIds: string[] = [];
+    let changed = false;
+    for (const [itemId, quantity] of this.questItemCounts()) {
+      const update = applyQuestSignal(this.quests, this.questJournal, {
+        type: 'item-count', itemId, quantity,
+      });
+      changed ||= update.changed;
+      completed.push(...update.completed);
+      failedQuestIds.push(...update.failedQuestIds);
+    }
+    this.applyQuestUpdate({ changed, completed, failedQuestIds });
+  }
+
+  /** Applies one state transition's rewards and refreshes the visible tracker. */
+  private applyQuestUpdate(update: QuestUpdateResult): void {
+    if (update.completed.length > 0 || update.failedQuestIds.length > 0) {
+      this.questNoticeTimer?.remove(false);
+      this.questNoticeTimer = null;
+    }
+    if (this.playerProfile !== null && this.playerState !== null && this.inventory !== null) {
+      for (const reward of update.completed) {
+        const quest = this.quests.get(reward.questId);
+        const experience = grantExperience(this.playerProfile, this.playerState, reward.experience);
+        const paidExperience = reward.experience - experience.discardedExperience;
+        this.inventory.currency += reward.currency;
+        this.questNotice = quest === undefined
+          ? `差事完成：经验 +${paidExperience} · 银两 +${reward.currency}`
+          : `完成「${quest.name}」：经验 +${paidExperience} · 银两 +${reward.currency}`;
+        console.info('[quest] 任务 "%s" 完成：经验 +%d，银两 +%d', reward.questId, paidExperience, reward.currency);
+      }
+    }
+    if (update.failedQuestIds.length > 0) {
+      const failed = this.quests.get(update.failedQuestIds[update.failedQuestIds.length - 1] ?? '');
+      this.questNotice = failed === undefined ? '有一项差事已失败' : `差事「${failed.name}」已失败`;
+      for (const id of update.failedQuestIds) console.info('[quest] 任务 "%s" 已失败', id);
+    }
+    this.updateQuestTrackerHud();
+    this.updateInteractHint();
+  }
+
+  private updateQuestTrackerHud(): void {
+    const text = this.questTrackerText;
+    if (text === null) return;
+    if (this.questNotice !== null) {
+      text.setText(this.questNotice).setColor(UI.textWarn);
+      if (this.questNoticeTimer === null) {
+        this.questNoticeTimer = this.time.delayedCall(5000, () => {
+          this.questNotice = null;
+          this.questNoticeTimer = null;
+          this.updateQuestTrackerHud();
+        });
+      }
+      return;
+    }
+    const trackedId = this.questJournal.trackedQuestId;
+    const quest = trackedId === null ? undefined : this.quests.get(trackedId);
+    const state = trackedId === null ? undefined : this.questJournal.states.get(trackedId);
+    if (quest === undefined || state?.status !== 'active') {
+      text.setText('');
+      return;
+    }
+    const progress = quest.objectives.map((objective) =>
+      `${objective.text} ${state.objectiveCounts.get(objective.id) ?? 0}/${objective.requiredCount}`,
+    ).join(' · ');
+    text.setText(`跟踪：${quest.name}　${progress}`).setColor(UI.textMuted);
   }
 
   /** B key: open the backpack while free, close it while it is open. */
@@ -1110,12 +1310,17 @@ export class GridScene extends Phaser.Scene {
     const onBackpack = (): void => this.toggleBackpack();
     backpackKey.on('down', onBackpack);
 
+    const questKey = keyboard.addKey(KeyCodes.Q);
+    const onQuestJournal = (): void => this.toggleQuestJournal();
+    questKey.on('down', onQuestJournal);
+
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       for (const { key, onDown } of listeners) {
         key.off('down', onDown);
       }
       interactKey.off('down', onInteract);
       backpackKey.off('down', onBackpack);
+      questKey.off('down', onQuestJournal);
       this.dialoguePanel?.destroy();
       this.dialoguePanel = null;
       this.battlePanel?.destroy();
@@ -1124,6 +1329,8 @@ export class GridScene extends Phaser.Scene {
       this.inventoryPanel = null;
       this.shopPanel?.destroy();
       this.shopPanel = null;
+      this.questPanel?.destroy();
+      this.questPanel = null;
       this.activeSession = null;
       this.activeEncounter = null;
     });
@@ -1131,8 +1338,8 @@ export class GridScene extends Phaser.Scene {
 
   /**
    * E key: the four-way adjacent NPC opens its shop when it keeps a valid
-   * one (nearest, id tie-break) and otherwise talks; with no NPC adjacent,
-   * the four-way adjacent encounter starts, if any.
+   * one (nearest, id tie-break), then opens a quest board, and otherwise
+   * talks; with no NPC adjacent, the four-way adjacent encounter starts.
    */
   private handleInteraction(): void {
     if (this.anyOverlayOpen()) {
@@ -1152,6 +1359,23 @@ export class GridScene extends Phaser.Scene {
           stock,
           inventory: this.inventory,
           items: this.items,
+        });
+        this.updateInteractHint();
+        return;
+      }
+      const hasQuests = [...this.quests.values()].some(
+        (quest) => quest.giverNpcId === target.record.id,
+      );
+      if (
+        target.record.questGiver && hasQuests && this.inventory !== null &&
+        this.questPanel !== null
+      ) {
+        this.questPanel.open({
+          quests: this.quests,
+          journal: this.questJournal,
+          giverNpcId: target.record.id,
+          giverName: target.record.name,
+          itemCounts: this.questItemCounts(),
         });
         this.updateInteractHint();
         return;
