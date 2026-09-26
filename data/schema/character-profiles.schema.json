@@ -120,7 +120,8 @@
           "attributeCap",
           "progression",
           "growth",
-          "derivedStats"
+          "derivedStats",
+          "startingMartialArtIds"
         ],
         "properties": {
           "id": {
@@ -205,6 +206,15 @@
                 "description": "内力上限公式参数。",
                 "$ref": "#/definitions/derivedFormula"
               }
+            }
+          },
+          "startingMartialArtIds": {
+            "description": "起始已掌握的武学 id 列表（Round 05）；空数组表示起步不会武学。引用存在、未被禁用且满足模板起始等级/属性/无门派条件由运行时装配逐条校验，坏引用只剔除该武学。",
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
             }
           }
         }

@@ -1,0 +1,184 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wuxia-rpg.invalid/schema/battle-encounters",
+  "title": "战斗遭遇集合",
+  "description": "战斗遭遇集合 JSON 的静态结构契约：字段名、类型与取值范围。遭遇名称、敌人属性/生命/内力、可用武学引用、胜利经验、失败恢复比例、重复性标志与全部提示文本均来自数据。跨资源语义（地图引用与触发格可走、不压出生点/NPC/其他遭遇格、角色模板与武学引用有效）由运行时装配逐条校验；单场遭遇失败只禁用该遭遇。",
+  "definitions": {
+    "cellPosition": {
+      "description": "触发格坐标（与网格地图同坐标系）。",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["col", "row"],
+      "properties": {
+        "col": { "type": "integer", "minimum": 0, "maximum": 255 },
+        "row": { "type": "integer", "minimum": 0, "maximum": 255 }
+      }
+    },
+    "enemyAttributes": {
+      "description": "敌人五项核心属性（通用协议键与 1–999 值域；参与伤害/治疗公式）。",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["body", "force", "agility", "insight", "resolve"],
+      "properties": {
+        "body": { "type": "integer", "minimum": 1, "maximum": 999 },
+        "force": { "type": "integer", "minimum": 1, "maximum": 999 },
+        "agility": { "type": "integer", "minimum": 1, "maximum": 999 },
+        "insight": { "type": "integer", "minimum": 1, "maximum": 999 },
+        "resolve": { "type": "integer", "minimum": 1, "maximum": 999 }
+      }
+    },
+    "recoveryRatio": {
+      "description": "失败后按上限比例恢复生命/内力；引擎保证恢复后至少 1 点生命。",
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "encounterText": {
+      "description": "遭遇提示文本（原创内容）。",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "stableId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["encounters"],
+  "properties": {
+    "encounters": {
+      "type": "array",
+      "description": "遭遇条目列表；允许空数组表达暂无战斗内容。id 在集合内应保持唯一。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "mapResourceId",
+          "position",
+          "profileId",
+          "enemy",
+          "victoryExperience",
+          "defeatRecovery",
+          "repeatable",
+          "texts"
+        ],
+        "properties": {
+          "id": {
+            "description": "稳定遭遇 id，建议前缀 encounter.。",
+            "$ref": "#/definitions/stableId"
+          },
+          "name": {
+            "description": "遭遇显示名称（原创）。",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32
+          },
+          "mapResourceId": {
+            "description": "触发位置所在地图的 manifest 资源 id（运行时校验引用与格位）。",
+            "$ref": "#/definitions/stableId"
+          },
+          "position": {
+            "description": "遭遇触发格：必须在地图可走格，且不与玩家出生点、NPC 或其他遭遇格重叠（运行时逐条校验）。",
+            "$ref": "#/definitions/cellPosition"
+          },
+          "profileId": {
+            "description": "参战玩家使用的角色模板 id（运行时校验存在且未被禁用）。",
+            "$ref": "#/definitions/stableId"
+          },
+          "enemy": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "attributes", "health", "qi", "martialArtIds"],
+            "properties": {
+              "name": {
+                "description": "敌人显示名称（原创）。",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 32
+              },
+              "attributes": {
+                "description": "敌人五项属性；直接数值，不走角色模板派生公式。",
+                "$ref": "#/definitions/enemyAttributes"
+              },
+              "health": {
+                "description": "敌人生命上限（开局即满）。",
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9999
+              },
+              "qi": {
+                "description": "敌人内力上限（开局即满）。",
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9999
+              },
+              "martialArtIds": {
+                "description": "敌人可用的武学 id 列表；每个 id 须存在于已加载且未禁用的武学集合（运行时逐条校验）。敌方回合在可用攻击中选择威力最高者。",
+                "type": "array",
+                "uniqueItems": true,
+                "minItems": 1,
+                "items": { "$ref": "#/definitions/stableId" }
+              }
+            }
+          },
+          "victoryExperience": {
+            "description": "胜利时发放的经验（经成长系统结算，仅发放一次）。",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000000
+          },
+          "defeatRecovery": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["healthRatio", "qiRatio"],
+            "properties": {
+              "healthRatio": {
+                "description": "失败后生命恢复到上限的比例。",
+                "$ref": "#/definitions/recoveryRatio"
+              },
+              "qiRatio": {
+                "description": "失败后内力恢复到上限的比例。",
+                "$ref": "#/definitions/recoveryRatio"
+              }
+            }
+          },
+          "repeatable": {
+            "description": "true 表示胜利后本次运行内可再次触发；false 表示胜利后不再触发（完成标记仅存于本次运行，刷新重置）。",
+            "type": "boolean"
+          },
+          "texts": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["approach", "intro", "victory", "defeat", "flee"],
+            "properties": {
+              "approach": {
+                "description": "玩家与触发格四方向相邻时的提示文本（可含按键引导）。",
+                "$ref": "#/definitions/encounterText"
+              },
+              "intro": {
+                "description": "开战时战报首条文本。",
+                "$ref": "#/definitions/encounterText"
+              },
+              "victory": {
+                "description": "胜利结果文本。",
+                "$ref": "#/definitions/encounterText"
+              },
+              "defeat": {
+                "description": "失败结果文本。",
+                "$ref": "#/definitions/encounterText"
+              },
+              "flee": {
+                "description": "撤退结果文本。",
+                "$ref": "#/definitions/encounterText"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -44,7 +44,11 @@
           "perLevel": 8,
           "attributeWeights": { "insight": 2, "resolve": 1 }
         }
-      }
+      },
+      "startingMartialArtIds": [
+        "skill.jianghu-sanshou",
+        "skill.tuna-yangqi-jue"
+      ]
     }
   ]
 }

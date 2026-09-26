@@ -17,8 +17,13 @@
  * succeeds, the indexing step adds the cross-resource rules (duplicate ids,
  * martial-art faction references) and isolates those failures per entry.
  *
- * Joining, practicing, combat effects and persistence are deliberately out
- * of scope (Rounds 05/09+): character state lives in runtime objects only.
+ * Round 05 adds the combat action of a martial art (`combat`: attack/heal,
+ * power, qi cost — numbers come from data) and the profile's starting
+ * martial-art list, validated per reference by
+ * {@link resolveStartingMartialArts} against the indexed arts.
+ *
+ * Joining, practicing and persistence remain out of scope (Rounds 09/13+):
+ * character state lives in runtime objects only.
  */
 
 /** Canonical attribute ids (protocol; display names and values stay in data). */
@@ -73,11 +78,26 @@ export interface CharacterProfileData {
   };
   growth: AttributeMap;
   derivedStats: CharacterDerivedStatsData;
+  /** Martial-art ids the character starts with (validated per reference at
+   * assembly time by {@link resolveStartingMartialArts}). */
+  startingMartialArtIds: string[];
 }
 
 /** Wire format of a character-profiles JSON file under `data/base/characters/`. */
 export interface CharacterProfileSetData {
   profiles: CharacterProfileData[];
+}
+
+/** Combat-action kinds (protocol; the concrete numbers stay in data). */
+export type CombatActionKind = 'attack' | 'heal';
+
+/** Wire format of a martial art's combat effect (Round 05). */
+export interface CombatActionData {
+  kind: CombatActionKind;
+  /** Raw magnitude: attack damage base or heal amount base. */
+  power: number;
+  /** Qi spent per use; an action costing more than the current qi is unusable. */
+  qiCost: number;
 }
 
 /** Wire format of one faction inside a faction-set JSON file. */
@@ -109,6 +129,8 @@ export interface MartialArtData {
   };
   initialProficiency: number;
   proficiencyCap: number;
+  /** Combat use of the art (Round 05): attack/heal, power and qi cost. */
+  combat: CombatActionData;
 }
 
 /** Wire format of a martial-arts-set JSON file under `data/base/skills/`. */
@@ -244,6 +266,22 @@ function requireDerivedFormula(raw: unknown): DerivedStatFormulaData | null {
   return { base, perLevel, attributeWeights };
 }
 
+/** Reads one martial art's combat effect (kind/power/qiCost). */
+function requireCombatAction(raw: unknown): CombatActionData | null {
+  const source = isPlainObject(raw) ? raw : null;
+  if (source === null) {
+    return null;
+  }
+  const kind: CombatActionKind | null =
+    source.kind === 'attack' || source.kind === 'heal' ? source.kind : null;
+  const power = requireIntegerInRange(source.power, 1, 999);
+  const qiCost = requireIntegerInRange(source.qiCost, 0, 99);
+  if (kind === null || power === null || qiCost === null) {
+    return null;
+  }
+  return { kind, power, qiCost };
+}
+
 function requireDerivedStats(raw: unknown): CharacterDerivedStatsData | null {
   const source = isPlainObject(raw) ? raw : null;
   if (source === null) {
@@ -295,6 +333,20 @@ export function parseCharacterProfileSet(raw: unknown): SetParseResult<Character
     );
     const attributeCap = requireIntegerInRange(entry.attributeCap, 1, ATTRIBUTE_MAX);
 
+    const startingMartialArtIds: string[] | null = Array.isArray(entry.startingMartialArtIds)
+      ? (() => {
+          const ids: string[] = [];
+          for (const id of entry.startingMartialArtIds) {
+            const value = requireNonEmptyString(id);
+            if (value === null) {
+              return null;
+            }
+            ids.push(value);
+          }
+          return ids;
+        })()
+      : null;
+
     const progressionSource = isPlainObject(entry.progression) ? entry.progression : null;
     const baseExperience =
       progressionSource === null
@@ -341,6 +393,9 @@ export function parseCharacterProfileSet(raw: unknown): SetParseResult<Character
     if (attributeCap === null) {
       problems.push(`${label}.attributeCap：应为 1–${ATTRIBUTE_MAX} 的整数`);
     }
+    if (startingMartialArtIds === null) {
+      problems.push(`${label}.startingMartialArtIds：应为武学 id 字符串数组（可为空数组）`);
+    }
     if (baseExperience === null || experiencePerLevel === null) {
       problems.push(`${label}.progression：应含 baseExperience（正整数）与 experiencePerLevel（非负整数）`);
     }
@@ -371,6 +426,7 @@ export function parseCharacterProfileSet(raw: unknown): SetParseResult<Character
       maxLevel === null ||
       startingExperience === null ||
       attributeCap === null ||
+      startingMartialArtIds === null ||
       baseExperience === null ||
       experiencePerLevel === null ||
       problems.length > 0
@@ -392,6 +448,7 @@ export function parseCharacterProfileSet(raw: unknown): SetParseResult<Character
       progression: { baseExperience, experiencePerLevel },
       growth,
       derivedStats,
+      startingMartialArtIds,
     });
   });
 
@@ -488,6 +545,7 @@ export function parseMartialArtSet(raw: unknown): SetParseResult<MartialArtSetDa
     const description = requireNonEmptyString(entry.description);
     const initialProficiency = requireIntegerInRange(entry.initialProficiency, 0, 999);
     const proficiencyCap = requireIntegerInRange(entry.proficiencyCap, 1, 999);
+    const combat = requireCombatAction(entry.combat);
 
     const factionIds: string[] = [];
     if (Array.isArray(entry.factionIds)) {
@@ -537,6 +595,11 @@ export function parseMartialArtSet(raw: unknown): SetParseResult<MartialArtSetDa
     if (proficiencyCap === null) {
       problems.push(`${label}.proficiencyCap：应为 1–999 的整数`);
     }
+    if (combat === null) {
+      problems.push(
+        `${label}.combat：应含 kind（attack/heal）、power（1–999 整数）与 qiCost（0–99 整数）`,
+      );
+    }
 
     // Single-file semantics a schema cannot express.
     if (initialProficiency !== null && proficiencyCap !== null && initialProficiency > proficiencyCap) {
@@ -556,6 +619,7 @@ export function parseMartialArtSet(raw: unknown): SetParseResult<MartialArtSetDa
       requiredAttributes === null ||
       initialProficiency === null ||
       proficiencyCap === null ||
+      combat === null ||
       problems.length > 0
     ) {
       errors.push(...problems);
@@ -572,6 +636,7 @@ export function parseMartialArtSet(raw: unknown): SetParseResult<MartialArtSetDa
       requirements: { level: requiredLevel, attributes: requiredAttributes },
       initialProficiency,
       proficiencyCap,
+      combat,
     });
   });
 
@@ -739,14 +804,21 @@ export interface CharacterState {
   attributes: AttributeMap;
   health: CharacterVitals;
   qi: CharacterVitals;
+  /**
+   * Martial-art ids the character has mastered. Copied verbatim from the
+   * profile's declared starting list; callers validate the references first
+   * (see {@link resolveStartingMartialArts}) and may overwrite this copy with
+   * the validated list so broken references never reach combat.
+   */
+  martialArtIds: string[];
 }
 
 /**
  * Creates the runtime state declared by a profile: starting level, starting
- * experience and copied attributes, with both vitals full. The declared
- * starting point is taken verbatim — if the data happens to declare enough
- * starting experience for a level-up, that settles on the next
- * {@link grantExperience} call, not implicitly here.
+ * experience, copied attributes and copied starting martial-art list, with
+ * both vitals full. The declared starting point is taken verbatim — if the
+ * data happens to declare enough starting experience for a level-up, that
+ * settles on the next {@link grantExperience} call, not implicitly here.
  */
 export function createCharacterState(profile: CharacterProfileData): CharacterState {
   const { healthMax, qiMax } = computeVitalMaxima(
@@ -761,6 +833,7 @@ export function createCharacterState(profile: CharacterProfileData): CharacterSt
     attributes: { ...profile.attributes },
     health: { current: healthMax, max: healthMax },
     qi: { current: qiMax, max: qiMax },
+    martialArtIds: [...profile.startingMartialArtIds],
   };
 }
 
@@ -912,4 +985,68 @@ export function checkMartialArtEligibility(
   }
 
   return { eligible: reasons.length === 0, reasons };
+}
+
+// ---------------------------------------------------------------------------
+// Starting martial arts (Round 05)
+// ---------------------------------------------------------------------------
+
+export interface StartingMartialArtResolution {
+  /** Validated ids in declaration order; broken references dropped. */
+  ids: string[];
+  /** The martial-art records matching `ids`. */
+  arts: MartialArtData[];
+  /** One readable problem per dropped or duplicated reference. */
+  warnings: string[];
+}
+
+/**
+ * Validates a profile's `startingMartialArtIds` against the indexed (already
+ * faction-checked) martial arts: every id must exist, must not be disabled,
+ * must be declared only once and must satisfy the art's requirements at the
+ * profile's *starting* standing — starting level, starting attributes and no
+ * faction (joining arrives in Round 13). A broken reference drops exactly
+ * that art with one readable warning; the profile itself stays usable.
+ */
+export function resolveStartingMartialArts(
+  profile: CharacterProfileData,
+  martialArts: ReadonlyMap<string, MartialArtData>,
+): StartingMartialArtResolution {
+  const ids: string[] = [];
+  const arts: MartialArtData[] = [];
+  const warnings: string[] = [];
+  const seen = new Set<string>();
+
+  for (const artId of profile.startingMartialArtIds) {
+    if (seen.has(artId)) {
+      warnings.push(`模板 "${profile.id}" 的起始武学 "${artId}" 重复声明，保留首次出现`);
+      continue;
+    }
+    seen.add(artId);
+
+    const art = martialArts.get(artId);
+    if (art === undefined) {
+      warnings.push(
+        `模板 "${profile.id}" 的起始武学 "${artId}" 不存在或已因校验失败被禁用，已剔除`,
+      );
+      continue;
+    }
+
+    const eligibility = checkMartialArtEligibility(art, {
+      level: profile.startingLevel,
+      attributes: profile.attributes,
+      factionId: null,
+    });
+    if (!eligibility.eligible) {
+      warnings.push(
+        `模板 "${profile.id}" 的起始武学 "${artId}"（${art.name}）不满足起始条件：${eligibility.reasons.join('；')}，已剔除`,
+      );
+      continue;
+    }
+
+    ids.push(artId);
+    arts.push(art);
+  }
+
+  return { ids, arts, warnings };
 }

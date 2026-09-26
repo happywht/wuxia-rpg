@@ -1,0 +1,34 @@
+{
+  "encounters": [
+    {
+      "id": "encounter.alley-blade-bully",
+      "name": "巷口拦路刀客",
+      "mapResourceId": "map.round-01-grid",
+      "position": { "col": 1, "row": 7 },
+      "profileId": "char.scribe-apprentice",
+      "enemy": {
+        "name": "疤脸刀客",
+        "attributes": {
+          "body": 8,
+          "force": 7,
+          "agility": 5,
+          "insight": 4,
+          "resolve": 4
+        },
+        "health": 60,
+        "qi": 16,
+        "martialArtIds": ["skill.lanmen-daofa", "skill.jianghu-sanshou"]
+      },
+      "victoryExperience": 40,
+      "defeatRecovery": { "healthRatio": 0.6, "qiRatio": 0.6 },
+      "repeatable": false,
+      "texts": {
+        "approach": "疤脸刀客横在巷口，按 E 迎战",
+        "intro": "疤脸刀客把刀往肩上一扛：「此路是我开！识相的留下钱粮！」",
+        "victory": "刀客捂着臂上的伤口连退几步，撂下一句「走着瞧」，翻身没入暗巷。",
+        "defeat": "你被刀客一脚踹进路边土沟，狼狈爬起，缓了好一阵才回过神。",
+        "flee": "你虚晃一招转身便走，身后的咒骂声渐渐远了。"
+      }
+    }
+  ]
+}

@@ -25,7 +25,9 @@ import {
 } from '../engine/npc-placement';
 import {
   type CharacterProfileData,
+  type CharacterState,
   type FactionData,
+  createCharacterState,
   indexFactions,
   indexMartialArts,
   indexProfiles,
@@ -33,28 +35,46 @@ import {
   parseCharacterProfileSet,
   parseFactionSet,
   parseMartialArtSet,
+  resolveStartingMartialArts,
 } from '../engine/character-progression';
+import {
+  assembleBattleEncounters,
+  type BattleEncounterSetData,
+  CombatSession,
+  parseBattleEncounterSet,
+  type PlacedEncounter,
+  selectEncounterTarget,
+} from '../engine/turn-based-combat';
 import { DialoguePanel } from './dialogue-ui';
+import { BattlePanel } from './combat-ui';
 
 /**
- * Round 03 grid scene, extended with the Round 04 progression datasets.
+ * Round 03 grid scene, extended with the Round 04 progression datasets and
+ * the Round 05 battle slice.
  *
  * The required map still loads through the generic data loader exactly like
  * Round 02 — manifest/schema/map failures remain fatal and land in the
- * readable error panel. NPC, dialogue, character-profile, faction and
- * martial-art resources are *optional* content on top of that: each failing
- * NPC, conversation, dataset or single martial art is disabled individually
- * with a warning, and the map stays fully playable without them (or with
- * none registered at all, which shows an explicit "no one to talk to" hint).
+ * readable error panel. NPC, dialogue, character-profile, faction,
+ * martial-art and battle-encounter resources are *optional* content on top
+ * of that: each failing NPC, conversation, dataset, single martial art or
+ * single encounter is disabled individually with a warning, and the map
+ * stays fully playable without them (or with none registered at all, which
+ * shows an explicit "no one to talk to" hint).
  *
  * NPCs are rendered at their data-declared walkable cells, block player
  * movement, and can be talked to with E while four-way adjacent. While the
  * dialogue panel is open, movement input is ignored and restored on close.
  * Every name and line of dialogue comes from `data/` — never from code.
  *
- * The Round 04 datasets are parsed and cross-validated at startup and kept
- * on the scene for the coming rounds (character creation, joining, combat);
- * this round deliberately adds no progression UI.
+ * Round 05 places data-declared encounters the same way: the enemy marker
+ * blocks its cell, the approach prompt shows while four-way adjacent, and E
+ * opens the battle overlay (movement locked while it is open, restored on
+ * close). The player's runtime state is created from the first valid
+ * encounter's profile with its starting martial arts validated; victory
+ * experience settles through the Round 04 progression engine, defeat
+ * restores by the encounter's declared ratios, and a completed
+ * non-repeatable encounter stays dormant until the page reloads (saves
+ * arrive in Round 09).
  */
 
 /** Stable resource ids from data/base/manifest.json — never hard-coded URLs. */
@@ -64,6 +84,7 @@ const DIALOGUE_RESOURCE_ID = 'dialogue.round-03-set';
 const CHARACTER_PROFILE_RESOURCE_ID = 'character-profile.round-04-set';
 const FACTION_RESOURCE_ID = 'faction.round-04-set';
 const MARTIAL_ART_RESOURCE_ID = 'martial-art.round-04-set';
+const ENCOUNTER_RESOURCE_ID = 'encounter.round-05-set';
 
 const VIEW_WIDTH = 960;
 const VIEW_HEIGHT = 540;
@@ -83,6 +104,11 @@ const NPC_PALETTE = [0x7ec8a9, 0xc89fd4, 0x8fb7e8, 0xe89f8f] as const;
 const NPC_BORDER = 0x1c2430;
 const NPC_SIZE_RATIO = 0.62;
 
+/** Presentation-only enemy-marker styling (content stays in data). */
+const ENCOUNTER_FILL = 0xc96a5a;
+const ENCOUNTER_BORDER = 0x30120e;
+const ENCOUNTER_SIZE_RATIO = 0.66;
+
 const UI = {
   background: '#0b0e14',
   panelFill: 0x10141d,
@@ -93,13 +119,14 @@ const UI = {
   fontFamily: 'sans-serif',
 } as const;
 
-/** Optional resources (NPC/dialogue/progression content) this scene can lose without dying. */
+/** Optional resources (NPC/dialogue/progression/battle content) this scene can lose without dying. */
 const OPTIONAL_RESOURCE_IDS = new Set([
   NPC_RESOURCE_ID,
   DIALOGUE_RESOURCE_ID,
   CHARACTER_PROFILE_RESOURCE_ID,
   FACTION_RESOURCE_ID,
   MARTIAL_ART_RESOURCE_ID,
+  ENCOUNTER_RESOURCE_ID,
 ]);
 
 /** Optional-content schemas; schema-level failures carry no resource id, so match by origin. */
@@ -109,6 +136,7 @@ const OPTIONAL_SCHEMA_ORIGINS = new Set([
   'schema:character-profiles',
   'schema:faction-set',
   'schema:martial-arts-set',
+  'schema:battle-encounters',
 ]);
 
 function isOptionalContentDiagnostic(diagnostic: Diagnostic): boolean {
@@ -146,6 +174,7 @@ interface WorldAssembly {
   npcs: PlacedNpc[];
   dialogues: ReadonlyMap<string, DialogueData>;
   progression: ProgressionAssembly;
+  encounters: PlacedEncounter[];
   warnings: Diagnostic[];
 }
 
@@ -171,7 +200,21 @@ export class GridScene extends Phaser.Scene {
     martialArts: new Map(),
   };
 
+  /** Placed battle encounters and their per-run completion state (Round 05). */
+  private encounters: PlacedEncounter[] = [];
+  private readonly completedEncounters = new Set<string>();
+  private encounterCells = new Map<string, PlacedEncounter>();
+  /** Marker graphics per encounter id, removed when a foe is defeated. */
+  private encounterMarkers = new Map<string, Phaser.GameObjects.GameObject[]>();
+
+  /** Player runtime state; created from the first valid encounter's profile. */
+  private playerProfile: CharacterProfileData | null = null;
+  private playerState: CharacterState | null = null;
+
   private dialoguePanel: DialoguePanel | null = null;
+  private battlePanel: BattlePanel | null = null;
+  private activeSession: CombatSession | null = null;
+  private activeEncounter: PlacedEncounter | null = null;
 
   private coordsText: Phaser.GameObjects.Text | null = null;
   private interactText: Phaser.GameObjects.Text | null = null;
@@ -223,6 +266,10 @@ export class GridScene extends Phaser.Scene {
           },
           'martial-arts-set': (value) => {
             const parsed = parseMartialArtSet(value);
+            return parsed.ok ? [] : parsed.errors;
+          },
+          'battle-encounters': (value) => {
+            const parsed = parseBattleEncounterSet(value);
             return parsed.ok ? [] : parsed.errors;
           },
         },
@@ -368,10 +415,49 @@ export class GridScene extends Phaser.Scene {
     const progressionAssembled = this.assembleProgressionContent(resources);
     warnings.push(...progressionAssembled.warnings);
 
+    // Encounters resolve against the map, placed NPCs, profiles and arts.
+    let encounters: PlacedEncounter[] = [];
+    let encounterSet: BattleEncounterSetData | null = null;
+    const encounterResource = resources.get(ENCOUNTER_RESOURCE_ID);
+    if (encounterResource !== undefined) {
+      const parsed = parseBattleEncounterSet(encounterResource.value);
+      if (!parsed.ok) {
+        warnings.push({
+          resource: ENCOUNTER_RESOURCE_ID,
+          origin: 'encounter-assembly',
+          severity: 'warning',
+          message: '遭遇资料结构不合规，本轮禁用全部战斗遭遇',
+          details: parsed.errors,
+        });
+      } else {
+        encounterSet = parsed.set;
+      }
+    }
+    const encounterPlacement = assembleBattleEncounters({
+      encounterSet,
+      knownResourceIds: new Set(resources.keys()),
+      maps: new Map([[MAP_RESOURCE_ID, map]]),
+      currentMapResourceId: MAP_RESOURCE_ID,
+      npcCells: new Set(placement.npcs.map((npc) => `${npc.col},${npc.row}`)),
+      profiles: progressionAssembled.assembly.profiles,
+      martialArts: progressionAssembled.assembly.martialArts,
+    });
+    for (const message of encounterPlacement.warnings) {
+      warnings.push({
+        resource: ENCOUNTER_RESOURCE_ID,
+        origin: 'encounter-assembly',
+        severity: 'warning',
+        message,
+        details: [],
+      });
+    }
+    encounters = encounterPlacement.encounters;
+
     return {
       npcs: placement.npcs,
       dialogues,
       progression: progressionAssembled.assembly,
+      encounters,
       warnings,
     };
   }
@@ -497,14 +583,49 @@ export class GridScene extends Phaser.Scene {
     this.dialogues = assembly.dialogues;
     this.progression = assembly.progression;
     this.occupancy = new NpcOccupancyIndex(this.placedNpcs);
+    this.encounters = assembly.encounters;
+    this.encounterCells = new Map(
+      assembly.encounters.map((encounter) => [
+        `${encounter.col},${encounter.row}`,
+        encounter,
+      ]),
+    );
 
-    // Progression datasets have no UI this round; surface the loaded counts
-    // in the console so authors can confirm their JSON actually landed.
+    // The player's runtime state is created from the first valid encounter's
+    // profile, with the profile's starting martial arts validated per
+    // reference (broken ones drop with a warning). Profiles differing from
+    // the first encounter's are reported so authors can fix the data.
+    const playerWarnings: string[] = [];
+    const firstEncounter = assembly.encounters[0];
+    if (firstEncounter !== undefined) {
+      this.playerProfile = firstEncounter.profile;
+      this.playerState = createCharacterState(firstEncounter.profile);
+      const starting = resolveStartingMartialArts(
+        firstEncounter.profile,
+        assembly.progression.martialArts,
+      );
+      this.playerState.martialArtIds = [...starting.ids];
+      playerWarnings.push(...starting.warnings);
+      for (const encounter of assembly.encounters.slice(1)) {
+        if (encounter.profile.id !== firstEncounter.profile.id) {
+          playerWarnings.push(
+            `遭遇 "${encounter.record.id}" 声明的角色模板 "${encounter.profile.id}" 与首次创建玩家所用模板 "${firstEncounter.profile.id}" 不同，仍沿用后者`,
+          );
+        }
+      }
+    }
+    for (const message of playerWarnings) {
+      console.warn(`[optional] ${message}`);
+    }
+
+    // Progression datasets surface their loaded counts in the console so
+    // authors can confirm their JSON actually landed.
     console.info(
-      '[progression] 已加载角色模板 %d 个、门派 %d 个、武学 %d 种',
+      '[progression] 已加载角色模板 %d 个、门派 %d 个、武学 %d 种、战斗遭遇 %d 处',
       this.progression.profiles.size,
       this.progression.factions.size,
       this.progression.martialArts.size,
+      this.encounters.length,
     );
 
     this.mapOrigin.set(
@@ -526,12 +647,93 @@ export class GridScene extends Phaser.Scene {
     this.marker.setStrokeStyle(3, MARKER_BORDER);
 
     this.renderNpcs(map);
+    this.renderEncounterMarkers(map);
     this.buildHud(map, optionalWarnings, modWarnings);
     this.updateCoordsHud();
 
     this.dialoguePanel = new DialoguePanel(this, {
       onClose: () => this.updateInteractHint(), // Movement is keyed off isOpen.
     });
+    this.battlePanel = new BattlePanel(this, {
+      onClose: () => this.settleBattleClose(),
+    });
+    this.updateInteractHint();
+  }
+
+  /** Draws each still-active encounter marker and its data-driven name. */
+  private renderEncounterMarkers(map: GridMap): void {
+    for (const encounter of this.activeEncounters()) {
+      const center = cellCenterOffset(map, encounter.col, encounter.row);
+      const size = map.tileSize * ENCOUNTER_SIZE_RATIO;
+      const body = this.add.rectangle(
+        this.mapOrigin.x + center.x,
+        this.mapOrigin.y + center.y,
+        size,
+        size,
+        ENCOUNTER_FILL,
+      );
+      body.setStrokeStyle(3, ENCOUNTER_BORDER);
+      body.setAngle(45); // Diamond silhouette separates foes from NPC squares.
+
+      const label = this.add
+        .text(
+          this.mapOrigin.x + center.x,
+          this.mapOrigin.y + center.y - size / 2 - 4,
+          encounter.record.enemy.name,
+          {
+            fontFamily: UI.fontFamily,
+            fontSize: '10px',
+            color: UI.textPrimary,
+          },
+        )
+        .setOrigin(0.5, 1);
+
+      this.encounterMarkers.set(encounter.record.id, [body, label]);
+    }
+  }
+
+  /**
+   * Encounters still standing this run: repeatable ones always, one-shot
+   * ones only until their first victory. Completion lives in memory only —
+   * a page refresh resets it, matching the pre-save boundary of Round 09.
+   */
+  private activeEncounters(): PlacedEncounter[] {
+    return this.encounters.filter(
+      (encounter) =>
+        encounter.record.repeatable || !this.completedEncounters.has(encounter.record.id),
+    );
+  }
+
+  /**
+   * Battle-overlay close hook: the session has already settled everything
+   * (experience, defeat recovery) inside the engine; the scene only records
+   * one-shot completion, drops panel references and refreshes the HUD.
+   */
+  private settleBattleClose(): void {
+    const session = this.activeSession;
+    const encounter = this.activeEncounter;
+    if (session !== null && encounter !== null) {
+      const result = session.finalResult;
+      if (result?.outcome === 'victory' && !encounter.record.repeatable) {
+        this.completedEncounters.add(encounter.record.id);
+        this.encounterCells.delete(`${encounter.col},${encounter.row}`);
+        for (const marker of this.encounterMarkers.get(encounter.record.id) ?? []) {
+          marker.destroy();
+        }
+        this.encounterMarkers.delete(encounter.record.id);
+      }
+      if (result !== null) {
+        console.info(
+          '[battle] 遭遇 "%s" 结束：%s（经验 +%d，升级 %d 次）',
+          encounter.record.id,
+          result.outcome,
+          result.experienceGained,
+          result.levelsGained,
+        );
+      }
+    }
+    this.activeSession = null;
+    this.activeEncounter = null;
     this.updateInteractHint();
   }
 
@@ -582,7 +784,7 @@ export class GridScene extends Phaser.Scene {
 
     const lines: { text: string; shown: boolean }[] = [
       {
-        text: '部分可选资料（NPC/对话/角色模板/门派/武学）无效，已禁用相应内容（详情见控制台）',
+        text: '部分可选资料（NPC/对话/角色模板/门派/武学/战斗遭遇）无效，已禁用相应内容（详情见控制台）',
         shown: optionalWarnings.length > 0,
       },
       {
@@ -638,20 +840,37 @@ export class GridScene extends Phaser.Scene {
       this.interactText.setText('');
       return;
     }
-    if (this.placedNpcs.length === 0) {
-      this.interactText.setText('暂无可交互人物');
+    if (this.battlePanel !== null && this.battlePanel.isOpen) {
+      this.interactText.setText('');
       return;
     }
-    const target =
+
+    // Adjacent NPCs win the prompt; otherwise an adjacent encounter shows
+    // its data-driven approach line.
+    const npcTarget =
       this.map === null
         ? null
         : selectInteractionTarget(this.placedNpcs, {
             col: this.playerCol,
             row: this.playerRow,
           });
-    this.interactText.setText(
-      target === null ? '' : `按 E 与「${target.record.name}」交谈`,
-    );
+    if (npcTarget !== null) {
+      this.interactText.setText(`按 E 与「${npcTarget.record.name}」交谈`);
+      return;
+    }
+    const encounterTarget = selectEncounterTarget(this.activeEncounters(), {
+      col: this.playerCol,
+      row: this.playerRow,
+    });
+    if (encounterTarget !== null) {
+      this.interactText.setText(encounterTarget.record.texts.approach);
+      return;
+    }
+    if (this.placedNpcs.length === 0 && this.activeEncounters().length === 0) {
+      this.interactText.setText('暂无可交互人物');
+      return;
+    }
+    this.interactText.setText('');
   }
 
   private bindMovementKeys(): void {
@@ -691,27 +910,63 @@ export class GridScene extends Phaser.Scene {
       interactKey.off('down', onInteract);
       this.dialoguePanel?.destroy();
       this.dialoguePanel = null;
+      this.battlePanel?.destroy();
+      this.battlePanel = null;
+      this.activeSession = null;
+      this.activeEncounter = null;
     });
   }
 
-  /** E key: talk to the four-way adjacent NPC, if any (nearest, id tie-break). */
+  /**
+   * E key: talk to the four-way adjacent NPC, if any (nearest, id
+   * tie-break); otherwise start the four-way adjacent encounter, if any.
+   */
   private handleInteraction(): void {
     const panel = this.dialoguePanel;
     if (panel === null || panel.isOpen) {
       return; // Never re-open or switch conversations while one is open.
     }
+    if (this.battlePanel !== null && this.battlePanel.isOpen) {
+      return; // The battle overlay owns the keyboard while it is open.
+    }
     const target = selectInteractionTarget(this.placedNpcs, {
       col: this.playerCol,
       row: this.playerRow,
     });
-    if (target === null) {
-      return; // Not adjacent to anyone: E does nothing.
+    if (target !== null) {
+      const conversation = this.dialogues.get(target.record.dialogueId);
+      if (conversation === undefined) {
+        return; // Defensive: placement already guarantees resolution.
+      }
+      panel.open(conversation, target.record.name);
+      this.updateInteractHint();
+      return;
     }
-    const conversation = this.dialogues.get(target.record.dialogueId);
-    if (conversation === undefined) {
-      return; // Defensive: placement already guarantees resolution.
+    this.tryStartBattle();
+  }
+
+  /** Opens the battle overlay for the four-way adjacent encounter, if any. */
+  private tryStartBattle(): void {
+    const battlePanel = this.battlePanel;
+    if (battlePanel === null || battlePanel.isOpen) {
+      return;
     }
-    panel.open(conversation, target.record.name);
+    const encounter = selectEncounterTarget(this.activeEncounters(), {
+      col: this.playerCol,
+      row: this.playerRow,
+    });
+    if (encounter === null || this.playerProfile === null || this.playerState === null) {
+      return; // No adjacent foe (or no playable profile): E does nothing.
+    }
+    const session = new CombatSession({
+      encounter: encounter.record,
+      profile: this.playerProfile,
+      player: this.playerState,
+      martialArts: this.progression.martialArts,
+    });
+    this.activeSession = session;
+    this.activeEncounter = encounter;
+    battlePanel.open(session);
     this.updateInteractHint();
   }
 
@@ -722,9 +977,10 @@ export class GridScene extends Phaser.Scene {
       map === null ||
       marker === null ||
       this.moving ||
-      (this.dialoguePanel !== null && this.dialoguePanel.isOpen)
+      (this.dialoguePanel !== null && this.dialoguePanel.isOpen) ||
+      (this.battlePanel !== null && this.battlePanel.isOpen)
     ) {
-      return; // Also locked while a dialogue is open.
+      return; // Also locked while a dialogue or battle panel is open.
     }
 
     const targetCol = this.playerCol + dCol;
@@ -734,6 +990,9 @@ export class GridScene extends Phaser.Scene {
     }
     if (this.occupancy.isOccupied(targetCol, targetRow)) {
       return; // An NPC stands there: occupied cells are not enterable.
+    }
+    if (this.encounterCells.has(`${targetCol},${targetRow}`)) {
+      return; // A still-active encounter foe blocks its cell.
     }
 
     this.playerCol = targetCol;

@@ -29,6 +29,11 @@
       "id": "martial-art.round-04-set",
       "path": "skills/round-04-martial-arts.json",
       "schema": "martial-arts-set"
+    },
+    {
+      "id": "encounter.round-05-set",
+      "path": "battles/round-05-encounters.json",
+      "schema": "battle-encounters"
     }
   ],
   "enabledMods": []
