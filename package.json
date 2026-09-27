@@ -6,7 +6,8 @@
   "description": "原创中文武侠 RPG（数据优先架构；受文曲星系列掌上 RPG 广泛玩法原则启发的独立新作，不含任何原作内容）",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "check": "npm run validate:data && npm run inspect:mods && npm run typecheck && npm test && npm run audit:round-34",
+    "build": "npm run check && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

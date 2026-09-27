@@ -4,6 +4,18 @@
 
 ## [Unreleased]
 
+### Added (Round 39)
+
+- **统一质量门槛 `npm run check`**：以 `&&` 串联固定顺序——`validate:data`（manifest + 26 个基础资源 Schema）→ `inspect:mods`（manifest 中已启用 MOD 覆盖层的只读校验与最终来源；未启用目录不在其覆盖边界内）→ `typecheck`（严格 tsc，含 `tests/` 与 `vitest.config.ts`）→ `test`（Vitest 53 用例）→ `audit:round-34`（文档一致性审计）。任一步非零退出即中止后续步骤并使 `check` 整体非零退出。
+- **`npm run build` 改为先过门槛再打包**：由 `tsc --noEmit && vite build` 改为 `npm run check && vite build`——资料、MOD、类型、测试与文档审计任一失败时不会开始 Vite 生产构建；类型检查不重复执行（已含在 check 中）。
+- **GitHub Actions 持续集成 `.github/workflows/quality-gates.yml`**：push、pull_request 与 workflow_dispatch 触发；`actions/checkout@v7` + `actions/setup-node@v7`（Node 22、npm 缓存）→ `npm ci`（锁文件精确安装）→ `npm run build`（内含完整 check 门槛与生产构建）→ `smoke:round-35`/`36`/`37` 回归烟测。仅 `contents: read` 权限、`timeout-minutes: 15`、无任何部署/发布步骤。
+- README 修正过期进度（原标 Round 36/R37 与 Vitest 4.1.11）至 R39 完成态、Vitest 5.0.2，补 `check`/`test` 命令与 CI 小节；`docs/TESTING.md` 新增「质量门槛、构建与持续集成」章节并更新手段关系表；`docs/REFERENCES.md` 登记 GitHub Actions 官方文档与 checkout/setup-node 官方仓库来源（#14、#15）。引擎运行时代码零改动。
+
+### Verification (Round 39)
+
+- 本机：`npm run check` 通过（26 资源校验、0 MOD 问题、类型检查、4 文件 53 用例、文档审计，exit 0）；`npm run build` 先完整运行 check 再通过 Vite 8.3.1 生产构建（130 modules、约 1.01 s，主 JS 1,881.37 kB / gzip 495.56 kB；500 kB 分包建议仍为非阻断提示）；临时必败测试实证 `npm run build` 于 test 步骤 exit 1 且未启动 Vite 打包；`npm run smoke:round-35`、`smoke:round-36`、`smoke:round-37` 全部通过（真实 `mods/` 与 manifest 字节不变）；`git diff --check` 通过。用预装 PyYAML 解析并结构校验 workflow 通过。
+- 构建门槛失败实证：临时加入类型正确的必败 Vitest 用例后运行 `npm run build`，命令 exit 1 且未进入 Vite 生产构建；移除探针后全套门槛与构建恢复通过。用系统预装 PyYAML 解析并结构断言 `.github/workflows/quality-gates.yml`，通过。GitHub 托管运行仍需待 workflow 远端首次实际执行确认。
+
 ### Added (Round 38)
 
 - **Vitest 测试基线**：新增 dev 依赖 Vitest 5.0.2（官方 Vite >=6.4、Node >=22.12 要求与本仓库 Vite 8.3.1、Node 22.18 相符；npm peer/engine 元数据已核验）与 `npm test`（`vitest run`）。测试使用**独立 `vitest.config.ts`**（Node 环境、`tests/**/*.test.ts`）：Vitest 在两配置并存时只读测试配置、完全不加载异步的 `vite.config.ts`，避免其动态加载开发态 HMR 插件和注册 `mods/` dev 中间件；`tsconfig.json` include 纳入 `tests/` 与 `vitest.config.ts`，测试代码接受同等严格类型检查（含 `noUncheckedIndexedAccess`）。ADR-0005 与来源/精确版本许可表已按实施核验更新。

@@ -1,6 +1,6 @@
 # 参考来源与使用边界（REFERENCES）
 
-核验日期：2026-09-28。历史/回忆类来源统一编号 **#1–#5**，官方技术来源统一编号 **#6–#13**；软件包元数据在独立表格中按精确包版本记录，不参与原作对照编号。来源授权状态只在核验到明确许可时标为已知；没有核验页面许可时，仅作事实性查阅，不复制内容。
+核验日期：2026-09-28。历史/回忆类来源统一编号 **#1–#5**，官方技术来源统一编号 **#6–#15**；软件包元数据在独立表格中按精确包版本记录，不参与原作对照编号。来源授权状态只在核验到明确许可时标为已知；没有核验页面许可时，仅作事实性查阅，不复制内容。
 
 ---
 
@@ -34,6 +34,8 @@
 | 11 | [Ajv 官方文档](https://ajv.js.org/) | Round 02 JSON Schema 校验管线参考（ADR-0004） | 页面许可未逐页核实；只查阅技术事实，不复制文档文字、示例代码或素材 |
 | 12 | [Vitest 官方指南](https://vitest.dev/guide/) | ADR-0005、Round 38：确认 Vitest 安装方式、独立配置可用，以及最低兼容条件 Vite >=6.4.0、Node >=22.12.0 | 页面许可未逐页核实；只查阅技术事实，不复制文档文字、示例代码或素材 |
 | 13 | [Vite HMR API](https://vite.dev/guide/api-hmr) 与 [Vite Plugin API](https://vite.dev/guide/api-plugin) | Round 36 自定义客户端 HMR 事件及 Vite Environment API `hotUpdate` 钩子的实现依据 | 页面许可未逐页核实；只查阅/转述技术事实，不复制文档段落、示例代码或素材 |
+| 14 | [GitHub Actions 官方文档](https://docs.github.com/actions) | Round 39 持续集成工作流的触发事件（push/pull_request/workflow_dispatch）、`permissions`、`timeout-minutes` 与 `npm ci` 缓存等语法依据 | 页面许可未逐页核实；只查阅/转述技术事实，不复制文档段落、示例代码或素材 |
+| 15 | [actions/checkout](https://github.com/actions/checkout) 与 [actions/setup-node](https://github.com/actions/setup-node) 官方仓库 | Round 39 CI 检出代码与 Node 22/npm 缓存环境搭建（`@v7`）所用官方 action 的用法与版本依据 | 仓库许可未逐项核实（两者为 GitHub 官方维护的开源 action）；只查阅用法事实，不复制其源码或文档段落 |
 
 ## 四、软件包许可核验（npm 元数据）
 

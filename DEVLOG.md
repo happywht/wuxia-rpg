@@ -4,6 +4,31 @@
 
 ---
 
+## Round 39 — 统一质量门槛与 GitHub Actions 持续集成（2026-09-28，已完成）
+
+### 计划与实现
+
+- 先写 `iterations/round-39/plan.md`，子任务为：编排 `check`/`build` 脚本并核对失败中止、GitHub Actions 工作流、文档/日志更新与本机验证。
+- `package.json` 新增 `"check": "npm run validate:data && npm run inspect:mods && npm run typecheck && npm test && npm run audit:round-34"`；`build` 由 `tsc --noEmit && vite build` 改为 `npm run check && vite build`（类型检查已在 check 内，不重复跑）。`&&` 链在 npm 于 Windows（cmd.exe）与 POSIX（sh）下的执行语义一致：任一子命令非零退出即中止后续。
+- 新增 `.github/workflows/quality-gates.yml`：触发 `push`/`pull_request`/`workflow_dispatch`；`permissions: contents: read`；单 job `ubuntu-latest`、`timeout-minutes: 15`；步骤为 `actions/checkout@v7` → `actions/setup-node@v7`（`node-version: 22`、`cache: npm`）→ `npm ci` → `npm run build`（含完整 check 门槛与 Vite 生产构建）→ `smoke:round-35`/`36`/`37`。无部署/发布/上传 artifact 步骤。注释为英文（与 scripts/ 现有 JSDoc 风格一致）；初稿误用 JS 块注释 `/** */` 写 YAML 头注，当即改为 `#`。
+- 文档更新：README 修正过期进度（原标 Round 36 已完成/R37 进行中、Vitest `^4.1.11`「后续」）为 R39 完成态、下一轮 R40、Vitest `^5.0.2`，命令区补 `check`/`test` 并改写 `build` 描述，新增「持续集成（Round 39 起）」小节，目录结构补 `tests/`；`docs/TESTING.md` 新增「质量门槛、构建与持续集成（Round 39 起）」章节（五步顺序、build 行为、CI 同源关系）并扩「与既有验证手段的关系」表；`docs/REFERENCES.md` 官方技术来源扩至 #14（GitHub Actions 文档：触发事件/权限/超时/缓存语法）与 #15（actions/checkout、actions/setup-node 官方仓库，`@v7`）。引擎运行时代码、`data/`、`mods/` 零改动。
+
+### 验证（本机实际命令与结果）
+
+- `npm run check`：**exit 0**。五步全绿——validate:data（manifest + 26 个基础资源 Schema）、inspect:mods（26 项资源、0 问题、未启用 MOD）、typecheck（无输出）、Vitest（4 文件 53 用例，960 ms）、audit:round-34（文档一致性审计通过）。
+- **构建失败中止路径实证**：在 `tests/` 放入类型正确的临时必败测试 `tmp-round39-gate-failure.test.ts`（`expect(1).toBe(2)`）后运行 `npm run build`——资料校验、MOD 检查、typecheck 均先通过；Vitest 报 53 通过/1 失败，整体 **exit 1**，输出未出现 Vite 的生产构建启动行；临时探针即删，`tests/` 恢复 4 个原文件。这验证构建门槛失败会中止打包。
+- `npm run build`：**exit 0**。输出顺序证明门槛先行——check 五步（audit 最后）→ `vite v8.3.1 building client environment for production...` → 130 modules、约 1.01 s；主 JS 1,881.37 kB / gzip 495.56 kB（与 R36–R38 基线一致）；500 kB 分包建议仍存在（非阻断，本轮不改变运行时打包策略）。
+- `npm run smoke:round-35`：**exit 0**（双 MOD 覆盖/坏覆盖回退/来源归因/真实 manifest enabledMods 为空）。`npm run smoke:round-36`：**exit 0**（真实 Vite dev server WebSocket 级验证、生产剔除热重载桥接、被触碰文件恢复原状）。`npm run smoke:round-37`：**exit 0**（内容包往返/攻击性输入/真实 CLI 全链路，真实 `mods/` 与 manifest 字节不变）。
+- `git diff --check`：**exit 0**；仅 Git 对 README.md、data/base/manifest.json（烟测触碰后内容未变）、docs/REFERENCES.md、docs/TESTING.md、package.json 的 LF→CRLF 换行提示，无空白错误。工作区改动仅限本轮文件（package.json、README、docs/TESTING.md、docs/REFERENCES.md、新增 .github/），`.serena/` 未触碰。
+- 工作流结构验证：使用系统预装 PyYAML 对 `.github/workflows/quality-gates.yml` 执行 `yaml.safe_load` 并断言 push/PR/手动触发、只读权限、checkout/setup-node@v7、`npm ci` 与 `npm run build` 步骤；解析与结构断言通过。工作流有 7 个步骤，其中 5 个执行命令（安装、build、三轮烟测）。
+
+### 未实现/限制
+
+- **GitHub 托管 Actions 无法在本机调度**：以上均为本机验证的同一组命令；workflow 首次真实运行需推送后到 GitHub Actions 页面确认（含 `actions/checkout@v7`、`actions/setup-node@v7` 在托管环境的确切可用性）。本轮不声称发生过托管 CI 运行。
+- `inspect:mods` 覆盖边界保持不变：仅校验 manifest 中启用的 MOD 层，不审计未启用目录（已在 TESTING.md 与 CHANGELOG 中如实说明）。
+
+---
+
 ## Round 38 — Vitest 测试基线：引擎单元与共享数据校验（2026-09-28，已完成）
 
 ### 计划与实现

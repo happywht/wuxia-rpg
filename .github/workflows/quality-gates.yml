@@ -1,0 +1,49 @@
+# Round 39 continuous-integration quality gates.
+#
+# Runs the exact same gate as a local `npm run build` (data schema
+# validation, enabled-MOD inspection, strict typecheck, Vitest, docs
+# audit, then the Vite production build) followed by the Round 35-37
+# regression smokes on a clean Node 22 runner. Installs strictly from
+# the lockfile via `npm ci`, holds read-only repo permissions and no
+# deploy/publish steps.
+name: Quality Gates
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+# Least privilege: nothing here needs more than reading the repository.
+permissions:
+  contents: read
+
+jobs:
+  quality-gates:
+    runs-on: ubuntu-latest
+    # Local full gate + build + three smokes finish in a few minutes; the
+    # timeout only guards against hung dev-server smoke runs.
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node 22 (npm cache)
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Check gate and production build
+        run: npm run build
+
+      - name: Smoke Round 35 (MOD priority, sources, bad-overlay fallback)
+        run: npm run smoke:round-35
+
+      - name: Smoke Round 36 (dev JSON hot reload and production stripping)
+        run: npm run smoke:round-36
+
+      - name: Smoke Round 37 (content-package export/import round-trip)
+        run: npm run smoke:round-37

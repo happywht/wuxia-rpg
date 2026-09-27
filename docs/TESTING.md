@@ -1,14 +1,29 @@
 # 测试说明（TESTING）
 
-Round 38 起本项目拥有可重复运行的 Vitest 自动化测试基线。本文说明测试命令、配置取舍、覆盖范围与编写约定。
+Round 38 起本项目拥有可重复运行的 Vitest 自动化测试基线；Round 39 起这些检查与资料校验、MOD 检查、类型检查和文档审计共同组成统一质量门槛 `npm run check`，并进入生产构建（`npm run build`）与 GitHub Actions 持续集成。本文说明测试命令、配置取舍、覆盖范围、质量门槛与编写约定。
 
 ## 快速开始
 
 ```bash
+npm run check       # 统一质量门槛（R39 起）：validate:data → inspect:mods → typecheck → test → audit:round-34
 npm test            # vitest run，单次运行全部测试（CI 语义）
 npm run typecheck   # tsc --noEmit，严格模式，包含 tests/ 与 vitest.config.ts
 npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现，见下文）
 ```
+
+## 质量门槛、构建与持续集成（Round 39 起）
+
+`npm run check` 用 `&&` 串联五个步骤，**顺序固定、任一步非零退出即中止后续步骤**：
+
+1. `npm run validate:data` — manifest 与全部基础资源 Schema 校验；
+2. `npm run inspect:mods` — manifest 中已启用 MOD 覆盖层的只读校验与最终来源报告（覆盖边界：仅启用层，未启用目录不在检查范围）；
+3. `npm run typecheck` — 严格 TypeScript 检查（含 `tests/` 与 `vitest.config.ts`）；
+4. `npm test` — Vitest 单元测试；
+5. `npm run audit:round-34` — 文档一致性审计（地图/对白/任务/世界设定）。
+
+`npm run build` 先完整通过 `check` 再执行 Vite 生产构建：门槛失败时不会开始打包（此前 build 只跑 `tsc --noEmit`，类型检查不重复执行）。
+
+`.github/workflows/quality-gates.yml` 在 push、pull request 与 workflow_dispatch 触发时于 Node 22 运行器上执行 `npm ci`（锁文件精确安装 + npm 缓存）→ `npm run build`（含完整门槛）→ `smoke:round-35`/`36`/`37` 回归烟测；仅 `contents: read` 权限、15 分钟超时、无部署发布步骤。CI 与本地命令完全同源；workflow 首次实际运行状态以 GitHub Actions 页面为准。
 
 - 测试框架：Vitest 5.0.2。官方指南要求 Vite >=6.4.0、Node >=22.12.0；本仓库使用 Vite 8.3.1 与 Node 22.18.0，符合要求（详见 [`docs/REFERENCES.md`](REFERENCES.md) #12）。
 - 运行环境：Node（无 DOM、无浏览器、无网络、无真实时钟依赖）。
@@ -56,11 +71,15 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 
 | 手段 | 定位 |
 | --- | --- |
-| `npm test`（Vitest） | 引擎规则与数据校验的快速单元回归，毫秒级、可重复 |
-| `npm run validate:data` | 内容作者的提交前资料检查（与测试共享实现） |
-| `npm run smoke:round-*` | 各轮专项端到端烟测（含真实 Vite 服务器、CLI 全链路） |
-| `npm run typecheck` / `npm run build` | 类型与生产构建门槛 |
+| `npm run check` | 统一质量门槛（R39 起）：资料、MOD、类型、测试、文档审计一次跑全，任一失败非零退出 |
+| `npm test`（Vitest） | 引擎规则与数据校验的快速单元回归，毫秒级、可重复（check 的第 4 步） |
+| `npm run validate:data` | 内容作者的提交前资料检查（与测试共享实现；check 的第 1 步） |
+| `npm run smoke:round-*` | 各轮专项端到端烟测（含真实 Vite 服务器、CLI 全链路）；R35–37 三条进入 CI |
+| `npm run typecheck` | 严格类型检查（check 的第 3 步） |
+| `npm run build` | `check` 全部通过后的 Vite 生产构建门槛（R39 起含完整 check） |
+| GitHub Actions（`.github/workflows/quality-gates.yml`） | push/PR/手动触发的托管同源门槛 + R35–37 烟测（R39 起） |
 
 ## 变更记录
 
+- 2026-09-28（Round 39）：新增统一质量门槛 `npm run check`（资料校验 → MOD 检查 → 类型 → 测试 → 文档审计，`&&` 串联失败即中止）；`npm run build` 改为先过 `check` 再 Vite 生产构建；新增 GitHub Actions `quality-gates.yml`（Node 22、`npm ci`、只读权限、15 分钟超时、build + R35–37 烟测）。
 - 2026-09-28（Round 38）：建立 Vitest 5 测试基线；抽取共享数据校验器 `scripts/lib/data-validation.mjs`（CLI 变薄）；新增四组 53 个单元测试；`tsconfig.json` 纳入 `tests/` 与 `vitest.config.ts` 严格检查。
