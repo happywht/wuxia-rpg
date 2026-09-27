@@ -4,6 +4,31 @@
 
 ---
 
+## Round 48 — 玩家手册、MOD 指南与文档一致性审计（2026-09-28，已完成）
+
+### 计划与实现
+
+- 开发前计划写入 `iterations/round-48/plan.md`，拆分现状基线、玩家与作者指南、架构/资料/许可复核、可测试文档门槛、全量验证与提交五项；预计人类工程师 60–90 分钟。
+- 新增 `docs/PLAYER-GUIDE.md`，键位、菜单、互动、战斗、存档/设置与常见问题以游戏内操作面板及当前实现为依据；新增 `docs/MOD-GUIDE.md`，说明同路径覆盖、manifest 启用顺序、只读校验、F2 诊断、内容包和静态构建边界。
+- 版本包 staging 白名单显式带上两份手册，Round 47 解包 smoke 检查解包后正文，不依赖仅有 `docs/` 目录的空壳。
+- 新增 `scripts/lib/docs-audit-round-48.mjs`、CLI 与类型声明；新增 `npm run audit:round-48-docs` 接入 `npm run check`。9 项测试覆盖仓库/夹具通过、缺指南/索引、README 与指南无效命令、过时根路径、manifest/schema/内容计数漂移、漏打包与不诚实的许可边界。
+- 更新 README、架构/资料/发布/参考/测试文档，明确当前 26 个 manifest 资源、24 种已登记资源 Schema 家族、26 份 Schema 文件，静态版不提供动态 MOD 安装；无项目 LICENSE，引用来源授权未知。
+
+### 验证
+
+- `npx vitest run tests/docs-audit-round-48.test.ts`：1 个文件、9 项通过，含仓库正向、fixture 正向及缺失文档/README 索引/未知命令/绝对根路径/manifest 资源数/Schema 数/内容清单计数/遗漏包指南/许可边界反向用例。
+- `node scripts/audit-round-48-docs.mjs`：通过；动态核对当前 README 与两份指南所用 npm scripts、manifest 的 26 项资源、26 份 Schema 文件、24 种登记资源 Schema 及基础数据数量；引用/发布授权表述和包内文档断言一致。
+- `npm run package:release`：完整 `check` / Vite 构建 / tarball 解包 smoke 通过。基础资源 Schema 26 项、启用 MOD 0 问题；全量测试 15 文件/142 项，R34 与 R48 两个文档审计通过，Vite 132 modules。生成 66 个归档 entries（65 个内容清单记录文件），620,869 bytes，SHA-256 `7ffd16bf0b26e7c840dc1e24152ee0a57fe6f7be8b069a078ba4edceeec43b1e`；两份新手册均从解包目录读取，子路径下资源 smoke 通过。
+- `npm run smoke:round-35`、`npm run smoke:round-36`、`npm run smoke:round-37`：均通过，分别复验多层覆盖/坏层回退、Vite 安全热重载/生产剔除、内容包导入导出与安全拒绝边界。
+- `npm run typecheck`：严格类型检查通过；`git diff --check`：提交前复核。
+
+### 未覆盖因素
+
+- 本轮手册按操作面板、源码和协议核对，但没有启动浏览器手动游玩/验证 Phaser UI 文案在不同分辨率下的可见性。
+- 静态包由本地解包/HTTP smoke 验证；工作区无 Git remote，没有 GitHub Actions 运行结果或 Pages URL，也未执行真实公开部署。
+
+---
+
 ## Round 47 — 静态版本打包与手动 Pages 部署（2026-09-28，已完成）
 
 ### 计划与实现

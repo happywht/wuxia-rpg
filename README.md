@@ -4,11 +4,11 @@
 
 - 设计文档：`docs/GDD.md`
 - 逐轮路线图（R00–R50）：`ROADMAP.md`
-- 当前进度：**Round 47 已完成；下一轮 Round 48**
+- 当前进度：**Round 48 已完成；下一轮 Round 49**
 
 ## 范围
 
-- ✅ 已完成（R00–R47）：网格探索、任务/物品/战斗与存档闭环；五派师门、昼夜天气、NPC 日程、伙伴、擂台、门派战、自创武学、经脉内修、锻造炼丹、多结局、成就与图鉴；原创「旧簿验痕 → 两家对页 → 封存水痕」主线接上 R31 渡籍补录，并以公开立册/护证留印互斥分支抵达两条新结局；R43 加入风雨传函漫游奇遇和五派资格支线，R44 加入按黄昏 NPC 日程及双方邻接触发的渡口争议与互斥调停任务，R46 以真实资料纵向集成验收任务/对白/战斗/成长/拜师/存档恢复及两条结局路线，R47 增加带清单/校验和的静态 Web 版本包及人工确认的 GitHub Pages 部署流程（尚无远端发布）。基础资料包含 32 项任务、51 件物品、30 种武学、163 个知识节点/258 条关系；资料审计、MOD 多层覆盖/来源追踪、开发热重载与内容包工作流、133 项 Vitest 测试及统一 `check` 质量门槛均已建立；地图性能见 `docs/PERFORMANCE.md`，无障碍/输入设置见 `docs/ACCESSIBILITY.md`。
+- ✅ 已完成（R00–R48）：网格探索、任务/物品/战斗与存档闭环；五派师门、昼夜天气、NPC 日程、伙伴、擂台、门派战、自创武学、经脉内修、锻造炼丹、多结局、成就与图鉴；原创「旧簿验痕 → 两家对页 → 封存水痕」主线接上 R31 渡籍补录，并以公开立册/护证留印互斥分支抵达两条新结局；R43 加入风雨传函漫游奇遇和五派资格支线，R44 加入按黄昏 NPC 日程及双方邻接触发的渡口争议与互斥调停任务，R46 以真实资料纵向集成验收任务/对白/战斗/成长/拜师/存档恢复及两条结局路线，R47 增加带清单/校验和的静态 Web 版本包及人工确认的 GitHub Pages 部署流程（尚无远端发布）；R48 补齐玩家手册、MOD 作者指南、架构/资料现状、许可边界与文档一致性质量门槛。基础资料包含 32 项任务、51 件物品、30 种武学、163 个知识节点/258 条关系；资料审计、MOD 多层覆盖/来源追踪、开发热重载与内容包工作流、142 项 Vitest 测试及统一 `check` 质量门槛均已建立；地图性能见 `docs/PERFORMANCE.md`，无障碍/输入设置见 `docs/ACCESSIBILITY.md`。
 - ⏳ 正在按路线图逐轮推进：共 51 轮（R00–R50）；内容扩充与发布验收尚未完成。
 - 永久边界：不做多人联网；不含原作内容；mod 仅限同名 JSON 覆盖（见 `docs/DATA-GUIDE.md`）。
 
@@ -33,11 +33,11 @@
 ```bash
 npm install        # 安装依赖
 npm run dev        # 启动开发服务器（默认 http://localhost:5173）
-npm run check      # 统一质量门槛：validate:data → inspect:mods → typecheck → test → audit:round-34，任一失败即中止
+npm run check      # 统一质量门槛：资料/MOD/类型/测试/round-34 与 round-48 文档审计，任一失败即中止
 npm run build      # 先完整通过 npm run check，再执行 Vite 生产构建
 npm run preview    # 预览生产构建
 npm run package:release # 质量门槛、生产构建、非根路径烟测、白名单版本包与 SHA-256
-npm test           # Vitest 自动测试（133 用例；不含基准）
+npm test           # Vitest 自动测试（142 用例；不含基准）
 npm run benchmark:round-40 # 性能/内存基准（渲染对象数与耗时、26 资源加载、50 轮长跑堆观察；与 npm test 隔离）
 npm run typecheck  # 仅类型检查（tsc --noEmit，严格模式）
 npm run validate:data # 校验 manifest 登记的基础资料/schema
@@ -58,6 +58,7 @@ npm run smoke:round-44 # NPC 日程邻近事件、声望奖励与双分支集成
 npm run smoke:round-46 # 真实资料纵向切片与多结局路线集成测试
 npm run smoke:round-47 # 校验版本归档/逐文件哈希及子路径资料加载
 npm run audit:round-34 # 地图、对白、任务及世界设定文档一致性审计
+npm run audit:round-48-docs # 玩家/MOD 指南、命令、现状、许可及发布包文档一致性审计
 ```
 
 ### 持续集成（Round 39 起）
@@ -94,10 +95,12 @@ npm run audit:round-34 # 地图、对白、任务及世界设定文档一致性�
 | `docs/GDD.md` | 工作标题与设定、平台与视觉、核心循环、范围边界、新系统、里程碑 |
 | `docs/ADR.md` | 技术决策记录与版本冻结总表 |
 | `docs/RELEASE.md` | 静态版本包、部署、安全门控与回滚指南 |
+| `docs/PLAYER-GUIDE.md` | 开局、探索、面板、战斗、存档与常见问题玩家手册 |
+| `docs/MOD-GUIDE.md` | 同路径 MOD、Schema 校验、热重载、内容包导入/导出与发布边界 |
 | `docs/REFERENCES.md` | 研究来源清单、授权/使用边界声明 |
 | `docs/ORIGINAL-FIDELITY.md` | 原作系列原则（有证据）/ 用户目标 / 新扩展 三组对照 |
-| `docs/ARCHITECTURE.md` | 分层架构、缺数据降级、校验、mod 覆盖、热重载规划 |
-| `docs/DATA-GUIDE.md` | 数据目录规范、命名约定、mod 覆盖规则 |
+| `docs/ARCHITECTURE.md` | 分层架构、缺数据降级、校验、MOD 覆盖、热重载与版本发布边界 |
+| `docs/DATA-GUIDE.md` | 数据目录规范、命名约定、MOD 覆盖规则与当前资料状态 |
 | `docs/KNOWLEDGE-GRAPH.md` | 图谱节点/关系、见闻解锁、百科与对话接入 |
 | `docs/DIALOGUE-GUIDE.md` | 对白资料协议：节点图、条件（含时段）、原子效果与引用隔离 |
 | `docs/CLIMATE.md` | 季节/天气资源协议、确定性日天气、画面表现与行动耗时 |

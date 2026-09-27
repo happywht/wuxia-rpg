@@ -5,7 +5,7 @@ Round 38 起本项目拥有可重复运行的 Vitest 自动化测试基线；Rou
 ## 快速开始
 
 ```bash
-npm run check       # 统一质量门槛（R39 起）：validate:data → inspect:mods → typecheck → test → audit:round-34
+npm run check       # 统一质量门槛：validate:data → inspect:mods → typecheck → test → audit:round-34 → audit:round-48-docs
 npm test            # vitest run，单次运行全部测试（CI 语义；不包含性能基准）
 npm run benchmark:round-40 # 性能/内存基准（R40 起；与 npm test 双向隔离，见下文）
 npm run smoke:round-46 # 真实资料驱动的开局→故事分支→多结局纵向集成回归
@@ -16,13 +16,14 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 
 ## 质量门槛、构建与持续集成（Round 39 起）
 
-`npm run check` 用 `&&` 串联五个步骤，**顺序固定、任一步非零退出即中止后续步骤**：
+`npm run check` 用 `&&` 串联六个步骤，**顺序固定、任一步非零退出即中止后续步骤**：
 
 1. `npm run validate:data` — manifest 与全部基础资源 Schema 校验；
 2. `npm run inspect:mods` — manifest 中已启用 MOD 覆盖层的只读校验与最终来源报告（覆盖边界：仅启用层，未启用目录不在检查范围）；
 3. `npm run typecheck` — 严格 TypeScript 检查（含 `tests/` 与 `vitest.config.ts`）；
 4. `npm test` — Vitest 单元测试；
-5. `npm run audit:round-34` — 文档一致性审计（地图/对白/任务/世界设定）。
+5. `npm run audit:round-34` — 文档一致性审计（地图/对白/任务/世界设定）；
+6. `npm run audit:round-48-docs` — 玩家/MOD 指南索引、命令、当前轮次/资料状态、发布包收录与授权边界审计。
 
 `npm run build` 先完整通过 `check` 再执行 Vite 生产构建：门槛失败时不会开始打包（此前 build 只跑 `tsc --noEmit`，类型检查不重复执行）。
 
@@ -30,7 +31,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 
 - 测试框架：Vitest 5.0.2。官方指南要求 Vite >=6.4.0、Node >=22.12.0；本仓库使用 Vite 8.3.1 与 Node 22.18.0，符合要求（详见 [`docs/REFERENCES.md`](REFERENCES.md) #12；基准 API 见同文件 #16）。
 - 运行环境：Node（无 DOM、无浏览器、无网络、无真实时钟依赖）。
-- 覆盖统计：14 个测试文件、133 个用例（R38 建立四组 53 个，R40 新增渲染器结构回归 10 个，R41 新增设置与输入 42 个，R42 新增主线集成 3 个，R43 新增漫游事件 6 个与门派支线集成 3 个，R44 新增日程漫游/奖励协议/双路线集成 6 个，R45 新增战斗成长基线与擂台奖品边界 4 个，R46 新增真实资料纵向切片 2 个，R47 新增版本清单/路径白名单测试 4 个；详见 `CHANGELOG.md` 对应条目）。
+- 覆盖统计：15 个测试文件、142 个用例（R38 建立四组 53 个，R40 新增渲染器结构回归 10 个，R41 新增设置与输入 42 个，R42 新增主线集成 3 个，R43 新增漫游事件 6 个与门派支线集成 3 个，R44 新增日程漫游/奖励协议/双路线集成 6 个，R45 新增战斗成长基线与擂台奖品边界 4 个，R46 新增真实资料纵向切片 2 个，R47 新增版本清单/路径白名单测试 4 个，R48 新增文档审计 9 个；详见 `CHANGELOG.md` 对应条目）。
 
 ## 配置：为什么有独立的 `vitest.config.ts`
 
@@ -110,6 +111,7 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 
 ## 变更记录
 
+- 2026-09-28（Round 48）：新增 `tests/docs-audit-round-48.test.ts` 9 用例覆盖玩家/MOD 指南、README/包索引、实际命令、manifest/Schema/内容计数、轮次/绝对路径和许可边界正反向审计；测试统计更新为 15 文件/142 用例。`npm run check` 新增末尾步骤 `audit:round-48-docs`。
 - 2026-09-28（Round 43）：新增 `tests/world-map.test.ts` 6 用例与 `tests/round43-faction-routes.test.ts` 3 用例，覆盖可选随机事件协议及五派任务资格、真实状态机/对白发现；覆盖统计更新为 10 文件 117 用例，新增 `npm run smoke:round-43`。
 - 2026-09-28（Round 44）：新增 nearby NPC 条件和任务声望/图谱奖励的解析、装配、幂等结算测试；新增真实渡口日程/邻接和两条互斥路线集成用例；新增 `npm run smoke:round-44`。完整覆盖统计更新为 11 文件 123 用例。
 - 2026-09-28（Round 45）：新增 `tests/round45-balance.test.ts` 4 用例，覆盖首次夺魁奖品、未完成/重赛边界、逐场经验保留和开场战斗升级基线；扩展 `npm run smoke:round-20` 检查首夺彩头及每轮经验。完整覆盖统计更新为 12 文件 127 用例。

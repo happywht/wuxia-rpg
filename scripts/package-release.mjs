@@ -171,7 +171,13 @@ try {
   await removeBuildPlaceholders(stagingRoot);
   await mkdir(path.join(stagingRoot, 'docs'), { recursive: true });
   await cp(path.join(root, 'README.md'), path.join(stagingRoot, 'README.md'));
-  for (const relative of ['RELEASE.md', 'REFERENCES.md', 'ORIGINAL-FIDELITY.md']) {
+  for (const relative of [
+    'RELEASE.md',
+    'REFERENCES.md',
+    'ORIGINAL-FIDELITY.md',
+    'PLAYER-GUIDE.md',
+    'MOD-GUIDE.md',
+  ]) {
     await cp(path.join(root, 'docs', relative), path.join(stagingRoot, 'docs', relative));
   }
   const thirdPartyNotices = await createThirdPartyNotices();

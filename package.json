@@ -6,7 +6,7 @@
   "description": "原创中文武侠 RPG（数据优先架构；受文曲星系列掌上 RPG 广泛玩法原则启发的独立新作，不含任何原作内容）",
   "scripts": {
     "dev": "vite",
-    "check": "npm run validate:data && npm run inspect:mods && npm run typecheck && npm test && npm run audit:round-34",
+    "check": "npm run validate:data && npm run inspect:mods && npm run typecheck && npm test && npm run audit:round-34 && npm run audit:round-48-docs",
     "build": "npm run check && vite build",
     "preview": "vite preview",
     "package:release": "npm run build && node scripts/package-release.mjs && npm run smoke:round-47",
@@ -18,6 +18,7 @@
     "content:export": "node scripts/content-package.mjs export",
     "content:import": "node scripts/content-package.mjs import",
     "audit:round-34": "node scripts/audit-round-34-docs.mjs",
+    "audit:round-48-docs": "node scripts/audit-round-48-docs.mjs",
     "smoke:round-20": "node scripts/smoke-round-20.mjs",
     "smoke:round-21": "node scripts/smoke-round-21.mjs",
     "smoke:round-22": "node scripts/smoke-round-22.mjs",

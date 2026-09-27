@@ -1,6 +1,6 @@
 # 架构说明（ARCHITECTURE）
 
-- 状态：Round 03–31 已实现地图、对话、成长、战斗、经济、任务（含互斥分支与谈话目标）、分层社会声望、伙伴、擂台连战、门派战、自创武学、经脉、装备锻造、炼丹、多结局、成就、存档、区域旅行、知识图谱/百科/图鉴、像素 UI、师门规则、昼夜气候、NPC 日程与条件奇遇，以及 12 名 NPC/5 门派/20 项差事的原创基础世界；Round 31 专项验证通过。
+- 状态：截至 Round 48，已实现地图探索、数据驱动对话/任务/战斗、角色成长与存档、五派、昼夜天气/NPC 日程、伙伴、擂台/门派战、自创武学、经脉、锻造/炼丹、多结局、图谱/百科/图鉴与成就；基础内容为 12 名 NPC、5 个门派、32 项差事、51 件物品、30 种武学、163 个图谱节点/258 条关系。R35–37 建立 MOD 追踪/热重载/内容包流程，R38–46 建立自动质量门槛与真实资料纵向验收，R47 建立静态版本包和人工确认的 Pages 流程，R48 补齐玩家/MOD 指南与文档一致性门槛。没有远端部署证据。
 - 关联：`docs/ADR.md`（技术选型依据）、`docs/DATA-GUIDE.md`（数据面细节）
 
 ---
@@ -31,7 +31,7 @@
 
 ## 2. 启动流程与缺失数据的降级策略
 
-Round 01 已实现地图加载切片：Vite 将 `data/` 作为静态目录服务，场景请求 `/base/maps/round-01-grid.json`（部署使用 `BASE_URL` 前缀）。地图文件随生产构建复制到输出目录。缺失/HTTP 错误、JSON 无法解析或结构检查失败时，场景保留画布并显示可读错误面板。当前结构检查只覆盖网格地图所需字段，不等同于正式 Schema 管线。
+Round 01 的切片式地图加载已由后续统一加载器取代。当前 Vite 将 `data/` 与 `mods/` 作为受限静态资料目录，生产构建复制资料并以相对基址 `./` 加载 `base/manifest.json`、`schema/`、`base/<resource.path>` 与已启用 MOD 覆盖；相对 URL 支持域名根路径和仓库子路径。缺失/HTTP 错误、JSON 无法解析、Schema 或语义检查失败时，场景显示结构化可读诊断。实际版本包只包含允许列表中的构建资源和说明，不带开发代码或依赖。Round 47 烟测从解包版本包的 `/preview/wuxia-rpg/` 子路径加载全部 26 项基础资源/schema；详细证据见 `DEVLOG.md`。
 
 Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id、相对路径、schema id 和按顺序启用的 MOD。加载顺序为：Ajv 校验 manifest → 加载并编译被引用的 schema → 加载并校验基础资源 → 按启用顺序读取同路径 MOD 覆盖并重复校验 → 通过事件总线广播结果 → 场景消费资源。Round 03 起 manifest 注册地图/NPC/对话，Round 04 登记角色/门派/武学，Round 05 登记战斗遭遇，Round 06 登记物品/商店，Round 07 登记任务；Round 10 根据 `grid-map` schema 家族收集全部地图，并要求 `world-map` 资源解析出有效起始地图；Round 11 将知识节点与关系作为两个可选、独立 schema 资源登记，缺失任一者时以空集合继续，坏引用只隔离相关关系或对话选项；Round 14 登记**必需**的 `game-calendar` 历法资源，未登记或语义无效时提供可读错误并拒绝加载；Round 15 登记**必需**的 `climate` 资源，必须与历法月份完整分区且权重引用有效；Round 16 的 NPC 日程是 NPC 资源的可选扩展，逐项引用历法时段并按地图校验占位；Round 21 的 `faction-war-set` 为可选资源，跨资源检查入口格、两派、双方对手武学及结局知识节点。地图、区域、图谱、历法、气候、日程和门派战协议均由 Phaser 无关模块执行。运行状态仍独立保存到浏览器本地存储，不混入世界资料。
 
@@ -73,7 +73,7 @@ Round 22 在上述流程中可选登记武学创制组件资源；它按 JSON Sc
 
 ## 3. JSON Schema 校验（Ajv，Round 02 已接入）
 
-- 当前 schema 使用 draft-07：`manifest.schema.json`、`grid-map.schema.json`、`world-map.schema.json`、`game-calendar.schema.json`、`climate.schema.json`、`knowledge-nodes.schema.json`、`knowledge-edges.schema.json`、`npc-set.schema.json`、`dialogue-set.schema.json`、`character-profiles.schema.json`、`faction-set.schema.json`、`martial-arts-set.schema.json`、`battle-encounters.schema.json`、`items-set.schema.json`、`shops-set.schema.json` 与 `quest-set.schema.json`。
+- 当前 `data/schema/` 有 26 份 draft-07 JSON Schema：`manifest`、`grid-map`、`world-map`、`game-calendar`、`climate`、`knowledge-nodes`、`knowledge-edges`、`npc-set`、`dialogue-set`、`character-profiles`、`faction-set`、`martial-arts-set`、`battle-encounters`、`items-set`、`shops-set`、`quest-set`、`companion-set`、`arena-set`、`faction-war-set`、`martial-art-components`、`meridian-set`、`equipment-forge-set`、`alchemy-set`、`ending-set`、`achievement-set` 与 `content-package`。当前基础 manifest 登记 26 项资源、覆盖 24 个资源 Schema 家族；`manifest` 与 `content-package` 是独立契约，不计入这 24 个世界资源家族。
 - Ajv 8.x 在加载期校验 manifest、基础资源和每份 MOD 覆盖（开发/生产相同），不在游戏循环内反复校验。
 - 跨字段规则分层完成：地图尺寸/出生点、世界图地图/区域/关口/事件引用、关口坐标和可走性、历法 id/时段起点唯一性与零点时段存在性、气候季节对历法月份的完整分区及天气权重引用等由语义解析补足；世界图跨地图装配后还会排除与 NPC/战斗遭遇重叠的关口或区域事件。角色成长、武学、物品/商店、任务与对话引用仍按原有模块逐项校验；对话范围顺序由防御解析器隔离。失败时只禁用受影响的最小条目，世界图起始地图、历法与气候等关键资料无效则提供可读启动错误。
 - 错误输出为结构化诊断（来源、资源、消息和字段路径），可被事件总线订阅并显示在场景。
@@ -97,7 +97,14 @@ Round 22 在上述流程中可选登记武学创制组件资源；它按 JSON Sc
 - 游戏场景把通知暂存到安全边界：不在移动、战斗或面板开启中替换数据；重载请求期间关闭场景输入。运行状态用 `captureSaveSnapshot` 保存在内存中（不写用户存档槽），经新世界的 `planSnapshotRestore` 兼容预检后再由 `restoreRunState` 重建。基础 JSON/schema 使世界加载失败或快照不兼容时保留旧世界与运行字段并显示可读提示。由于地图、NPC、任务、图谱等资料存在跨资源引用，当前按 manifest 完整重读和组装世界，而非局部原位替换。
 - 加载期间再次修改 JSON 会排队触发后续重读；初始世界加载期间的变更也会在首次装配后补跑。HMR 插件 `apply: 'serve'`，客户端桥接经生产打包校验不会进入发布 JS。作者工作流与局限见 `docs/DATA-GUIDE.md` §6。
 
-## 6. 代码组织约定
+## 6. 静态版本包与授权边界（Round 47）
+
+- `vite.config.ts` 以相对 `./` 作为生产资源基址；加载器将该基址与 `base/`、`schema/`、`mods/` 路径拼合，支持挂载在根路径或仓库子路径。
+- `npm run package:release` 从生产 `dist/` 和明确的发布说明文件构造临时 staging；包内 manifest 记录其余每份文件的长度与 SHA-256，归档有单独 checksum。打包白名单包含玩家/MOD 手册，解包 smoke 会验证其存在。
+- 静态版本包只能使用构建时携带的 MOD。新增覆盖要由维护者编辑资料、启用并校验，再重新构建和部署；开发 HMR/命令行内容包导入不会变成浏览器版的动态安装功能。
+- 版本包带运行时 npm 依赖的 package license 元数据与随包许可证文本，不授予项目代码、原创数据或参考网页的授权。项目无独立 `LICENSE`；人工 Pages workflow 是可用配置，不表示已经部署。
+
+## 7. 代码组织约定
 
 - `src/engine/` 内模块不 import `src/game/`（单向依赖：game → engine）。
 - 引擎对外暴露 TypeScript 接口（协议优先），数据形状由 schema 与接口共同约束。

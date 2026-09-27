@@ -4,6 +4,20 @@
 
 ## [Unreleased]
 
+### Added (Round 48)
+
+- **玩家与资料作者手册**：新增 `docs/PLAYER-GUIDE.md` 和 `docs/MOD-GUIDE.md`，按当前操作、Schema/MOD/内容包协议说明开局、探索、战斗、存读档、资料作者校验与静态版 MOD 边界。
+- **文档一致性门槛**：新增只读 `npm run audit:round-48-docs`，核对玩家/MOD 指南、README/发布包索引、示例命令、轮次摘要、manifest/Schema/内容计数、许可边界及静态包收录；接入 `npm run check`，新增九项正向/反向审计测试。
+- **发布资料随包**：静态版本包白名单加入两份指南；Round 47 解包 smoke 对两份指南做内容断言。
+- **架构/数据状态校准**：更新 R47 相对 `./` 基址、26 项 manifest 资源与 Schema 家族、静态版 MOD 边界、当前许可事实和 Round 47 发布证据。
+
+### Verification (Round 48)
+
+- `npx vitest run tests/docs-audit-round-48.test.ts`：9 项通过；`npm run typecheck`：通过；`node scripts/audit-round-48-docs.mjs`：通过。
+- `npm run package:release`：包含全量 `check`、Vite 132 modules 生产构建与解包/路径 smoke；15 个测试文件、142 项通过，26 个 manifest 资源 Schema、启用 MOD 问题 0，R34/R48 审计通过。包 620,869 bytes，SHA-256 `7ffd16bf0b26e7c840dc1e24152ee0a57fe6f7be8b069a078ba4edceeec43b1e`；解包 65 个内容文件的长度和哈希匹配，新增玩家/MOD 指南可读。
+- `smoke:round-35`、`smoke:round-36`、`smoke:round-37`：全部通过。
+- 本机未进行浏览器手动游玩；无 Git remote，故没有远端 Pages 发布/URL 验证。Vite 主 JS chunk >500 kB 仍为非阻断提示。
+
 ### Added (Round 47)
 
 - **部署基址**：Vite 生产输出改用 `./` 相对路径，支持根路径和 GitHub Pages 仓库子路径；新增真实 HTTP 子路径 smoke，使用实际 data-loader 请求全部基础 JSON/Schema、静态资源与示例 MOD。

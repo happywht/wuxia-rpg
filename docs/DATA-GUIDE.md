@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：Round 03–37 已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台、门派战、自创武学、经脉、装备锻造、炼丹、存档、区域旅行、知识图谱、NPC 私有记忆、江湖图鉴、昼夜气候、日程、条件奇遇、多层社会声望、多结局、成就、原创人物/门派扩充（12 名 NPC、5 个门派）、原创任务链（20 项差事）、原创物品/武学扩充（50 件物品、30 种武学）、知识图谱目录全量映射（134 节点）、文档一致性审计、MOD 优先级/来源追踪/作者工作流、开发模式资料热重载及单文件 v1 内容包（导出/只读预检/显式安装）；热重载与内容包专项/真实演练、类型检查、生产构建与回归记录见 `DEVLOG.md`；专题目录见 `docs/ITEMS.md` 与 `docs/MARTIAL-ARTS.md`，内容包规范见 `docs/CONTENT-PACKAGES.md`，世界设定总览见 `docs/WORLD-SETTING.md`。
+- 状态：截至 Round 47，已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台、门派战、自创武学、经脉、装备锻造、炼丹、存档、区域旅行、知识图谱、NPC 私有记忆、江湖图鉴、昼夜气候、日程、条件奇遇、多层社会声望、多结局、成就；基础内容为 12 名 NPC、5 个门派、32 项任务、51 件物品、30 种武学、163 个图谱节点/258 条边。MOD 已支持同路径多层覆盖、来源诊断、开发模式安全热重载及 v1 内容包导入/导出；R48 新增面向作者的独立操作手册。运行规则及专项证据见 `DEVLOG.md`；专题目录见 `docs/ITEMS.md`、`docs/MARTIAL-ARTS.md`、`docs/CONTENT-PACKAGES.md` 与 `docs/WORLD-SETTING.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -36,7 +36,7 @@ data/
 mods/                        # mod 覆盖层：mods/<modId>/ 镜像 data/base/ 相对路径
 ```
 
-Round 07 状态：manifest 另登记可选资源 `quest.round-07-set` → `quests/round-07-quests.json`（`quest-set`）。截至 Round 44，基础资料提供 32 项原创差事，含三组互斥分支与 `talkToNpc` 谈话目标；NPC 可声明可选 `questGiver`（缺省为 false）；Q 打开任务日志，邻接任务发布人按 E 打开只列出其任务的名录。Round 09 起玩家任务、背包、战斗遭遇等运行状态由版本化存档持久化，不写回世界 JSON。此前角色模板、NPC 商店字段与物品数据仍按 Round 06 契约使用。Vite 把整个 `data/` 目录作为静态资源目录，开发期可从站点根路径读取，生产构建时复制到 `dist/`。`mods/example/` 提供未启用的同路径覆盖示例。启用 MOD 只需把其单段 id 按优先顺序加入 manifest 的 `enabledMods` 数组。
+Round 07 状态：manifest 另登记可选资源 `quest.round-07-set` → `quests/round-07-quests.json`（`quest-set`）。截至 Round 47，基础资料提供 32 项原创差事，含互斥分支与 `talkToNpc` 谈话目标；NPC 可声明可选 `questGiver`（缺省为 false）；Q 打开任务日志，邻接任务发布人按 E 打开只列出其任务的名录。Round 09 起玩家任务、背包、战斗遭遇等运行状态由版本化存档持久化，不写回世界 JSON。Vite 以 `BASE_URL` 的相对 `./` 基址读取并打包 `data/` 与 `mods/`，因此开发和发布部署均可挂在子路径下。`mods/example/` 提供未启用的同路径覆盖示例。启用 MOD 需把其单段 id 按优先顺序加入 manifest 的 `enabledMods` 数组。
 
 Round 32 状态：物品仍由 manifest 的 `item.round-06-set` 资源和 `items-set` schema 装配，基础集扩至 50 项；姜百味货架新增八种消耗品、两件基础装备和九种有限库存材料，六件升级装备由渡口铁砧的连续配方取得。武学仍由 `martial-art.round-04-set` 与 `martial-arts-set` schema 装配，基础集扩至 30 种；24 种新增门派武学通过五位导师的 `martialArtEligible` / `learnMartialArt` 对话分支授予，只有当前门派成员能进入本门目录。价格、材料、属性门槛和战斗作用均由现有 JSON 表达，不新增引擎中的剧情分支。完整目录见 `docs/ITEMS.md`、`docs/MARTIAL-ARTS.md`。
 
@@ -162,6 +162,13 @@ npm run content:import -- example.wuxia.json --apply    # 预检全过后安装�
 - **语义校验边界**：预检只做静态 JSON/Schema/兼容性检查；跨资源语义（引用闭合、坐标/占格等）仍由运行时加载器在装配时执行，游戏内坏引用按 §5.1 的 MOD 回退规则处理。
 - 完整格式规范、安全模型与常见问题见 [`CONTENT-PACKAGES.md`](CONTENT-PACKAGES.md)。
 
+### 5.6 静态发布包边界（Round 47）
+
+- 发布包会携带构建时已选定的 `data/`、`mods/`、Schema 与示例 MOD；玩家在浏览器中没有安装或启用新 MOD 的入口。
+- 要发布新的覆盖，维护者需在仓库副本中更新 MOD 和 `enabledMods`，运行 `npm run inspect:mods`、`npm run check`，再重新 `npm run package:release` 并按部署流程上传。
+- 开发服务器的资料热重载只适用于本地仓库工作流，不存在于静态生产 bundle。静态部署挂载到仓库子路径时，游戏通过相对 `./` 基址解析 `base/`、`schema/` 和 `mods/`。
+- 新手作者操作步骤见 [`MOD-GUIDE.md`](MOD-GUIDE.md)；该指南随 Web 版本包一起分发。
+
 
 ## 6. 开发热重载的处理范围与边界
 
@@ -281,5 +288,6 @@ NPC 当前坐标是由地图、时钟和人物日程派生的临时运行状态�
 | 2026-09-27 | Round 35 | §5 扩写为 MOD 覆盖规则与作者工作流：覆盖语义（后声明有效者胜、坏覆盖原子回退）、启用/排序步骤、`inspect:mods` 只读检查、F2 游戏内来源/诊断面板与重载说明 |
 | 2026-09-27 | Round 36 | §5 补充开发期自动应用；§6 记录 Vite JSON 事件范围、整世界装配、安全边界、运行态兼容恢复与生产限制 |
 | 2026-09-28 | Round 37 | §5.5 内容包：单文件 v1 包导出/只读预检/显式安装、规范 JSON 校验和、格式与引擎版本兼容边界及安装安全模型；登记 content-package schema；详见 `docs/CONTENT-PACKAGES.md` |
+| 2026-09-28 | Round 47–48 | 补记相对 `./` 子路径发布基址、静态版 MOD 能力边界与玩家/MOD 指南；静态版新增 MOD 需由维护者重新构建分发 |
 | 2026-09-27 | Round 34 | 新增 `audit:round-34` 只读文档审计（数据/Schema 驱动核验地图、对白协议、任务与门派覆盖）；新增世界设定总览 `docs/WORLD-SETTING.md` 并校准地图图册/对白指南/任务志 |
 | 2026-09-28 | Round 44 | 世界事件支持按日程/邻接检查 nearby NPC；任务奖励支持一次性门派声望与图谱发现；详见 `docs/MAP-ATLAS.md`、`docs/QUESTS.md` |

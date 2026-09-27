@@ -76,6 +76,10 @@ try {
   const notices = await readFile(path.join(packageRoot, 'THIRD-PARTY-NOTICES.md'), 'utf8');
   assert.match(notices, /phaser@4\.2\.1 — MIT/);
   assert.match(notices, /fast-uri@3\.1\.8 — BSD-3-Clause/);
+  for (const guide of ['PLAYER-GUIDE.md', 'MOD-GUIDE.md']) {
+    const guideText = await readFile(path.join(packageRoot, 'docs', guide), 'utf8');
+    assert.ok(guideText.length > 500, `${guide} 是完整随包指南`);
+  }
   assert.deepEqual(
     manifest.files.map(({ path: filePath }) => filePath).sort(),
     packageFiles.filter((filePath) => filePath !== 'release-manifest.json').sort(),

@@ -18,7 +18,7 @@ npm run package:release
 - 包内 `release-manifest.json`：格式版本、游戏版本、CI 源码提交（本地包为 `null`）以及每个被打包文件的字节数和 SHA-256。
 - 根目录 `THIRD-PARTY-NOTICES.md`：从锁定 production dependency 树收集包名、版本、license 标识与其发行包随附的 LICENSE/NOTICE 正文。Pages workflow 将此文件一并上传，因此静态站点也在 `/THIRD-PARTY-NOTICES.md` 提供许可文本。
 
-版本包从临时 staging 目录构成，文件白名单只允许构建后的 `index.html`、JS/CSS、基础资料、Schema、示例 MOD、第三方 notices、README 和本发布说明/参考/原作边界文件。打包器拒绝符号链接、遗漏运行文件、危险路径或清单外包内文件。不会把源代码、测试、依赖、Git 历史、本机 `.env` 或 `.serena/` 放进版本包。每个版本只覆盖 `release/` 中同版本的归档和 checksum；该输出目录不进入 Git。
+版本包从临时 staging 目录构成，文件白名单只允许构建后的 `index.html`、JS/CSS、基础资料、Schema、示例 MOD、第三方 notices、README 和发布/参考/原作边界/玩家/MOD 指南。包内发布说明也列出 [`PLAYER-GUIDE.md`](PLAYER-GUIDE.md) 与 [`MOD-GUIDE.md`](MOD-GUIDE.md)。打包器拒绝符号链接、遗漏运行文件、危险路径或清单外包内文件。不会把源代码、测试、依赖、Git 历史、本机 `.env` 或 `.serena/` 放进版本包。每个版本只覆盖 `release/` 中同版本的归档和 checksum；该输出目录不进入 Git。
 
 此处产出的是学习/原型用 Web 构建，不代表 1.0 商业发行许可。当前没有单独的项目 LICENSE；版本包会按锁定的 production dependency 图携带所有运行时 npm 依赖的 license 元数据与 LICENSE/NOTICE 原文（`THIRD-PARTY-NOTICES.md`），但这不自动覆盖项目自身代码/资料或参考来源。上线或再分发前仍须按 [`REFERENCES.md`](REFERENCES.md) 检查来源授权并审阅项目代码/资料的授权政策。
 
