@@ -21,6 +21,11 @@
       "schema": "game-calendar"
     },
     {
+      "id": "climate.base",
+      "path": "worldview/climate.json",
+      "schema": "climate"
+    },
+    {
       "id": "npc.round-03-set",
       "path": "characters/round-03-npcs.json",
       "schema": "npc-set"

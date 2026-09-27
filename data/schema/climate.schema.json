@@ -1,0 +1,135 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wuxia-rpg.invalid/schema/climate",
+  "title": "江湖气候",
+  "description": "季节与逐日天气的世界契约：季节按历法月份划分、每季一份加权天气表，每种天气声明画面色调、降水样式与移动附加耗时。静态 Schema 只约束字段与数值范围；跨字段语义（季节/天气 id 唯一、月份在文档内不跨季重复、权重引用解析且权重和为正、相对历法的月份完整分区）由加载期语义校验补足——气候是必需资料，任一无效即整资源拒绝，不做部分降级。每日天气由世界种子与历日确定性推导，本资源只声明分布与表现。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "seasons", "weathers"],
+  "properties": {
+    "id": {
+      "description": "气候资源 id，如 climate.base。",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+    },
+    "seasons": {
+      "description": "季节列表；monthIds 引用历法月份 id，各季合并后必须恰好覆盖历法全部月份且互不重叠（语义校验）。",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 24,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "monthIds", "weatherWeights"],
+        "properties": {
+          "id": {
+            "description": "稳定季节 id，建议前缀 season.。",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+          },
+          "name": {
+            "description": "季节显示名（如 春、盛夏）。",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 16
+          },
+          "monthIds": {
+            "description": "归属本季的历法月份 id；至少一个，文档内不得与其他季节重复（完整分区由语义校验对照历法检查）。",
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 24,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
+          },
+          "weatherWeights": {
+            "description": "本季逐日天气的加权表；weatherId 必须在 weathers 中声明（语义校验），权重和必须为正。",
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 64,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["weatherId", "weight"],
+              "properties": {
+                "weatherId": {
+                  "description": "天气 id，引用同文档 weathers[].id。",
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+                },
+                "weight": {
+                  "description": "抽取权重（≥0；同季权重和必须 >0，语义校验）。权重为 0 的天气永不入选但保留声明。",
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1000000
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "weathers": {
+      "description": "天气列表；天气 id 在文档中必须唯一，所有季节权重引用必须能在此列表解析。",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "tintColor", "tintAlpha", "stepMinutes"],
+        "properties": {
+          "id": {
+            "description": "稳定天气 id，建议前缀 weather.。",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+          },
+          "name": {
+            "description": "天气显示名（如 晴朗、细雨）。",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 16
+          },
+          "tintColor": {
+            "description": "天气画面色调，#RRGGBB 十六进制颜色；与昼夜调色分层叠加。",
+            "type": "string",
+            "pattern": "^#[0-9A-Fa-f]{6}$"
+          },
+          "tintAlpha": {
+            "description": "色调层不透明度（0 不叠加–0.45 上限；上限保证 HUD 与世界可读性）。",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 0.45
+          },
+          "stepMinutes": {
+            "description": "本天气下每次成功网格移动额外消耗的游戏分钟数（叠加在历法 stepMinutes 之上；0 表示不额外耗时）。",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1440
+          },
+          "precipitation": {
+            "description": "降水样式；省略表示无降水（无粒子）。",
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "density"],
+            "properties": {
+              "kind": {
+                "description": "降水类型：rain 雨丝（细长快速下落）、snow 雪片（缓慢飘落）。",
+                "type": "string",
+                "enum": ["rain", "snow"]
+              },
+              "density": {
+                "description": "降水密度（0–1），控制程序化粒子数量，0 表示不显示粒子。",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

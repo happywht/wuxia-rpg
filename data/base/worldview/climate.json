@@ -1,0 +1,107 @@
+{
+  "id": "climate.base",
+  "seasons": [
+    {
+      "id": "season.spring",
+      "name": "春",
+      "monthIds": ["month.qingyang", "month.huazhao", "month.taolang"],
+      "weatherWeights": [
+        { "weatherId": "weather.clear", "weight": 40 },
+        { "weatherId": "weather.cloudy", "weight": 25 },
+        { "weatherId": "weather.drizzle", "weight": 20 },
+        { "weatherId": "weather.overcast", "weight": 10 },
+        { "weatherId": "weather.rain", "weight": 5 }
+      ]
+    },
+    {
+      "id": "season.summer",
+      "name": "夏",
+      "monthIds": ["month.meilin", "month.liuhuo", "month.hefeng"],
+      "weatherWeights": [
+        { "weatherId": "weather.clear", "weight": 30 },
+        { "weatherId": "weather.storm", "weight": 25 },
+        { "weatherId": "weather.rain", "weight": 20 },
+        { "weatherId": "weather.cloudy", "weight": 15 },
+        { "weatherId": "weather.overcast", "weight": 10 }
+      ]
+    },
+    {
+      "id": "season.autumn",
+      "name": "秋",
+      "monthIds": ["month.qiaoyun", "month.guiyue", "month.shuanghua"],
+      "weatherWeights": [
+        { "weatherId": "weather.clear", "weight": 45 },
+        { "weatherId": "weather.cloudy", "weight": 25 },
+        { "weatherId": "weather.overcast", "weight": 15 },
+        { "weatherId": "weather.drizzle", "weight": 10 },
+        { "weatherId": "weather.snow", "weight": 5 }
+      ]
+    },
+    {
+      "id": "season.winter",
+      "name": "冬",
+      "monthIds": ["month.lubai", "month.xuejian", "month.suichu"],
+      "weatherWeights": [
+        { "weatherId": "weather.snow", "weight": 30 },
+        { "weatherId": "weather.clear", "weight": 30 },
+        { "weatherId": "weather.overcast", "weight": 20 },
+        { "weatherId": "weather.cloudy", "weight": 20 }
+      ]
+    }
+  ],
+  "weathers": [
+    {
+      "id": "weather.clear",
+      "name": "晴朗",
+      "tintColor": "#f5efd8",
+      "tintAlpha": 0,
+      "stepMinutes": 0
+    },
+    {
+      "id": "weather.cloudy",
+      "name": "多云",
+      "tintColor": "#b8c4d8",
+      "tintAlpha": 0.1,
+      "stepMinutes": 0
+    },
+    {
+      "id": "weather.overcast",
+      "name": "阴沉",
+      "tintColor": "#8a94a8",
+      "tintAlpha": 0.22,
+      "stepMinutes": 0
+    },
+    {
+      "id": "weather.drizzle",
+      "name": "细雨",
+      "tintColor": "#6f87a8",
+      "tintAlpha": 0.26,
+      "stepMinutes": 1,
+      "precipitation": { "kind": "rain", "density": 0.25 }
+    },
+    {
+      "id": "weather.rain",
+      "name": "降雨",
+      "tintColor": "#5a7396",
+      "tintAlpha": 0.32,
+      "stepMinutes": 2,
+      "precipitation": { "kind": "rain", "density": 0.55 }
+    },
+    {
+      "id": "weather.storm",
+      "name": "骤雨",
+      "tintColor": "#46608a",
+      "tintAlpha": 0.4,
+      "stepMinutes": 3,
+      "precipitation": { "kind": "rain", "density": 1 }
+    },
+    {
+      "id": "weather.snow",
+      "name": "落雪",
+      "tintColor": "#aebdd4",
+      "tintAlpha": 0.24,
+      "stepMinutes": 2,
+      "precipitation": { "kind": "snow", "density": 0.5 }
+    }
+  ]
+}

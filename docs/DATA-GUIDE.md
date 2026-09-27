@@ -94,6 +94,7 @@ Round 14 状态：manifest 登记**必需**资源 `calendar.base` → `worldview
 - 新增商店：在 shops-set JSON 中声明稳定 shop id、`npcId`（指向可放置 NPC）、原创 `name`/`greeting`、`sellRate` 及 `stock`（`itemId` 必须存在，quantity 为 -1 无限或非负余量）；在 NPC 条目加 `shopId` 后，玩家四方向相邻按 E 开店，否则仍走其对话。货币与背包起点在角色模板的 `startingCurrency`、`inventoryCapacity` 和 `startingItems` 中配置。
 - 新增任务：在 quest-set JSON 的 `quests` 数组新增任务（`id` 建议 `quest.` 前缀；`giverNpcId` 必须指向有效 NPC，并在 NPC 条目声明 `questGiver: true`；`prerequisiteQuestIds` 只能引用无环任务；目标 `kind` 选 `collectItem`/`defeatEncounter`，`targetId` 分别引用有效物品/遭遇，`requiredCount` 为正整数；`failOnEncounterIds` 声明败北失败的遭遇；`rewards` 声明非负 experience/currency）。收集目标接取时以当前背包数量为起点，物品变化后同步目标数量；击败目标在战斗胜利后推进；任务奖励恰发一次。E 打开发布人名录，Q 打开日志，A 放弃活动任务；Round 09 起任务阶段和进度随本地存档持久化。
 - 修改历法：直接编辑 `data/base/worldview/calendar.json`（或用 MOD 同路径覆盖）。调整月份天数/时段表/耗时都会即时反映到新开局与读档折算（存档只存分钟数）；删除对话正在引用的时段 id 只会剔除相应选项并警告。时段 id 建议 `period.` 前缀、月份 id 建议 `month.` 前缀；照度 0–1 控制夜幕深度（场景按 `1 − 照度` 叠加至多约 0.55 透明度的冷色层，UI 始终保持清晰）。
+- 修改季节/天气：编辑 `data/base/worldview/climate.json`（或用 MOD 同路径覆盖），必须保留至少一种天气并确保各季节恰好覆盖历法的每个月份。季节 `monthIds` 引用 `calendar.json` 的稳定月份 id；`weatherWeights` 引用同文件的天气 id，权重为相对非负整数且每季总和需大于 0；天气声明 `#RRGGBB` 色调、0–0.45 透明度、0–1440 步耗时，以及可选的雨/雪粒子类型和 0–1 密度。相同世界种子/历日会稳定抽得相同天气。雨雪步耗时只叠加到成功单格行走；改动示例和扩展边界见 `docs/CLIMATE.md`。
 - 所有内容必须原创（红线见 `docs/ORIGINAL-FIDELITY.md`）；命名避开任何原作专有名称。
 
 ## Round 13：门派与师承资料
@@ -124,6 +125,14 @@ Round 14 状态：manifest 登记**必需**资源 `calendar.base` → `worldview
 - 基础资料为原创"青阳—岁除"十二月历（各 30 天）与子夜/拂晓/晨光/日中/午后/黄昏/入夜七时段；照度决定场景夜幕深度。
 - 存档只保存 `elapsedGameMinutes` 分钟计数；读档用**当前**历法折算年月日与时段，因此改月份长度不会产生矛盾日期。
 
+## Round 15：季节与天气资料
+
+`data/base/worldview/climate.json` 是**必需**资源（manifest 登记 `climate.base`，schema `climate`），配置 `seasons` 和 `weathers`。季节按 `monthIds` 绑定现有历法月份，并声明非空的 `weatherWeights`；加载期对照已解析的 `calendar.base` 检查月份恰好分属一个季节、没有未知月份，且权重天气引用都存在、每季权重合计大于零。上述语义错误会拒绝整份 climate 资源并给出可读错误，不会让引擎使用内置气候回退。
+
+每种天气配置名称、`tintColor`、`tintAlpha`、`stepMinutes` 和可选 `precipitation`（`kind: rain|snow`, `density: 0–1`）。天气每个游戏日抽取一次，其输入是存档中的 u32 `worldSeed`、日期索引和当前季节权重表；同种子/同一日稳定，跨日按新日期推导。场景会在世界层绘制天气色调和程序降水粒子。成功网格步耗时 = 历法 `actionCosts.stepMinutes` + 当前天气 `stepMinutes`；阻挡移动不推进时间，区域旅行和 V 等候仍只使用历法各自成本。
+
+Round 14 之前的 v1 存档缺 `worldSeed` 时固定归一为 `1`，后续再保存会带上该值。完整字段范围、MOD 编辑说明和边界见 `docs/CLIMATE.md`。
+
 ## 变更记录
 
 | 日期 | 轮次 | 变更 |
@@ -142,3 +151,4 @@ Round 14 状态：manifest 登记**必需**资源 `calendar.base` → `worldview
 | 2026-09-27 | Round 10–11 | 记录多区域地图资源、知识图谱节点/关系、百科、知识对话条件与存档恢复 |
 | 2026-09-27 | Round 13 | 增加导师、拜师/授艺/退门资料字段、规则说明及旧资料缺省语义 |
 | 2026-09-27 | Round 14 | 登记必需历法资源与 game-calendar schema，记录月份/时段/照度/耗时契约、语义校验拒绝规则与分钟计数存档 |
+| 2026-09-27 | Round 15 | 登记必需气候资源与 climate schema，记录季节月份分区、天气分布/表现/步耗时和稳定种子存档 |

@@ -67,6 +67,12 @@ import {
 } from './quest-system';
 import { type SocialState, MORALITY_RANGE, RENOWN_RANGE, RELATIONSHIP_RANGE } from './social-state';
 import type { FactionMembership } from './faction-system';
+import {
+  DEFAULT_WORLD_SEED,
+  WORLD_SEED_MAX,
+  WORLD_SEED_MIN,
+  isWorldSeed,
+} from './climate-system';
 
 // ---------------------------------------------------------------------------
 // Protocol constants
@@ -168,6 +174,12 @@ export interface SaveSnapshotV1 {
    * a save.
    */
   elapsedGameMinutes: number;
+  /**
+   * 32-bit world seed the daily weather derives from; absent in Round 14 and
+   * earlier v1 saves (the run then uses the stable default seed, so old
+   * worlds keep deterministic weather across every future load).
+   */
+  worldSeed: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -560,6 +572,12 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
   if (elapsedGameMinutes === null) {
     errors.push('elapsedGameMinutes：应为非负整数');
   }
+  const worldSeed = raw.worldSeed === undefined
+    ? DEFAULT_WORLD_SEED
+    : requireIntegerInRange(raw.worldSeed, WORLD_SEED_MIN, WORLD_SEED_MAX);
+  if (worldSeed === null) {
+    errors.push(`worldSeed：应为 ${WORLD_SEED_MIN}–${WORLD_SEED_MAX} 的整数（32 位世界种子）`);
+  }
 
   if (
     errors.length > 0 ||
@@ -582,7 +600,8 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     completedEncounters === null ||
     completedRegionalEvents === null ||
     knownKnowledgeNodeIds === null ||
-    elapsedGameMinutes === null
+    elapsedGameMinutes === null ||
+    worldSeed === null
   ) {
     return { ok: false, reason: 'corrupt', message: '存档结构不合规', errors };
   }
@@ -611,6 +630,7 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     completedRegionalEvents,
     knownKnowledgeNodeIds,
     elapsedGameMinutes,
+    worldSeed,
   };
   return { ok: true, snapshot };
 }
@@ -870,6 +890,8 @@ export interface CaptureInput {
   knownKnowledgeNodeIds: ReadonlySet<string>;
   /** In-game minutes elapsed since the calendar start (GameClock counter). */
   elapsedGameMinutes: number;
+  /** 32-bit world seed the daily weather derives from (Round 15+). */
+  worldSeed: number;
   /** Absent in older callers/snapshots means currently unaffiliated. */
   factionMembership?: FactionMembership | null;
   /** Injectable clock for deterministic tests. */
@@ -924,6 +946,7 @@ export function captureSaveSnapshot(input: CaptureInput): SaveSnapshotV1 {
     completedRegionalEvents: [...input.completedRegionalEvents],
     knownKnowledgeNodeIds: [...input.knownKnowledgeNodeIds],
     elapsedGameMinutes: Math.max(0, Math.floor(input.elapsedGameMinutes)),
+    worldSeed: isWorldSeed(input.worldSeed) ? input.worldSeed : DEFAULT_WORLD_SEED,
   };
 }
 

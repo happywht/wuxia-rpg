@@ -16,6 +16,13 @@ import {
   getVisibleOptions,
 } from '../engine/dialogue-runtime';
 import { GameClock } from '../engine/game-calendar';
+import {
+  ClimateRuntime,
+  DEFAULT_WORLD_SEED,
+  generateWorldSeed,
+  type ClimateSeasonData,
+  type ClimateWeatherData,
+} from '../engine/climate-system';
 import { type SocialState, createSocialState } from '../engine/social-state';
 import {
   NpcOccupancyIndex,
@@ -89,11 +96,14 @@ import {
  * Round 03 grid scene, extended with the Round 04 progression datasets,
  * the Round 05 battle slice, Round 06 item/trade slice, Round 07 quests,
  * the Round 08 dialogue condition/effect runtime, the Round 09
- * menu/save/settings flow and the Round 14 data-driven in-game clock:
+ * menu/save/settings flow, Round 14 data-driven in-game clock and Round 15
+ * seasonal daily climate:
  * successful moves, region travels and the explicit V-key wait advance the
  * calendar (blocked or refused actions cost nothing), the HUD shows the
  * current date/time/period and a depth-sorted daylight wash tints the world
- * layers per period light level while every overlay stays legible.
+ * layers per period light level; weather adds a deterministic daily tint and
+ * procedural rain/snow, and can add time to successful grid steps. Every
+ * overlay stays legible.
  *
  * Since Round 09 the scene starts from {@link GridStartupData} handed over
  * by the menu scene: either a fresh character (`kind:'new'` with the chosen
@@ -123,8 +133,8 @@ import {
 const VIEW_WIDTH = 960;
 const VIEW_HEIGHT = 540;
 
-/** Vertical space reserved for the HUD strip above the map (two warning lines). */
-const HUD_HEIGHT = 64;
+/** Vertical space reserved for controls, run state, climate, and warning lines. */
+const HUD_HEIGHT = 72;
 
 const MOVE_DURATION_MS = 110;
 
@@ -142,6 +152,9 @@ const DAYLIGHT_TINT_COLOR = 0x0a1024;
 const DAYLIGHT_MAX_ALPHA = 0.55;
 /** Depth band: world 0 < daylight 50 < HUD text 60 < overlay panels 1000+. */
 const DAYLIGHT_DEPTH = 50;
+/** Weather washes/particles layer above daylight and below HUD and panels. */
+const WEATHER_TINT_DEPTH = 51;
+const WEATHER_PARTICLE_DEPTH = 52;
 const HUD_TEXT_DEPTH = 60;
 /** Duration of the alpha cross-fade when the day period changes. */
 const DAYLIGHT_FADE_MS = 600;
@@ -226,6 +239,19 @@ export class GridScene extends Phaser.Scene {
   private lastDaylightPeriodId: string | null = null;
   /** Full-screen tint rectangle between the world layers and the HUD. */
   private daylightLayer: Phaser.GameObjects.Rectangle | null = null;
+  /** Deterministic seasons/weather derived from the loaded climate and clock. */
+  private climateRuntime: ClimateRuntime | null = null;
+  /** Persisted per-run weather seed; generated once for new games. */
+  private worldSeed = DEFAULT_WORLD_SEED;
+  /** Last climate ids used to avoid rebuilding effects on every minute. */
+  private lastClimateSeasonId: string | null = null;
+  private lastClimateWeatherId: string | null = null;
+  private weatherTintLayer: Phaser.GameObjects.Rectangle | null = null;
+  private weatherEmitter: Phaser.GameObjects.Particles.ParticleEmitter | null = null;
+  private readonly weatherTextureKeys = {
+    rain: 'wuxia-weather-rain-drop',
+    snow: 'wuxia-weather-snow-flake',
+  } as const;
 
   private dialoguePanel: DialoguePanel | null = null;
   private battlePanel: BattlePanel | null = null;
@@ -253,6 +279,7 @@ export class GridScene extends Phaser.Scene {
 
   private coordsText: Phaser.GameObjects.Text | null = null;
   private timeText: Phaser.GameObjects.Text | null = null;
+  private climateText: Phaser.GameObjects.Text | null = null;
   private interactText: Phaser.GameObjects.Text | null = null;
   private questTrackerText: Phaser.GameObjects.Text | null = null;
   private questNotice: string | null = null;
@@ -323,6 +350,8 @@ export class GridScene extends Phaser.Scene {
           playerPosition: { col: number; row: number };
           /** In-game minutes restored from the save (0 for old v1 saves). */
           elapsedGameMinutes: number;
+          /** Daily weather seed restored from the save (fixed default for old v1 saves). */
+          worldSeed: number;
         })
       | null = null;
 
@@ -342,8 +371,14 @@ export class GridScene extends Phaser.Scene {
     // restored (older v1 snapshots lack the field and restart at 0), which
     // the calendar start then re-dates using the *current* month table.
     this.clock = new GameClock(world.calendar, restoredRun?.elapsedGameMinutes ?? 0);
+    this.climateRuntime = new ClimateRuntime(world.climate, world.calendar);
+    this.worldSeed = restoredRun?.worldSeed ?? generateWorldSeed();
     this.daylightLayer = null;
     this.lastDaylightPeriodId = null;
+    this.lastClimateSeasonId = null;
+    this.lastClimateWeatherId = null;
+    this.weatherTintLayer = null;
+    this.weatherEmitter = null;
     this.knownKnowledgeNodeIds = createKnowledgeState(
       world.knowledgeGraph,
       restoredRun?.knownKnowledgeNodeIds ?? [],
@@ -491,6 +526,7 @@ export class GridScene extends Phaser.Scene {
     this.buildHud(activeMap, world.optionalWarnings, world.modWarnings);
     this.updateCoordsHud();
     this.updateTimeHud();
+    this.updateClimatePresentation(false);
 
     this.dialoguePanel = new DialoguePanel(this, {
       onClose: () => this.noteOverlayClosed(), // Also refreshes the hint.
@@ -549,6 +585,7 @@ export class GridScene extends Phaser.Scene {
       mapResourceId: string;
       playerPosition: { col: number; row: number };
       elapsedGameMinutes: number;
+      worldSeed: number;
     };
     warnings: string[];
   } | null {
@@ -608,6 +645,7 @@ export class GridScene extends Phaser.Scene {
         mapResourceId: read.snapshot.mapResourceId,
         playerPosition: { ...read.snapshot.playerPosition },
         elapsedGameMinutes: read.snapshot.elapsedGameMinutes,
+        worldSeed: read.snapshot.worldSeed,
       },
       warnings: plan.warnings,
     };
@@ -693,6 +731,7 @@ export class GridScene extends Phaser.Scene {
       completedRegionalEvents: this.completedRegionalEvents,
       knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
       elapsedGameMinutes: this.clock?.elapsedMinutes ?? 0,
+      worldSeed: this.worldSeed,
       factionMembership: this.factionState.membership,
     });
     const result = writeSaveSlot(this.storage, slotId, snapshot);
@@ -948,6 +987,15 @@ export class GridScene extends Phaser.Scene {
       .setOrigin(1, 0)
       .setDepth(HUD_TEXT_DEPTH), 13);
 
+    this.climateText = this.registerScaledText(this.add
+      .text(VIEW_WIDTH - 16, 51, '', {
+        fontFamily: UI.fontFamily,
+        fontSize: uiFontSize(10),
+        color: UI.textMuted,
+      })
+      .setOrigin(1, 0)
+      .setDepth(HUD_TEXT_DEPTH), 10);
+
     // Interaction status line under the map: adjacent-NPC prompt or the
     // explicit empty-state hint required when no NPC is interactable.
     this.interactText = this.registerScaledText(this.add
@@ -998,6 +1046,7 @@ export class GridScene extends Phaser.Scene {
     }
     this.updateTimeHud();
     this.updateDaylight(true);
+    this.updateClimatePresentation(true);
   }
 
   /** V key: wait in place. Blocked by any open overlay or in-flight move. */
@@ -1075,6 +1124,104 @@ export class GridScene extends Phaser.Scene {
     } else {
       layer.setAlpha(targetAlpha);
     }
+  }
+
+  /** Current data-driven season and weather for the in-game calendar date. */
+  private currentClimate(): { season: ClimateSeasonData; weather: ClimateWeatherData } | null {
+    const clock = this.clock;
+    const climate = this.climateRuntime;
+    if (clock === null || climate === null) {
+      return null;
+    }
+    const stamp = clock.snapshot();
+    return {
+      season: climate.seasonForStamp(stamp),
+      weather: climate.weatherForDay(this.worldSeed, stamp),
+    };
+  }
+
+  /** Updates climate tint and generated precipitation only when the daily reading changes. */
+  private updateClimatePresentation(animate: boolean): void {
+    const reading = this.currentClimate();
+    if (reading === null) {
+      return;
+    }
+    const { season, weather } = reading;
+    const movementNote = weather.stepMinutes > 0 ? ` · 行走 +${weather.stepMinutes} 分/格` : '';
+    this.climateText?.setText(`${season.name} · ${weather.name}${movementNote}`);
+    if (
+      this.lastClimateSeasonId === season.id &&
+      this.lastClimateWeatherId === weather.id
+    ) {
+      return;
+    }
+    this.lastClimateSeasonId = season.id;
+    this.lastClimateWeatherId = weather.id;
+
+    let layer = this.weatherTintLayer;
+    if (layer === null || !layer.active) {
+      layer = this.add.rectangle(
+        VIEW_WIDTH / 2,
+        HUD_HEIGHT + (VIEW_HEIGHT - HUD_HEIGHT) / 2,
+        VIEW_WIDTH,
+        VIEW_HEIGHT - HUD_HEIGHT,
+        weather.tintColor,
+        1,
+      ).setDepth(WEATHER_TINT_DEPTH);
+      this.weatherTintLayer = layer;
+    }
+    this.tweens.killTweensOf(layer);
+    layer.setFillStyle(weather.tintColor, 1);
+    if (animate && weather.tintAlpha > 0) {
+      layer.setAlpha(0);
+      this.tweens.add({
+        targets: layer,
+        alpha: weather.tintAlpha,
+        duration: DAYLIGHT_FADE_MS,
+      });
+    } else {
+      layer.setAlpha(weather.tintAlpha);
+    }
+    this.replaceWeatherEmitter(weather);
+  }
+
+  /** Replaces the previous day's particles with a bounded procedural effect. */
+  private replaceWeatherEmitter(weather: ClimateWeatherData): void {
+    this.weatherEmitter?.destroy();
+    this.weatherEmitter = null;
+    const precipitation = weather.precipitation;
+    if (precipitation === null || precipitation.density <= 0) {
+      return;
+    }
+
+    const textureKey = this.weatherTextureKeys[precipitation.kind];
+    if (!this.textures.exists(textureKey)) {
+      const graphics = this.add.graphics();
+      graphics.fillStyle(0xffffff, 1);
+      if (precipitation.kind === 'rain') {
+        graphics.fillRect(1, 0, 2, 9);
+        graphics.generateTexture(textureKey, 4, 10);
+      } else {
+        graphics.fillCircle(3, 3, 2.5);
+        graphics.generateTexture(textureKey, 6, 6);
+      }
+      graphics.destroy();
+    }
+
+    const isRain = precipitation.kind === 'rain';
+    const emitter = this.add.particles(0, 0, textureKey, {
+      x: { min: 0, max: VIEW_WIDTH },
+      y: { min: HUD_HEIGHT, max: VIEW_HEIGHT },
+      lifespan: isRain ? { min: 1400, max: 2200 } : { min: 3200, max: 5200 },
+      speedX: isRain ? { min: -18, max: 18 } : { min: -26, max: 26 },
+      speedY: isRain ? { min: 200, max: 310 } : { min: 24, max: 68 },
+      frequency: Math.max(35, Math.round(260 - precipitation.density * 220)),
+      quantity: 1,
+      tint: isRain ? 0xcbd9ed : 0xf4f8ff,
+      alpha: { start: 0.86, end: 0.16 },
+      scale: isRain ? 0.82 : 0.8,
+    });
+    this.weatherEmitter = emitter.setDepth(WEATHER_PARTICLE_DEPTH);
   }
 
   /** Refreshes the bottom status line from the current adjacency state. */
@@ -1653,7 +1800,9 @@ export class GridScene extends Phaser.Scene {
     this.playerRow = targetRow;
     this.updateCoordsHud();
     this.updateInteractHint();
-    this.advanceTime(this.clock?.calendar.actionCosts.stepMinutes ?? 0);
+    const baseStepMinutes = this.clock?.calendar.actionCosts.stepMinutes ?? 0;
+    const weatherStepMinutes = this.currentClimate()?.weather.stepMinutes ?? 0;
+    this.advanceTime(baseStepMinutes + weatherStepMinutes);
 
     const target = cellCenterOffset(map, targetCol, targetRow);
     this.moving = true;

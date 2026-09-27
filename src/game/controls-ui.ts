@@ -50,10 +50,11 @@ export class ControlsPanel {
     this.addText('F　与相邻人物直接交谈', left + 44, top + 151, 14, UI_PALETTE.text);
     this.addText('V　原地等候片刻（面板打开时无效）', left + 44, top + 180, 14, UI_PALETTE.text);
     this.addText('B 背包　J 师门　Q 差事　M 舆图　K 百科　Esc 暂停', left + 44, top + 209, 13, UI_PALETTE.text);
+    this.addText('天气随日期变化；雨雪会增加每步行走耗时', left + 44, top + 238, 12, UI_PALETTE.muted);
 
-    this.addText('面板', left + 28, top + 238, 13, UI_PALETTE.jade);
-    this.addText('↑/↓ 或 W/S　选择条目　·　Enter　确认', left + 44, top + 265, 13, UI_PALETTE.text);
-    this.addText('商店可用 ←/→ 或 A/D 切换买卖；战斗中 Esc 可撤退。', left + 44, top + 294, 12, UI_PALETTE.muted);
+    this.addText('面板', left + 28, top + 266, 13, UI_PALETTE.jade);
+    this.addText('↑/↓ 或 W/S　选择条目　·　Enter　确认', left + 44, top + 293, 13, UI_PALETTE.text);
+    this.addText('商店可用 ←/→ 或 A/D 切换买卖；战斗中 Esc 可撤退。', left + 44, top + 322, 12, UI_PALETTE.muted);
     this.addText('H 或 Esc 收起　·　方向键在帮助页打开时不会移动', left + width - 24, top + height - 24, 11, UI_PALETTE.accent, 'right');
   }
 

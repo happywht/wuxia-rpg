@@ -6,10 +6,11 @@
  * pipeline — the menu needs the character templates for creation and the
  * same degraded-error behaviour, and duplicating the assembly would drift.
  * Every convention carries over unchanged: the map (manifest/schemas) and,
- * since Round 14, the game calendar are required and fatal; NPC/dialogue/
- * progression/battle/item/shop/quest content is optional and degrades per
- * smallest unit with warnings (see docs/ARCHITECTURE.md §2). No world
- * content lives here — ids and text come from `data/` only.
+ * since Round 14, the game calendar, and since Round 15 the climate are
+ * required and fatal; NPC/dialogue/progression/battle/item/shop/quest
+ * content is optional and degrades per smallest unit with warnings (see
+ * docs/ARCHITECTURE.md §2). No world content lives here — ids and text
+ * come from `data/` only.
  */
 
 import {
@@ -41,6 +42,7 @@ import {
 } from '../engine/dialogue-graph';
 import { assembleDialogueReferences } from '../engine/dialogue-runtime';
 import { type GameCalendarData, parseGameCalendar } from '../engine/game-calendar';
+import { type ClimateData, parseClimate } from '../engine/climate-system';
 import {
   type CharacterProfileData,
   type FactionData,
@@ -83,6 +85,7 @@ import {
 /** Stable resource ids from data/base/manifest.json — never hard-coded URLs. */
 export const WORLD_MAP_RESOURCE_ID = 'world.atlas';
 const CALENDAR_RESOURCE_ID = 'calendar.base';
+const CLIMATE_RESOURCE_ID = 'climate.base';
 const NPC_RESOURCE_ID = 'npc.round-03-set';
 const DIALOGUE_RESOURCE_ID = 'dialogue.round-03-set';
 const CHARACTER_PROFILE_RESOURCE_ID = 'character-profile.round-04-set';
@@ -172,6 +175,8 @@ export interface LoadedWorld {
   worldMap: WorldMapAssembly;
   /** Validated game calendar (required resource; time rules derive from it). */
   calendar: GameCalendarData;
+  /** Validated climate (required resource; season/weather rules derive from it). */
+  climate: ClimateData;
   knowledgeGraph: KnowledgeGraph;
   assembly: WorldAssembly;
   optionalWarnings: readonly Diagnostic[];
@@ -219,6 +224,12 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
         },
         'game-calendar': (value) => {
           const parsed = parseGameCalendar(value);
+          return parsed.ok ? [] : parsed.errors;
+        },
+        'climate': (value) => {
+          // Intra-document semantics only (unique ids, weight resolution);
+          // the calendar partition check runs below with both resources.
+          const parsed = parseClimate(value);
           return parsed.ok ? [] : parsed.errors;
         },
         'character-profiles': (value) => {
@@ -295,6 +306,27 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
         ok: false,
         title: `历法资源 "${CALENDAR_RESOURCE_ID}" 语义校验未通过`,
         lines: parsedCalendar.errors,
+      };
+    }
+
+    // The climate is required world data like the calendar: a missing
+    // resource or an invalid document refuses the load with readable lines.
+    // The parse hands over the calendar so the season↔month partition is
+    // verified across resources — no silent fallback climate exists.
+    const climateResource = result.resources.get(CLIMATE_RESOURCE_ID);
+    if (climateResource === undefined) {
+      return {
+        ok: false,
+        title: '江湖气候资料缺失',
+        lines: [`清单中没有 id 为 "${CLIMATE_RESOURCE_ID}" 的资源，请检查 data/base/manifest.json。`],
+      };
+    }
+    const parsedClimate = parseClimate(climateResource.value, parsedCalendar.calendar);
+    if (!parsedClimate.ok) {
+      return {
+        ok: false,
+        title: `气候资源 "${CLIMATE_RESOURCE_ID}" 语义校验未通过`,
+        lines: parsedClimate.errors,
       };
     }
 
@@ -385,6 +417,7 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
         maps,
         worldMap: resolvedWorldMap,
         calendar: parsedCalendar.calendar,
+        climate: parsedClimate.climate,
         knowledgeGraph: knowledgeResult.graph,
         assembly,
         optionalWarnings: [...optionalWarnings, ...assembly.warnings],

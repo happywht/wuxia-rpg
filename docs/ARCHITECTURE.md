@@ -1,6 +1,6 @@
 # 架构说明（ARCHITECTURE）
 
-- 状态：Round 03–11 的地图、对话、成长、战斗、经济、任务、社会状态、存档、区域旅行与知识图谱/百科运行时，以及 Round 14 的数据驱动历法/游戏时钟均已落地。
+- 状态：Round 03–15 已实现地图、对话、成长、战斗、经济、任务、社会状态、存档、区域旅行、知识图谱/百科、像素 UI、师门规则、数据驱动历法、游戏时钟、季节与天气。
 - 关联：`docs/ADR.md`（技术选型依据）、`docs/DATA-GUIDE.md`（数据面细节）
 
 ---
@@ -33,7 +33,7 @@
 
 Round 01 已实现地图加载切片：Vite 将 `data/` 作为静态目录服务，场景请求 `/base/maps/round-01-grid.json`（部署使用 `BASE_URL` 前缀）。地图文件随生产构建复制到输出目录。缺失/HTTP 错误、JSON 无法解析或结构检查失败时，场景保留画布并显示可读错误面板。当前结构检查只覆盖网格地图所需字段，不等同于正式 Schema 管线。
 
-Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id、相对路径、schema id 和按顺序启用的 MOD。加载顺序为：Ajv 校验 manifest → 加载并编译被引用的 schema → 加载并校验基础资源 → 按启用顺序读取同路径 MOD 覆盖并重复校验 → 通过事件总线广播结果 → 场景消费资源。Round 03 起 manifest 注册地图/NPC/对话，Round 04 登记角色/门派/武学，Round 05 登记战斗遭遇，Round 06 登记物品/商店，Round 07 登记任务；Round 10 根据 `grid-map` schema 家族收集全部地图，并要求 `world-map` 资源解析出有效起始地图；Round 11 将知识节点与关系作为两个可选、独立 schema 资源登记，缺失任一者时以空集合继续，坏引用只隔离相关关系或对话选项；Round 14 登记**必需**的 `game-calendar` 历法资源，未登记或语义无效（重复 id/时段起点、缺零点时段、悬空起始引用、非法耗时）时提供可读错误并拒绝加载，不做部分降级。区域、图谱与历法的语义检查由 Phaser 无关模块执行。运行状态仍独立保存到浏览器本地存储，不混入世界资料。
+Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id、相对路径、schema id 和按顺序启用的 MOD。加载顺序为：Ajv 校验 manifest → 加载并编译被引用的 schema → 加载并校验基础资源 → 按启用顺序读取同路径 MOD 覆盖并重复校验 → 通过事件总线广播结果 → 场景消费资源。Round 03 起 manifest 注册地图/NPC/对话，Round 04 登记角色/门派/武学，Round 05 登记战斗遭遇，Round 06 登记物品/商店，Round 07 登记任务；Round 10 根据 `grid-map` schema 家族收集全部地图，并要求 `world-map` 资源解析出有效起始地图；Round 11 将知识节点与关系作为两个可选、独立 schema 资源登记，缺失任一者时以空集合继续，坏引用只隔离相关关系或对话选项；Round 14 登记**必需**的 `game-calendar` 历法资源，未登记或语义无效（重复 id/时段起点、缺零点时段、悬空起始引用、非法耗时）时提供可读错误并拒绝加载；Round 15 登记**必需**的 `climate` 资源，需与历法月份构成无遗漏、无重叠的季节分区，天气权重必须引用有效天气且总权重大于零，否则给出可读错误并拒绝加载。地图、区域、图谱、历法和气候的语义检查由 Phaser 无关模块执行。运行状态仍独立保存到浏览器本地存储，不混入世界资料。
 
 缺数据/坏数据的行为按严重度分级：
 
@@ -41,6 +41,7 @@ Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id
 |---|---|---|
 | manifest、manifest/grid-map schema 或当前关键地图缺失/不可解析 | 资源不进入运行状态；场景显示诊断面板并停止装配 | 来源路径、HTTP/解析/schema 原因及修复提示 |
 | 历法资源（game-calendar）未登记、缺失、schema 不符或语义无效（重复月份/时段 id、时段起点重复、缺零点时段、起始月/日/时刻越界、耗时越界） | 同上：历法是必需资料，整资源拒绝，不回退到硬编码历法 | 面板点名 `calendar.base` 与具体未通过的语义条目 |
+| 气候资源（climate）未登记、缺失、schema 不符或语义无效（重复季节/天气 id、月份重叠/缺失/未知、天气权重悬空或总和为零） | 同上：气候是必需资料，整资源拒绝，不回退到硬编码天气 | 面板点名 `climate.base` 与具体未通过的语义条目 |
 | 可选资源（NPC/对话/角色模板/门派/武学/战斗遭遇/物品/商店/任务/知识图谱）或其 schema 缺失、不可解析、schema 不符、未通过语义校验 | 降级为警告；场景继续装配其余内容 | 地图与移动不受影响；HUD 显示"已禁用相应内容"警告行，控制台保留结构化诊断 |
 | 单条 NPC 记录坏（引用不存在、坐标越界/阻挡、压出生点、同格冲突、id 重复） | 只禁用该 NPC，其余照常放置 | 同上；警告消息点名被禁用的 NPC 与原因 |
 | 单段对话坏（起始节点/选项引用断裂、节点 id 重复）或对话 id 重复 | 只禁用该对话及引用它的 NPC，其余照常 | 同上 |
@@ -65,9 +66,9 @@ Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id
 
 ## 3. JSON Schema 校验（Ajv，Round 02 已接入）
 
-- 当前 schema 使用 draft-07：`manifest.schema.json`、`grid-map.schema.json`、`world-map.schema.json`、`game-calendar.schema.json`、`knowledge-nodes.schema.json`、`knowledge-edges.schema.json`、`npc-set.schema.json`、`dialogue-set.schema.json`、`character-profiles.schema.json`、`faction-set.schema.json`、`martial-arts-set.schema.json`、`battle-encounters.schema.json`、`items-set.schema.json`、`shops-set.schema.json` 与 `quest-set.schema.json`。
+- 当前 schema 使用 draft-07：`manifest.schema.json`、`grid-map.schema.json`、`world-map.schema.json`、`game-calendar.schema.json`、`climate.schema.json`、`knowledge-nodes.schema.json`、`knowledge-edges.schema.json`、`npc-set.schema.json`、`dialogue-set.schema.json`、`character-profiles.schema.json`、`faction-set.schema.json`、`martial-arts-set.schema.json`、`battle-encounters.schema.json`、`items-set.schema.json`、`shops-set.schema.json` 与 `quest-set.schema.json`。
 - Ajv 8.x 在加载期校验 manifest、基础资源和每份 MOD 覆盖（开发/生产相同），不在游戏循环内反复校验。
-- 跨字段规则分层完成：地图尺寸/出生点、世界图地图/区域/关口/事件引用、关口坐标和可走性、历法 id/时段起点唯一性与零点时段存在性等由语义解析补足；世界图跨地图装配后还会排除与 NPC/战斗遭遇重叠的关口或区域事件。角色成长、武学、物品/商店、任务与对话引用仍按原有模块逐项校验；对话范围顺序由防御解析器隔离。失败时只禁用受影响的最小条目，世界图起始地图、历法等关键资料无效则提供可读启动错误。
+- 跨字段规则分层完成：地图尺寸/出生点、世界图地图/区域/关口/事件引用、关口坐标和可走性、历法 id/时段起点唯一性与零点时段存在性、气候季节对历法月份的完整分区及天气权重引用等由语义解析补足；世界图跨地图装配后还会排除与 NPC/战斗遭遇重叠的关口或区域事件。角色成长、武学、物品/商店、任务与对话引用仍按原有模块逐项校验；对话范围顺序由防御解析器隔离。失败时只禁用受影响的最小条目，世界图起始地图、历法与气候等关键资料无效则提供可读启动错误。
 - 错误输出为结构化诊断（来源、资源、消息和字段路径），可被事件总线订阅并显示在场景。
 
 ## 4. mod 覆盖：同名文件优先级（Round 02 已提供基础能力，Round 35 增强作者工具）
@@ -112,6 +113,10 @@ Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id
 ### Round 14：数据驱动历法与游戏时钟
 
 `game-calendar.ts` 是 Phaser-free 的历法协议与时钟引擎：防御解析并语义校验月份/时段/起始时刻/动作耗时（Ajv 语义校验器在资源层拒绝无效历法），`GameClock` 以单一"已过分钟数"为权威状态，按需折算年/月/日/分钟并做循环时段查询——零点时段由校验保证存在，跨午夜时段因此无需特判。`grid-scene.ts` 只在动作确实完成后调用推进：成功移动一步、成功通过关口旅行和 V 键等候分别消耗资料配置的分钟数，被阻挡的移动、被拒的传送与任何打开中的面板一律零消耗。时间 HUD 显示历日/时刻/时段；昼夜调色层以固定深度带（世界 0 < 调色 50 < HUD 60 < 面板 1000+）夹在世界图像与 UI 之间，按当前时段照度渐变，区域切换重建世界层后仍稳定覆盖。`dialogue-runtime.ts` 的 `timeOfDay` 条件读取时钟当前时段 id，装配期对照历法剔除悬空时段引用的选项。存档保存分钟计数而非派生日期，旧 v1 快照缺字段时从历法起始时刻恢复。
+
+### Round 15：确定性季节天气
+
+`climate-system.ts` 不依赖 Phaser，负责气候资料防御解析和确定性日天气：季节必须恰好划分已解析历法的全部月份，季节权重只能引用现有天气且总和为正；同一个 u32 世界种子和历日通过确定性 32 位混合得到固定权重 roll。新开局生成并固定世界种子，`save-system.ts` 将其保存为 v1 `worldSeed`，Round 14 及更早快照缺字段时归一到固定值 1。`grid-scene.ts` 按当日季节/天气更新 HUD、世界调色和雨雪程序粒子；动作成本只对成功网格行走增加天气 `stepMinutes`，不修改日历旅行与等候成本。季节/天气名、视觉参数、权重和步耗时全部来自 climate 资源。
 
 ## 变更记录
 
