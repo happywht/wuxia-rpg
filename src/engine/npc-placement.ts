@@ -29,6 +29,14 @@ export interface NpcRecordData {
   shopId: string | null;
   /** Whether this NPC publishes quests (Round 07); missing means false. */
   questGiver: boolean;
+  /** Optional time-of-day destinations (Round 16), normalized to an empty array. */
+  schedule: NpcScheduleEntryData[];
+}
+
+/** A same-map destination selected while the calendar occupies `periodId`. */
+export interface NpcScheduleEntryData {
+  periodId: string;
+  position: CellPosition;
 }
 
 /** Wire format of an npc-set JSON file under `data/base/characters/`. */
@@ -85,8 +93,30 @@ export function parseNpcSet(raw: unknown): NpcSetParseResult {
     const position = isPlainObject(entry.position) ? entry.position : null;
     const col = position === null ? null : requireInteger(position.col);
     const row = position === null ? null : requireInteger(position.row);
-
     const problems: string[] = [];
+    const schedule: NpcScheduleEntryData[] = [];
+    if (entry.schedule !== undefined && !Array.isArray(entry.schedule)) {
+      problems.push(`${label}.schedule：应为时段日程数组`);
+    } else if (Array.isArray(entry.schedule)) {
+      entry.schedule.forEach((scheduleEntry, scheduleIndex) => {
+        const scheduleLabel = `${label}.schedule[${scheduleIndex}]`;
+        if (!isPlainObject(scheduleEntry)) {
+          problems.push(`${scheduleLabel}：应为对象`);
+          return;
+        }
+        const periodId = requireNonEmptyString(scheduleEntry.periodId);
+        const schedulePosition = isPlainObject(scheduleEntry.position)
+          ? scheduleEntry.position
+          : null;
+        const scheduleCol = schedulePosition === null ? null : requireInteger(schedulePosition.col);
+        const scheduleRow = schedulePosition === null ? null : requireInteger(schedulePosition.row);
+        if (periodId === null || scheduleCol === null || scheduleRow === null) {
+          problems.push(`${scheduleLabel}：应含非空 periodId 与整数 position.col/row`);
+          return;
+        }
+        schedule.push({ periodId, position: { col: scheduleCol, row: scheduleRow } });
+      });
+    }
     if (id === null) {
       problems.push(`${label}.id：应为非空字符串`);
     }
@@ -116,6 +146,10 @@ export function parseNpcSet(raw: unknown): NpcSetParseResult {
       errors.push(...problems);
       return;
     }
+    if (problems.length > 0) {
+      errors.push(...problems);
+      return;
+    }
 
     npcs.push({
       id,
@@ -124,6 +158,7 @@ export function parseNpcSet(raw: unknown): NpcSetParseResult {
       dialogueId,
       shopId,
       questGiver,
+      schedule,
       position: { col, row },
     });
   });

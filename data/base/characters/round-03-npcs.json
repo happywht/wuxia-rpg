@@ -5,14 +5,22 @@
       "name": "沈墨涵",
       "mapResourceId": "map.round-01-grid",
       "position": { "col": 4, "row": 1 },
-      "dialogueId": "dlg.shen-mohan-bookshop"
+      "dialogueId": "dlg.shen-mohan-bookshop",
+      "schedule": [
+        { "periodId": "period.midday", "position": { "col": 3, "row": 1 } },
+        { "periodId": "period.dusk", "position": { "col": 4, "row": 1 } }
+      ]
     },
     {
       "id": "char.lu-zhenniang",
       "name": "陆贞娘",
       "mapResourceId": "map.round-01-grid",
       "position": { "col": 5, "row": 5 },
-      "dialogueId": "dlg.lu-zhenniang-teastall"
+      "dialogueId": "dlg.lu-zhenniang-teastall",
+      "schedule": [
+        { "periodId": "period.dusk", "position": { "col": 6, "row": 5 } },
+        { "periodId": "period.night", "position": { "col": 5, "row": 5 } }
+      ]
     },
     {
       "id": "char.gu-yechen",
@@ -27,7 +35,11 @@
       "mapResourceId": "map.round-01-grid",
       "position": { "col": 9, "row": 1 },
       "dialogueId": "dlg.jiang-baiwei-peddler",
-      "shopId": "shop.jiang-baiwei-peddler-cart"
+      "shopId": "shop.jiang-baiwei-peddler-cart",
+      "schedule": [
+        { "periodId": "period.afternoon", "position": { "col": 10, "row": 1 } },
+        { "periodId": "period.night", "position": { "col": 8, "row": 1 } }
+      ]
     },
     {
       "id": "char.ma-shangyi",
@@ -35,7 +47,11 @@
       "mapResourceId": "map.round-01-grid",
       "position": { "col": 12, "row": 1 },
       "dialogueId": "dlg.ma-shangyi-notice-board",
-      "questGiver": true
+      "questGiver": true,
+      "schedule": [
+        { "periodId": "period.midday", "position": { "col": 13, "row": 1 } },
+        { "periodId": "period.night", "position": { "col": 12, "row": 1 } }
+      ]
     },
     {
       "id": "char.ye-tingzhou",
@@ -49,14 +65,22 @@
       "name": "石北",
       "mapResourceId": "map.round-10-mist-ferry",
       "position": { "col": 3, "row": 1 },
-      "dialogueId": "dlg.shi-bei-mentor"
+      "dialogueId": "dlg.shi-bei-mentor",
+      "schedule": [
+        { "periodId": "period.midday", "position": { "col": 4, "row": 1 } },
+        { "periodId": "period.dusk", "position": { "col": 3, "row": 2 } }
+      ]
     },
     {
       "id": "char.wen-suxin",
       "name": "闻素心",
       "mapResourceId": "map.round-10-mist-ferry",
       "position": { "col": 12, "row": 7 },
-      "dialogueId": "dlg.wen-suxin-mentor"
+      "dialogueId": "dlg.wen-suxin-mentor",
+      "schedule": [
+        { "periodId": "period.morning", "position": { "col": 11, "row": 7 } },
+        { "periodId": "period.night", "position": { "col": 13, "row": 7 } }
+      ]
     }
   ]
 }

@@ -84,7 +84,7 @@ Round 14 状态：manifest 登记**必需**资源 `calendar.base` → `worldview
 
 - 改世界 → 只动 `data/base/`；想替换官方内容 → 写到 `mods/`，不要直接改基础数据。
 - 新增数据先在 `data/base/manifest.json` 登记资源 id、相对路径及 schema id，并在 `data/schema/` 提供 draft-07 schema；`npm run dev` 会在启动时校验并把错误逐条写到控制台/场景。
-- 新增 NPC：在 npc-set JSON 里加条目（稳定 id 建议 `char.` 前缀、姓名、`mapResourceId` 用已登记地图资源 id、`position` 填可走格、`dialogueId` 指向已登记对话）；坐标坏、引用断或占位冲突只会禁用该 NPC 并在 HUD/控制台给出点名警告，不影响其他人物。
+- 新增 NPC：在 npc-set JSON 里加条目（稳定 id 建议 `char.` 前缀、姓名、`mapResourceId` 用已登记地图资源 id、`position` 填可走格、`dialogueId` 指向已登记对话）；可选 `schedule` 按已登记日历的 `periodId` 声明地图内 `position`，具体校验和冲突回退见 [`NPC-SCHEDULES.md`](NPC-SCHEDULES.md)。基础 NPC 坐标/引用无效会禁用该 NPC；单独坏掉的日程项只回退该人物该时段的基础位置。
 - 新增对话：在 dialogue-set JSON 里加一段（id 建议 `dlg.` 前缀、`startNodeId` 指向存在节点、选项 `nextNodeId` 必须可达；无 `options` 的节点即结束节点）。断裂引用只禁用该段对话及引用它的 NPC。选项可声明 `conditions`（全满足才可见：任务状态、物品数量、善恶/声望/NPC 关系闭区间）与 `effects`（确认时原子执行：接取/放弃任务、给予/交付物品、修善良恶/声望/关系；见 §4 对话条件与效果）；坏跨资源引用只剔除该选项，draft-07 Schema 可表达的结构/协议错误仍按资源级拒绝，解析器额外发现的单段语义错误（如反向上下界）只禁用该段并警告。示例：马尚义对话按任务 offered/active/completed 显示不同分支，顾夜尘带话后关系达标解锁新选项。
 - 新增角色模板：在 character-profiles JSON 里加条目（id 建议 `char.` 前缀；五项属性 `body/force/agility/insight/resolve` 键与 1–999 值域是协议，显示名称写在 `attributeLabels`；`maxLevel` 必须大于 `startingLevel`，属性起点不得超过 `attributeCap`，否则整个资源在加载期被拒；`startingMartialArtIds` 列出起始武学——引用必须存在、未禁用并满足模板起始等级/属性（起始视为无门派），坏引用只剔除该武学并警告）。
 - 新增门派：在 faction-set JSON 里加条目（id 建议 `faction.` 前缀，名称/立场/宗旨/武学风格全为原创文本）。id 重复只保留先声明者并警告。
@@ -133,6 +133,25 @@ Round 14 状态：manifest 登记**必需**资源 `calendar.base` → `worldview
 
 Round 14 之前的 v1 存档缺 `worldSeed` 时固定归一为 `1`，后续再保存会带上该值。完整字段范围、MOD 编辑说明和边界见 `docs/CLIMATE.md`。
 
+## Round 16：NPC 时段日程
+
+NPC 集合的每个条目可省略 `schedule`，也可提供日程项数组：
+
+```json
+{
+  "id": "char.example",
+  "mapResourceId": "map.round-01-grid",
+  "position": { "col": 4, "row": 1 },
+  "schedule": [
+    { "periodId": "period.midday", "position": { "col": 3, "row": 1 } }
+  ]
+}
+```
+
+`periodId` 必须引用 `calendar.json` 中的时段；单个人物不得重复声明同一时段。日程位置按 `mapResourceId` 所属网格图校验通行、出生点、固定遭遇和同一时段 NPC 占位。无效引用、坐标、重复项或冲突只隔离相应日程项并警告，人物在该时段留于基础 `position`。没有显式配置的时段也使用基础位置。场景时段切换时更新标记、姓名牌、占格和交互；玩家当前格优先，遇到运行时抢格时移动 NPC 尝试基础位置，仍不安全则暂不显示。跨区抵达按旅行耗时后的时段选择目的地图日程。
+
+NPC 当前坐标是由地图、时钟和人物日程派生的临时运行状态，不写入 v1 存档。读档恢复后使用 `elapsedGameMinutes` 重建历法时段，再按快照地图/玩家格/有效遭遇解析占位；因此 R15 及更早 v1 存档无需新增字段或迁移。
+
 ## 变更记录
 
 | 日期 | 轮次 | 变更 |
@@ -152,3 +171,4 @@ Round 14 之前的 v1 存档缺 `worldSeed` 时固定归一为 `1`，后续再�
 | 2026-09-27 | Round 13 | 增加导师、拜师/授艺/退门资料字段、规则说明及旧资料缺省语义 |
 | 2026-09-27 | Round 14 | 登记必需历法资源与 game-calendar schema，记录月份/时段/照度/耗时契约、语义校验拒绝规则与分钟计数存档 |
 | 2026-09-27 | Round 15 | 登记必需气候资源与 climate schema，记录季节月份分区、天气分布/表现/步耗时和稳定种子存档 |
+| 2026-09-27 | Round 16 | NPC 可选时段日程、跨资源位置校验、基础位置回退、存读档派生与时段占位同步 |

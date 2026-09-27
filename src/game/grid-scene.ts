@@ -16,6 +16,7 @@ import {
   getVisibleOptions,
 } from '../engine/dialogue-runtime';
 import { GameClock } from '../engine/game-calendar';
+import { resolveNpcPlacementsForPlayer } from '../engine/npc-schedule';
 import {
   ClimateRuntime,
   DEFAULT_WORLD_SEED,
@@ -97,13 +98,14 @@ import {
  * the Round 05 battle slice, Round 06 item/trade slice, Round 07 quests,
  * the Round 08 dialogue condition/effect runtime, the Round 09
  * menu/save/settings flow, Round 14 data-driven in-game clock and Round 15
- * seasonal daily climate:
+ * seasonal daily climate and period-driven NPC schedules:
  * successful moves, region travels and the explicit V-key wait advance the
  * calendar (blocked or refused actions cost nothing), the HUD shows the
  * current date/time/period and a depth-sorted daylight wash tints the world
  * layers per period light level; weather adds a deterministic daily tint and
- * procedural rain/snow, and can add time to successful grid steps. Every
- * overlay stays legible.
+ * procedural rain/snow, and can add time to successful grid steps. NPCs
+ * move to their compiled same-map destinations when the calendar period
+ * changes. Every overlay stays legible.
  *
  * Since Round 09 the scene starts from {@link GridStartupData} handed over
  * by the menu scene: either a fresh character (`kind:'new'` with the chosen
@@ -193,6 +195,12 @@ export class GridScene extends Phaser.Scene {
   /** NPCs placed on the current map and their occupied cells. */
   private placedNpcs: PlacedNpc[] = [];
   private occupancy = new NpcOccupancyIndex();
+  /** Calendar period used by the current NPC placement and visual layer. */
+  private lastNpcSchedulePeriodId: string | null = null;
+  private readonly npcVisuals = new Map<string, {
+    marker: Phaser.GameObjects.Container;
+    label: Phaser.GameObjects.Text;
+  }>();
   private dialogues: ReadonlyMap<string, DialogueData> = new Map();
 
   /** Validated progression datasets (assembled by the shared world loader). */
@@ -371,6 +379,8 @@ export class GridScene extends Phaser.Scene {
     // restored (older v1 snapshots lack the field and restart at 0), which
     // the calendar start then re-dates using the *current* month table.
     this.clock = new GameClock(world.calendar, restoredRun?.elapsedGameMinutes ?? 0);
+    this.lastNpcSchedulePeriodId = null;
+    this.npcVisuals.clear();
     this.climateRuntime = new ClimateRuntime(world.climate, world.calendar);
     this.worldSeed = restoredRun?.worldSeed ?? generateWorldSeed();
     this.daylightLayer = null;
@@ -487,6 +497,9 @@ export class GridScene extends Phaser.Scene {
       this.playerCol = map.playerStart.col;
       this.playerRow = map.playerStart.row;
     }
+    this.lastNpcSchedulePeriodId = this.clock.currentPeriod().id;
+    this.placedNpcs = this.resolveNpcPlacements(this.lastNpcSchedulePeriodId);
+    this.occupancy = new NpcOccupancyIndex(this.placedNpcs);
     for (const message of playerWarnings) {
       console.warn(`[optional] ${message}`);
     }
@@ -655,17 +668,31 @@ export class GridScene extends Phaser.Scene {
   private saveWorldReferences(world: LoadedWorld, snapshot: SaveSnapshotV1) {
     const map = world.map;
     const completedEncounters = new Set(snapshot.completedEncounters);
+    const periodId = new GameClock(world.calendar, snapshot.elapsedGameMinutes).currentPeriod().id;
+    const periodNpcs = world.assembly.npcsByPeriod.get(periodId) ?? world.assembly.npcs;
     const maps = new Map([...world.maps.entries()].map(([mapId, regionMap]) => {
-      const occupiedCells = new Set(
-        world.assembly.npcs
-          .filter((npc) => npc.record.mapResourceId === mapId)
-          .map((npc) => `${npc.col},${npc.row}`),
+      const baseNpcs = world.assembly.npcs.filter((npc) => npc.record.mapResourceId === mapId);
+      const scheduledNpcs = periodNpcs.filter((npc) => npc.record.mapResourceId === mapId);
+      const activeEncounters = world.assembly.encounters.filter((encounter) =>
+        encounter.record.mapResourceId === mapId &&
+        (encounter.record.repeatable || !completedEncounters.has(encounter.record.id)),
       );
-      for (const encounter of world.assembly.encounters) {
-        if (encounter.record.mapResourceId === mapId &&
-            (encounter.record.repeatable || !completedEncounters.has(encounter.record.id))) {
-          occupiedCells.add(`${encounter.col},${encounter.row}`);
-        }
+      const npcPlayerPosition = snapshot.mapResourceId === mapId
+        ? snapshot.playerPosition
+        : null;
+      const resolvedNpcs = resolveNpcPlacementsForPlayer({
+        baseNpcs,
+        periodNpcs: scheduledNpcs,
+        mapResourceId: mapId,
+        map: regionMap,
+        playerPosition: npcPlayerPosition,
+        blockedCells: new Set(activeEncounters.map((encounter) => `${encounter.col},${encounter.row}`)),
+      });
+      const occupiedCells = new Set(
+        resolvedNpcs.map((npc) => `${npc.col},${npc.row}`),
+      );
+      for (const encounter of activeEncounters) {
+        occupiedCells.add(`${encounter.col},${encounter.row}`);
       }
       return [mapId, {
         isWalkableCell: (col: number, row: number) => regionMap.canEnter(col, row),
@@ -886,25 +913,87 @@ export class GridScene extends Phaser.Scene {
   /** Draws every placed NPC and its data-driven name label. */
   private renderNpcs(map: GridMap): void {
     this.npcLayer = this.add.container();
-    this.placedNpcs.forEach((npc, index) => {
-      const center = cellCenterOffset(map, npc.col, npc.row);
-      const body = createPixelPerson(
-        this,
-        this.mapOrigin.x + center.x,
-        this.mapOrigin.y + center.y,
-        map.tileSize,
-        NPC_PALETTE[index % NPC_PALETTE.length] ?? NPC_PALETTE[0],
-      );
+    this.npcVisuals.clear();
+    this.placedNpcs.forEach((npc) => this.createNpcVisual(npc, map));
+  }
 
-      const label = this.registerScaledText(this.add
-        .text(this.mapOrigin.x + center.x, this.mapOrigin.y + center.y - map.tileSize * 0.42 - 4, npc.record.name, {
-          fontFamily: UI.fontFamily,
-          fontSize: uiFontSize(10),
-          color: UI.textPrimary,
-        })
-        .setOrigin(0.5, 1), 10);
-      this.npcLayer?.add([body, label]);
+  private createNpcVisual(npc: PlacedNpc, map: GridMap): void {
+    const center = cellCenterOffset(map, npc.col, npc.row);
+    const colorIndex = Math.max(
+      0,
+      this.world?.assembly.npcs.findIndex((candidate) => candidate.record.id === npc.record.id) ?? 0,
+    );
+    const marker = createPixelPerson(
+      this,
+      this.mapOrigin.x + center.x,
+      this.mapOrigin.y + center.y,
+      map.tileSize,
+      NPC_PALETTE[colorIndex % NPC_PALETTE.length] ?? NPC_PALETTE[0],
+    );
+    const label = this.registerScaledText(this.add
+      .text(this.mapOrigin.x + center.x, this.mapOrigin.y + center.y - map.tileSize * 0.42 - 4, npc.record.name, {
+        fontFamily: UI.fontFamily,
+        fontSize: uiFontSize(10),
+        color: UI.textPrimary,
+      })
+      .setOrigin(0.5, 1), 10);
+    this.npcLayer?.add([marker, label]);
+    this.npcVisuals.set(npc.record.id, { marker, label });
+  }
+
+  /** Resolves a compiled period layout against the player's live location. */
+  private resolveNpcPlacements(periodId: string): PlacedNpc[] {
+    const world = this.world;
+    const map = this.map;
+    if (world === null || map === null) return [];
+
+    const compiled = world.assembly.npcsByPeriod.get(periodId) ?? world.assembly.npcs;
+    return resolveNpcPlacementsForPlayer({
+      baseNpcs: world.assembly.npcs,
+      periodNpcs: compiled,
+      mapResourceId: this.currentMapResourceId,
+      map,
+      playerPosition: { col: this.playerCol, row: this.playerRow },
+      blockedCells: new Set(this.encounterCells.keys()),
     });
+  }
+
+  /** Repositions NPCs and rebuilds logical occupancy only when the period changes. */
+  private syncNpcSchedule(animate: boolean): void {
+    const clock = this.clock;
+    const map = this.map;
+    if (clock === null || map === null) return;
+    const periodId = clock.currentPeriod().id;
+    if (this.lastNpcSchedulePeriodId === periodId) return;
+    this.lastNpcSchedulePeriodId = periodId;
+
+    const nextNpcs = this.resolveNpcPlacements(periodId);
+    this.placedNpcs = nextNpcs;
+    this.occupancy = new NpcOccupancyIndex(nextNpcs);
+    const nextById = new Map(nextNpcs.map((npc) => [npc.record.id, npc]));
+    for (const [npcId, visual] of this.npcVisuals) {
+      const npc = nextById.get(npcId);
+      if (npc === undefined) {
+        this.tweens.killTweensOf(visual.marker);
+        this.tweens.killTweensOf(visual.label);
+        visual.marker.setVisible(false);
+        visual.label.setVisible(false);
+        continue;
+      }
+      visual.marker.setVisible(true);
+      visual.label.setVisible(true);
+      const center = cellCenterOffset(map, npc.col, npc.row);
+      const x = this.mapOrigin.x + center.x;
+      const y = this.mapOrigin.y + center.y;
+      if (animate) {
+        this.tweens.add({ targets: visual.marker, x, y, duration: 420 });
+        this.tweens.add({ targets: visual.label, x, y: y - map.tileSize * 0.42 - 4, duration: 420 });
+      } else {
+        visual.marker.setPosition(x, y);
+        visual.label.setPosition(x, y - map.tileSize * 0.42 - 4);
+      }
+    }
+    this.updateInteractHint();
   }
 
   private buildHud(
@@ -1047,6 +1136,7 @@ export class GridScene extends Phaser.Scene {
     this.updateTimeHud();
     this.updateDaylight(true);
     this.updateClimatePresentation(true);
+    this.syncNpcSchedule(true);
   }
 
   /** V key: wait in place. Blocked by any open overlay or in-flight move. */
@@ -1830,7 +1920,12 @@ export class GridScene extends Phaser.Scene {
       this.showRegionNotice(`关口「${transition.name}」的落点不可通行。`);
       return;
     }
-    const occupiedByNpc = world.assembly.npcs.some((npc) =>
+    const travelMinutes = this.clock?.calendar.actionCosts.travelMinutes ?? 0;
+    const arrivalClock = new GameClock(world.calendar, this.clock?.elapsedMinutes ?? 0);
+    arrivalClock.advance(travelMinutes);
+    const arrivalPeriodId = arrivalClock.currentPeriod().id;
+    const arrivalNpcs = world.assembly.npcsByPeriod.get(arrivalPeriodId) ?? world.assembly.npcs;
+    const occupiedByNpc = arrivalNpcs.some((npc) =>
       npc.record.mapResourceId === transition.to.mapResourceId &&
       npc.col === transition.to.col && npc.row === transition.to.row,
     );
@@ -1850,16 +1945,13 @@ export class GridScene extends Phaser.Scene {
     this.mapLayer = null;
     this.npcLayer = null;
     this.encounterLayer = null;
+    this.npcVisuals.clear();
     this.encounterMarkers.clear();
 
     this.currentMapResourceId = transition.to.mapResourceId;
     this.map = destinationMap;
     this.playerCol = transition.to.col;
     this.playerRow = transition.to.row;
-    this.placedNpcs = world.assembly.npcs.filter(
-      (npc) => npc.record.mapResourceId === this.currentMapResourceId,
-    );
-    this.occupancy = new NpcOccupancyIndex(this.placedNpcs);
     this.encounters = world.assembly.encounters.filter(
       (encounter) => encounter.record.mapResourceId === this.currentMapResourceId,
     );
@@ -1869,6 +1961,9 @@ export class GridScene extends Phaser.Scene {
         encounter,
       ]),
     );
+    this.lastNpcSchedulePeriodId = arrivalPeriodId;
+    this.placedNpcs = this.resolveNpcPlacements(arrivalPeriodId);
+    this.occupancy = new NpcOccupancyIndex(this.placedNpcs);
     this.mapOrigin.set(
       (VIEW_WIDTH - destinationMap.pixelWidth) / 2,
       HUD_HEIGHT + (VIEW_HEIGHT - HUD_HEIGHT - destinationMap.pixelHeight) / 2,
@@ -1881,7 +1976,7 @@ export class GridScene extends Phaser.Scene {
     this.ensureDaylightLayer(); // The rebuilt world layers must sit below the wash again.
     this.mapNameText?.setText(destinationMap.data.name);
     this.updateCoordsHud();
-    this.advanceTime(this.clock?.calendar.actionCosts.travelMinutes ?? 0);
+    this.advanceTime(travelMinutes);
     this.showRegionNotice(`已抵达「${destinationMap.data.name}」。`);
     this.triggerRegionEvents();
   }

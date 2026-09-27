@@ -59,6 +59,32 @@
           "questGiver": {
             "description": "可选：该 NPC 可发布任务（Round 07）。玩家与其相邻按 E 打开任务名录；缺省为 false。",
             "type": "boolean"
+          },
+          "schedule": {
+            "description": "可选：按历法时段声明地图内位置（Round 16）；未声明当前时段时回到基础 position。",
+            "type": "array",
+            "maxItems": 24,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["periodId", "position"],
+              "properties": {
+                "periodId": {
+                  "description": "日历时段 id，必须在必需的 game-calendar 资源中声明。",
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+                },
+                "position": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["col", "row"],
+                  "properties": {
+                    "col": { "type": "integer", "minimum": 0 },
+                    "row": { "type": "integer", "minimum": 0 }
+                  }
+                }
+              }
+            }
           }
         }
       }

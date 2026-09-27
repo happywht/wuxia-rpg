@@ -60,6 +60,7 @@ import {
   parseNpcSet,
   type PlacedNpc,
 } from '../engine/npc-placement';
+import { compileNpcSchedules } from '../engine/npc-schedule';
 import {
   assembleBattleEncounters,
   type BattleEncounterSetData,
@@ -157,6 +158,8 @@ export interface ProgressionAssembly {
 /** Everything the playable world needs after optional-content assembly. */
 export interface WorldAssembly {
   npcs: PlacedNpc[];
+  /** Time-of-day NPC placements compiled against the loaded calendar. */
+  npcsByPeriod: ReadonlyMap<string, readonly PlacedNpc[]>;
   dialogues: ReadonlyMap<string, DialogueData>;
   progression: ProgressionAssembly;
   encounters: PlacedEncounter[];
@@ -369,7 +372,11 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
     const knowledgeResult = assembleKnowledgeGraphContent(result.resources);
     const calendarPeriodIds = new Set(parsedCalendar.calendar.periods.map((period) => period.id));
     const assembly = assembleOptionalContent(
-      result.resources, maps, new Set(knowledgeResult.graph.nodes.keys()), calendarPeriodIds,
+      result.resources,
+      maps,
+      new Set(knowledgeResult.graph.nodes.keys()),
+      calendarPeriodIds,
+      parsedCalendar.calendar.periods,
     );
     assembly.warnings.push(...knowledgeResult.warnings);
     const overlapWarnings: string[] = [];
@@ -512,6 +519,7 @@ function assembleOptionalContent(
   maps: ReadonlyMap<string, GridMap>,
   knowledgeNodeIds: ReadonlySet<string>,
   timeOfDayPeriodIds: ReadonlySet<string>,
+  calendarPeriods: GameCalendarData['periods'],
 ): WorldAssembly {
   const warnings: Diagnostic[] = [];
 
@@ -717,6 +725,31 @@ function assembleOptionalContent(
     });
   }
 
+  // Compile one safe NPC layout per declared calendar period. The base
+  // placements remain the stable cast registry for quests/factions; runtime
+  // scenes choose the current period's layout from the clock.
+  const encounterBlocksByMap = new Map<string, Set<string>>();
+  for (const encounter of encounters) {
+    const blocked = encounterBlocksByMap.get(encounter.record.mapResourceId) ?? new Set<string>();
+    blocked.add(`${encounter.col},${encounter.row}`);
+    encounterBlocksByMap.set(encounter.record.mapResourceId, blocked);
+  }
+  const npcSchedules = compileNpcSchedules({
+    npcs: allNpcs,
+    periods: calendarPeriods,
+    maps,
+    blockedCellsByMap: encounterBlocksByMap,
+  });
+  for (const message of npcSchedules.warnings) {
+    warnings.push({
+      resource: NPC_RESOURCE_ID,
+      origin: 'npc-schedule',
+      severity: 'warning',
+      message,
+      details: [],
+    });
+  }
+
   let questSet: QuestSetData | null = null;
   const questResource = resources.get(QUEST_RESOURCE_ID);
   if (questResource !== undefined) {
@@ -808,6 +841,7 @@ function assembleOptionalContent(
 
   return {
     npcs: allNpcs,
+    npcsByPeriod: npcSchedules.placementsByPeriod,
     dialogues: dialogueReferences.conversations,
     progression,
     encounters,
