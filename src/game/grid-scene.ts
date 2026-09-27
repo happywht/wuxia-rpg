@@ -152,6 +152,7 @@ import { type GameSettings, applyGameSettings, loadGameSettings, uiFontSize } fr
 import { ModStatusPanel } from './mod-status-ui';
 import { createPixelPerson, UI_FONT_FAMILY } from './ui-theme';
 import { type GridStartupData } from './menu-scene';
+import { subscribeDataChanges, type DataChangeBatch, type UnsubscribeDataChanges } from './data-hot-reload';
 import {
   type LoadedWorld,
   type ProgressionAssembly,
@@ -391,6 +392,21 @@ export class GridScene extends Phaser.Scene {
   private mapNameText: Phaser.GameObjects.Text | null = null;
   private readonly scaledTextTargets: { text: Phaser.GameObjects.Text; base: number }[] = [];
 
+  /**
+   * Round 36 dev data hot reload. `pendingDataReload` latches a change that
+   * arrived mid-move/mid-battle/behind an overlay until a safe boundary
+   * (move tween completion or overlay close) retries it; `dataReloading`
+   * locks exploration input while the new world is being assembled;
+   * `dataReloadToken` drops results of superseded reloads or of a reload
+   * whose scene shut down mid-await; `hotReloadSnapshot` carries the
+   * pre-checked run snapshot into the next setupWorld (consumed once).
+   */
+  private dataReloadToken = 0;
+  private pendingDataReload = false;
+  private dataReloading = false;
+  private hotReloadSnapshot: SaveSnapshotV1 | null = null;
+  private unsubscribeDataChanges: UnsubscribeDataChanges | null = null;
+
   constructor() {
     super('grid');
   }
@@ -414,6 +430,7 @@ export class GridScene extends Phaser.Scene {
     applyGameSettings(this.game, this.settings);
 
     this.bindMovementKeys();
+    this.subscribeDataHotReload();
     this.add
       .text(VIEW_WIDTH / 2, VIEW_HEIGHT / 2, '正在加载地图数据…', {
         fontFamily: UI.fontFamily,
@@ -431,6 +448,7 @@ export class GridScene extends Phaser.Scene {
       return;
     }
     this.setupWorld(outcome.world);
+    void this.runPendingDataReload(); // A JSON edit may arrive during the initial load.
   }
 
   /**
@@ -457,7 +475,20 @@ export class GridScene extends Phaser.Scene {
         })
       | null = null;
 
-    if (this.startup?.kind === 'load' && this.startup.slotId !== undefined) {
+    if (this.hotReloadSnapshot !== null) {
+      // Round 36 data hot reload: restore from the in-memory snapshot the
+      // reload preflight already sanitized against this exact world. The
+      // branch runs before the slot path because a hot reload replaces the
+      // startup semantics for this setupWorld call only (consumed once).
+      const planned = this.hotReloadSnapshot;
+      this.hotReloadSnapshot = null;
+      const restoration = this.restorePlannedSnapshot(world, planned);
+      if (restoration === null) {
+        return; // Defensive: the preflight already refused incompatible data.
+      }
+      restoredRun = restoration.run;
+      playerWarnings.push(...restoration.warnings);
+    } else if (this.startup?.kind === 'load' && this.startup.slotId !== undefined) {
       const restoration = this.restoreFromSlot(world, this.startup.slotId);
       if (restoration === null) {
         return; // The readable failure panel is already on screen.
@@ -766,10 +797,46 @@ export class GridScene extends Phaser.Scene {
       console.warn(`[save] ${warning}`);
     }
 
-    const profile = world.assembly.progression.profiles.get(read.snapshot.profileId);
+    const restoration = this.restorePlannedSnapshot(world, plan.snapshot);
+    if (restoration === null) {
+      return null; // The readable failure panel is already on screen.
+    }
+    console.info(
+      '[save] 已从 %s 读档：%s Lv.%d（位置 %d,%d，银两 %d）',
+      slotId,
+      read.snapshot.displayName,
+      restoration.run.character.level,
+      read.snapshot.playerPosition.col,
+      read.snapshot.playerPosition.row,
+      restoration.run.inventory.currency,
+    );
+    return { run: restoration.run, warnings: plan.warnings };
+  }
+
+  /**
+   * Restores an already-sanitized snapshot against the given world. Shared
+   * by the slot-load path (read → preflight → restore) and the Round 36 dev
+   * hot reload (capture → preflight against the freshly loaded world →
+   * rebuild), so both rebuild run state through exactly one code path.
+   */
+  private restorePlannedSnapshot(
+    world: LoadedWorld,
+    planned: SaveSnapshotV1,
+  ): {
+    run: RestoredRunState & {
+      profileId: string;
+      displayName: string;
+      mapResourceId: string;
+      playerPosition: { col: number; row: number };
+      elapsedGameMinutes: number;
+      worldSeed: number;
+    };
+    warnings: string[];
+  } | null {
+    const profile = world.assembly.progression.profiles.get(planned.profileId);
     if (profile === undefined) {
-      // Defensive: the preflight above already guarantees this exists.
-      this.showErrorState('读档失败', [`存档引用的角色模板 "${read.snapshot.profileId}" 不可用。`], true);
+      // Defensive: preflight callers already guarantee this exists.
+      this.showErrorState('读档失败', [`存档引用的角色模板 "${planned.profileId}" 不可用。`], true);
       return null;
     }
     const restored = restoreRunState({
@@ -777,28 +844,19 @@ export class GridScene extends Phaser.Scene {
       items: world.assembly.items,
       quests: world.assembly.quests,
       shops: world.assembly.shops,
-      snapshot: plan.snapshot,
+      snapshot: planned,
     });
-    console.info(
-      '[save] 已从 %s 读档：%s Lv.%d（位置 %d,%d，银两 %d）',
-      slotId,
-      read.snapshot.displayName,
-      restored.character.level,
-      read.snapshot.playerPosition.col,
-      read.snapshot.playerPosition.row,
-      restored.inventory.currency,
-    );
     return {
       run: {
         ...restored,
-        profileId: read.snapshot.profileId,
-        displayName: read.snapshot.displayName,
-        mapResourceId: read.snapshot.mapResourceId,
-        playerPosition: { ...read.snapshot.playerPosition },
-        elapsedGameMinutes: read.snapshot.elapsedGameMinutes,
-        worldSeed: read.snapshot.worldSeed,
+        profileId: planned.profileId,
+        displayName: planned.displayName,
+        mapResourceId: planned.mapResourceId,
+        playerPosition: { ...planned.playerPosition },
+        elapsedGameMinutes: planned.elapsedGameMinutes,
+        worldSeed: planned.worldSeed,
       },
-      warnings: plan.warnings,
+      warnings: [],
     };
   }
 
@@ -889,11 +947,30 @@ export class GridScene extends Phaser.Scene {
 
   /** Captures the live run into one slot; readable feedback for the pause menu. */
   private saveToSlot(slotId: SaveSlotId): { ok: boolean; message: string } {
-    if (this.storage === null || this.playerState === null || this.inventory === null) {
+    const snapshot = this.buildRunSnapshot();
+    if (this.storage === null || snapshot === null) {
       return { ok: false, message: '浏览器本地存储不可用或当前无可保存的进度' };
     }
+    const result = writeSaveSlot(this.storage, slotId, snapshot);
+    if (result.ok) {
+      console.info('[save] 已保存到 %s（%s）', slotId, result.savedAt);
+      return { ok: true, message: `保存成功（${snapshot.displayName} Lv.${snapshot.player.level}）` };
+    }
+    console.warn('[save] 保存失败：', result.message);
+    return { ok: false, message: result.message };
+  }
+
+  /**
+   * Captures the complete run state as a v1 snapshot (null while no profile
+   * is playable). Shared by saving and the Round 36 hot reload, so both see
+   * the exact same serialization of progress.
+   */
+  private buildRunSnapshot(): SaveSnapshotV1 | null {
+    if (this.playerState === null || this.inventory === null) {
+      return null;
+    }
     this.syncKnowledgeFromRunFacts();
-    const snapshot = captureSaveSnapshot({
+    return captureSaveSnapshot({
       displayName: this.playerDisplayName,
       mapResourceId: this.currentMapResourceId,
       playerCol: this.playerCol,
@@ -915,13 +992,113 @@ export class GridScene extends Phaser.Scene {
       customMartialArts: this.customMartialArts,
       achievementState: this.achievementState,
     });
-    const result = writeSaveSlot(this.storage, slotId, snapshot);
-    if (result.ok) {
-      console.info('[save] 已保存到 %s（%s）', slotId, result.savedAt);
-      return { ok: true, message: `保存成功（${snapshot.displayName} Lv.${snapshot.player.level}）` };
+  }
+
+  // -------------------------------------------------------------------------
+  // Round 36 dev data hot reload
+  // -------------------------------------------------------------------------
+
+  /**
+   * Dev-only subscription, mirroring the menu scene: the static DEV guard
+   * folds to `null` in production builds (tree-shaking the bridge module),
+   * and SHUTDOWN detaches the listener while expiring any in-flight reload.
+   */
+  private subscribeDataHotReload(): void {
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.dataReloadToken += 1; // Expire any reload awaiting loadWorldData.
+      this.dataReloading = false;
+      this.input.enabled = true;
+      this.unsubscribeDataChanges?.();
+      this.unsubscribeDataChanges = null;
+    });
+    this.unsubscribeDataChanges = import.meta.env.DEV
+      ? subscribeDataChanges((batch) => this.onWorldDataChanged(batch))
+      : null;
+  }
+
+  /** Latches a merged data change batch; runs the reload at a safe boundary. */
+  private onWorldDataChanged(batch: DataChangeBatch): void {
+    console.info(
+      '[data-hmr] 世界资料变更（%s），等待安全边界后热重载…',
+      batch.map((notice) => `${notice.layer}/${notice.relative}:${notice.changeType}`).join('、'),
+    );
+    this.pendingDataReload = true;
+    if (this.world === null || this.dataReloading) {
+      return; // Retry after initial loading or the in-flight reload finishes.
     }
-    console.warn('[save] 保存失败：', result.message);
-    return { ok: false, message: result.message };
+    void this.runPendingDataReload();
+  }
+
+  /** True when no move tween, battle session or overlay holds the run state. */
+  private canReloadWorldNow(): boolean {
+    return !this.moving && this.activeSession === null && !this.anyOverlayOpen();
+  }
+
+  /**
+   * Applies a latched data change at the next safe boundary: captures the
+   * run snapshot, reloads the world through the shared loader, preflights
+   * the snapshot against the new data and rebuilds the scene around it in
+   * one atomic setupWorld. Any failure keeps the complete old run — the
+   * world fields are only replaced after the whole pipeline succeeded, and
+   * the visible failure notice names the reason (details in the console).
+   */
+  private async runPendingDataReload(): Promise<void> {
+    if (!this.pendingDataReload || this.dataReloading || this.world === null) {
+      return;
+    }
+    if (!this.canReloadWorldNow()) {
+      return; // Retried from move completion / overlay close hooks.
+    }
+    this.pendingDataReload = false;
+    const snapshot = this.buildRunSnapshot();
+    const token = ++this.dataReloadToken;
+    this.dataReloading = true;
+    this.input.enabled = false; // Lock every scene input while the atomic refresh runs.
+    const outcome = await loadWorldData();
+    if (token !== this.dataReloadToken) {
+      return; // Superseded by a newer reload, or the scene shut down.
+    }
+    this.dataReloading = false;
+    this.input.enabled = true;
+    if (this.pendingDataReload) {
+      // A second edit landed while the loader was awaiting fetches; skip this
+      // now-stale assembly and immediately load the newest filesystem state.
+      void this.runPendingDataReload();
+      return;
+    }
+    if (!outcome.ok) {
+      this.reportDataReloadFailure(outcome.title, outcome.lines);
+      return;
+    }
+    let restoreSnapshot: SaveSnapshotV1 | null = null;
+    if (snapshot !== null) {
+      const plan = planSnapshotRestore(
+        snapshot,
+        this.saveWorldReferences(outcome.world, snapshot),
+      );
+      if (!plan.ok) {
+        this.reportDataReloadFailure(
+          '当前进度与新资料不兼容（角色模板、地图或站位无法恢复）',
+          plan.errors,
+        );
+        return;
+      }
+      for (const warning of plan.warnings) {
+        console.warn(`[data-hmr] ${warning}`);
+      }
+      restoreSnapshot = plan.snapshot;
+    }
+    this.hotReloadSnapshot = restoreSnapshot;
+    this.setupWorld(outcome.world);
+    this.showRegionNotice(restoreSnapshot === null
+      ? '世界资料已重新装配。'
+      : `世界资料已热重载（${restoreSnapshot.displayName} Lv.${restoreSnapshot.player.level}，位置与进度已保留）。`);
+  }
+
+  /** Readable hot-reload failure: old run stays live, reason reaches the HUD. */
+  private reportDataReloadFailure(title: string, details: readonly string[]): void {
+    console.warn(`[data-hmr] 资料热重载未应用：${title}`, details);
+    this.showRegionNotice(`资料热重载未应用：${title}。旧世界与进度已保留，详情见控制台。`);
   }
 
   /** Leaves the run and hands control back to the main menu scene. */
@@ -939,10 +1116,14 @@ export class GridScene extends Phaser.Scene {
     this.lastOverlayCloseAt = this.time.now;
     this.refreshScaledTextTargets();
     this.updateInteractHint();
+    void this.runPendingDataReload(); // Safe boundary for a latched data change.
   }
 
   /** Escape while exploring: toggle the pause menu (never over another overlay). */
   private togglePauseMenu(): void {
+    if (this.dataReloading) {
+      return; // The world is being rebuilt around a hot reload right now.
+    }
     if (this.factionPanel?.isOpen) {
       this.factionPanel.close();
       this.noteOverlayClosed();
@@ -1738,7 +1919,7 @@ export class GridScene extends Phaser.Scene {
   /** V key: wait in place. Blocked by any open overlay or in-flight move. */
   private handleWait(): void {
     const clock = this.clock;
-    if (clock === null || this.moving || this.anyOverlayOpen()) {
+    if (clock === null || this.moving || this.anyOverlayOpen() || this.dataReloading) {
       return;
     }
     const minutes = clock.calendar.actionCosts.waitMinutes;
@@ -2636,8 +2817,8 @@ export class GridScene extends Phaser.Scene {
    * talks; next comes a four-way adjacent encounter, then a data-driven gate.
    */
   private handleInteraction(): void {
-    if (this.anyOverlayOpen()) {
-      return; // Whichever overlay is open owns the keyboard.
+    if (this.anyOverlayOpen() || this.dataReloading) {
+      return; // Whichever overlay is open owns the keyboard; hot reload rebuilds.
     }
     const target = selectInteractionTarget(this.placedNpcs, {
       col: this.playerCol,
@@ -2804,8 +2985,8 @@ export class GridScene extends Phaser.Scene {
    * entry points stay reachable at the same time (Round 08).
    */
   private tryTalk(): void {
-    if (this.anyOverlayOpen()) {
-      return; // Whichever overlay is open owns the keyboard.
+    if (this.anyOverlayOpen() || this.dataReloading) {
+      return; // Whichever overlay is open owns the keyboard; hot reload rebuilds.
     }
     if (this.map === null) {
       return;
@@ -2954,8 +3135,14 @@ export class GridScene extends Phaser.Scene {
   private tryMove(dCol: number, dRow: number): void {
     const map = this.map;
     const marker = this.marker;
-    if (map === null || marker === null || this.moving || this.anyOverlayOpen()) {
-      return; // Also locked while a dialogue, battle, backpack or shop panel is open.
+    if (
+      map === null ||
+      marker === null ||
+      this.moving ||
+      this.anyOverlayOpen() ||
+      this.dataReloading
+    ) {
+      return; // Also locked while a dialogue, battle, backpack or shop panel is open — or a data hot reload is rebuilding the world.
     }
 
     const previousCell = { col: this.playerCol, row: this.playerRow };
@@ -2990,6 +3177,7 @@ export class GridScene extends Phaser.Scene {
         this.moving = false;
         this.refreshCompanionFollower(previousCell);
         this.triggerRegionEvents();
+        void this.runPendingDataReload(); // Safe boundary for a latched data change.
       },
     });
   }

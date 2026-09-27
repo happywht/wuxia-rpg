@@ -4,6 +4,33 @@
 
 ---
 
+## Round 36 — 开发模式资料热重载（2026-09-27，已完成）
+
+### 计划与实现
+
+- 先写 `iterations/round-36/plan.md`，计划分四项可验证子任务：Vite 文件事件、安全过滤；客户端批量桥接与菜单刷新；游戏快照预检与运行态重建；专项验证、文档和提交。
+- 新增 `scripts/data-hmr-plugin.mjs`，按 Vite 8 Environment API `hotUpdate` 接收 JSON 文件 add/update/delete；只转发根目录内 `data/`、`mods/` JSON，发送 `wuxia:data-change` 并返回 `[]` 阻止默认模块传播/整页刷新。新增类型化事件 `src/vite-env.d.ts`，插件安装在 `vite.config.ts` 且 `apply: 'serve'`。
+- 新增 `src/game/data-hot-reload.ts`：开发态订阅、80 ms 同文件去重/末次状态合并；退订时清除定时器和 HMR listener。生产构建中事件名、HMR 上下文及桥接导出均不进入 JS bundle。
+- `MenuScene` 收到通知后重读共享 `loadWorldData`，刷新当前页所依赖的角色模板；重载过程中键盘输入关闭，文件更新排队后再跑，初始加载期间发生的更新在首次装配后补跑；SHUTDOWN 取消待处理结果并退订。
+- `GridScene` 收到通知后先排队，待无移动/战斗/面板时关闭全部场景输入；用共享快照捕获器取得内存 `SaveSnapshotV1`（不写任何用户槽），完整重读和组装 manifest，再由 `planSnapshotRestore` 预检，通过后走共用 `restoreRunState` 恢复。跨资源内容变化时重新装配全世界以保持引用闭合；进行中的二次编辑和初始加载期间的编辑都会触发后续重载。失败时只显示提示并记录诊断，旧世界与运行状态不替换。
+- 补全 `README.md`、`docs/ARCHITECTURE.md`、`docs/DATA-GUIDE.md`、`docs/REFERENCES.md`、CHANGELOG 和路线图。Vite 的 `hotUpdate`/客户端自定义事件 API 来源记入 `REFERENCES.md` #13；不添加运行时依赖，不改 `data/`、`mods/` 内容。
+
+### 验证
+
+- `npm run smoke:round-36`：通过（exit 0）。安全路径分类覆盖 data/schema/MOD JSON、源码、非 JSON、点目录、越界与 slash-normalized 路径；fake Environment 验证更新/新增/删除自定义事件及空模块列表；客户端 HMR bridge 验证 80 ms 批次、同文件末次状态、退订和待发批次取消、生产 no-op。随后以真实 Vite dev server 和 WebSocket 改写相同字节的 manifest、临时创建/删除 MOD JSON、创建/删除非 JSON，确认 data 修改与 MOD 增删事件正确、全程无 `full-reload`；临时生产构建确认无 HMR event/`import.meta.hot` 字符串且 `data/base/manifest.json` 正常发布。临时 fixture/探针均清理。
+- 初次烟测前序运行通过，但生产剔除检查之后一条源码断言假设 `subscribeDataChanges` 必须与 DEV 判断处在同一行，和实际多行格式不符而失败；将断言改为跨行结构匹配后完整复跑，最终 exit 0。
+- `npm run typecheck`：通过（`tsc --noEmit` 无输出）。`npm run validate:data`：通过（manifest + 26 个基础资源 Schema）。`npm run inspect:mods`：通过（26 项资源、0 问题、真实 manifest 未启用 MOD）。
+- `npm run build`：通过（Vite 8.3.1，130 modules，771 ms）；主 JS 1,881.37 kB / gzip 495.56 kB。Vite 默认 500 kB 分包建议仍存在。
+- 回归 `npm run smoke:round-30`、`smoke:round-31`、`smoke:round-33`、`smoke:round-35` 与 `npm run audit:round-34`：全部 exit 0；R30 单独运行通过。
+- `git diff --check`：通过。Round 36 实际浏览器内 UI/移动后热重载和存档兼容恢复未手动演练；已通过真实 Vite HMR WebSocket 级验证与引擎现有保存/恢复通路的类型、回归检查。
+
+### 未实现/限制
+
+- 每次资料变化当前重新读取并装配整个 manifest 世界，未做单个 schema 家族的增量缓存；该选择保证跨资源引用一致，26 项基础资源下成本可接受。
+- 开发热重载只适用于 `npm run dev`；production/preview 不包含热重载桥接。
+
+---
+
 ## Round 35 — MOD 优先级、来源追踪与作者工作流（2026-09-27，已完成）
 
 ### 计划与实现

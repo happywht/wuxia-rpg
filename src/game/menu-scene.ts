@@ -42,6 +42,7 @@ import {
   volumeLabel,
 } from './settings';
 import { loadWorldData } from './world-loader';
+import { subscribeDataChanges, type UnsubscribeDataChanges } from './data-hot-reload';
 import { addPixelPanelChrome, addPixelSelection, UI_FONT_FAMILY } from './ui-theme';
 
 const VIEW_WIDTH = 960;
@@ -105,6 +106,15 @@ export class MenuScene extends Phaser.Scene {
   private slotsMessage: string | null = null;
   private feedback: string | null = null;
 
+  /**
+   * Round 36 dev data hot reload: the token drops results of a superseded
+   * world reload; the unsubscribe handle detaches the dev listener.
+   */
+  private dataReloadToken = 0;
+  private dataReloadPending = false;
+  private dataReloading = false;
+  private unsubscribeDataChanges: UnsubscribeDataChanges | null = null;
+
   private readonly bindings: { key: Phaser.Input.Keyboard.Key; handler: () => void }[] = [];
 
   constructor() {
@@ -117,6 +127,7 @@ export class MenuScene extends Phaser.Scene {
     applyGameSettings(this.game, this.settings);
 
     this.bindKeys();
+    this.subscribeDataHotReload();
     this.showLoading();
     void this.loadWorld();
   }
@@ -128,12 +139,94 @@ export class MenuScene extends Phaser.Scene {
       this.errorLines = outcome.lines;
       this.page = 'error';
       this.renderPage();
+      void this.runPendingDataReload(); // A JSON edit may arrive during the initial load.
       return;
     }
     this.profiles = [...outcome.world.assembly.progression.profiles.values()];
     this.page = 'home';
     this.homeSelection = 0;
     this.renderPage();
+    void this.runPendingDataReload();
+  }
+
+  // -------------------------------------------------------------------------
+  // Round 36 dev data hot reload
+  // -------------------------------------------------------------------------
+
+  /**
+   * Dev-only subscription to world-data changes. The static DEV guard folds
+   * to `null` in production builds, which tree-shakes the bridge module out
+   * of the bundle entirely; shutdown detaches the dev listener synchronously
+   * (the subscription itself is synchronous, so no async race exists).
+   */
+  private subscribeDataHotReload(): void {
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.dataReloadToken += 1;
+      this.dataReloadPending = false;
+      this.dataReloading = false;
+      this.input.enabled = true;
+      this.unsubscribeDataChanges?.();
+      this.unsubscribeDataChanges = null;
+    });
+    this.unsubscribeDataChanges = import.meta.env.DEV
+      ? subscribeDataChanges(() => {
+        this.dataReloadPending = true;
+        void this.runPendingDataReload();
+      })
+      : null;
+  }
+
+  /**
+   * Re-runs the shared world loader and refreshes whichever page the player
+   * is looking at: template lists, the no-template notice and the error page
+   * all reflect the new data without a browser reload. A concurrent reload
+   * is merged by only adopting the newest token's result.
+   */
+  private async runPendingDataReload(): Promise<void> {
+    if (!this.dataReloadPending || this.dataReloading || this.page === 'loading') {
+      return; // Initial/concurrent assembly finishes before the pending refresh retries.
+    }
+    const token = ++this.dataReloadToken;
+    const resumePage: MenuPage = this.page === 'error' ? 'home' : this.page;
+    this.dataReloading = true;
+    this.input.enabled = false;
+    try {
+      while (this.dataReloadPending) {
+        this.dataReloadPending = false;
+        this.page = 'loading';
+        this.renderPage();
+        const outcome = await loadWorldData();
+        if (token !== this.dataReloadToken) {
+          return; // Scene shutdown invalidated this request.
+        }
+        if (this.dataReloadPending) {
+          continue; // A newer edit arrived while loading; discard this stale result.
+        }
+        if (!outcome.ok) {
+          this.errorTitle = outcome.title;
+          this.errorLines = outcome.lines;
+          this.page = 'error';
+          this.renderPage();
+          console.warn('[data-hmr] 主菜单资料热重载失败：', outcome.title, outcome.lines);
+          continue;
+        }
+        this.profiles = [...outcome.world.assembly.progression.profiles.values()];
+        this.profileSelection = this.profiles.length > 0
+          ? Math.min(this.profileSelection, this.profiles.length - 1)
+          : 0;
+        this.page = resumePage;
+        this.renderPage();
+        console.info('[data-hmr] 主菜单资料已热重载：可用角色模板 %d 个', this.profiles.length);
+      }
+    } finally {
+      if (token === this.dataReloadToken) {
+        this.dataReloading = false;
+        this.input.enabled = true;
+      }
+      if (this.dataReloadPending && this.page !== 'loading') {
+        void this.runPendingDataReload();
+      }
+    }
   }
 
   // -------------------------------------------------------------------------

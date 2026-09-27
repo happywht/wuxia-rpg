@@ -4,6 +4,17 @@
 
 ## [Unreleased]
 
+### Added (Round 36)
+
+- 开发服务器新增 Vite 8 Environment API `hotUpdate` 插件：仓库内 `data/**/*.json` 与 `mods/**/*.json` 的新增、修改、删除广播 `wuxia:data-change`，自定义处理后不触发 Vite 整页刷新；源码、非 JSON 与仓库外路径不转发。
+- 菜单和游戏场景接入开发态资料热重载。菜单更新当前角色模板；游戏在输入锁定且离开移动/战斗/面板状态后重载并重新组装 manifest 全集，通过内存 `SaveSnapshotV1` 与现有存档预检恢复兼容的角色进度，不写用户存档槽。初始载入或热重载中再次发生的文件变更会排队再次加载；不兼容或关键资料失效时保留旧世界与运行字段并提示原因。
+- 新增 `npm run smoke:round-36`：覆盖路径分类、真实 Vite HMR WebSocket 修改/创建/删除事件、通知合并/退订、数据 JSON 变更不整页刷新，以及生产构建不含客户端热重载桥接；临时探针均清理。
+- 更新 Vite HMR 架构/资料指南、README、引用来源、路线图及开发日志，明确整世界重读的跨资源一致性策略、热重载安全边界和生产限制。
+
+### Verification (Round 36)
+
+- `npm run smoke:round-36`、`npm run typecheck`、`npm run validate:data`、`npm run inspect:mods`、`npm run build`、`npm run smoke:round-30`、`npm run smoke:round-31`、`npm run smoke:round-33`、`npm run smoke:round-35`、`npm run audit:round-34`、`git diff --check`：通过；构建体积及真实 Vite 演练详情见 `DEVLOG.md`。
+
 ### Added (Round 35)
 
 - **MOD 优先级与来源追踪**：`DataLoadResult` 新增 `enabledMods`（manifest 声明顺序原样暴露）；`LoadedResource` 携带 manifest 相对 `path`；成功装配的 `LoadedWorld` 新增 `enabledMods`、`resourceSources`（按 manifest 顺序的每资源最终来源）与 `modDiagnostics`（按 `mod:` origin 过滤）。覆盖语义不变：后声明且校验通过的层获胜，坏覆盖原子回退到上一有效值。

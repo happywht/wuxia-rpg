@@ -124,6 +124,10 @@ function modsDistribution(): Plugin {
               }
               response.statusCode = 200;
               response.setHeader('Content-Type', jsonContentType);
+              // Match the public-dir behaviour (sirv dev mode): always
+              // revalidate so the Round 36 data hot reload fetches the
+              // freshest MOD overrides instead of a heuristic cache entry.
+              response.setHeader('Cache-Control', 'no-cache');
               response.end(contents);
             });
           });
@@ -151,14 +155,26 @@ function modsDistribution(): Plugin {
  * public dir) and are exposed by the plugin above at `/mods/<modId>/…`.
  * If `data/` is removed, Vite skips the missing public directory and the scene
  * reports the failed manifest request in-game.
+ *
+ * Round 36 adds the dev-only data hot-reload plugin (scripts/data-hmr-plugin.mjs):
+ * data/mods JSON changes broadcast a custom HMR event instead of a page
+ * reload. The import is dynamic and untyped because the plugin ships as
+ * plain .mjs on purpose (it is also loaded by the Node-side smoke script);
+ * esbuild inlines it into the bundled config either way.
  */
-export default defineConfig({
-  publicDir: 'data',
-  plugins: [modsDistribution()],
-  server: {
-    port: 5173,
-  },
-  build: {
-    target: 'es2022',
-  },
+export default defineConfig(async () => {
+  // @ts-expect-error the dev plugin is plain .mjs with no type declarations by design
+  const { dataHotReload } = (await import('./scripts/data-hmr-plugin.mjs')) as {
+    dataHotReload: (root: string) => Plugin;
+  };
+  return {
+    publicDir: 'data',
+    plugins: [modsDistribution(), dataHotReload(projectRoot)],
+    server: {
+      port: 5173,
+    },
+    build: {
+      target: 'es2022',
+    },
+  };
 });
