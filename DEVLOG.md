@@ -295,6 +295,13 @@
 - 在线复核：go1980 文章将“击杀不同人物影响结局”归于参与白金版开发者 LEE 的陈述，但仍是单篇媒体转述；ZOL 问答页在指南段落中自称转自百度白金吧，且包含方向键移动、NPC 动作菜单和回合制战斗概述，维持低置信度社区证据；Phaser 官方归档当前列出 v4.2.1。没有据此升级版本或扩展原作事实。
 - 验证：`npm run typecheck`、`npm run build` 和 `git diff --check` 均通过；来源编号扫描确认历史/技术来源连续唯一，A 组引文仍能对应 #1–#5。构建只有既有主 chunk 超过 500 kB 的非阻断提示。
 
+### Round 00 GDD 现状标注复核（2026-09-27）
+
+- 审核发现 GDD 页首仍将状态写为 Round 02，且数据 Schema 概述只列 manifest、地图、NPC 和对话，落后于已完成的 Round 04–07 内容；`manifest.json` 实际登记 10 个资源族，schema 目录包含对应契约及 manifest 契约共 11 份。
+- 将页首改为持续维护且更新至 Round 09；列明 11 份 draft-07 契约，并区分当前 10 项 manifest 资源与知识图谱/结局/世界事件等待接入数据族。没有把未来系统写成已实现。
+- 游戏画布尺寸说明与 `src/main.ts` 的 960×540 / `Phaser.Scale.FIT` 配置一致。
+- 验证：PowerShell 检查确认 10 项 manifest 资源均指向存在的 draft-07 schema，11 份 schema（含 manifest）无未登记文件；GDD 状态和逐项 Schema 名称检查通过；`npm run build`（含 `tsc --noEmit`）及 `git diff --check` 通过。Vite 仍有既有主 chunk 大于 500 kB 的非阻断提示。
+
 ### 产出
 
 - 配置与入口：`package.json`、`tsconfig.json`、`vite.config.ts`、`index.html`、`.gitignore`。

@@ -1,6 +1,6 @@
-# 游戏设计文档（GDD）— 初稿
+# 游戏设计文档（GDD）— 初稿（持续修订）
 
-- 状态：Round 02 设计基线，随迭代逐轮修订
+- 状态：持续维护的设计基线；当前内容更新至 Round 09
 - 上游文档：`iterations/round-00/plan.md`、`docs/ORIGINAL-FIDELITY.md`（本作与原作系列体验的对照及证据分级）
 - 本文档描述的是**原创作品**：不包含、不搬用、不改编任何原作游戏的角色、地名、对话、剧情、源代码或美术/音频素材
 
@@ -79,7 +79,7 @@
 - `src/engine/`：引擎运行时（渲染、循环、加载、校验、存档等通用机制）。**只认识数据协议，不认识任何具体世界内容**。
 - `src/game/`：胶水层，把引擎能力接到 Phaser 场景与 UI。
 - `data/base/`：全部世界观、角色、地图、任务、对话、知识图谱、物品、武学、门派、结局，一律为 JSON 数据。
-- `data/schema/`：数据协议的 JSON Schema；当前 manifest、网格地图、NPC 集合与对话集合已由 Ajv 在加载期校验，其他数据族随内容落地时补 schema。
+- `data/schema/`：数据协议的 JSON Schema。当前包含 `manifest`、`grid-map`、`npc-set`、`dialogue-set`、`character-profiles`、`faction-set`、`martial-arts-set`、`battle-encounters`、`items-set`、`shops-set` 与 `quest-set` 共 11 份契约；基础 manifest 登记的 10 个内容资源均指定对应 schema，由 Round 02 接入的 Ajv 管线在加载基础资料与 MOD 覆盖时校验。尚未进入 manifest 的数据族（如知识图谱、结局和世界事件）仍须在接入前补充 schema。
 - `mods/`：玩家/作者以同名文件覆盖 `data/base/` 内容的轻量 mod 层。
 
 规则：**引擎代码中不出现具体设定文本**（角色名、地名、台词等），一切世界内容以数据进入游戏。详见 `docs/ARCHITECTURE.md` 与 `docs/DATA-GUIDE.md`。
