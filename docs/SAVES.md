@@ -1,8 +1,10 @@
 # 本地存档与设置协议
 
-Round 09 引入本地单机存档；Round 10 扩展到多地图行程与区域事件；Round 11 增加已发现知识词条；Round 13 保存玩家当前门派与师父；Round 14 记录已流逝的游戏内分钟数；Round 15 保存世界气候种子；Round 16 以分钟数派生 NPC 日程位置；Round 17 的条件奇遇复用已完成事件 id 和已发现知识 id，不增加存档字段；Round 18 将逐门派声望保存在 `social.factionRenown`；Round 19 添加当前同行伙伴 id。兼容缺字段的旧 v1 档时同行伙伴归一为 null。存档是运行时状态的版本化 JSON 快照，不是世界资料：不会写回 `data/base/`，也不会被 MOD 覆盖。协议实现位于 `src/engine/save-system.ts`，菜单与游戏场景负责呈现和调用。
+Round 09 引入本地单机存档；Round 10 扩展到多地图行程与区域事件；Round 11 增加已发现知识词条；Round 13 保存玩家当前门派与师父；Round 14 记录已流逝的游戏内分钟数；Round 15 保存世界气候种子；Round 16 以分钟数派生 NPC 日程位置；Round 17 的条件奇遇复用已完成事件 id 和已发现知识 id，不增加存档字段；Round 18 将逐门派声望保存在 `social.factionRenown`；Round 19 添加当前同行伙伴 id；Round 20 加入擂台战绩册。缺字段的旧 v1 档中伙伴归一为 null、擂台战绩归一为空数组。存档是运行时状态的版本化 JSON 快照，不是世界资料：不会写回 `data/base/`，也不会被 MOD 覆盖。协议实现位于 `src/engine/save-system.ts`，菜单与游戏场景负责呈现和调用。
 
 ## 槽位与存储
+
+Round 20 增补 arenaRecords（报名次数、最佳胜场、夺魁次数、最近挑战胜场）；旧 v1 快照缺字段时解析为空数组，因此不要求升级协议版本。
 
 - 使用浏览器 `localStorage`，有三个固定槽位：`slot-1`、`slot-2`、`slot-3`。
 - 键名为 `wuxia-rpg.save.<slotId>`；主音量和文字大小独立存放在 `wuxia-rpg.settings.v1`。
@@ -11,6 +13,8 @@ Round 09 引入本地单机存档；Round 10 扩展到多地图行程与区域�
 - 任何时候均不自动清空其他槽位；删除只作用于玩家明确选择的槽位。
 
 ## 快照内容
+
+Round 20 的 arenaRecords 按擂台 id 保存报名次数、历史最佳胜场、夺魁次数与最近挑战胜场。
 
 每份快照包含 `protocolVersion: 1`、保存时间、角色模板 id、玩家显示名、地图资源 id 与网格坐标，以及以下状态：
 

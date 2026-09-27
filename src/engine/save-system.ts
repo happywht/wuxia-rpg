@@ -72,6 +72,7 @@ import {
   RENOWN_RANGE,
   RELATIONSHIP_RANGE,
 } from './social-state';
+import { parseArenaRecords, type ArenaRecord } from './arena-challenge';
 import type { FactionMembership } from './faction-system';
 import {
   DEFAULT_WORLD_SEED,
@@ -189,6 +190,8 @@ export interface SaveSnapshotV1 {
   worldSeed: number;
   /** Active companion; missing in older v1 saves means no companion. */
   activeCompanionId: string | null;
+  /** Arena record book; absent in pre-R20 v1 saves. */
+  arenaRecords: ArenaRecord[];
 }
 
 // ---------------------------------------------------------------------------
@@ -622,6 +625,8 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
   if (raw.activeCompanionId !== undefined && raw.activeCompanionId !== null && activeCompanionId === null) {
     errors.push('activeCompanionId：应为非空伙伴 id 或 null');
   }
+  const arenaRecords = parseArenaRecords(raw.arenaRecords);
+  if (arenaRecords === null) errors.push('arenaRecords：擂台战绩结构不合规');
 
   if (
     errors.length > 0 ||
@@ -643,6 +648,7 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     renown === null ||
     !factionRenownValid ||
     completedEncounters === null ||
+    arenaRecords === null ||
     completedRegionalEvents === null ||
     knownKnowledgeNodeIds === null ||
     elapsedGameMinutes === null ||
@@ -677,6 +683,7 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     elapsedGameMinutes,
     worldSeed,
     activeCompanionId,
+    arenaRecords,
   };
   return { ok: true, snapshot };
 }
@@ -940,6 +947,8 @@ export interface CaptureInput {
   worldSeed: number;
   /** Optional for older capture callers; omitted means no active companion. */
   activeCompanionId?: string | null;
+  /** Optional for older capture callers; omitted means no arena record. */
+  arenaRecords?: ReadonlyMap<string, ArenaRecord>;
   /** Absent in older callers/snapshots means currently unaffiliated. */
   factionMembership?: FactionMembership | null;
   /** Injectable clock for deterministic tests. */
@@ -997,6 +1006,7 @@ export function captureSaveSnapshot(input: CaptureInput): SaveSnapshotV1 {
     elapsedGameMinutes: Math.max(0, Math.floor(input.elapsedGameMinutes)),
     worldSeed: isWorldSeed(input.worldSeed) ? input.worldSeed : DEFAULT_WORLD_SEED,
     activeCompanionId: input.activeCompanionId ?? null,
+    arenaRecords: [...(input.arenaRecords?.values() ?? [])].map((record) => ({ ...record })),
   };
 }
 
@@ -1343,6 +1353,7 @@ export interface RestoredRunState {
   knownKnowledgeNodeIds: string[];
   factionMembership: FactionMembership | null;
   activeCompanionId: string | null;
+  arenaRecords: ArenaRecord[];
 }
 
 /**
@@ -1440,6 +1451,7 @@ export function restoreRunState(input: RestoreRunInput): RestoredRunState {
       ? null
       : { ...snapshot.player.factionMembership },
     activeCompanionId: snapshot.activeCompanionId ?? null,
+    arenaRecords: snapshot.arenaRecords.map((record) => ({ ...record })),
   };
 }
 

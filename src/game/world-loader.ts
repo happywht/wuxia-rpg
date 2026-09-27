@@ -63,6 +63,12 @@ import {
 } from '../engine/npc-placement';
 import { compileNpcSchedules } from '../engine/npc-schedule';
 import {
+  assembleArenas,
+  parseArenaSet,
+  type ArenaSetData,
+  type AssembledArena,
+} from '../engine/arena-challenge';
+import {
   assembleBattleEncounters,
   type BattleEncounterSetData,
   parseBattleEncounterSet,
@@ -94,6 +100,7 @@ const CHARACTER_PROFILE_RESOURCE_ID = 'character-profile.round-04-set';
 const FACTION_RESOURCE_ID = 'faction.round-04-set';
 const MARTIAL_ART_RESOURCE_ID = 'martial-art.round-04-set';
 const ENCOUNTER_RESOURCE_ID = 'encounter.round-05-set';
+const ARENA_RESOURCE_ID = 'arena.round-20-set';
 const ITEM_RESOURCE_ID = 'item.round-06-set';
 const SHOP_RESOURCE_ID = 'shop.round-06-set';
 const QUEST_RESOURCE_ID = 'quest.round-07-set';
@@ -109,6 +116,7 @@ const OPTIONAL_RESOURCE_IDS = new Set([
   FACTION_RESOURCE_ID,
   MARTIAL_ART_RESOURCE_ID,
   ENCOUNTER_RESOURCE_ID,
+  ARENA_RESOURCE_ID,
   ITEM_RESOURCE_ID,
   SHOP_RESOURCE_ID,
   QUEST_RESOURCE_ID,
@@ -125,6 +133,7 @@ const OPTIONAL_SCHEMA_ORIGINS = new Set([
   'schema:faction-set',
   'schema:martial-arts-set',
   'schema:battle-encounters',
+  'schema:arena-set',
   'schema:items-set',
   'schema:shops-set',
   'schema:quest-set',
@@ -167,6 +176,7 @@ export interface WorldAssembly {
   dialogues: ReadonlyMap<string, DialogueData>;
   progression: ProgressionAssembly;
   encounters: PlacedEncounter[];
+  arenas: AssembledArena[];
   items: ReadonlyMap<string, ItemRecordData>;
   shops: ReadonlyMap<string, AssembledShop>;
   quests: ReadonlyMap<string, QuestData>;
@@ -254,6 +264,10 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
         },
         'battle-encounters': (value) => {
           const parsed = parseBattleEncounterSet(value);
+          return parsed.ok ? [] : parsed.errors;
+        },
+        'arena-set': (value) => {
+          const parsed = parseArenaSet(value);
           return parsed.ok ? [] : parsed.errors;
         },
         'items-set': (value) => {
@@ -734,6 +748,54 @@ function assembleOptionalContent(
     });
   }
 
+  let arenaSet: ArenaSetData | null = null;
+  const arenaResource = resources.get(ARENA_RESOURCE_ID);
+  if (arenaResource !== undefined) {
+    const parsed = parseArenaSet(arenaResource.value);
+    if (!parsed.ok) {
+      warnings.push({
+        resource: ARENA_RESOURCE_ID,
+        origin: 'arena-assembly',
+        severity: 'warning',
+        message: '擂台资料结构不合规，本轮禁用全部擂台',
+        details: parsed.errors,
+      });
+    } else {
+      arenaSet = parsed.set;
+      for (const issue of parsed.errors) warnings.push({
+        resource: ARENA_RESOURCE_ID,
+        origin: 'arena-assembly',
+        severity: 'warning',
+        message: issue,
+        details: [],
+      });
+    }
+  }
+  const arenaAssembly = assembleArenas({
+    set: arenaSet,
+    knownResourceIds: new Set(resources.keys()),
+    maps,
+    spawns: new Map([...maps].map(([id, map]) => [id, map.data.playerStart])),
+    npcCells: new Map([...maps.keys()].map((id) => [
+      id,
+      new Set(allNpcs.filter((npc) => npc.record.mapResourceId === id).map((npc) => npc.col + ',' + npc.row)),
+    ])),
+    encounterCells: new Map([...maps.keys()].map((id) => [
+      id,
+      new Set(encounters.filter((encounter) => encounter.record.mapResourceId === id).map((encounter) => encounter.col + ',' + encounter.row)),
+    ])),
+    profileIds: new Set(progressionAssembled.assembly.profiles.keys()),
+    martialArts: progressionAssembled.assembly.martialArts,
+    itemIds: new Set(itemAssembly.items.keys()),
+  });
+  for (const message of arenaAssembly.warnings) warnings.push({
+    resource: ARENA_RESOURCE_ID,
+    origin: 'arena-assembly',
+    severity: 'warning',
+    message,
+    details: [],
+  });
+
   // Compile one safe NPC layout per declared calendar period. The base
   // placements remain the stable cast registry for quests/factions; runtime
   // scenes choose the current period's layout from the clock.
@@ -742,6 +804,13 @@ function assembleOptionalContent(
     const blocked = encounterBlocksByMap.get(encounter.record.mapResourceId) ?? new Set<string>();
     blocked.add(`${encounter.col},${encounter.row}`);
     encounterBlocksByMap.set(encounter.record.mapResourceId, blocked);
+  }
+  // Arena entrances are fixed world markers too; keep scheduled NPCs from
+  // standing on the interaction point in a later time period.
+  for (const arena of arenaAssembly.arenas) {
+    const blocked = encounterBlocksByMap.get(arena.record.mapResourceId) ?? new Set<string>();
+    blocked.add(String(arena.record.position.col) + ',' + String(arena.record.position.row));
+    encounterBlocksByMap.set(arena.record.mapResourceId, blocked);
   }
   const npcSchedules = compileNpcSchedules({
     npcs: allNpcs,
@@ -881,6 +950,7 @@ function assembleOptionalContent(
     dialogues: dialogueReferences.conversations,
     progression,
     encounters,
+    arenas: arenaAssembly.arenas,
     items: itemAssembly.items,
     shops: shopAssembly.shops,
     quests: questAssembly.quests,

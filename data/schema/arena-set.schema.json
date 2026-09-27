@@ -1,0 +1,113 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wuxia-rpg.invalid/schema/arena-set",
+  "title": "擂台挑战集合",
+  "description": "擂台入口、连续对手、胜利奖励与数据化提示。地图/格位、角色模板、武学和物品引用在运行时逐座校验，单座错误不影响其他内容。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["arenas"],
+  "definitions": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$" },
+    "enemy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "attributes", "health", "qi", "martialArtIds"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 32 },
+        "attributes": {
+          "type": "object", "additionalProperties": false,
+          "required": ["body", "force", "agility", "insight", "resolve"],
+          "properties": {
+            "body": { "type": "integer", "minimum": 1, "maximum": 999 },
+            "force": { "type": "integer", "minimum": 1, "maximum": 999 },
+            "agility": { "type": "integer", "minimum": 1, "maximum": 999 },
+            "insight": { "type": "integer", "minimum": 1, "maximum": 999 },
+            "resolve": { "type": "integer", "minimum": 1, "maximum": 999 }
+          }
+        },
+        "health": { "type": "integer", "minimum": 1, "maximum": 9999 },
+        "qi": { "type": "integer", "minimum": 0, "maximum": 9999 },
+        "martialArtIds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/definitions/id" } }
+      }
+    },
+    "texts": {
+      "type": "object", "additionalProperties": false,
+      "required": ["intro", "victory", "defeat", "flee"],
+      "properties": {
+        "intro": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "victory": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "defeat": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "flee": { "type": "string", "minLength": 1, "maxLength": 200 }
+      }
+    },
+    "ratio": { "type": "number", "minimum": 0, "maximum": 1 }
+  },
+  "properties": {
+    "arenas": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "name", "description", "mapResourceId", "position", "profileId", "opponents", "reward", "texts"],
+        "properties": {
+          "id": { "$ref": "#/definitions/id" },
+          "name": { "type": "string", "minLength": 1, "maxLength": 48 },
+          "description": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "mapResourceId": { "$ref": "#/definitions/id" },
+          "position": {
+            "type": "object", "additionalProperties": false, "required": ["col", "row"],
+            "properties": {
+              "col": { "type": "integer", "minimum": 0, "maximum": 255 },
+              "row": { "type": "integer", "minimum": 0, "maximum": 255 }
+            }
+          },
+          "profileId": { "$ref": "#/definitions/id" },
+          "opponents": {
+            "type": "array", "minItems": 1, "maxItems": 20,
+            "items": {
+              "type": "object", "additionalProperties": false,
+              "required": ["id", "name", "enemy", "victoryExperience", "defeatRecovery", "texts"],
+              "properties": {
+                "id": { "$ref": "#/definitions/id" },
+                "name": { "type": "string", "minLength": 1, "maxLength": 48 },
+                "enemy": { "$ref": "#/definitions/enemy" },
+                "victoryExperience": { "type": "integer", "minimum": 0, "maximum": 1000000 },
+                "defeatRecovery": {
+                  "type": "object", "additionalProperties": false, "required": ["healthRatio", "qiRatio"],
+                  "properties": {
+                    "healthRatio": { "$ref": "#/definitions/ratio" },
+                    "qiRatio": { "$ref": "#/definitions/ratio" }
+                  }
+                },
+                "texts": { "$ref": "#/definitions/texts" }
+              }
+            }
+          },
+          "reward": {
+            "type": "object", "additionalProperties": false, "required": ["currency", "items"],
+            "properties": {
+              "currency": { "type": "integer", "minimum": 0, "maximum": 1000000000 },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object", "additionalProperties": false, "required": ["itemId", "quantity"],
+                  "properties": {
+                    "itemId": { "$ref": "#/definitions/id" },
+                    "quantity": { "type": "integer", "minimum": 1, "maximum": 999 }
+                  }
+                }
+              }
+            }
+          },
+          "texts": {
+            "type": "object", "additionalProperties": false, "required": ["approach", "champion", "retreat"],
+            "properties": {
+              "approach": { "type": "string", "minLength": 1, "maxLength": 200 },
+              "champion": { "type": "string", "minLength": 1, "maxLength": 200 },
+              "retreat": { "type": "string", "minLength": 1, "maxLength": 200 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

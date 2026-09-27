@@ -161,7 +161,7 @@ export function compileNpcSchedules(
       const blocked = blockedCellsByMap?.get(baseNpc.record.mapResourceId);
       if (blocked?.has(cellKey(col, row))) {
         warnings.push(
-          `NPC "${baseNpc.record.id}" 的 ${period.name} 日程与固定遭遇格 (${col}, ${row}) 重叠，该时段回到基础位置`,
+          `NPC "${baseNpc.record.id}" 的 ${period.name} 日程与固定互动格 (${col}, ${row}) 重叠，该时段回到基础位置`,
         );
         continue;
       }

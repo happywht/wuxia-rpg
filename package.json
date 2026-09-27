@@ -8,7 +8,9 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "validate:data": "node scripts/validate-data.mjs",
+    "smoke:round-20": "node scripts/smoke-round-20.mjs"
   },
   "dependencies": {
     "ajv": "^8.20.0",

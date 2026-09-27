@@ -53,6 +53,13 @@ import {
   selectEncounterTarget,
 } from '../engine/turn-based-combat';
 import {
+  arenaOpponentAsEncounter,
+  createArenaRecord,
+  selectArenaTarget,
+  type ArenaRecord,
+  type AssembledArena,
+} from '../engine/arena-challenge';
+import {
   type AssembledShop,
   type InventoryState,
   type ItemRecordData,
@@ -60,6 +67,8 @@ import {
   createInventoryState,
   createShopStockRuntime,
   countItem,
+  additionalCapacityFor,
+  grantItems,
   resolveStartingItems,
 } from '../engine/item-system';
 import {
@@ -95,6 +104,7 @@ import { PauseMenuPanel } from './pause-menu';
 import { ControlsPanel } from './controls-ui';
 import { FactionPanel } from './faction-ui';
 import { CompanionPanel } from './companion-ui';
+import { ArenaPanel } from './arena-ui';
 import { type GameSettings, applyGameSettings, loadGameSettings, uiFontSize } from './settings';
 import { createPixelPerson, UI_FONT_FAMILY } from './ui-theme';
 import { type GridStartupData } from './menu-scene';
@@ -215,6 +225,8 @@ export class GridScene extends Phaser.Scene {
   private dialogues: ReadonlyMap<string, DialogueData> = new Map();
   private companions: LoadedWorld['assembly']['companions'] = new Map();
   private companionState: CompanionState = createCompanionState();
+  private readonly arenaRecords = new Map<string, ArenaRecord>();
+  private activeArenaRun: { arena: AssembledArena; roundIndex: number; wins: number } | null = null;
   private companionFollower: { marker: Phaser.GameObjects.Container; label: Phaser.GameObjects.Text } | null = null;
 
   /** Validated progression datasets (assembled by the shared world loader). */
@@ -286,6 +298,7 @@ export class GridScene extends Phaser.Scene {
   private worldMapPanel: WorldMapPanel | null = null;
   private encyclopediaPanel: EncyclopediaPanel | null = null;
   private companionPanel: CompanionPanel | null = null;
+  private arenaPanel: ArenaPanel | null = null;
   private activeSession: CombatSession | null = null;
   private activeEncounter: PlacedEncounter | null = null;
 
@@ -390,6 +403,11 @@ export class GridScene extends Phaser.Scene {
     this.children.removeAll(true); // Drop the transient loading hint.
     this.scaledTextTargets.length = 0;
     this.world = world;
+    this.arenaRecords.clear();
+    for (const record of restoredRun?.arenaRecords ?? []) {
+      this.arenaRecords.set(record.arenaId, { ...record });
+    }
+    this.activeArenaRun = null;
     // Round 14 clock: elapsed minutes come from the save when one was
     // restored (older v1 snapshots lack the field and restart at 0), which
     // the calendar start then re-dates using the *current* month table.
@@ -553,6 +571,7 @@ export class GridScene extends Phaser.Scene {
 
     this.renderNpcs(activeMap);
     this.renderEncounterMarkers(activeMap);
+    this.renderArenaMarkers(activeMap);
     this.ensureDaylightLayer();
     this.buildHud(activeMap, world.optionalWarnings, world.modWarnings);
     this.updateCoordsHud();
@@ -589,6 +608,7 @@ export class GridScene extends Phaser.Scene {
     this.controlsPanel = new ControlsPanel(this);
     this.factionPanel = new FactionPanel(this, () => this.noteOverlayClosed());
     this.companionPanel = new CompanionPanel(this, () => this.noteOverlayClosed());
+    this.arenaPanel = new ArenaPanel(this, () => this.noteOverlayClosed());
     this.worldMapPanel = new WorldMapPanel(this, () => this.noteOverlayClosed());
     this.encyclopediaPanel = new EncyclopediaPanel(this, { onClose: () => this.noteOverlayClosed() });
     this.updateQuestTrackerHud();
@@ -788,6 +808,7 @@ export class GridScene extends Phaser.Scene {
       worldSeed: this.worldSeed,
       factionMembership: this.factionState.membership,
       activeCompanionId: this.companionState.activeCompanionId,
+      arenaRecords: this.arenaRecords,
     });
     const result = writeSaveSlot(this.storage, slotId, snapshot);
     if (result.ok) {
@@ -882,6 +903,26 @@ export class GridScene extends Phaser.Scene {
     }
   }
 
+  /** Small gold tile distinguishes non-blocking tournament entrances from foes. */
+  private renderArenaMarkers(map: GridMap): void {
+    const arenas = this.world?.assembly.arenas.filter((arena) =>
+      arena.record.mapResourceId === this.currentMapResourceId,
+    ) ?? [];
+    for (const arena of arenas) {
+      const center = cellCenterOffset(map, arena.record.position.col, arena.record.position.row);
+      const x = this.mapOrigin.x + center.x;
+      const y = this.mapOrigin.y + center.y;
+      const badge = this.add.rectangle(x, y, Math.max(18, map.tileSize * 0.42), Math.max(18, map.tileSize * 0.42), 0x80602e)
+        .setStrokeStyle(2, 0xe8c66a).setDepth(4);
+      const label = this.registerScaledText(this.add.text(x, y, '擂', {
+        fontFamily: UI.fontFamily,
+        fontSize: uiFontSize(12),
+        color: '#fff1c4',
+      }).setOrigin(0.5).setDepth(5), 12);
+      this.encounterLayer?.add([badge, label]);
+    }
+  }
+
   /**
    * Encounters still standing this run: repeatable ones always, one-shot
    * ones only until their first victory. One-shot completion persists in
@@ -894,6 +935,129 @@ export class GridScene extends Phaser.Scene {
     );
   }
 
+  /** Opens the data-authored signup card; item capacity is reserved up front. */
+  private openArenaSignup(arena: AssembledArena): void {
+    const panel = this.arenaPanel;
+    if (panel === null) return;
+    const record = this.arenaRecords.get(arena.record.id) ?? createArenaRecord(arena.record.id);
+    this.arenaRecords.set(record.arenaId, record);
+    const blocked = this.arenaRegistrationBlock(arena);
+    const rewardLines = [
+      arena.record.reward.currency + ' 文钱',
+      ...arena.record.reward.items.map((entry) =>
+        (this.items.get(entry.itemId)?.name ?? entry.itemId) + ' ×' + entry.quantity,
+      ),
+    ];
+    panel.open({
+      arena,
+      record,
+      rewardLines,
+      registrationBlockedReason: blocked,
+      onRegister: () => {
+        record.attempts += 1;
+        this.activeArenaRun = { arena, roundIndex: 0, wins: 0 };
+        this.startArenaRound();
+        this.updateInteractHint();
+      },
+    });
+    this.updateInteractHint();
+  }
+
+  /** Guarantees the one-time clear reward can be committed as a whole. */
+  private arenaRegistrationBlock(arena: AssembledArena): string | null {
+    if (this.playerProfile === null || this.playerState === null || this.inventory === null) {
+      return '当前角色状态不可用，暂时不能报名。';
+    }
+    if (this.playerProfile.id !== arena.record.profileId) {
+      return '当前角色不符合这座擂台的报名模板。';
+    }
+    if (this.inventory.currency + arena.record.reward.currency > 999_999_999) {
+      return '钱袋已满，先花用一些文钱再来报名。';
+    }
+    const trial = {
+      ...this.inventory,
+      stacks: this.inventory.stacks.map((stack) => ({ ...stack })),
+      equipped: { ...this.inventory.equipped },
+    };
+    for (const entry of arena.record.reward.items) {
+      const item = this.items.get(entry.itemId);
+      if (item === undefined || additionalCapacityFor(trial, item) < entry.quantity) {
+        return '背包空位不足以收下全部夺魁彩头，请先整理背包。';
+      }
+      grantItems(trial, item, entry.quantity);
+    }
+    return null;
+  }
+
+  /** Starts one independent combat session for the current tournament round. */
+  private startArenaRound(): void {
+    const run = this.activeArenaRun;
+    const battlePanel = this.battlePanel;
+    const player = this.playerState;
+    const profile = this.playerProfile;
+    if (run === null || battlePanel === null || player === null || profile === null) return;
+    const opponent = run.arena.record.opponents[run.roundIndex];
+    if (opponent === undefined) return;
+    const encounterRecord = arenaOpponentAsEncounter(run.arena.record, opponent, profile.id);
+    const placed: PlacedEncounter = {
+      record: encounterRecord,
+      col: run.arena.record.position.col,
+      row: run.arena.record.position.row,
+      profile,
+      enemyArts: [...(run.arena.enemyArts.get(opponent.id) ?? [])],
+    };
+    const activeCompanion = this.companions.get(this.companionState.activeCompanionId ?? '');
+    const companionNpc = activeCompanion === undefined
+      ? undefined
+      : this.world?.assembly.npcs.find((npc) => npc.record.id === activeCompanion.npcId);
+    const session = new CombatSession({
+      encounter: placed.record,
+      profile,
+      player,
+      martialArts: this.progression.martialArts,
+      ...(activeCompanion !== undefined && companionNpc !== undefined
+        ? { companion: { name: companionNpc.record.name, support: activeCompanion.combatSupport } }
+        : {}),
+    });
+    this.activeSession = session;
+    this.activeEncounter = null; // Arena victories are not overworld quest encounters.
+    battlePanel.open(session);
+  }
+
+  /** Closes an attempt, stores the streak and pays only a full-clear reward. */
+  private finishArenaAttempt(champion: boolean): void {
+    const run = this.activeArenaRun;
+    if (run === null) return;
+    const record = this.arenaRecords.get(run.arena.record.id) ?? createArenaRecord(run.arena.record.id);
+    record.bestWins = Math.max(record.bestWins, run.wins);
+    record.lastWins = run.wins;
+    if (champion && this.inventory !== null) {
+      record.championships += 1;
+      this.inventory.currency += run.arena.record.reward.currency;
+      for (const reward of run.arena.record.reward.items) {
+        const item = this.items.get(reward.itemId);
+        if (item !== undefined) grantItems(this.inventory, item, reward.quantity);
+      }
+      const prizes = [
+        run.arena.record.reward.currency + ' 文钱',
+        ...run.arena.record.reward.items.map((reward) =>
+          (this.items.get(reward.itemId)?.name ?? reward.itemId) + ' ×' + reward.quantity,
+        ),
+      ].join('、');
+      this.showRegionNotice(run.arena.record.texts.champion + ' 彩头：' + prizes + '。');
+    } else {
+      this.showRegionNotice(run.arena.record.texts.retreat + ' 本次胜场：' + run.wins + '。');
+    }
+    this.arenaRecords.set(record.arenaId, record);
+    console.info(
+      '[arena] 擂台 "%s" 结束：胜场 %d/%d，%s',
+      run.arena.record.id,
+      run.wins,
+      run.arena.record.opponents.length,
+      champion ? '夺魁' : '未夺魁',
+    );
+  }
+
   /**
    * Battle-overlay close hook: the session has already settled everything
    * (experience, defeat recovery) inside the engine; the scene only records
@@ -902,6 +1066,27 @@ export class GridScene extends Phaser.Scene {
   private settleBattleClose(): void {
     const session = this.activeSession;
     const encounter = this.activeEncounter;
+    const arenaRun = this.activeArenaRun;
+    if (session !== null && arenaRun !== null) {
+      const result = session.finalResult;
+      if (result?.outcome === 'victory') arenaRun.wins += 1;
+      this.activeSession = null;
+      this.activeEncounter = null;
+      if (
+        result?.outcome === 'victory' &&
+        arenaRun.roundIndex + 1 < arenaRun.arena.record.opponents.length
+      ) {
+        arenaRun.roundIndex += 1;
+        this.startArenaRound();
+      } else {
+        this.finishArenaAttempt(
+          result?.outcome === 'victory' && arenaRun.wins === arenaRun.arena.record.opponents.length,
+        );
+        this.activeArenaRun = null;
+      }
+      this.noteOverlayClosed();
+      return;
+    }
     if (session !== null && encounter !== null) {
       const result = session.finalResult;
       if (result?.outcome === 'victory') {
@@ -1083,6 +1268,9 @@ export class GridScene extends Phaser.Scene {
     const blocked = new Set([
       ...this.placedNpcs.map((entry) => `${entry.col},${entry.row}`),
       ...this.encounterCells.keys(),
+      ...(this.world?.assembly.arenas
+        .filter((arena) => arena.record.mapResourceId === this.currentMapResourceId)
+        .map((arena) => String(arena.record.position.col) + ',' + String(arena.record.position.row)) ?? []),
     ]);
     const cell = resolveCompanionFollowCell(
       map,
@@ -1471,6 +1659,15 @@ export class GridScene extends Phaser.Scene {
       this.interactText.setText(encounterTarget.record.texts.approach);
       return;
     }
+    const arenaTarget = this.world === null ? null : selectArenaTarget(
+      this.world.assembly.arenas,
+      this.currentMapResourceId,
+      { col: this.playerCol, row: this.playerRow },
+    );
+    if (arenaTarget !== null) {
+      this.interactText.setText(arenaTarget.record.texts.approach);
+      return;
+    }
     const gate = this.world === null
       ? null
       : selectAdjacentTransition(this.world.worldMap.transitions, this.currentMapResourceId, {
@@ -1503,6 +1700,7 @@ export class GridScene extends Phaser.Scene {
       (this.encyclopediaPanel !== null && this.encyclopediaPanel.isOpen) ||
       (this.factionPanel !== null && this.factionPanel.isOpen) ||
       (this.companionPanel !== null && this.companionPanel.isOpen) ||
+      (this.arenaPanel !== null && this.arenaPanel.isOpen) ||
       (this.controlsPanel !== null && this.controlsPanel.isOpen)
     );
   }
@@ -1822,10 +2020,13 @@ export class GridScene extends Phaser.Scene {
       this.factionPanel = null;
       this.companionPanel?.destroy();
       this.companionPanel = null;
+      this.arenaPanel?.destroy();
+      this.arenaPanel = null;
       this.controlsPanel?.destroy();
       this.controlsPanel = null;
       this.activeSession = null;
       this.activeEncounter = null;
+      this.activeArenaRun = null;
     });
   }
 
@@ -1877,6 +2078,15 @@ export class GridScene extends Phaser.Scene {
       return;
     }
     if (this.tryStartBattle()) return;
+    const arena = this.world === null ? null : selectArenaTarget(
+      this.world.assembly.arenas,
+      this.currentMapResourceId,
+      { col: this.playerCol, row: this.playerRow },
+    );
+    if (arena !== null) {
+      this.openArenaSignup(arena);
+      return;
+    }
     const gate = this.world === null
       ? null
       : selectAdjacentTransition(this.world.worldMap.transitions, this.currentMapResourceId, {
@@ -2132,6 +2342,7 @@ export class GridScene extends Phaser.Scene {
     this.marker?.setPosition(this.mapOrigin.x + center.x, this.mapOrigin.y + center.y);
     this.renderNpcs(destinationMap);
     this.renderEncounterMarkers(destinationMap);
+    this.renderArenaMarkers(destinationMap);
     this.ensureDaylightLayer(); // The rebuilt world layers must sit below the wash again.
     this.mapNameText?.setText(destinationMap.data.name);
     this.updateCoordsHud();

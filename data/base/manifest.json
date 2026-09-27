@@ -61,6 +61,11 @@
       "schema": "battle-encounters"
     },
     {
+      "id": "arena.round-20-set",
+      "path": "arenas/round-20-arenas.json",
+      "schema": "arena-set"
+    },
+    {
       "id": "item.round-06-set",
       "path": "items/round-06-items.json",
       "schema": "items-set"

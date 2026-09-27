@@ -1,0 +1,61 @@
+{
+  "arenas": [
+    {
+      "id": "arena.south-market",
+      "name": "南市武擂",
+      "description": "茶棚东侧临时搭起一座木台，规矩是连胜两场便可夺魁。每场胜利后气力不作恢复，若要报名，先备好背包空位领取彩头。",
+      "mapResourceId": "map.round-01-grid",
+      "position": { "col": 8, "row": 7 },
+      "profileId": "char.scribe-apprentice",
+      "opponents": [
+        {
+          "id": "round.wandering-student",
+          "name": "过招第一场",
+          "enemy": {
+            "name": "青衫游学少年",
+            "attributes": { "body": 5, "force": 4, "agility": 4, "insight": 4, "resolve": 4 },
+            "health": 28,
+            "qi": 0,
+            "martialArtIds": ["skill.jianghu-sanshou"]
+          },
+          "victoryExperience": 15,
+          "defeatRecovery": { "healthRatio": 0.65, "qiRatio": 0.65 },
+          "texts": {
+            "intro": "木台边锣声一响，青衫少年抱拳上前。第一场，试手见真章。",
+            "victory": "少年退到台边，笑着拱手认输。",
+            "defeat": "你脚下踉跄，被裁判扶下木台。",
+            "flee": "你向裁判拱手，主动止住了这场比试。"
+          }
+        },
+        {
+          "id": "round.old-guard",
+          "name": "过招第二场",
+          "enemy": {
+            "name": "镖局老护院",
+            "attributes": { "body": 7, "force": 6, "agility": 5, "insight": 5, "resolve": 6 },
+            "health": 40,
+            "qi": 0,
+            "martialArtIds": ["skill.jianghu-sanshou"]
+          },
+          "victoryExperience": 25,
+          "defeatRecovery": { "healthRatio": 0.5, "qiRatio": 0.5 },
+          "texts": {
+            "intro": "老护院沉肩立桩，台下喝彩渐歇。第二场，胜者方能夺魁。",
+            "victory": "老护院收势抱拳，裁判高声宣布你连胜夺魁。",
+            "defeat": "老护院卸去你的招式，裁判鸣锣结束比试。",
+            "flee": "你向裁判拱手，主动止住了这场比试。"
+          }
+        }
+      ],
+      "reward": {
+        "currency": 45,
+        "items": [{ "itemId": "item.qingxin-wan", "quantity": 1 }]
+      },
+      "texts": {
+        "approach": "南市武擂今日开场。按 E 查看赛程并报名。",
+        "champion": "裁判将彩头递到你手中，台下掌声渐渐散去。",
+        "retreat": "你收势退场，今日的擂台挑战到此为止。"
+      }
+    }
+  ]
+}

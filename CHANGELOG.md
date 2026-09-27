@@ -4,6 +4,20 @@
 
 ## [Unreleased]
 
+### Added (Round 20)
+
+- 新增独立擂台 JSON 资料与 arena-set Schema；校验入口格、角色模板、敌方武学、彩头物品及占格冲突，E 邻接打开赛程/奖励/战绩页。
+- 报名后自动连续挑战数据对手，共用回合战斗/经验/伙伴援护；胜利逐轮接续，败退/撤退停止，只有全胜夺魁会完整发放文钱和物品彩头。
+- v1 快照加入报名次数、最佳胜场、夺魁次数与最近胜场；旧 v1 缺字段为空记录册。
+- 新增战绩保存规则、Ajv 全资源校验与 Round 20 Phaser-free 冒烟脚本。
+
+### Verification (Round 20)
+
+- npm run build：通过；112 模块生产构建完成，Vite 显示主 JS 包超过 500 kB 建议线。
+- npm run validate:data：manifest + 18 个登记基础 JSON 通过 Ajv。
+- npm run smoke:round-20：擂台引用装配/占格隔离、邻接入口、两场通用战斗经验、战绩值域及旧/新 v1 存档往返均通过。
+- git diff --check：通过；只有仓库 LF→CRLF 自动转换提示。
+
 ### Added (Round 19)
 
 - 新增独立伙伴资料与 draft-07 Schema；伙伴引用有效 NPC，支援专长及行动间隔来自数据。
