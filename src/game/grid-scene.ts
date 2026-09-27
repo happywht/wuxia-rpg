@@ -3,6 +3,7 @@ import Phaser from 'phaser';
 import type { Diagnostic } from '../engine/data-loader';
 import { GridMap } from '../engine/grid-map';
 import { cellCenterOffset, renderGridMap } from '../engine/grid-map-renderer';
+import { selectAdjacentTransition, type RegionTransitionData } from '../engine/world-map';
 import {
   type DialogueData,
   type DialogueSession,
@@ -67,11 +68,11 @@ import { BattlePanel } from './combat-ui';
 import { InventoryPanel } from './inventory-ui';
 import { ShopPanel } from './shop-ui';
 import { QuestPanel } from './quest-ui';
+import { WorldMapPanel } from './world-map-ui';
 import { PauseMenuPanel } from './pause-menu';
 import { type GameSettings, applyGameSettings, loadGameSettings, uiFontSize } from './settings';
 import { type GridStartupData } from './menu-scene';
 import {
-  MAP_RESOURCE_ID,
   type LoadedWorld,
   type ProgressionAssembly,
   loadWorldData,
@@ -143,7 +144,12 @@ const UI = {
 
 export class GridScene extends Phaser.Scene {
   private map: GridMap | null = null;
+  private world: LoadedWorld | null = null;
+  private currentMapResourceId = '';
   private mapOrigin = new Phaser.Math.Vector2(0, 0);
+  private mapLayer: Phaser.GameObjects.Container | null = null;
+  private npcLayer: Phaser.GameObjects.Container | null = null;
+  private encounterLayer: Phaser.GameObjects.Container | null = null;
   private marker: Phaser.GameObjects.Arc | null = null;
   private playerCol = 0;
   private playerRow = 0;
@@ -172,6 +178,7 @@ export class GridScene extends Phaser.Scene {
   /** Placed battle encounters and their per-run completion state (Round 05). */
   private encounters: PlacedEncounter[] = [];
   private readonly completedEncounters = new Set<string>();
+  private readonly completedRegionalEvents = new Set<string>();
   private encounterCells = new Map<string, PlacedEncounter>();
   /** Marker graphics per encounter id, removed when a foe is defeated. */
   private encounterMarkers = new Map<string, Phaser.GameObjects.GameObject[]>();
@@ -201,6 +208,7 @@ export class GridScene extends Phaser.Scene {
   private shopPanel: ShopPanel | null = null;
   private questPanel: QuestPanel | null = null;
   private pauseMenu: PauseMenuPanel | null = null;
+  private worldMapPanel: WorldMapPanel | null = null;
   private activeSession: CombatSession | null = null;
   private activeEncounter: PlacedEncounter | null = null;
 
@@ -220,6 +228,9 @@ export class GridScene extends Phaser.Scene {
   private questTrackerText: Phaser.GameObjects.Text | null = null;
   private questNotice: string | null = null;
   private questNoticeTimer: Phaser.Time.TimerEvent | null = null;
+  private regionNotice: string | null = null;
+  private regionNoticeTimer: Phaser.Time.TimerEvent | null = null;
+  private mapNameText: Phaser.GameObjects.Text | null = null;
 
   constructor() {
     super('grid');
@@ -278,6 +289,7 @@ export class GridScene extends Phaser.Scene {
       | (RestoredRunState & {
           profileId: string;
           displayName: string;
+          mapResourceId: string;
           playerPosition: { col: number; row: number };
         })
       | null = null;
@@ -292,14 +304,21 @@ export class GridScene extends Phaser.Scene {
     }
 
     this.children.removeAll(true); // Drop the transient loading hint.
-    this.map = map;
-    this.placedNpcs = assembly.npcs;
+    this.world = world;
+    this.currentMapResourceId = restoredRun?.mapResourceId ?? world.mapResourceId;
+    const activeMap = world.maps.get(this.currentMapResourceId) ?? map;
+    this.map = activeMap;
+    this.placedNpcs = assembly.npcs.filter(
+      (npc) => npc.record.mapResourceId === this.currentMapResourceId,
+    );
     this.dialogues = assembly.dialogues;
     this.progression = assembly.progression;
     this.occupancy = new NpcOccupancyIndex(this.placedNpcs);
-    this.encounters = assembly.encounters;
+    this.encounters = assembly.encounters.filter(
+      (encounter) => encounter.record.mapResourceId === this.currentMapResourceId,
+    );
     this.encounterCells = new Map(
-      assembly.encounters.map((encounter) => [
+      this.activeEncounters().map((encounter) => [
         `${encounter.col},${encounter.row}`,
         encounter,
       ]),
@@ -309,6 +328,7 @@ export class GridScene extends Phaser.Scene {
     this.quests = assembly.quests;
     this.encounterMarkers.clear();
     this.completedEncounters.clear();
+    this.completedRegionalEvents.clear();
 
     if (restoredRun !== null) {
       // ---- Save path: adopt the fully restored objects atomically.
@@ -325,11 +345,15 @@ export class GridScene extends Phaser.Scene {
       for (const encounterId of restoredRun.completedEncounters) {
         this.completedEncounters.add(encounterId);
         const encounter = assembly.encounters.find(
-          (candidate) => candidate.record.id === encounterId,
+          (candidate) => candidate.record.id === encounterId &&
+            candidate.record.mapResourceId === this.currentMapResourceId,
         );
         if (encounter !== undefined) {
           this.encounterCells.delete(`${encounter.col},${encounter.row}`);
         }
+      }
+      for (const eventId of restoredRun.completedRegionalEvents) {
+        this.completedRegionalEvents.add(eventId);
       }
       this.playerCol = restoredRun.playerPosition.col;
       this.playerRow = restoredRun.playerPosition.row;
@@ -404,9 +428,9 @@ export class GridScene extends Phaser.Scene {
       (VIEW_WIDTH - map.pixelWidth) / 2,
       HUD_HEIGHT + (VIEW_HEIGHT - HUD_HEIGHT - map.pixelHeight) / 2,
     );
-    renderGridMap(this, map, this.mapOrigin.x, this.mapOrigin.y);
+    this.mapLayer = renderGridMap(this, activeMap, this.mapOrigin.x, this.mapOrigin.y);
 
-    const startOffset = cellCenterOffset(map, this.playerCol, this.playerRow);
+    const startOffset = cellCenterOffset(activeMap, this.playerCol, this.playerRow);
     this.marker = this.add.circle(
       this.mapOrigin.x + startOffset.x,
       this.mapOrigin.y + startOffset.y,
@@ -415,9 +439,9 @@ export class GridScene extends Phaser.Scene {
     );
     this.marker.setStrokeStyle(3, MARKER_BORDER);
 
-    this.renderNpcs(map);
-    this.renderEncounterMarkers(map);
-    this.buildHud(map, world.optionalWarnings, world.modWarnings);
+    this.renderNpcs(activeMap);
+    this.renderEncounterMarkers(activeMap);
+    this.buildHud(activeMap, world.optionalWarnings, world.modWarnings);
     this.updateCoordsHud();
 
     this.dialoguePanel = new DialoguePanel(this, {
@@ -444,8 +468,10 @@ export class GridScene extends Phaser.Scene {
       returnToMenu: () => this.returnToMenu(),
       onClose: () => this.noteOverlayClosed(),
     });
+    this.worldMapPanel = new WorldMapPanel(this, () => this.noteOverlayClosed());
     this.updateQuestTrackerHud();
     this.updateInteractHint();
+    this.triggerRegionEvents();
   }
 
   // -------------------------------------------------------------------------
@@ -466,6 +492,7 @@ export class GridScene extends Phaser.Scene {
     run: RestoredRunState & {
       profileId: string;
       displayName: string;
+      mapResourceId: string;
       playerPosition: { col: number; row: number };
     };
     warnings: string[];
@@ -523,6 +550,7 @@ export class GridScene extends Phaser.Scene {
         ...restored,
         profileId: read.snapshot.profileId,
         displayName: read.snapshot.displayName,
+        mapResourceId: read.snapshot.mapResourceId,
         playerPosition: { ...read.snapshot.playerPosition },
       },
       warnings: plan.warnings,
@@ -532,15 +560,24 @@ export class GridScene extends Phaser.Scene {
   /** Assembles the world id/geometry index a save preflight checks against. */
   private saveWorldReferences(world: LoadedWorld, snapshot: SaveSnapshotV1) {
     const map = world.map;
-    const occupiedCells = new Set(
-      world.assembly.npcs.map((npc) => `${npc.col},${npc.row}`),
-    );
     const completedEncounters = new Set(snapshot.completedEncounters);
-    for (const encounter of world.assembly.encounters) {
-      if (encounter.record.repeatable || !completedEncounters.has(encounter.record.id)) {
-        occupiedCells.add(`${encounter.col},${encounter.row}`);
+    const maps = new Map([...world.maps.entries()].map(([mapId, regionMap]) => {
+      const occupiedCells = new Set(
+        world.assembly.npcs
+          .filter((npc) => npc.record.mapResourceId === mapId)
+          .map((npc) => `${npc.col},${npc.row}`),
+      );
+      for (const encounter of world.assembly.encounters) {
+        if (encounter.record.mapResourceId === mapId &&
+            (encounter.record.repeatable || !completedEncounters.has(encounter.record.id))) {
+          occupiedCells.add(`${encounter.col},${encounter.row}`);
+        }
       }
-    }
+      return [mapId, {
+        isWalkableCell: (col: number, row: number) => regionMap.canEnter(col, row),
+        isCellOccupied: (col: number, row: number) => occupiedCells.has(`${col},${row}`),
+      }];
+    }));
     const questObjectives = new Map<string, ReadonlySet<string>>();
     for (const quest of world.assembly.quests.values()) {
       questObjectives.set(quest.id, new Set(quest.objectives.map((objective) => objective.id)));
@@ -550,7 +587,8 @@ export class GridScene extends Phaser.Scene {
       profileRecords: world.assembly.progression.profiles,
       mapResourceId: world.mapResourceId,
       isWalkableCell: (col: number, row: number) => map.canEnter(col, row),
-      isCellOccupied: (col: number, row: number) => occupiedCells.has(`${col},${row}`),
+      isCellOccupied: (col: number, row: number) => maps.get(world.mapResourceId)?.isCellOccupied(col, row) ?? false,
+      maps,
       itemIds: new Set(world.assembly.items.keys()),
       itemRecords: world.assembly.items,
       martialArtIds: new Set(world.assembly.progression.martialArts.keys()),
@@ -563,6 +601,7 @@ export class GridScene extends Phaser.Scene {
       shopRecords: world.assembly.shops,
       questRecords: world.assembly.quests,
       npcIds: new Set(world.assembly.npcs.map((npc) => npc.record.id)),
+      regionalEventIds: new Set(world.worldMap.events.map((event) => event.id)),
     };
   }
 
@@ -573,7 +612,7 @@ export class GridScene extends Phaser.Scene {
     }
     const snapshot = captureSaveSnapshot({
       displayName: this.playerDisplayName,
-      mapResourceId: MAP_RESOURCE_ID,
+      mapResourceId: this.currentMapResourceId,
       playerCol: this.playerCol,
       playerRow: this.playerRow,
       character: this.playerState,
@@ -582,6 +621,7 @@ export class GridScene extends Phaser.Scene {
       journal: this.questJournal,
       social: this.social,
       completedEncounters: this.completedEncounters,
+      completedRegionalEvents: this.completedRegionalEvents,
     });
     const result = writeSaveSlot(this.storage, slotId, snapshot);
     if (result.ok) {
@@ -633,6 +673,7 @@ export class GridScene extends Phaser.Scene {
 
   /** Draws each still-active encounter marker and its data-driven name. */
   private renderEncounterMarkers(map: GridMap): void {
+    this.encounterLayer = this.add.container();
     for (const encounter of this.activeEncounters()) {
       const center = cellCenterOffset(map, encounter.col, encounter.row);
       const size = map.tileSize * ENCOUNTER_SIZE_RATIO;
@@ -659,6 +700,7 @@ export class GridScene extends Phaser.Scene {
         )
         .setOrigin(0.5, 1);
 
+      this.encounterLayer.add([body, label]);
       this.encounterMarkers.set(encounter.record.id, [body, label]);
     }
   }
@@ -721,6 +763,7 @@ export class GridScene extends Phaser.Scene {
 
   /** Draws every placed NPC and its data-driven name label. */
   private renderNpcs(map: GridMap): void {
+    this.npcLayer = this.add.container();
     this.placedNpcs.forEach((npc, index) => {
       const center = cellCenterOffset(map, npc.col, npc.row);
       const size = map.tileSize * NPC_SIZE_RATIO;
@@ -733,13 +776,14 @@ export class GridScene extends Phaser.Scene {
       );
       body.setStrokeStyle(3, NPC_BORDER);
 
-      this.add
+      const label = this.add
         .text(this.mapOrigin.x + center.x, this.mapOrigin.y + center.y - size / 2 - 4, npc.record.name, {
           fontFamily: UI.fontFamily,
           fontSize: uiFontSize(10),
           color: UI.textPrimary,
         })
         .setOrigin(0.5, 1);
+      this.npcLayer?.add([body, label]);
     });
   }
 
@@ -749,7 +793,7 @@ export class GridScene extends Phaser.Scene {
     modWarnings: readonly Diagnostic[],
   ): void {
     this.add
-      .text(16, 14, '方向键 / WASD 移动 · 每次一格 · 邻近人物按 E 交互 · F 交谈 · B 背包 · Q 任务 · Esc 暂停', {
+      .text(16, 14, '方向键 / WASD 移动 · E 交互 · F 交谈 · B 背包 · Q 任务 · M 舆图 · Esc 暂停', {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(13),
         color: UI.textMuted,
@@ -765,7 +809,7 @@ export class GridScene extends Phaser.Scene {
       })
       .setOrigin(0, 0);
 
-    this.add
+    this.mapNameText = this.add
       .text(VIEW_WIDTH / 2, 14, map.data.name, {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(14),
@@ -832,6 +876,10 @@ export class GridScene extends Phaser.Scene {
       this.interactText.setText('');
       return;
     }
+    if (this.regionNotice !== null) {
+      this.interactText.setText(this.regionNotice);
+      return;
+    }
 
     // Adjacent NPCs win the prompt; otherwise an adjacent encounter shows
     // its data-driven approach line.
@@ -864,6 +912,16 @@ export class GridScene extends Phaser.Scene {
       this.interactText.setText(encounterTarget.record.texts.approach);
       return;
     }
+    const gate = this.world === null
+      ? null
+      : selectAdjacentTransition(this.world.worldMap.transitions, this.currentMapResourceId, {
+          col: this.playerCol,
+          row: this.playerRow,
+        });
+    if (gate !== null) {
+      this.interactText.setText(`按 E 通过「${gate.name}」前往另一处地界`);
+      return;
+    }
     if (this.placedNpcs.length === 0 && this.activeEncounters().length === 0) {
       this.interactText.setText('暂无可交互人物');
       return;
@@ -879,7 +937,8 @@ export class GridScene extends Phaser.Scene {
       (this.inventoryPanel !== null && this.inventoryPanel.isOpen) ||
       (this.shopPanel !== null && this.shopPanel.isOpen) ||
       (this.questPanel !== null && this.questPanel.isOpen) ||
-      (this.pauseMenu !== null && this.pauseMenu.isOpen)
+      (this.pauseMenu !== null && this.pauseMenu.isOpen) ||
+      (this.worldMapPanel !== null && this.worldMapPanel.isOpen)
     );
   }
 
@@ -897,6 +956,20 @@ export class GridScene extends Phaser.Scene {
       journal: this.questJournal,
       itemCounts: this.questItemCounts(),
     });
+    this.updateInteractHint();
+  }
+
+  /** M key: show the read-only region atlas while locking exploration input. */
+  private toggleWorldMap(): void {
+    const panel = this.worldMapPanel;
+    const world = this.world;
+    if (panel === null || world === null) return;
+    if (panel.isOpen) {
+      panel.close();
+      return;
+    }
+    if (this.anyOverlayOpen()) return;
+    panel.open(world.worldMap, this.currentMapResourceId);
     this.updateInteractHint();
   }
 
@@ -1055,6 +1128,10 @@ export class GridScene extends Phaser.Scene {
     const onPause = (): void => this.togglePauseMenu();
     pauseKey.on('down', onPause);
 
+    const worldMapKey = keyboard.addKey(KeyCodes.M);
+    const onWorldMap = (): void => this.toggleWorldMap();
+    worldMapKey.on('down', onWorldMap);
+
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       for (const { key, onDown } of listeners) {
         key.off('down', onDown);
@@ -1064,6 +1141,7 @@ export class GridScene extends Phaser.Scene {
       questKey.off('down', onQuestJournal);
       talkKey.off('down', onTalk);
       pauseKey.off('down', onPause);
+      worldMapKey.off('down', onWorldMap);
       this.dialoguePanel?.destroy();
       this.dialoguePanel = null;
       this.battlePanel?.destroy();
@@ -1076,6 +1154,8 @@ export class GridScene extends Phaser.Scene {
       this.questPanel = null;
       this.pauseMenu?.destroy();
       this.pauseMenu = null;
+      this.worldMapPanel?.destroy();
+      this.worldMapPanel = null;
       this.activeSession = null;
       this.activeEncounter = null;
     });
@@ -1084,7 +1164,7 @@ export class GridScene extends Phaser.Scene {
   /**
    * E key: the four-way adjacent NPC opens its shop when it keeps a valid
    * one (nearest, id tie-break), then opens a quest board, and otherwise
-   * talks; with no NPC adjacent, the four-way adjacent encounter starts.
+   * talks; next comes a four-way adjacent encounter, then a data-driven gate.
    */
   private handleInteraction(): void {
     if (this.anyOverlayOpen()) {
@@ -1128,7 +1208,14 @@ export class GridScene extends Phaser.Scene {
       this.openDialogueWith(target);
       return;
     }
-    this.tryStartBattle();
+    if (this.tryStartBattle()) return;
+    const gate = this.world === null
+      ? null
+      : selectAdjacentTransition(this.world.worldMap.transitions, this.currentMapResourceId, {
+          col: this.playerCol,
+          row: this.playerRow,
+        });
+    if (gate !== null) this.switchRegion(gate);
   }
 
   /**
@@ -1221,17 +1308,17 @@ export class GridScene extends Phaser.Scene {
   }
 
   /** Opens the battle overlay for the four-way adjacent encounter, if any. */
-  private tryStartBattle(): void {
+  private tryStartBattle(): boolean {
     const battlePanel = this.battlePanel;
     if (battlePanel === null || battlePanel.isOpen) {
-      return;
+      return false;
     }
     const encounter = selectEncounterTarget(this.activeEncounters(), {
       col: this.playerCol,
       row: this.playerRow,
     });
     if (encounter === null || this.playerProfile === null || this.playerState === null) {
-      return; // No adjacent foe (or no playable profile): E does nothing.
+      return encounter !== null; // A foe keeps priority over a gate even without a profile.
     }
     const session = new CombatSession({
       encounter: encounter.record,
@@ -1243,6 +1330,7 @@ export class GridScene extends Phaser.Scene {
     this.activeEncounter = encounter;
     battlePanel.open(session);
     this.updateInteractHint();
+    return true;
   }
 
   private tryMove(dCol: number, dRow: number): void {
@@ -1278,8 +1366,100 @@ export class GridScene extends Phaser.Scene {
       duration: MOVE_DURATION_MS,
       onComplete: () => {
         this.moving = false;
+        this.triggerRegionEvents();
       },
     });
+  }
+
+  /** Travels through one validated world-map endpoint after a fresh occupancy check. */
+  private switchRegion(transition: RegionTransitionData): void {
+    const world = this.world;
+    const destinationMap = world?.maps.get(transition.to.mapResourceId);
+    if (world === null || destinationMap === undefined) {
+      this.showRegionNotice(`关口「${transition.name}」通向的地图当前不可用。`);
+      return;
+    }
+    if (!destinationMap.canEnter(transition.to.col, transition.to.row)) {
+      this.showRegionNotice(`关口「${transition.name}」的落点不可通行。`);
+      return;
+    }
+    const occupiedByNpc = world.assembly.npcs.some((npc) =>
+      npc.record.mapResourceId === transition.to.mapResourceId &&
+      npc.col === transition.to.col && npc.row === transition.to.row,
+    );
+    const occupiedByEncounter = world.assembly.encounters.some((encounter) =>
+      encounter.record.mapResourceId === transition.to.mapResourceId &&
+      encounter.col === transition.to.col && encounter.row === transition.to.row &&
+      (encounter.record.repeatable || !this.completedEncounters.has(encounter.record.id)),
+    );
+    if (occupiedByNpc || occupiedByEncounter) {
+      this.showRegionNotice(`关口「${transition.name}」的另一端暂被挡住。`);
+      return;
+    }
+
+    this.mapLayer?.destroy();
+    this.npcLayer?.destroy();
+    this.encounterLayer?.destroy();
+    this.mapLayer = null;
+    this.npcLayer = null;
+    this.encounterLayer = null;
+    this.encounterMarkers.clear();
+
+    this.currentMapResourceId = transition.to.mapResourceId;
+    this.map = destinationMap;
+    this.playerCol = transition.to.col;
+    this.playerRow = transition.to.row;
+    this.placedNpcs = world.assembly.npcs.filter(
+      (npc) => npc.record.mapResourceId === this.currentMapResourceId,
+    );
+    this.occupancy = new NpcOccupancyIndex(this.placedNpcs);
+    this.encounters = world.assembly.encounters.filter(
+      (encounter) => encounter.record.mapResourceId === this.currentMapResourceId,
+    );
+    this.encounterCells = new Map(
+      this.activeEncounters().map((encounter) => [
+        `${encounter.col},${encounter.row}`,
+        encounter,
+      ]),
+    );
+    this.mapOrigin.set(
+      (VIEW_WIDTH - destinationMap.pixelWidth) / 2,
+      HUD_HEIGHT + (VIEW_HEIGHT - HUD_HEIGHT - destinationMap.pixelHeight) / 2,
+    );
+    this.mapLayer = renderGridMap(this, destinationMap, this.mapOrigin.x, this.mapOrigin.y);
+    const center = cellCenterOffset(destinationMap, this.playerCol, this.playerRow);
+    this.marker?.setPosition(this.mapOrigin.x + center.x, this.mapOrigin.y + center.y);
+    this.renderNpcs(destinationMap);
+    this.renderEncounterMarkers(destinationMap);
+    this.mapNameText?.setText(destinationMap.data.name);
+    this.updateCoordsHud();
+    this.showRegionNotice(`已抵达「${destinationMap.data.name}」。`);
+    this.triggerRegionEvents();
+  }
+
+  /** Fires events authored for the exact cell just entered. */
+  private triggerRegionEvents(): void {
+    const events = this.world?.worldMap.events.filter((event) =>
+      event.mapResourceId === this.currentMapResourceId &&
+      event.col === this.playerCol && event.row === this.playerRow &&
+      (!event.once || !this.completedRegionalEvents.has(event.id)),
+    ) ?? [];
+    if (events.length === 0) return;
+    for (const event of events) {
+      if (event.once) this.completedRegionalEvents.add(event.id);
+    }
+    this.showRegionNotice(events.map((event) => event.text).join(' '));
+  }
+
+  private showRegionNotice(text: string): void {
+    this.regionNotice = text;
+    this.regionNoticeTimer?.remove(false);
+    this.regionNoticeTimer = this.time.delayedCall(5200, () => {
+      this.regionNotice = null;
+      this.regionNoticeTimer = null;
+      this.updateInteractHint();
+    });
+    this.updateInteractHint();
   }
 
   /**

@@ -6,6 +6,16 @@
       "schema": "grid-map"
     },
     {
+      "id": "map.round-10-mist-ferry",
+      "path": "maps/round-10-mist-ferry.json",
+      "schema": "grid-map"
+    },
+    {
+      "id": "world.atlas",
+      "path": "world/world-map.json",
+      "schema": "world-map"
+    },
+    {
       "id": "npc.round-03-set",
       "path": "characters/round-03-npcs.json",
       "schema": "npc-set"

@@ -21,6 +21,11 @@ import {
 import { EventBus } from '../engine/event-bus';
 import { GridMap, parseGridMap } from '../engine/grid-map';
 import {
+  assembleWorldMap,
+  parseWorldMap,
+  type WorldMapAssembly,
+} from '../engine/world-map';
+import {
   type DialogueData,
   indexConversations,
   parseDialogueSet,
@@ -67,7 +72,7 @@ import {
 } from '../engine/quest-system';
 
 /** Stable resource ids from data/base/manifest.json — never hard-coded URLs. */
-export const MAP_RESOURCE_ID = 'map.round-01-grid';
+export const WORLD_MAP_RESOURCE_ID = 'world.atlas';
 const NPC_RESOURCE_ID = 'npc.round-03-set';
 const DIALOGUE_RESOURCE_ID = 'dialogue.round-03-set';
 const CHARACTER_PROFILE_RESOURCE_ID = 'character-profile.round-04-set';
@@ -144,8 +149,11 @@ export interface WorldAssembly {
 
 /** Successful load: the required map plus the assembled optional content. */
 export interface LoadedWorld {
+  /** Default starting map retained for menu/template compatibility. */
   map: GridMap;
   mapResourceId: string;
+  maps: ReadonlyMap<string, GridMap>;
+  worldMap: WorldMapAssembly;
   assembly: WorldAssembly;
   optionalWarnings: readonly Diagnostic[];
   modWarnings: readonly Diagnostic[];
@@ -184,6 +192,10 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
       semanticValidators: {
         'grid-map': (value) => {
           const parsed = parseGridMap(value);
+          return parsed.ok ? [] : parsed.errors;
+        },
+        'world-map': (value) => {
+          const parsed = parseWorldMap(value);
           return parsed.ok ? [] : parsed.errors;
         },
         'character-profiles': (value) => {
@@ -234,28 +246,96 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
         (diagnostic.severity ?? 'error') === 'error' && isOptionalContentDiagnostic(diagnostic),
     );
 
-    const mapResource = result.resources.get(MAP_RESOURCE_ID);
-    if (mapResource === undefined) {
+    const worldResource = result.resources.get(WORLD_MAP_RESOURCE_ID);
+    if (worldResource === undefined) {
       return {
         ok: false,
-        title: '地图资源缺失',
-        lines: [
-          `清单中没有 id 为 "${MAP_RESOURCE_ID}" 的资源，请检查 data/base/manifest.json。`,
-        ],
+        title: '世界地图资料缺失',
+        lines: [`清单中没有 id 为 "${WORLD_MAP_RESOURCE_ID}" 的资源，请检查 data/base/manifest.json。`],
       };
     }
 
-    const parsed = parseGridMap(mapResource.value);
-    if (!parsed.ok) {
-      return { ok: false, title: '地图数据结构不合规', lines: parsed.errors };
+    const parsedWorldMap = parseWorldMap(worldResource.value);
+    if (!parsedWorldMap.ok) {
+      return { ok: false, title: '世界地图数据结构不合规', lines: parsedWorldMap.errors };
     }
 
-    const assembly = assembleOptionalContent(result.resources, parsed.map);
+    const maps = new Map<string, GridMap>();
+    for (const resource of result.resources.values()) {
+      if (resource.schema !== 'grid-map') continue;
+      const parsedMap = parseGridMap(resource.value);
+      if (!parsedMap.ok) {
+        return {
+          ok: false,
+          title: `地图资源 "${resource.id}" 数据结构不合规`,
+          lines: parsedMap.errors,
+        };
+      }
+      if (parsedMap.map.data.id !== resource.id) {
+        return {
+          ok: false,
+          title: `地图资源 "${resource.id}" 标识不匹配`,
+          lines: [`文件内 id 为 "${parsedMap.map.data.id}"，必须与 manifest 资源 id 相同。`],
+        };
+      }
+      maps.set(resource.id, parsedMap.map);
+    }
+    const worldMapResult = assembleWorldMap(parsedWorldMap.data, maps);
+    if ('ok' in worldMapResult && !worldMapResult.ok) {
+      return { ok: false, title: '世界地图引用无效', lines: worldMapResult.errors };
+    }
+    const worldMap = worldMapResult as WorldMapAssembly;
+    const startingMapResourceId = parsedWorldMap.data.startingMapResourceId;
+    const startingMap = maps.get(startingMapResourceId);
+    if (startingMap === undefined) {
+      return { ok: false, title: '起始地图不可用', lines: [`地图资源 "${startingMapResourceId}" 未能加载。`] };
+    }
+
+    const assembly = assembleOptionalContent(result.resources, maps);
+    const overlapWarnings: string[] = [];
+    const overlapsWorldOccupant = (mapResourceId: string, col: number, row: number): boolean =>
+      assembly.npcs.some((npc) => npc.record.mapResourceId === mapResourceId && npc.col === col && npc.row === row) ||
+      assembly.encounters.some((encounter) => encounter.record.mapResourceId === mapResourceId &&
+        encounter.col === col && encounter.row === row);
+    const transitions = worldMap.transitions.filter((transition) => {
+      const endpoints = [transition.from, transition.to];
+      if (endpoints.some((endpoint) => overlapsWorldOccupant(
+        endpoint.mapResourceId, endpoint.col, endpoint.row,
+      ))) {
+        overlapWarnings.push(`关口 "${transition.id}" 与 NPC 或战斗遭遇占格冲突，已禁用`);
+        return false;
+      }
+      return true;
+    });
+    const events = worldMap.events.filter((event) => {
+      if (overlapsWorldOccupant(event.mapResourceId, event.col, event.row)) {
+        overlapWarnings.push(`区域事件 "${event.id}" 与 NPC 或战斗遭遇占格冲突，已禁用`);
+        return false;
+      }
+      return true;
+    });
+    const resolvedWorldMap: WorldMapAssembly = {
+      ...worldMap,
+      transitions,
+      events,
+      warnings: [...worldMap.warnings, ...overlapWarnings],
+    };
+    for (const warning of resolvedWorldMap.warnings) {
+      assembly.warnings.push({
+        resource: WORLD_MAP_RESOURCE_ID,
+        origin: 'world-map-assembly',
+        severity: 'warning',
+        message: warning,
+        details: [],
+      });
+    }
     return {
       ok: true,
       world: {
-        map: parsed.map,
-        mapResourceId: MAP_RESOURCE_ID,
+        map: startingMap,
+        mapResourceId: startingMapResourceId,
+        maps,
+        worldMap: resolvedWorldMap,
         assembly,
         optionalWarnings: [...optionalWarnings, ...assembly.warnings],
         modWarnings,
@@ -280,7 +360,7 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
  */
 function assembleOptionalContent(
   resources: ReadonlyMap<string, LoadedResource>,
-  map: GridMap,
+  maps: ReadonlyMap<string, GridMap>,
 ): WorldAssembly {
   const warnings: Diagnostic[] = [];
 
@@ -351,14 +431,34 @@ function assembleOptionalContent(
     }
   }
 
-  const placement = assembleNpcPlacements({
-    npcSet,
-    knownResourceIds: new Set(resources.keys()),
-    maps: new Map([[MAP_RESOURCE_ID, map]]),
-    currentMapResourceId: MAP_RESOURCE_ID,
-    dialogueIds: new Set(dialogues.keys()),
-  });
-  for (const message of placement.warnings) {
+  const placements = [...maps.keys()].map((currentMapResourceId) =>
+    assembleNpcPlacements({
+      npcSet,
+      knownResourceIds: new Set(resources.keys()),
+      maps,
+      currentMapResourceId,
+      dialogueIds: new Set(dialogues.keys()),
+    }),
+  );
+  const allNpcs: PlacedNpc[] = [];
+  const globallySeenNpcIds = new Set<string>();
+  for (const placement of placements) {
+    for (const npc of placement.npcs) {
+      if (globallySeenNpcIds.has(npc.record.id)) {
+        warnings.push({
+          resource: NPC_RESOURCE_ID,
+          origin: 'npc-assembly',
+          severity: 'warning',
+          message: `NPC "${npc.record.id}" 在多张地图重复登记，保留世界图首条记录`,
+          details: [],
+        });
+      } else {
+        globallySeenNpcIds.add(npc.record.id);
+        allNpcs.push(npc);
+      }
+    }
+  }
+  for (const message of new Set(placements.flatMap((placement) => placement.warnings))) {
     warnings.push({
       resource: NPC_RESOURCE_ID,
       origin: 'npc-assembly',
@@ -378,7 +478,7 @@ function assembleOptionalContent(
 
   const shopAssembly = assembleShops({
     shopSet: itemAssembly.shopSet,
-    placedNpcIds: new Set(placement.npcs.map((npc) => npc.record.id)),
+    placedNpcIds: new Set(allNpcs.map((npc) => npc.record.id)),
     items: itemAssembly.items,
   });
   for (const message of shopAssembly.warnings) {
@@ -393,7 +493,7 @@ function assembleOptionalContent(
 
   // A shopkeeper NPC whose shopId fails to resolve falls back to its
   // dialogue — worth a warning so authors can fix the reference.
-  for (const npc of placement.npcs) {
+  for (const npc of allNpcs) {
     if (npc.record.shopId !== null && !shopAssembly.shops.has(npc.record.shopId)) {
       warnings.push({
         resource: NPC_RESOURCE_ID,
@@ -423,16 +523,40 @@ function assembleOptionalContent(
       encounterSet = parsed.set;
     }
   }
-  const encounterPlacement = assembleBattleEncounters({
-    encounterSet,
-    knownResourceIds: new Set(resources.keys()),
-    maps: new Map([[MAP_RESOURCE_ID, map]]),
-    currentMapResourceId: MAP_RESOURCE_ID,
-    npcCells: new Set(placement.npcs.map((npc) => `${npc.col},${npc.row}`)),
-    profiles: progressionAssembled.assembly.profiles,
-    martialArts: progressionAssembled.assembly.martialArts,
-  });
-  for (const message of encounterPlacement.warnings) {
+  const encounterPlacements = [...maps.keys()].map((currentMapResourceId) =>
+    assembleBattleEncounters({
+      encounterSet,
+      knownResourceIds: new Set(resources.keys()),
+      maps,
+      currentMapResourceId,
+      npcCells: new Set(
+        allNpcs
+          .filter((npc) => npc.record.mapResourceId === currentMapResourceId)
+          .map((npc) => `${npc.col},${npc.row}`),
+      ),
+      profiles: progressionAssembled.assembly.profiles,
+      martialArts: progressionAssembled.assembly.martialArts,
+    }),
+  );
+  const globallySeenEncounterIds = new Set<string>();
+  encounters = [];
+  for (const placement of encounterPlacements) {
+    for (const encounter of placement.encounters) {
+      if (globallySeenEncounterIds.has(encounter.record.id)) {
+        warnings.push({
+          resource: ENCOUNTER_RESOURCE_ID,
+          origin: 'encounter-assembly',
+          severity: 'warning',
+          message: `遭遇 "${encounter.record.id}" 在多张地图重复登记，保留世界图首条记录`,
+          details: [],
+        });
+      } else {
+        globallySeenEncounterIds.add(encounter.record.id);
+        encounters.push(encounter);
+      }
+    }
+  }
+  for (const message of new Set(encounterPlacements.flatMap((placement) => placement.warnings))) {
     warnings.push({
       resource: ENCOUNTER_RESOURCE_ID,
       origin: 'encounter-assembly',
@@ -441,7 +565,6 @@ function assembleOptionalContent(
       details: [],
     });
   }
-  encounters = encounterPlacement.encounters;
 
   let questSet: QuestSetData | null = null;
   const questResource = resources.get(QUEST_RESOURCE_ID);
@@ -462,7 +585,7 @@ function assembleOptionalContent(
   const questAssembly = assembleQuests({
     questSet,
     questGiverNpcIds: new Set(
-      placement.npcs.filter((npc) => npc.record.questGiver).map((npc) => npc.record.id),
+      allNpcs.filter((npc) => npc.record.questGiver).map((npc) => npc.record.id),
     ),
     itemIds: new Set(itemAssembly.items.keys()),
     encounterIds: new Set(encounters.map((encounter) => encounter.record.id)),
@@ -480,7 +603,7 @@ function assembleOptionalContent(
   // Round 08: resolve condition/effect references now that quests, items
   // and placed NPCs are all known. A dangling reference drops exactly its
   // option; the conversation (and its referencing NPC) stays playable.
-  const placedNpcIds = new Set(placement.npcs.map((npc) => npc.record.id));
+  const placedNpcIds = new Set(allNpcs.map((npc) => npc.record.id));
   const dialogueReferences = assembleDialogueReferences({
     conversations: dialogues,
     quests: questAssembly.quests,
@@ -498,7 +621,7 @@ function assembleOptionalContent(
   }
 
   return {
-    npcs: placement.npcs,
+    npcs: allNpcs,
     dialogues: dialogueReferences.conversations,
     progression: progressionAssembled.assembly,
     encounters,

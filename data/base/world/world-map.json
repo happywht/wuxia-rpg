@@ -1,0 +1,50 @@
+{
+  "id": "world.atlas",
+  "startingMapResourceId": "map.round-01-grid",
+  "regions": [
+    {
+      "mapResourceId": "map.round-01-grid",
+      "name": "方格试炼场",
+      "description": "石阶环抱的旧试场，几条小径通向渡口。",
+      "atlasPosition": { "x": 27, "y": 52 }
+    },
+    {
+      "mapResourceId": "map.round-10-mist-ferry",
+      "name": "雾雨渡口",
+      "description": "山雨与江雾相接，渡船歇在芦苇深处。",
+      "atlasPosition": { "x": 72, "y": 52 }
+    }
+  ],
+  "transitions": [
+    {
+      "id": "gate.trial-to-ferry",
+      "name": "石阶渡口",
+      "from": { "mapResourceId": "map.round-01-grid", "col": 14, "row": 7 },
+      "to": { "mapResourceId": "map.round-10-mist-ferry", "col": 1, "row": 4 }
+    },
+    {
+      "id": "gate.ferry-to-trial",
+      "name": "回望石阶",
+      "from": { "mapResourceId": "map.round-10-mist-ferry", "col": 2, "row": 4 },
+      "to": { "mapResourceId": "map.round-01-grid", "col": 13, "row": 7 }
+    }
+  ],
+  "events": [
+    {
+      "id": "event.ferry-first-arrival",
+      "mapResourceId": "map.round-10-mist-ferry",
+      "col": 1,
+      "row": 4,
+      "text": "渡口边留着一行新鲜脚印，雨水还没有将它们冲散。",
+      "once": true
+    },
+    {
+      "id": "event.trial-cloudbreak",
+      "mapResourceId": "map.round-01-grid",
+      "col": 8,
+      "row": 7,
+      "text": "云隙投下一束日光，石面上的旧刻痕清晰起来。",
+      "once": true
+    }
+  ]
+}

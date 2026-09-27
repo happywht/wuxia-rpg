@@ -4,12 +4,12 @@
 
 - 设计文档：`docs/GDD.md`
 - 逐轮路线图（R00–R50）：`ROADMAP.md`
-- 当前进度：**Round 09 完成；下一轮 Round 10（世界地图与区域切换）**
+- 当前进度：**Round 10 完成；下一轮 Round 11（知识图谱与百科/对话条件接入）**
 
 ## 范围
 
-- ✅ 已完成（R00–R09）：三槽版本化 localStorage 存档覆盖角色/位置/背包装备/商店库存/任务/社会状态/一次性遭遇；读档先校验当前世界引用再整体恢复，损坏或不兼容存档会给出错误。开局主菜单支持创建角色、继续/删除存档，游戏内 Esc 暂停菜单提供保存和设置；音量与文字大小可持久化。此前对话条件/效果与各系统保留。
-- ❌ 后续轮次：世界地图和区域切换及其余玩法按路线图逐轮实现；测试基线（Round 38 起）。
+- ✅ 已完成（R00–R10）：双区域网格世界支持 M 键舆图、E 键关口往返、JSON 区域事件与一次性去重；版本化 localStorage 存档恢复当前地图/坐标/已触发事件，并继续接受 Round 09 旧 v1 快照。此前角色、战斗、物品、任务、对话与设置闭环保留。
+- ❌ 后续轮次：知识图谱、百科查询和对话条件接入，以及路线图中的后续玩法；正式 Vitest 基线仍排在 Round 38。
 - 永久边界：不做多人联网；不含原作内容；mod 仅限同名 JSON 覆盖（见 `docs/DATA-GUIDE.md`）。
 
 ## 技术栈（版本已核验并冻结，见 `docs/ADR.md`）
@@ -38,7 +38,7 @@ npm run preview    # 预览生产构建
 npm run typecheck  # 仅类型检查
 ```
 
-> Round 09 验证：`npm run build` 通过；临时存档/设置引擎冒烟检查 83 项全部通过；浏览器手动验证主菜单、新建角色、进入地图、Esc 暂停、保存槽位及返回后续读档入口。Phaser 主包 chunk 仍超过 500 kB 建议阈值；基础数据与 schema 位于 `data/`，启用 MOD 列表见 `data/base/manifest.json`，存档协议见 `docs/SAVES.md`。
+> Round 10 验证：`npm run build` 通过；Ajv 检查 manifest 下登记资料；浏览器手动验证 M 舆图/输入锁、关口往返、一次性事件去重、跨区保存/读档以及 Round 09 快照兼容。Phaser 主包 chunk 仍超过 500 kB 建议阈值；基础数据与 schema 位于 `data/`，启用 MOD 列表见 `data/base/manifest.json`，区域协议见 `docs/MAP-ATLAS.md`，存档协议见 `docs/SAVES.md`。
 
 ## 目录结构
 
@@ -47,14 +47,14 @@ npm run typecheck  # 仅类型检查
 ├── src/
 │   ├── main.ts           # Phaser 启动与场景注册
 │   ├── style.css         # 页面外壳样式
-│   ├── engine/           # 网格地图、数据加载器、事件总线、玩法规则与版本化存档引擎
-│   └── game/             # 主菜单、网格探索、对话、战斗、暂停/设置及玩法面板
+│   ├── engine/           # 网格地图、世界图、数据加载器、玩法规则与版本化存档引擎
+│   └── game/             # 主菜单、网格探索、舆图、对话、战斗、暂停/设置及玩法面板
 ├── data/
 │   ├── base/             # 原创世界数据及 manifest（含战斗、物品、商店、任务）
 │   └── schema/           # 所有已登记数据族的 JSON Schema
 ├── mods/                 # mod 同名覆盖层（含未启用的 example）
 ├── docs/                 # 设计与规范文档
-├── iterations/           # 逐轮计划（Round 00–Round 09）
+├── iterations/           # 逐轮计划（Round 00–Round 10）
 ├── ROADMAP.md            # R00–R50 路线图
 ├── CHANGELOG.md          # 变更日志
 └── DEVLOG.md             # 开发日志（含核验记录）
@@ -71,6 +71,7 @@ npm run typecheck  # 仅类型检查
 | `docs/ARCHITECTURE.md` | 分层架构、缺数据降级、校验、mod 覆盖、热重载规划 |
 | `docs/DATA-GUIDE.md` | 数据目录规范、命名约定、mod 覆盖规则 |
 | `docs/SAVES.md` | 本地存档与设置存储协议、恢复预检和兼容边界 |
+| `docs/MAP-ATLAS.md` | 世界舆图、区域地图资源、关口、区域事件及占位校验 |
 
 ## 原创性与授权声明
 

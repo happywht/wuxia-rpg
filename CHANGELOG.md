@@ -4,6 +4,19 @@
 
 ## [Unreleased]
 
+### Added (Round 10)
+
+- 增加 `world-map` 资料 Schema 与语义装配，manifest 可登记多张网格地图；地区图册通过 M 键查看，并高亮当前所在区域。
+- 新增雾雨渡口原创地图、区域节点、可往返关口与数据驱动区域事件；E 键交互保留 NPC/遭遇优先级，关口旅行会检查目标落点。
+- 扩展 v1 存档以持久化当前地图和一次性区域事件状态，并兼容缺少事件字段的 Round 09 v1 快照。
+- 新增 `docs/MAP-ATLAS.md` 区域资料说明，并更新架构、数据指南、存档说明、README 与路线图。
+
+### Verification (Round 10)
+
+- Ajv 检查 manifest 和 12 份登记资源全部通过；世界图解析/装配冒烟检查通过。
+- 浏览器验证舆图输入锁、关口往返、一次性事件去重、跨区存档恢复及旧 v1 缺省字段兼容。
+- `npm run build` 与 `git diff --check` 通过；Vite 主 bundle 仍有超过 500 kB 的非阻断建议。
+
 ### Fixed (Round 08 parser isolation)
 
 - 当条件通过 draft-07 Schema、但同时声明的 `minValue`/`maxValue` 顺序相反时，防御解析器现在只隔离该对话并发出 warning，集合中其他对话和引用它们的 NPC 继续可用；顶层 envelope 错误仍拒绝整份集合，静态 Schema 错误仍按通用加载规则拒绝资源。

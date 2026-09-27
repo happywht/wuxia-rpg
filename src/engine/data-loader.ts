@@ -44,6 +44,8 @@ export type ResourceSource = { kind: 'base' } | { kind: 'mod'; modId: string };
 
 export interface LoadedResource {
   id: string;
+  /** Schema family from the manifest, used by generic multi-resource assemblers. */
+  schema: string;
   /** Schema-valid raw JSON; format-specific parsing is up to the consumer. */
   value: unknown;
   source: ResourceSource;
@@ -378,7 +380,12 @@ async function resolveResource(
     return null;
   }
 
-  let current: LoadedResource = { id: resource.id, value: baseValue, source: { kind: 'base' } };
+  let current: LoadedResource = {
+    id: resource.id,
+    schema: resource.schema,
+    value: baseValue,
+    source: { kind: 'base' },
+  };
 
   for (const modId of ctx.enabledMods) {
     const overrideUrl = joinUrl(ctx.baseUrl, MODS_URL_SEGMENT, modId, resource.path);
@@ -407,7 +414,12 @@ async function resolveResource(
       });
       continue;
     }
-    current = { id: resource.id, value: overrideValue, source: { kind: 'mod', modId } };
+    current = {
+      id: resource.id,
+      schema: resource.schema,
+      value: overrideValue,
+      source: { kind: 'mod', modId },
+    };
   }
 
   return current;

@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wuxia-rpg.invalid/schema/world-map",
+  "title": "世界地图与区域事件",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "startingMapResourceId", "regions", "transitions", "events"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "startingMapResourceId": { "type": "string", "minLength": 1 },
+    "regions": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["mapResourceId", "name", "description", "atlasPosition"],
+        "properties": {
+          "mapResourceId": { "type": "string", "minLength": 1 },
+          "name": { "type": "string", "minLength": 1 },
+          "description": { "type": "string" },
+          "atlasPosition": { "$ref": "#/definitions/atlasPosition" }
+        }
+      }
+    },
+    "transitions": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "name", "from", "to"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "name": { "type": "string", "minLength": 1 },
+          "from": { "$ref": "#/definitions/endpoint" },
+          "to": { "$ref": "#/definitions/endpoint" }
+        }
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "mapResourceId", "col", "row", "text", "once"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "mapResourceId": { "type": "string", "minLength": 1 },
+          "col": { "type": "integer", "minimum": 0, "maximum": 255 },
+          "row": { "type": "integer", "minimum": 0, "maximum": 255 },
+          "text": { "type": "string", "minLength": 1 },
+          "once": { "type": "boolean" }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "cell": {
+      "type": "object", "additionalProperties": false,
+      "required": ["col", "row"],
+      "properties": {
+        "col": { "type": "integer", "minimum": 0, "maximum": 255 },
+        "row": { "type": "integer", "minimum": 0, "maximum": 255 }
+      }
+    },
+    "endpoint": {
+      "type": "object", "additionalProperties": false,
+      "required": ["mapResourceId", "col", "row"],
+      "properties": {
+        "mapResourceId": { "type": "string", "minLength": 1 },
+        "col": { "type": "integer", "minimum": 0, "maximum": 255 },
+        "row": { "type": "integer", "minimum": 0, "maximum": 255 }
+      }
+    },
+    "atlasPosition": {
+      "type": "object", "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "y": { "type": "integer", "minimum": 0, "maximum": 100 }
+      }
+    }
+  }
+}

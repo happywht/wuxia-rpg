@@ -126,7 +126,7 @@ export interface SaveSnapshotV1 {
   displayName: string;
   /** Character template id the run started from. */
   profileId: string;
-  /** Map resource id the run takes place on (multi-map saves arrive R10). */
+  /** Map resource id the run takes place on. */
   mapResourceId: string;
   playerPosition: { col: number; row: number };
   player: SavePlayerData;
@@ -153,6 +153,8 @@ export interface SaveSnapshotV1 {
   };
   /** One-shot encounter ids already beaten this run. */
   completedEncounters: string[];
+  /** One-shot data event ids already triggered; absent in older v1 saves. */
+  completedRegionalEvents: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -514,6 +516,12 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
   if (completedEncounters === null) {
     errors.push('completedEncounters：应为非重复的非空字符串数组');
   }
+  const completedRegionalEvents = raw.completedRegionalEvents === undefined
+    ? []
+    : requireUniqueNonEmptyStringArray(raw.completedRegionalEvents);
+  if (completedRegionalEvents === null) {
+    errors.push('completedRegionalEvents：应为非重复的非空字符串数组');
+  }
 
   if (
     errors.length > 0 ||
@@ -533,7 +541,8 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     capacity === null ||
     morality === null ||
     renown === null ||
-    completedEncounters === null
+    completedEncounters === null ||
+    completedRegionalEvents === null
   ) {
     return { ok: false, reason: 'corrupt', message: '存档结构不合规', errors };
   }
@@ -558,6 +567,7 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     quests: { states: questStates, trackedQuestId },
     social: { morality, renown, relationships },
     completedEncounters,
+    completedRegionalEvents,
   };
   return { ok: true, snapshot };
 }
@@ -813,6 +823,7 @@ export interface CaptureInput {
   journal: Readonly<QuestJournal>;
   social: Readonly<SocialState>;
   completedEncounters: ReadonlySet<string>;
+  completedRegionalEvents: ReadonlySet<string>;
   /** Injectable clock for deterministic tests. */
   now?: () => Date;
 }
@@ -859,6 +870,7 @@ export function captureSaveSnapshot(input: CaptureInput): SaveSnapshotV1 {
       relationships: [...input.social.relationships.entries()].map(([id, value]) => ({ id, value })),
     },
     completedEncounters: [...input.completedEncounters],
+    completedRegionalEvents: [...input.completedRegionalEvents],
   };
 }
 
@@ -877,6 +889,11 @@ export interface SaveWorldReferences {
   isWalkableCell: (col: number, row: number) => boolean;
   /** True while an NPC or still-active encounter occupies the cell. */
   isCellOccupied: (col: number, row: number) => boolean;
+  /** Additional map geometries/occupancy for cross-region saves (Round 10). */
+  maps?: ReadonlyMap<string, {
+    isWalkableCell: (col: number, row: number) => boolean;
+    isCellOccupied: (col: number, row: number) => boolean;
+  }>;
   itemIds: ReadonlySet<string>;
   /** Item category, slot and stack limit for load-time sanitization. */
   itemRecords?: ReadonlyMap<string, ItemRecordData>;
@@ -892,6 +909,8 @@ export interface SaveWorldReferences {
   /** Current objective caps, used to clamp progress on changed quest data. */
   questRecords?: ReadonlyMap<string, QuestData>;
   npcIds: ReadonlySet<string>;
+  /** Current valid event ids; stale completion flags are dropped on load. */
+  regionalEventIds?: ReadonlySet<string>;
 }
 
 export type RestorePlanResult =
@@ -923,16 +942,17 @@ export function planSnapshotRestore(
       `存档等级 ${snapshot.player.level} 超过当前角色模板的上限 ${profile.maxLevel}`,
     );
   }
-  if (snapshot.mapResourceId !== refs.mapResourceId) {
+  const mapReferences = refs.maps?.get(snapshot.mapResourceId) ??
+    (snapshot.mapResourceId === refs.mapResourceId
+      ? { isWalkableCell: refs.isWalkableCell, isCellOccupied: refs.isCellOccupied }
+      : undefined);
+  if (mapReferences === undefined) {
+    errors.push(`存档引用的地图资源 "${snapshot.mapResourceId}" 在当前世界中不存在或已失效`);
+  } else if (!mapReferences.isWalkableCell(snapshot.playerPosition.col, snapshot.playerPosition.row)) {
     errors.push(
-      `存档来自地图资源 "${snapshot.mapResourceId}"，与当前地图 "${refs.mapResourceId}" 不一致（跨地图读档在后续轮次提供）`,
+      `存档位置 (${snapshot.playerPosition.col}, ${snapshot.playerPosition.row}) 不在地图 "${snapshot.mapResourceId}" 的可通行区域内`,
     );
-  }
-  if (!refs.isWalkableCell(snapshot.playerPosition.col, snapshot.playerPosition.row)) {
-    errors.push(
-      `存档位置 (${snapshot.playerPosition.col}, ${snapshot.playerPosition.row}) 不在当前地图的可通行区域内`,
-    );
-  } else if (refs.isCellOccupied(snapshot.playerPosition.col, snapshot.playerPosition.row)) {
+  } else if (mapReferences.isCellOccupied(snapshot.playerPosition.col, snapshot.playerPosition.row)) {
     errors.push(
       `存档位置 (${snapshot.playerPosition.col}, ${snapshot.playerPosition.row}) 被当前世界的人物或敌人占据`,
     );
@@ -1095,6 +1115,11 @@ export function planSnapshotRestore(
     warnings.push(`已完成的遭遇 "${encounterId}" 在当前资料中不存在，已忽略`);
     return false;
   });
+  const completedRegionalEvents = snapshot.completedRegionalEvents.filter((eventId) => {
+    if (refs.regionalEventIds?.has(eventId) ?? true) return true;
+    warnings.push(`区域事件 "${eventId}" 在当前资料中不存在，忽略其完成状态`);
+    return false;
+  });
 
   return {
     ok: true,
@@ -1107,6 +1132,7 @@ export function planSnapshotRestore(
       quests: { states: questStates, trackedQuestId },
       social: { ...snapshot.social, relationships },
       completedEncounters,
+      completedRegionalEvents,
     },
   };
 }
@@ -1133,6 +1159,7 @@ export interface RestoredRunState {
   journal: QuestJournal;
   social: SocialState;
   completedEncounters: string[];
+  completedRegionalEvents: string[];
 }
 
 /**
@@ -1223,6 +1250,7 @@ export function restoreRunState(input: RestoreRunInput): RestoredRunState {
     journal,
     social,
     completedEncounters: [...snapshot.completedEncounters],
+    completedRegionalEvents: [...snapshot.completedRegionalEvents],
   };
 }
 
