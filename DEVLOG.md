@@ -302,6 +302,12 @@
 - 游戏画布尺寸说明与 `src/main.ts` 的 960×540 / `Phaser.Scale.FIT` 配置一致。
 - 验证：PowerShell 检查确认 10 项 manifest 资源均指向存在的 draft-07 schema，11 份 schema（含 manifest）无未登记文件；GDD 状态和逐项 Schema 名称检查通过；`npm run build`（含 `tsc --noEmit`）及 `git diff --check` 通过。Vite 仍有既有主 chunk 大于 500 kB 的非阻断提示。
 
+### Round 00 核心系统设计矩阵（2026-09-27）
+
+- 在 GDD 核心循环后增加系统目标表，集中表达探索/区域、NPC/对话、任务/事件、成长/门派/武学、回合制战斗、物品/经济、社会后果/结局、江湖模拟、存档/设置/MOD 的玩家体验目标和完成/规划状态。
+- 明确此表是本作原创产品目标而非原作规格；每行对应 ROADMAP 轮次，避免将已完成的 R01–R09 最小闭环与 R10+ 扩展混写。补充当前键位基线，并逐项对照 `GridScene` 的方向键/WASD、E、F、B、Q、Esc 绑定和 R41 可访问性计划。
+- 验证：系统矩阵引用的轮次均能在路线图中解析；键盘绑定、960×540/Scale.FIT 画布及覆盖层输入锁均与代码一致；`npm run build`（97 模块）和 `git diff --check` 通过，只有既有主 chunk 大于 500 kB 的 Vite 建议。
+
 ### 产出
 
 - 配置与入口：`package.json`、`tsconfig.json`、`vite.config.ts`、`index.html`、`.gitignore`。
