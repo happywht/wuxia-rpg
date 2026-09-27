@@ -61,6 +61,8 @@ export interface BattleEncounterData {
   mapResourceId: string;
   position: CellPosition;
   profileId: string;
+  /** Optional graph character entry revealed when the player faces this foe. */
+  knowledgeNodeId?: string;
   enemy: EncounterEnemyData;
   victoryExperience: number;
   defeatRecovery: {
@@ -234,6 +236,9 @@ export function parseBattleEncounterSet(raw: unknown): BattleEncounterSetParseRe
     const name = requireNonEmptyString(entry.name);
     const mapResourceId = requireNonEmptyString(entry.mapResourceId);
     const profileId = requireNonEmptyString(entry.profileId);
+    const knowledgeNodeId = entry.knowledgeNodeId === undefined
+      ? null
+      : requireNonEmptyString(entry.knowledgeNodeId);
     const victoryExperience = requireIntegerInRange(entry.victoryExperience, 0, 1_000_000);
     const repeatable = typeof entry.repeatable === 'boolean' ? entry.repeatable : null;
 
@@ -262,6 +267,9 @@ export function parseBattleEncounterSet(raw: unknown): BattleEncounterSetParseRe
     }
     if (profileId === null) {
       problems.push(`${label}.profileId：应为非空字符串`);
+    }
+    if (entry.knowledgeNodeId !== undefined && knowledgeNodeId === null) {
+      problems.push(`${label}.knowledgeNodeId：应为非空知识节点 id`);
     }
     if (victoryExperience === null) {
       problems.push(`${label}.victoryExperience：应为 0–1000000 的整数`);
@@ -302,6 +310,7 @@ export function parseBattleEncounterSet(raw: unknown): BattleEncounterSetParseRe
       mapResourceId,
       position: { col, row },
       profileId,
+      ...(knowledgeNodeId !== null ? { knowledgeNodeId } : {}),
       enemy,
       victoryExperience,
       defeatRecovery: { healthRatio, qiRatio },
@@ -346,6 +355,8 @@ export interface BattleEncounterAssemblyInput {
   profiles: ReadonlyMap<string, CharacterProfileData>;
   /** Valid martial arts by id (already faction-checked). */
   martialArts: ReadonlyMap<string, MartialArtData>;
+  /** Knowledge node ids whose kind is character, used for optional encounter discoveries. */
+  knowledgeCharacterNodeIds: ReadonlySet<string>;
 }
 
 export interface BattleEncounterAssemblyResult {
@@ -451,8 +462,14 @@ export function assembleBattleEncounters(
     }
 
     occupiedCells.set(cellKey(record.position.col, record.position.row), record.id);
+    let placedRecord = record;
+    if (record.knowledgeNodeId !== undefined && !input.knowledgeCharacterNodeIds.has(record.knowledgeNodeId)) {
+      const { knowledgeNodeId: _invalidKnowledgeNodeId, ...withoutKnowledgeReference } = record;
+      placedRecord = withoutKnowledgeReference;
+      warnings.push(`遭遇 "${record.id}" 的知识人物节点 "${record.knowledgeNodeId}" 不存在或并非人物，见闻引用已忽略`);
+    }
     encounters.push({
-      record,
+      record: placedRecord,
       col: record.position.col,
       row: record.position.row,
       profile,

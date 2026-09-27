@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：Round 03–28 已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台、门派战、自创武学、经脉、装备锻造、炼丹、存档、区域旅行、知识图谱、NPC 私有记忆、昼夜气候、日程、条件奇遇、多层社会声望、多结局与成就；Round 28 专项与回归验证已通过；详情分别见 `docs/SAVES.md`、`docs/KNOWLEDGE-GRAPH.md`、`docs/ENDINGS.md`、`docs/ACHIEVEMENTS.md`、`docs/COMPANIONS.md`、`docs/FACTION_WAR_DESIGN.md`、`docs/MARTIAL_ART_FORGE.md`、`docs/EQUIPMENT-FORGING.md` 与 `docs/ALCHEMY.md`。
+- 状态：Round 03–29 已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台、门派战、自创武学、经脉、装备锻造、炼丹、存档、区域旅行、知识图谱、NPC 私有记忆、江湖图鉴、昼夜气候、日程、条件奇遇、多层社会声望、多结局与成就；Round 29 专项、资料校验、R28 回归和生产构建均已通过；详情分别见 `docs/SAVES.md`、`docs/KNOWLEDGE-GRAPH.md`、`docs/ENDINGS.md`、`docs/ACHIEVEMENTS.md`、`docs/COMPANIONS.md`、`docs/FACTION_WAR_DESIGN.md`、`docs/MARTIAL_ART_FORGE.md`、`docs/EQUIPMENT-FORGING.md` 与 `docs/ALCHEMY.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -50,7 +50,7 @@ Round 19 状态：`companion.round-19-set` 登记可选伙伴集合。伙伴由 
 
 Round 11 状态：manifest 登记可选 `knowledge-nodes` 与 `knowledge-edges` 资源，分别使用 `knowledge-nodes.schema.json` 与 `knowledge-edges.schema.json`；节点类别为 character/place/faction/item/martialArt/event/quest/ending，关系类型为 mentorOf/parentOf/hostileTo/belongsTo/locatedAt/holds/triggers/requires/rewards/knows/participatesIn/influences。节点含稳定 id、类型、标题、摘要和 `knownByDefault`；边含稳定 id、两端节点 id、关系类型和说明。Round 26 允许人物到人物边增加可选非零 `attitudeSpread`（-1…1）；parser 与图装配验证值域和端点类型。解析器对坏单条给警告并隔离，装配时重复 id 保留首项，悬空端点关系逐条丢弃。
 
-玩家新局从 `knownByDefault: true` 节点建立知识状态。对话选项可以声明 `{ "kind": "knowledgeKnown", "nodeId": "kg.node-id" }` 条件，全部条件满足才显示；效果 `{ "kind": "discoverKnowledgeNode", "nodeId": "kg.node-id" }` 会解锁词条，重复发现幂等。悬空引用只剔除对应对话选项。K 打开百科，左右/A/D 切换分类、上下/W/S 浏览、Esc 或 K 关闭。未发现条目只汇总为“未解锁见闻”，不会泄漏标题、摘要或相关边；关系只在两端节点都已知时显示。已知 id 随存档保存。具体内容组织和编辑步骤见 `docs/KNOWLEDGE-GRAPH.md`。
+玩家新局从 `knownByDefault: true` 节点建立知识状态。对话选项可以声明 `{ "kind": "knowledgeKnown", "nodeId": "kg.node-id" }` 条件，全部条件满足才显示；效果 `{ "kind": "discoverKnowledgeNode", "nodeId": "kg.node-id" }` 会解锁词条，重复发现幂等。悬空引用只剔除对应对话选项。K 打开百科；L 打开图鉴，两个面板都用左右/A/D 切换分类、上下/W/S 浏览，Esc 关闭。图鉴按八种节点 kind 投影已发现/总量/百分比，不另存重复状态；未知名称/摘要不泄露，只显示未解锁数量。人物、地图、物品、武学的稳定 id 与知识节点同 id 且 kind 相符时，首次观察到 NPC 交互、抵达地图、持有物品或已学武学会自动解锁。战斗遭遇可选填写 `knowledgeNodeId` 指向人物词条，装配时校验当前有效 character 节点，首次迎战时记录；悬空或非人物引用只忽略这项见闻链接。百科关系仅在两端都已知时显示；知识 id 沿用 v1 存档字段。具体内容组织和编辑步骤见 `docs/KNOWLEDGE-GRAPH.md`。
 
 Round 14 状态：manifest 登记**必需**资源 `calendar.base` → `worldview/calendar.json`（`game-calendar` schema）。历法声明月份序列（id/名称/天数 1–60，至多 24 个月）、日内时段（id/名称/起始分钟 0–1439/照度 0–1，至多 24 段；必须存在零点时段且起始分钟互异）、起始时刻（年/月 id/日/日内分钟）与动作耗时（`stepMinutes` 0–1440、`travelMinutes`/`waitMinutes` 1–1440）。语义校验拒绝重复月份/时段 id、重复时段起点、悬空起始月份、超出当月天数的起始日与越界耗时——历法无效即整资源拒绝（可读错误面板），不做部分降级。时段按循环边界划分，可跨午夜；运行时 HUD 显示历日/时刻/时段，世界层按时段照度渐变调色。一天固定 1440 分钟；游戏时间只由成功移动（每步 `stepMinutes`）、成功区域旅行（`travelMinutes`）与 V 键等候（`waitMinutes`）推进，被阻挡或被面板拦截的操作零消耗。存档保存相对起始时刻的分钟计数（`elapsedGameMinutes`），日期随时由当前资料折算。对白写作细节见 `docs/DIALOGUE-GUIDE.md`。
 
@@ -67,6 +67,8 @@ Round 26 以 `social.npcKnowledge` 保存动态 NPC 见闻；旧 v1 缺字段时
 Round 27 新增可选 `ending-set` 资源，使用 `ending-set.schema.json`，可由同路径 MOD 覆盖。资源为终章声明一个地图入口、多个结局文本和 AND 条件；条件可读取任务状态、善恶、江湖/门派声望、NPC 关系、门派身份及已知图谱节点。加载时逐结局校验引用与地图占格，坏入口使该资源不可用，坏结局只隔离该结局；NPC 日程不会进入终章格。结局评估为纯函数，界面显示未满足条件并在确认时重算。当前原型在读完结局后回主菜单，尚不记录结局选择到存档。资料字段、路线及限制见 [`ENDINGS.md`](ENDINGS.md)。
 
 Round 28 新增可选 `achievement-set` 资源，使用 `achievement-set.schema.json`，成就 JSON 放在 `achievements/` 并可由 MOD 同路径覆盖。每条成就声明 1–12 个 AND 条件（封闭 14 类：等级、任务/见闻/战斗/擂台/经脉/自创武学/锻造/炼丹计数、指定见闻、善恶/声望/人物关系区间、门派身份）和一次性经验/银两奖励；条件必带作者 `hint` 用于面板提示。Schema 校验字段封闭与基本类型，防御解析器逐条隔离语义越界/缺项成就，装配期再校验悬空人物/门派/知识引用。缺资源时世界照常运行；解锁 id 与活动计数保存在 v1 可选 `achievementState`。条件词汇、进度投影、G 键面板与领奖幂等语义见 [`ACHIEVEMENTS.md`](ACHIEVEMENTS.md)。
+
+Round 29 图鉴不增加额外词条 Schema 或数据文件：它投影 `knowledge-nodes` 的八类条目并复用既有发现 id。`projectKnowledgeCollection` 是 Phaser-free 只读统计；`discoverObservedKnowledge` 只接受 character/place/item/martialArt 四组事实中同 id 且 kind 匹配的节点。图鉴列表只呈现已知词条及汇总的未知数量，K 百科则保留叙事关联浏览。发现 id 仍存入 v1 `knownKnowledgeNodeIds`，旧档、MOD 节点删除过滤与原规则相同。详细 UI 行为、解锁观察点与隔离规则见 [`KNOWLEDGE-GRAPH.md`](KNOWLEDGE-GRAPH.md)。
 
 Round 20 新增擂台资料族：manifest 中的可选 arena-set 资源按地图入口、角色模板、赛程武学、彩头物品逐项校验；坏入口只禁用对应擂台。赛事文件可由 MOD 使用同路径覆盖，资料字段和玩法边界见 docs/ARENA_DESIGN.md。
 
@@ -211,3 +213,4 @@ NPC 当前坐标是由地图、时钟和人物日程派生的临时运行状态�
 | 2026-09-27 | Round 19 | 新增可选伙伴资料族、NPC 引用装配、攻疗支援字段与 MOD 覆盖语义；详见 `docs/COMPANIONS.md` |
 | 2026-09-27 | Round 26 | 加入 NPC 私有知识、对白分享与图谱关系态度传播规则，并扩展 v1 兼容字段 |
 | 2026-09-27 | Round 28 | 登记可选 achievement-set 资源族、条件/奖励契约、逐条隔离规则与 `achievementState` 存档字段；专项烟测与回归通过 |
+| 2026-09-27 | Round 29 | 从知识图谱派生八类图鉴进度，以稳定 ID 观察人物/地图/物品/武学发现；复用 v1 已知见闻字段 |

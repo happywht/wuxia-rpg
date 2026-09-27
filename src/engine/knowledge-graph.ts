@@ -17,6 +17,22 @@ export const KNOWLEDGE_NODE_KINDS = [
 
 export type KnowledgeNodeKind = (typeof KNOWLEDGE_NODE_KINDS)[number];
 
+export interface KnowledgeCollectionProgress {
+  kind: KnowledgeNodeKind;
+  discovered: number;
+  total: number;
+  /** Empty categories report 0%; they contain no collectible entries yet. */
+  percent: number;
+}
+
+/** Runtime facts with stable ids that can reveal matching graph entries. */
+export interface KnowledgeObservations {
+  characterIds?: readonly string[];
+  placeIds?: readonly string[];
+  itemIds?: readonly string[];
+  martialArtIds?: readonly string[];
+}
+
 export const KNOWLEDGE_RELATIONS = [
   'mentorOf',
   'parentOf',
@@ -218,6 +234,56 @@ export function createKnowledgeState(
     if (graph.nodes.has(id)) known.add(id);
   }
   return known;
+}
+
+/** Purely projects collection totals from the graph and current discovery set. */
+export function projectKnowledgeCollection(
+  graph: Pick<KnowledgeGraph, 'nodes'>,
+  knownNodeIds: ReadonlySet<string>,
+): KnowledgeCollectionProgress[] {
+  return KNOWLEDGE_NODE_KINDS.map((kind) => {
+    let total = 0;
+    let discovered = 0;
+    for (const node of graph.nodes.values()) {
+      if (node.kind !== kind) continue;
+      total += 1;
+      if (knownNodeIds.has(node.id)) discovered += 1;
+    }
+    return {
+      kind,
+      discovered,
+      total,
+      percent: total === 0 ? 0 : Math.floor((discovered / total) * 100),
+    };
+  });
+}
+
+/**
+ * Adds entries revealed by observed game facts when ids and node kinds match.
+ * The graph remains immutable; already-known, unknown, or mismatched ids are
+ * ignored, and the returned rows contain only newly discovered entries.
+ */
+export function discoverObservedKnowledge(
+  graph: Pick<KnowledgeGraph, 'nodes'>,
+  knownNodeIds: Set<string>,
+  observations: KnowledgeObservations,
+): KnowledgeNodeData[] {
+  const groups: readonly [KnowledgeNodeKind, readonly string[] | undefined][] = [
+    ['character', observations.characterIds],
+    ['place', observations.placeIds],
+    ['item', observations.itemIds],
+    ['martialArt', observations.martialArtIds],
+  ];
+  const discovered: KnowledgeNodeData[] = [];
+  for (const [kind, ids] of groups) {
+    for (const id of ids ?? []) {
+      const node = graph.nodes.get(id);
+      if (node === undefined || node.kind !== kind || knownNodeIds.has(id)) continue;
+      knownNodeIds.add(id);
+      discovered.push(node);
+    }
+  }
+  return discovered;
 }
 
 /** Static NPC knowledge comes only from directed, valid NPC `knows` edges. */

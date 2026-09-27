@@ -4,6 +4,19 @@
 
 ## [Unreleased]
 
+### Added (Round 29)
+
+- 新增独立 L 键江湖图鉴：按知识图谱八类展示已发现/总量和比例，未知条目只展示汇总数量，不暴露标题和摘要；K 键百科保留已知见闻与关联查询。
+- 知识图谱引擎新增纯函数分类进度投影及同 ID/kind 观察式解锁；与人物交互、首次迎战、抵达对应地图、持有物品、习得武学会自动记入现有发现集合。
+- 战斗遭遇可选声明 `knowledgeNodeId` 人物引用；首次迎战解锁对手词条，坏的可选图谱引用被忽略并警告，不影响遭遇战斗。
+- 发现状态仍复用 v1 `knownKnowledgeNodeIds`，未增加重复图鉴数据集、存档字段或协议版本；更新键位帮助、知识图谱、数据指南、架构、GDD 和专项烟测。
+
+### Verification (Round 29)
+
+- `npm run smoke:round-29`、`npm run typecheck`、`npm run validate:data`、`npm run smoke:round-28` 与 `npm run build`：通过。
+- 本地浏览器手动验证：新开局后 L 可打开图鉴，按 → 键切换到人物类并正确显示 5/10 与 50%；关闭图鉴后 K 可单独打开百科。
+- `git diff --check`：通过；Vite 仍提示主 JS chunk 超过 500 kB 默认建议线。
+
 ### Added (Round 28)
 
 - 新增可选 `achievement-set` 资料族与 schema（draft-07）；成就条件、展示文本与经验/银两奖励由 JSON/MOD 声明，封闭 14 类条件按 AND 组合，逐条坏成就只禁用自身。

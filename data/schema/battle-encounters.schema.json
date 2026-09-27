@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://wuxia-rpg.invalid/schema/battle-encounters",
   "title": "战斗遭遇集合",
-  "description": "战斗遭遇集合 JSON 的静态结构契约：字段名、类型与取值范围。遭遇名称、敌人属性/生命/内力、可用武学引用、胜利经验、失败恢复比例、重复性标志与全部提示文本均来自数据。跨资源语义（地图引用与触发格可走、不压出生点/NPC/其他遭遇格、角色模板与武学引用有效）由运行时装配逐条校验；单场遭遇失败只禁用该遭遇。",
+  "description": "战斗遭遇集合 JSON 的静态结构契约：字段名、类型与取值范围。遭遇名称、可选知识人物节点、敌人属性/生命/内力、可用武学引用、胜利经验、失败恢复比例、重复性标志与全部提示文本均来自数据。跨资源语义（地图引用与触发格可走、不压出生点/NPC/其他遭遇格、角色模板/武学/知识人物引用有效）由运行时装配逐条校验；单场遭遇失败只禁用该遭遇，坏的可选知识引用仅被忽略。",
   "definitions": {
     "cellPosition": {
       "description": "触发格坐标（与网格地图同坐标系）。",
@@ -87,6 +87,10 @@
           },
           "profileId": {
             "description": "参战玩家使用的角色模板 id（运行时校验存在且未被禁用）。",
+            "$ref": "#/definitions/stableId"
+          },
+          "knowledgeNodeId": {
+            "description": "可选的图谱人物节点 id；玩家首次面对该遭遇时记录人物见闻。无效或非人物引用在运行时忽略，不影响战斗。",
             "$ref": "#/definitions/stableId"
           },
           "enemy": {

@@ -49,12 +49,13 @@ export class ControlsPanel {
     this.addText('E　交互相邻人物、关口、区域事件、工位或终章石', left + 44, top + 122, 13, UI_PALETTE.text);
     this.addText('F　与相邻人物直接交谈', left + 44, top + 151, 14, UI_PALETTE.text);
     this.addText('V　原地等候片刻（面板打开时无效）', left + 44, top + 180, 14, UI_PALETTE.text);
-    this.addText('B 背包　N 经脉　C 自创武学　P 伙伴　J 师门　Q 差事　M 舆图　K 百科　G 成就　Esc 暂停', left + 44, top + 209, 12, UI_PALETTE.text);
-    this.addText('内修消耗升级修为和背包材料；打通的效果影响战斗属性', left + 44, top + 238, 11, UI_PALETTE.muted);
+    this.addText('B 背包　N 经脉　C 自创武学　P 伙伴　J 师门　G 成就', left + 44, top + 209, 12, UI_PALETTE.text);
+    this.addText('Q 差事　M 舆图　K 百科　L 图鉴　Esc 暂停', left + 44, top + 231, 12, UI_PALETTE.text);
+    this.addText('内修消耗修为和背包材料；图鉴进度随人物、地点、物品与武学发现更新', left + 44, top + 253, 10, UI_PALETTE.muted);
 
-    this.addText('面板', left + 28, top + 266, 13, UI_PALETTE.jade);
-    this.addText('↑/↓ 或 W/S　选择条目　·　Enter　确认', left + 44, top + 293, 13, UI_PALETTE.text);
-    this.addText('商店可用 ←/→ 或 A/D 切换买卖；战斗中 Esc 可撤退。', left + 44, top + 322, 12, UI_PALETTE.muted);
+    this.addText('面板', left + 28, top + 278, 13, UI_PALETTE.jade);
+    this.addText('↑/↓ 或 W/S　选择条目　·　Enter　确认', left + 44, top + 305, 13, UI_PALETTE.text);
+    this.addText('商店可用 ←/→ 或 A/D 切换买卖；战斗中 Esc 可撤退。', left + 44, top + 334, 12, UI_PALETTE.muted);
     this.addText('H 或 Esc 收起　·　方向键在帮助页打开时不会移动', left + width - 24, top + height - 24, 11, UI_PALETTE.accent, 'right');
   }
 

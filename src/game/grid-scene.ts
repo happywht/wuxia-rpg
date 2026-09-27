@@ -9,7 +9,12 @@ import {
   selectTriggeredRegionEvents,
   type RegionTransitionData,
 } from '../engine/world-map';
-import { createKnowledgeState, mergeNpcKnowledge } from '../engine/knowledge-graph';
+import {
+  createKnowledgeState,
+  discoverObservedKnowledge,
+  mergeNpcKnowledge,
+  type KnowledgeObservations,
+} from '../engine/knowledge-graph';
 import {
   createCompanionState,
   resolveCompanionFollowCell,
@@ -130,6 +135,7 @@ import { ShopPanel } from './shop-ui';
 import { QuestPanel } from './quest-ui';
 import { WorldMapPanel } from './world-map-ui';
 import { EncyclopediaPanel } from './encyclopedia-ui';
+import { CollectionPanel } from './collection-ui';
 import { PauseMenuPanel } from './pause-menu';
 import { ControlsPanel } from './controls-ui';
 import { FactionPanel } from './faction-ui';
@@ -347,6 +353,7 @@ export class GridScene extends Phaser.Scene {
   private factionPanel: FactionPanel | null = null;
   private worldMapPanel: WorldMapPanel | null = null;
   private encyclopediaPanel: EncyclopediaPanel | null = null;
+  private collectionPanel: CollectionPanel | null = null;
   private companionPanel: CompanionPanel | null = null;
   private arenaPanel: ArenaPanel | null = null;
   private factionWarPanel: FactionWarPanel | null = null;
@@ -602,6 +609,7 @@ export class GridScene extends Phaser.Scene {
       this.playerRow = map.playerStart.row;
     }
     this.social.npcKnowledge = mergeNpcKnowledge(world.knowledgeGraph, this.social.npcKnowledge);
+    this.syncKnowledgeFromRunFacts();
     if (this.playerProfile !== null && this.playerState !== null) {
       applyMeridianEffects(
         this.playerProfile,
@@ -698,6 +706,7 @@ export class GridScene extends Phaser.Scene {
     this.meridianPanel = new MeridianPanel(this, () => this.noteOverlayClosed());
     this.worldMapPanel = new WorldMapPanel(this, () => this.noteOverlayClosed());
     this.encyclopediaPanel = new EncyclopediaPanel(this, { onClose: () => this.noteOverlayClosed() });
+    this.collectionPanel = new CollectionPanel(this, { onClose: () => this.noteOverlayClosed() });
     this.updateQuestTrackerHud();
     this.updateInteractHint();
     this.triggerRegionEvents();
@@ -880,6 +889,7 @@ export class GridScene extends Phaser.Scene {
     if (this.storage === null || this.playerState === null || this.inventory === null) {
       return { ok: false, message: '浏览器本地存储不可用或当前无可保存的进度' };
     }
+    this.syncKnowledgeFromRunFacts();
     const snapshot = captureSaveSnapshot({
       displayName: this.playerDisplayName,
       mapResourceId: this.currentMapResourceId,
@@ -1208,6 +1218,7 @@ export class GridScene extends Phaser.Scene {
         const item = this.items.get(reward.itemId);
         if (item !== undefined) grantItems(this.inventory, item, reward.quantity);
       }
+      this.syncKnowledgeFromRunFacts();
       const prizes = [
         run.arena.record.reward.currency + ' 文钱',
         ...run.arena.record.reward.items.map((reward) =>
@@ -2008,7 +2019,7 @@ export class GridScene extends Phaser.Scene {
         : 'P 同行伙伴 · 暂无可交互人物');
       return;
     }
-    this.interactText.setText('N 经脉 · C 自创武学 · G 成就 · H 操作帮助 · Esc 暂停');
+    this.interactText.setText('N 经脉 · C 自创武学 · L 图鉴 · G 成就 · H 操作帮助 · Esc 暂停');
   }
 
   /** True while any keyboard overlay owns the input (dialogue/battle/backpack/shop/quest/pause). */
@@ -2022,6 +2033,7 @@ export class GridScene extends Phaser.Scene {
       (this.pauseMenu !== null && this.pauseMenu.isOpen) ||
       (this.worldMapPanel !== null && this.worldMapPanel.isOpen) ||
       (this.encyclopediaPanel !== null && this.encyclopediaPanel.isOpen) ||
+      (this.collectionPanel !== null && this.collectionPanel.isOpen) ||
       (this.factionPanel !== null && this.factionPanel.isOpen) ||
       (this.companionPanel !== null && this.companionPanel.isOpen) ||
       (this.arenaPanel !== null && this.arenaPanel.isOpen) ||
@@ -2221,6 +2233,39 @@ export class GridScene extends Phaser.Scene {
     this.updateInteractHint();
   }
 
+  /** L key: inspect collection progress derived from the shared knowledge graph. */
+  private toggleCollection(): void {
+    const panel = this.collectionPanel;
+    const world = this.world;
+    if (panel === null || world === null) return;
+    if (panel.isOpen) {
+      panel.close();
+      return;
+    }
+    if (this.anyOverlayOpen()) return;
+    this.syncKnowledgeFromRunFacts();
+    panel.open({ graph: world.knowledgeGraph, knownNodeIds: this.knownKnowledgeNodeIds });
+    this.updateInteractHint();
+  }
+
+  /** Reconciles concrete runtime facts against same-id graph entries only. */
+  private recordKnowledgeObservations(observations: KnowledgeObservations): void {
+    const graph = this.world?.knowledgeGraph;
+    if (graph === undefined) return;
+    discoverObservedKnowledge(graph, this.knownKnowledgeNodeIds, observations);
+  }
+
+  /** Items, learned arts and the current map are observed at stable run boundaries. */
+  private syncKnowledgeFromRunFacts(): void {
+    this.recordKnowledgeObservations({
+      placeIds: this.currentMapResourceId.length > 0 ? [this.currentMapResourceId] : [],
+      itemIds: (this.inventory?.stacks ?? [])
+        .filter((stack) => stack.quantity > 0)
+        .map((stack) => stack.itemId),
+      martialArtIds: this.playerState?.martialArtIds ?? [],
+    });
+  }
+
   /** G key: inspect data-authored achievements and current journey progress. */
   private toggleAchievements(): void {
     const panel = this.achievementPanel;
@@ -2302,6 +2347,7 @@ export class GridScene extends Phaser.Scene {
 
   /** Reconciles collect goals after any successful use or shop transaction. */
   private refreshQuestCollectObjectives(): void {
+    this.syncKnowledgeFromRunFacts();
     if (this.inventory === null) return;
     const completed: QuestUpdateResult['completed'][number][] = [];
     const failedQuestIds: string[] = [];
@@ -2391,6 +2437,7 @@ export class GridScene extends Phaser.Scene {
     if (this.playerProfile === null || this.playerState === null || this.inventory === null) {
       return; // No playable profile this run: no backpack.
     }
+    this.syncKnowledgeFromRunFacts();
     panel.open({
       profile: this.playerProfile,
       character: this.playerState,
@@ -2454,6 +2501,10 @@ export class GridScene extends Phaser.Scene {
     const onEncyclopedia = (): void => this.toggleEncyclopedia();
     encyclopediaKey.on('down', onEncyclopedia);
 
+    const collectionKey = keyboard.addKey(KeyCodes.L);
+    const onCollection = (): void => this.toggleCollection();
+    collectionKey.on('down', onCollection);
+
     const factionKey = keyboard.addKey(KeyCodes.J);
     const onFaction = (): void => this.toggleFactionPanel();
     factionKey.on('down', onFaction);
@@ -2495,6 +2546,7 @@ export class GridScene extends Phaser.Scene {
       pauseKey.off('down', onPause);
       worldMapKey.off('down', onWorldMap);
       encyclopediaKey.off('down', onEncyclopedia);
+      collectionKey.off('down', onCollection);
       factionKey.off('down', onFaction);
       martialArtForgeKey.off('down', onMartialArtForge);
       controlsKey.off('down', onControls);
@@ -2518,6 +2570,8 @@ export class GridScene extends Phaser.Scene {
       this.worldMapPanel = null;
       this.encyclopediaPanel?.destroy();
       this.encyclopediaPanel = null;
+      this.collectionPanel?.destroy();
+      this.collectionPanel = null;
       this.factionPanel?.destroy();
       this.factionPanel = null;
       this.companionPanel?.destroy();
@@ -2561,6 +2615,7 @@ export class GridScene extends Phaser.Scene {
       row: this.playerRow,
     });
     if (target !== null) {
+      this.recordKnowledgeObservations({ characterIds: [target.record.id] });
       const shop =
         target.record.shopId === null ? undefined : this.shops.get(target.record.shopId);
       const stock = shop === undefined ? undefined : this.shopStocks.get(shop.record.id);
@@ -2743,6 +2798,7 @@ export class GridScene extends Phaser.Scene {
     if (panel === null || conversation === undefined) {
       return; // Defensive: placement already guarantees resolution.
     }
+    this.recordKnowledgeObservations({ characterIds: [target.record.id] });
     panel.open(conversation, target.record.name, {
       visibleOptions: (node) =>
         getVisibleOptions(node, this.dialogueContextFor(target.record.id)),
@@ -2808,6 +2864,7 @@ export class GridScene extends Phaser.Scene {
       if (this.companionState.activeCompanionId !== companionBefore) {
         this.refreshNpcPlacements();
       }
+      this.syncKnowledgeFromRunFacts();
       // Dialogue effects can alter morality, relationships, faction, knowledge,
       // or learned arts without changing a quest. Re-evaluate while this
       // conversation is still active so those achievements unlock immediately.
@@ -2833,6 +2890,9 @@ export class GridScene extends Phaser.Scene {
     });
     if (encounter === null || this.playerProfile === null || this.playerState === null) {
       return encounter !== null; // A foe keeps priority over a gate even without a profile.
+    }
+    if (encounter.record.knowledgeNodeId !== undefined) {
+      this.recordKnowledgeObservations({ characterIds: [encounter.record.knowledgeNodeId] });
     }
     const activeCompanion = this.companions.get(this.companionState.activeCompanionId ?? '');
     const companionNpc = activeCompanion === undefined
@@ -2942,6 +3002,7 @@ export class GridScene extends Phaser.Scene {
     this.encounterMarkers.clear();
 
     this.currentMapResourceId = transition.to.mapResourceId;
+    this.recordKnowledgeObservations({ placeIds: [this.currentMapResourceId] });
     this.map = destinationMap;
     this.playerCol = transition.to.col;
     this.playerRow = transition.to.row;

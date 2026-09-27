@@ -656,6 +656,11 @@ function assembleOptionalContent(
   calendarPeriods: GameCalendarData['periods'],
 ): WorldAssembly {
   const warnings: Diagnostic[] = [];
+  const knowledgeCharacterNodeIds = new Set(
+    [...knowledgeNodes.values()]
+      .filter((node) => node.kind === 'character')
+      .map((node) => node.id),
+  );
 
   let martialArtForgeComponents: MartialArtForgeComponentSet | null = null;
   const forgeResource = resources.get(MARTIAL_ART_COMPONENT_RESOURCE_ID);
@@ -873,6 +878,7 @@ function assembleOptionalContent(
       ),
       profiles: progressionAssembled.assembly.profiles,
       martialArts: progressionAssembled.assembly.martialArts,
+      knowledgeCharacterNodeIds,
     }),
   );
   const globallySeenEncounterIds = new Set<string>();
