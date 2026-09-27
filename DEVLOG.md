@@ -4,6 +4,27 @@
 
 ---
 
+## Round 08 — 语义解析错误局部隔离追修（2026-09-27）
+
+### 计划与实现
+
+- 追加 Round 08 追修计划：Schema 接受的反向条件范围会被 `parseDialogueSet` 的语义校验拒绝；旧实现把一段解析错误返回为整份对话集失败。
+- `parseDialogueSet` 现在把逐段解析问题作为局部 warning 返回，只收录完整有效的对话；坏段不再丢弃同集合内的合法对话。顶层 envelope 错误仍拒绝整份集合。
+- `world-loader` 将解析器局部 warning 纳入世界装配告警，并继续索引/装配其他有效对话；静态 Schema 校验仍由通用数据加载器在资源级执行。
+- 更新 dialogue-set Schema 描述、架构降级表、资料指南、路线图与变更日志，说明 draft-07 无法表达上下界大小关系及其运行时隔离边界。
+
+### 验证
+
+- `node_modules/.bin/rolldown tmp-r08-dialogue-isolation-smoke.ts --platform node --format esm --file tmp-r08-dialogue-isolation-smoke.mjs` 后运行 `node tmp-r08-dialogue-isolation-smoke.mjs`：通过。Ajv 接受三类值域内的反向范围；解析器逐段隔离善恶、声望、NPC 关系三个错误对话，保留合法旧式对话；直接解析时单条坏记录也只产生局部 warning，坏顶层 envelope 仍拒绝。
+- `npm run build`：通过，`tsc --noEmit` 与 Vite 生产构建成功（97 个模块）；主 chunk 超过 500 kB 仍只有非阻断建议。
+- `git diff --check`：通过；只出现仓库现有的 LF→CRLF 工作副本提示。
+
+### 边界
+
+- Ajv 能检测到的静态结构/协议错误仍由通用加载器按资源级拒绝；本追修隔离的是资源通过静态 Schema 后由解析器发现的逐段语义问题。未改变原始对话资料，也未新增持久自动化测试文件。
+
+---
+
 ## Round 09 — 2026-09-27
 
 ### 计划与实现

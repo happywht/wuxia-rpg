@@ -98,7 +98,7 @@ export interface DialogueSetData {
 }
 
 export type DialogueSetParseResult =
-  | { ok: true; set: DialogueSetData }
+  | { ok: true; set: DialogueSetData; warnings: string[] }
   | { ok: false; errors: string[] };
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -363,8 +363,10 @@ function parseOptions(raw: unknown): DialogueOptionData[] | null | undefined {
 
 /**
  * Defensive re-parse of a dialogue-set document. The Ajv schema already
- * rejected structural violations at load time; this guards the engine
- * against unvalidated values and yields readable per-entry errors.
+ * rejected static shape violations at load time; this guards the engine
+ * against semantic and unvalidated values. A bad conversation is skipped
+ * with a local warning while valid siblings remain available. Only a broken
+ * set envelope rejects the complete document.
  */
 export function parseDialogueSet(raw: unknown): DialogueSetParseResult {
   if (
@@ -376,15 +378,15 @@ export function parseDialogueSet(raw: unknown): DialogueSetParseResult {
   }
 
   const conversations: DialogueData[] = [];
-  const errors: string[] = [];
+  const warnings: string[] = [];
   raw.conversations.forEach((entry, index) => {
     const label = `conversations[${index}]`;
     if (!isPlainObject(entry)) {
-      errors.push(`${label}：应为对象`);
+      warnings.push(`对话 ${label} 已禁用：应为对象`);
       return;
     }
     if (!hasOnlyKeys(entry, ['id', 'startNodeId', 'nodes'])) {
-      errors.push(`${label}：含有未声明字段`);
+      warnings.push(`对话 ${label} 已禁用：含有未声明字段`);
       return;
     }
 
@@ -404,18 +406,19 @@ export function parseDialogueSet(raw: unknown): DialogueSetParseResult {
       problems.push(`${label}.nodes：应为至少含一个节点的数组`);
     }
     if (id === null || startNodeId === null || !Array.isArray(rawNodes) || rawNodes.length === 0) {
-      errors.push(...problems);
+      const subject = id === null ? `对话 ${label}` : `对话 "${id}"`;
+      warnings.push(`${subject} 已禁用：${problems.join('；')}`);
       return;
     }
 
     rawNodes.forEach((node, nodeIndex) => {
       const nodeLabel = `${label}.nodes[${nodeIndex}]`;
       if (!isPlainObject(node)) {
-        errors.push(`${nodeLabel}：应为对象`);
+        problems.push(`${nodeLabel}：应为对象`);
         return;
       }
       if (!hasOnlyKeys(node, ['id', 'text', 'options'])) {
-        errors.push(`${nodeLabel}：含有未声明字段`);
+        problems.push(`${nodeLabel}：含有未声明字段`);
         return;
       }
       const nodeId = requireNonEmptyString(node.id);
@@ -433,23 +436,21 @@ export function parseDialogueSet(raw: unknown): DialogueSetParseResult {
         nodeProblems.push(`${nodeLabel}.options：应为选项数组，结束节点可省略或使用空数组`);
       }
       if (nodeId === null || text === null || options === null) {
-        errors.push(...nodeProblems);
+        problems.push(...nodeProblems);
         return;
       }
 
       nodes.push(options === undefined ? { id: nodeId, text } : { id: nodeId, text, options });
     });
 
-    if (errors.length > 0) {
-      return; // A single bad node invalidates the whole set document.
+    if (problems.length > 0) {
+      warnings.push(`对话 "${id}" 已禁用：${problems.join('；')}`);
+      return;
     }
     conversations.push({ id, startNodeId, nodes });
   });
 
-  if (errors.length > 0) {
-    return { ok: false, errors };
-  }
-  return { ok: true, set: { conversations } };
+  return { ok: true, set: { conversations }, warnings };
 }
 
 /**

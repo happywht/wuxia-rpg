@@ -298,6 +298,15 @@ function assembleOptionalContent(
         details: parsed.errors,
       });
     } else {
+      for (const warning of parsed.warnings) {
+        warnings.push({
+          resource: DIALOGUE_RESOURCE_ID,
+          origin: 'dialogue-assembly',
+          severity: 'warning',
+          message: warning,
+          details: [],
+        });
+      }
       const index = indexConversations(parsed.set);
       for (const id of index.duplicateIds) {
         warnings.push({

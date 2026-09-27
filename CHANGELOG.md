@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+### Fixed (Round 08 parser isolation)
+
+- 当条件通过 draft-07 Schema、但同时声明的 `minValue`/`maxValue` 顺序相反时，防御解析器现在只隔离该对话并发出 warning，集合中其他对话和引用它们的 NPC 继续可用；顶层 envelope 错误仍拒绝整份集合，静态 Schema 错误仍按通用加载规则拒绝资源。
+
 ### Fixed (Round 00 reference audit)
 
 - 给 `docs/REFERENCES.md` 的历史/回忆来源与官方技术资料统一分配不重复编号（#1–#12），并明确官网文档页面许可未逐页核实、仅作事实查阅；npm 包许可证仅按精确版本 registry 元数据记录，不代表文档页面许可。

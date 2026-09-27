@@ -43,6 +43,7 @@ Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id
 | 可选资源（NPC/对话/角色模板/门派/武学/战斗遭遇/物品/商店/任务）或其 schema 缺失、不可解析、schema 不符、未通过语义校验 | 降级为警告；场景继续装配其余内容 | 地图与移动不受影响；HUD 显示"已禁用相应内容"警告行，控制台保留结构化诊断 |
 | 单条 NPC 记录坏（引用不存在、坐标越界/阻挡、压出生点、同格冲突、id 重复） | 只禁用该 NPC，其余照常放置 | 同上；警告消息点名被禁用的 NPC 与原因 |
 | 单段对话坏（起始节点/选项引用断裂、节点 id 重复）或对话 id 重复 | 只禁用该对话及引用它的 NPC，其余照常 | 同上 |
+| 对话条件通过静态 Schema 但语义无效（例如同时提供的 `minValue` 大于 `maxValue`） | 只禁用该对话及引用它的 NPC；其他合法对话保留 | 同上；warning 点名段落与原因。静态 Schema 违规仍按资源级拒绝 |
 | 单个对话选项的条件/效果引用坏（questId/itemId/npcId 悬空） | 只剔除该选项；其所在节点可能因此成为结束节点，对话与其余选项照常 | 同上；警告点名对话、节点与被剔除的选项 |
 | 角色模板/门派条目 id 重复 | 保留先声明者并警告 | 同上；警告点名重复 id |
 | 单条武学坏（引用的门派不存在或已被禁用） | 只禁用该武学，其余照常索引 | 同上；警告点名被禁用的武学与悬空门派 id |
@@ -62,7 +63,7 @@ Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id
 
 - 当前 schema 使用 draft-07：`manifest.schema.json`、`grid-map.schema.json`、`npc-set.schema.json`、`dialogue-set.schema.json`、`character-profiles.schema.json`、`faction-set.schema.json`、`martial-arts-set.schema.json`、`battle-encounters.schema.json`、`items-set.schema.json`、`shops-set.schema.json` 与 `quest-set.schema.json`；后续数据族各自补充契约。
 - Ajv 8.x 在加载期校验 manifest、基础资源和每份 MOD 覆盖（开发/生产相同），不在游戏循环内反复校验。
-- 跨字段规则分两层：单文件语义（地图尺寸/出生点；角色模板成长与起始资源；武学初始熟练度；消耗品必须恢复生命或内力）由按 schema id 注册的语义校验器补足；对话条件/效果的封闭 kind 枚举、字段白名单与值域由 Ajv schema（`additionalProperties: false` + 枚举/范围）拒绝、引擎防御解析（`parseDialogueSet`）二次兜底。跨资源语义（NPC 的地图/对话；武学的门派；遭遇的地图/模板/武学；物品的起始模板引用；商店 NPC 与库存物品引用；任务发布 NPC、目标、前置任务及失败遭遇；对话选项条件/效果对任务/物品/NPC 的引用）由装配层逐条校验补足（`npc-placement.ts`、`dialogue-graph.ts`、`character-progression.ts`、`turn-based-combat.ts`、`item-system.ts`、`quest-system.ts`、`dialogue-runtime.ts`），失败只禁用受影响的最小条目。正式校验细节见 `docs/ADR.md` ADR-0004。
+- 跨字段规则分两层：单文件语义（地图尺寸/出生点；角色模板成长与起始资源；武学初始熟练度；消耗品必须恢复生命或内力）由按 schema id 注册的语义校验器补足；对话条件/效果的封闭 kind 枚举、字段白名单与数值值域由 Ajv schema（`additionalProperties: false` + 枚举/范围）拒绝、引擎防御解析（`parseDialogueSet`）二次兜底；draft-07 无法比较两个字段的大小，对同时提供的 `minValue`/`maxValue` 执行顺序检查并按对话隔离。跨资源语义（NPC 的地图/对话；武学的门派；遭遇的地图/模板/武学；物品的起始模板引用；商店 NPC 与库存物品引用；任务发布 NPC、目标、前置任务及失败遭遇；对话选项条件/效果对任务/物品/NPC 的引用）由装配层逐条校验补足（`npc-placement.ts`、`dialogue-graph.ts`、`character-progression.ts`、`turn-based-combat.ts`、`item-system.ts`、`quest-system.ts`、`dialogue-runtime.ts`），失败只禁用受影响的最小条目。正式校验细节见 `docs/ADR.md` ADR-0004。
 - 错误输出为结构化诊断（来源、资源、消息和字段路径），可被事件总线订阅并显示在场景。
 
 ## 4. mod 覆盖：同名文件优先级（Round 02 已提供基础能力，Round 35 增强作者工具）
