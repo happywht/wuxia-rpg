@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wuxia-rpg.invalid/schema/content-package",
+  "title": "内容包（content package）",
+  "description": "可分享的单文件 MOD 内容包（.wuxia.json）。包内只携带资源 id 与数据本体，不携带任何文件路径——安装路径一律由目标仓库当前可信 manifest 的资源登记解析。formatVersion 语义上仅支持 1；更大的值表示来自更新工具的未来格式，导入端在 schema 之外给出明确的版本拒绝（schema 只兜底类型与下界）。资源级结构与内容合法性由 manifest 指向的各资源 schema 在导入预检时逐项校验，本 schema 只约束包层结构。跨资源语义（引用闭合、坐标一致等）仍由运行时加载器负责。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["formatVersion", "package", "minimumEngineVersion", "resources"],
+  "properties": {
+    "formatVersion": {
+      "description": "包格式协议版本；当前引擎只实现 1。",
+      "type": "integer",
+      "minimum": 1
+    },
+    "package": {
+      "type": "object",
+      "description": "包自身的稳定标识与展示元数据；id 同时是安装时的 mods/ 一级目录名。",
+      "additionalProperties": false,
+      "required": ["id", "name", "version"],
+      "properties": {
+        "id": {
+          "description": "安全单一目录名（与 manifest enabledMods/modId 同一规则：禁止路径分隔符、穿越与以点开头的段）。",
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_\\-一-鿿][A-Za-z0-9._\\-一-鿿]*$"
+        },
+        "name": {
+          "description": "人类可读包名。",
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "description": "包版本，严格三段数字（语义化版本的核心子集）。",
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "description": {
+          "description": "可选一句话说明。",
+          "type": "string"
+        },
+        "author": {
+          "description": "可选作者署名。",
+          "type": "string"
+        }
+      }
+    },
+    "minimumEngineVersion": {
+      "description": "安装本包所需的最低引擎版本，严格三段数字；导入端按数字逐段比较，宽放或非数字串一律拒绝。",
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "resources": {
+      "type": "array",
+      "description": "包内资源条目；id 必须是目标仓库 manifest 已登记的资源 id，sha256 是 data 经递归键排序规范 JSON 序列化（UTF-8）后的 SHA-256 十六进制小写值。",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "sha256", "data"],
+        "properties": {
+          "id": {
+            "description": "目标仓库 manifest 中的稳定资源 id，如 map.round-01-grid。",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+          },
+          "sha256": {
+            "description": "data 规范 JSON 的 SHA-256（64 位小写十六进制）。",
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "data": {
+            "description": "资源 JSON 本体；安装时按 manifest 登记路径落盘，格式化差异不影响校验和。"
+          }
+        }
+      }
+    }
+  }
+}

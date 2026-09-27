@@ -11,6 +11,8 @@
     "typecheck": "tsc --noEmit",
     "validate:data": "node scripts/validate-data.mjs",
     "inspect:mods": "node scripts/inspect-mods.mjs",
+    "content:export": "node scripts/content-package.mjs export",
+    "content:import": "node scripts/content-package.mjs import",
     "audit:round-34": "node scripts/audit-round-34-docs.mjs",
     "smoke:round-20": "node scripts/smoke-round-20.mjs",
     "smoke:round-21": "node scripts/smoke-round-21.mjs",
@@ -27,7 +29,8 @@
     "smoke:round-32": "node scripts/smoke-round-32.mjs",
     "smoke:round-33": "node scripts/smoke-round-33.mjs",
     "smoke:round-35": "node scripts/smoke-round-35.mjs",
-    "smoke:round-36": "node scripts/smoke-round-36.mjs"
+    "smoke:round-36": "node scripts/smoke-round-36.mjs",
+    "smoke:round-37": "node scripts/smoke-round-37.mjs"
   },
   "dependencies": {
     "ajv": "^8.20.0",

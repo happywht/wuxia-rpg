@@ -4,6 +4,30 @@
 
 ---
 
+## Round 37 — 单文件 v1 内容包：导出、只读预检与显式安装（2026-09-28，已完成）
+
+### 计划与实现
+
+- 先写 `iterations/round-37/plan.md`，子任务为：包格式 Schema 与确定性摘要、预检/显式安装 CLI、往返与攻击性输入专项烟测与文档。
+- 新增 `data/schema/content-package.schema.json`（draft-07）：约束 `formatVersion`（integer ≥1，语义上仅支持 1，未来值由导入端给出可读拒绝）、包元数据（id 安全单一目录名 pattern、严格三段版本 pattern）、`minimumEngineVersion`（严格三段数字 pattern）与资源条目（id + 64 位小写 hex `sha256` + 任意 `data`；`additionalProperties: false` 使包内无处夹带 `path` 等字段）。
+- 新增 `scripts/content-package.mjs`（可导入函数 + CLI）：
+  - 规范 JSON：对象键递归排序（UTF-16 码元序）、`JSON.stringify` 紧凑语义、UTF-8 编码；`sha256OfJson` 与源文件排版无关。
+  - 导出 `buildModPackage`：只读取 MOD 目录中与 manifest 登记路径一致的 JSON，逐项资源 schema 校验并验证包自身 Schema 后按 manifest 顺序产出资源；孤儿文件、坏 JSON、Schema 不符、不安全 MOD/包 id、非三段版本逐条点名；`serializePackage` 对同一输入字节级确定；超限包和已有输出路径拒绝。默认包 id/名 = modId、版本 1.0.0、`minimumEngineVersion` = `--repo` 指向仓库 `package.json` 中的 version。
+  - 预检 `inspectPackage`：包大小上限为 10 MiB，并在常规读入前先查文件长度；包 JSON 与包 Schema 校验后拒绝未知/未来格式、宽松或超安全整数版本，以及不兼容目标引擎版本；资源 id 必须唯一且在目标仓库 manifest 登记，安装位置只能取自登记的安全 JSON 路径；逐项重算 SHA-256 并按目标仓库当前 Schema 校验。报告注明诊断、修复提示与跨资源语义校验边界。
+  - 安装 `applyPackage`：先整包预检（任一失败零写入）；随后写入 `mods/.staging-<pid>-<rand>` 同盘暂存目录（每资源落盘前断言目标在暂存目录内），**写完后**检查 `mods/<包id>/` 不存在——已存在则删除暂存并拒绝（顺带验证清理路径），再 `rename` 原子改名；rename/写盘异常同样清理暂存。不改 manifest、不启用、不覆盖。
+  - CLI：`export --mod … [--id/--name/--version/--description/--author/--out/--repo]`、`import <file> [--repo] [--apply]`，中文报告 + 非零退出；`--repo` 支持指向任意仓库副本。
+- `package.json` 新增 `content:export`、`content:import`、`smoke:round-37`；无新增依赖（复用 Ajv 与 Node 内置 crypto/fs）。
+
+### 验证
+
+- `npm run smoke:round-37`：一次通过（exit 0）。隔离临时仓库（mkdtemp，自带最小 manifest + 复制真实 manifest/grid-map/content-package schema + 传统 MOD 目录）覆盖：规范 JSON 单元（递归键序、数组序保持、排版无关、中文键、`__proto__` 键保真）与严格三段版本单元（拒绝超安全整数；兼容性按 `--repo` 目标引擎判断）；导出（manifest 序资源、`sha256OfJson` 比对、无 path 字段、重复导出字节一致）；预检往返（id→本地路径映射、内存对象等价、默认零写入）；应用（安装数据语义相等、manifest/基础资源字节未变、enabledMods 仍空、无暂存残留）；重复应用被拒且无暂存残留；篡改数据校验和失败、坏 schema（重算校验和后仍拒）、重复/未登记资源、重复 manifest 路径、`../evil`/`a/b`/`.hidden` 包 id、资源夹带 `path` 字段、`formatVersion 99`、引擎 `99.0.0`、宽松 `1.2`、包版本超安全整数、大小上限注入逐项可读拒绝；导出侧目录缺失/孤儿文件/坏 JSON/坏 Schema/不安全 mod id/超过包体限额/输出文件冲突诊断；真实 CLI（execFile + process.execPath）导出-预检-应用-冲突退出码-用法错误全链路；结尾断言真实 `mods/` 树与 `data/base/manifest.json` 字节不变，临时仓库删除。
+- 真实工作区未写入：烟测末尾逐字节比较真实 `mods/` 树与 manifest；本轮没有对正式 MOD 做应用操作。
+- `npm run smoke:round-35`：通过（MOD 覆盖/回退回归）。`npm run validate:data`：通过（manifest + 26 个基础资源 Schema）。`npm run inspect:mods`：通过（26 项资源、0 问题、未启用 MOD）。`npm run typecheck`：通过（无输出）。
+- `npm run build`：通过（Vite 8.3.1，主 JS 1,881.37 kB / gzip 495.56 kB，与 R36 基线一致；500 kB 分包建议仍存在）。`git diff --check`：通过；Git 对部分文本的 LF→CRLF 提示没有空白错误。
+- 边界记录：预检是静态 JSON/schema/兼容性检查，跨资源语义装配仍由运行时加载器执行；导入不管理下载/更新/卸载，安装出的目录按普通 MOD 工作流处理。本轮未改任何运行时引擎代码。
+
+---
+
 ## Round 36 — 开发模式资料热重载（2026-09-27，已完成）
 
 ### 计划与实现
@@ -47,7 +71,7 @@
 
 - `npm run inspect:mods`：通过（exit 0）。真实 manifest（`enabledMods: []`）：26 项资源基础层全部 ✓、0 问题、最终来源全为 base；输出含两条范围说明（整文件替换语义、运行时语义校验边界）。
 - `npm run smoke:round-35`：通过（exit 0）。断言全部命中：modB 有效层获胜、坏 JSON/schema 无效覆盖分别回退到 modA/base、来源按 manifest 顺序、坏基础资源/坏 manifest 拒绝路径、加载与跨资源诊断精确归因/修复提示、inspectMods 与运行时加载器层结果一致、真实 manifest 未被启用测试 MOD；唯一转译目录与临时 fixture 目录均已清理。
-- `npm run validate:data`：通过（exit 0），manifest Schema 与 26 个基础资源 Schema。
+- `npm run smoke:round-35`：通过（MOD 覆盖/回退回归）。`npm run validate:data`：通过（exit 0），manifest Schema 与 26 个基础资源 Schema。
 - `npm run typecheck`：通过（exit 0），`tsc --noEmit` 无输出（期间修复过一次 `noUncheckedIndexedAccess` 报出的 `labels[index]` 可能未定义）。
 - `npm run build`：通过（exit 0），711ms；主 JS chunk 1,877.50 kB（gzip 494.50 kB），较 R34 的 1,867.95 kB 增加约 9.6 kB（新增 F2 面板与诊断字段），Vite 默认 500 kB 分包建议警告仍在。
 - `npm run smoke:round-30` / `npm run smoke:round-31` / `npm run smoke:round-33`：通过（exit 0），人物/门派、任务链、知识图谱回归正常。
@@ -73,7 +97,7 @@
 ### 验证
 
 - `npm run audit:round-34`：通过（exit 0）。核验范围（计数由数据推导）：2 张地图/2 个区域/2 个关口/3 个区域事件、条件 11 种 + 效果 15 种、20 项任务（collectItem/defeatEncounter/talkToNpc）、5 个门派名。
-- `npm run validate:data`：通过（exit 0），manifest Schema 与 26 个基础资源 Schema。
+- `npm run smoke:round-35`：通过（MOD 覆盖/回退回归）。`npm run validate:data`：通过（exit 0），manifest Schema 与 26 个基础资源 Schema。
 - `npm run typecheck`：通过（exit 0），`tsc --noEmit` 无输出。
 - `npm run build`：通过（exit 0），127 个模块，920ms；主 JS chunk 1,867.95 kB（gzip 491.51 kB），与 R32/R33 相同的 Vite 默认 500 kB 分包建议警告仍在（本轮未改引擎代码，属既有提示）。
 - `npm run smoke:round-33`：通过（exit 0），134 节点/202 关系图谱全量映射、五结局影响边闭环回归正常。
@@ -96,7 +120,7 @@
 
 ### 验证
 
-- `npm run validate:data`：通过，manifest Schema 与 26 个基础资源 Schema。
+- `npm run smoke:round-35`：通过（MOD 覆盖/回退回归）。`npm run validate:data`：通过，manifest Schema 与 26 个基础资源 Schema。
 - `npm run smoke:round-33`：通过（134 节点/202 关系；目录映射、唯一 id、端点闭合、货架持有、锻造投入、武学归属、20 任务链路、遭遇不伪造节点、五结局影响边与默认未知）。
 - `npm run smoke:round-27`：通过（五结局条件评估/边界、锁定提示、MOD 引用隔离、终章格装配/邻接及完整世界加载——图谱扩充未破坏结局装配）。
 - `npm run typecheck`：通过（tsc --noEmit 无输出）。
@@ -117,7 +141,7 @@
 
 ### 验证
 
-- `npm run validate:data`：通过，manifest 与 26 个基础资源 Schema 合规。
+- `npm run smoke:round-35`：通过（MOD 覆盖/回退回归）。`npm run validate:data`：通过，manifest 与 26 个基础资源 Schema 合规。
 - `npm run typecheck`：通过。
 - `npm run smoke:round-32`：通过；验证 50 件物品/新增 25、30 种武学/新增 24、材料/货架/六条锻造链引用闭合、五派目录门控、24 种招式逐一实际授艺、学后隐藏/重复授艺拒绝，以及完整世界装配无新资料告警。
 - `npm run smoke:round-31`：通过，20 项任务链、谈话/分支/败北失败与旧档兼容回归正常。
@@ -140,7 +164,7 @@
 
 ### 验证
 
-- `npm run validate:data`：通过，manifest 与 26 个基础资源 Schema 有效（任务集含 20 项与 3 新遭遇后仍全部合规）。
+- `npm run smoke:round-35`：通过（MOD 覆盖/回退回归）。`npm run validate:data`：通过，manifest 与 26 个基础资源 Schema 有效（任务集含 20 项与 3 新遭遇后仍全部合规）。
 - `npm run typecheck`：通过。
 - `npm run smoke:round-31`：初次运行发现完整世界只装配 12/20 项任务；定位为容素青 NPC 缺少 `questGiver: true`，导致其名下任务及依赖后续被正确级联禁用。补上标记、把互斥选项统一到白鹭洲告示板并增加同发布人断言后重跑，通过（20 项全部装配，引用/交互/存档断言全通过）。
 - `npm run smoke:round-30`：通过，人物/门派/对话/图谱与完整世界装配回归正常（12 名 NPC 标记 `questGiver` 不影响放置与日程警告断言）。
@@ -165,7 +189,7 @@
 ### 验证
 
 - `npm run typecheck`：通过。
-- `npm run validate:data`：通过，manifest 与 26 个基础资源 Schema 有效（新增 `dialogue.round-30-set`）。
+- `npm run smoke:round-35`：通过（MOD 覆盖/回退回归）。`npm run validate:data`：通过，manifest 与 26 个基础资源 Schema 有效（新增 `dialogue.round-30-set`）。
 - `npm run smoke:round-30`：通过（首跑捕获两处烟测自身缺陷——旧 NPC 无 `schedule` 字段的空值处理、结局无 factionId 条件的过滤——修正后全绿）。
 - `npm run smoke:round-29`：通过，图鉴八类投影与完整世界装配回归正常。
 - `npm run smoke:round-28`：通过，成就协议与 v1 存档路径回归正常。
@@ -193,7 +217,7 @@
 
 - `npm run typecheck`：通过。
 - `npm run smoke:round-29`：通过，覆盖 8 类统计、未知节点保密、输入/图谱只读投影、四类观察发现、类型错误拒绝、重复发现幂等、基础资源 id 交叉核对、遭遇人物引用装配及坏的可选引用降级。
-- `npm run validate:data`：通过，manifest 与 25 个基础资源 Schema 有效。
+- `npm run smoke:round-35`：通过（MOD 覆盖/回退回归）。`npm run validate:data`：通过，manifest 与 25 个基础资源 Schema 有效。
 - `npm run smoke:round-28`：通过，既有成就协议、进度/奖励及 v1 存档路径回归正常。
 - `npm run build`：通过，127 个模块构建成功；主 JS chunk 为 1,866.48 kB（gzip 490.99 kB），仍超过 Vite 500 kB 默认建议线。
 - `git diff --check`：通过；Git 报告部分 LF 工作区文件将在下次触碰时规范为 CRLF。
@@ -218,7 +242,7 @@
 
 - `npm run smoke:round-28`：通过，覆盖 schema/解析器逐条隔离、14 类条件进度、区间/布尔分支、纯度、计数器上限、解锁幂等、MOD 历史 id、完整世界装配及新旧 v1 存档兼容。
 - `npm run smoke:round-27`、`npm run smoke:round-26`、`npm run smoke:round-25`：串行通过。
-- `npm run validate:data`：通过，manifest 与 25 个基础资源 Schema 有效。
+- `npm run smoke:round-35`：通过（MOD 覆盖/回退回归）。`npm run validate:data`：通过，manifest 与 25 个基础资源 Schema 有效。
 - `npm run typecheck`：通过。
 - `npm run build`：通过，Vite 构建成功；主 JS chunk 为 1858.25 kB（gzip 489.49 kB），Vite 提示超过 500 kB 默认建议线。
 - `git diff --check`：本轮提交前通过。
@@ -268,7 +292,7 @@
 
 ### 验证
 
-- `npm run validate:data`：通过；manifest 与 23 个基础资源 Schema 通过。
+- `npm run smoke:round-35`：通过（MOD 覆盖/回退回归）。`npm run validate:data`：通过；manifest 与 23 个基础资源 Schema 通过。
 - `npm run smoke:round-26`：通过图谱初始 NPC 记忆、玩家/NPC 知识隔离、未掌握见闻分享拒绝、坏引用逐选项隔离、分享后专属回应、后续效果失败全事务回滚、重复存档见闻 id 拒绝、0/越界/有效传播系数、非人物端点剥离传播字段、有向正负传播、半数对称舍入、来源与目标关系边界钳制、v1 捕获/恢复、旧字段缺省及 MOD 删除 NPC/知识节点过滤。
 - `npm run smoke:round-25`：通过配方、交易、任务信号、成药和 v1 回归。
 - `npm run smoke:round-24`、`npm run smoke:round-23`：顺序执行均通过，未出现测试服务器端口冲突。
@@ -295,7 +319,7 @@
 ### 验证
 
 - `npm run build`：通过；122 个模块，主 JS 1,826.18 kB（gzip 481.76 kB）；Vite 提示默认 500 kB 分包建议。
-- `npm run validate:data`：通过；manifest 与 23 个基础资源 Schema 全部通过。
+- `npm run smoke:round-35`：通过（MOD 覆盖/回退回归）。`npm run validate:data`：通过；manifest 与 23 个基础资源 Schema 全部通过。
 - `npm run smoke:round-25`：通过，覆盖药方和图谱解析、工位占位/邻接、发现门控、悟性档位、资金/材料/容量拒绝不变、满包腾格转换、collectItem 信号、成药消耗、坏配方隔离、v1 药品/知识进度恢复及无资源降级。
 - `npm run smoke:round-24` 与 `npm run smoke:round-23`：回归通过。
 - `git diff --check`：通过；仅有 LF→CRLF 工作区规范化提醒。未运行浏览器手动炼药流程，因此不宣称 UI 经浏览器实测。
@@ -319,7 +343,7 @@
 ### 验证
 
 - `npm run build`：通过；120 个模块，主 JS 1,809.95 kB（gzip 478.95 kB）；保留 Vite 默认 500 kB 分包建议提示。
-- `npm run validate:data`：通过，manifest 与 22 个登记基础 JSON 资源均过 Schema/Ajv。
+- `npm run smoke:round-35`：通过（MOD 覆盖/回退回归）。`npm run validate:data`：通过，manifest 与 22 个登记基础 JSON 资源均过 Schema/Ajv。
 - `npm run smoke:round-24`：通过，覆盖 valid set 与坐标/跨引用/坏配方隔离、相邻/斜角选择、工位占位冲突、银两/材料/装备中输入拒绝不变性、满包转换、产物装备后战斗伤害大于未穿戴基线、v1 捕获/预检/恢复后装备 bonus 重算。
 - `npm run smoke:round-23`、`npm run smoke:round-22`：顺序回归通过。
 - `git diff --check`：通过；仅提示 LF→CRLF 自动规范化。未操作浏览器进行手工锻造流程；面板经过 TypeScript/生产构建和纯引擎烟测，并不宣称 UI 浏览器实测。
@@ -343,7 +367,7 @@
 ### 验证
 
 - `npm run build`：通过；118 个模块；主 JS 1,795.26 kB（gzip 475.41 kB），Vite 的 500 kB 分包建议仍出现。
-- `npm run validate:data`：通过，manifest + 21 个登记基础资源 Schema 全部通过。
+- `npm run smoke:round-35`：通过（MOD 覆盖/回退回归）。`npm run validate:data`：通过，manifest + 21 个登记基础资源 Schema 全部通过。
 - `npm run smoke:round-23`：通过，覆盖唯一/循环前置校验、悬空材料及依赖隔离、等级/修为/材料限制、拒绝路径状态不变、属性与装备不重复叠加、战斗升级发点、存档新旧字段、非法值和 MOD 移除节点恢复过滤。
 - `npm run smoke:round-22` 与 `npm run smoke:round-21`：顺序回归均通过。
 - `git diff --check`：提交前执行。本轮没有运行浏览器手工流程；N 面板只通过构建和静态集成核验，不声称浏览器游玩已验证。
@@ -362,7 +386,7 @@
 ### 验证
 
 - `npm run build`：通过，TypeScript 检查通过；Vite 生产构建完成 116 模块，主 JS 1,781.43 kB（gzip 471.51 kB），超过默认 500 kB 分包提示线。
-- `npm run validate:data`：通过，manifest 与 20 个基础资源通过 JSON Schema/Ajv。
+- `npm run smoke:round-35`：通过（MOD 覆盖/回退回归）。`npm run validate:data`：通过，manifest 与 20 个基础资源通过 JSON Schema/Ajv。
 - `npm run smoke:round-22`：通过，覆盖组件 Schema/语义边界、重名/预算/银两原子拒绝、创制交易、CombatSession 可用性、自创作品新旧 v1 往返和恶意功力边界拒绝。
 - `npm run smoke:round-21`：串行重跑通过，覆盖门派战资料、战斗/贡献与新旧 v1 存档；首次并行运行时出现的 WebSocket 端口提示未复现。
 - `git diff --check`：通过；仅有 Git 的 LF→CRLF 规范化提示。
@@ -388,7 +412,7 @@
 ### 验证
 
 - `npm run build`：通过，TypeScript 检查通过；Vite 生产构建完成 114 模块。主 JS 1,766.77 kB（gzip 467.12 kB），保留超过 500 kB 默认建议的提示。
-- `npm run validate:data`：通过；manifest 与 19 个基础资源通过 JSON Schema/Ajv 校验。
+- `npm run smoke:round-35`：通过（MOD 覆盖/回退回归）。`npm run validate:data`：通过；manifest 与 19 个基础资源通过 JSON Schema/Ajv 校验。
 - `npm run smoke:round-21`：通过；验证资料解析、邻接选择、坏占格和参战门派引用隔离、双方各三阶段的 CombatSession/经验适配、贡献胜平负分档、旧 v1 缺字段、新战绩捕获/解析/恢复及 MOD 移除战事时的存档软过滤。
 - `git diff --check`：通过；仅报告部分 LF 文件后续可能规范为 CRLF。
 - 本轮使用无 Phaser 运行时冒烟验证，没有声称进行浏览器手动游玩验证。

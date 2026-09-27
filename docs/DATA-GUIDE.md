@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：Round 03–36 已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台、门派战、自创武学、经脉、装备锻造、炼丹、存档、区域旅行、知识图谱、NPC 私有记忆、江湖图鉴、昼夜气候、日程、条件奇遇、多层社会声望、多结局、成就、原创人物/门派扩充（12 名 NPC、5 个门派）、原创任务链（20 项差事）、原创物品/武学扩充（50 件物品、30 种武学）、知识图谱目录全量映射（134 节点）、文档一致性审计、MOD 优先级/来源追踪/作者工作流及开发模式资料热重载；热重载专项/真实 Vite 演练、类型检查、生产构建与回归记录见 `DEVLOG.md`；专题目录见 `docs/ITEMS.md` 与 `docs/MARTIAL-ARTS.md`，世界设定总览见 `docs/WORLD-SETTING.md`。
+- 状态：Round 03–37 已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台、门派战、自创武学、经脉、装备锻造、炼丹、存档、区域旅行、知识图谱、NPC 私有记忆、江湖图鉴、昼夜气候、日程、条件奇遇、多层社会声望、多结局、成就、原创人物/门派扩充（12 名 NPC、5 个门派）、原创任务链（20 项差事）、原创物品/武学扩充（50 件物品、30 种武学）、知识图谱目录全量映射（134 节点）、文档一致性审计、MOD 优先级/来源追踪/作者工作流、开发模式资料热重载及单文件 v1 内容包（导出/只读预检/显式安装）；热重载与内容包专项/真实演练、类型检查、生产构建与回归记录见 `DEVLOG.md`；专题目录见 `docs/ITEMS.md` 与 `docs/MARTIAL-ARTS.md`，内容包规范见 `docs/CONTENT-PACKAGES.md`，世界设定总览见 `docs/WORLD-SETTING.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -32,7 +32,7 @@ data/
 │   ├── battles/             # 战斗：遭遇触发点、敌人、奖励与提示文本
 │   ├── endings/             # 结局：触发条件与结局文本
 │   └── achievements/        # 成就：条件组合、进度提示与一次性奖励
-├── schema/                  # JSON Schema（含 manifest、grid-map、world-map、game-calendar、knowledge-nodes、knowledge-edges、ending-set、achievement-set、npc-set、companion-set、faction-war-set、martial-art-components、meridian-set、equipment-forge-set、alchemy-set、dialogue-set、character-profiles、faction-set、martial-arts-set、battle-encounters、arena-set、items-set、shops-set、quest-set）
+├── schema/                  # JSON Schema（含 manifest、grid-map、world-map、game-calendar、knowledge-nodes、knowledge-edges、ending-set、achievement-set、npc-set、companion-set、faction-war-set、martial-art-components、meridian-set、equipment-forge-set、alchemy-set、dialogue-set、character-profiles、faction-set、martial-arts-set、battle-encounters、arena-set、items-set、shops-set、quest-set、content-package）
 mods/                        # mod 覆盖层：mods/<modId>/ 镜像 data/base/ 相对路径
 ```
 
@@ -146,6 +146,23 @@ npm run inspect:mods
 - 有 MOD 覆盖被回退时 HUD 会出现黄色提示行，引导按 F2 查看原因。
 - F2 打开期间探索输入被锁定，关闭后恢复移动/交互。
 
+### 5.5 内容包：导出、只读预检与显式安装（Round 37）
+
+把 `mods/<modId>/` 的传统布局导出为**单文件 v1 内容包**（`.wuxia.json`，含格式版本、包元数据、引擎兼容声明、逐资源 SHA-256），在其他仓库副本预检后安装为全新 MOD 目录：
+
+```bash
+npm run content:export -- --mod example --name "示例魔改包" --out example.wuxia.json
+npm run content:import -- example.wuxia.json            # 只读预检，不写任何文件
+npm run content:import -- example.wuxia.json --apply    # 预检全过后安装到 mods/<包id>/ 新目录
+```
+
+- **迁移语义**：导出只读取 MOD 中与 manifest 登记路径一致的 JSON；孤儿文件、坏 JSON、Schema 不符都会在导出时报错并点名文件，不产出半成品包。资源按清单顺序排列，同一输入重复导出字节级一致；校验和基于**递归键排序的规范 JSON**，与源文件排版无关。
+- **兼容边界**：包声明 `formatVersion`（当前仅支持 1，未来版本明确拒绝并提示升级）与 `minimumEngineVersion`（严格三段数字，逐段数值比较；宽松版本串一律拒绝）。
+- **安装边界**：默认只读；`--apply` 也只安装到 `mods/<包id>/` **全新**目录（已存在即拒绝），不改 `data/base/manifest.json`、不写 `enabledMods`、不覆盖任何已有内容。包内**不携带文件路径**——安装路径唯一来源是目标仓库 manifest 的资源登记（按资源 id 解析）；包 id 必须是安全单一目录名（拒绝 `../evil`、`a/b`）；包大小设硬上限。安装先整包校验，再经 `mods/` 下同盘暂存目录原子改名，失败清理暂存。
+- **语义校验边界**：预检只做静态 JSON/Schema/兼容性检查；跨资源语义（引用闭合、坐标/占格等）仍由运行时加载器在装配时执行，游戏内坏引用按 §5.1 的 MOD 回退规则处理。
+- 完整格式规范、安全模型与常见问题见 [`CONTENT-PACKAGES.md`](CONTENT-PACKAGES.md)。
+
+
 ## 6. 开发热重载的处理范围与边界
 
 - 监听 `data/`（含 `base/`、`schema/`）和 `mods/` 下的 JSON 新建/修改/删除；其它文件不会触发资料 HMR。修改 manifest 会与其它资料一样自动重读。
@@ -157,6 +174,7 @@ npm run inspect:mods
 ## 7. 资料作者须知（速查）
 
 - 改世界 → 只动 `data/base/`；想替换官方内容 → 写到 `mods/`，不要直接改基础数据。
+- 要分享 MOD → 用 `npm run content:export` 导出单文件包，接收方 `npm run content:import` 先预检再 `--apply`（§5.5）；安装不会自动启用，启用按 §5.2 手动登记。
 - 新增数据先在 `data/base/manifest.json` 登记资源 id、相对路径及 schema id，并在 `data/schema/` 提供 draft-07 schema；`npm run dev` 会在启动时校验并把错误逐条写到控制台/场景。
 - 新增 NPC：在 npc-set JSON 里加条目（稳定 id 建议 `char.` 前缀、姓名、`mapResourceId` 用已登记地图资源 id、`position` 填可走格、`dialogueId` 指向已登记对话）；可选 `schedule` 按已登记日历的 `periodId` 声明地图内 `position`，具体校验和冲突回退见 [`NPC-SCHEDULES.md`](NPC-SCHEDULES.md)。基础 NPC 坐标/引用无效会禁用该 NPC；单独坏掉的日程项只回退该人物该时段的基础位置。
 - 新增对话：在 dialogue-set JSON 里加一段（id 建议 `dlg.` 前缀、`startNodeId` 指向存在节点、选项 `nextNodeId` 必须可达；无 `options` 的节点即结束节点）。Round 30 起对话文件可按轮次拆分：在 manifest 登记多个 `dialogue-set` 资源即可，加载器合并全部资源，重复对话 id 保留清单先声明者；NPC 的 `dialogueId` 可指向任一对话文件中的对话。断裂引用只禁用该段对话及引用它的 NPC。选项可声明 `conditions`（全满足才可见：任务状态、物品数量、善恶/声望/NPC 关系闭区间、玩家已知词条或 NPC 私有记忆）与 `effects`（确认时原子执行：接取/放弃任务、给予/交付物品、修善良恶/声望/关系、向 NPC 分享玩家已知见闻；见 §4 对话条件与效果）；坏跨资源引用只剔除该选项，draft-07 Schema 可表达的结构/协议错误仍按资源级拒绝，解析器额外发现的单段语义错误（如反向上下界）只禁用该段并警告。示例：马尚义对话按任务 offered/active/completed 显示不同分支，顾夜尘带话后关系达标解锁新选项；陆贞娘在玩家分享脚印线索后可按她自己的记忆回应。
@@ -262,4 +280,5 @@ NPC 当前坐标是由地图、时钟和人物日程派生的临时运行状态�
 | 2026-09-27 | Round 33 | 知识图谱扩至 134 节点/202 关系，物品/武学/任务/门派/NPC/地图目录全量映射，补齐武学归属、货架持有、锻造投入、任务链路与结局影响边；详见 `docs/KNOWLEDGE-GRAPH.md` |
 | 2026-09-27 | Round 35 | §5 扩写为 MOD 覆盖规则与作者工作流：覆盖语义（后声明有效者胜、坏覆盖原子回退）、启用/排序步骤、`inspect:mods` 只读检查、F2 游戏内来源/诊断面板与重载说明 |
 | 2026-09-27 | Round 36 | §5 补充开发期自动应用；§6 记录 Vite JSON 事件范围、整世界装配、安全边界、运行态兼容恢复与生产限制 |
+| 2026-09-28 | Round 37 | §5.5 内容包：单文件 v1 包导出/只读预检/显式安装、规范 JSON 校验和、格式与引擎版本兼容边界及安装安全模型；登记 content-package schema；详见 `docs/CONTENT-PACKAGES.md` |
 | 2026-09-27 | Round 34 | 新增 `audit:round-34` 只读文档审计（数据/Schema 驱动核验地图、对白协议、任务与门派覆盖）；新增世界设定总览 `docs/WORLD-SETTING.md` 并校准地图图册/对白指南/任务志 |

@@ -4,6 +4,18 @@
 
 ## [Unreleased]
 
+### Added (Round 37)
+
+- **单文件 v1 内容包格式**：新增 `data/schema/content-package.schema.json` 约束包层结构（`formatVersion`、包 id/名/版本、`minimumEngineVersion`、资源 id + SHA-256 + 数据本体）；资源条目禁止携带任何文件路径——安装路径唯一来源是目标仓库 manifest 的资源登记。校验和基于递归键排序的规范 JSON（UTF-8、无空白），与源文件排版无关。
+- **导出命令 `npm run content:export`**（`scripts/content-package.mjs`，可导入函数 + CLI）：把 `mods/<modId>/` 传统无元数据布局迁移为确定性 v1 包；资源按 manifest 顺序排列、同一输入重复导出字节级一致；资源 Schema 与包自身 Schema 均校验；超过 10 MiB 的导出包与已存在输出路径均拒绝；孤儿文件（未登记路径）、坏 JSON、Schema 不符、不安全 id/版本在导出时点名拒绝，不产出半成品包。全程只读源 MOD。
+- **导入命令 `npm run content:import`**：默认只读预检——包大小硬上限（默认 10 MiB，读入前生效；导出端也拒绝产出超限包）、包 Schema 全量校验、未知/未来 `formatVersion` 可读拒绝（提示升级）、`minimumEngineVersion` 严格三段数字逐段比较（宽松串拒绝）、包内资源 id 去重与登记检查、逐资源校验和与当前 Schema 校验，全部通过才放行。`--apply` 先整包校验，再写入 `mods/` 下同盘暂存目录并原子改名为 `mods/<包id>/` 全新目录；目标已存在（暂存之后检查）即清理并拒绝，不覆盖任何内容，不改 `data/base/manifest.json`、不自动启用。
+- **专项烟测 `npm run smoke:round-37`**：在隔离临时仓库覆盖规范 JSON/严格版本单元（含 `__proto__` 键保真及超安全整数拒绝）、传统 MOD 导出→预检往返、确定性序列化、导出元数据/自身 Schema 与大小校验、默认零写入、成功安装（manifest/基础资料字节未动、未启用、无暂存残留）、目标冲突与暂存清理、已存在包文件拒绝覆盖、超限导出拒绝、篡改校验和、Schema 不符、重复/未知资源、重复 manifest 路径拒绝、穿越 id（`../evil`、`a/b`、`.hidden`）、资源级夹带 `path` 字段、未来 `formatVersion`、按 `--repo` 目标版本检查引擎兼容、引擎过新、宽松/超范围版本串、包大小上限、导出侧孤儿/坏 JSON/坏 Schema 诊断，以及真实 CLI 导出-预检-应用-冲突-用法错误全链路；结尾断言真实 `mods/` 与 manifest 字节不变。
+- 新增 `docs/CONTENT-PACKAGES.md`（格式规范、命令、预检/安装流程、版本兼容策略、迁移语义、安全模型与 FAQ）；`docs/DATA-GUIDE.md` §5.5、§7 与变更记录同步。
+
+### Verification (Round 37)
+
+- `npm run smoke:round-37`、`npm run validate:data`、`npm run inspect:mods`、`npm run typecheck`、`npm run build`、`git diff --check`：通过；真实仓库手动演练（导出 `mods/example` → 只读预检 → 对已存在目标 `--apply` 被拒）与构建体积见 `DEVLOG.md`。
+
 ### Added (Round 36)
 
 - 开发服务器新增 Vite 8 Environment API `hotUpdate` 插件：仓库内 `data/**/*.json` 与 `mods/**/*.json` 的新增、修改、删除广播 `wuxia:data-change`，自定义处理后不触发 Vite 整页刷新；源码、非 JSON 与仓库外路径不转发。

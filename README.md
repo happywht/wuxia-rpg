@@ -8,7 +8,7 @@
 
 ## 范围
 
-- ✅ 已完成（R00–R36）：网格探索、任务/物品/战斗与存档闭环；五派师门、昼夜天气、NPC 日程、伙伴、擂台、门派战、自创武学、经脉内修、锻造炼丹、多结局、成就与图鉴；基础资料包含 20 项任务、50 件物品、30 种武学及 134 节点知识图谱，并有世界设定和资料规范文档审计；MOD 多层覆盖顺序、来源追踪、游戏内 F2 诊断面板、`inspect:mods` 只读检查及开发模式资料热重载。
+- ✅ 已完成（R00–R37）：网格探索、任务/物品/战斗与存档闭环；五派师门、昼夜天气、NPC 日程、伙伴、擂台、门派战、自创武学、经脉内修、锻造炼丹、多结局、成就与图鉴；基础资料包含 20 项任务、50 件物品、30 种武学及 134 节点知识图谱，并有世界设定和资料规范文档审计；MOD 多层覆盖顺序、来源追踪、游戏内 F2 诊断面板、`inspect:mods` 只读检查、开发模式资料热重载及单文件 v1 内容包（导出/只读预检/显式安装）。
 - ⏳ 正在按路线图逐轮推进：共 51 轮（R00–R50）；正式 Vitest 基线仍排在 Round 38，最终内容数量与发布验收尚未完成。
 - 永久边界：不做多人联网；不含原作内容；mod 仅限同名 JSON 覆盖（见 `docs/DATA-GUIDE.md`）。
 
@@ -38,6 +38,8 @@ npm run preview    # 预览生产构建
 npm run typecheck  # 仅类型检查
 npm run validate:data # 校验 manifest 登记的基础资料/schema
 npm run inspect:mods  # 只读检查已启用 MOD 的覆盖层/最终来源与修复提示
+npm run content:export -- --mod <modId> # 把传统 MOD 导出为单文件 v1 内容包（.wuxia.json）
+npm run content:import -- <file.wuxia.json> [--apply] # 内容包只读预检；--apply 安装到 mods/ 新目录（不启用）
 npm run smoke:round-22 # 自创武学规则、战斗与存档冒烟
 npm run smoke:round-23 # 经脉内修规则、战斗、资料与存档冒烟
 npm run smoke:round-24 # 装备锻造、占位/配方隔离、战斗与存档冒烟
@@ -45,6 +47,7 @@ npm run smoke:round-25 # 药方发现、悟性品质炼制、原子交易与存�
 npm run smoke:round-33 # 知识图谱目录覆盖与结局关系闭环
 npm run smoke:round-35 # MOD 优先级、来源报告与坏覆盖回退冒烟
 npm run smoke:round-36 # Vite JSON 热重载通知、场景桥接与生产剔除冒烟
+npm run smoke:round-37 # 内容包导出/预检/安装往返与攻击性输入冒烟
 npm run audit:round-34 # 地图、对白、任务及世界设定文档一致性审计
 ```
 
