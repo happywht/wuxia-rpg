@@ -164,6 +164,150 @@
         "healthBonus": 0,
         "qiBonus": 20
       }
+    },
+    {
+      "id": "item.hanzhu-cao",
+      "name": "寒珠草",
+      "description": "叶心凝着一滴晨露似的凉珠，揉碎后苦香沁脾，性凉败火，是止血配伍里的常客。",
+      "category": "misc",
+      "stackLimit": 99,
+      "buyPrice": 8,
+      "sellPrice": 3
+    },
+    {
+      "id": "item.cangya-gen",
+      "name": "苍崖根",
+      "description": "崖缝里抠出的皱皮细根，断面泛紫，切片入汤能托气生肌。",
+      "category": "misc",
+      "stackLimit": 99,
+      "buyPrice": 10,
+      "sellPrice": 3
+    },
+    {
+      "id": "item.luodie-hua",
+      "name": "落蝶花",
+      "description": "风过时花瓣四散如蝶，晒干后辛香温润，能引药性入心经。",
+      "category": "misc",
+      "stackLimit": 99,
+      "buyPrice": 12,
+      "sellPrice": 4
+    },
+    {
+      "id": "item.shengji-san-cu",
+      "name": "生肌散·粗制",
+      "description": "初学之手熬出的生肌散，色暗末粗，药力打了折扣，急用时应个景。",
+      "category": "consumable",
+      "stackLimit": 9,
+      "buyPrice": 0,
+      "sellPrice": 0,
+      "consumable": {
+        "healthRestore": 18,
+        "qiRestore": 0
+      }
+    },
+    {
+      "id": "item.shengji-san-zhong",
+      "name": "生肌散·中正",
+      "description": "火候拿捏得宜的生肌散，末细色正，敷创生肌。",
+      "category": "consumable",
+      "stackLimit": 9,
+      "buyPrice": 0,
+      "sellPrice": 0,
+      "consumable": {
+        "healthRestore": 28,
+        "qiRestore": 6
+      }
+    },
+    {
+      "id": "item.shengji-san-shang",
+      "name": "生肌散·上乘",
+      "description": "文火收霜恰到好处的生肌散，药香清冽，血亏金创皆宜。",
+      "category": "consumable",
+      "stackLimit": 9,
+      "buyPrice": 0,
+      "sellPrice": 0,
+      "consumable": {
+        "healthRestore": 40,
+        "qiRestore": 12
+      }
+    },
+    {
+      "id": "item.ningshen-wan-cu",
+      "name": "宁神丸·粗制",
+      "description": "搓得大小不一的宁神丸，含之微涩，聊胜于无。",
+      "category": "consumable",
+      "stackLimit": 9,
+      "buyPrice": 0,
+      "sellPrice": 0,
+      "consumable": {
+        "healthRestore": 0,
+        "qiRestore": 16
+      }
+    },
+    {
+      "id": "item.ningshen-wan-zhong",
+      "name": "宁神丸·中正",
+      "description": "蜜衣匀净的宁神丸，含服徐化，凝神续力。",
+      "category": "consumable",
+      "stackLimit": 9,
+      "buyPrice": 0,
+      "sellPrice": 0,
+      "consumable": {
+        "healthRestore": 6,
+        "qiRestore": 24
+      }
+    },
+    {
+      "id": "item.ningshen-wan-shang",
+      "name": "宁神丸·上乘",
+      "description": "药力醇和的宁神丸，入口回甘，心浮气躁者服之立安。",
+      "category": "consumable",
+      "stackLimit": 9,
+      "buyPrice": 0,
+      "sellPrice": 0,
+      "consumable": {
+        "healthRestore": 10,
+        "qiRestore": 36
+      }
+    },
+    {
+      "id": "item.shuanghe-dan-cu",
+      "name": "双和丹·粗制",
+      "description": "形色稍逊的双和丹，气血双补之力尚浅。",
+      "category": "consumable",
+      "stackLimit": 9,
+      "buyPrice": 0,
+      "sellPrice": 0,
+      "consumable": {
+        "healthRestore": 12,
+        "qiRestore": 10
+      }
+    },
+    {
+      "id": "item.shuanghe-dan-zhong",
+      "name": "双和丹·中正",
+      "description": "三味合和得当的双和丹，调气养血两不相误。",
+      "category": "consumable",
+      "stackLimit": 9,
+      "buyPrice": 0,
+      "sellPrice": 0,
+      "consumable": {
+        "healthRestore": 18,
+        "qiRestore": 16
+      }
+    },
+    {
+      "id": "item.shuanghe-dan-shang",
+      "name": "双和丹·上乘",
+      "description": "鼎足火候俱全的双和丹，丹香透壳，气血两旺。",
+      "category": "consumable",
+      "stackLimit": 9,
+      "buyPrice": 0,
+      "sellPrice": 0,
+      "consumable": {
+        "healthRestore": 26,
+        "qiRestore": 24
+      }
     }
   ]
 }

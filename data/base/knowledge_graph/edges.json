@@ -18,6 +18,26 @@
     { "id": "kg.edge.mist-pact-tiezhang-stalemate", "fromId": "event.mist-pact-stalemate", "toId": "faction.tiezhang-pai", "relation": "influences", "summary": "双方约定轮值药道后，铁嶂派与云隐山庄均维持互通。" },
     { "id": "kg.edge.mist-pact-yunyin-stalemate", "fromId": "event.mist-pact-stalemate", "toId": "faction.yunyin-shanzhuang", "relation": "influences", "summary": "双方约定轮值药道后，铁嶂派与云隐山庄均维持互通。" },
     { "id": "kg.edge.mist-pact-tiezhang-defeat", "fromId": "event.mist-pact-defeat", "toId": "faction.tiezhang-pai", "relation": "influences", "summary": "本门让出先行时辰后，铁嶂派仍保留约定轮值的机会。" },
-    { "id": "kg.edge.mist-pact-yunyin-defeat", "fromId": "event.mist-pact-defeat", "toId": "faction.yunyin-shanzhuang", "relation": "influences", "summary": "本门争约失利后，云隐山庄取得先行时辰并继续开放药道。" }
+    { "id": "kg.edge.mist-pact-yunyin-defeat", "fromId": "event.mist-pact-defeat", "toId": "faction.yunyin-shanzhuang", "relation": "influences", "summary": "本门争约失利后，云隐山庄取得先行时辰并继续开放药道。" },
+    { "id": "kg.edge.rong-at-ferry", "fromId": "char.rong-su-qing", "toId": "map.round-10-mist-ferry", "relation": "locatedAt", "summary": "容素青在渡口檐下晾药坐诊，替往来的药队看方。" },
+    { "id": "kg.edge.rong-knows-shengji", "fromId": "char.rong-su-qing", "toId": "event.formula-shengji-san", "relation": "knows", "summary": "容素青握有生肌散的完整配伍与火候。" },
+    { "id": "kg.edge.rong-knows-ningshen", "fromId": "char.rong-su-qing", "toId": "event.formula-ningshen-wan", "relation": "knows", "summary": "宁神丸的火候口诀只在容素青肚里记着。" },
+    { "id": "kg.edge.rong-knows-shuanghe", "fromId": "char.rong-su-qing", "toId": "event.formula-shuanghe-dan", "relation": "knows", "summary": "容素青只把双和丹传给肯守炉子的问方人。" },
+    { "id": "kg.edge.shengji-needs-hanzhu", "fromId": "event.formula-shengji-san", "toId": "item.hanzhu-cao", "relation": "requires", "summary": "生肌散以寒珠草败火定血，需两份。" },
+    { "id": "kg.edge.shengji-needs-cangya", "fromId": "event.formula-shengji-san", "toId": "item.cangya-gen", "relation": "requires", "summary": "生肌散以苍崖根托气生肌，需一份。" },
+    { "id": "kg.edge.ningshen-needs-luodie", "fromId": "event.formula-ningshen-wan", "toId": "item.luodie-hua", "relation": "requires", "summary": "宁神丸以落蝶花引药入心经，需两份。" },
+    { "id": "kg.edge.ningshen-needs-hanzhu", "fromId": "event.formula-ningshen-wan", "toId": "item.hanzhu-cao", "relation": "requires", "summary": "宁神丸以寒珠草清降躁火，需一份。" },
+    { "id": "kg.edge.shuanghe-needs-hanzhu", "fromId": "event.formula-shuanghe-dan", "toId": "item.hanzhu-cao", "relation": "requires", "summary": "双和丹三味鼎足，寒珠草居其一。" },
+    { "id": "kg.edge.shuanghe-needs-cangya", "fromId": "event.formula-shuanghe-dan", "toId": "item.cangya-gen", "relation": "requires", "summary": "双和丹三味鼎足，苍崖根居其一。" },
+    { "id": "kg.edge.shuanghe-needs-luodie", "fromId": "event.formula-shuanghe-dan", "toId": "item.luodie-hua", "relation": "requires", "summary": "双和丹三味鼎足，落蝶花居其一。" },
+    { "id": "kg.edge.shengji-rewards-cu", "fromId": "event.formula-shengji-san", "toId": "item.shengji-san-cu", "relation": "rewards", "summary": "悟性初入门时，此方只出粗制一档。" },
+    { "id": "kg.edge.shengji-rewards-zhong", "fromId": "event.formula-shengji-san", "toId": "item.shengji-san-zhong", "relation": "rewards", "summary": "悟性渐长后，此方能出中正一档。" },
+    { "id": "kg.edge.shengji-rewards-shang", "fromId": "event.formula-shengji-san", "toId": "item.shengji-san-shang", "relation": "rewards", "summary": "悟性纯熟时，此方出上乘一档。" },
+    { "id": "kg.edge.ningshen-rewards-cu", "fromId": "event.formula-ningshen-wan", "toId": "item.ningshen-wan-cu", "relation": "rewards", "summary": "悟性初入门时，此方只出粗制一档。" },
+    { "id": "kg.edge.ningshen-rewards-zhong", "fromId": "event.formula-ningshen-wan", "toId": "item.ningshen-wan-zhong", "relation": "rewards", "summary": "悟性渐长后，此方能出中正一档。" },
+    { "id": "kg.edge.ningshen-rewards-shang", "fromId": "event.formula-ningshen-wan", "toId": "item.ningshen-wan-shang", "relation": "rewards", "summary": "悟性纯熟时，此方出上乘一档。" },
+    { "id": "kg.edge.shuanghe-rewards-cu", "fromId": "event.formula-shuanghe-dan", "toId": "item.shuanghe-dan-cu", "relation": "rewards", "summary": "悟性初入门时，此方只出粗制一档。" },
+    { "id": "kg.edge.shuanghe-rewards-zhong", "fromId": "event.formula-shuanghe-dan", "toId": "item.shuanghe-dan-zhong", "relation": "rewards", "summary": "悟性渐长后，此方能出中正一档。" },
+    { "id": "kg.edge.shuanghe-rewards-shang", "fromId": "event.formula-shuanghe-dan", "toId": "item.shuanghe-dan-shang", "relation": "rewards", "summary": "悟性纯熟时，此方出上乘一档。" }
   ]
 }

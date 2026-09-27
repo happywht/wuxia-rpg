@@ -32,6 +32,8 @@ import {
 import {
   assembleWorldMap,
   parseWorldMap,
+  type RegionEventData,
+  type RegionTransitionData,
   type WorldMapAssembly,
 } from '../engine/world-map';
 import {
@@ -90,6 +92,12 @@ import {
   type EquipmentForgeSetData,
 } from '../engine/equipment-forge';
 import {
+  assembleAlchemyStations,
+  parseAlchemySet,
+  type AlchemySetData,
+  type AssembledAlchemyStation,
+} from '../engine/alchemy-system';
+import {
   assembleBattleEncounters,
   type BattleEncounterSetData,
   parseBattleEncounterSet,
@@ -126,6 +134,7 @@ const FACTION_WAR_RESOURCE_ID = 'faction-war.round-21-set';
 const MARTIAL_ART_COMPONENT_RESOURCE_ID = 'martial-art-components.round-22-set';
 const MERIDIAN_RESOURCE_ID = 'meridian.round-23-set';
 const EQUIPMENT_FORGE_RESOURCE_ID = 'equipment-forge.round-24-set';
+const ALCHEMY_RESOURCE_ID = 'alchemy.round-25-set';
 const ITEM_RESOURCE_ID = 'item.round-06-set';
 const SHOP_RESOURCE_ID = 'shop.round-06-set';
 const QUEST_RESOURCE_ID = 'quest.round-07-set';
@@ -146,6 +155,7 @@ const OPTIONAL_RESOURCE_IDS = new Set([
   MARTIAL_ART_COMPONENT_RESOURCE_ID,
   MERIDIAN_RESOURCE_ID,
   EQUIPMENT_FORGE_RESOURCE_ID,
+  ALCHEMY_RESOURCE_ID,
   ITEM_RESOURCE_ID,
   SHOP_RESOURCE_ID,
   QUEST_RESOURCE_ID,
@@ -167,6 +177,7 @@ const OPTIONAL_SCHEMA_ORIGINS = new Set([
   'schema:martial-art-components',
   'schema:meridian-set',
   'schema:equipment-forge-set',
+  'schema:alchemy-set',
   'schema:items-set',
   'schema:shops-set',
   'schema:quest-set',
@@ -217,6 +228,8 @@ export interface WorldAssembly {
   meridianSet: MeridianSetData | null;
   /** Optional map-placed item-forging stations; invalid data only disables forging. */
   equipmentForges: readonly AssembledEquipmentForgeStation[];
+  /** Optional data-authored medicine stations and discovered recipes. */
+  alchemyStations: readonly AssembledAlchemyStation[];
   items: ReadonlyMap<string, ItemRecordData>;
   shops: ReadonlyMap<string, AssembledShop>;
   quests: ReadonlyMap<string, QuestData>;
@@ -324,6 +337,10 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
         },
         'equipment-forge-set': (value) => {
           const parsed = parseEquipmentForgeSet(value);
+          return parsed.ok ? [] : parsed.errors;
+        },
+        'alchemy-set': (value) => {
+          const parsed = parseAlchemySet(value);
           return parsed.ok ? [] : parsed.errors;
         },
         'items-set': (value) => {
@@ -453,6 +470,8 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
     const assembly = assembleOptionalContent(
       result.resources,
       maps,
+      worldMap.transitions,
+      worldMap.events,
       new Set(knowledgeResult.graph.nodes.keys()),
       calendarPeriodIds,
       parsedCalendar.calendar.periods,
@@ -598,6 +617,8 @@ function assembleKnowledgeGraphContent(
 function assembleOptionalContent(
   resources: ReadonlyMap<string, LoadedResource>,
   maps: ReadonlyMap<string, GridMap>,
+  regionTransitions: readonly RegionTransitionData[],
+  regionEvents: readonly RegionEventData[],
   knowledgeNodeIds: ReadonlySet<string>,
   timeOfDayPeriodIds: ReadonlySet<string>,
   calendarPeriods: GameCalendarData['periods'],
@@ -995,6 +1016,65 @@ function assembleOptionalContent(
     details: [],
   });
 
+  let alchemySet: AlchemySetData | null = null;
+  const alchemyResource = resources.get(ALCHEMY_RESOURCE_ID);
+  if (alchemyResource !== undefined) {
+    const parsed = parseAlchemySet(alchemyResource.value);
+    if (!parsed.ok) {
+      warnings.push({
+        resource: ALCHEMY_RESOURCE_ID,
+        origin: 'alchemy-assembly',
+        severity: 'warning',
+        message: '炼药资料结构不合规，本轮禁用全部炼药工位',
+        details: parsed.errors,
+      });
+    } else {
+      for (const message of parsed.warnings) warnings.push({
+        resource: ALCHEMY_RESOURCE_ID,
+        origin: 'alchemy-assembly',
+        severity: 'warning',
+        message,
+        details: [],
+      });
+      alchemySet = parsed.set;
+    }
+  }
+  const alchemyBlockedCells = new Map<string, Set<string>>();
+  const blockAlchemyCell = (mapId: string, cell: string): void => {
+    const blocked = alchemyBlockedCells.get(mapId) ?? new Set<string>();
+    blocked.add(cell);
+    alchemyBlockedCells.set(mapId, blocked);
+  };
+  for (const [mapId, map] of maps) blockAlchemyCell(mapId, `${map.data.playerStart.col},${map.data.playerStart.row}`);
+  for (const npc of allNpcs) blockAlchemyCell(npc.record.mapResourceId, `${npc.col},${npc.row}`);
+  for (const transition of regionTransitions) {
+    blockAlchemyCell(transition.from.mapResourceId, `${transition.from.col},${transition.from.row}`);
+    blockAlchemyCell(transition.to.mapResourceId, `${transition.to.col},${transition.to.row}`);
+  }
+  for (const event of regionEvents) blockAlchemyCell(event.mapResourceId, `${event.col},${event.row}`);
+  for (const encounter of encounters) blockAlchemyCell(encounter.record.mapResourceId, `${encounter.col},${encounter.row}`);
+  for (const arena of arenaAssembly.arenas) blockAlchemyCell(arena.record.mapResourceId, `${arena.record.position.col},${arena.record.position.row}`);
+  for (const war of factionWarAssembly.wars) blockAlchemyCell(war.record.mapResourceId, `${war.record.position.col},${war.record.position.row}`);
+  for (const station of equipmentForgeAssembly.stations) {
+    blockAlchemyCell(station.record.mapResourceId, `${station.record.position.col},${station.record.position.row}`);
+  }
+  const alchemyAssembly = assembleAlchemyStations({
+    set: alchemySet,
+    knownResourceIds: new Set(resources.keys()),
+    maps,
+    spawns: new Map([...maps].map(([id, map]) => [id, map.data.playerStart])),
+    blockedCells: alchemyBlockedCells,
+    items: itemAssembly.items,
+    knowledgeNodeIds,
+  });
+  for (const message of alchemyAssembly.warnings) warnings.push({
+    resource: ALCHEMY_RESOURCE_ID,
+    origin: 'alchemy-assembly',
+    severity: 'warning',
+    message,
+    details: [],
+  });
+
   // Compile one safe NPC layout per declared calendar period. The base
   // placements remain the stable cast registry for quests/factions; runtime
   // scenes choose the current period's layout from the clock.
@@ -1018,6 +1098,11 @@ function assembleOptionalContent(
   }
   // Crafting workstations are fixed world markers too; keep time-based NPCs clear.
   for (const station of equipmentForgeAssembly.stations) {
+    const blocked = encounterBlocksByMap.get(station.record.mapResourceId) ?? new Set<string>();
+    blocked.add(`${station.record.position.col},${station.record.position.row}`);
+    encounterBlocksByMap.set(station.record.mapResourceId, blocked);
+  }
+  for (const station of alchemyAssembly.stations) {
     const blocked = encounterBlocksByMap.get(station.record.mapResourceId) ?? new Set<string>();
     blocked.add(`${station.record.position.col},${station.record.position.row}`);
     encounterBlocksByMap.set(station.record.mapResourceId, blocked);
@@ -1165,6 +1250,7 @@ function assembleOptionalContent(
     martialArtForgeComponents,
     meridianSet,
     equipmentForges: equipmentForgeAssembly.stations,
+    alchemyStations: alchemyAssembly.stations,
     items: itemAssembly.items,
     shops: shopAssembly.shops,
     quests: questAssembly.quests,

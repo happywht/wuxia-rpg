@@ -27,6 +27,22 @@
     { "id": "ending.river-lantern", "kind": "ending", "title": "河灯归处", "summary": "一则尚未证实的旧传闻：若有人替沿岸村镇解开多年心结，河灯会为他指一条归路。", "knownByDefault": false },
     { "id": "event.mist-pact-victory", "kind": "event", "title": "雾渡药道会盟：争得先约", "summary": "在雾渡药道切磋中取得足够贡献，本门先定药队轮值时辰，并为对方保留后续通行约期。", "knownByDefault": false },
     { "id": "event.mist-pact-stalemate", "kind": "event", "title": "雾渡药道会盟：轮值成约", "summary": "双方在雾桥各有胜负，最后以时辰轮换药队，药道按共同约定开放。", "knownByDefault": false },
-    { "id": "event.mist-pact-defeat", "kind": "event", "title": "雾渡药道会盟：让出先约", "summary": "本门未能争得药道先行时辰，但仍保有轮值通行的机会。", "knownByDefault": false }
+    { "id": "event.mist-pact-defeat", "kind": "event", "title": "雾渡药道会盟：让出先约", "summary": "本门未能争得药道先行时辰，但仍保有轮值通行的机会。", "knownByDefault": false },
+    { "id": "char.rong-su-qing", "kind": "character", "title": "容素青", "summary": "在雾雨渡口晾药坐诊的药师，通晓几副日用方剂的火候。", "knownByDefault": true },
+    { "id": "event.formula-shengji-san", "kind": "event", "title": "药方·生肌散", "summary": "容素青的生肌散炼法：寒珠草配苍崖根，二比一下料，文火收霜。", "knownByDefault": false },
+    { "id": "event.formula-ningshen-wan", "kind": "event", "title": "药方·宁神丸", "summary": "容素青的宁神丸炼法：落蝶花引寒珠草凉性入心经，蜜炼含服。", "knownByDefault": false },
+    { "id": "event.formula-shuanghe-dan", "kind": "event", "title": "药方·双和丹", "summary": "容素青的双和丹炼法：三味鼎足，武火催香、缓火固形。", "knownByDefault": false },
+    { "id": "item.hanzhu-cao", "kind": "item", "title": "寒珠草", "summary": "叶心凝凉珠的渡口草药，性凉败火，止血配伍常客。", "knownByDefault": true },
+    { "id": "item.cangya-gen", "kind": "item", "title": "苍崖根", "summary": "崖缝皱皮细根，断面泛紫，切片入汤托气生肌。", "knownByDefault": true },
+    { "id": "item.luodie-hua", "kind": "item", "title": "落蝶花", "summary": "花瓣四散如蝶的辛香药花，晒干能引药性入心经。", "knownByDefault": true },
+    { "id": "item.shengji-san-cu", "kind": "item", "title": "生肌散·粗制", "summary": "火候未足的生肌散，药力打了折扣。", "knownByDefault": false },
+    { "id": "item.shengji-san-zhong", "kind": "item", "title": "生肌散·中正", "summary": "火候得宜的生肌散，敷创生肌。", "knownByDefault": false },
+    { "id": "item.shengji-san-shang", "kind": "item", "title": "生肌散·上乘", "summary": "收霜恰到好处的生肌散，药香清冽。", "knownByDefault": false },
+    { "id": "item.ningshen-wan-cu", "kind": "item", "title": "宁神丸·粗制", "summary": "初搓的宁神丸，含之微涩，聊胜于无。", "knownByDefault": false },
+    { "id": "item.ningshen-wan-zhong", "kind": "item", "title": "宁神丸·中正", "summary": "蜜衣匀净的宁神丸，凝神续力。", "knownByDefault": false },
+    { "id": "item.ningshen-wan-shang", "kind": "item", "title": "宁神丸·上乘", "summary": "药力醇和的宁神丸，入口回甘。", "knownByDefault": false },
+    { "id": "item.shuanghe-dan-cu", "kind": "item", "title": "双和丹·粗制", "summary": "形色稍逊的双和丹，双补之力尚浅。", "knownByDefault": false },
+    { "id": "item.shuanghe-dan-zhong", "kind": "item", "title": "双和丹·中正", "summary": "三味合和得当的双和丹，气血两调。", "knownByDefault": false },
+    { "id": "item.shuanghe-dan-shang", "kind": "item", "title": "双和丹·上乘", "summary": "火候俱全的双和丹，丹香透壳。", "knownByDefault": false }
   ]
 }

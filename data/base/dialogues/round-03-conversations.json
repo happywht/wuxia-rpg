@@ -592,6 +592,38 @@
         { "id": "war-defeat", "text": "闻素心替你重新包好伤处：「胜负是一时的，药路仍然开着。下回先记住，护送药队本身也是本分。」" },
         { "id": "farewell", "text": "闻素心将药箱背起：「答案想清楚再来，不迟。」" }
       ]
+    },
+    {
+      "id": "dlg.rong-su-qing-herbalist",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "容素青在檐下翻晒药匾，见你走近，先把半筐寒珠草挪开，让出一张小凳：「坐。渡口雾潮，药材存不住三日，方子倒有几副烂在肚子里。你想问哪一副？」",
+          "options": [
+            {
+              "text": "愿闻生肌散的炼法。",
+              "nextNodeId": "teach-shengji",
+              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.formula-shengji-san" }]
+            },
+            {
+              "text": "想学宁神丸的火候。",
+              "nextNodeId": "teach-ningshen",
+              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.formula-ningshen-wan" }]
+            },
+            {
+              "text": "可有气血双补的方子？",
+              "nextNodeId": "teach-shuanghe",
+              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.formula-shuanghe-dan" }]
+            },
+            { "text": "只是路过，叨扰了。", "nextNodeId": "farewell" }
+          ]
+        },
+        { "id": "teach-shengji", "text": "她抓起一把寒珠草，又按上两段苍崖根：「寒珠败火定血，苍崖托气生肌，二比一下料，文火收霜，宁少勿多。记住了——散是死的，伤口是活的。」" },
+        { "id": "teach-ningshen", "text": "「落蝶花带半分辛香，能引寒珠的凉性往心经走。」她以指轻叩药匾，「蜜炼成丸，含服徐化；火候老了发苦，药力便钝三分。」" },
+        { "id": "teach-shuanghe", "text": "「双和丹不稀奇，稀奇的是肯守炉。」她三味各拈一撮，在匾上摆成鼎足，「武火催香，缓火固形，少看一眼便前功尽弃。去炉子那边练手，别烧了我的匾。」" },
+        { "id": "farewell", "text": "「炉子就在这渡口里，趁雾散前动手。」她低头继续翻匾，不再多言。" }
+      ]
     }
   ]
 }

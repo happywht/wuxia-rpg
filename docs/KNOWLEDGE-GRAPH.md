@@ -62,6 +62,8 @@ Schema 检查资源结构和字段值域；Phaser 无关装配器再处理重复
 
 基础示例可在 `data/base/dialogues/round-03-conversations.json` 与 `data/base/world/world-map.json` 查看：茶棚对白或初抵渡口可记录“雨后的脚印”，之后在黄昏/入夜的降雨天气探索芦苇边才会解锁河滩地点。询问拦路旅人仍可解锁人物词条；后续选项根据已知词条出现。
 
+Round 25 的三张药方各自对应一个默认未知的 `event` 知识节点。药师对话以 `discoverKnowledgeNode` 逐方传授；同一 `knownKnowledgeNodeIds` 状态同时控制药炉能否制作和百科能否展示已知的配方关联。成药 item 节点在首次制得后进入已知集。图谱关系由资料声明，药方被 MOD 移除时，既有 v1 恢复预检会过滤失效知识 id。
+
 ## 存档行为
 
 v1 快照字段 `knownKnowledgeNodeIds` 保存玩家已知节点；区域奇遇的一次性状态沿用 `completedRegionalEvents`。Round 17 没有新增存档字段。Round 21 结局将资料指定的见闻节点加入同一字段。读取 Round 10 及更早的 v1 存档时，缺失知识/事件字段归一为空数组；恢复预检会补入当前图谱公开词条、过滤当前图谱不存在的 id 并发出警告。移除资料后，相关百科条目和对话选项不再可用，但旧存档仍可加载。

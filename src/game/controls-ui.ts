@@ -46,7 +46,7 @@ export class ControlsPanel {
     this.addText('操作手册', left + 26, top + 22, 21, UI_PALETTE.accent);
     this.addText('探索', left + 28, top + 66, 13, UI_PALETTE.jade);
     this.addText('方向键 / WASD　移动', left + 44, top + 93, 14, UI_PALETTE.text);
-    this.addText('E　调查相邻人物、关口、区域事件或锻造工位', left + 44, top + 122, 13, UI_PALETTE.text);
+    this.addText('E　交互相邻人物、关口、区域事件、铁砧或药炉', left + 44, top + 122, 13, UI_PALETTE.text);
     this.addText('F　与相邻人物直接交谈', left + 44, top + 151, 14, UI_PALETTE.text);
     this.addText('V　原地等候片刻（面板打开时无效）', left + 44, top + 180, 14, UI_PALETTE.text);
     this.addText('B 背包　N 经脉　C 自创武学　P 伙伴　J 师门　Q 差事　M 舆图　K 百科　Esc 暂停', left + 44, top + 209, 12, UI_PALETTE.text);

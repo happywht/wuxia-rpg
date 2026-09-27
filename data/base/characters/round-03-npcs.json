@@ -81,6 +81,13 @@
         { "periodId": "period.morning", "position": { "col": 11, "row": 7 } },
         { "periodId": "period.night", "position": { "col": 13, "row": 7 } }
       ]
+    },
+    {
+      "id": "char.rong-su-qing",
+      "name": "容素青",
+      "mapResourceId": "map.round-10-mist-ferry",
+      "position": { "col": 12, "row": 2 },
+      "dialogueId": "dlg.rong-su-qing-herbalist"
     }
   ]
 }

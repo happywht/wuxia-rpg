@@ -1,0 +1,67 @@
+{
+  "stations": [
+    {
+      "id": "alchemy.station.mist-ferry-brazier",
+      "name": "渡口药炉",
+      "mapResourceId": "map.round-10-mist-ferry",
+      "position": { "col": 13, "row": 4 }
+    }
+  ],
+  "recipes": [
+    {
+      "id": "alchemy.recipe.shengji-san",
+      "name": "生肌散",
+      "description": "以寒珠草配苍崖根研末熬膏，文火收霜，专调金创血亏。",
+      "discoveryHint": "容素青握有生肌散的完整炼法，去渡口寻她问方。",
+      "discoveryNodeId": "event.formula-shengji-san",
+      "stationId": "alchemy.station.mist-ferry-brazier",
+      "ingredients": [
+        { "itemId": "item.hanzhu-cao", "quantity": 2 },
+        { "itemId": "item.cangya-gen", "quantity": 1 }
+      ],
+      "currencyCost": 18,
+      "outcomes": [
+        { "name": "粗制", "minimumInsight": 0, "resultItemId": "item.shengji-san-cu" },
+        { "name": "中正", "minimumInsight": 12, "resultItemId": "item.shengji-san-zhong" },
+        { "name": "上乘", "minimumInsight": 24, "resultItemId": "item.shengji-san-shang" }
+      ]
+    },
+    {
+      "id": "alchemy.recipe.ningshen-wan",
+      "name": "宁神丸",
+      "description": "落蝶花衬寒珠草蜜炼成丸，含服徐化，宁心续力。",
+      "discoveryHint": "宁神丸的火候口诀，须向容素青当面讨教。",
+      "discoveryNodeId": "event.formula-ningshen-wan",
+      "stationId": "alchemy.station.mist-ferry-brazier",
+      "ingredients": [
+        { "itemId": "item.luodie-hua", "quantity": 2 },
+        { "itemId": "item.hanzhu-cao", "quantity": 1 }
+      ],
+      "currencyCost": 16,
+      "outcomes": [
+        { "name": "粗制", "minimumInsight": 0, "resultItemId": "item.ningshen-wan-cu" },
+        { "name": "中正", "minimumInsight": 12, "resultItemId": "item.ningshen-wan-zhong" },
+        { "name": "上乘", "minimumInsight": 24, "resultItemId": "item.ningshen-wan-shang" }
+      ]
+    },
+    {
+      "id": "alchemy.recipe.shuanghe-dan",
+      "name": "双和丹",
+      "description": "三味合和，武火催香、缓火固形，气血双调。",
+      "discoveryHint": "容素青只把双和丹传给肯守炉子的问方人。",
+      "discoveryNodeId": "event.formula-shuanghe-dan",
+      "stationId": "alchemy.station.mist-ferry-brazier",
+      "ingredients": [
+        { "itemId": "item.hanzhu-cao", "quantity": 1 },
+        { "itemId": "item.cangya-gen", "quantity": 1 },
+        { "itemId": "item.luodie-hua", "quantity": 1 }
+      ],
+      "currencyCost": 26,
+      "outcomes": [
+        { "name": "粗制", "minimumInsight": 0, "resultItemId": "item.shuanghe-dan-cu" },
+        { "name": "中正", "minimumInsight": 12, "resultItemId": "item.shuanghe-dan-zhong" },
+        { "name": "上乘", "minimumInsight": 24, "resultItemId": "item.shuanghe-dan-shang" }
+      ]
+    }
+  ]
+}

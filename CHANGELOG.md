@@ -4,6 +4,21 @@
 
 ## [Unreleased]
 
+### Added (Round 25)
+
+- 新增可选 `alchemy-set` Schema/manifest 资源和同路径 MOD 覆盖；地图药炉、药师、方子、材料/产物跨引用及日程占位可独立校验，无资料时世界可正常运行。
+- 新增三味药材、三张需对话发现的药方及三档固定品质成药；悟性决定结果 item id，结果为沿用恢复规则的普通消耗品。
+- 新增 Phaser-free 药炼规则和邻接 E 面板；可查看未知药方寻方线索、材料/工钱、悟性产出预览。资金/材料/背包失败不改状态，成功后刷新 collectItem 数量。
+- 药方发现复用已知知识 id，成药复用普通物品背包、任务、百科与 v1 存档；新增炼丹资料作者指南，并更新 GDD、架构、图谱、数据、存档、帮助、README、开发日志及路线图。
+
+### Verification (Round 25)
+
+- `npm run build`：通过；122 个模块，主 JS 1,826.18 kB（gzip 481.76 kB）；Vite 仍提示超过默认 500 kB 分包建议线。
+- `npm run validate:data`：通过；manifest 与 23 个登记基础资源 Schema 通过。
+- `npm run smoke:round-25`：通过，覆盖图谱/配方解析、工位占位与四向邻接、发现门控、悟性品质、缺钱/缺料/背包容量拒绝不变性、满包转换、任务收集信号、成药使用、单配方隔离、v1 存档及无资料降级。
+- `npm run smoke:round-24`、`npm run smoke:round-23`：顺序回归均通过。
+- `git diff --check`：通过；Git 提示部分 LF 工作区文件将在下次触碰时规范为 CRLF。本轮未进行浏览器手动流程，不宣称面板已浏览器实测。
+
 ### Added (Round 24)
 
 - 新增可选 `equipment-forge-set` Schema/资源与同路径 MOD 覆盖；工位校验地图可走格、出生点、NPC、遭遇、擂台、门派战、重复工位占位，坏配方按单条隔离。

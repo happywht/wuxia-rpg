@@ -73,6 +73,7 @@ import {
   craftEquipment,
   selectEquipmentForgeStation,
 } from '../engine/equipment-forge';
+import { craftAlchemy, selectAlchemyStation } from '../engine/alchemy-system';
 import {
   aggregateMeridianEffects,
   applyMeridianEffects,
@@ -129,6 +130,7 @@ import { ArenaPanel } from './arena-ui';
 import { FactionWarPanel } from './faction-war-ui';
 import { MartialArtForgePanel } from './martial-art-forge-ui';
 import { EquipmentForgePanel } from './equipment-forge-ui';
+import { AlchemyPanel } from './alchemy-ui';
 import { MeridianPanel } from './meridian-ui';
 import { type GameSettings, applyGameSettings, loadGameSettings, uiFontSize } from './settings';
 import { createPixelPerson, UI_FONT_FAMILY } from './ui-theme';
@@ -338,6 +340,7 @@ export class GridScene extends Phaser.Scene {
   private factionWarPanel: FactionWarPanel | null = null;
   private martialArtForgePanel: MartialArtForgePanel | null = null;
   private equipmentForgePanel: EquipmentForgePanel | null = null;
+  private alchemyPanel: AlchemyPanel | null = null;
   private meridianPanel: MeridianPanel | null = null;
   private activeSession: CombatSession | null = null;
   private activeEncounter: PlacedEncounter | null = null;
@@ -631,6 +634,7 @@ export class GridScene extends Phaser.Scene {
     this.renderArenaMarkers(activeMap);
     this.renderFactionWarMarkers(activeMap);
     this.renderEquipmentForgeMarkers(activeMap);
+    this.renderAlchemyMarkers(activeMap);
     this.ensureDaylightLayer();
     this.buildHud(activeMap, world.optionalWarnings, world.modWarnings);
     this.updateCoordsHud();
@@ -671,6 +675,7 @@ export class GridScene extends Phaser.Scene {
     this.factionWarPanel = new FactionWarPanel(this, () => this.noteOverlayClosed());
     this.martialArtForgePanel = new MartialArtForgePanel(this, () => this.noteOverlayClosed());
     this.equipmentForgePanel = new EquipmentForgePanel(this, () => this.noteOverlayClosed());
+    this.alchemyPanel = new AlchemyPanel(this, () => this.noteOverlayClosed());
     this.meridianPanel = new MeridianPanel(this, () => this.noteOverlayClosed());
     this.worldMapPanel = new WorldMapPanel(this, () => this.noteOverlayClosed());
     this.encyclopediaPanel = new EncyclopediaPanel(this, { onClose: () => this.noteOverlayClosed() });
@@ -1025,6 +1030,26 @@ export class GridScene extends Phaser.Scene {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(12),
         color: '#fff0c8',
+      }).setOrigin(0.5).setDepth(5), 12);
+      this.encounterLayer?.add([badge, label]);
+    }
+  }
+
+  /** Jade cauldron badge denotes a fixed data-authored medicine station. */
+  private renderAlchemyMarkers(map: GridMap): void {
+    const stations = this.world?.assembly.alchemyStations.filter((station) =>
+      station.record.mapResourceId === this.currentMapResourceId,
+    ) ?? [];
+    for (const station of stations) {
+      const center = cellCenterOffset(map, station.record.position.col, station.record.position.row);
+      const x = this.mapOrigin.x + center.x;
+      const y = this.mapOrigin.y + center.y;
+      const badge = this.add.rectangle(x, y, Math.max(20, map.tileSize * 0.48), Math.max(20, map.tileSize * 0.48), 0x285a50)
+        .setStrokeStyle(2, 0x83d5ae).setDepth(4);
+      const label = this.registerScaledText(this.add.text(x, y, '药', {
+        fontFamily: UI.fontFamily,
+        fontSize: uiFontSize(12),
+        color: '#e3fff1',
       }).setOrigin(0.5).setDepth(5), 12);
       this.encounterLayer?.add([badge, label]);
     }
@@ -1907,6 +1932,16 @@ export class GridScene extends Phaser.Scene {
       this.interactText.setText(`按 E 在「${forgeTarget.record.name}」锻造装备 · ${forgeTarget.recipes.length} 种配方`);
       return;
     }
+    const alchemyTarget = this.world === null ? null : selectAlchemyStation(
+      this.world.assembly.alchemyStations,
+      this.currentMapResourceId,
+      { col: this.playerCol, row: this.playerRow },
+    );
+    if (alchemyTarget !== null) {
+      const known = alchemyTarget.recipes.filter((recipe) => this.knownKnowledgeNodeIds.has(recipe.discoveryNodeId)).length;
+      this.interactText.setText(`按 E 在「${alchemyTarget.record.name}」炼药 · 已识药方 ${known}/${alchemyTarget.recipes.length}`);
+      return;
+    }
     const gate = this.world === null
       ? null
       : selectAdjacentTransition(this.world.worldMap.transitions, this.currentMapResourceId, {
@@ -1943,6 +1978,7 @@ export class GridScene extends Phaser.Scene {
       (this.factionWarPanel !== null && this.factionWarPanel.isOpen) ||
       (this.martialArtForgePanel !== null && this.martialArtForgePanel.isOpen) ||
       (this.equipmentForgePanel !== null && this.equipmentForgePanel.isOpen) ||
+      (this.alchemyPanel !== null && this.alchemyPanel.isOpen) ||
       (this.meridianPanel !== null && this.meridianPanel.isOpen) ||
       (this.controlsPanel !== null && this.controlsPanel.isOpen)
     );
@@ -2371,6 +2407,8 @@ export class GridScene extends Phaser.Scene {
       this.martialArtForgePanel = null;
       this.equipmentForgePanel?.destroy();
       this.equipmentForgePanel = null;
+      this.alchemyPanel?.destroy();
+      this.alchemyPanel = null;
       this.meridianPanel?.destroy();
       this.meridianPanel = null;
       this.controlsPanel?.destroy();
@@ -2466,6 +2504,38 @@ export class GridScene extends Phaser.Scene {
           return outcome.ok
             ? { ok: true, message: `已锻成「${outcome.result.name}」，剩余银两 ${outcome.remainingCurrency}。` }
             : { ok: false, message: outcome.reason };
+        },
+      });
+      this.updateInteractHint();
+      return;
+    }
+    const alchemy = this.world === null ? null : selectAlchemyStation(
+      this.world.assembly.alchemyStations,
+      this.currentMapResourceId,
+      { col: this.playerCol, row: this.playerRow },
+    );
+    if (alchemy !== null && this.inventory !== null && this.playerState !== null && this.alchemyPanel !== null) {
+      const inventory = this.inventory;
+      const character = this.playerState;
+      this.alchemyPanel.open({
+        station: alchemy,
+        inventory,
+        items: this.items,
+        knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
+        insight: character.attributes.insight,
+        onCraft: (recipeId) => {
+          const outcome = craftAlchemy({
+            station: alchemy,
+            recipeId,
+            character,
+            knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
+            inventory,
+            items: this.items,
+          });
+          if (!outcome.ok) return { ok: false, message: outcome.reason };
+          this.refreshQuestCollectObjectives();
+          if (this.world?.knowledgeGraph.nodes.has(outcome.result.id)) this.knownKnowledgeNodeIds.add(outcome.result.id);
+          return { ok: true, message: `已炼成「${outcome.result.name}」，剩余银两 ${outcome.remainingCurrency}。` };
         },
       });
       this.updateInteractHint();
@@ -2730,6 +2800,7 @@ export class GridScene extends Phaser.Scene {
     this.renderArenaMarkers(destinationMap);
     this.renderFactionWarMarkers(destinationMap);
     this.renderEquipmentForgeMarkers(destinationMap);
+    this.renderAlchemyMarkers(destinationMap);
     this.ensureDaylightLayer(); // The rebuilt world layers must sit below the wash again.
     this.mapNameText?.setText(destinationMap.data.name);
     this.updateCoordsHud();

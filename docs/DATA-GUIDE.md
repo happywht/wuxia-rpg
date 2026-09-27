@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：Round 03–24 已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台、门派战、自创武学、经脉、装备锻造、存档、区域旅行、知识图谱、昼夜气候、日程、条件奇遇与多层社会声望；详情分别见 `docs/SAVES.md`、`docs/KNOWLEDGE-GRAPH.md`、`docs/COMPANIONS.md`、`docs/FACTION_WAR_DESIGN.md`、`docs/MARTIAL_ART_FORGE.md` 与 `docs/EQUIPMENT-FORGING.md`。
+- 状态：Round 03–25 已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台、门派战、自创武学、经脉、装备锻造、炼丹、存档、区域旅行、知识图谱、昼夜气候、日程、条件奇遇与多层社会声望；详情分别见 `docs/SAVES.md`、`docs/KNOWLEDGE-GRAPH.md`、`docs/COMPANIONS.md`、`docs/FACTION_WAR_DESIGN.md`、`docs/MARTIAL_ART_FORGE.md`、`docs/EQUIPMENT-FORGING.md` 与 `docs/ALCHEMY.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -21,6 +21,7 @@ data/
 │   ├── companions/          # 同行伙伴及其战斗支援专长
 │   ├── faction_wars/        # 门派战入口、阶段对手、贡献和声望/见闻后果
 │   ├── forges/              # 装备锻造工位与配方
+│   ├── alchemy/             # 药炉与悟性品质药方
 │   ├── maps/                # 地图：区域、房间/场景、连接与出生点
 │   ├── quests/              # 任务：目标、步骤、条件、奖励
 │   ├── dialogues/           # 对话：节点、选项、条件分支、效果
@@ -30,7 +31,7 @@ data/
 │   ├── factions/            # 门派：立场、声望规则、成员关系
 │   ├── battles/             # 战斗：遭遇触发点、敌人、奖励与提示文本
 │   └── endings/             # 结局：触发条件与结局文本
-├── schema/                  # JSON Schema（含 manifest、grid-map、world-map、game-calendar、knowledge-nodes、knowledge-edges、npc-set、companion-set、faction-war-set、martial-art-components、meridian-set、equipment-forge-set、dialogue-set、character-profiles、faction-set、martial-arts-set、battle-encounters、arena-set、items-set、shops-set、quest-set）
+├── schema/                  # JSON Schema（含 manifest、grid-map、world-map、game-calendar、knowledge-nodes、knowledge-edges、npc-set、companion-set、faction-war-set、martial-art-components、meridian-set、equipment-forge-set、alchemy-set、dialogue-set、character-profiles、faction-set、martial-arts-set、battle-encounters、arena-set、items-set、shops-set、quest-set）
 mods/                        # mod 覆盖层：mods/<modId>/ 镜像 data/base/ 相对路径
 ```
 
@@ -57,6 +58,8 @@ Round 14 状态：manifest 登记**必需**资源 `calendar.base` → `worldview
 Round 23 新增可选 `meridian-set`（`meridian-set.schema.json`），经脉 JSON 放在 `meridians/` 并可由 MOD 同路径覆盖。资源声明初始修为、逐级修为和上限；每个节点声明 level/point 门槛、依赖节点、物品消耗及属性/气血/内力上限效果。依赖图须无环，材料引用会在世界装配期对照物品集，失效材料只关闭相关节点链。节点进度在运行存档，派生加成不写入世界资料。具体边界见 [`MERIDIANS.md`](MERIDIANS.md)。
 
 Round 24 新增可选 `equipment-forge-set`，配方和地图工位定义放在 `forges/`，通过 manifest 同名路径 MOD 覆盖。工位引用地图资源与坐标；配方引用当前 item id、一个未穿戴基础装备、杂项材料、银两和同槽强化结果。装配会检查可走格、静态与日程占位，以及物品类别、槽位和属性不降级约束。配方投入数量和交易值域见 `data/schema/equipment-forge-set.schema.json`，运行规则与示例见 [`EQUIPMENT-FORGING.md`](EQUIPMENT-FORGING.md)。
+
+Round 25 新增可选 `alchemy-set`，药炉和药方定义放在 `alchemy/`，通过 manifest 同名路径 MOD 覆盖。药方引用一个需要先发现的知识节点、杂项药材、正银两成本和按悟性阈值递增的 2–5 档普通消耗品结果。Schema 检查字段边界；装配器校验地图占位、物品/知识跨引用、门槛排序及恢复效果单调性。投入和结果定义见 `data/schema/alchemy-set.schema.json`，内容流程见 [`ALCHEMY.md`](ALCHEMY.md)。
 
 Round 20 新增擂台资料族：manifest 中的可选 arena-set 资源按地图入口、角色模板、赛程武学、彩头物品逐项校验；坏入口只禁用对应擂台。赛事文件可由 MOD 使用同路径覆盖，资料字段和玩法边界见 docs/ARENA_DESIGN.md。
 

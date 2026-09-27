@@ -71,6 +71,11 @@
       "schema": "equipment-forge-set"
     },
     {
+      "id": "alchemy.round-25-set",
+      "path": "alchemy/round-25-alchemy.json",
+      "schema": "alchemy-set"
+    },
+    {
       "id": "encounter.round-05-set",
       "path": "battles/round-05-encounters.json",
       "schema": "battle-encounters"

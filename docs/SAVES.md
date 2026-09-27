@@ -1,6 +1,6 @@
 # 本地存档与设置协议
 
-Round 09 引入本地单机存档；Round 10 扩展到多地图行程与区域事件；Round 11 增加已发现知识词条；Round 13 保存玩家当前门派与师父；Round 14 记录已流逝的游戏内分钟数；Round 15 保存世界气候种子；Round 16 以分钟数派生 NPC 日程位置；Round 17 的条件奇遇复用已完成事件 id 和已发现知识 id，不增加存档字段；Round 18 将逐门派声望保存在 `social.factionRenown`；Round 19 添加当前同行伙伴 id；Round 20 加入擂台战绩册；Round 21 加入门派战绩册；Round 22 保存自创武学完整定义；Round 23 加入未用修为与已打通经脉节点 id；Round 24 的锻造结果沿用普通物品/装备 id，不改 v1 协议。缺字段的旧 v1 档中伙伴归一为 null，战绩/自创作品/经脉节点归一为空数组，修为归零。存档是运行时状态的版本化 JSON 快照，不是世界资料：不会写回 `data/base/`，也不会被 MOD 覆盖。协议实现位于 `src/engine/save-system.ts`，菜单与游戏场景负责呈现和调用。
+Round 09 引入本地单机存档；Round 10 扩展到多地图行程与区域事件；Round 11 增加已发现知识词条；Round 13 保存玩家当前门派与师父；Round 14 记录已流逝的游戏内分钟数；Round 15 保存世界气候种子；Round 16 以分钟数派生 NPC 日程位置；Round 17 的条件奇遇复用已完成事件 id 和已发现知识 id，不增加存档字段；Round 18 将逐门派声望保存在 `social.factionRenown`；Round 19 添加当前同行伙伴 id；Round 20 加入擂台战绩册；Round 21 加入门派战绩册；Round 22 保存自创武学完整定义；Round 23 加入未用修为与已打通经脉节点 id；Round 24 的锻造结果和 Round 25 的成药都沿用普通物品/装备与 `knownKnowledgeNodeIds`，不改 v1 协议。缺字段的旧 v1 档中伙伴归一为 null，战绩/自创作品/经脉节点归一为空数组，修为归零。存档是运行时状态的版本化 JSON 快照，不是世界资料：不会写回 `data/base/`，也不会被 MOD 覆盖。协议实现位于 `src/engine/save-system.ts`，菜单与游戏场景负责呈现和调用。
 
 ## 槽位与存储
 
@@ -58,6 +58,10 @@ v1 快照的可选 `customMartialArts` 数组保存玩家自创作品完整定�
 ### Round 24：锻造物品兼容
 
 锻造会消耗普通 item id 和银两，并将固定结果装备作为普通堆栈加入背包；如穿戴则继续由 `inventory.equipped` 的槽位 → item id 映射记录。Round 24 不新增快照字段或版本。读取时按当前物品资料经 `equipItem` 重算属性及气血/内力上限；MOD 移除锻造结果时，存档预检按既有未知物品规则过滤该物品/装备引用。
+
+### Round 25：炼丹与配方发现
+
+炼丹消耗普通杂项材料和货币，并把固定品质的普通消耗品 item id 加入背包。药方发现状态复用已有 `knownKnowledgeNodeIds`，成药数量复用 `inventory.stacks`；Round 25 不新增快照字段或版本。v1 捕获/读回因此保留药品数量和已学药方，使用消耗品沿用背包逻辑；恢复时若 MOD 删除结果物品或知识节点，按已有未知 item/node 过滤规则软处理。
 
 ## 设置
 
