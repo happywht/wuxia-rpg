@@ -21,6 +21,14 @@ import {
 import { EventBus } from '../engine/event-bus';
 import { GridMap, parseGridMap } from '../engine/grid-map';
 import {
+  assembleKnowledgeGraph,
+  parseKnowledgeEdgeSet,
+  parseKnowledgeNodeSet,
+  type KnowledgeGraph,
+  type KnowledgeNodeSetData,
+  type KnowledgeEdgeSetData,
+} from '../engine/knowledge-graph';
+import {
   assembleWorldMap,
   parseWorldMap,
   type WorldMapAssembly,
@@ -82,6 +90,8 @@ const ENCOUNTER_RESOURCE_ID = 'encounter.round-05-set';
 const ITEM_RESOURCE_ID = 'item.round-06-set';
 const SHOP_RESOURCE_ID = 'shop.round-06-set';
 const QUEST_RESOURCE_ID = 'quest.round-07-set';
+const KNOWLEDGE_NODE_RESOURCE_ID = 'knowledge.round-11-nodes';
+const KNOWLEDGE_EDGE_RESOURCE_ID = 'knowledge.round-11-edges';
 
 /** Optional resources (NPC/dialogue/progression/battle/trade content) the world can lose without dying. */
 const OPTIONAL_RESOURCE_IDS = new Set([
@@ -94,6 +104,8 @@ const OPTIONAL_RESOURCE_IDS = new Set([
   ITEM_RESOURCE_ID,
   SHOP_RESOURCE_ID,
   QUEST_RESOURCE_ID,
+  KNOWLEDGE_NODE_RESOURCE_ID,
+  KNOWLEDGE_EDGE_RESOURCE_ID,
 ]);
 
 /** Optional-content schemas; schema-level failures carry no resource id, so match by origin. */
@@ -107,6 +119,8 @@ const OPTIONAL_SCHEMA_ORIGINS = new Set([
   'schema:items-set',
   'schema:shops-set',
   'schema:quest-set',
+  'schema:knowledge-nodes',
+  'schema:knowledge-edges',
 ]);
 
 function isOptionalContentDiagnostic(diagnostic: Diagnostic): boolean {
@@ -154,6 +168,7 @@ export interface LoadedWorld {
   mapResourceId: string;
   maps: ReadonlyMap<string, GridMap>;
   worldMap: WorldMapAssembly;
+  knowledgeGraph: KnowledgeGraph;
   assembly: WorldAssembly;
   optionalWarnings: readonly Diagnostic[];
   modWarnings: readonly Diagnostic[];
@@ -291,7 +306,11 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
       return { ok: false, title: '起始地图不可用', lines: [`地图资源 "${startingMapResourceId}" 未能加载。`] };
     }
 
-    const assembly = assembleOptionalContent(result.resources, maps);
+    const knowledgeResult = assembleKnowledgeGraphContent(result.resources);
+    const assembly = assembleOptionalContent(
+      result.resources, maps, new Set(knowledgeResult.graph.nodes.keys()),
+    );
+    assembly.warnings.push(...knowledgeResult.warnings);
     const overlapWarnings: string[] = [];
     const overlapsWorldOccupant = (mapResourceId: string, col: number, row: number): boolean =>
       assembly.npcs.some((npc) => npc.record.mapResourceId === mapResourceId && npc.col === col && npc.row === row) ||
@@ -336,6 +355,7 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
         mapResourceId: startingMapResourceId,
         maps,
         worldMap: resolvedWorldMap,
+        knowledgeGraph: knowledgeResult.graph,
         assembly,
         optionalWarnings: [...optionalWarnings, ...assembly.warnings],
         modWarnings,
@@ -353,6 +373,72 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
 }
 
 /**
+ * Loads graph resources as optional content. A missing/invalid half leaves
+ * the surviving nodes or edges available where meaningful; invalid graph
+ * rows are isolated by the Phaser-free parser/assembler.
+ */
+function assembleKnowledgeGraphContent(
+  resources: ReadonlyMap<string, LoadedResource>,
+): { graph: KnowledgeGraph; warnings: Diagnostic[] } {
+  const warnings: Diagnostic[] = [];
+  let nodeSet: KnowledgeNodeSetData = { nodes: [] };
+  let edgeSet: KnowledgeEdgeSetData = { edges: [] };
+  const nodeResource = resources.get(KNOWLEDGE_NODE_RESOURCE_ID);
+  if (nodeResource !== undefined) {
+    const parsed = parseKnowledgeNodeSet(nodeResource.value);
+    if (!parsed.ok) {
+      warnings.push({
+        resource: KNOWLEDGE_NODE_RESOURCE_ID,
+        origin: 'knowledge-assembly',
+        severity: 'warning',
+        message: '知识节点资料结构不合规，本轮禁用节点集',
+        details: parsed.errors,
+      });
+    } else {
+      nodeSet = parsed.data;
+      for (const message of parsed.warnings) warnings.push({
+        resource: KNOWLEDGE_NODE_RESOURCE_ID,
+        origin: 'knowledge-assembly',
+        severity: 'warning',
+        message,
+        details: [],
+      });
+    }
+  }
+  const edgeResource = resources.get(KNOWLEDGE_EDGE_RESOURCE_ID);
+  if (edgeResource !== undefined) {
+    const parsed = parseKnowledgeEdgeSet(edgeResource.value);
+    if (!parsed.ok) {
+      warnings.push({
+        resource: KNOWLEDGE_EDGE_RESOURCE_ID,
+        origin: 'knowledge-assembly',
+        severity: 'warning',
+        message: '知识关系资料结构不合规，本轮禁用关系集',
+        details: parsed.errors,
+      });
+    } else {
+      edgeSet = parsed.data;
+      for (const message of parsed.warnings) warnings.push({
+        resource: KNOWLEDGE_EDGE_RESOURCE_ID,
+        origin: 'knowledge-assembly',
+        severity: 'warning',
+        message,
+        details: [],
+      });
+    }
+  }
+  const graph = assembleKnowledgeGraph(nodeSet, edgeSet);
+  for (const message of graph.warnings) warnings.push({
+    resource: KNOWLEDGE_EDGE_RESOURCE_ID,
+    origin: 'knowledge-assembly',
+    severity: 'warning',
+    message,
+    details: [],
+  });
+  return { graph, warnings };
+}
+
+/**
  * Assembles optional NPC/dialogue content. Every failure disables the
  * smallest possible unit — one conversation or one NPC — and becomes a
  * warning instead of killing the scene. Missing (unregistered) resources
@@ -361,6 +447,7 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
 function assembleOptionalContent(
   resources: ReadonlyMap<string, LoadedResource>,
   maps: ReadonlyMap<string, GridMap>,
+  knowledgeNodeIds: ReadonlySet<string>,
 ): WorldAssembly {
   const warnings: Diagnostic[] = [];
 
@@ -609,6 +696,7 @@ function assembleOptionalContent(
     quests: questAssembly.quests,
     items: itemAssembly.items,
     placedNpcIds,
+    knowledgeNodeIds,
   });
   for (const message of dialogueReferences.warnings) {
     warnings.push({

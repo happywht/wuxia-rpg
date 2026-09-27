@@ -1,0 +1,26 @@
+{
+  "nodes": [
+    { "id": "char.shen-mohan", "kind": "character", "title": "沈墨涵", "summary": "书铺里的年轻掌柜，熟悉旧书、残卷与镇上文人往来。", "knownByDefault": true },
+    { "id": "char.lu-zhenniang", "kind": "character", "title": "陆贞娘", "summary": "茶棚主人，常听行脚人讲述镇外的道路和新近传闻。", "knownByDefault": true },
+    { "id": "char.gu-yechen", "kind": "character", "title": "顾夜尘", "summary": "一名在镇外持刀拦路的旅人，行事警惕，似在追查旧事。", "knownByDefault": false },
+    { "id": "char.ma-shangyi", "kind": "character", "title": "马尚义", "summary": "熟悉巷里乡邻的差事发布人，愿意把善后之事托付给可信之人。", "knownByDefault": true },
+    { "id": "char.jiang-baiwei", "kind": "character", "title": "姜百味", "summary": "走街串巷的药材贩子，常备便于携带的寻常药物。", "knownByDefault": true },
+    { "id": "char.alley-blade", "kind": "character", "title": "巷口刀客", "summary": "曾在巷口滋扰乡邻的持刀之人，败后去向未明。", "knownByDefault": false },
+    { "id": "map.round-01-grid", "kind": "place", "title": "方格试炼场", "summary": "石阶环抱的旧试场，当前可从此处沿小径前往渡口。", "knownByDefault": true },
+    { "id": "map.round-10-mist-ferry", "kind": "place", "title": "雾雨渡口", "summary": "山雨与江雾相接的渡口，旧船道隐在芦苇深处。", "knownByDefault": true },
+    { "id": "place.reedbank", "kind": "place", "title": "芦苇河滩", "summary": "旧渡口东侧一段低浅河滩，雨后泥面容易留下行人足迹。", "knownByDefault": false },
+    { "id": "faction.tingyu-jiange", "kind": "faction", "title": "听雨剑阁", "summary": "以静制动、后发先至的江南剑派，尚文重礼。", "knownByDefault": true },
+    { "id": "faction.tiezhang-pai", "kind": "faction", "title": "铁嶂派", "summary": "崇尚筋骨苦修、桩功沉厚的北地门派。", "knownByDefault": true },
+    { "id": "faction.yunyin-shanzhuang", "kind": "faction", "title": "云隐山庄", "summary": "兼习养生与医理的隐逸庄园，武学以护身济世为先。", "knownByDefault": true },
+    { "id": "item.huichun-gao", "kind": "item", "title": "回春膏", "summary": "走方郎中熬制的药膏，适合处理寻常刀伤与擦伤。", "knownByDefault": true },
+    { "id": "item.xisui-canpian", "kind": "item", "title": "洗髓残篇", "summary": "水渍斑斑的旧抄本，残存几行经脉行气图。", "knownByDefault": true },
+    { "id": "item.qingxin-wan", "kind": "item", "title": "清心丸", "summary": "以清浅药材合成的小丸，能帮行气之人凝神续力。", "knownByDefault": true },
+    { "id": "skill.jianghu-sanshou", "kind": "martialArt", "title": "江湖散手", "summary": "市井搏斗中磨出的朴实拳脚，谈不上精妙，胜在随手可用。", "knownByDefault": true },
+    { "id": "skill.tingyu-jianfa", "kind": "martialArt", "title": "听雨剑法", "summary": "先以静制动窥敌破绽，再后发先至的剑阁入门剑法。", "knownByDefault": true },
+    { "id": "skill.yunyin-shenfa", "kind": "martialArt", "title": "云隐身法", "summary": "提气纵跃、落地无声的轻身功夫。", "knownByDefault": true },
+    { "id": "event.old-footprints", "kind": "event", "title": "雨后的脚印", "summary": "茶棚传出的线索指向芦苇河滩：一串新鲜泥印似乎在寻找某个旧船道。", "knownByDefault": false },
+    { "id": "quest.round-07-medicine-run", "kind": "quest", "title": "巷口送药", "summary": "替受伤乡邻备齐回春膏，再由熟悉巷情的人送去安置。", "knownByDefault": true },
+    { "id": "quest.round-07-clear-alley", "kind": "quest", "title": "巷口除患", "summary": "击退在巷口滋扰乡邻的刀客，免得其再拦阻行人。", "knownByDefault": true },
+    { "id": "ending.river-lantern", "kind": "ending", "title": "河灯归处", "summary": "一则尚未证实的旧传闻：若有人替沿岸村镇解开多年心结，河灯会为他指一条归路。", "knownByDefault": false }
+  ]
+}

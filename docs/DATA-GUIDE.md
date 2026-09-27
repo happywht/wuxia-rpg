@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：Round 03–08 已落地地图/NPC/对话、成长/武学/战斗、物品/商店、任务与社会状态运行时；Round 09 将玩家运行状态放入独立本地存档；Round 10 登记世界图并支持跨地图旅行和区域事件，分别见 `docs/SAVES.md` 与 `docs/MAP-ATLAS.md`。
+- 状态：Round 03–11 已落地地图、NPC/对话、成长/战斗、物品/任务、存档、区域旅行、知识图谱与百科；详情分别见 `docs/SAVES.md` 与 `docs/KNOWLEDGE-GRAPH.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -27,7 +27,7 @@ data/
 │   ├── factions/            # 门派：立场、声望规则、成员关系
 │   ├── battles/             # 战斗：遭遇触发点、敌人、奖励与提示文本
 │   └── endings/             # 结局：触发条件与结局文本
-├── schema/                  # JSON Schema（当前含 manifest、grid-map、world-map、npc-set、dialogue-set、character-profiles、faction-set、martial-arts-set、battle-encounters、items-set、shops-set、quest-set）
+├── schema/                  # JSON Schema（当前含 manifest、grid-map、world-map、knowledge-nodes、knowledge-edges、npc-set、dialogue-set、character-profiles、faction-set、martial-arts-set、battle-encounters、items-set、shops-set、quest-set）
 mods/                        # mod 覆盖层：mods/<modId>/ 镜像 data/base/ 相对路径
 ```
 
@@ -36,6 +36,10 @@ Round 07 状态：manifest 另登记可选资源 `quest.round-07-set` → `quest
 Round 08 状态：dialogue-set 选项新增可选 `conditions`（数组，全部满足才可见）与 `effects`（数组，确认时先全量验证再统一提交）字段，二者均为封闭枚举协议（见 §4 对话条件与效果），旧的无条件对话完全兼容。示例对话扩展覆盖任务接取/放弃/交付、物品赠予/交付、善恶、声望与 NPC 关系分支。Round 09 起运行时社会状态（善恶 −100…100、声望 0…1000、逐 NPC 关系 −100…100）和任务/物品进度通过存档持久化；门派级声望统一规则留待 Round 18。任务发布人 NPC 保留 E 名录入口，另可用 F 直接交谈。
 
 Round 10 状态：manifest 可登记多个 `grid-map` 资源；`world.atlas` 是必需的 `world-map` 资料，声明 `startingMapResourceId`、区域图册坐标、地图内关口端点和区域事件。每张地图文件中的 `id` 必须与 manifest 资源 id 一致；世界图解析器检查起始区域存在、区域不重复、端点/事件引用有效且坐标可走。跨资源装配再隔离与 NPC 或遭遇占格重叠的关口/事件。M 打开图册，E 键按 NPC、遭遇、关口的优先顺序处理交互；一次性事件 id 随存档保存。新增资料流程与示例见 `docs/MAP-ATLAS.md`。
+
+Round 11 状态：manifest 登记可选 `knowledge-nodes` 与 `knowledge-edges` 资源，分别使用 `knowledge-nodes.schema.json` 与 `knowledge-edges.schema.json`；节点类别为 character/place/faction/item/martialArt/event/quest/ending，关系类型为 mentorOf/parentOf/hostileTo/belongsTo/locatedAt/holds/triggers/requires/rewards/knows/participatesIn/influences。节点含稳定 id、类型、标题、摘要和 `knownByDefault`；边含稳定 id、两端节点 id、关系类型和说明。解析器对坏单条给警告并隔离，装配时重复 id 保留首项，悬空端点关系逐条丢弃。
+
+玩家新局从 `knownByDefault: true` 节点建立知识状态。对话选项可以声明 `{ "kind": "knowledgeKnown", "nodeId": "kg.node-id" }` 条件，全部条件满足才显示；效果 `{ "kind": "discoverKnowledgeNode", "nodeId": "kg.node-id" }` 会解锁词条，重复发现幂等。悬空引用只剔除对应对话选项。K 打开百科，左右/A/D 切换分类、上下/W/S 浏览、Esc 或 K 关闭。未发现条目只汇总为“未解锁见闻”，不会泄漏标题、摘要或相关边；关系只在两端节点都已知时显示。已知 id 随存档保存。具体内容组织和编辑步骤见 `docs/KNOWLEDGE-GRAPH.md`。
 
 ## 3. 文件与命名约定
 
@@ -56,7 +60,7 @@ Round 10 状态：manifest 可登记多个 `grid-map` 资源；`world.atlas` 是
 - **对话条件与效果（Round 08）**：dialogue-set 选项可声明 `conditions` 与 `effects`（均为对象数组，字段白名单封闭、未知 kind/字段/值域在 Ajv 校验与引擎防御解析两级被拒；空数组无意义被拒，省略表示无条件/纯跳转，旧数据完全兼容）。**条件**（全部满足该选项才可见）：`questStatus`（`questId` + `status`∈locked/offered/active/completed/failed）、`itemCount`（`itemId` + `minCount` 1–999）、`morality`/`renown`/`npcRelationship`（`minValue`/`maxValue` 至少其一，闭区间，取值范围分别为 ±100 / 0–1000 / ±100；`npcRelationship` 须带 `npcId`）。同时提供上下界时还须满足 `minValue <= maxValue`；draft-07 无法声明字段间大小关系，该语义由防御解析器校验，错误只禁用所在对话并保留同集合的其他有效对话。静态 Schema 不通过仍会拒绝整份资源。**效果**（确认选项时原子执行，任一不可行则全部不执行且不转移节点）：`acceptQuest`/`abandonQuest`（要求目标任务分别为 offered/active）、`giveItem`/`takeItem`（`quantity` 1–99；给予校验背包容量，扣除校验拥有数量且装备中的唯一实例锁一件）、`adjustMorality`（delta ±100 非零）/`adjustRenown`（delta ±1000 非零）/`adjustRelationship`（delta ±100 非零；省略 `npcId` 作用于当前对话对象）；善恶/声望/关系结果按范围边界钳制。条件或效果引用的 questId/itemId/npcId 悬空时只剔除该选项（节点可能因此成为结束节点），对话其余选项照常可用。对话扣除或给予物品后按背包新数量同步活动任务收集目标（进度可能回退，属预期行为）。
 - **多地图与世界区域（Round 10）**：已登记地图资源按 `grid-map` schema 收集，并要求地图内 `id` 与 manifest 资源 id 一致。必需 `world-map` 定义起始地图、图册节点、跨图关口与区域事件；舆图位置为 0–100 相对坐标，关口端点/事件格须引用有效地图并落在可走格。往返旅行需分别声明去程和回程端点。与 NPC/遭遇占格冲突的端点或事件会被逐条隔离并给出警告。事件 `once: true` 时只在首次踩入时结算并将 id 记入存档；`false` 允许每次进入重复提示。M 打开舆图且锁定探索输入；E 按 NPC → 遭遇 → 关口的顺序仲裁。详细字段及资料流程见 `docs/MAP-ATLAS.md`。
 - **值与变化量分开看**：声望条件读取的当前声望范围为 0…1000；`adjustRenown.delta` 是有符号变化量，范围为 -1000…1000（排除 0）。负变化合法，执行后的声望仍钳制在 0…1000。Ajv Schema 与引擎防御解析必须接受同一合法变化范围。
-- **未登记的数据族**：地图是当前场景的关键资源，缺失时加载器会生成错误诊断并显示修复说明。NPC/对话、角色成长/武学/战斗、物品/商店和任务均为可选资源：未登记或有效集合为空时地图正常显示（NPC 空集提示“暂无可交互人物”，背包/任务日志可显示空状态）；玩家运行状态只要求有有效角色模板，不要求遭遇或任务数据。其余空目录尚未进入运行时资料集。
+- **未登记的数据族**：地图是当前场景的关键资源，缺失时加载器会生成错误诊断并显示修复说明。NPC/对话、角色成长/武学/战斗、物品/商店、任务和知识图谱均为可选资源：未登记或有效集合为空时地图正常显示（百科提示图谱资料未加载，NPC/任务面板可显示空状态）；玩家运行状态只要求有有效角色模板，不要求遭遇或任务数据。其余空目录尚未进入运行时资料集。
 - **关键单点缺失**（如出生点地图缺失）：启动失败，输出单一明确错误（缺什么、去哪补）。
 
 ## 5. mod 覆盖规则（同名文件优先）
@@ -104,3 +108,4 @@ Round 10 状态：manifest 可登记多个 `grid-map` 资源；`world.atlas` 是
 | 2026-09-27 | Round 08 追修 | 对照 Ajv 与引擎解析器的声望状态/变化量范围，修正负向声望变化被误拒 |
 | 2026-09-27 | Round 08 语义追修 | 反向区间由防御解析器逐段拒绝并隔离，不再使同集合其他对话失效 |
 | 2026-09-27 | Round 09 | 记录存档与设置不属于世界资料、引用兼容检查及各系统状态恢复语义 |
+| 2026-09-27 | Round 10–11 | 记录多区域地图资源、知识图谱节点/关系、百科、知识对话条件与存档恢复 |

@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wuxia-rpg.invalid/schema/knowledge-edges",
+  "title": "知识图谱关系集",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["edges"],
+  "properties": {
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "fromId", "toId", "relation", "summary"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "fromId": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "toId": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "relation": {
+            "type": "string",
+            "enum": ["mentorOf", "parentOf", "hostileTo", "belongsTo", "locatedAt", "holds", "triggers", "requires", "rewards", "knows", "participatesIn", "influences"]
+          },
+          "summary": { "type": "string", "minLength": 1, "maxLength": 400 }
+        }
+      }
+    }
+  }
+}

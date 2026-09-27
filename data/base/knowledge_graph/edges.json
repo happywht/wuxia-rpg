@@ -1,0 +1,14 @@
+{
+  "edges": [
+    { "id": "kg.edge.lu-knows-gu", "fromId": "char.lu-zhenniang", "toId": "char.gu-yechen", "relation": "knows", "summary": "陆贞娘曾听过这名旅人在镇口打听船家。" },
+    { "id": "kg.edge.gu-at-ferry", "fromId": "char.gu-yechen", "toId": "map.round-10-mist-ferry", "relation": "locatedAt", "summary": "渡口传闻将顾夜尘的行踪指向芦苇深处。" },
+    { "id": "kg.edge.traces-at-reedbank", "fromId": "event.old-footprints", "toId": "place.reedbank", "relation": "locatedAt", "summary": "雨后脚印在芦苇河滩附近出现。" },
+    { "id": "kg.edge.traces-trigger-alley", "fromId": "event.old-footprints", "toId": "quest.round-07-clear-alley", "relation": "triggers", "summary": "沿线追查让巷口旧患重新浮出水面。" },
+    { "id": "kg.edge.medicine-needs-ointment", "fromId": "quest.round-07-medicine-run", "toId": "item.huichun-gao", "relation": "requires", "summary": "送药差事需要备齐回春膏。" },
+    { "id": "kg.edge.ma-at-trial", "fromId": "char.ma-shangyi", "toId": "map.round-01-grid", "relation": "locatedAt", "summary": "马尚义在试场附近张罗乡邻的差事。" },
+    { "id": "kg.edge.shen-holds-scroll", "fromId": "char.shen-mohan", "toId": "item.xisui-canpian", "relation": "holds", "summary": "洗髓残篇曾由书铺掌柜暂为收存。" },
+    { "id": "kg.edge.jiang-rewards-pill", "fromId": "char.jiang-baiwei", "toId": "item.qingxin-wan", "relation": "rewards", "summary": "帮药贩处理琐事后，他曾赠出一枚清心丸。" },
+    { "id": "kg.edge.gu-hostile-blade", "fromId": "char.gu-yechen", "toId": "char.alley-blade", "relation": "hostileTo", "summary": "两人都涉足巷口冲突，立场并不相同。" },
+    { "id": "kg.edge.rumor-influences-ending", "fromId": "event.old-footprints", "toId": "ending.river-lantern", "relation": "influences", "summary": "这条旧路传闻或许会影响江湖最终的去向。" }
+  ]
+}

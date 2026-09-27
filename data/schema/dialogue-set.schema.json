@@ -148,6 +148,16 @@
             "maxValue": { "type": "integer", "minimum": -100, "maximum": 100 }
           },
           "anyOf": [{ "required": ["minValue"] }, { "required": ["maxValue"] }]
+        },
+        {
+          "description": "玩家已获知指定知识节点时成立。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "nodeId"],
+          "properties": {
+            "kind": { "const": "knowledgeKnown" },
+            "nodeId": { "type": "string", "minLength": 1, "maxLength": 64 }
+          }
         }
       ]
     },
@@ -239,6 +249,16 @@
                 { "not": { "enum": [0] } }
               ]
             }
+          }
+        },
+        {
+          "description": "将已验证的知识节点加入玩家见闻，并在反馈中显示其标题。已知节点重复发现时不重复入档。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "nodeId"],
+          "properties": {
+            "kind": { "const": "discoverKnowledgeNode" },
+            "nodeId": { "type": "string", "minLength": 1, "maxLength": 64 }
           }
         }
       ]

@@ -107,6 +107,11 @@
               "conditions": [
                 { "kind": "npcRelationship", "npcId": "char.lu-zhenniang", "minValue": 10 }
               ]
+            },
+            {
+              "text": "关于那串雨后的脚印，我还有一事要问。",
+              "nextNodeId": "footprints",
+              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.old-footprints" }]
             }
           ]
         },
@@ -115,7 +120,14 @@
           "text": "有倒是有。前日来了个背刀的，把镇口船家问了个遍，像是在找什么人。客官出门在外，多留个心眼。",
           "options": [
             { "text": "多谢提醒，这就告辞。", "nextNodeId": "thanks" },
-            { "text": "那背刀的往哪儿去了？", "nextNodeId": "where" }
+            {
+              "text": "那背刀的往哪儿去了？",
+              "nextNodeId": "where",
+              "effects": [
+                { "kind": "discoverKnowledgeNode", "nodeId": "event.old-footprints" },
+                { "kind": "discoverKnowledgeNode", "nodeId": "place.reedbank" }
+              ]
+            }
           ]
         },
         {
@@ -133,6 +145,10 @@
         {
           "id": "warm",
           "text": "（她笑起来）你倒是记着。背刀的那位早走了，你放心——往后再有生面孔过镇，我先给你递个信儿。"
+        },
+        {
+          "id": "footprints",
+          "text": "脚印后来被雨冲散了，可河滩上有一串更浅的，像是有人回头看过。你既然留了心，这条旧路便不算全无来处。"
         },
         {
           "id": "thanks",
@@ -157,7 +173,16 @@
           "text": "三流剪径的毛贼，也敢挡路？……你身上有墨味，是镇上书铺的学徒？",
           "options": [
             { "text": "正是。阁下找的，可是书铺的人？", "nextNodeId": "search" },
-            { "text": "阁下为何守在这条路上？", "nextNodeId": "why-here" },
+            {
+              "text": "阁下为何守在这条路上？",
+              "nextNodeId": "why-here",
+              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "char.gu-yechen" }]
+            },
+            {
+              "text": "上回听你提起旧账，后来可有新消息？",
+              "nextNodeId": "debt",
+              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "char.gu-yechen" }]
+            },
             {
               "text": "顾兄，上回带的话，掌柜的已经收到了。",
               "nextNodeId": "ally",

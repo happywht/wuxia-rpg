@@ -4,6 +4,20 @@
 
 ## [Unreleased]
 
+### Added (Round 11)
+
+- 新增独立知识节点/关系数据族、draft-07 Schema、manifest 注册与 Phaser 无关图谱解析装配；样例包含 22 个节点、10 条关系边，支持 8 类节点及 12 种关系协议。
+- 新增 K 键江湖百科：按类别筛选、展示已知词条和双方已知的关联；未解锁条目以泛化行显示，不暴露内容。
+- 对话选项新增 `knowledgeKnown` 条件与 `discoverKnowledgeNode` 效果；发现进度进入 v1 存档，兼容 Round 10 及更早的 v1 快照。
+- 新增 `docs/KNOWLEDGE-GRAPH.md`，并更新 GDD、架构、数据、存档、路线与 README 文档。
+
+### Verification (Round 11)
+
+- Ajv 检查 manifest 与 14 个登记资源通过，使用当前 14 份 schema 契约。
+- 临时 Phaser 无关 harness 通过图谱解析/逐条隔离、知识门控与发现、坏引用剔除、效果事务原子性、Round 09/10 旧 v1 字段兼容和恢复公开词条基线；脚本随后清理。
+- 浏览器手动验证百科分类/锁定见闻隐私与探索输入锁、对话发现两条线索、后续知识条件选项出现，以及保存/重载/继续后已知词条恢复。
+- `npm run build` 通过（101 个模块）；`git diff --check` 通过。Vite 仍提示约 1,677 kB 的主 JS chunk 超过 500 kB 建议值。
+
 ### Added (Round 10)
 
 - 增加 `world-map` 资料 Schema 与语义装配，manifest 可登记多张网格地图；地区图册通过 M 键查看，并高亮当前所在区域。

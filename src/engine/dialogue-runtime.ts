@@ -58,6 +58,7 @@ import {
   adjustRenown,
   getRelationship,
 } from './social-state';
+import type { KnowledgeNodeData } from './knowledge-graph';
 
 // ---------------------------------------------------------------------------
 // Runtime context
@@ -73,6 +74,9 @@ export interface DialogueRuntimeContext {
   social: SocialState;
   /** NPC the conversation is spoken with (default relationship target). */
   speakerNpcId: string;
+  /** Known node ids plus their validated, data-driven details. */
+  knownKnowledgeNodeIds: Set<string>;
+  knowledgeNodes: ReadonlyMap<string, KnowledgeNodeData>;
   /** Optional display names by NPC id for feedback lines (data-driven). */
   npcNames?: ReadonlyMap<string, string>;
 }
@@ -88,6 +92,8 @@ export interface DialogueReferenceAssemblyInput {
   items: ReadonlyMap<string, ItemRecordData>;
   /** Ids of NPCs that passed placement. */
   placedNpcIds: ReadonlySet<string>;
+  /** Node ids accepted by the knowledge graph assembler. */
+  knowledgeNodeIds: ReadonlySet<string>;
 }
 
 export interface DialogueReferenceAssemblyResult {
@@ -102,23 +108,26 @@ function optionReferences(option: DialogueOptionData): {
   questIds: string[];
   itemIds: string[];
   npcIds: string[];
+  knowledgeNodeIds: string[];
 } {
   const questIds: string[] = [];
   const itemIds: string[] = [];
   const npcIds: string[] = [];
+  const knowledgeNodeIds: string[] = [];
   for (const condition of option.conditions ?? []) {
     if (condition.kind === 'questStatus') questIds.push(condition.questId);
     else if (condition.kind === 'itemCount') itemIds.push(condition.itemId);
     else if (condition.kind === 'npcRelationship') npcIds.push(condition.npcId);
+    else if (condition.kind === 'knowledgeKnown') knowledgeNodeIds.push(condition.nodeId);
   }
   for (const effect of option.effects ?? []) {
     if (effect.kind === 'acceptQuest' || effect.kind === 'abandonQuest') questIds.push(effect.questId);
     else if (effect.kind === 'giveItem' || effect.kind === 'takeItem') itemIds.push(effect.itemId);
     else if (effect.kind === 'adjustRelationship' && effect.npcId !== undefined) {
       npcIds.push(effect.npcId);
-    }
+    } else if (effect.kind === 'discoverKnowledgeNode') knowledgeNodeIds.push(effect.nodeId);
   }
-  return { questIds, itemIds, npcIds };
+  return { questIds, itemIds, npcIds, knowledgeNodeIds };
 }
 
 /**
@@ -151,6 +160,9 @@ export function assembleDialogueReferences(
         }
         for (const npcId of references.npcIds) {
           if (!input.placedNpcIds.has(npcId)) problems.push(`引用无效人物 "${npcId}"`);
+        }
+        for (const nodeId of references.knowledgeNodeIds) {
+          if (!input.knowledgeNodeIds.has(nodeId)) problems.push(`引用无效见闻 "${nodeId}"`);
         }
         if (problems.length > 0) {
           changed = true;
@@ -225,6 +237,8 @@ export function isConditionMet(
         condition.minValue,
         condition.maxValue,
       );
+    case 'knowledgeKnown':
+      return context.knownKnowledgeNodeIds.has(condition.nodeId);
   }
 }
 
@@ -322,6 +336,7 @@ function cloneRuntimeContext(context: DialogueRuntimeContext): DialogueRuntimeCo
       renown: context.social.renown,
       relationships: new Map(context.social.relationships),
     },
+    knownKnowledgeNodeIds: new Set(context.knownKnowledgeNodeIds),
   };
 }
 
@@ -358,6 +373,8 @@ function commitRuntimeContext(
   for (const [npcId, relationship] of staged.social.relationships) {
     target.social.relationships.set(npcId, relationship);
   }
+  target.knownKnowledgeNodeIds.clear();
+  for (const nodeId of staged.knownKnowledgeNodeIds) target.knownKnowledgeNodeIds.add(nodeId);
 }
 
 /**
@@ -421,6 +438,10 @@ function validateEffect(
       }
       return null;
     }
+    case 'discoverKnowledgeNode':
+      return context.knowledgeNodes.has(effect.nodeId)
+        ? null
+        : `见闻节点 "${effect.nodeId}" 不存在或不可用`;
     default:
       // adjust* effects: value ranges were pinned at parse time and explicit
       // npcIds at reference-assembly time; they can always commit.
@@ -539,6 +560,15 @@ export function applyDialogueEffects(
             ? `关系 ${sign}${magnitude}`
             : `与「${displayName}」关系 ${sign}${magnitude}`,
         );
+        break;
+      }
+      case 'discoverKnowledgeNode': {
+        const node = staged.knowledgeNodes.get(effect.nodeId);
+        if (node !== undefined) {
+          const alreadyKnown = staged.knownKnowledgeNodeIds.has(node.id);
+          staged.knownKnowledgeNodeIds.add(node.id);
+          lines.push(alreadyKnown ? `已记下「${node.title}」` : `新增见闻「${node.title}」`);
+        }
         break;
       }
     }

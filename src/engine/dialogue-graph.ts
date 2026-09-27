@@ -14,8 +14,8 @@
  * per-conversation validation here adds the graph semantics a schema cannot
  * express (start node exists, option targets resolve, node ids unique) so a
  * single broken conversation disables exactly itself, not the whole set.
- * Cross-resource id checks (quest/item/NPC references inside conditions and
- * effects) run in `assembleDialogueReferences` after world assembly and
+ * Cross-resource id checks (quest/item/NPC/knowledge references inside
+ * conditions and effects) run in `assembleDialogueReferences` after world assembly and
  * drop only the offending option.
  */
 
@@ -51,7 +51,8 @@ export type DialogueConditionData =
   | { kind: 'itemCount'; itemId: string; minCount: number }
   | { kind: 'morality'; minValue?: number; maxValue?: number }
   | { kind: 'renown'; minValue?: number; maxValue?: number }
-  | { kind: 'npcRelationship'; npcId: string; minValue?: number; maxValue?: number };
+  | { kind: 'npcRelationship'; npcId: string; minValue?: number; maxValue?: number }
+  | { kind: 'knowledgeKnown'; nodeId: string };
 
 /**
  * One effect executed when its option is confirmed. The runtime validates
@@ -66,7 +67,8 @@ export type DialogueEffectData =
   | { kind: 'takeItem'; itemId: string; quantity: number }
   | { kind: 'adjustMorality'; delta: number }
   | { kind: 'adjustRenown'; delta: number }
-  | { kind: 'adjustRelationship'; npcId?: string; delta: number };
+  | { kind: 'adjustRelationship'; npcId?: string; delta: number }
+  | { kind: 'discoverKnowledgeNode'; nodeId: string };
 
 /** One player-selectable branch leading to another node. */
 export interface DialogueOptionData {
@@ -222,6 +224,11 @@ function parseCondition(raw: unknown): DialogueConditionData | null {
       const [minValue, maxValue] = bounds;
       return { kind: 'npcRelationship', npcId, ...(minValue !== undefined ? { minValue } : {}), ...(maxValue !== undefined ? { maxValue } : {}) };
     }
+    case 'knowledgeKnown': {
+      if (!hasOnlyKeys(source, ['kind', 'nodeId'])) return null;
+      const nodeId = requireNonEmptyString(source.nodeId);
+      return nodeId === null ? null : { kind: 'knowledgeKnown', nodeId };
+    }
     default:
       return null;
   }
@@ -276,6 +283,11 @@ function parseEffect(raw: unknown): DialogueEffectData | null {
         return null;
       }
       return { kind: 'adjustRelationship', ...(npcId !== undefined ? { npcId } : {}), delta };
+    }
+    case 'discoverKnowledgeNode': {
+      if (!hasOnlyKeys(source, ['kind', 'nodeId'])) return null;
+      const nodeId = requireNonEmptyString(source.nodeId);
+      return nodeId === null ? null : { kind: 'discoverKnowledgeNode', nodeId };
     }
     default:
       return null;

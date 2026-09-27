@@ -4,6 +4,7 @@ import type { Diagnostic } from '../engine/data-loader';
 import { GridMap } from '../engine/grid-map';
 import { cellCenterOffset, renderGridMap } from '../engine/grid-map-renderer';
 import { selectAdjacentTransition, type RegionTransitionData } from '../engine/world-map';
+import { createKnowledgeState } from '../engine/knowledge-graph';
 import {
   type DialogueData,
   type DialogueSession,
@@ -69,6 +70,7 @@ import { InventoryPanel } from './inventory-ui';
 import { ShopPanel } from './shop-ui';
 import { QuestPanel } from './quest-ui';
 import { WorldMapPanel } from './world-map-ui';
+import { EncyclopediaPanel } from './encyclopedia-ui';
 import { PauseMenuPanel } from './pause-menu';
 import { type GameSettings, applyGameSettings, loadGameSettings, uiFontSize } from './settings';
 import { type GridStartupData } from './menu-scene';
@@ -201,6 +203,8 @@ export class GridScene extends Phaser.Scene {
 
   /** Round 08 social state (morality/renown/NPC relationships). */
   private social: SocialState = createSocialState();
+  /** Discovered encyclopedia entries are run state and participate in saves. */
+  private knownKnowledgeNodeIds = new Set<string>();
 
   private dialoguePanel: DialoguePanel | null = null;
   private battlePanel: BattlePanel | null = null;
@@ -209,6 +213,7 @@ export class GridScene extends Phaser.Scene {
   private questPanel: QuestPanel | null = null;
   private pauseMenu: PauseMenuPanel | null = null;
   private worldMapPanel: WorldMapPanel | null = null;
+  private encyclopediaPanel: EncyclopediaPanel | null = null;
   private activeSession: CombatSession | null = null;
   private activeEncounter: PlacedEncounter | null = null;
 
@@ -305,6 +310,10 @@ export class GridScene extends Phaser.Scene {
 
     this.children.removeAll(true); // Drop the transient loading hint.
     this.world = world;
+    this.knownKnowledgeNodeIds = createKnowledgeState(
+      world.knowledgeGraph,
+      restoredRun?.knownKnowledgeNodeIds ?? [],
+    );
     this.currentMapResourceId = restoredRun?.mapResourceId ?? world.mapResourceId;
     const activeMap = world.maps.get(this.currentMapResourceId) ?? map;
     this.map = activeMap;
@@ -469,6 +478,7 @@ export class GridScene extends Phaser.Scene {
       onClose: () => this.noteOverlayClosed(),
     });
     this.worldMapPanel = new WorldMapPanel(this, () => this.noteOverlayClosed());
+    this.encyclopediaPanel = new EncyclopediaPanel(this, { onClose: () => this.noteOverlayClosed() });
     this.updateQuestTrackerHud();
     this.updateInteractHint();
     this.triggerRegionEvents();
@@ -602,6 +612,12 @@ export class GridScene extends Phaser.Scene {
       questRecords: world.assembly.quests,
       npcIds: new Set(world.assembly.npcs.map((npc) => npc.record.id)),
       regionalEventIds: new Set(world.worldMap.events.map((event) => event.id)),
+      knowledgeNodeIds: new Set(world.knowledgeGraph.nodes.keys()),
+      defaultKnowledgeNodeIds: new Set(
+        [...world.knowledgeGraph.nodes.values()]
+          .filter((node) => node.knownByDefault)
+          .map((node) => node.id),
+      ),
     };
   }
 
@@ -622,6 +638,7 @@ export class GridScene extends Phaser.Scene {
       social: this.social,
       completedEncounters: this.completedEncounters,
       completedRegionalEvents: this.completedRegionalEvents,
+      knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
     });
     const result = writeSaveSlot(this.storage, slotId, snapshot);
     if (result.ok) {
@@ -793,7 +810,7 @@ export class GridScene extends Phaser.Scene {
     modWarnings: readonly Diagnostic[],
   ): void {
     this.add
-      .text(16, 14, '方向键 / WASD 移动 · E 交互 · F 交谈 · B 背包 · Q 任务 · M 舆图 · Esc 暂停', {
+      .text(16, 14, '方向键 / WASD 移动 · E 交互 · F 交谈 · B 背包 · Q 任务 · M 舆图 · K 百科 · Esc 暂停', {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(13),
         color: UI.textMuted,
@@ -938,7 +955,8 @@ export class GridScene extends Phaser.Scene {
       (this.shopPanel !== null && this.shopPanel.isOpen) ||
       (this.questPanel !== null && this.questPanel.isOpen) ||
       (this.pauseMenu !== null && this.pauseMenu.isOpen) ||
-      (this.worldMapPanel !== null && this.worldMapPanel.isOpen)
+      (this.worldMapPanel !== null && this.worldMapPanel.isOpen) ||
+      (this.encyclopediaPanel !== null && this.encyclopediaPanel.isOpen)
     );
   }
 
@@ -970,6 +988,20 @@ export class GridScene extends Phaser.Scene {
     }
     if (this.anyOverlayOpen()) return;
     panel.open(world.worldMap, this.currentMapResourceId);
+    this.updateInteractHint();
+  }
+
+  /** K key: browse known graph entries without exposing undiscovered details. */
+  private toggleEncyclopedia(): void {
+    const panel = this.encyclopediaPanel;
+    const world = this.world;
+    if (panel === null || world === null) return;
+    if (panel.isOpen) {
+      panel.close();
+      return;
+    }
+    if (this.anyOverlayOpen()) return;
+    panel.open({ graph: world.knowledgeGraph, knownNodeIds: this.knownKnowledgeNodeIds });
     this.updateInteractHint();
   }
 
@@ -1132,6 +1164,10 @@ export class GridScene extends Phaser.Scene {
     const onWorldMap = (): void => this.toggleWorldMap();
     worldMapKey.on('down', onWorldMap);
 
+    const encyclopediaKey = keyboard.addKey(KeyCodes.K);
+    const onEncyclopedia = (): void => this.toggleEncyclopedia();
+    encyclopediaKey.on('down', onEncyclopedia);
+
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       for (const { key, onDown } of listeners) {
         key.off('down', onDown);
@@ -1142,6 +1178,7 @@ export class GridScene extends Phaser.Scene {
       talkKey.off('down', onTalk);
       pauseKey.off('down', onPause);
       worldMapKey.off('down', onWorldMap);
+      encyclopediaKey.off('down', onEncyclopedia);
       this.dialoguePanel?.destroy();
       this.dialoguePanel = null;
       this.battlePanel?.destroy();
@@ -1156,6 +1193,8 @@ export class GridScene extends Phaser.Scene {
       this.pauseMenu = null;
       this.worldMapPanel?.destroy();
       this.worldMapPanel = null;
+      this.encyclopediaPanel?.destroy();
+      this.encyclopediaPanel = null;
       this.activeSession = null;
       this.activeEncounter = null;
     });
@@ -1265,6 +1304,8 @@ export class GridScene extends Phaser.Scene {
       inventory: this.inventory,
       social: this.social,
       speakerNpcId,
+      knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
+      knowledgeNodes: this.world?.knowledgeGraph.nodes ?? new Map(),
       npcNames: new Map(this.placedNpcs.map((npc) => [npc.record.id, npc.record.name])),
     };
   }

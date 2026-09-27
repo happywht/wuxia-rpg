@@ -59,6 +59,16 @@
       "id": "quest.round-07-set",
       "path": "quests/round-07-quests.json",
       "schema": "quest-set"
+    },
+    {
+      "id": "knowledge.round-11-nodes",
+      "path": "knowledge_graph/nodes.json",
+      "schema": "knowledge-nodes"
+    },
+    {
+      "id": "knowledge.round-11-edges",
+      "path": "knowledge_graph/edges.json",
+      "schema": "knowledge-edges"
     }
   ],
   "enabledMods": []

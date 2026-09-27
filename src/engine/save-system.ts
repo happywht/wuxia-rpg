@@ -155,6 +155,8 @@ export interface SaveSnapshotV1 {
   completedEncounters: string[];
   /** One-shot data event ids already triggered; absent in older v1 saves. */
   completedRegionalEvents: string[];
+  /** Discovered encyclopedia nodes; absent from Round 10 and earlier v1 saves. */
+  knownKnowledgeNodeIds: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -522,6 +524,12 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
   if (completedRegionalEvents === null) {
     errors.push('completedRegionalEvents：应为非重复的非空字符串数组');
   }
+  const knownKnowledgeNodeIds = raw.knownKnowledgeNodeIds === undefined
+    ? []
+    : requireUniqueNonEmptyStringArray(raw.knownKnowledgeNodeIds);
+  if (knownKnowledgeNodeIds === null) {
+    errors.push('knownKnowledgeNodeIds：应为非重复的非空字符串数组');
+  }
 
   if (
     errors.length > 0 ||
@@ -542,7 +550,8 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     morality === null ||
     renown === null ||
     completedEncounters === null ||
-    completedRegionalEvents === null
+    completedRegionalEvents === null ||
+    knownKnowledgeNodeIds === null
   ) {
     return { ok: false, reason: 'corrupt', message: '存档结构不合规', errors };
   }
@@ -568,6 +577,7 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     social: { morality, renown, relationships },
     completedEncounters,
     completedRegionalEvents,
+    knownKnowledgeNodeIds,
   };
   return { ok: true, snapshot };
 }
@@ -824,6 +834,7 @@ export interface CaptureInput {
   social: Readonly<SocialState>;
   completedEncounters: ReadonlySet<string>;
   completedRegionalEvents: ReadonlySet<string>;
+  knownKnowledgeNodeIds: ReadonlySet<string>;
   /** Injectable clock for deterministic tests. */
   now?: () => Date;
 }
@@ -871,6 +882,7 @@ export function captureSaveSnapshot(input: CaptureInput): SaveSnapshotV1 {
     },
     completedEncounters: [...input.completedEncounters],
     completedRegionalEvents: [...input.completedRegionalEvents],
+    knownKnowledgeNodeIds: [...input.knownKnowledgeNodeIds],
   };
 }
 
@@ -911,6 +923,9 @@ export interface SaveWorldReferences {
   npcIds: ReadonlySet<string>;
   /** Current valid event ids; stale completion flags are dropped on load. */
   regionalEventIds?: ReadonlySet<string>;
+  /** Current knowledge graph ids and immutable public baseline. */
+  knowledgeNodeIds?: ReadonlySet<string>;
+  defaultKnowledgeNodeIds?: ReadonlySet<string>;
 }
 
 export type RestorePlanResult =
@@ -1120,6 +1135,24 @@ export function planSnapshotRestore(
     warnings.push(`区域事件 "${eventId}" 在当前资料中不存在，忽略其完成状态`);
     return false;
   });
+  const knownKnowledgeNodeIds: string[] = [];
+  const knownKnowledgeSeen = new Set<string>();
+  for (const nodeId of refs.defaultKnowledgeNodeIds ?? []) {
+    if ((refs.knowledgeNodeIds?.has(nodeId) ?? true) && !knownKnowledgeSeen.has(nodeId)) {
+      knownKnowledgeSeen.add(nodeId);
+      knownKnowledgeNodeIds.push(nodeId);
+    }
+  }
+  for (const nodeId of snapshot.knownKnowledgeNodeIds) {
+    if (refs.knowledgeNodeIds?.has(nodeId) ?? true) {
+      if (!knownKnowledgeSeen.has(nodeId)) {
+        knownKnowledgeSeen.add(nodeId);
+        knownKnowledgeNodeIds.push(nodeId);
+      }
+    } else {
+      warnings.push(`已发现的知识条目 "${nodeId}" 在当前图谱中不存在，已忽略`);
+    }
+  }
 
   return {
     ok: true,
@@ -1133,6 +1166,7 @@ export function planSnapshotRestore(
       social: { ...snapshot.social, relationships },
       completedEncounters,
       completedRegionalEvents,
+      knownKnowledgeNodeIds,
     },
   };
 }
@@ -1160,6 +1194,7 @@ export interface RestoredRunState {
   social: SocialState;
   completedEncounters: string[];
   completedRegionalEvents: string[];
+  knownKnowledgeNodeIds: string[];
 }
 
 /**
@@ -1251,6 +1286,7 @@ export function restoreRunState(input: RestoreRunInput): RestoredRunState {
     social,
     completedEncounters: [...snapshot.completedEncounters],
     completedRegionalEvents: [...snapshot.completedRegionalEvents],
+    knownKnowledgeNodeIds: [...snapshot.knownKnowledgeNodeIds],
   };
 }
 

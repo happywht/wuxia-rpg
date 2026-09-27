@@ -4,12 +4,12 @@
 
 - 设计文档：`docs/GDD.md`
 - 逐轮路线图（R00–R50）：`ROADMAP.md`
-- 当前进度：**Round 10 完成；下一轮 Round 11（知识图谱与百科/对话条件接入）**
+- 当前进度：**Round 11 已完成；下一轮 Round 12（UI 与操作打磨）**
 
 ## 范围
 
-- ✅ 已完成（R00–R10）：双区域网格世界支持 M 键舆图、E 键关口往返、JSON 区域事件与一次性去重；版本化 localStorage 存档恢复当前地图/坐标/已触发事件，并继续接受 Round 09 旧 v1 快照。此前角色、战斗、物品、任务、对话与设置闭环保留。
-- ❌ 后续轮次：知识图谱、百科查询和对话条件接入，以及路线图中的后续玩法；正式 Vitest 基线仍排在 Round 38。
+- ✅ 已完成（R00–R11）：双区域网格世界、区域事件及往返旅行；22 个图谱节点、K 键百科、见闻发现与知识条件对话；v1 存档保存已知词条并兼容较早 v1 档。此前角色、战斗、物品、任务和设置闭环保留。
+- ❌ 后续轮次：UI/操作打磨和路线图中的玩法扩展；正式 Vitest 基线仍排在 Round 38。
 - 永久边界：不做多人联网；不含原作内容；mod 仅限同名 JSON 覆盖（见 `docs/DATA-GUIDE.md`）。
 
 ## 技术栈（版本已核验并冻结，见 `docs/ADR.md`）
@@ -50,11 +50,11 @@ npm run typecheck  # 仅类型检查
 │   ├── engine/           # 网格地图、世界图、数据加载器、玩法规则与版本化存档引擎
 │   └── game/             # 主菜单、网格探索、舆图、对话、战斗、暂停/设置及玩法面板
 ├── data/
-│   ├── base/             # 原创世界数据及 manifest（含战斗、物品、商店、任务）
+│   ├── base/             # 原创世界数据及 manifest（含知识图谱）
 │   └── schema/           # 所有已登记数据族的 JSON Schema
 ├── mods/                 # mod 同名覆盖层（含未启用的 example）
 ├── docs/                 # 设计与规范文档
-├── iterations/           # 逐轮计划（Round 00–Round 10）
+├── iterations/           # 逐轮计划（Round 00–Round 11）
 ├── ROADMAP.md            # R00–R50 路线图
 ├── CHANGELOG.md          # 变更日志
 └── DEVLOG.md             # 开发日志（含核验记录）
@@ -70,6 +70,7 @@ npm run typecheck  # 仅类型检查
 | `docs/ORIGINAL-FIDELITY.md` | 原作系列原则（有证据）/ 用户目标 / 新扩展 三组对照 |
 | `docs/ARCHITECTURE.md` | 分层架构、缺数据降级、校验、mod 覆盖、热重载规划 |
 | `docs/DATA-GUIDE.md` | 数据目录规范、命名约定、mod 覆盖规则 |
+| `docs/KNOWLEDGE-GRAPH.md` | 图谱节点/关系、见闻解锁、百科与对话接入 |
 | `docs/SAVES.md` | 本地存档与设置存储协议、恢复预检和兼容边界 |
 | `docs/MAP-ATLAS.md` | 世界舆图、区域地图资源、关口、区域事件及占位校验 |
 
