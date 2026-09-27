@@ -6,6 +6,7 @@ import {
   type PlayerActionView,
 } from '../engine/turn-based-combat';
 import { uiFontSize } from './settings';
+import { addPixelPanelChrome, UI_FONT_FAMILY, addPixelSelection } from './ui-theme';
 
 /**
  * Generic keyboard-driven battle overlay.
@@ -42,7 +43,7 @@ const UI = {
   logPlayer: '#a8d8b0',
   logEnemy: '#e0a8a8',
   logResult: '#f0c96a',
-  fontFamily: 'sans-serif',
+  fontFamily: UI_FONT_FAMILY,
 } as const;
 
 const PADDING = 24;
@@ -52,6 +53,7 @@ const BAR_GAP = 18;
 /** Vertical budget for the log block; older entries drop off first. */
 const LOG_HEIGHT_BUDGET = 128;
 const ACTION_LINE_HEIGHT = 26;
+const VISIBLE_ACTION_ROWS = 5;
 const CURSOR_ACTIVE = '▸ ';
 const CURSOR_IDLE = '  ';
 /** Fixed panel height: two combatant blocks, log budget, up to five rows, hint. */
@@ -64,7 +66,7 @@ const LABELS = {
   attackKind: '攻击',
   healKind: '恢复',
   fleeAction: '撤退',
-  selectHint: '↑/↓ 选择 · Enter 确认 · Esc 撤退',
+  selectHint: '↑/↓ 滚动与选择 · Enter 确认 · Esc 撤退',
   closeHint: 'Enter / Esc 离开战场',
   insufficientQi: '内力不足，该行动无法使出',
 } as const;
@@ -247,19 +249,12 @@ export class BattlePanel {
     const panelTop = (height - PANEL_HEIGHT) / 2 + 12;
     const contentWidth = panelWidth - PADDING * 2;
 
-    const overlay = this.scene.add.rectangle(0, 0, width, height, UI.overlayFill, UI.overlayAlpha);
-    overlay.setOrigin(0, 0);
-    this.container.add(overlay);
-
-    const panel = this.scene.add.rectangle(
-      panelLeft + panelWidth / 2,
-      panelTop + PANEL_HEIGHT / 2,
-      panelWidth,
-      PANEL_HEIGHT,
-      UI.panelFill,
+    addPixelPanelChrome(
+      this.scene,
+      this.container,
+      { x: panelLeft, y: panelTop, width: panelWidth, height: PANEL_HEIGHT },
+      UI.overlayAlpha,
     );
-    panel.setStrokeStyle(2, UI.panelStroke);
-    this.container.add(panel);
 
     this.renderCombatant(session.playerView, panelLeft + PADDING + BAR_WIDTH / 2, panelTop + PADDING);
     this.renderCombatant(
@@ -270,7 +265,7 @@ export class BattlePanel {
 
     const logBottom = this.renderLog(session, panelLeft + PADDING, panelTop + 118, contentWidth);
     if (!session.isOver) {
-      this.renderActions(session.playerActions, panelLeft + PADDING + 6, logBottom + 10);
+      this.renderActions(session.playerActions, panelLeft + PADDING + 6, logBottom + 10, contentWidth - 12);
     }
     this.renderHint(
       panelLeft + panelWidth - PADDING,
@@ -422,10 +417,22 @@ export class BattlePanel {
   }
 
   /** Action list plus the flee row, with the cursor and affordability states. */
-  private renderActions(actions: readonly PlayerActionView[], left: number, top: number): void {
+  private renderActions(actions: readonly PlayerActionView[], left: number, top: number, width: number): void {
     let cursorY = top;
-    actions.forEach((action, index) => {
+    const windowStart = Math.floor(this.selection / VISIBLE_ACTION_ROWS) * VISIBLE_ACTION_ROWS;
+    for (let offset = 0; offset < VISIBLE_ACTION_ROWS; offset += 1) {
+      const index = windowStart + offset;
+      const action = actions[index];
+      if (action === undefined) break;
       const active = index === this.selection;
+      if (active) {
+        addPixelSelection(this.scene, this.container, {
+          x: left - 6,
+          y: cursorY - 2,
+          width,
+          height: ACTION_LINE_HEIGHT,
+        });
+      }
       const line = this.scene.add
         .text(left, cursorY, actionLineText(action, active), {
           fontFamily: UI.fontFamily,
@@ -439,17 +446,27 @@ export class BattlePanel {
         .setOrigin(0, 0);
       this.container.add(line);
       cursorY += ACTION_LINE_HEIGHT;
-    });
+    }
 
     const fleeActive = this.selection === actions.length;
-    const fleeLine = this.scene.add
-      .text(left, cursorY, `${fleeActive ? CURSOR_ACTIVE : CURSOR_IDLE}${LABELS.fleeAction}`, {
-        fontFamily: UI.fontFamily,
-        fontSize: uiFontSize(13),
-        color: fleeActive ? UI.actionActive : UI.actionIdle,
-      })
-      .setOrigin(0, 0);
-    this.container.add(fleeLine);
+    if (actions.length < windowStart + VISIBLE_ACTION_ROWS) {
+      if (fleeActive) {
+        addPixelSelection(this.scene, this.container, {
+          x: left - 6,
+          y: cursorY - 2,
+          width,
+          height: ACTION_LINE_HEIGHT,
+        });
+      }
+      const fleeLine = this.scene.add
+        .text(left, cursorY, `${fleeActive ? CURSOR_ACTIVE : CURSOR_IDLE}${LABELS.fleeAction}`, {
+          fontFamily: UI.fontFamily,
+          fontSize: uiFontSize(13),
+          color: fleeActive ? UI.actionActive : UI.actionIdle,
+        })
+        .setOrigin(0, 0);
+      this.container.add(fleeLine);
+    }
   }
 
   /** Bottom-right key hint inside the panel. */

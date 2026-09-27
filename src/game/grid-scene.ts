@@ -72,7 +72,9 @@ import { QuestPanel } from './quest-ui';
 import { WorldMapPanel } from './world-map-ui';
 import { EncyclopediaPanel } from './encyclopedia-ui';
 import { PauseMenuPanel } from './pause-menu';
+import { ControlsPanel } from './controls-ui';
 import { type GameSettings, applyGameSettings, loadGameSettings, uiFontSize } from './settings';
+import { createPixelPerson, UI_FONT_FAMILY } from './ui-theme';
 import { type GridStartupData } from './menu-scene';
 import {
   type LoadedWorld,
@@ -119,15 +121,8 @@ const HUD_HEIGHT = 64;
 
 const MOVE_DURATION_MS = 110;
 
-/** Generic geometric player marker (no art assets in this round). */
-const MARKER_COLOR = 0xe8b04b;
-const MARKER_BORDER = 0x3a2c12;
-const MARKER_RADIUS_RATIO = 0.3;
-
 /** Presentation-only NPC palette, cycled by placement order (content stays in data). */
 const NPC_PALETTE = [0x7ec8a9, 0xc89fd4, 0x8fb7e8, 0xe89f8f] as const;
-const NPC_BORDER = 0x1c2430;
-const NPC_SIZE_RATIO = 0.62;
 
 /** Presentation-only enemy-marker styling (content stays in data). */
 const ENCOUNTER_FILL = 0xc96a5a;
@@ -141,7 +136,7 @@ const UI = {
   textPrimary: '#d8dee9',
   textMuted: '#8a94a6',
   textWarn: '#e8b04b',
-  fontFamily: 'sans-serif',
+  fontFamily: UI_FONT_FAMILY,
 } as const;
 
 export class GridScene extends Phaser.Scene {
@@ -152,7 +147,7 @@ export class GridScene extends Phaser.Scene {
   private mapLayer: Phaser.GameObjects.Container | null = null;
   private npcLayer: Phaser.GameObjects.Container | null = null;
   private encounterLayer: Phaser.GameObjects.Container | null = null;
-  private marker: Phaser.GameObjects.Arc | null = null;
+  private marker: Phaser.GameObjects.Container | null = null;
   private playerCol = 0;
   private playerRow = 0;
 
@@ -212,6 +207,7 @@ export class GridScene extends Phaser.Scene {
   private shopPanel: ShopPanel | null = null;
   private questPanel: QuestPanel | null = null;
   private pauseMenu: PauseMenuPanel | null = null;
+  private controlsPanel: ControlsPanel | null = null;
   private worldMapPanel: WorldMapPanel | null = null;
   private encyclopediaPanel: EncyclopediaPanel | null = null;
   private activeSession: CombatSession | null = null;
@@ -236,6 +232,7 @@ export class GridScene extends Phaser.Scene {
   private regionNotice: string | null = null;
   private regionNoticeTimer: Phaser.Time.TimerEvent | null = null;
   private mapNameText: Phaser.GameObjects.Text | null = null;
+  private readonly scaledTextTargets: { text: Phaser.GameObjects.Text; base: number }[] = [];
 
   constructor() {
     super('grid');
@@ -309,6 +306,7 @@ export class GridScene extends Phaser.Scene {
     }
 
     this.children.removeAll(true); // Drop the transient loading hint.
+    this.scaledTextTargets.length = 0;
     this.world = world;
     this.knownKnowledgeNodeIds = createKnowledgeState(
       world.knowledgeGraph,
@@ -440,13 +438,14 @@ export class GridScene extends Phaser.Scene {
     this.mapLayer = renderGridMap(this, activeMap, this.mapOrigin.x, this.mapOrigin.y);
 
     const startOffset = cellCenterOffset(activeMap, this.playerCol, this.playerRow);
-    this.marker = this.add.circle(
+    this.marker = createPixelPerson(
+      this,
       this.mapOrigin.x + startOffset.x,
       this.mapOrigin.y + startOffset.y,
-      map.tileSize * MARKER_RADIUS_RATIO,
-      MARKER_COLOR,
+      map.tileSize,
+      0xe8b04b,
+      0x3a2c12,
     );
-    this.marker.setStrokeStyle(3, MARKER_BORDER);
 
     this.renderNpcs(activeMap);
     this.renderEncounterMarkers(activeMap);
@@ -475,8 +474,12 @@ export class GridScene extends Phaser.Scene {
       storage: this.storage,
       save: (slotId) => this.saveToSlot(slotId),
       returnToMenu: () => this.returnToMenu(),
-      onClose: () => this.noteOverlayClosed(),
+      onClose: () => {
+        this.settings = this.pauseMenu?.currentSettings() ?? this.settings;
+        this.noteOverlayClosed();
+      },
     });
+    this.controlsPanel = new ControlsPanel(this);
     this.worldMapPanel = new WorldMapPanel(this, () => this.noteOverlayClosed());
     this.encyclopediaPanel = new EncyclopediaPanel(this, { onClose: () => this.noteOverlayClosed() });
     this.updateQuestTrackerHud();
@@ -662,11 +665,17 @@ export class GridScene extends Phaser.Scene {
    */
   private noteOverlayClosed(): void {
     this.lastOverlayCloseAt = this.time.now;
+    this.refreshScaledTextTargets();
     this.updateInteractHint();
   }
 
   /** Escape while exploring: toggle the pause menu (never over another overlay). */
   private togglePauseMenu(): void {
+    if (this.controlsPanel?.isOpen) {
+      this.controlsPanel.close();
+      this.noteOverlayClosed();
+      return;
+    }
     const panel = this.pauseMenu;
     if (panel === null) {
       return;
@@ -704,7 +713,7 @@ export class GridScene extends Phaser.Scene {
       body.setStrokeStyle(3, ENCOUNTER_BORDER);
       body.setAngle(45); // Diamond silhouette separates foes from NPC squares.
 
-      const label = this.add
+      const label = this.registerScaledText(this.add
         .text(
           this.mapOrigin.x + center.x,
           this.mapOrigin.y + center.y - size / 2 - 4,
@@ -715,7 +724,7 @@ export class GridScene extends Phaser.Scene {
             color: UI.textPrimary,
           },
         )
-        .setOrigin(0.5, 1);
+        .setOrigin(0.5, 1), 10);
 
       this.encounterLayer.add([body, label]);
       this.encounterMarkers.set(encounter.record.id, [body, label]);
@@ -783,23 +792,21 @@ export class GridScene extends Phaser.Scene {
     this.npcLayer = this.add.container();
     this.placedNpcs.forEach((npc, index) => {
       const center = cellCenterOffset(map, npc.col, npc.row);
-      const size = map.tileSize * NPC_SIZE_RATIO;
-      const body = this.add.rectangle(
+      const body = createPixelPerson(
+        this,
         this.mapOrigin.x + center.x,
         this.mapOrigin.y + center.y,
-        size,
-        size,
+        map.tileSize,
         NPC_PALETTE[index % NPC_PALETTE.length] ?? NPC_PALETTE[0],
       );
-      body.setStrokeStyle(3, NPC_BORDER);
 
-      const label = this.add
-        .text(this.mapOrigin.x + center.x, this.mapOrigin.y + center.y - size / 2 - 4, npc.record.name, {
+      const label = this.registerScaledText(this.add
+        .text(this.mapOrigin.x + center.x, this.mapOrigin.y + center.y - map.tileSize * 0.42 - 4, npc.record.name, {
           fontFamily: UI.fontFamily,
           fontSize: uiFontSize(10),
           color: UI.textPrimary,
         })
-        .setOrigin(0.5, 1);
+        .setOrigin(0.5, 1), 10);
       this.npcLayer?.add([body, label]);
     });
   }
@@ -809,30 +816,30 @@ export class GridScene extends Phaser.Scene {
     optionalWarnings: readonly Diagnostic[],
     modWarnings: readonly Diagnostic[],
   ): void {
-    this.add
-      .text(16, 14, '方向键 / WASD 移动 · E 交互 · F 交谈 · B 背包 · Q 任务 · M 舆图 · K 百科 · Esc 暂停', {
+    this.registerScaledText(this.add
+      .text(16, 12, '方向键 / WASD 移动 · E 交互 · H 帮助', {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(13),
         color: UI.textMuted,
       })
-      .setOrigin(0, 0);
+      .setOrigin(0, 0), 13);
 
-    this.questTrackerText = this.add
+    this.questTrackerText = this.registerScaledText(this.add
       .text(16, 34, '', {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(11),
         color: UI.textMuted,
         wordWrap: { width: 360 },
       })
-      .setOrigin(0, 0);
+      .setOrigin(0, 0), 11);
 
-    this.mapNameText = this.add
+    this.mapNameText = this.registerScaledText(this.add
       .text(VIEW_WIDTH / 2, 14, map.data.name, {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(14),
         color: UI.textPrimary,
       })
-      .setOrigin(0.5, 0);
+      .setOrigin(0.5, 0), 14);
 
     const lines: { text: string; shown: boolean }[] = [
       {
@@ -848,35 +855,51 @@ export class GridScene extends Phaser.Scene {
       if (!line.shown) {
         return;
       }
-      this.add
+      this.registerScaledText(this.add
         .text(VIEW_WIDTH / 2, 33 + index * 15, line.text, {
           fontFamily: UI.fontFamily,
           fontSize: uiFontSize(11),
           color: UI.textWarn,
         })
-        .setOrigin(0.5, 0);
+        .setOrigin(0.5, 0), 11);
     });
     for (const diagnostic of optionalWarnings) {
       console.warn(`[optional] ${diagnostic.message}`, diagnostic.details);
     }
 
-    this.coordsText = this.add
+    this.coordsText = this.registerScaledText(this.add
       .text(VIEW_WIDTH - 16, 14, '', {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(13),
         color: UI.textPrimary,
       })
-      .setOrigin(1, 0);
+      .setOrigin(1, 0), 13);
 
     // Interaction status line under the map: adjacent-NPC prompt or the
     // explicit empty-state hint required when no NPC is interactable.
-    this.interactText = this.add
+    this.interactText = this.registerScaledText(this.add
       .text(VIEW_WIDTH / 2, VIEW_HEIGHT - 14, '', {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(12),
         color: UI.textWarn,
       })
-      .setOrigin(0.5, 1);
+      .setOrigin(0.5, 1), 12);
+  }
+
+  private registerScaledText(text: Phaser.GameObjects.Text, base: number): Phaser.GameObjects.Text {
+    this.scaledTextTargets.push({ text, base });
+    return text;
+  }
+
+  /** Refreshes already-rendered exploration labels after the live setting changes. */
+  private refreshScaledTextTargets(): void {
+    const survivors: typeof this.scaledTextTargets = [];
+    for (const target of this.scaledTextTargets) {
+      if (!target.text.active) continue;
+      target.text.setFontSize(uiFontSize(target.base));
+      survivors.push(target);
+    }
+    this.scaledTextTargets.splice(0, this.scaledTextTargets.length, ...survivors);
   }
 
   private updateCoordsHud(): void {
@@ -887,6 +910,10 @@ export class GridScene extends Phaser.Scene {
   /** Refreshes the bottom status line from the current adjacency state. */
   private updateInteractHint(): void {
     if (this.interactText === null) {
+      return;
+    }
+    if (this.controlsPanel?.isOpen) {
+      this.interactText.setText('按 H 或 Esc 收起操作手册');
       return;
     }
     if (this.anyOverlayOpen()) {
@@ -943,7 +970,7 @@ export class GridScene extends Phaser.Scene {
       this.interactText.setText('暂无可交互人物');
       return;
     }
-    this.interactText.setText('');
+    this.interactText.setText('H 操作帮助 · Esc 暂停');
   }
 
   /** True while any keyboard overlay owns the input (dialogue/battle/backpack/shop/quest/pause). */
@@ -956,8 +983,23 @@ export class GridScene extends Phaser.Scene {
       (this.questPanel !== null && this.questPanel.isOpen) ||
       (this.pauseMenu !== null && this.pauseMenu.isOpen) ||
       (this.worldMapPanel !== null && this.worldMapPanel.isOpen) ||
-      (this.encyclopediaPanel !== null && this.encyclopediaPanel.isOpen)
+      (this.encyclopediaPanel !== null && this.encyclopediaPanel.isOpen) ||
+      (this.controlsPanel !== null && this.controlsPanel.isOpen)
     );
+  }
+
+  /** H key: show the keyboard reference without allowing world input through. */
+  private toggleControlsPanel(): void {
+    const panel = this.controlsPanel;
+    if (panel === null) return;
+    if (panel.isOpen) {
+      panel.close();
+      this.noteOverlayClosed();
+      return;
+    }
+    if (this.anyOverlayOpen()) return;
+    panel.open();
+    this.updateInteractHint();
   }
 
   /** Q key: open the journal anywhere, or close it while it owns input. */
@@ -1168,6 +1210,10 @@ export class GridScene extends Phaser.Scene {
     const onEncyclopedia = (): void => this.toggleEncyclopedia();
     encyclopediaKey.on('down', onEncyclopedia);
 
+    const controlsKey = keyboard.addKey(KeyCodes.H);
+    const onControls = (): void => this.toggleControlsPanel();
+    controlsKey.on('down', onControls);
+
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       for (const { key, onDown } of listeners) {
         key.off('down', onDown);
@@ -1179,6 +1225,7 @@ export class GridScene extends Phaser.Scene {
       pauseKey.off('down', onPause);
       worldMapKey.off('down', onWorldMap);
       encyclopediaKey.off('down', onEncyclopedia);
+      controlsKey.off('down', onControls);
       this.dialoguePanel?.destroy();
       this.dialoguePanel = null;
       this.battlePanel?.destroy();
@@ -1195,6 +1242,8 @@ export class GridScene extends Phaser.Scene {
       this.worldMapPanel = null;
       this.encyclopediaPanel?.destroy();
       this.encyclopediaPanel = null;
+      this.controlsPanel?.destroy();
+      this.controlsPanel = null;
       this.activeSession = null;
       this.activeEncounter = null;
     });

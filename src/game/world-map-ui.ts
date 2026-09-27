@@ -2,9 +2,9 @@ import Phaser from 'phaser';
 
 import type { WorldMapAssembly } from '../engine/world-map';
 import { uiFontSize } from './settings';
+import { addPixelPanelChrome, UI_FONT_FAMILY } from './ui-theme';
 
 const WIDTH = 960;
-const HEIGHT = 540;
 const COLORS = {
   overlay: 0x05070b,
   panel: 0x10141d,
@@ -73,10 +73,7 @@ export class WorldMapPanel {
   }
 
   private render(worldMap: WorldMapAssembly, currentMapResourceId: string): void {
-    this.container.add(this.scene.add.rectangle(0, 0, WIDTH, HEIGHT, COLORS.overlay, 0.84).setOrigin(0));
-    this.container.add(
-      this.scene.add.rectangle(WIDTH / 2, HEIGHT / 2, 780, 450, COLORS.panel).setStrokeStyle(2, COLORS.stroke),
-    );
+    addPixelPanelChrome(this.scene, this.container, { x: 90, y: 45, width: 780, height: 450 }, 0.84);
     this.addText(WIDTH / 2, 62, '江湖舆图', 20, COLORS.text, 0.5);
     this.addText(WIDTH / 2, 91, '各处行路相连 · 按 M 或 Esc 收起', 12, COLORS.muted, 0.5);
 
@@ -128,7 +125,7 @@ export class WorldMapPanel {
 
   private addText(x: number, y: number, text: string, size: number, color: string, originX: number): void {
     const object = this.scene.add.text(x, y, text, {
-      fontFamily: 'sans-serif', fontSize: uiFontSize(size), color,
+      fontFamily: UI_FONT_FAMILY, fontSize: uiFontSize(size), color,
       wordWrap: { width: 680 },
     }).setOrigin(originX, 0.5);
     this.container.add(object);

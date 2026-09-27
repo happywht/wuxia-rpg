@@ -12,6 +12,7 @@ import {
   sellItem,
 } from '../engine/item-system';
 import { uiFontSize } from './settings';
+import { addPixelPanelChrome, UI_FONT_FAMILY, addPixelSelection } from './ui-theme';
 
 /**
  * Generic keyboard-driven merchant panel (Round 06).
@@ -40,7 +41,7 @@ const UI = {
   rowActive: '#f0c96a',
   rowDisabled: '#5a6272',
   rowEquipped: '#a8d8b0',
-  fontFamily: 'sans-serif',
+  fontFamily: UI_FONT_FAMILY,
 } as const;
 
 const PADDING = 24;
@@ -268,19 +269,12 @@ export class ShopPanel {
     const panelTop = (height - PANEL_HEIGHT) / 2 + 6;
     const contentWidth = PANEL_WIDTH - PADDING * 2;
 
-    const overlay = this.scene.add.rectangle(0, 0, width, height, UI.overlayFill, UI.overlayAlpha);
-    overlay.setOrigin(0, 0);
-    this.container.add(overlay);
-
-    const panel = this.scene.add.rectangle(
-      panelLeft + PANEL_WIDTH / 2,
-      panelTop + PANEL_HEIGHT / 2,
-      PANEL_WIDTH,
-      PANEL_HEIGHT,
-      UI.panelFill,
+    addPixelPanelChrome(
+      this.scene,
+      this.container,
+      { x: panelLeft, y: panelTop, width: PANEL_WIDTH, height: PANEL_HEIGHT },
+      UI.overlayAlpha,
     );
-    panel.setStrokeStyle(2, UI.panelStroke);
-    this.container.add(panel);
 
     // Header: shop name (data), tabs and the player's money.
     const nameText = this.scene.add
@@ -350,6 +344,14 @@ export class ShopPanel {
           this.tab === 'buy' ? this.buyLine(index) : this.sellLine(index);
         if (line === null) {
           continue;
+        }
+        if (index === this.selection) {
+          addPixelSelection(this.scene, this.container, {
+            x: panelLeft + PADDING,
+            y: listTop + offset * ROW_HEIGHT - 2,
+            width: PANEL_WIDTH - PADDING * 2,
+            height: ROW_HEIGHT,
+          });
         }
         const rowText = this.scene.add
           .text(

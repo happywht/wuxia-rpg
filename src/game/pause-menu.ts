@@ -34,6 +34,7 @@ import {
   uiFontSize,
   volumeLabel,
 } from './settings';
+import { addPixelPanelChrome, addPixelSelection, UI_FONT_FAMILY } from './ui-theme';
 
 const UI = {
   overlay: 0x000000,
@@ -45,7 +46,7 @@ const UI = {
   textWarn: '#e8b04b',
   textActive: '#f0c96a',
   textIdle: '#a8b2c4',
-  fontFamily: 'sans-serif',
+  fontFamily: UI_FONT_FAMILY,
 } as const;
 
 const CURSOR_ACTIVE = '▸ ';
@@ -310,23 +311,16 @@ export class PauseMenuPanel {
     const width = this.scene.scale.width;
     const height = this.scene.scale.height;
 
-    const overlay = this.scene.add.rectangle(width / 2, height / 2, width, height, UI.overlay);
-    overlay.setAlpha(UI.overlayAlpha);
-    this.container.add(overlay);
-
     const panelWidth = Math.min(640, width - 96);
     const panelHeight = 380;
     const left = (width - panelWidth) / 2;
     const top = (height - panelHeight) / 2;
-    const panel = this.scene.add.rectangle(
-      left + panelWidth / 2,
-      top + panelHeight / 2,
-      panelWidth,
-      panelHeight,
-      UI.panelFill,
+    addPixelPanelChrome(
+      this.scene,
+      this.container,
+      { x: left, y: top, width: panelWidth, height: panelHeight },
+      UI.overlayAlpha,
     );
-    panel.setStrokeStyle(2, UI.panelStroke);
-    this.container.add(panel);
 
     const titles: Record<PausePage, string> = {
       main: '暂停',
@@ -394,6 +388,14 @@ export class PauseMenuPanel {
     const width = this.scene.scale.width;
     MAIN_ENTRIES.forEach((entry, index) => {
       const active = index === this.selection;
+      if (active) {
+        addPixelSelection(this.scene, this.container, {
+          x: (width - 360) / 2,
+          y: top + 75 + index * 42,
+          width: 360,
+          height: 32,
+        });
+      }
       this.container.add(
         this.scene.add
           .text(width / 2, top + 90 + index * 42, `${active ? CURSOR_ACTIVE : CURSOR_IDLE}${entry.label}`, {
@@ -417,6 +419,14 @@ export class PauseMenuPanel {
           : summary !== undefined && summary.state === 'error'
             ? `${SAVE_SLOT_LABELS[slotId]} · 已有损坏存档（保存将覆盖）`
             : `${SAVE_SLOT_LABELS[slotId]} · 空（新建存档）`;
+      if (active) {
+        addPixelSelection(this.scene, this.container, {
+          x: (width - Math.min(640, width - 96)) / 2 + 20,
+          y: top + 81 + index * 48,
+          width: Math.min(640, width - 96) - 40,
+          height: 38,
+        });
+      }
       this.container.add(
         this.scene.add
           .text(width / 2, top + 96 + index * 48, `${active ? CURSOR_ACTIVE : CURSOR_IDLE}${line}`, {
@@ -443,10 +453,18 @@ export class PauseMenuPanel {
     const width = this.scene.scale.width;
     const rows = [
       `音量　${volumeLabel(this.settings.volume)}（${this.settings.volume}/10）`,
-      `文字大小　${TEXT_SCALE_LABELS[this.settings.textScaleIndex] ?? '标准'}（重开的面板即时生效）`,
+      `文字大小　${TEXT_SCALE_LABELS[this.settings.textScaleIndex] ?? '标准'}（全界面即时生效）`,
     ];
     rows.forEach((row, index) => {
       const active = index === this.selection;
+      if (active) {
+        addPixelSelection(this.scene, this.container, {
+          x: (width - 400) / 2,
+          y: top + 105 + index * 48,
+          width: 400,
+          height: 38,
+        });
+      }
       this.container.add(
         this.scene.add
           .text(width / 2, top + 120 + index * 48, `${active ? CURSOR_ACTIVE : CURSOR_IDLE}${row}`, {
@@ -484,6 +502,14 @@ export class PauseMenuPanel {
     const rows = ['确定返回', '取消'];
     rows.forEach((row, index) => {
       const active = index === this.selection;
+      if (active) {
+        addPixelSelection(this.scene, this.container, {
+          x: (width - 360) / 2,
+          y: top + 164 + index * 40,
+          width: 360,
+          height: 32,
+        });
+      }
       this.container.add(
         this.scene.add
           .text(width / 2, top + 180 + index * 40, `${active ? CURSOR_ACTIVE : CURSOR_IDLE}${row}`, {

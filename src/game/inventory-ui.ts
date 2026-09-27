@@ -16,6 +16,7 @@ import {
   equipItem,
 } from '../engine/item-system';
 import { uiFontSize } from './settings';
+import { addPixelPanelChrome, UI_FONT_FAMILY, addPixelSelection } from './ui-theme';
 
 /**
  * Generic keyboard-driven backpack panel (Round 06).
@@ -43,7 +44,7 @@ const UI = {
   rowIdle: '#a8b2c4',
   rowActive: '#f0c96a',
   rowEquipped: '#a8d8b0',
-  fontFamily: 'sans-serif',
+  fontFamily: UI_FONT_FAMILY,
 } as const;
 
 const PADDING = 24;
@@ -308,19 +309,12 @@ export class InventoryPanel {
     const panelTop = (height - PANEL_HEIGHT) / 2 + 6;
     const contentWidth = PANEL_WIDTH - PADDING * 2;
 
-    const overlay = this.scene.add.rectangle(0, 0, width, height, UI.overlayFill, UI.overlayAlpha);
-    overlay.setOrigin(0, 0);
-    this.container.add(overlay);
-
-    const panel = this.scene.add.rectangle(
-      panelLeft + PANEL_WIDTH / 2,
-      panelTop + PANEL_HEIGHT / 2,
-      PANEL_WIDTH,
-      PANEL_HEIGHT,
-      UI.panelFill,
+    addPixelPanelChrome(
+      this.scene,
+      this.container,
+      { x: panelLeft, y: panelTop, width: PANEL_WIDTH, height: PANEL_HEIGHT },
+      UI.overlayAlpha,
     );
-    panel.setStrokeStyle(2, UI.panelStroke);
-    this.container.add(panel);
 
     // Header: title, money and stack capacity.
     const title = this.scene.add
@@ -404,6 +398,14 @@ export class InventoryPanel {
         }
         const active = index === this.selection;
         const equipped = isEquipped(model.inventory, item.id);
+        if (active) {
+          addPixelSelection(this.scene, this.container, {
+            x: panelLeft + PADDING,
+            y: listTop + offset * ROW_HEIGHT - 2,
+            width: PANEL_WIDTH - PADDING * 2,
+            height: ROW_HEIGHT,
+          });
+        }
         const line = this.scene.add
           .text(
             panelLeft + PADDING + 6,

@@ -11,6 +11,7 @@ import {
   toggleTrackedQuest,
 } from '../engine/quest-system';
 import { uiFontSize } from './settings';
+import { addPixelPanelChrome, UI_FONT_FAMILY, addPixelSelection } from './ui-theme';
 
 /** Generic data-driven quest board and journal overlay. */
 
@@ -26,7 +27,7 @@ const UI = {
   complete: '#a8d8b0',
   failed: '#e0a8a8',
   idle: '#a8b2c4',
-  fontFamily: 'sans-serif',
+  fontFamily: UI_FONT_FAMILY,
 } as const;
 
 const PADDING = 24;
@@ -241,15 +242,12 @@ export class QuestPanel {
     const top = (height - PANEL_HEIGHT) / 2;
     const contentWidth = PANEL_WIDTH - PADDING * 2;
 
-    const overlay = this.scene.add.rectangle(0, 0, width, height, UI.overlayFill, UI.overlayAlpha).setOrigin(0, 0);
-    const panel = this.scene.add.rectangle(
-      left + PANEL_WIDTH / 2,
-      top + PANEL_HEIGHT / 2,
-      PANEL_WIDTH,
-      PANEL_HEIGHT,
-      UI.panelFill,
-    ).setStrokeStyle(2, UI.panelStroke);
-    this.container.add([overlay, panel]);
+    addPixelPanelChrome(
+      this.scene,
+      this.container,
+      { x: left, y: top, width: PANEL_WIDTH, height: PANEL_HEIGHT },
+      UI.overlayAlpha,
+    );
 
     const isBoard = model.giverNpcId !== undefined;
     const title = isBoard
@@ -269,6 +267,14 @@ export class QuestPanel {
         if (quest === undefined) break;
         const state = model.journal.states.get(quest.id);
         const active = windowStart + offset === this.selection;
+        if (active) {
+          addPixelSelection(this.scene, this.container, {
+            x: left + PADDING,
+            y: listTop + offset * ROW_HEIGHT - 2,
+            width: PANEL_WIDTH - PADDING * 2,
+            height: ROW_HEIGHT,
+          });
+        }
         this.addText(
           `${active ? CURSOR_ACTIVE : CURSOR_IDLE}${questRow(model, quest)}`,
           left + PADDING,
@@ -285,19 +291,28 @@ export class QuestPanel {
       this.addText(LABELS.noSelection, left + PADDING, detailTop, 12, UI.muted);
     } else {
       const state = model.journal.states.get(selected.id);
-      this.addWrappedText(selected.description, left + PADDING, detailTop, contentWidth, 12, UI.primary);
+      const description = this.addWrappedText(
+        selected.description,
+        left + PADDING,
+        detailTop,
+        contentWidth,
+        12,
+        UI.primary,
+      );
+      let detailY = detailTop + Math.max(18, description.height) + 6;
       const objectiveLines = state === undefined
         ? []
         : getQuestObjectiveProgress(selected, state).map(({ objective, current }) =>
             `目标 ${current}/${objective.requiredCount}：${objective.text}`,
           );
-      objectiveLines.forEach((line, index) =>
-        this.addWrappedText(line, left + PADDING, detailTop + 43 + index * 18, contentWidth, 11, UI.muted),
-      );
+      objectiveLines.forEach((line) => {
+        const objective = this.addWrappedText(line, left + PADDING, detailY, contentWidth, 11, UI.muted);
+        detailY += Math.max(16, objective.height) + 3;
+      });
       this.addText(
         `${LABELS.reward}：${LABELS.experience} +${selected.rewards.experience} · ${LABELS.currency} +${selected.rewards.currency}`,
         left + PADDING,
-        detailTop + 83,
+        detailY + 2,
         11,
         UI.warning,
       );
@@ -305,7 +320,7 @@ export class QuestPanel {
         this.addText(
           model.journal.trackedQuestId === selected.id ? LABELS.untrack : LABELS.track,
           left + PADDING,
-          detailTop + 103,
+          detailY + 22,
           10,
           UI.muted,
         );
@@ -335,7 +350,14 @@ export class QuestPanel {
     this.container.add(node);
   }
 
-  private addWrappedText(text: string, x: number, y: number, maxWidth: number, fontSize: number, color: string): void {
+  private addWrappedText(
+    text: string,
+    x: number,
+    y: number,
+    maxWidth: number,
+    fontSize: number,
+    color: string,
+  ): Phaser.GameObjects.Text {
     const node = this.scene.add.text(x, y, text, {
       fontFamily: UI.fontFamily,
       fontSize: uiFontSize(fontSize),
@@ -344,5 +366,6 @@ export class QuestPanel {
       lineSpacing: 3,
     }).setOrigin(0, 0);
     this.container.add(node);
+    return node;
   }
 }

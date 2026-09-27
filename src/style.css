@@ -19,3 +19,7 @@ canvas:focus-visible {
   outline: 2px solid #e8b04b;
   outline-offset: 2px;
 }
+
+canvas {
+  image-rendering: pixelated;
+}

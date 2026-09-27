@@ -16,6 +16,11 @@ const FALLBACK_FILL = 0x000000;
 const TILE_BORDER_COLOR = 0x0b0e14;
 const TILE_BORDER_ALPHA = 0.35;
 
+function shadeColor(color: number, amount: number): number {
+  const channels = [16, 8, 0].map((shift) => Math.max(0, Math.min(255, ((color >> shift) & 0xff) + amount)));
+  return ((channels[0] ?? 0) << 16) | ((channels[1] ?? 0) << 8) | (channels[2] ?? 0);
+}
+
 /**
  * Draws the grid into a new container anchored at (originX, originY).
  * Cell (col, row) occupies the square [col * tileSize, (col + 1) * tileSize).
@@ -44,7 +49,24 @@ export function renderGridMap(
         fill,
       );
       cell.setStrokeStyle(1, TILE_BORDER_COLOR, TILE_BORDER_ALPHA);
-      container.add(cell);
+      const edge = Math.max(1, Math.round(tileSize / 16));
+      const highlight = scene.add.rectangle(
+        col * tileSize + tileSize / 2,
+        row * tileSize + edge / 2,
+        tileSize - edge * 2,
+        edge,
+        shadeColor(fill, 18),
+        0.75,
+      );
+      const shadow = scene.add.rectangle(
+        col * tileSize + tileSize - edge / 2,
+        row * tileSize + tileSize / 2,
+        edge,
+        tileSize - edge * 2,
+        shadeColor(fill, -20),
+        0.75,
+      );
+      container.add([cell, highlight, shadow]);
     }
   }
 

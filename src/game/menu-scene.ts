@@ -42,6 +42,7 @@ import {
   volumeLabel,
 } from './settings';
 import { loadWorldData } from './world-loader';
+import { addPixelPanelChrome, addPixelSelection, UI_FONT_FAMILY } from './ui-theme';
 
 const VIEW_WIDTH = 960;
 const VIEW_HEIGHT = 540;
@@ -55,7 +56,7 @@ const UI = {
   textWarn: '#e8b04b',
   textActive: '#f0c96a',
   textIdle: '#a8b2c4',
-  fontFamily: 'sans-serif',
+  fontFamily: UI_FONT_FAMILY,
 } as const;
 
 const CURSOR_ACTIVE = '▸ ';
@@ -475,8 +476,19 @@ export class MenuScene extends Phaser.Scene {
     this.drawBackdrop();
     this.drawTitle();
 
+    const menuFrame = this.add.container(0, 0);
+    addPixelPanelChrome(this, menuFrame, { x: 310, y: 210, width: 340, height: 166 });
+
     HOME_ENTRIES.forEach((entry, index) => {
       const active = index === this.homeSelection;
+      if (active) {
+        addPixelSelection(this, menuFrame, {
+          x: 332,
+          y: 224 + index * 40,
+          width: 296,
+          height: 32,
+        });
+      }
       this.add
         .text(
           VIEW_WIDTH / 2,
@@ -542,7 +554,7 @@ export class MenuScene extends Phaser.Scene {
           fontFamily: UI.fontFamily,
           fontSize: uiFontSize(12),
           color: UI.textMuted,
-          wordWrap: { width: 500 },
+          wordWrap: { width: 500, useAdvancedWrap: true },
           lineSpacing: 5,
         })
         .setOrigin(0, 0);

@@ -7,6 +7,7 @@ import {
 } from '../engine/dialogue-graph';
 import type { VisibleDialogueOption } from '../engine/dialogue-runtime';
 import { uiFontSize } from './settings';
+import { addPixelPanelChrome, addPixelSelection, UI_FONT_FAMILY } from './ui-theme';
 
 /**
  * Generic keyboard-driven dialogue panel.
@@ -42,7 +43,7 @@ const UI = {
   feedbackWarn: '#e8b04b',
   optionIdle: '#a8b2c4',
   optionActive: '#f0c96a',
-  fontFamily: 'sans-serif',
+  fontFamily: UI_FONT_FAMILY,
 } as const;
 
 const PADDING = 22;
@@ -84,7 +85,6 @@ export interface DialoguePanelOptions {
 export class DialoguePanel {
   private readonly scene: Phaser.Scene;
   private readonly container: Phaser.GameObjects.Container;
-  private readonly optionTexts: Phaser.GameObjects.Text[] = [];
   private readonly bindings: PanelKeyBinding[] = [];
   private readonly onClose?: () => void;
 
@@ -140,7 +140,6 @@ export class DialoguePanel {
     this.unbindKeys();
     this.container.setVisible(false);
     this.container.removeAll(true);
-    this.optionTexts.length = 0;
     this.session = null;
     this.controller = null;
     this.feedback = null;
@@ -236,7 +235,6 @@ export class DialoguePanel {
       return;
     }
     this.container.removeAll(true);
-    this.optionTexts.length = 0;
 
     const width = this.scene.scale.width;
     const height = this.scene.scale.height;
@@ -270,15 +268,12 @@ export class DialoguePanel {
     const left = (width - panelWidth) / 2;
     const top = height - 24 - panelHeight;
 
-    const panel = this.scene.add.rectangle(
-      left + panelWidth / 2,
-      top + panelHeight / 2,
-      panelWidth,
-      panelHeight,
-      UI.panelFill,
-    );
-    panel.setStrokeStyle(2, UI.panelStroke);
-    this.container.add(panel);
+    addPixelPanelChrome(this.scene, this.container, {
+      x: left,
+      y: top,
+      width: panelWidth,
+      height: panelHeight,
+    });
     this.container.add(nodeText);
 
     const nameText = this.scene.add
@@ -308,6 +303,14 @@ export class DialoguePanel {
 
     cursorY += HINT_GAP;
     visible.forEach(({ option }, index) => {
+      if (index === this.selection) {
+        addPixelSelection(this.scene, this.container, {
+          x: left + PADDING,
+          y: cursorY - 2,
+          width: contentWidth,
+          height: OPTION_LINE_HEIGHT,
+        });
+      }
       const optionText = this.scene.add
         .text(left + PADDING + 8, cursorY, `${index === this.selection ? CURSOR_ACTIVE : CURSOR_IDLE}${option.text}`, {
           fontFamily: UI.fontFamily,
@@ -316,7 +319,6 @@ export class DialoguePanel {
         })
         .setOrigin(0, 0);
       this.container.add(optionText);
-      this.optionTexts.push(optionText);
       cursorY += OPTION_LINE_HEIGHT;
     });
 
@@ -332,14 +334,8 @@ export class DialoguePanel {
     this.container.add(hint);
   }
 
-  /** Cheap refresh of the option cursor/colors after an Up/Down press. */
+  /** Rebuilds the option rows so the focus band follows the current choice. */
   private updateOptionStyles(): void {
-    const visible = this.visibleOptions();
-    this.optionTexts.forEach((text, index) => {
-      const active = index === this.selection;
-      const option = visible[index]?.option;
-      text.setText(`${active ? CURSOR_ACTIVE : CURSOR_IDLE}${option?.text ?? ''}`);
-      text.setColor(active ? UI.optionActive : UI.optionIdle);
-    });
+    this.renderNode();
   }
 }

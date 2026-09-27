@@ -8,6 +8,7 @@ import {
   type KnowledgeRelation,
 } from '../engine/knowledge-graph';
 import { uiFontSize } from './settings';
+import { addPixelPanelChrome, addPixelSelection, UI_FONT_FAMILY } from './ui-theme';
 
 /** Data-driven encyclopedia overlay; only discovered details are rendered. */
 
@@ -20,7 +21,7 @@ const UI = {
   muted: '#8a94a6',
   warning: '#e8b04b',
   known: '#b9d8c4',
-  fontFamily: 'sans-serif',
+  fontFamily: UI_FONT_FAMILY,
 } as const;
 
 const PANEL_WIDTH = 850;
@@ -180,11 +181,12 @@ export class EncyclopediaPanel {
     const height = this.scene.scale.height;
     const left = (width - PANEL_WIDTH) / 2;
     const top = (height - PANEL_HEIGHT) / 2;
-    const panel = this.scene.add.rectangle(0, 0, width, height, UI.overlayFill, UI.overlayAlpha).setOrigin(0, 0);
-    const body = this.scene.add.rectangle(
-      left + PANEL_WIDTH / 2, top + PANEL_HEIGHT / 2, PANEL_WIDTH, PANEL_HEIGHT, UI.panelFill,
-    ).setStrokeStyle(2, UI.panelStroke);
-    this.container.add([panel, body]);
+    addPixelPanelChrome(
+      this.scene,
+      this.container,
+      { x: left, y: top, width: PANEL_WIDTH, height: PANEL_HEIGHT },
+      UI.overlayAlpha,
+    );
 
     const currentFilter = this.filter;
     const category = currentFilter === null ? '全部' : KIND_LABELS[currentFilter];
@@ -206,6 +208,14 @@ export class EncyclopediaPanel {
       if (row === undefined) break;
       const selected = windowStart + offset === this.selection;
       const label = row.kind === 'known' ? `${row.node.title}　［${KIND_LABELS[row.node.kind]}］` : '未解锁见闻';
+      if (selected) {
+        addPixelSelection(this.scene, this.container, {
+          x: left + 14,
+          y: listTop + offset * ROW_HEIGHT - 2,
+          width: 292,
+          height: ROW_HEIGHT,
+        });
+      }
       this.addText(`${selected ? '▸ ' : '  '}${label}`,
         left + 22, listTop + offset * ROW_HEIGHT, 12,
         row.kind === 'locked' ? UI.muted : (selected ? UI.warning : UI.known));
