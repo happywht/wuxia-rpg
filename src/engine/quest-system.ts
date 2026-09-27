@@ -6,7 +6,7 @@
  * validation, objective progress and one-time reward transitions.
  */
 
-export type QuestObjectiveKind = 'collectItem' | 'defeatEncounter';
+export type QuestObjectiveKind = 'collectItem' | 'defeatEncounter' | 'talkToNpc';
 
 export interface QuestObjectiveData {
   id: string;
@@ -27,6 +27,13 @@ export interface QuestData {
   description: string;
   giverNpcId: string;
   prerequisiteQuestIds: string[];
+  /**
+   * Optional exclusive branch group: members with the same group id and the
+   * same prerequisites form one player choice; accepting any member fails its
+   * offered siblings. Groups with fewer than two valid members or mixed
+   * prerequisites are disabled as a whole during assembly.
+   */
+  exclusiveGroupId?: string;
   objectives: QuestObjectiveData[];
   failOnEncounterIds: string[];
   rewards: QuestRewardsData;
@@ -49,6 +56,8 @@ export interface QuestAssemblyInput {
   questSet: QuestSetData | null;
   /** NPCs which survived NPC placement and explicitly publish tasks. */
   questGiverNpcIds: ReadonlySet<string>;
+  /** Every placed NPC id; talk objectives resolve against this roster. */
+  npcIds: ReadonlySet<string>;
   itemIds: ReadonlySet<string>;
   encounterIds: ReadonlySet<string>;
 }
@@ -88,7 +97,8 @@ export interface QuestUpdateResult {
 export type QuestSignal =
   | { type: 'item-count'; itemId: string; quantity: number }
   | { type: 'encounter-victory'; encounterId: string }
-  | { type: 'encounter-defeat'; encounterId: string };
+  | { type: 'encounter-defeat'; encounterId: string }
+  | { type: 'npc-talk'; npcId: string };
 
 export type QuestActionResult =
   | { ok: true; update: QuestUpdateResult }
@@ -130,6 +140,8 @@ function parseIdList(value: unknown, label: string, errors: string[]): string[] 
   return result;
 }
 
+const OBJECTIVE_KINDS: readonly QuestObjectiveKind[] = ['collectItem', 'defeatEncounter', 'talkToNpc'];
+
 function parseObjective(raw: unknown, label: string, errors: string[]): QuestObjectiveData | null {
   if (!isPlainObject(raw)) {
     errors.push(`${label}：应为对象`);
@@ -140,11 +152,11 @@ function parseObjective(raw: unknown, label: string, errors: string[]): QuestObj
   const targetId = string(raw.targetId);
   const requiredCount = safeNonNegativeInteger(raw.requiredCount);
   const text = string(raw.text);
-  const maximumCount = kind === 'defeatEncounter' ? 99 : 999;
+  const maximumCount = kind === 'collectItem' ? 999 : 99;
   const problems: string[] = [];
   if (id === null) problems.push('id 应为非空字符串');
-  if (kind !== 'collectItem' && kind !== 'defeatEncounter') {
-    problems.push('kind 必须是 collectItem 或 defeatEncounter');
+  if (!OBJECTIVE_KINDS.includes(kind as QuestObjectiveKind)) {
+    problems.push(`kind 必须是 ${OBJECTIVE_KINDS.join(' 或 ')}`);
   }
   if (targetId === null) problems.push('targetId 应为非空字符串');
   if (requiredCount === null || requiredCount <= 0 || requiredCount > maximumCount) {
@@ -175,6 +187,9 @@ export function parseQuestSet(raw: unknown): QuestSetParseResult {
     const name = string(entry.name);
     const description = string(entry.description);
     const giverNpcId = string(entry.giverNpcId);
+    const exclusiveGroupId = entry.exclusiveGroupId === undefined
+      ? undefined
+      : string(entry.exclusiveGroupId);
     const prerequisiteQuestIds = parseIdList(
       entry.prerequisiteQuestIds,
       `${label}.prerequisiteQuestIds`,
@@ -202,6 +217,9 @@ export function parseQuestSet(raw: unknown): QuestSetParseResult {
     if (name === null) problems.push('name 应为非空字符串');
     if (description === null) problems.push('description 应为非空字符串');
     if (giverNpcId === null) problems.push('giverNpcId 应为非空字符串');
+    if (entry.exclusiveGroupId !== undefined && exclusiveGroupId === null) {
+      problems.push('exclusiveGroupId 应为非空字符串');
+    }
     if (prerequisiteQuestIds === null) problems.push('prerequisiteQuestIds 格式无效');
     if (failOnEncounterIds === null) problems.push('failOnEncounterIds 格式无效');
     if (rawRewards === null || experience === null || currency === null) {
@@ -218,6 +236,9 @@ export function parseQuestSet(raw: unknown): QuestSetParseResult {
       name,
       description,
       giverNpcId,
+      ...(exclusiveGroupId !== null && exclusiveGroupId !== undefined
+        ? { exclusiveGroupId }
+        : {}),
       prerequisiteQuestIds,
       objectives,
       failOnEncounterIds,
@@ -262,6 +283,9 @@ export function assembleQuests(input: QuestAssemblyInput): QuestAssemblyResult {
       if (objective.kind === 'defeatEncounter' && !input.encounterIds.has(objective.targetId)) {
         problems.push(`击败目标引用无效遭遇 "${objective.targetId}"`);
       }
+      if (objective.kind === 'talkToNpc' && !input.npcIds.has(objective.targetId)) {
+        problems.push(`谈话目标引用无效人物 "${objective.targetId}"`);
+      }
     }
     for (const prerequisiteId of quest.prerequisiteQuestIds) {
       if (prerequisiteId === id || !index.byId.has(prerequisiteId)) {
@@ -284,6 +308,34 @@ export function assembleQuests(input: QuestAssemblyInput): QuestAssemblyResult {
     valid.delete(id);
     warnings.push(`任务 "${id}" 因前置任务形成循环而禁用`);
   }
+
+  // Exclusive branch groups are validated as a whole: every group must keep
+  // at least two valid members that declare identical prerequisites. A group
+  // with a broken member never degrades into a false single-choice branch.
+  const groups = new Map<string, QuestData[]>();
+  for (const quest of valid.values()) {
+    if (quest.exclusiveGroupId === undefined) continue;
+    const members = groups.get(quest.exclusiveGroupId) ?? [];
+    members.push(quest);
+    groups.set(quest.exclusiveGroupId, members);
+  }
+  for (const [groupId, members] of groups) {
+    const groupProblems: string[] = [];
+    if (members.length < 2) {
+      groupProblems.push('有效成员不足 2 项，不足以构成可选分支');
+    } else {
+      const signature = prerequisiteSignature(members[0]!);
+      if (members.some((member) => prerequisiteSignature(member) !== signature)) {
+        groupProblems.push('成员前置任务不一致，不能并列为玩家选择');
+      }
+    }
+    if (groupProblems.length === 0) continue;
+    for (const member of members) {
+      valid.delete(member.id);
+      warnings.push(`任务 "${member.id}" 已禁用：互斥组 "${groupId}" ${groupProblems.join('；')}`);
+    }
+  }
+
   // A quest depending on a cyclic/otherwise disabled quest is invalid too.
   let removed = true;
   while (removed) {
@@ -328,6 +380,11 @@ function isPrerequisiteComplete(journal: QuestJournal, quest: QuestData): boolea
   );
 }
 
+/** Order-insensitive prerequisite comparison key for exclusive group checks. */
+function prerequisiteSignature(quest: QuestData): string {
+  return [...quest.prerequisiteQuestIds].sort().join('|');
+}
+
 export function createQuestJournal(quests: ReadonlyMap<string, QuestData>): QuestJournal {
   const journal: QuestJournal = { states: new Map(), trackedQuestId: null };
   for (const quest of quests.values()) {
@@ -369,7 +426,11 @@ function refreshUnlocked(quests: ReadonlyMap<string, QuestData>, journal: QuestJ
   return changed;
 }
 
-/** Accepts an offered quest and snapshots current item counts for collect goals. */
+/**
+ * Accepts an offered quest and snapshots current item counts for collect
+ * goals. Accepting a member of an exclusive group deterministically fails
+ * its still-offered siblings (declaration order) and reports their ids.
+ */
 export function acceptQuest(
   quests: ReadonlyMap<string, QuestData>,
   journal: QuestJournal,
@@ -385,6 +446,16 @@ export function acceptQuest(
     return { ok: false, reason: 'not-offered', update: emptyUpdate() };
   }
   state.status = 'active';
+  const failedQuestIds: string[] = [];
+  if (quest.exclusiveGroupId !== undefined) {
+    for (const sibling of quests.values()) {
+      if (sibling.id === quest.id || sibling.exclusiveGroupId !== quest.exclusiveGroupId) continue;
+      const siblingState = journal.states.get(sibling.id);
+      if (siblingState?.status !== 'offered') continue;
+      siblingState.status = 'failed';
+      failedQuestIds.push(sibling.id);
+    }
+  }
   const completed: QuestRewardGrant[] = [];
   for (const objective of quest.objectives) {
     if (objective.kind === 'collectItem') {
@@ -404,7 +475,7 @@ export function acceptQuest(
   refreshUnlocked(quests, journal);
   return {
     ok: true,
-    update: { changed: true, completed, failedQuestIds: [] },
+    update: { changed: true, completed, failedQuestIds },
   };
 }
 
@@ -461,6 +532,11 @@ export function applyQuestSignal(
       } else if (
         objective.kind === 'defeatEncounter' && signal.type === 'encounter-victory' &&
         objective.targetId === signal.encounterId
+      ) {
+        next = Math.min(objective.requiredCount, current + 1);
+      } else if (
+        objective.kind === 'talkToNpc' && signal.type === 'npc-talk' &&
+        objective.targetId === signal.npcId
       ) {
         next = Math.min(objective.requiredCount, current + 1);
       }

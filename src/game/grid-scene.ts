@@ -2799,6 +2799,13 @@ export class GridScene extends Phaser.Scene {
       return; // Defensive: placement already guarantees resolution.
     }
     this.recordKnowledgeObservations({ characterIds: [target.record.id] });
+    // A real conversation is its own quest signal: talkToNpc objectives only
+    // advance here (F key talk, or E on NPCs without board/shop). Opening a
+    // quest board with E never counts as talking.
+    this.applyQuestUpdate(applyQuestSignal(this.quests, this.questJournal, {
+      type: 'npc-talk',
+      npcId: target.record.id,
+    }));
     panel.open(conversation, target.record.name, {
       visibleOptions: (node) =>
         getVisibleOptions(node, this.dialogueContextFor(target.record.id)),

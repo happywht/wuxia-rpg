@@ -4,6 +4,28 @@
 
 ---
 
+## Round 31 — 原创任务链与可选分支（2026-09-27，已完成）
+
+### 计划与实现
+
+- 按 `iterations/round-31/plan.md` 先做只读扫描：确认任务引擎已支持五态与按目标 id 的 v1 计数快照（无需升版本）；确认 E 键任务告示板在 `handleInteraction` 中提前返回、F 键 `tryTalk` 与其共用 `openDialogueWith`——把 `npc-talk` 信号放在 `openDialogueWith` 内即可天然满足"告示板不算谈话、接取同一次交互不自动完成谈话目标"。
+- 引擎通用化（`src/engine/quest-system.ts`，不含任何剧情/人名）：`QuestObjectiveKind` 新增 `talkToNpc`（requiredCount 上限 99，按 `npc-talk` 信号累加）；`QuestData` 新增可选 `exclusiveGroupId`；`QuestAssemblyInput` 新增 `npcIds`（全部已放置 NPC，谈话目标按此校验而非仅发布人）；装配期互斥组**整组校验**——按前置签名单独比较，有效成员不足 2 项或签名不一致即整组禁用（校验放在前置环检测之后、依赖清理之前，被禁组员的下游后续由既有清理循环一并摘除）；`acceptQuest` 接取组员时按声明顺序把同组仍处 `offered` 的兄弟置为 `failed` 并在 `update.failedQuestIds` 报告。`quest-set.schema.json` 同步新增 `talk-objective` 与可选 `exclusiveGroupId`。
+- 场景接线：`grid-scene.ts` 的 `openDialogueWith` 在面板打开时发一次 `npc-talk`（全文件唯一发射点，F 路径与非公告板 NPC 的 E 回落共用）；`quest-ui.ts` 接取互斥任务时提示「另一条岔路就此封止」，日志副标题改为"随物品、交谈与战斗自动更新"。
+- 资料落地：`round-07-quests.json` 扩至 20 项（新增 18 项 `quest.r31-*`）：巷陌小务四条（茶棚凉汤/书铺驱蠹/货郎口信/路旁荐帖，开局即可接取）→ 问药/药庐/巡岸/启程主线 → 互斥组 `branch.ferry-priority`（先保药队 vs 先修栈桥，共享前置「药队启程」）→ 各自后续（药队答谢 45/20 vs 栈桥通渡 42/55）；旁线渡籍→书院夜课、河灯之约、江湖耳目、刀场淬料、师门勘验。两项互斥选择由白鹭洲的告示板同时发布，A 项转述石北的主张。谈话目标 9 项、收集 7 项（含双物品收集）、击败 4 项（其中 3 项新差事声明 `failOnEncounterIds`）。12 名 NPC 全部标记 `questGiver: true`（姜百味保留商店优先，其差事经 Q 日志接取）。
+- 新增 3 个任务专用遭遇（`round-05-encounters.json`）：雾夜探子 (5,6)、芦苇水路伏兵 (6,6)、栈桥索银人 (10,6)，均在雾雨渡口南岸第 6 行空行——经全量核对不与任何人物基础/日程位、区域事件、关口端点、擂台、门派战入口、工位、药炉、终章入口、其他遭遇格或出生点重叠，且从出生点 BFS 可达。
+- 新增 `docs/QUESTS.md` 任务志（协议速览、20 项总表、分支路线图、四章叙事、遭遇表与接取入口备忘），更新 `docs/DATA-GUIDE.md`（任务协议与变更记录）、`docs/ARCHITECTURE.md`（状态行、任务引擎段落、隔离表新增互斥组行、变更记录）、`CHANGELOG.md`、`ROADMAP.md` 与本日志。
+- 新增 `scripts/smoke-round-31.mjs` 与 `smoke:round-31` 命令：断言覆盖数量与新增恰数、任务/目标 id 全局唯一、三型目标与互斥组结构、手工坏档逐条隔离（坏发布人/物品/遭遇/谈话人物）与互斥组整组校验（坏成员/前置不一/单成员均不留假单选）、完整世界装配零任务警告、三新遭遇槽位避让与可达性、谈话信号语义（接取前与接取时都不计数、错人不推进、正确 NPC 完成且奖励恰发一次）、物品接取快照与钳制、败北失败原子锁链（前置失败永久锁死后续、胜绩不复活失败差事）、互斥分支双向确定性失败报告/幂等拒绝/各自后续互不串线、`npc-talk` 唯一入口的源码文本断言（发射点位于 `openDialogueWith` 内、E 键告示板走独立调用点）、v1 快照往返（含互斥 failed 与谈话计数）与 R31 前旧档（仅 round-07 状态）免迁移恢复。
+
+### 验证
+
+- `npm run validate:data`：通过，manifest 与 26 个基础资源 Schema 有效（任务集含 20 项与 3 新遭遇后仍全部合规）。
+- `npm run typecheck`：通过。
+- `npm run smoke:round-31`：初次运行发现完整世界只装配 12/20 项任务；定位为容素青 NPC 缺少 `questGiver: true`，导致其名下任务及依赖后续被正确级联禁用。补上标记、把互斥选项统一到白鹭洲告示板并增加同发布人断言后重跑，通过（20 项全部装配，引用/交互/存档断言全通过）。
+- `npm run smoke:round-30`：通过，人物/门派/对话/图谱与完整世界装配回归正常（12 名 NPC 标记 `questGiver` 不影响放置与日程警告断言）。
+- `npm run build`：通过（844ms）；主 JS chunk 1,867.95 kB（gzip 491.51 kB），仍超过 Vite 500 kB 默认建议线。
+
+---
+
 ## Round 30 — 原创人物、门派与关系资料扩充（2026-09-27，已完成）
 
 ### 计划与实现

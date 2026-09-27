@@ -30,6 +30,96 @@
         "defeat": "你被刀客一脚踹进路边土沟，狼狈爬起，缓了好一阵才回过神。",
         "flee": "你虚晃一招转身便走，身后的咒骂声渐渐远了。"
       }
+    },
+    {
+      "id": "encounter.mist-shore-prowler",
+      "name": "雾夜探子",
+      "mapResourceId": "map.round-10-mist-ferry",
+      "position": { "col": 5, "row": 6 },
+      "profileId": "char.scribe-apprentice",
+      "enemy": {
+        "name": "斗笠探子",
+        "attributes": {
+          "body": 6,
+          "force": 5,
+          "agility": 8,
+          "insight": 6,
+          "resolve": 5
+        },
+        "health": 42,
+        "qi": 8,
+        "martialArtIds": ["skill.yunyin-shenfa"]
+      },
+      "victoryExperience": 32,
+      "defeatRecovery": { "healthRatio": 0.65, "qiRatio": 0.65 },
+      "repeatable": false,
+      "texts": {
+        "approach": "芦苇根处黑影一闪，雾夜探子按 E 拦下",
+        "intro": "那人斗笠压得极低，声音沙哑：「巡岸的？替谁看水路，先说清楚再走。」",
+        "victory": "斗笠落地，探子捂着腕子退进苇荡，再没敢回头。",
+        "defeat": "你被一根苇杆绊倒在水洼里，等爬起来，探子早没了踪影。",
+        "flee": "你贴着苇根退开，雾很快吞掉了对方的脚步声。"
+      }
+    },
+    {
+      "id": "encounter.ferry-reed-ambush",
+      "name": "芦苇水路伏兵",
+      "mapResourceId": "map.round-10-mist-ferry",
+      "position": { "col": 6, "row": 6 },
+      "profileId": "char.scribe-apprentice",
+      "enemy": {
+        "name": "苇荡水匪",
+        "attributes": {
+          "body": 8,
+          "force": 8,
+          "agility": 6,
+          "insight": 5,
+          "resolve": 6
+        },
+        "health": 54,
+        "qi": 6,
+        "martialArtIds": ["skill.jianghu-sanshou", "skill.lanmen-daofa"]
+      },
+      "victoryExperience": 42,
+      "defeatRecovery": { "healthRatio": 0.6, "qiRatio": 0.6 },
+      "repeatable": false,
+      "texts": {
+        "approach": "苇荡深处橹声一停，芦苇水路伏兵按 E 迎战",
+        "intro": "两条小船堵住水路，为首的把桨一横：「药担留下，人可以走。」",
+        "victory": "伏兵弃船钻进苇荡，药担一只不少地码回船头。",
+        "defeat": "你被打落水里，呛了几口浑水，药队被迫退回渡口。",
+        "flee": "你借着雾气脱身，身后传来伏兵懊恼的咒骂。"
+      }
+    },
+    {
+      "id": "encounter.pier-toll-robber",
+      "name": "栈桥索银人",
+      "mapResourceId": "map.round-10-mist-ferry",
+      "position": { "col": 10, "row": 6 },
+      "profileId": "char.scribe-apprentice",
+      "enemy": {
+        "name": "索银的扁担汉",
+        "attributes": {
+          "body": 9,
+          "force": 7,
+          "agility": 6,
+          "insight": 6,
+          "resolve": 8
+        },
+        "health": 50,
+        "qi": 10,
+        "martialArtIds": ["skill.tiezhang-zhuanggong"]
+      },
+      "victoryExperience": 38,
+      "defeatRecovery": { "healthRatio": 0.6, "qiRatio": 0.6 },
+      "repeatable": false,
+      "texts": {
+        "approach": "桥心横着根扁担，栈桥索银人按 E 拆招",
+        "intro": "索银人拍着新钉的桥板：「此桥我修的？错，是我看着修的。过桥钱，一文不能少。」",
+        "victory": "扁担断成两截，索银人抱头窜下桥去，桥头从此清净。",
+        "defeat": "你被扁担扫下桥滩，索银人得意地在新桥板上又刻了一道记号。",
+        "flee": "你退出桥心，索银人在身后把「过桥钱」三个字喊得更响。"
+      }
     }
   ]
 }

@@ -204,7 +204,9 @@ export class QuestPanel {
         this.render();
         return;
       }
-      this.status = `已接取「${quest.name}」`;
+      this.status = result.update.failedQuestIds.length > 0
+        ? `已接取「${quest.name}」，另一条岔路就此封止`
+        : `已接取「${quest.name}」`;
       this.onUpdate?.(result.update);
     } else if (state?.status === 'active') {
       toggleTrackedQuest(model.journal, quest.id);
@@ -254,7 +256,7 @@ export class QuestPanel {
       ? `${LABELS.board} · ${model.giverName ?? ''}`
       : LABELS.journal;
     this.addText(title, left + PADDING, top + 16, 18, UI.warning);
-    this.addText(isBoard ? '接取差事后可按 Q 随时查看日志' : '差事进度随物品与战斗变化自动更新',
+    this.addText(isBoard ? '接取差事后可按 Q 随时查看日志' : '差事进度随物品、交谈与战斗自动更新',
       left + PADDING, top + 43, 11, UI.muted);
 
     const listTop = top + 72;

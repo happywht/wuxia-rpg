@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://wuxia-rpg.invalid/schema/quest-set",
   "title": "任务集合",
-  "description": "任务集合静态契约。NPC、物品、遭遇与前置任务的跨资源引用由运行时装配层逐条校验；任务名称、说明、目标描述与奖励数值均来自数据。",
+  "description": "任务集合静态契约。NPC、物品、遭遇与前置任务的跨资源引用由运行时装配层逐条校验；互斥分支组按整组校验（至少两个前置一致的成员）；任务名称、说明、目标描述与奖励数值均来自数据。",
   "type": "object",
   "additionalProperties": false,
   "required": ["quests"],
@@ -27,6 +27,10 @@
         "name": { "type": "string", "minLength": 1, "maxLength": 48 },
         "description": { "type": "string", "minLength": 1, "maxLength": 500 },
         "giverNpcId": { "$ref": "#/definitions/id" },
+        "exclusiveGroupId": {
+          "description": "可选互斥分支组：同组且前置一致的任务构成一次玩家选择，接取其一会将其余已解锁成员记为失败；装配时整组校验。",
+          "$ref": "#/definitions/id"
+        },
         "prerequisiteQuestIds": {
           "type": "array",
           "uniqueItems": true,
@@ -38,7 +42,8 @@
           "items": {
             "oneOf": [
               { "$ref": "#/definitions/collect-objective" },
-              { "$ref": "#/definitions/defeat-objective" }
+              { "$ref": "#/definitions/defeat-objective" },
+              { "$ref": "#/definitions/talk-objective" }
             ]
           }
         },
@@ -69,6 +74,18 @@
       "properties": {
         "id": { "$ref": "#/definitions/id" },
         "kind": { "const": "defeatEncounter" },
+        "targetId": { "$ref": "#/definitions/id" },
+        "requiredCount": { "type": "integer", "minimum": 1, "maximum": 99 },
+        "text": { "type": "string", "minLength": 1, "maxLength": 160 }
+      }
+    },
+    "talk-objective": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "targetId", "requiredCount", "text"],
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "kind": { "const": "talkToNpc" },
         "targetId": { "$ref": "#/definitions/id" },
         "requiredCount": { "type": "integer", "minimum": 1, "maximum": 99 },
         "text": { "type": "string", "minLength": 1, "maxLength": 160 }

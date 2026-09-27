@@ -6,6 +6,7 @@
       "mapResourceId": "map.round-01-grid",
       "position": { "col": 4, "row": 1 },
       "dialogueId": "dlg.shen-mohan-bookshop",
+      "questGiver": true,
       "schedule": [
         { "periodId": "period.midday", "position": { "col": 3, "row": 1 } },
         { "periodId": "period.dusk", "position": { "col": 4, "row": 1 } }
@@ -17,6 +18,7 @@
       "mapResourceId": "map.round-01-grid",
       "position": { "col": 5, "row": 5 },
       "dialogueId": "dlg.lu-zhenniang-teastall",
+      "questGiver": true,
       "schedule": [
         { "periodId": "period.dusk", "position": { "col": 6, "row": 5 } },
         { "periodId": "period.night", "position": { "col": 5, "row": 5 } }
@@ -27,7 +29,8 @@
       "name": "顾夜尘",
       "mapResourceId": "map.round-01-grid",
       "position": { "col": 12, "row": 3 },
-      "dialogueId": "dlg.gu-yechen-roadside"
+      "dialogueId": "dlg.gu-yechen-roadside",
+      "questGiver": true
     },
     {
       "id": "char.jiang-baiwei",
@@ -35,6 +38,7 @@
       "mapResourceId": "map.round-01-grid",
       "position": { "col": 9, "row": 1 },
       "dialogueId": "dlg.jiang-baiwei-peddler",
+      "questGiver": true,
       "shopId": "shop.jiang-baiwei-peddler-cart",
       "schedule": [
         { "periodId": "period.afternoon", "position": { "col": 10, "row": 1 } },
@@ -58,7 +62,8 @@
       "name": "叶庭舟",
       "mapResourceId": "map.round-01-grid",
       "position": { "col": 2, "row": 1 },
-      "dialogueId": "dlg.ye-tingzhou-mentor"
+      "dialogueId": "dlg.ye-tingzhou-mentor",
+      "questGiver": true
     },
     {
       "id": "char.shi-bei",
@@ -66,6 +71,7 @@
       "mapResourceId": "map.round-10-mist-ferry",
       "position": { "col": 3, "row": 1 },
       "dialogueId": "dlg.shi-bei-mentor",
+      "questGiver": true,
       "schedule": [
         { "periodId": "period.midday", "position": { "col": 4, "row": 1 } },
         { "periodId": "period.dusk", "position": { "col": 3, "row": 2 } }
@@ -77,6 +83,7 @@
       "mapResourceId": "map.round-10-mist-ferry",
       "position": { "col": 12, "row": 7 },
       "dialogueId": "dlg.wen-suxin-mentor",
+      "questGiver": true,
       "schedule": [
         { "periodId": "period.morning", "position": { "col": 11, "row": 7 } },
         { "periodId": "period.night", "position": { "col": 13, "row": 7 } }
@@ -87,7 +94,8 @@
       "name": "容素青",
       "mapResourceId": "map.round-10-mist-ferry",
       "position": { "col": 12, "row": 2 },
-      "dialogueId": "dlg.rong-su-qing-herbalist"
+      "dialogueId": "dlg.rong-su-qing-herbalist",
+      "questGiver": true
     },
     {
       "id": "char.liu-tinglan",
@@ -95,6 +103,7 @@
       "mapResourceId": "map.round-01-grid",
       "position": { "col": 5, "row": 3 },
       "dialogueId": "dlg.liu-tinglan-mentor",
+      "questGiver": true,
       "schedule": [
         { "periodId": "period.midday", "position": { "col": 6, "row": 3 } },
         { "periodId": "period.dusk", "position": { "col": 5, "row": 3 } }
@@ -106,6 +115,7 @@
       "mapResourceId": "map.round-10-mist-ferry",
       "position": { "col": 11, "row": 3 },
       "dialogueId": "dlg.zhu-jiuxian-mentor",
+      "questGiver": true,
       "schedule": [
         { "periodId": "period.morning", "position": { "col": 12, "row": 3 } },
         { "periodId": "period.night", "position": { "col": 11, "row": 3 } }
@@ -117,6 +127,7 @@
       "mapResourceId": "map.round-10-mist-ferry",
       "position": { "col": 4, "row": 4 },
       "dialogueId": "dlg.bai-luzhou-ferry-master",
+      "questGiver": true,
       "schedule": [
         { "periodId": "period.dusk", "position": { "col": 3, "row": 4 } }
       ]

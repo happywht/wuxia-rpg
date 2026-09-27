@@ -1233,6 +1233,7 @@ function assembleOptionalContent(
     questGiverNpcIds: new Set(
       allNpcs.filter((npc) => npc.record.questGiver).map((npc) => npc.record.id),
     ),
+    npcIds: new Set(allNpcs.map((npc) => npc.record.id)),
     itemIds: new Set(itemAssembly.items.keys()),
     encounterIds: new Set(encounters.map((encounter) => encounter.record.id)),
   });

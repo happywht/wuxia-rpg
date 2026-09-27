@@ -32,6 +32,355 @@
       ],
       "failOnEncounterIds": ["encounter.alley-blade-bully"],
       "rewards": { "experience": 30, "currency": 25 }
+    },
+    {
+      "id": "quest.r31-teastall-herbal-water",
+      "name": "茶棚凉汤",
+      "description": "入夏后茶棚的凉汤走俏，陆贞娘惯用寒珠草提味败火，岸边湿地的草却被夜雨打烂了一片。替她备来四株，回头给赶路的药队也留一桶。",
+      "giverNpcId": "char.lu-zhenniang",
+      "objectives": [
+        {
+          "id": "objective.r31-teastall-herbs",
+          "kind": "collectItem",
+          "targetId": "item.hanzhu-cao",
+          "requiredCount": 4,
+          "text": "采备四株寒珠草"
+        }
+      ],
+      "rewards": { "experience": 18, "currency": 15 }
+    },
+    {
+      "id": "quest.r31-bookshop-mothproof",
+      "name": "书铺驱蠹",
+      "description": "书铺新进一批旧册，沈墨涵怕蠹虫蛀了书页，要用落蝶花的干瓣铺在架底。渡口沙洲上花开得正散，采来三束，书页便能安生过夏。",
+      "giverNpcId": "char.shen-mohan",
+      "objectives": [
+        {
+          "id": "objective.r31-bookshop-petals",
+          "kind": "collectItem",
+          "targetId": "item.luodie-hua",
+          "requiredCount": 3,
+          "text": "采来三束落蝶花"
+        }
+      ],
+      "rewards": { "experience": 16, "currency": 14 }
+    },
+    {
+      "id": "quest.r31-peddler-errand",
+      "name": "货郎口信",
+      "description": "姜百味的货担随药队走到渡口便要回程，他捎了句口信给渡董白鹭洲：下一批针线茶叶改走水路。替他当面带到，免得误了船期。",
+      "giverNpcId": "char.jiang-baiwei",
+      "objectives": [
+        {
+          "id": "objective.r31-peddler-message",
+          "kind": "talkToNpc",
+          "targetId": "char.bai-luzhou",
+          "requiredCount": 1,
+          "text": "把改走水路的口信带给白鹭洲"
+        }
+      ],
+      "rewards": { "experience": 12, "currency": 20 }
+    },
+    {
+      "id": "quest.r31-roadside-note",
+      "name": "路旁荐帖",
+      "description": "顾夜尘在路旁看了你练刀许久，说招式有了骨架，缺一股狠劲。他写下一页荐帖，让你带去雾雨渡口交给盘舷刀场的祝九弦——肯不肯收，看你的造化。",
+      "giverNpcId": "char.gu-yechen",
+      "objectives": [
+        {
+          "id": "objective.r31-roadside-letter",
+          "kind": "talkToNpc",
+          "targetId": "char.zhu-jiuxian",
+          "requiredCount": 1,
+          "text": "把荐帖交给祝九弦"
+        }
+      ],
+      "rewards": { "experience": 14, "currency": 10 }
+    },
+    {
+      "id": "quest.r31-herbal-inquiry",
+      "name": "灯下问药",
+      "description": "巷口伤者的疮口收得慢，马尚义拿不准是药不对症，还是换了季节须改方子。他请你去渡口药庐，当面向容素青问一句配伍的忌讳。",
+      "giverNpcId": "char.ma-shangyi",
+      "prerequisiteQuestIds": ["quest.round-07-medicine-run"],
+      "objectives": [
+        {
+          "id": "objective.r31-herbal-question",
+          "kind": "talkToNpc",
+          "targetId": "char.rong-su-qing",
+          "requiredCount": 1,
+          "text": "向容素青请教疮口的配伍忌讳"
+        }
+      ],
+      "rewards": { "experience": 20, "currency": 12 }
+    },
+    {
+      "id": "quest.r31-herbal-stocktaking",
+      "name": "药庐清点",
+      "description": "容素青清点药庐，苍崖根只够再配两剂生肌散。雨后崖根松动，渡口北坡就能抠出几截。取来三根，她顺带把你问来的忌讳记进药案。",
+      "giverNpcId": "char.rong-su-qing",
+      "prerequisiteQuestIds": ["quest.r31-herbal-inquiry"],
+      "objectives": [
+        {
+          "id": "objective.r31-root-stock",
+          "kind": "collectItem",
+          "targetId": "item.cangya-gen",
+          "requiredCount": 3,
+          "text": "备齐三根苍崖根"
+        }
+      ],
+      "rewards": { "experience": 22, "currency": 16 }
+    },
+    {
+      "id": "quest.r31-ferry-ledger",
+      "name": "渡籍补录",
+      "description": "连日阴雨泡坏了渡籍的半页轮值，白鹭洲要按药道会盟的新约补录，须请寒山书院的教习柳听澜誊正一份用印。替他把话带到，字据随后取回。",
+      "giverNpcId": "char.bai-luzhou",
+      "prerequisiteQuestIds": ["quest.r31-peddler-errand"],
+      "objectives": [
+        {
+          "id": "objective.r31-ledger-transcript",
+          "kind": "talkToNpc",
+          "targetId": "char.liu-tinglan",
+          "requiredCount": 1,
+          "text": "请柳听澜誊正渡籍并加盖书院印"
+        }
+      ],
+      "rewards": { "experience": 20, "currency": 18 }
+    },
+    {
+      "id": "quest.r31-academy-nightclass",
+      "name": "书院夜课",
+      "description": "书院连着三晚赶抄渡籍与药档，学生们熬得眼酸心浮。柳听澜想备两丸清心丸放在案头，学子们各含一丸，抄书的手才稳得住。",
+      "giverNpcId": "char.liu-tinglan",
+      "prerequisiteQuestIds": ["quest.r31-ferry-ledger"],
+      "objectives": [
+        {
+          "id": "objective.r31-nightclass-pills",
+          "kind": "collectItem",
+          "targetId": "item.qingxin-wan",
+          "requiredCount": 2,
+          "text": "备来两丸清心丸"
+        }
+      ],
+      "rewards": { "experience": 24, "currency": 15 }
+    },
+    {
+      "id": "quest.r31-mist-shore-watch",
+      "name": "雾夜巡岸",
+      "description": "药队起运前夜，闻素心放心不下北岸雾里的动静——接连几晚有黑影沿芦苇根探路，像是替人踩点。替她巡这一夜；若真撞见探子，莫让他把消息带回去，若你反被制住，这趟巡岸便算扑空。",
+      "giverNpcId": "char.wen-suxin",
+      "prerequisiteQuestIds": ["quest.r31-herbal-stocktaking"],
+      "objectives": [
+        {
+          "id": "objective.r31-shore-prowler",
+          "kind": "defeatEncounter",
+          "targetId": "encounter.mist-shore-prowler",
+          "requiredCount": 1,
+          "text": "拿下北岸雾夜探子"
+        }
+      ],
+      "failOnEncounterIds": ["encounter.mist-shore-prowler"],
+      "rewards": { "experience": 34, "currency": 22 }
+    },
+    {
+      "id": "quest.r31-caravan-provisioning",
+      "name": "药队启程",
+      "description": "药队只等一味压箱的无极丹——护送的人若在路上伤了，没有它撑不到镇上。石北托你购来一丸交渡董白鹭洲清点封箱，顺道把起运的时辰与他敲定。",
+      "giverNpcId": "char.shi-bei",
+      "prerequisiteQuestIds": ["quest.r31-herbal-stocktaking", "quest.r31-mist-shore-watch"],
+      "objectives": [
+        {
+          "id": "objective.r31-caravan-pill",
+          "kind": "collectItem",
+          "targetId": "item.wuji-dan",
+          "requiredCount": 1,
+          "text": "购备一丸无极丹"
+        },
+        {
+          "id": "objective.r31-caravan-ferry-time",
+          "kind": "talkToNpc",
+          "targetId": "char.bai-luzhou",
+          "requiredCount": 1,
+          "text": "与白鹭洲敲定药队起运时辰"
+        }
+      ],
+      "rewards": { "experience": 28, "currency": 24 }
+    },
+    {
+      "id": "quest.r31-guard-the-caravan",
+      "name": "先保药队",
+      "description": "探子的消息坐实：有人要在药队过芦苇水路时动手。白鹭洲把两条路都列在渡口告示板上：石北主张先护药队过雾桥，栈桥修缮缓一两日再议。替他押这一程；若在苇荡里败下阵来，药队只好原路退回，这趟护送也就黄了。",
+      "giverNpcId": "char.bai-luzhou",
+      "exclusiveGroupId": "branch.ferry-priority",
+      "prerequisiteQuestIds": ["quest.r31-caravan-provisioning"],
+      "objectives": [
+        {
+          "id": "objective.r31-caravan-ambush",
+          "kind": "defeatEncounter",
+          "targetId": "encounter.ferry-reed-ambush",
+          "requiredCount": 1,
+          "text": "击退芦苇水路的伏兵，护药队过雾桥"
+        }
+      ],
+      "failOnEncounterIds": ["encounter.ferry-reed-ambush"],
+      "rewards": { "experience": 40, "currency": 30 }
+    },
+    {
+      "id": "quest.r31-mend-the-pier",
+      "name": "先修栈桥",
+      "description": "白鹭洲不赞成硬闯：旧栈桥的桩脚早就酥了，重载药队一上去便是塌。他要用熟铁砂补桩、韧皮捆扎，先把桥修牢，药队宁可等两日走旱桥。备齐三份熟铁砂与两捆韧皮料，工钱他出。",
+      "giverNpcId": "char.bai-luzhou",
+      "exclusiveGroupId": "branch.ferry-priority",
+      "prerequisiteQuestIds": ["quest.r31-caravan-provisioning"],
+      "objectives": [
+        {
+          "id": "objective.r31-pier-ironsand",
+          "kind": "collectItem",
+          "targetId": "item.iron-sand",
+          "requiredCount": 3,
+          "text": "备齐三份熟铁砂补桩"
+        },
+        {
+          "id": "objective.r31-pier-leather",
+          "kind": "collectItem",
+          "targetId": "item.tough-leather",
+          "requiredCount": 2,
+          "text": "备齐两捆韧皮料捆扎"
+        }
+      ],
+      "rewards": { "experience": 35, "currency": 38 }
+    },
+    {
+      "id": "quest.r31-caravan-gratitude",
+      "name": "药队答谢",
+      "description": "药队平安过桥，庄里备下谢仪。闻素心更看重另一件事：把山庄的谢意当面说给石北与白鹭洲听——镖师拼了力气，渡董担了干系，这份人情云隐山庄认账。",
+      "giverNpcId": "char.wen-suxin",
+      "prerequisiteQuestIds": ["quest.r31-guard-the-caravan"],
+      "objectives": [
+        {
+          "id": "objective.r31-gratitude-escort",
+          "kind": "talkToNpc",
+          "targetId": "char.shi-bei",
+          "requiredCount": 1,
+          "text": "向石北当面致谢"
+        },
+        {
+          "id": "objective.r31-gratitude-ferryman",
+          "kind": "talkToNpc",
+          "targetId": "char.bai-luzhou",
+          "requiredCount": 1,
+          "text": "向白鹭洲当面致谢"
+        }
+      ],
+      "rewards": { "experience": 45, "currency": 20 }
+    },
+    {
+      "id": "quest.r31-pier-toll-clearing",
+      "name": "栈桥通渡",
+      "description": "栈桥修到最后一截，桥心却来了个自称「过桥钱管事」的索银人，扬言不给钱就拆桥板。白鹭洲咽不下这口气：新桥要通渡，先得把桥头收拾干净；你若不敌，这桥怕是要改名姓。",
+      "giverNpcId": "char.bai-luzhou",
+      "prerequisiteQuestIds": ["quest.r31-mend-the-pier"],
+      "objectives": [
+        {
+          "id": "objective.r31-pier-robber",
+          "kind": "defeatEncounter",
+          "targetId": "encounter.pier-toll-robber",
+          "requiredCount": 1,
+          "text": "赶走桥心的栈桥索银人"
+        }
+      ],
+      "failOnEncounterIds": ["encounter.pier-toll-robber"],
+      "rewards": { "experience": 42, "currency": 55 }
+    },
+    {
+      "id": "quest.r31-river-lantern-promise",
+      "name": "河灯之约",
+      "description": "陆贞娘记得去年灯节渡口放河灯的旧约：茶棚出灯油，渡董出船位。今年她想做三盏落蝶花灯——花开时风一吹，便像一群蝶顺水去。采来花瓣，再把放灯的时辰与白鹭洲约下。",
+      "giverNpcId": "char.lu-zhenniang",
+      "prerequisiteQuestIds": ["quest.r31-teastall-herbal-water"],
+      "objectives": [
+        {
+          "id": "objective.r31-lantern-petals",
+          "kind": "collectItem",
+          "targetId": "item.luodie-hua",
+          "requiredCount": 3,
+          "text": "采来三束落蝶花扎灯"
+        },
+        {
+          "id": "objective.r31-lantern-appointment",
+          "kind": "talkToNpc",
+          "targetId": "char.bai-luzhou",
+          "requiredCount": 1,
+          "text": "与白鹭洲约下放灯的船位时辰"
+        }
+      ],
+      "rewards": { "experience": 30, "currency": 25 }
+    },
+    {
+      "id": "quest.r31-wharf-ears",
+      "name": "江湖耳目",
+      "description": "顾夜尘想摸清渡口这条药道往后还安不安生：刀场的态度是一回事，书铺里传抄的消息是另一回事。替他分别去问祝九弦与沈墨涵，把两边的口风都带回来。",
+      "giverNpcId": "char.gu-yechen",
+      "prerequisiteQuestIds": ["quest.r31-roadside-note"],
+      "objectives": [
+        {
+          "id": "objective.r31-ears-bladeyard",
+          "kind": "talkToNpc",
+          "targetId": "char.zhu-jiuxian",
+          "requiredCount": 1,
+          "text": "向祝九弦打听刀场对药道的口风"
+        },
+        {
+          "id": "objective.r31-ears-bookshop",
+          "kind": "talkToNpc",
+          "targetId": "char.shen-mohan",
+          "requiredCount": 1,
+          "text": "向沈墨涵打听书铺里的传抄消息"
+        }
+      ],
+      "rewards": { "experience": 26, "currency": 20 }
+    },
+    {
+      "id": "quest.r31-blade-quench-stock",
+      "name": "刀场淬料",
+      "description": "祝九弦收下荐帖，却先不急着教你刀，只指着炉膛说：盘舷刀场的规矩，进门弟子自己备淬火的熟铁砂。挑两份筛得细的来，炉火一起，第一课便开。",
+      "giverNpcId": "char.zhu-jiuxian",
+      "prerequisiteQuestIds": ["quest.r31-roadside-note"],
+      "objectives": [
+        {
+          "id": "objective.r31-quench-ironsand",
+          "kind": "collectItem",
+          "targetId": "item.iron-sand",
+          "requiredCount": 2,
+          "text": "备来两份细筛熟铁砂"
+        }
+      ],
+      "rewards": { "experience": 22, "currency": 26 }
+    },
+    {
+      "id": "quest.r31-mentor-review",
+      "name": "师门勘验",
+      "description": "叶庭舟听说你已能在药道上走动，便布置下一场勘验：去渡口分别请教容素青与闻素心，把药性与护送的门道各记一页带回来。师门的道理向来是——拳脚之外，还要认得人、认得药。",
+      "giverNpcId": "char.ye-tingzhou",
+      "prerequisiteQuestIds": ["quest.r31-caravan-provisioning"],
+      "objectives": [
+        {
+          "id": "objective.r31-review-herbalist",
+          "kind": "talkToNpc",
+          "targetId": "char.rong-su-qing",
+          "requiredCount": 1,
+          "text": "向容素青记一页药性"
+        },
+        {
+          "id": "objective.r31-review-escort",
+          "kind": "talkToNpc",
+          "targetId": "char.wen-suxin",
+          "requiredCount": 1,
+          "text": "向闻素心记一页护送门道"
+        }
+      ],
+      "rewards": { "experience": 40, "currency": 35 }
     }
   ]
 }
