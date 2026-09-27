@@ -9,7 +9,8 @@ import { applyGameSettings, loadGameSettings } from './game/settings';
 /**
  * Round 09 boot: the menu scene starts first (new game / continue / settings)
  * and hands over to the grid scene with a startup payload. Persistent
- * settings (volume, text scale) load and apply before any scene renders.
+ * settings (volume, text scale, and since Round 41 movement layout, gamepad,
+ * high contrast and reduced motion) load and apply before any scene renders.
  * World content is not bundled here — scenes fetch it from `data/` at
  * runtime and degrade to a readable message when it is unavailable.
  */
@@ -24,6 +25,11 @@ const game = new Phaser.Game({
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
+  },
+  // Round 41: enable the Gamepad plugin for every scene. Without a device
+  // nothing changes — each consumer still gates on the persisted setting.
+  input: {
+    gamepad: true,
   },
   scene: [MenuScene, GridScene],
 });

@@ -1,6 +1,6 @@
 # 参考来源与使用边界（REFERENCES）
 
-核验日期：2026-09-28。历史/回忆类来源统一编号 **#1–#5**，官方技术来源统一编号 **#6–#15**；软件包元数据在独立表格中按精确包版本记录，不参与原作对照编号。来源授权状态只在核验到明确许可时标为已知；没有核验页面许可时，仅作事实性查阅，不复制内容。
+核验日期：2026-09-28。历史/回忆类来源统一编号 **#1–#5**，官方技术来源统一编号 **#6–#18**；软件包元数据在独立表格中按精确包版本记录，不参与原作对照编号。来源授权状态只在核验到明确许可时标为已知；没有核验页面许可时，仅作事实性查阅，不复制内容。
 
 ---
 
@@ -37,6 +37,8 @@
 | 14 | [GitHub Actions 官方文档](https://docs.github.com/actions) | Round 39 持续集成工作流的触发事件（push/pull_request/workflow_dispatch）、`permissions`、`timeout-minutes` 与 `npm ci` 缓存等语法依据 | 页面许可未逐页核实；只查阅/转述技术事实，不复制文档段落、示例代码或素材 |
 | 15 | [actions/checkout](https://github.com/actions/checkout) 与 [actions/setup-node](https://github.com/actions/setup-node) 官方仓库 | Round 39 CI 检出代码与 Node 22/npm 缓存环境搭建（`@v7`）所用官方 action 的用法与版本依据 | 仓库许可未逐项核实（两者为 GitHub 官方维护的开源 action）；只查阅用法事实，不复制其源码或文档段落 |
 | 16 | [Vitest 官方基准指南](https://vitest.dev/guide/benchmarking) 与 [迁移指南](https://vitest.dev/guide/migration/) | Round 40 基准通道依据：Vitest 5 起 `bench` 从顶层导入改为 `test()` 回调的 bench fixture、`*.bench.ts` 按 `benchmark.include` 与普通测试互不可见、`vitest bench` 命令语义、模块 runner export-getter 开销警示及"测构建产物/局部捕获"缓解建议 | 页面许可未逐页核实；只查阅/转述技术事实，不复制文档段落、示例代码或素材 |
+| 17 | [Phaser Gamepad 官方 API 文档](https://docs.phaser.io/api-documentation/class/input-gamepad-gamepad) | Round 41 手柄输入的设备模型依据：标准映射 D-pad 布尔（up/down/left/right）、左摇杆 `leftStick` 向量、A/B 按钮簇语义、`getAxisValue` 取值范围及按钮需先按下浏览器才开放设备的行为 | 页面许可未逐页核实；只查阅/转述技术事实，不复制文档段落、示例代码或素材 |
+| 18 | [Phaser GamepadPlugin 官方 API 文档](https://docs.phaser.io/api-documentation/class/input-gamepad-gamepadplugin) | Round 41 场景接入依据：`this.input.gamepad` 场景级插件、`input: { gamepad: true }` 配置启用、`pad1`–`pad4`/`getAll()`/`total` 设备发现、`enabled` 开关与 SSL/浏览器安全限制说明 | 页面许可未逐页核实；只查阅/转述技术事实，不复制文档段落、示例代码或素材 |
 
 ## 四、软件包许可核验（npm 元数据）
 

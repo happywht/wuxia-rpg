@@ -33,14 +33,18 @@ import {
   type SaveStorage,
 } from '../engine/save-system';
 import {
+  DEFAULT_GAME_SETTINGS,
   type GameSettings,
-  TEXT_SCALE_LABELS,
+  SETTINGS_ROW_COUNT,
+  adjustGameSetting,
   applyGameSettings,
+  currentGamepadEnabled,
   loadGameSettings,
   saveGameSettings,
+  settingsRows,
   uiFontSize,
-  volumeLabel,
 } from './settings';
+import { GamepadEdgeTracker, sampleStandardPad } from './input-settings';
 import { loadWorldData } from './world-loader';
 import { subscribeDataChanges, type UnsubscribeDataChanges } from './data-hot-reload';
 import { addPixelPanelChrome, addPixelSelection, UI_FONT_FAMILY } from './ui-theme';
@@ -92,7 +96,9 @@ export class MenuScene extends Phaser.Scene {
 
   private profiles: CharacterProfileData[] = [];
   private storage: SaveStorage | null = null;
-  private settings: GameSettings = { volume: 8, textScaleIndex: 1 };
+  private settings: GameSettings = { ...DEFAULT_GAME_SETTINGS };
+  /** Round 41 gamepad press edges for menu navigation (held → single fire). */
+  private readonly gamepadEdges = new GamepadEdgeTracker();
 
   private homeSelection = 0;
   private profileSelection = 0;
@@ -130,6 +136,37 @@ export class MenuScene extends Phaser.Scene {
     this.subscribeDataHotReload();
     this.showLoading();
     void this.loadWorld();
+  }
+
+  /**
+   * Round 41 gamepad polling: samples the first connected standard pad once
+   * per frame into press edges (a held stick or button fires once). D-pad /
+   * stick up/down moves the active row, left/right adjusts the focused
+   * setting, A confirms and B goes one page back — the keyboard contract
+   * verbatim. Everything is gated on the persisted gamepad setting; with no
+   * device or the setting off, nothing here changes keyboard behaviour.
+   */
+  update(): void {
+    if (!currentGamepadEnabled()) {
+      return;
+    }
+    const pad = this.input.gamepad?.pad1;
+    if (pad === undefined || pad === null) {
+      this.gamepadEdges.reset();
+      return;
+    }
+    const edges = this.gamepadEdges.update(sampleStandardPad({
+      dpad: { up: pad.up, down: pad.down, left: pad.left, right: pad.right },
+      leftStick: { x: pad.leftStick.x, y: pad.leftStick.y },
+      A: pad.A,
+      B: pad.B,
+    }));
+    if (edges.direction === 'up') this.moveSelection(-1);
+    else if (edges.direction === 'down') this.moveSelection(1);
+    else if (edges.direction === 'left') this.adjustSetting(-1);
+    else if (edges.direction === 'right') this.adjustSetting(1);
+    if (edges.confirm) this.confirm();
+    if (edges.back) this.back();
   }
 
   private async loadWorld(): Promise<void> {
@@ -303,7 +340,7 @@ export class MenuScene extends Phaser.Scene {
         break;
       }
       case 'settings': {
-        const count = 2;
+        const count = SETTINGS_ROW_COUNT;
         this.settingsSelection = (this.settingsSelection + delta + count) % count;
         break;
       }
@@ -318,13 +355,13 @@ export class MenuScene extends Phaser.Scene {
     if (this.page !== 'settings') {
       return;
     }
-    if (this.settingsSelection === 0) {
-      this.settings.volume = Phaser.Math.Clamp(this.settings.volume + delta, 0, 10);
-    } else {
-      const count = TEXT_SCALE_LABELS.length;
-      this.settings.textScaleIndex =
-        (this.settings.textScaleIndex + delta + count) % count;
+    // Shared with the pause-menu settings page, so both always expose and
+    // apply the identical rows and adjustment rules.
+    const next = adjustGameSetting(this.settings, this.settingsSelection, delta);
+    if (next === this.settings) {
+      return; // Clamped no-op (volume at an end of its bar).
     }
+    this.settings = next;
     applyGameSettings(this.game, this.settings);
     if (this.storage !== null) {
       saveGameSettings(this.storage, this.settings); // Session-only on refusal.
@@ -746,21 +783,20 @@ export class MenuScene extends Phaser.Scene {
   private renderSettingsPage(): void {
     this.drawBackdrop();
     this.add
-      .text(VIEW_WIDTH / 2, 70, '设置', {
+      .text(VIEW_WIDTH / 2, 64, '设置', {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(22),
         color: UI.textPrimary,
       })
       .setOrigin(0.5);
 
-    const rows = [
-      `音量　${volumeLabel(this.settings.volume)}（${this.settings.volume}/10）`,
-      `文字大小　${TEXT_SCALE_LABELS[this.settings.textScaleIndex] ?? '标准'}（本页与游戏界面即时生效）`,
-    ];
-    rows.forEach((row, index) => {
+    // Six rows since Round 41 (volume / text / movement layout / gamepad /
+    // contrast / reduced motion), rendered from the shared settings helper
+    // so this page and the pause menu can never drift apart.
+    settingsRows(this.settings).forEach((row, index) => {
       const active = index === this.settingsSelection;
       this.add
-        .text(VIEW_WIDTH / 2, 180 + index * 48, `${active ? CURSOR_ACTIVE : CURSOR_IDLE}${row}`, {
+        .text(VIEW_WIDTH / 2, 140 + index * 46, `${active ? CURSOR_ACTIVE : CURSOR_IDLE}${row}`, {
           fontFamily: UI.fontFamily,
           fontSize: uiFontSize(15),
           color: active ? UI.textActive : UI.textIdle,
@@ -768,7 +804,7 @@ export class MenuScene extends Phaser.Scene {
         .setOrigin(0.5);
     });
 
-    this.drawFeedback(330);
+    this.drawFeedback(428);
     this.drawHint('↑/↓ 选择 · ←/→ 调整（立即保存） · Esc 返回');
   }
 

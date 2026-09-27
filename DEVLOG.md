@@ -4,6 +4,45 @@
 
 ---
 
+## Round 41 — 输入方案与无障碍显示选项（2026-09-28，已完成）
+
+### 计划与实现
+
+- 先写 `iterations/round-41/plan.md`（子任务：设置模型与输入解析模块 → 场景/菜单接入与设置应用 → 测试、文档与验证），随后按仓库现状实现。
+- **设置模型（`src/game/settings.ts`）**：`GameSettings` 扩展为六字段（volume / textScaleIndex / movementLayout / gamepadEnabled / highContrast / reducedMotion），`TEXT_SCALE_STEPS` 追加 1.6 档（五档；两个设置页 6 行布局按最大字号校验过行距）。解析规则与 Round 09 同语义并向前兼容：旧载荷 `{volume,textScaleIndex}` 直接加载、新字段补默认；已知字段"存在但无效"（如 `movementLayout:'qwerty'`、布尔字段传字符串）整载荷拒绝回默认且不写存储。新增共享 `settingsRows`/`adjustGameSetting`（主菜单与暂停菜单同一来源渲染与调整，音量钳制、其余循环/取反、无操作返回原引用以便跳过持久化）。`applyGameSettings` 在声音总线之外写画布高对比度 CSS 滤镜（`HIGH_CONTRAST_FILTER = contrast(1.4) saturate(1.25)`）；实现中顺带修复 `game.sound` 为 `undefined`（极端/mock 环境）时 `manager !== null` 判空漏网导致空引用的边界，改为 `!= null`。新增运行时访问器 `currentMovementLayout/currentGamepadEnabled/currentReducedMotion` 供场景每帧/每键读取。
+- **Phaser-free 输入模块（`src/game/input-settings.ts`，新增）**：三档移动布局解析、键集与逐键启用判定、帮助文本；`resolveStickDirection`（死区 0.5、主导轴、对角水平优先、非有限值防御）；`resolveGamepadDirection`（D-pad 布尔基数优先——up>down、left>right 的对向消解与键盘路径同序——摇杆仅在 D-pad 静默时兜底）；`sampleStandardPad`（结构化入参，A→confirm、B→back）；`GamepadEdgeTracker`（按住只发一次、换向即新边沿、释放重触发、`reset()` 供面板关闭防泄漏）。实现前以仓库锁定的 Phaser 4.2.1 类型（`node_modules/phaser/types/phaser.d.ts` 的 `Gamepad`/`GamepadPlugin`）核对 API 形态：`input.gamepad` 为场景级插件且可空、`pad1`–`pad4` 类型标注非空但文档明示运行时可 `undefined`（代码按 truthiness 防御）、`leftStick` 已应用轴阈值。官方来源登记 `docs/REFERENCES.md` #17/#18。
+- **场景接入**：`src/main.ts` 配置 `input: { gamepad: true }` 启用插件。`GridScene.update()`/`MenuScene.update()` 每帧轮询首只手柄：全部动作先过 `currentGamepadEnabled()` 门，无设备时重置边沿并早退（键盘零影响）；探索中 D-pad/摇杆边沿→`tryMove` 单步移动、A→交互、B→暂停；暂停菜单打开时边沿改交 `PauseMenuPanel.handleGamepadEdges`（上下选行/左右调设置/A 确认/B 返回），与键盘契约逐条对齐。`bindMovementKeys` 八键保持绑定、处理函数按下时按 `currentMovementLayout()` 门控（免重绑、暂停菜单改完下一键即生效）；HUD 首行与操作手册（`controls-ui.ts`）的移动说明随布局更新，操作手册另显示手柄开关状态。
+- **减少动态贯穿**：`tryMove` 在 `currentReducedMotion()` 时瞬移并同步执行完成回调（`moving` 解锁、伙伴跟随、区域事件、热重载安全边界全部保留，抽取 `finishMove` 供补间/直设两路复用）；`updateDaylight`/`updateClimatePresentation` 的 600 ms 渐变、`syncNpcVisuals` 的 420 ms 补间均加"animate 且未开减少动态"分支；降水粒子不生成。新增暂停设置页 `onSettingsChanged` 同步：开启时当帧停止已有昼夜/天气补间、写入目标透明度并销毁既有粒子；关闭时按当前天气即时恢复降水表现，不必等下一日切换。伙伴跟随本就直接定位（无补间），行为一致。
+- **测试（42 用例）**：`tests/settings.test.ts` 21 例（v1 迁移含"旧存储字节不动"、六字段往返、新字段无效整载荷拒绝、Round 09 字段越界/JSON 损坏/非对象回退、未知字段忽略、写拒绝会话内仍生效、读抛错降级、mock game 断言音量 0.8/滤镜开/关/无效载荷不动外观、`{sound:null}`/`{}`/仅 canvas 替身不崩、五档单调与 `uiFontSize` 最小 8px、共享行 6 行与调整钳制/循环/取反/越界原引用）；`tests/input-settings.test.ts` 21 例（布局解析与三档键集、逐键启用、帮助文本、死区内/主导轴/对角水平优先/自定义死区/NaN+Infinity、D-pad 优先与对向消解、静默时摇杆兜底、采样映射、边沿六组语义含 reset 与方向按钮独立性）。首跑 2 例失败并修正：其一为源码真实边界（`sound` undefined 判空漏网，修源码）；其二为断言误解（首次 `applyGameSettings` 即同步清空滤镜为 `''`，修正断言并顺带把"无效载荷不动外观"的断言写得更强——带上 `highContrast:true` 的无效载荷不得落地滤镜）。
+- 文档：新增 `docs/ACCESSIBILITY.md`（六项设置作用范围、手柄映射与浏览器设备发现限制、画布级滤镜≠WCAG 逐元素审计、减少动态逐项对照）；`docs/REFERENCES.md` 登记 Phaser Gamepad/GamepadPlugin 官方 API（#17/#18，编号说明 #6–#15 → #6–#18）；README 进度至 R41/用例数 105/文档索引；`docs/TESTING.md` 覆盖表两行与变更记录。
+
+### 验证（本机实际命令与结果）
+
+- 环境：Windows 11 Home（10.0.26200）、Node v22.18.0（win32 x64）、Vitest 5.0.2、Vite 8.3.1。
+- `npm run typecheck`：首轮通过（全部场景接入后零错误）。
+- `npm test`：**7 文件 105 用例全部通过**（63 旧 + 42 新；新文件首轮 40/42，修 2 例后全绿）。
+- `npm run check`：**exit 0**（26 资源校验、0 MOD 问题、typecheck、Vitest 7 文件 105 用例、audit:round-34 文档一致性审计通过）。
+- `npm run build`：**exit 0**（Round 41 收尾复跑后的完整 check 先行；主 JS 1,887.10 kB / gzip 497.63 kB，较 R40 的 1,882.01 kB 增 5.09 kB；500 kB 分包建议仍为非阻断提示）。
+- 烟测：`smoke:round-20`/`30`/`33`/`35`/`36`/`37` 全部 **exit 0**。
+- **浏览器烟测（生产构建 + `npx vite preview`（4273 端口；4173 被本机残留进程占用）+ Playwright 键盘路径）**，要点与证据：
+  - 主菜单设置页 6 行：ArrowDown×4 聚焦高对比度行 → ArrowRight，`canvas.style.filter` 当帧变为 `contrast(1.4) saturate(1.25)`，localStorage 写入完整六字段载荷 `{"volume":8,"textScaleIndex":1,"movementLayout":"both","gamepadEnabled":true,"highContrast":true,"reducedMotion":false}`；
+  - 刷新页面后启动路径自动恢复滤镜（`loadGameSettings → applyGameSettings` 跨启动保留实证）；
+  - 暂停菜单设置页 6 行（Esc → ↓×2 → Enter → ↓×5 → →）：`reducedMotion:true` 成功写入，证明两处设置页同源；
+  - 移动布局端到端：主菜单将 `movementLayout` 切至 `wasd`、`textScaleIndex` 切至 2 后进游戏——按 ArrowUp 画面零变化（MD5 相同）、按 W 画面变化（MD5 变化且 `w:87` 按键由页面监听日志核验到达），布局门控免重绑即时生效实证；
+  - 减少动态行为：开启后玩家移动仍发生（截图哈希变化）；等待 6 秒后连拍两帧 MD5 完全一致（无粒子/补间残留的静止画面）；
+  - 排查记录：初判"wasd 下 W 不动"为烟测交互时序踩空（Esc 逐级返回 + 主菜单 3 项循环导致实际停在设置/存档页，菜单选行同样改变画面），以 reload 干净状态 + 按键到达日志 + 双向对照（方向键禁用/W 生效）重新取证后闭环；期间确认 canvas 为 WebGL 上下文，`toDataURL` 指纹法不适用（无 preserveDrawingBuffer），改用 Playwright 合成器级截图对比。
+  - 控制台全程无新增错误（仅既有 favicon 404 与 R32 锻造配方可选警告）。
+- `git diff --check`：通过（仅 LF→CRLF 换行提示）。
+
+### 未实现/限制
+
+- **物理手柄硬件未测试**：本机无控制器。方向解析、死区、边沿与菜单路由逻辑由单元测试覆盖；浏览器内手柄端到端未验证。浏览器"须先按手柄按钮才开放设备/可能要求 HTTPS"的行为以 `docs/ACCESSIBILITY.md` 说明，不声称做过硬件验证。
+- **高对比度边界**：画布级 CSS 滤镜作用于整张渲染画面，不等同 WCAG 逐元素色彩审计（未做对比度比值计算与认证）；已在 `docs/ACCESSIBILITY.md` 与计划风险中如实标注，正式无障碍合规结论留给后续验收轮次。
+- **设置页布局按 1.6 档校验**：更大字号需求（如 2.0+）未提供——当前 960×540 画布与面板行距下更大档会与反馈/提示行冲突；`TEXT_SCALE_STEPS` 为常量数组，后续轮次可按需评估。
+- 烟测中重申的既有非本轮问题：R32 锻造配方 `forge.recipe.r32-marsh-amber-seal` 运行时语义校验禁用的 HUD 聚合通知（R40 已记录，未处理）。
+
+---
+
 ## Round 40 — 地图渲染 O(1) 对象与可重复性能/内存基准（2026-09-28，已完成）
 
 ### 计划与实现

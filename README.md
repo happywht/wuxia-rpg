@@ -4,11 +4,11 @@
 
 - 设计文档：`docs/GDD.md`
 - 逐轮路线图（R00–R50）：`ROADMAP.md`
-- 当前进度：**Round 40 已完成；下一轮 Round 41**
+- 当前进度：**Round 41 已完成；下一轮 Round 42**
 
 ## 范围
 
-- ✅ 已完成（R00–R40）：网格探索、任务/物品/战斗与存档闭环；五派师门、昼夜天气、NPC 日程、伙伴、擂台、门派战、自创武学、经脉内修、锻造炼丹、多结局、成就与图鉴；基础资料包含 20 项任务、50 件物品、30 种武学及 134 节点知识图谱，并有世界设定和资料规范文档审计；MOD 多层覆盖顺序、来源追踪、游戏内 F2 诊断面板、`inspect:mods` 只读检查、开发模式资料热重载、单文件 v1 内容包（导出/只读预检/显式安装）、Vitest 单元测试基线（63 用例）与统一 `check` 质量门槛（资料/MOD 校验、类型、测试、文档审计）及 GitHub Actions 持续集成；地图渲染重写为单 Graphics 层（每图恒定 2 个场景对象，R40）并有可重复性能/内存基准（`npm run benchmark:round-40`，见 `docs/PERFORMANCE.md`）。
+- ✅ 已完成（R00–R41）：网格探索、任务/物品/战斗与存档闭环；五派师门、昼夜天气、NPC 日程、伙伴、擂台、门派战、自创武学、经脉内修、锻造炼丹、多结局、成就与图鉴；基础资料包含 20 项任务、50 件物品、30 种武学及 134 节点知识图谱，并有世界设定和资料规范文档审计；MOD 多层覆盖顺序、来源追踪、游戏内 F2 诊断面板、`inspect:mods` 只读检查、开发模式资料热重载、单文件 v1 内容包（导出/只读预检/显式安装）、Vitest 单元测试基线（105 用例）与统一 `check` 质量门槛（资料/MOD 校验、类型、测试、文档审计）及 GitHub Actions 持续集成；地图渲染重写为单 Graphics 层（每图恒定 2 个场景对象，R40）并有可重复性能/内存基准（`npm run benchmark:round-40`，见 `docs/PERFORMANCE.md`）；六项无障碍/输入设置（音量、五档字号、方向键/WASD 移动布局、标准手柄输入、高对比度、减少动态效果，R41，见 `docs/ACCESSIBILITY.md`）。
 - ⏳ 正在按路线图逐轮推进：共 51 轮（R00–R50）；内容扩充与发布验收尚未完成。
 - 永久边界：不做多人联网；不含原作内容；mod 仅限同名 JSON 覆盖（见 `docs/DATA-GUIDE.md`）。
 
@@ -36,7 +36,7 @@ npm run dev        # 启动开发服务器（默认 http://localhost:5173）
 npm run check      # 统一质量门槛：validate:data → inspect:mods → typecheck → test → audit:round-34，任一失败即中止
 npm run build      # 先完整通过 npm run check，再执行 Vite 生产构建
 npm run preview    # 预览生产构建
-npm test           # Vitest 单元测试（vitest run，63 用例；不含基准）
+npm test           # Vitest 单元测试（vitest run，105 用例；不含基准）
 npm run benchmark:round-40 # 性能/内存基准（渲染对象数与耗时、26 资源加载、50 轮长跑堆观察；与 npm test 隔离）
 npm run typecheck  # 仅类型检查（tsc --noEmit，严格模式）
 npm run validate:data # 校验 manifest 登记的基础资料/schema
@@ -101,6 +101,7 @@ npm run audit:round-34 # 地图、对白、任务及世界设定文档一致性�
 | `docs/ALCHEMY.md` | 药方发现、悟性品质炼制、数据协议与存档兼容 |
 | `docs/MAP-ATLAS.md` | 世界舆图、区域地图资源、关口、区域事件及占位校验 |
 | `docs/WORLD-SETTING.md` | 原创世界设定汇编：背景、区域地理、五派格局、药道会盟与叙事边界（数据为证） |
+| `docs/ACCESSIBILITY.md` | 无障碍/输入选项：六项设置的作用范围、手柄标准映射、高对比度画布滤镜与减少动态呈现的边界（R41 起） |
 
 ## 原创性与授权声明
 

@@ -4,6 +4,22 @@
 
 ## [Unreleased]
 
+### Added (Round 41)
+
+- **六项持久化界面设置（输入方案与无障碍显示）**：`src/game/settings.ts` 的 `GameSettings` 在音量/文字大小之外新增 `movementLayout`（方向键+WASD / 仅方向键 / 仅 WASD）、`gamepadEnabled`、`highContrast`、`reducedMotion`，文字大小新增 1.6"最大"档（五档 0.85–1.6，设置页布局按该档校验）。载荷解析向后兼容 Round 09 的 `{ volume, textScaleIndex }` 旧载荷（缺失新字段补默认；任一已知字段"存在但无效"整载荷拒绝回默认且不动存储——与旧两字段规则同语义）；主菜单与暂停菜单设置页由共享 `settingsRows`/`adjustGameSetting` 渲染与调整（6 行，两处永不漂移），调整即时 `applyGameSettings`（声音总线音量 + 画布高对比度 CSS 滤镜 `contrast(1.4) saturate(1.25)` + 全面板 `uiFontSize`）并持久化。
+- **Phaser-free 输入设置模块 `src/game/input-settings.ts`**：键盘移动布局解析/键集/逐键启用判定/帮助文本；标准手柄方向解析（D-pad 布尔基数优先、左摇杆 0.5 死区、主导轴、对角水平优先、非有限值防御）；标准映射采样（A→确认、B→返回）；`GamepadEdgeTracker` 把按住的摇杆/按键转为按下沿（持续按住只触发一次、换向即新边沿、释放重触发、`reset()`）——这是"手柄按住不逐帧移动"的机制核心。零 Phaser 依赖，纯 Node 可单测。
+- **手柄输入接入**：`src/main.ts` 以 `input: { gamepad: true }` 启用 Phaser Gamepad 插件；`GridScene.update()` 与 `MenuScene.update()` 每帧采样首只标准手柄并经边沿检测分派——探索中 D-pad/左摇杆单步移动、A 交互（等同 E）、B 暂停（等同 Esc）；主菜单/暂停菜单中上下选行、左右调设置、A 确认、B 返回（`PauseMenuPanel.handleGamepadEdges`）；暂停菜单持有屏幕时游戏内动作改走路由。全部手柄动作以 `gamepadEnabled` 持久设置为门，无设备或关闭时轮询早退，键盘行为零变化。
+- **移动键位布局接入**：探索移动八键保持绑定但处理函数按下时读 `currentMovementLayout()` 门控（切换无需重绑、下一个按键即生效）；HUD 首行与 H 键操作手册的移动说明随布局更新（暂停菜单关闭时刷新），操作手册同时显示手柄开关状态说明。
+- **减少动态效果贯穿呈现层**：开启后玩家移动瞬移并同帧完成（伙伴跟随/区域事件/热重载安全边界回调全保留，游戏状态推进路径不变）、昼夜与天气色调直接设值不播 600 ms 渐变、NPC 日程重定位直接定位不播 420 ms 补间、雨/雪粒子不生成且开启设置时立即销毁既有粒子；`applyGameSettings` 顺带修复了声音管理器为 `undefined` 时（mock/极端环境）的空引用边界（`!= null`）。
+- **回归测试 42 用例**：`tests/settings.test.ts`（21：v1 旧载荷迁移与旧存储字节不动、完整六字段往返、新字段无效拒绝、越界/损坏回退、写入拒绝会话内生效、mock game 断言声音总线音量与画布滤镜、五档字号单调、共享行/调整钳制与循环）与 `tests/input-settings.test.ts`（21：布局解析与键集、逐键启用、帮助文本、死区/主导轴/对角/非有限值、D-pad 优先与对向消解、标准映射采样、边沿检测全部语义）。`npm test` 更新为 7 文件 105 用例。
+- 新增 `docs/ACCESSIBILITY.md`（六项设置作用范围、手柄标准映射与浏览器设备发现限制、高对比度=画布级滤镜而非 WCAG 逐元素审计、减少动态逐项对照表）；`docs/REFERENCES.md` 登记 Phaser Gamepad/GamepadPlugin 官方 API 文档（#17、#18）；README 进度/命令/文档索引与 `docs/TESTING.md` 覆盖表/变更记录同步。
+
+### Verification (Round 41)
+
+- 本机（Windows 11、Node v22.18.0）：`npm run check` 通过（26 资源校验、0 MOD 问题、类型检查、7 文件 105 用例、文档审计）；`npm run build` 通过（主 JS 1,886.46 kB / gzip 497.52 kB，较 R40 +4.45 kB）；`npm run smoke:round-20/30/33/35/36/37` 全部通过；`git diff --check` 通过（仅换行提示）。
+- 浏览器烟测（生产构建 + `vite preview` + Playwright，键盘路径）：主菜单设置页 6 行导航——高对比度开启当帧画布 `style.filter` 变为 `contrast(1.4) saturate(1.25)` 且 localStorage 写入完整六字段载荷，刷新页面后启动路径自动恢复滤镜（跨启动保留）；移动键位切至"仅 WASD"并调字号后进游戏——按方向键画面零变化、按 W 画面变化（布局门控端到端生效，`w:87` 按键经页面监听核验）；暂停菜单设置页 6 行调整减少动态效果成功持久化；开启减少动态后移动仍发生（截图哈希变化）且等待 6 秒后画面完全静止（无粒子/补间残留）；控制台无新增错误（仅既有 favicon 404 与既有锻造配方警告）。
+- **物理手柄硬件未测试**：无控制器环境。手柄方向解析、死区、边沿与菜单路由逻辑由 42 个单元测试覆盖；浏览器内手柄路径未做硬件验证，浏览器"先按按钮才开放设备"的行为以文档说明（`docs/ACCESSIBILITY.md`）。
+
 ### Added (Round 40)
 
 - **可重复性能/内存基准 `npm run benchmark:round-40`**（与常规 `npm test` 双向隔离）：入口 `scripts/benchmark-round-40.mjs` 串联两段——① Vitest bench 通道（`tests/performance-round-40.bench.ts`，由 `vitest.config.ts` 新增的 `benchmark.include` 只匹配 `tests/` 下 `*.bench.ts`；普通 `npm test` 的 `*.test.ts` glob 与 Vitest 普通 `run` 模式都看不到基准文件），以 `NODE_OPTIONS=--expose-gc` 把 GC 暴露给 worker；② 裸 Node 通道（`scripts/benchmark-round-40-bare.mjs`）用 Vite `build.ssr` API 打包真实渲染器后纯 Node 计时。Vitest 5 的基准 API 已改为 `test()` 回调中的 `bench` fixture（不再是顶层导入），官方来源登记于 `docs/REFERENCES.md` #16。输出 Node/平台/CPU/GC 环境、每图场景对象数与绘制调用数（结构）、四尺寸渲染耗时、真实 26 资源 `loadGameData` 耗时（内存 fetch stub，零网络）与 50 轮长跑的 GC 后堆观察；毫秒/堆读数全部为描述性观察，仅保留结构性断言（每轮 26 资源/0 诊断）。

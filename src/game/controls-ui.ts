@@ -1,4 +1,4 @@
-import { uiFontSize } from './settings';
+import { currentGamepadEnabled, currentMovementHelpText, uiFontSize } from './settings';
 import { addPixelPanelChrome, UI_FONT_FAMILY, UI_PALETTE } from './ui-theme';
 
 /** Small, data-independent keyboard reference for exploration and overlays. */
@@ -45,7 +45,9 @@ export class ControlsPanel {
 
     this.addText('操作手册', left + 26, top + 22, 21, UI_PALETTE.accent);
     this.addText('探索', left + 28, top + 66, 13, UI_PALETTE.jade);
-    this.addText('方向键 / WASD　移动', left + 44, top + 93, 14, UI_PALETTE.text);
+    // Round 41: the movement line follows the live keyboard-layout setting
+    // (the panel re-renders on every open, so a pause-menu change lands here).
+    this.addText(currentMovementHelpText(), left + 44, top + 93, 14, UI_PALETTE.text);
     this.addText('E　交互相邻人物、关口、区域事件、工位或终章石', left + 44, top + 122, 13, UI_PALETTE.text);
     this.addText('F　与相邻人物直接交谈', left + 44, top + 151, 14, UI_PALETTE.text);
     this.addText('V　原地等候片刻（面板打开时无效）', left + 44, top + 180, 14, UI_PALETTE.text);
@@ -55,7 +57,10 @@ export class ControlsPanel {
 
     this.addText('面板', left + 28, top + 278, 13, UI_PALETTE.jade);
     this.addText('↑/↓ 或 W/S　选择条目　·　Enter　确认', left + 44, top + 305, 13, UI_PALETTE.text);
-    this.addText('商店可用 ←/→ 或 A/D 切换买卖；战斗中 Esc 可撤退。', left + 44, top + 334, 12, UI_PALETTE.muted);
+    this.addText(currentGamepadEnabled()
+      ? '手柄（设置开启时）：D-pad/左摇杆移动与选择 · A 确认 · B 返回'
+      : '手柄输入已在设置中关闭，键盘操作不受影响。', left + 44, top + 334, 12, UI_PALETTE.muted);
+    this.addText('商店可用 ←/→ 或 A/D 切换买卖；战斗中 Esc 可撤退。', left + 44, top + 352, 12, UI_PALETTE.muted);
     this.addText('H 或 Esc 收起　·　方向键在帮助页打开时不会移动', left + width - 24, top + height - 24, 11, UI_PALETTE.accent, 'right');
   }
 

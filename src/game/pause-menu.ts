@@ -6,14 +6,18 @@
  * - save — the three slots with their current summaries; Enter overwrites
  *   the slot with a fresh snapshot of the live run (the host supplies the
  *   capture so this class never touches gameplay state);
- * - settings — the same two persistent settings as the main menu, adjusted
- *   with Left/Right and applied immediately (volume bus + every panel's
- *   font size through {@link uiFontSize});
+ * - settings — the same six persistent settings as the main menu (volume,
+ *   text scale, movement layout, gamepad, high contrast, reduced motion,
+ *   rendered and adjusted through the shared settings helpers), adjusted
+ *   with Left/Right and applied immediately (volume bus, canvas contrast,
+ *   every panel's font size through {@link uiFontSize});
  * - confirm-quit — an explicit confirm step before an unsaved run ends.
  *
  * While open the owning scene ignores movement input (`isOpen` is the
  * gate); keys are bound on open and unbound on close, matching every other
- * panel in this project. Labels here are interface mechanics only.
+ * panel in this project. Since Round 41 the owning scene also routes
+ * standard-gamepad press edges to {@link PauseMenuPanel.handleGamepadEdges}
+ * while this panel owns the screen. Labels here are interface mechanics only.
  */
 
 import Phaser from 'phaser';
@@ -28,12 +32,16 @@ import {
   type SaveStorage,
 } from '../engine/save-system';
 import {
-  TEXT_SCALE_LABELS,
+  DEFAULT_GAME_SETTINGS,
+  type GameSettings,
+  SETTINGS_ROW_COUNT,
+  adjustGameSetting,
   applyGameSettings,
   saveGameSettings,
+  settingsRows,
   uiFontSize,
-  volumeLabel,
 } from './settings';
+import type { StandardPadAction } from './input-settings';
 import { addPixelPanelChrome, addPixelSelection, UI_FONT_FAMILY } from './ui-theme';
 
 const UI = {
@@ -69,6 +77,8 @@ export interface PauseMenuPanelOptions {
   save: (slotId: SaveSlotId) => { ok: boolean; message: string };
   /** Invoked after the player confirmed leaving the run. */
   returnToMenu: () => void;
+  /** Applies live presentation changes while the settings page is still open. */
+  onSettingsChanged?: (settings: GameSettings) => void;
   /** Invoked after the panel closed by any path (the scene refreshes HUD here). */
   onClose?: () => void;
 }
@@ -87,7 +97,7 @@ export class PauseMenuPanel {
   private slotSummaries: SaveSlotSummary[] = [];
   private slotsAvailable = false;
   private slotsMessage: string | null = null;
-  private settings = { volume: 8, textScaleIndex: 1 };
+  private settings: GameSettings = { ...DEFAULT_GAME_SETTINGS };
 
   constructor(scene: Phaser.Scene, options: PauseMenuPanelOptions) {
     this.scene = scene;
@@ -100,7 +110,7 @@ export class PauseMenuPanel {
   }
 
   /** Opens the pause menu on its main page. */
-  open(settings: { volume: number; textScaleIndex: number }): void {
+  open(settings: GameSettings): void {
     if (this.openState) {
       return;
     }
@@ -173,7 +183,7 @@ export class PauseMenuPanel {
       case 'save':
         return SAVE_SLOT_IDS.length;
       case 'settings':
-        return 2;
+        return SETTINGS_ROW_COUNT;
       case 'confirm-quit':
         return 2; // 确认 / 取消
     }
@@ -192,22 +202,42 @@ export class PauseMenuPanel {
     if (this.page !== 'settings') {
       return;
     }
-    if (this.selection === 0) {
-      this.settings.volume = Phaser.Math.Clamp(this.settings.volume + delta, 0, 10);
-    } else {
-      const count = TEXT_SCALE_LABELS.length;
-      this.settings.textScaleIndex = (this.settings.textScaleIndex + delta + count) % count;
+    // Shared with the main-menu settings page, so both always expose and
+    // apply the identical rows and adjustment rules.
+    const next = adjustGameSetting(this.settings, this.selection, delta);
+    if (next === this.settings) {
+      return; // Clamped no-op (volume at an end of its bar).
     }
+    this.settings = next;
     applyGameSettings(this.scene.game, this.settings);
     if (this.options.storage !== null) {
       saveGameSettings(this.options.storage, this.settings);
     }
+    this.options.onSettingsChanged?.({ ...this.settings });
     this.render();
   }
 
   /** The settings as last adjusted (the scene persists them for its own state). */
-  currentSettings(): { volume: number; textScaleIndex: number } {
+  currentSettings(): GameSettings {
     return { ...this.settings };
+  }
+
+  /**
+   * Round 41 gamepad routing: the grid scene polls the pad while this panel
+   * owns the screen and hands the press edges over. D-pad/stick up/down
+   * moves the row, left/right adjusts the focused setting, A confirms and
+   * B goes one page back — exactly the keyboard contract.
+   */
+  handleGamepadEdges(edges: StandardPadAction): void {
+    if (!this.openState) {
+      return;
+    }
+    if (edges.direction === 'up') this.moveSelection(-1);
+    else if (edges.direction === 'down') this.moveSelection(1);
+    else if (edges.direction === 'left') this.adjustSetting(-1);
+    else if (edges.direction === 'right') this.adjustSetting(1);
+    if (edges.confirm) this.confirm();
+    if (edges.back) this.back();
   }
 
   private confirm(): void {
@@ -451,23 +481,21 @@ export class PauseMenuPanel {
 
   private renderSettingsEntries(top: number): void {
     const width = this.scene.scale.width;
-    const rows = [
-      `音量　${volumeLabel(this.settings.volume)}（${this.settings.volume}/10）`,
-      `文字大小　${TEXT_SCALE_LABELS[this.settings.textScaleIndex] ?? '标准'}（全界面即时生效）`,
-    ];
-    rows.forEach((row, index) => {
+    // Six rows since Round 41 (volume / text / movement layout / gamepad /
+    // contrast / reduced motion); spacing keeps the largest text scale fit.
+    settingsRows(this.settings).forEach((row, index) => {
       const active = index === this.selection;
       if (active) {
         addPixelSelection(this.scene, this.container, {
-          x: (width - 400) / 2,
-          y: top + 105 + index * 48,
-          width: 400,
+          x: (width - 540) / 2,
+          y: top + 77 + index * 42,
+          width: 540,
           height: 38,
         });
       }
       this.container.add(
         this.scene.add
-          .text(width / 2, top + 120 + index * 48, `${active ? CURSOR_ACTIVE : CURSOR_IDLE}${row}`, {
+          .text(width / 2, top + 92 + index * 42, `${active ? CURSOR_ACTIVE : CURSOR_IDLE}${row}`, {
             fontFamily: UI.fontFamily,
             fontSize: uiFontSize(15),
             color: active ? UI.textActive : UI.textIdle,
@@ -478,7 +506,7 @@ export class PauseMenuPanel {
     if (this.options.storage === null) {
       this.container.add(
         this.scene.add
-          .text(width / 2, top + 240, '浏览器本地存储不可用：设置仅本次会话有效', {
+          .text(width / 2, top + 330, '浏览器本地存储不可用：设置仅本次会话有效', {
             fontFamily: UI.fontFamily,
             fontSize: uiFontSize(11),
             color: UI.textWarn,

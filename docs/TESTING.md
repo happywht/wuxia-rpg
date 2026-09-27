@@ -28,7 +28,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 
 - 测试框架：Vitest 5.0.2。官方指南要求 Vite >=6.4.0、Node >=22.12.0；本仓库使用 Vite 8.3.1 与 Node 22.18.0，符合要求（详见 [`docs/REFERENCES.md`](REFERENCES.md) #12；基准 API 见同文件 #16）。
 - 运行环境：Node（无 DOM、无浏览器、无网络、无真实时钟依赖）。
-- 覆盖统计：5 个测试文件、63 个用例（R38 建立四组 53 个，R40 新增渲染器结构回归 10 个；详见 `CHANGELOG.md` 对应条目）。
+- 覆盖统计：7 个测试文件、105 个用例（R38 建立四组 53 个，R40 新增渲染器结构回归 10 个，R41 新增设置与输入 42 个；详见 `CHANGELOG.md` 对应条目）。
 
 ## 配置：为什么有独立的 `vitest.config.ts`
 
@@ -57,6 +57,8 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 | `tests/quest-system.test.ts` | `src/engine/quest-system.ts` | `parseQuestSet` 防御解析；`assembleQuests` 跨资源装配（坏发布人剔除、前置循环禁用、互斥组整组校验）；`createQuestJournal` 初始 offered/locked；接受/推进/完成/失败全生命周期（npc-talk 推进、item-count 绝对数量同步并钳制、接取时背包快照即时完成、encounter-defeat 失败、abandon 终态、互斥分支连带失败、奖励结算、前置完成后解锁） |
 | `tests/data-validation.test.ts` | `scripts/lib/data-validation.mjs`、`scripts/validate-data.mjs` | **真实仓库**正向校验（manifest + 全部基础资源计数一致）；临时 fixture 反向校验（资源违反 Schema、manifest 违反 Schema、资源文件缺失、无效 Schema、JSON `null`）；另以临时 CLI 副本启动真实 Node 子进程，锁定可读错误输出与非零退出码 |
 | `tests/grid-map-renderer.test.ts` | `src/engine/grid-map-renderer.ts` | R40 渲染器结构回归：场景对象数随面积增长恒为 2（O(1) 契约）；逐格命令顺序（底色→边线→亮边→暗边）与几何/颜色/alpha 精确锁定；绘制范围与地图像素尺寸一致；Graphics 挂在返回容器内（地图切换 `destroy()` 级联语义）；样式去重；`cellCenterOffset` 普通坐标返回 |
+| `tests/settings.test.ts` | `src/game/settings.ts` | R41 设置回归：Round 09 旧载荷 `{volume,textScaleIndex}` 迁移（新字段补默认、旧存储字节不动）；完整六字段往返；新字段"存在但无效"整载荷拒绝且不动存储；音量/字号越界与 JSON 损坏回退默认；写入拒绝（会话内仍生效）；`applyGameSettings` 声音总线音量与画布高对比度滤镜（mock game 结构替身，无浏览器依赖）；五档字号单调与 `uiFontSize`；`settingsRows`/`adjustGameSetting` 共享行数、循环与钳制语义 |
+| `tests/input-settings.test.ts` | `src/game/input-settings.ts` | R41 输入回归：三档移动键位解析与键集（arrows 恰 4 键 / wasd 恰 4 键 / both 8 键）、逐键启用判定与帮助文本；摇杆死区（默认 0.5 与自定义）、主导轴、对角水平优先、非有限值；D-pad 基数优先于摇杆与对向键消解；标准映射采样（D-pad/左摇杆/A→confirm、B→back）；`GamepadEdgeTracker` 按住只发一次、换向即新边沿、释放重触发、confirm/back 边沿与 `reset()` |
 
 测试只调用**公共导出函数**并断言行为，不做源码文本匹配；引擎模块均为 Phaser-free 设计，无需启动任何场景。
 
@@ -93,6 +95,7 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 
 ## 变更记录
 
+- 2026-09-28（Round 41）：新增 `tests/settings.test.ts`（21 用例：v1 旧载荷迁移、验证/持久化、声音总线与画布外观应用、五档字号、共享设置行/调整语义）与 `tests/input-settings.test.ts`（21 用例：键位布局、摇杆死区/主导轴、D-pad 基数优先、标准映射采样、边沿检测）；覆盖统计更新为 7 文件 105 用例。手柄路由的浏览器内行为另经生产构建 + Playwright 烟测（设置导航/画布滤镜/布局门控），物理控制器硬件未测试——见 `DEVLOG.md` Round 41。
 - 2026-09-28（Round 40）：新增性能/内存基准通道 `npm run benchmark:round-40`（`benchmark.include` 独立匹配 `*.bench.ts`，与 `npm test` 双向隔离）；新增 `tests/grid-map-renderer.test.ts` 10 用例锁定 R40 单 Graphics 渲染器结构契约；覆盖统计更新为 5 文件 63 用例。
 - 2026-09-28（Round 39）：新增统一质量门槛 `npm run check`（资料校验 → MOD 检查 → 类型 → 测试 → 文档审计，`&&` 串联失败即中止）；`npm run build` 改为先过 `check` 再 Vite 生产构建；新增 GitHub Actions `quality-gates.yml`（Node 22、`npm ci`、只读权限、15 分钟超时、build + R35–37 烟测）。
 - 2026-09-28（Round 38）：建立 Vitest 5 测试基线；抽取共享数据校验器 `scripts/lib/data-validation.mjs`（CLI 变薄）；新增四组 53 个单元测试；`tsconfig.json` 纳入 `tests/` 与 `vitest.config.ts` 严格检查。

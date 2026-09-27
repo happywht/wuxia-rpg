@@ -148,7 +148,23 @@ import { AlchemyPanel } from './alchemy-ui';
 import { EndingPanel } from './ending-ui';
 import { AchievementPanel } from './achievement-ui';
 import { MeridianPanel } from './meridian-ui';
-import { type GameSettings, applyGameSettings, loadGameSettings, uiFontSize } from './settings';
+import {
+  DEFAULT_GAME_SETTINGS,
+  type GameSettings,
+  applyGameSettings,
+  currentGamepadEnabled,
+  currentMovementHelpText,
+  currentMovementLayout,
+  currentReducedMotion,
+  loadGameSettings,
+  uiFontSize,
+} from './settings';
+import {
+  GamepadEdgeTracker,
+  type MovementKeyName,
+  isMovementKeyEnabled,
+  sampleStandardPad,
+} from './input-settings';
 import { ModStatusPanel } from './mod-status-ui';
 import { createPixelPerson, UI_FONT_FAMILY } from './ui-theme';
 import { type GridStartupData } from './menu-scene';
@@ -371,7 +387,12 @@ export class GridScene extends Phaser.Scene {
 
   /** Round 09 storage/settings plumbing (storage null = browser disallows it). */
   private storage: SaveStorage | null = null;
-  private settings: GameSettings = { volume: 8, textScaleIndex: 1 };
+  private settings: GameSettings = { ...DEFAULT_GAME_SETTINGS };
+  /**
+   * Round 41 gamepad state: turns held pads/sticks into press edges so a
+   * held direction moves one cell per deflection, never per frame.
+   */
+  private readonly gamepadEdges = new GamepadEdgeTracker();
   /**
    * Timestamp of the most recent overlay close. Escape closes whichever
    * overlay owns it AND fires this scene's Escape key in the same DOM
@@ -390,6 +411,8 @@ export class GridScene extends Phaser.Scene {
   private regionNotice: string | null = null;
   private regionNoticeTimer: Phaser.Time.TimerEvent | null = null;
   private mapNameText: Phaser.GameObjects.Text | null = null;
+  /** First HUD line; its movement segment follows the live layout setting. */
+  private movementHintText: Phaser.GameObjects.Text | null = null;
   private readonly scaledTextTargets: { text: Phaser.GameObjects.Text; base: number }[] = [];
 
   /**
@@ -721,6 +744,10 @@ export class GridScene extends Phaser.Scene {
       storage: this.storage,
       save: (slotId) => this.saveToSlot(slotId),
       returnToMenu: () => this.returnToMenu(),
+      onSettingsChanged: (settings) => {
+        this.settings = { ...settings };
+        this.syncSettingsPresentation();
+      },
       onClose: () => {
         this.settings = this.pauseMenu?.currentSettings() ?? this.settings;
         this.noteOverlayClosed();
@@ -1114,9 +1141,91 @@ export class GridScene extends Phaser.Scene {
    */
   private noteOverlayClosed(): void {
     this.lastOverlayCloseAt = this.time.now;
-    this.refreshScaledTextTargets();
+    this.syncSettingsPresentation();
+    this.gamepadEdges.reset(); // A confirm press that closed a panel must not leak through.
     this.updateInteractHint();
     void this.runPendingDataReload(); // Safe boundary for a latched data change.
+  }
+
+  /** Applies live settings to already-rendered exploration presentation. */
+  private syncSettingsPresentation(): void {
+    // The pause/settings pages may have just changed the movement layout,
+    // text scale, or reduced-motion preference — reflect them immediately.
+    this.movementHintText?.setText(
+      `${currentMovementHelpText()} · E 交互 · P 伙伴 · F2 MOD · H 帮助`,
+    );
+    this.refreshScaledTextTargets();
+    this.syncReducedMotionPresentation();
+  }
+
+  /**
+   * Round 41 reduced motion: live sync after the setting may have changed.
+   * Precipitation particles are the only always-animated presentation, so a
+   * freshly enabled preference tears the emitter down; fades and moves read
+   * the flag at their next occurrence through {@link currentReducedMotion}.
+   */
+  private syncReducedMotionPresentation(): void {
+    const reading = this.currentClimate();
+    if (currentReducedMotion()) {
+      const daylight = this.daylightLayer;
+      const clock = this.clock;
+      if (daylight !== null && clock !== null) {
+        const period = clock.currentPeriod();
+        const alpha = Math.max(0, Math.min(1, 1 - period.lightLevel)) * DAYLIGHT_MAX_ALPHA;
+        this.tweens.killTweensOf(daylight);
+        daylight.setAlpha(alpha);
+      }
+      if (this.weatherTintLayer !== null && reading !== null) {
+        this.tweens.killTweensOf(this.weatherTintLayer);
+        this.weatherTintLayer.setFillStyle(reading.weather.tintColor, 1);
+        this.weatherTintLayer.setAlpha(reading.weather.tintAlpha);
+      }
+      this.weatherEmitter?.destroy();
+      this.weatherEmitter = null;
+    } else if (this.weatherEmitter === null && reading !== null) {
+      // Turning reduced motion off restores the current precipitation without
+      // waiting for the next in-game day/weather transition.
+      this.replaceWeatherEmitter(reading.weather);
+    }
+  }
+
+  /**
+   * Round 41 gamepad polling: samples the first connected standard pad once
+   * per frame and converts held state into press edges. Everything is gated
+   * on the persisted gamepad setting; without a device (or with the setting
+   * off) this is a cheap early return and keyboard play is untouched. While
+   * the pause menu owns the screen its actions route there instead of the
+   * world, mirroring the keyboard Escape ownership rules.
+   */
+  private pollGamepad(): void {
+    if (!currentGamepadEnabled() || this.dataReloading) {
+      return;
+    }
+    const pad = this.input.gamepad?.pad1;
+    if (pad === undefined || pad === null) {
+      this.gamepadEdges.reset();
+      return;
+    }
+    const edges = this.gamepadEdges.update(sampleStandardPad({
+      dpad: { up: pad.up, down: pad.down, left: pad.left, right: pad.right },
+      leftStick: { x: pad.leftStick.x, y: pad.leftStick.y },
+      A: pad.A,
+      B: pad.B,
+    }));
+    if (this.pauseMenu?.isOpen) {
+      this.pauseMenu.handleGamepadEdges(edges);
+      return;
+    }
+    if (edges.direction === 'up') this.tryMove(0, -1);
+    else if (edges.direction === 'down') this.tryMove(0, 1);
+    else if (edges.direction === 'left') this.tryMove(-1, 0);
+    else if (edges.direction === 'right') this.tryMove(1, 0);
+    if (edges.confirm) this.handleInteraction();
+    if (edges.back) this.togglePauseMenu();
+  }
+
+  update(): void {
+    this.pollGamepad();
   }
 
   /** Escape while exploring: toggle the pause menu (never over another overlay). */
@@ -1707,10 +1816,11 @@ export class GridScene extends Phaser.Scene {
       const center = cellCenterOffset(map, npc.col, npc.row);
       const x = this.mapOrigin.x + center.x;
       const y = this.mapOrigin.y + center.y;
-      if (animate) {
+      if (animate && !currentReducedMotion()) {
         this.tweens.add({ targets: visual.marker, x, y, duration: 420 });
         this.tweens.add({ targets: visual.label, x, y: y - map.tileSize * 0.42 - 4, duration: 420 });
       } else {
+        // Includes reduced motion: schedule changes reposition NPCs directly.
         visual.marker.setPosition(x, y);
         visual.label.setPosition(x, y - map.tileSize * 0.42 - 4);
       }
@@ -1779,9 +1889,10 @@ export class GridScene extends Phaser.Scene {
     modWarnings: readonly Diagnostic[],
   ): void {
     // HUD text lives above the daylight wash (depth 50) so every period's
-    // tint keeps the interface fully legible.
-    this.registerScaledText(this.add
-      .text(16, 12, '方向键 / WASD 移动 · E 交互 · P 伙伴 · F2 MOD · H 帮助', {
+    // tint keeps the interface fully legible. The leading movement segment
+    // follows the live layout setting (refreshed on overlay close).
+    this.movementHintText = this.registerScaledText(this.add
+      .text(16, 12, `${currentMovementHelpText()} · E 交互 · P 伙伴 · F2 MOD · H 帮助`, {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(13),
         color: UI.textMuted,
@@ -1986,7 +2097,7 @@ export class GridScene extends Phaser.Scene {
     this.lastDaylightPeriodId = period.id;
     const targetAlpha = Math.max(0, Math.min(1, 1 - period.lightLevel)) * DAYLIGHT_MAX_ALPHA;
     this.tweens.killTweensOf(layer);
-    if (animate) {
+    if (animate && !currentReducedMotion()) {
       this.tweens.add({ targets: layer, alpha: targetAlpha, duration: DAYLIGHT_FADE_MS });
     } else {
       layer.setAlpha(targetAlpha);
@@ -2039,7 +2150,7 @@ export class GridScene extends Phaser.Scene {
     }
     this.tweens.killTweensOf(layer);
     layer.setFillStyle(weather.tintColor, 1);
-    if (animate && weather.tintAlpha > 0) {
+    if (animate && weather.tintAlpha > 0 && !currentReducedMotion()) {
       layer.setAlpha(0);
       this.tweens.add({
         targets: layer,
@@ -2056,6 +2167,11 @@ export class GridScene extends Phaser.Scene {
   private replaceWeatherEmitter(weather: ClimateWeatherData): void {
     this.weatherEmitter?.destroy();
     this.weatherEmitter = null;
+    // Reduced motion keeps the weather tint but skips the endless particle
+    // drift — the strongest persistent animation the presentation has.
+    if (currentReducedMotion()) {
+      return;
+    }
     const precipitation = weather.precipitation;
     if (precipitation === null || precipitation.density <= 0) {
       return;
@@ -2657,23 +2773,40 @@ export class GridScene extends Phaser.Scene {
     }
 
     const KeyCodes = Phaser.Input.Keyboard.KeyCodes;
-    const bindings = [
-      { code: KeyCodes.UP, dCol: 0, dRow: -1 },
-      { code: KeyCodes.W, dCol: 0, dRow: -1 },
-      { code: KeyCodes.DOWN, dCol: 0, dRow: 1 },
-      { code: KeyCodes.S, dCol: 0, dRow: 1 },
-      { code: KeyCodes.LEFT, dCol: -1, dRow: 0 },
-      { code: KeyCodes.A, dCol: -1, dRow: 0 },
-      { code: KeyCodes.RIGHT, dCol: 1, dRow: 0 },
-      { code: KeyCodes.D, dCol: 1, dRow: 0 },
-    ] as const;
+    // Round 41: every movement key stays bound, but each handler checks the
+    // live layout setting first, so switching the layout in the pause menu
+    // takes effect on the very next keypress without rebinding.
+    const codeByName: Record<MovementKeyName, number> = {
+      UP: KeyCodes.UP,
+      DOWN: KeyCodes.DOWN,
+      LEFT: KeyCodes.LEFT,
+      RIGHT: KeyCodes.RIGHT,
+      W: KeyCodes.W,
+      A: KeyCodes.A,
+      S: KeyCodes.S,
+      D: KeyCodes.D,
+    };
+    const bindings: { key: MovementKeyName; dCol: number; dRow: number }[] = [
+      { key: 'UP', dCol: 0, dRow: -1 },
+      { key: 'DOWN', dCol: 0, dRow: 1 },
+      { key: 'LEFT', dCol: -1, dRow: 0 },
+      { key: 'RIGHT', dCol: 1, dRow: 0 },
+      { key: 'W', dCol: 0, dRow: -1 },
+      { key: 'S', dCol: 0, dRow: 1 },
+      { key: 'A', dCol: -1, dRow: 0 },
+      { key: 'D', dCol: 1, dRow: 0 },
+    ];
 
-    keyboard.addCapture(bindings.map(({ code }) => code));
-    const listeners = bindings.map(({ code, dCol, dRow }) => {
-      const key = keyboard.addKey(code);
-      const onDown = (): void => this.tryMove(dCol, dRow);
-      key.on('down', onDown);
-      return { key, onDown };
+    keyboard.addCapture(bindings.map(({ key }) => codeByName[key]));
+    const listeners = bindings.map(({ key, dCol, dRow }) => {
+      const keyCode = keyboard.addKey(codeByName[key]);
+      const onDown = (): void => {
+        if (isMovementKeyEnabled(currentMovementLayout(), key)) {
+          this.tryMove(dCol, dRow);
+        }
+      };
+      keyCode.on('down', onDown);
+      return { key: keyCode, onDown };
     });
 
     const interactKey = keyboard.addKey(KeyCodes.E);
@@ -3167,18 +3300,27 @@ export class GridScene extends Phaser.Scene {
     this.advanceTime(baseStepMinutes + weatherStepMinutes);
 
     const target = cellCenterOffset(map, targetCol, targetRow);
+    const finishMove = (): void => {
+      this.moving = false;
+      this.refreshCompanionFollower(previousCell);
+      this.triggerRegionEvents();
+      void this.runPendingDataReload(); // Safe boundary for a latched data change.
+    };
     this.moving = true;
+    if (currentReducedMotion()) {
+      // Round 41: reduced motion snaps the marker to the target cell and
+      // settles synchronously — game state advances on the same code path,
+      // just without the tween (companion follows and region events included).
+      marker.setPosition(this.mapOrigin.x + target.x, this.mapOrigin.y + target.y);
+      finishMove();
+      return;
+    }
     this.tweens.add({
       targets: marker,
       x: this.mapOrigin.x + target.x,
       y: this.mapOrigin.y + target.y,
       duration: MOVE_DURATION_MS,
-      onComplete: () => {
-        this.moving = false;
-        this.refreshCompanionFollower(previousCell);
-        this.triggerRegionEvents();
-        void this.runPendingDataReload(); // Safe boundary for a latched data change.
-      },
+      onComplete: finishMove,
     });
   }
 
