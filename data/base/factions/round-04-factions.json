@@ -20,6 +20,7 @@
         "allowed": true,
         "moralityDelta": 0,
         "renownDelta": -20,
+        "factionRenownDelta": -20,
         "forgetFactionMartialArts": true
       }
     },
@@ -42,6 +43,7 @@
         "allowed": true,
         "moralityDelta": -5,
         "renownDelta": -50,
+        "factionRenownDelta": -40,
         "forgetFactionMartialArts": true
       }
     },
@@ -64,6 +66,7 @@
         "allowed": true,
         "moralityDelta": -10,
         "renownDelta": 0,
+        "factionRenownDelta": -10,
         "forgetFactionMartialArts": false
       }
     }

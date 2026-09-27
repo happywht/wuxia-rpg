@@ -1,6 +1,6 @@
 # 架构说明（ARCHITECTURE）
 
-- 状态：Round 03–16 已实现地图、对话、成长、战斗、经济、任务、社会状态、存档、区域旅行、知识图谱/百科、像素 UI、师门规则、数据驱动历法、游戏时钟、季节、天气与 NPC 日程。
+- 状态：Round 03–18 已实现地图、对话、成长、战斗、经济、任务、分层社会声望、存档、区域旅行、知识图谱/百科、像素 UI、师门规则、昼夜气候、NPC 日程与条件奇遇。
 - 关联：`docs/ADR.md`（技术选型依据）、`docs/DATA-GUIDE.md`（数据面细节）
 
 ---
@@ -101,7 +101,7 @@ Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id
 - Round 05 的 `turn-based-combat.ts` 是与 Phaser 无关的战斗引擎：遭遇集合解析与跨资源装配（单条失败只禁用该遭遇）、固定协议的伤害/治疗公式、`CombatSession` 交替回合状态机（玩家行动 + 确定性敌方回应在一次调用内完成）、行动可用性校验（无效/内力不足不偷回合）、胜利经验经 Round 04 API 恰好一次结算、失败按数据比例恢复、撤退零奖励，全部输出为可读战报条目。Phaser 呈现只出现在 `src/game/combat-ui.ts`（资源条、行动列表、战报）与场景装配中：遭遇敌人占格阻挡、四方向邻接 E 开战、面板打开期间移动锁定；Round 09 后一次性遭遇完成状态随存档保留。
 - Round 06 的 `item-system.ts` 与 Phaser 无关，负责物品/商店解析、引用装配、背包、容量/堆叠、消耗、装备、角色属性同步与原子买卖；`CharacterState.baseAttributes` 保存成长值，`attributes` 为叠加装备后的有效值，升级只改基础值后重算装备效果。`inventory-ui.ts` / `shop-ui.ts` 与 GridScene 负责背包/商店呈现、NPC 交互和移动锁。Round 09 存档保存库存、装备、货币和剩余商店库存。
 - Round 07 的 `quest-system.ts` 与 Phaser 无关，负责任务集合防御解析、重复 id 与 NPC/物品/遭遇/前置引用校验、前置循环隔离、状态机、目标进度、失败/放弃、单一跟踪目标和完成奖励结果。`collectItem` 目标在接取时以当前物品数量初始化，之后按背包变化的绝对数量同步；`defeatEncounter` 仅响应胜利信号，配置的失败遭遇在战斗失败时终止任务。完成状态保证奖励只生成一次；奖励由 GridScene 通过成长引擎和库存货币更新。`quest-ui.ts` 与 GridScene 负责 E 键发布人名录、Q 键任务日志和移动锁。Round 09 存档保存任务阶段、目标进度及跟踪状态。
-- Round 08 的 `social-state.ts` 与 `dialogue-runtime.ts` 同样与 Phaser 无关：前者持有运行时善恶（±100）、声望（0–1000）与逐 NPC 关系（±100）标量并提供边界钳制；后者提供对话选项的条件求值（任务状态/物品数量/善恶/声望/NPC 关系，全满足才可见）、装配期引用校验（坏引用只剔除相应选项）与效果事务执行（接取/放弃任务、给予/扣除物品、修善良恶/声望/关系——先全量验证可行性，再统一提交，任一被拒即零变更且不转移节点）。物品增减经 `item-system.ts` 公开的提交原语并按 `item-count` 信号同步活动任务收集目标（进度可随交付回退）；对话接取走 `quest-system.ts` 既有原子路径。`dialogue-ui.ts` 支持场景注入的条件过滤与效果执行钩子，无控制器的旧对话按纯跳转播放；GridScene 新增 F 键直接交谈，任务发布人保留 E 名录双入口。社会状态与关系现由 Round 09 存档持久化；门派级声望统一规则留到 Round 18。
+- Round 08 的 `social-state.ts` 与 `dialogue-runtime.ts` 同样与 Phaser 无关：前者原先持有善恶、江湖声望与逐 NPC 关系；Round 18 扩展为统一管理善恶（±100）、江湖声望/逐派声望（各 0–1000）及逐 NPC 关系（±100），统一 signed delta 与各自边界钳制。`dialogue-runtime.ts` 条件现在也能检查指定门派声望；效果先全量验证后在 staged copy 中统一提交，接取/放弃任务、物品、社会数值、拜师/退门和授艺仍保持单笔原子性。物品增减经 `item-system.ts` 公开的提交原语并按 `item-count` 信号同步活动收集目标。社会状态由 Round 09 v1 存档持久化，Round 18 新增可缺省的 `social.factionRenown` id/value 列表。
 - Round 09 的 `save-system.ts` 与 Phaser 无关，定义版本 1 纯数据快照、三槽存储适配、字段与值域校验、跨当前世界引用预检、坏次要引用的逐项丢弃/警告，以及运行状态捕获和恢复。恢复计划完成后才写入运行状态；装备通过既有装备路径重算属性与资源上限。`menu-scene.ts` 与 `pause-menu.ts` 提供主菜单、新游戏模板/显示名、继续/删除、游戏内保存和设置界面；`settings.ts` 持久化主音量与文字大小。保存内容和已知兼容边界见 `docs/SAVES.md`。
 - Round 10 的 `world-map.ts` 是 Phaser 无关的区域/关口/事件协议解析器与语义装配器；`world-loader.ts` 按已验证的 `grid-map` 资源装配地图，逐图放置 NPC/遭遇，再校验世界图端点占位。`grid-scene.ts` 持有当前区域与跨区切换生命周期，E 交互按 NPC、战斗、关口顺序仲裁；`world-map-ui.ts` 仅负责 M 键舆图呈现并锁定其他输入。区域事件由资料触发，一次性 id 并入 v1 存档完成集。恢复预检根据快照地图 id 检查相应地图和占位；旧 v1 快照缺少新字段时归一为空集。
 - Round 11 的 `knowledge-graph.ts` 负责 Phaser 无关的节点/关系防御解析、唯一 id 索引、悬空端点隔离、公开词条起始状态和已知端点边过滤；`world-loader.ts` 发现知识资源、参与同名 MOD/schema 流程并把有效节点 id 交给对话引用装配。`dialogue-runtime.ts` 以 `knowledgeKnown` 过滤选项、以 `discoverKnowledgeNode` 在效果事务中解锁；知识状态进入 v1 快照。`encyclopedia-ui.ts` 的 K 键面板按类型筛选并只呈现已知词条和双方已知的关系，GridScene 负责与其他面板互斥及探索输入锁。
@@ -127,6 +127,10 @@ Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id
 
 `world-map.ts` 扩展为纯 TypeScript 区域事件协议：防御解析 `conditions` 的知识节点/时段/天气条件组，组间 AND、组内 OR；`selectTriggeredRegionEvents` 根据位置、已知线索、当前历法时段和气候返回满足的事件，不修改任何运行状态。世界加载器把有效图谱节点、历法时段和天气 id 交给 `assembleWorldMap`，坏引用只隔离对应事件。GridScene 在移动完成、跨区到达和原地等候后检查当前格；等待摘要和命中的事件文案合并，一次性状态仅在成功触发后进入既有完成集，发现节点并入既有百科状态和 v1 存档。内容只读取事件文本与图谱标题，不在协议中写入具体人物/地点常量。
 
+### Round 18：统一社会声望规则
+
+`social-state.ts` 以 `SocialChange` 统一善恶、江湖个人声望、逐派声望和逐 NPC 关系的 signed delta 与范围钳制；`factionRenown` 以 faction id 为键，未出现的门派中立为 0。`dialogue-graph.ts` / `dialogue-runtime.ts` 新增 `factionRenown` 区间条件与 `adjustFactionRenown` 效果，跨资源装配检查 faction id，效果仍在 staged copy 中原子提交。门派 admission 可配置 `minimumFactionRenown`，departure 的 `factionRenownDelta` 只影响该派。`save-system.ts` 把门派声望写入 v1 `social.factionRenown` 列表，缺失字段视为空列表、移除门派逐项过滤；师门页并列显示全局善恶/声望与每派声望。
+
 ## 变更记录
 
 | 日期 | 轮次 | 变更 |
@@ -146,3 +150,5 @@ Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id
 | 2026-09-27 | Round 13 | Phaser-free 师门规则、原子对话效果、导师引用检查及师承存档兼容 |
 | 2026-09-27 | Round 14 | 必需历法资源与语义校验、纯规则游戏时钟、timeOfDay 对话条件、昼夜调色与时间 HUD、分钟计数存档兼容 |
 | 2026-09-27 | Round 16 | NPC 历法时段日程编译、冲突回退、地图/存档派生和交互占位同步 |
+| 2026-09-27 | Round 17 | 条件区域奇遇、线索门槛/时间天气门槛、百科发现及等待时重查 |
+| 2026-09-27 | Round 18 | 统一社会数值范围、逐派声望对白/师门/退门接线与旧 v1 存档兼容 |

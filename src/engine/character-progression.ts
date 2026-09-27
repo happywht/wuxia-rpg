@@ -128,6 +128,7 @@ export interface FactionAdmissionData {
   minimumMorality?: number;
   maximumMorality?: number;
   minimumRenown?: number;
+  minimumFactionRenown?: number;
   minimumTeacherRelationship?: number;
   requiredQuestIds: string[];
 }
@@ -136,6 +137,7 @@ export interface FactionDepartureData {
   allowed: boolean;
   moralityDelta: number;
   renownDelta: number;
+  factionRenownDelta: number;
   forgetFactionMartialArts: boolean;
 }
 
@@ -558,6 +560,9 @@ function parseFactionAdmission(raw: unknown): FactionAdmissionData | null {
   const minimumRenown = source.minimumRenown === undefined
     ? undefined
     : requireIntegerInRange(source.minimumRenown, 0, 1000);
+  const minimumFactionRenown = source.minimumFactionRenown === undefined
+    ? undefined
+    : requireIntegerInRange(source.minimumFactionRenown, 0, 1000);
   const minimumTeacherRelationship = source.minimumTeacherRelationship === undefined
     ? undefined
     : requireIntegerInRange(source.minimumTeacherRelationship, -100, 100);
@@ -576,6 +581,7 @@ function parseFactionAdmission(raw: unknown): FactionAdmissionData | null {
     minimumMorality === null ||
     maximumMorality === null ||
     minimumRenown === null ||
+    minimumFactionRenown === null ||
     minimumTeacherRelationship === null
   ) return null;
   if (
@@ -589,6 +595,7 @@ function parseFactionAdmission(raw: unknown): FactionAdmissionData | null {
     ...(minimumMorality !== undefined ? { minimumMorality } : {}),
     ...(maximumMorality !== undefined ? { maximumMorality } : {}),
     ...(minimumRenown !== undefined ? { minimumRenown } : {}),
+    ...(minimumFactionRenown !== undefined ? { minimumFactionRenown } : {}),
     ...(minimumTeacherRelationship !== undefined ? { minimumTeacherRelationship } : {}),
     requiredQuestIds,
   };
@@ -596,7 +603,7 @@ function parseFactionAdmission(raw: unknown): FactionAdmissionData | null {
 
 function parseFactionDeparture(raw: unknown): FactionDepartureData | null {
   if (raw === undefined) {
-    return { allowed: true, moralityDelta: 0, renownDelta: 0, forgetFactionMartialArts: false };
+    return { allowed: true, moralityDelta: 0, renownDelta: 0, factionRenownDelta: 0, forgetFactionMartialArts: false };
   }
   const source = isPlainObject(raw) ? raw : null;
   if (source === null) return null;
@@ -607,6 +614,9 @@ function parseFactionDeparture(raw: unknown): FactionDepartureData | null {
   const renownDelta = source.renownDelta === undefined
     ? 0
     : requireIntegerInRange(source.renownDelta, -1000, 1000);
+  const factionRenownDelta = source.factionRenownDelta === undefined
+    ? 0
+    : requireIntegerInRange(source.factionRenownDelta, -1000, 1000);
   const forgetFactionMartialArts = source.forgetFactionMartialArts === undefined
     ? false
     : source.forgetFactionMartialArts;
@@ -614,9 +624,10 @@ function parseFactionDeparture(raw: unknown): FactionDepartureData | null {
     typeof allowed !== 'boolean' ||
     moralityDelta === null ||
     renownDelta === null ||
+    factionRenownDelta === null ||
     typeof forgetFactionMartialArts !== 'boolean'
   ) return null;
-  return { allowed, moralityDelta, renownDelta, forgetFactionMartialArts };
+  return { allowed, moralityDelta, renownDelta, factionRenownDelta, forgetFactionMartialArts };
 }
 
 /**

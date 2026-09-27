@@ -4,6 +4,25 @@
 
 ---
 
+## Round 18 — 社会声望与门派态度（2026-09-27）
+
+### 计划与实现
+
+- 开工前新增 `iterations/round-18/plan.md`，预计人类工程师工时 20–28 小时，拆为社会状态/门派规则、对白协议与原子事务、存档/UI、资料与验证四项子任务。
+- 新增 `SocialChange` 中心化善恶、江湖个人声望、逐派声望和逐 NPC 关系变化；每个作用域独立钳制，派别声望未初始化时视为 0。
+- 扩展门派资料解析和 Schema：拜师可声明本门声望下限，退门可声明本门声望增减；缺省退门值归一为 0。J 师门页展示全局值、逐派值和相关要求。
+- 对话 Schema/解析/引用校验/运行时支持门派声望条件与调整效果；效果沿用 staged copy 全量验证后提交。示例拜师奖励 +10 本门声望，听雨剑阁新增门槛分支。
+- v1 存档新增 `social.factionRenown`；读取缺字段旧档归一为空列表，恢复时过滤已删除门派并给出 warning。
+
+### 验证
+
+- `npm run build`：通过，`tsc --noEmit` 无错误，Vite 转换 108 个模块并完成生产构建；主 JS 包 1,724.10 kB，超过 500 kB 建议线但构建成功。
+- Ajv 临时 harness：manifest + 16 个登记基础资源共 17 项全部通过；新增门派字段组合也通过 `faction-set` Schema。
+- Phaser-free Node 22 临时 harness（`node --no-warnings --experimental-strip-types --experimental-loader ./.tmp-ts-loader.mjs .tmp-round18-smoke.mjs`）：41/41 通过，覆盖四类社会边界、派别旧资料默认值、新字段解析/Schema、拜师后本门声望与分支解锁、最低本门声望门槛、退门代价、失败后续效果回滚、坏门派引用逐选项隔离、逐派声望捕获/读档/越界与重复 id 拒绝/移除门派过滤及旧 v1 缺字段兼容。临时 harness 与 loader 在提交前移除。
+- `git diff --check`：通过；Git 仅提示工作区 LF 将在下次写回时转换成 CRLF。
+
+---
+
 ## Round 17 — 条件奇遇与传闻记录（2026-09-27）
 
 ### 计划与实现

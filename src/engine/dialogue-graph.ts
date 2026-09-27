@@ -23,6 +23,7 @@
 import {
   MORALITY_RANGE,
   RELATIONSHIP_RANGE,
+  FACTION_RENOWN_RANGE,
   RENOWN_RANGE,
 } from './social-state';
 
@@ -32,6 +33,7 @@ import {
  */
 const MORALITY_BOUND = MORALITY_RANGE;
 const RENOWN_BOUND = RENOWN_RANGE;
+const FACTION_RENOWN_BOUND = FACTION_RENOWN_RANGE;
 const RELATIONSHIP_BOUND = RELATIONSHIP_RANGE;
 
 // ---------------------------------------------------------------------------
@@ -53,6 +55,7 @@ export type DialogueConditionData =
   | { kind: 'itemCount'; itemId: string; minCount: number }
   | { kind: 'morality'; minValue?: number; maxValue?: number }
   | { kind: 'renown'; minValue?: number; maxValue?: number }
+  | { kind: 'factionRenown'; factionId: string; minValue?: number; maxValue?: number }
   | { kind: 'npcRelationship'; npcId: string; minValue?: number; maxValue?: number }
   | { kind: 'knowledgeKnown'; nodeId: string }
   | { kind: 'factionMembership'; factionId?: string; isMember: boolean }
@@ -72,6 +75,7 @@ export type DialogueEffectData =
   | { kind: 'takeItem'; itemId: string; quantity: number }
   | { kind: 'adjustMorality'; delta: number }
   | { kind: 'adjustRenown'; delta: number }
+  | { kind: 'adjustFactionRenown'; factionId: string; delta: number }
   | { kind: 'adjustRelationship'; npcId?: string; delta: number }
   | { kind: 'discoverKnowledgeNode'; nodeId: string }
   | { kind: 'joinFaction'; factionId: string }
@@ -222,6 +226,18 @@ function parseCondition(raw: unknown): DialogueConditionData | null {
       const [minValue, maxValue] = bounds;
       return { kind: 'renown', ...(minValue !== undefined ? { minValue } : {}), ...(maxValue !== undefined ? { maxValue } : {}) };
     }
+    case 'factionRenown': {
+      if (!hasOnlyKeys(source, ['kind', 'factionId', 'minValue', 'maxValue'])) return null;
+      const factionId = requireNonEmptyString(source.factionId);
+      const bounds = requireRangeBounds(source, FACTION_RENOWN_BOUND.min, FACTION_RENOWN_BOUND.max);
+      if (factionId === null || bounds === null) return null;
+      const [minValue, maxValue] = bounds;
+      return {
+        kind: 'factionRenown', factionId,
+        ...(minValue !== undefined ? { minValue } : {}),
+        ...(maxValue !== undefined ? { maxValue } : {}),
+      };
+    }
     case 'npcRelationship': {
       if (!hasOnlyKeys(source, ['kind', 'npcId', 'minValue', 'maxValue'])) return null;
       const npcId = requireNonEmptyString(source.npcId);
@@ -299,6 +315,14 @@ function parseEffect(raw: unknown): DialogueEffectData | null {
       // resulting value back into RENOWN_BOUND.
       const delta = requireIntegerInRange(source.delta, -RENOWN_BOUND.max, RENOWN_BOUND.max);
       return delta !== null && delta !== 0 ? { kind: 'adjustRenown', delta } : null;
+    }
+    case 'adjustFactionRenown': {
+      if (!hasOnlyKeys(source, ['kind', 'factionId', 'delta'])) return null;
+      const factionId = requireNonEmptyString(source.factionId);
+      const delta = requireIntegerInRange(source.delta, -FACTION_RENOWN_BOUND.max, FACTION_RENOWN_BOUND.max);
+      return factionId !== null && delta !== null && delta !== 0
+        ? { kind: 'adjustFactionRenown', factionId, delta }
+        : null;
     }
     case 'adjustRelationship': {
       if (!hasOnlyKeys(source, ['kind', 'npcId', 'delta'])) return null;

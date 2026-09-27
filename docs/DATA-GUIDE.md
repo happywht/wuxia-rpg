@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：Round 03–11 已落地地图、NPC/对话、成长/战斗、物品/任务、存档、区域旅行、知识图谱与百科；详情分别见 `docs/SAVES.md` 与 `docs/KNOWLEDGE-GRAPH.md`。
+- 状态：Round 03–18 已落地地图、NPC/对话、成长/战斗、物品/任务、存档、区域旅行、知识图谱、昼夜气候、日程、条件奇遇与多层社会声望；详情分别见 `docs/SAVES.md` 与 `docs/KNOWLEDGE-GRAPH.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -33,11 +33,13 @@ mods/                        # mod 覆盖层：mods/<modId>/ 镜像 data/base/ �
 
 Round 07 状态：manifest 另登记可选资源 `quest.round-07-set` → `quests/round-07-quests.json`（`quest-set`）。基础资料提供两项原创差事，NPC 可声明可选 `questGiver`（缺省为 false）；Q 打开任务日志，邻接任务发布人按 E 打开只列出其任务的名录。Round 09 起玩家任务、背包、战斗遭遇等运行状态由版本化存档持久化，不写回世界 JSON。此前角色模板、NPC 商店字段与物品数据仍按 Round 06 契约使用。Vite 把整个 `data/` 目录作为静态资源目录，开发期可从站点根路径读取，生产构建时复制到 `dist/`。`mods/example/` 提供未启用的同路径覆盖示例。启用 MOD 只需把其单段 id 按优先顺序加入 manifest 的 `enabledMods` 数组。
 
-Round 08 状态：dialogue-set 选项新增可选 `conditions`（数组，全部满足才可见）与 `effects`（数组，确认时先全量验证再统一提交）字段，二者均为封闭枚举协议（见 §4 对话条件与效果），旧的无条件对话完全兼容。示例对话扩展覆盖任务接取/放弃/交付、物品赠予/交付、善恶、声望与 NPC 关系分支。Round 09 起运行时社会状态（善恶 −100…100、声望 0…1000、逐 NPC 关系 −100…100）和任务/物品进度通过存档持久化；门派级声望统一规则留待 Round 18。任务发布人 NPC 保留 E 名录入口，另可用 F 直接交谈。
+Round 08 状态：dialogue-set 选项新增可选 `conditions`（数组，全部满足才可见）与 `effects`（数组，确认时先全量验证再统一提交）字段，二者均为封闭枚举协议（见 §4 对话条件与效果），旧的无条件对话完全兼容。示例对话扩展覆盖任务接取/放弃/交付、物品赠予/交付、善恶、声望与 NPC 关系分支。Round 09 起相关运行状态通过存档持久化；任务发布人 NPC 保留 E 名录入口，另可用 F 直接交谈。
 
 Round 10 状态：manifest 可登记多个 `grid-map` 资源；`world.atlas` 是必需的 `world-map` 资料，声明 `startingMapResourceId`、区域图册坐标、地图内关口端点和区域事件。每张地图文件中的 `id` 必须与 manifest 资源 id 一致；世界图解析器检查起始区域存在、区域不重复、端点/事件引用有效且坐标可走。跨资源装配再隔离与 NPC 或遭遇占格重叠的关口/事件。M 打开图册，E 键按 NPC、遭遇、关口的优先顺序处理交互；一次性事件 id 随存档保存。新增资料流程与示例见 `docs/MAP-ATLAS.md`。
 
 Round 17 状态：`world-map` 事件可省略或声明 `conditions`（知识节点、时段、天气三组可选；组间 AND，组内 OR）和 `discoverKnowledgeNodeId`。触发器只在位置匹配且全部条件满足后结算；一次性状态在成功时才记入现有 `completedRegionalEvents`，发现节点进入现有 `knownKnowledgeNodeIds`。等候、移动和跨区抵达都会检查当前格；等候摘要与事件提示合并。事件的图谱、历法、天气坏引用逐条隔离，并报告具体 id。基础奇遇样例在渡口以“雨后脚印”为线索，在降雨的黄昏/夜间发现芦苇河滩。协议细节见 `docs/MAP-ATLAS.md` 与 `docs/KNOWLEDGE-GRAPH.md`。
+
+Round 18 状态：善恶（−100…100）、江湖个人声望（0…1000）、逐派声望（各 0…1000）与逐 NPC 关系（−100…100）由 `social-state.ts` 统一提供有界变化规则。对白支持 `factionRenown` 区间条件和 `adjustFactionRenown` 原子效果；门派资料可声明拜师门槛 `minimumFactionRenown` 与退门代价 `factionRenownDelta`。每派数值在 J 师门页展示；本门声望复用 v1 `social.factionRenown` id/value 列表，旧存档缺失时中立归零，已移除门派的值恢复时逐项忽略。基础导师对白拜师后 +10 本门声望，听雨剑阁对白演示本门声望条件分支。
 
 Round 11 状态：manifest 登记可选 `knowledge-nodes` 与 `knowledge-edges` 资源，分别使用 `knowledge-nodes.schema.json` 与 `knowledge-edges.schema.json`；节点类别为 character/place/faction/item/martialArt/event/quest/ending，关系类型为 mentorOf/parentOf/hostileTo/belongsTo/locatedAt/holds/triggers/requires/rewards/knows/participatesIn/influences。节点含稳定 id、类型、标题、摘要和 `knownByDefault`；边含稳定 id、两端节点 id、关系类型和说明。解析器对坏单条给警告并隔离，装配时重复 id 保留首项，悬空端点关系逐条丢弃。
 
@@ -102,7 +104,11 @@ Round 14 状态：manifest 登记**必需**资源 `calendar.base` → `worldview
 
 ## Round 13：门派与师承资料
 
-在 faction-set 的 faction 条目声明 `mentorNpcIds`、`admission` 与 `departure`；导师必须引用可放置 NPC。`admission` 可设 `minimumLevel`、五项 `minimumAttributes`、善恶上下限、声望/师徒关系下限及 `requiredQuestIds`；缺失任务引用会令该门派不可入门并产生警告。`departure.allowed` 控制能否离门，`moralityDelta`/`renownDelta` 设置代价，`forgetFactionMartialArts` 决定退门时是否遗忘 `factionIds` 包含该派的武学。NPC 对话通过 `factionMembership` / `martialArtEligible` 条件及 `joinFaction` / `leaveFaction` / `learnMartialArt` 效果提供流程；J 打开师门档案。旧 faction 资料未写扩展字段时采用无门槛、可退门且保留武学的默认值。
+在 faction-set 的 faction 条目声明 `mentorNpcIds`、`admission` 与 `departure`；导师必须引用可放置 NPC。`admission` 可设 `minimumLevel`、五项 `minimumAttributes`、善恶上下限、江湖声望/师徒关系下限、Round 18 新增的本门声望下限 `minimumFactionRenown` 及 `requiredQuestIds`；缺失任务引用会令该门派不可入门并产生警告。`departure.allowed` 控制能否离门，`moralityDelta`/`renownDelta`/`factionRenownDelta` 分别设置善恶、江湖个人声望、本门声望代价，最后一项只改变该 faction id 的数值，省略时默认为 0；`forgetFactionMartialArts` 决定退门时是否遗忘 `factionIds` 包含该派的武学。NPC 对话通过 `factionMembership` / `factionRenown` / `martialArtEligible` 条件及 `joinFaction` / `leaveFaction` / `learnMartialArt` / `adjustFactionRenown` 效果提供流程；J 打开师门档案。旧 faction 资料未写声望门槛时不设该门槛，未写本门退门声望代价时默认为 0；此前已有的入门、退门和武学去留缺省规则保持不变。
+
+## Round 18：社会声望与门派态度
+
+社会状态是四个互相独立的作用域：善恶 `−100…100`、江湖个人声望 `0…1000`、每个门派的本门声望 `0…1000`、逐 NPC 关系 `−100…100`。引擎统一按“当前值 + signed delta”计算并钳制在对应范围；没有记录的门派声望按 0 读取。对白选项可用 `{ "kind": "factionRenown", "factionId": "…", "minValue": 0, "maxValue": 1000 }` 门控，或用 `{ "kind": "adjustFactionRenown", "factionId": "…", "delta": 10 }` 调整。新增字段受 `dialogue-set` 和 `faction-set` Schema 约束，并在跨资料装配时校验门派 id。拜师门槛 `minimumFactionRenown` 可省略；退门变化 `factionRenownDelta` 可为负、零或正数，旧资料缺省为 0。逐派声望存于 v1 `social.factionRenown` id/value 列表，旧 v1 档缺字段时从中立值开始，读档遇到已移除的门派仅丢弃那一条并给出 warning。对白效果延续先验证、再一次提交的事务约定。详见 `docs/DIALOGUE-GUIDE.md` 与 `docs/SAVES.md`。
 
 ## Round 14：历法资料
 

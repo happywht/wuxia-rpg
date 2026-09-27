@@ -409,7 +409,16 @@
                 { "kind": "factionMembership", "isMember": false }
               ],
               "effects": [
-                { "kind": "joinFaction", "factionId": "faction.tingyu-jiange" }
+                { "kind": "joinFaction", "factionId": "faction.tingyu-jiange" },
+                { "kind": "adjustFactionRenown", "factionId": "faction.tingyu-jiange", "delta": 10 }
+              ]
+            },
+            {
+              "text": "门中弟子似乎已认可我的行事。",
+              "nextNodeId": "respected",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.tingyu-jiange", "isMember": true },
+                { "kind": "factionRenown", "factionId": "faction.tingyu-jiange", "minValue": 10 }
               ]
             },
             {
@@ -436,6 +445,7 @@
         },
         { "id": "sword-talk", "text": "叶庭舟以枝代剑，点出你眼中尚急的锋芒：「先看清对面，再谈出剑。等你心与手不再相争，我再看你的根骨。」" },
         { "id": "accepted", "text": "叶庭舟替你正了衣襟：「入门不是求一块招牌。从今日起，先学听雨，再学听人。」" },
+        { "id": "respected", "text": "叶庭舟点头道：「肯把门中规矩放进心里，这份信任就不是白给的。」" },
         { "id": "taught", "text": "叶庭舟将剑谱交到你手中：「招式已授，往后要在每一场交手里读懂它。」" },
         { "id": "departed", "text": "叶庭舟收回目光：「缘分既尽，便各走各路。门中剑法也随今日一并还来。」" },
         { "id": "farewell", "text": "叶庭舟将纸页收进袖中：「沿路多看，答案不在一处。」" }
@@ -456,7 +466,8 @@
                 { "kind": "factionMembership", "isMember": false }
               ],
               "effects": [
-                { "kind": "joinFaction", "factionId": "faction.tiezhang-pai" }
+                { "kind": "joinFaction", "factionId": "faction.tiezhang-pai" },
+                { "kind": "adjustFactionRenown", "factionId": "faction.tiezhang-pai", "delta": 10 }
               ]
             },
             {
@@ -502,7 +513,8 @@
                 { "kind": "factionMembership", "isMember": false }
               ],
               "effects": [
-                { "kind": "joinFaction", "factionId": "faction.yunyin-shanzhuang" }
+                { "kind": "joinFaction", "factionId": "faction.yunyin-shanzhuang" },
+                { "kind": "adjustFactionRenown", "factionId": "faction.yunyin-shanzhuang", "delta": 10 }
               ]
             },
             {

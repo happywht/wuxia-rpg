@@ -137,6 +137,19 @@
           "anyOf": [{ "required": ["minValue"] }, { "required": ["maxValue"] }]
         },
         {
+          "description": "玩家在指定门派的声望位于闭区间 [minValue, maxValue]（0 至 1000）；至少声明其一。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "factionId"],
+          "properties": {
+            "kind": { "const": "factionRenown" },
+            "factionId": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "minValue": { "type": "integer", "minimum": 0, "maximum": 1000 },
+            "maxValue": { "type": "integer", "minimum": 0, "maximum": 1000 }
+          },
+          "anyOf": [{ "required": ["minValue"] }, { "required": ["maxValue"] }]
+        },
+        {
           "description": "与指定 NPC 的关系值位于闭区间 [minValue, maxValue]（-100 至 100）；至少声明其一。",
           "type": "object",
           "additionalProperties": false,
@@ -258,6 +271,22 @@
           "required": ["kind", "delta"],
           "properties": {
             "kind": { "const": "adjustRenown" },
+            "delta": {
+              "allOf": [
+                { "type": "integer", "minimum": -1000, "maximum": 1000 },
+                { "not": { "enum": [0] } }
+              ]
+            }
+          }
+        },
+        {
+          "description": "修改指定门派的独立声望（-1000 至 1000，非零；结果按边界钳制）。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "factionId", "delta"],
+          "properties": {
+            "kind": { "const": "adjustFactionRenown" },
+            "factionId": { "type": "string", "minLength": 1, "maxLength": 64 },
             "delta": {
               "allOf": [
                 { "type": "integer", "minimum": -1000, "maximum": 1000 },

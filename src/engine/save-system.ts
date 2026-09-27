@@ -65,7 +65,13 @@ import {
   type QuestStatus,
   createQuestJournal,
 } from './quest-system';
-import { type SocialState, MORALITY_RANGE, RENOWN_RANGE, RELATIONSHIP_RANGE } from './social-state';
+import {
+  type SocialState,
+  FACTION_RENOWN_RANGE,
+  MORALITY_RANGE,
+  RENOWN_RANGE,
+  RELATIONSHIP_RANGE,
+} from './social-state';
 import type { FactionMembership } from './faction-system';
 import {
   DEFAULT_WORLD_SEED,
@@ -158,6 +164,7 @@ export interface SaveSnapshotV1 {
   social: {
     morality: number;
     renown: number;
+    factionRenown: IdEntry<number>[];
     relationships: IdEntry<number>[];
   };
   /** One-shot encounter ids already beaten this run. */
@@ -524,6 +531,35 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
   if (renown === null) {
     errors.push(`social.renown：应为 ${RENOWN_RANGE.min}–${RENOWN_RANGE.max} 的整数`);
   }
+  const factionRenown: IdEntry<number>[] = [];
+  let factionRenownValid = true;
+  const factionRenownRaw = socialSource?.factionRenown;
+  if (socialSource === null || (factionRenownRaw !== undefined && !Array.isArray(factionRenownRaw))) {
+    factionRenownValid = false;
+    errors.push('social.factionRenown：应为门派 id/value 条目数组');
+  } else if (Array.isArray(factionRenownRaw)) {
+    const seenFactionRenown = new Set<string>();
+    for (const [index, entry] of factionRenownRaw.entries()) {
+      const label = `social.factionRenown[${index}]`;
+      const source = isPlainObject(entry) ? entry : null;
+      const factionId = source === null ? null : requireNonEmptyString(source.id);
+      const value = source === null
+        ? null
+        : requireIntegerInRange(source.value, FACTION_RENOWN_RANGE.min, FACTION_RENOWN_RANGE.max);
+      if (factionId === null || value === null) {
+        factionRenownValid = false;
+        errors.push(`${label}：应含 id（非空字符串）与 value（${FACTION_RENOWN_RANGE.min}–${FACTION_RENOWN_RANGE.max} 整数）`);
+        continue;
+      }
+      if (seenFactionRenown.has(factionId)) {
+        factionRenownValid = false;
+        errors.push(`${label}.id：门派 "${factionId}" 的声望重复出现`);
+        continue;
+      }
+      seenFactionRenown.add(factionId);
+      factionRenown.push({ id: factionId, value });
+    }
+  }
   const relationships: IdEntry<number>[] = [];
   const seenRelationships = new Set<string>();
   if (socialSource === null || !Array.isArray(socialSource.relationships)) {
@@ -597,6 +633,7 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     capacity === null ||
     morality === null ||
     renown === null ||
+    !factionRenownValid ||
     completedEncounters === null ||
     completedRegionalEvents === null ||
     knownKnowledgeNodeIds === null ||
@@ -625,7 +662,7 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     inventory: { currency, capacity, stacks, equipped },
     shopStocks,
     quests: { states: questStates, trackedQuestId },
-    social: { morality, renown, relationships },
+    social: { morality, renown, factionRenown, relationships },
     completedEncounters,
     completedRegionalEvents,
     knownKnowledgeNodeIds,
@@ -940,6 +977,7 @@ export function captureSaveSnapshot(input: CaptureInput): SaveSnapshotV1 {
     social: {
       morality: input.social.morality,
       renown: input.social.renown,
+      factionRenown: [...input.social.factionRenown.entries()].map(([id, value]) => ({ id, value })),
       relationships: [...input.social.relationships.entries()].map(([id, value]) => ({ id, value })),
     },
     completedEncounters: [...input.completedEncounters],
@@ -1205,6 +1243,11 @@ export function planSnapshotRestore(
     warnings.push(`与 "${entry.id}" 的关系值在当前资料中无对应人物，已忽略`);
     return false;
   });
+  const factionRenown = snapshot.social.factionRenown.filter((entry) => {
+    if (refs.factionIds === undefined || refs.factionIds.has(entry.id)) return true;
+    warnings.push(`门派声望所属门派 "${entry.id}" 在当前资料中不存在，已忽略`);
+    return false;
+  });
 
   const completedEncounters = snapshot.completedEncounters.filter((encounterId) => {
     if (refs.encounterIds.has(encounterId)) {
@@ -1246,7 +1289,7 @@ export function planSnapshotRestore(
       inventory: { ...snapshot.inventory, capacity: inventoryCapacity, stacks, equipped },
       shopStocks,
       quests: { states: questStates, trackedQuestId },
-      social: { ...snapshot.social, relationships },
+      social: { ...snapshot.social, factionRenown, relationships },
       completedEncounters,
       completedRegionalEvents,
       knownKnowledgeNodeIds,
@@ -1359,6 +1402,7 @@ export function restoreRunState(input: RestoreRunInput): RestoredRunState {
   const social: SocialState = {
     morality: snapshot.social.morality,
     renown: snapshot.social.renown,
+    factionRenown: new Map(snapshot.social.factionRenown.map((entry) => [entry.id, entry.value])),
     relationships: new Map(snapshot.social.relationships.map((entry) => [entry.id, entry.value])),
   };
 

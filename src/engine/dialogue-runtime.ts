@@ -54,8 +54,10 @@ import {
 import {
   type SocialState,
   adjustMorality,
+  adjustFactionRenown,
   adjustRelationship,
   adjustRenown,
+  getFactionRenown,
   getRelationship,
 } from './social-state';
 import type { KnowledgeNodeData } from './knowledge-graph';
@@ -148,6 +150,7 @@ function optionReferences(option: DialogueOptionData): {
     if (condition.kind === 'questStatus') questIds.push(condition.questId);
     else if (condition.kind === 'itemCount') itemIds.push(condition.itemId);
     else if (condition.kind === 'npcRelationship') npcIds.push(condition.npcId);
+    else if (condition.kind === 'factionRenown') factionIds.push(condition.factionId);
     else if (condition.kind === 'knowledgeKnown') knowledgeNodeIds.push(condition.nodeId);
     else if (condition.kind === 'factionMembership' && condition.factionId !== undefined) {
       factionIds.push(condition.factionId);
@@ -161,6 +164,7 @@ function optionReferences(option: DialogueOptionData): {
       npcIds.push(effect.npcId);
     } else if (effect.kind === 'discoverKnowledgeNode') knowledgeNodeIds.push(effect.nodeId);
     else if (effect.kind === 'joinFaction') factionIds.push(effect.factionId);
+    else if (effect.kind === 'adjustFactionRenown') factionIds.push(effect.factionId);
     else if (effect.kind === 'learnMartialArt') martialArtIds.push(effect.martialArtId);
   }
   return { questIds, itemIds, npcIds, knowledgeNodeIds, factionIds, martialArtIds, periodIds };
@@ -276,6 +280,12 @@ export function isConditionMet(
       return withinBounds(context.social.morality, condition.minValue, condition.maxValue);
     case 'renown':
       return withinBounds(context.social.renown, condition.minValue, condition.maxValue);
+    case 'factionRenown':
+      return withinBounds(
+        getFactionRenown(context.social, condition.factionId),
+        condition.minValue,
+        condition.maxValue,
+      );
     case 'npcRelationship':
       return withinBounds(
         getRelationship(context.social, condition.npcId),
@@ -399,6 +409,7 @@ function cloneRuntimeContext(context: DialogueRuntimeContext): DialogueRuntimeCo
     social: {
       morality: context.social.morality,
       renown: context.social.renown,
+      factionRenown: new Map(context.social.factionRenown),
       relationships: new Map(context.social.relationships),
     },
     character: context.character === null
@@ -438,6 +449,10 @@ function commitRuntimeContext(
 
   target.social.morality = staged.social.morality;
   target.social.renown = staged.social.renown;
+  target.social.factionRenown.clear();
+  for (const [factionId, renown] of staged.social.factionRenown) {
+    target.social.factionRenown.set(factionId, renown);
+  }
   target.social.relationships.clear();
   for (const [npcId, relationship] of staged.social.relationships) {
     target.social.relationships.set(npcId, relationship);
@@ -521,6 +536,10 @@ function validateEffect(
       return context.knowledgeNodes.has(effect.nodeId)
         ? null
         : `见闻节点 "${effect.nodeId}" 不存在或不可用`;
+    case 'adjustFactionRenown':
+      return context.factions.has(effect.factionId)
+        ? null
+        : `门派资料 "${effect.factionId}" 不存在或不可用`;
     case 'joinFaction': {
       const faction = context.factions.get(effect.factionId);
       if (faction === undefined) return `门派资料 "${effect.factionId}" 不存在或不可用`;
@@ -662,6 +681,14 @@ export function applyDialogueEffects(
         lines.push(`声望 ${effect.delta > 0 ? '+' : '−'}${Math.abs(effect.delta)}`);
         break;
       }
+      case 'adjustFactionRenown': {
+        const faction = staged.factions.get(effect.factionId);
+        if (faction !== undefined) {
+          adjustFactionRenown(staged.social, effect.factionId, effect.delta);
+          lines.push(`「${faction.name}」声望 ${effect.delta > 0 ? '+' : '−'}${Math.abs(effect.delta)}`);
+        }
+        break;
+      }
       case 'adjustRelationship': {
         const targetId = effect.npcId ?? staged.speakerNpcId;
         adjustRelationship(staged.social, targetId, effect.delta);
@@ -701,6 +728,7 @@ export function applyDialogueEffects(
         if (faction !== undefined) {
           adjustMorality(staged.social, faction.departure.moralityDelta);
           adjustRenown(staged.social, faction.departure.renownDelta);
+          adjustFactionRenown(staged.social, faction.id, faction.departure.factionRenownDelta);
           if (faction.departure.forgetFactionMartialArts && staged.character !== null) {
             staged.character.martialArtIds = staged.character.martialArtIds.filter((artId) =>
               !staged.martialArts.get(artId)?.factionIds.includes(faction.id),
@@ -711,7 +739,7 @@ export function applyDialogueEffects(
             ? '，门派武学亦将遗忘'
             : '，已学武学保留';
           lines.push(
-            `退出「${faction.name}」：善恶 ${faction.departure.moralityDelta >= 0 ? '+' : ''}${faction.departure.moralityDelta}，声望 ${faction.departure.renownDelta >= 0 ? '+' : ''}${faction.departure.renownDelta}${artConsequence}`,
+            `退出「${faction.name}」：善恶 ${faction.departure.moralityDelta >= 0 ? '+' : ''}${faction.departure.moralityDelta}，江湖声望 ${faction.departure.renownDelta >= 0 ? '+' : ''}${faction.departure.renownDelta}，本门声望 ${faction.departure.factionRenownDelta >= 0 ? '+' : ''}${faction.departure.factionRenownDelta}${artConsequence}`,
           );
         }
         break;

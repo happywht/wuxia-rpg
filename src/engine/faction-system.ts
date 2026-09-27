@@ -6,7 +6,7 @@
 
 import type { CharacterState, FactionData } from './character-progression';
 import type { QuestData, QuestJournal } from './quest-system';
-import { getRelationship, type SocialState } from './social-state';
+import { getFactionRenown, getRelationship, type SocialState } from './social-state';
 
 export interface FactionMembership {
   factionId: string;
@@ -63,6 +63,12 @@ export function checkFactionAdmission(query: FactionAdmissionQuery): FactionAdmi
   }
   if (admission.minimumRenown !== undefined && social.renown < admission.minimumRenown) {
     reasons.push(`江湖声望需达到 ${admission.minimumRenown}（当前 ${social.renown}）`);
+  }
+  if (admission.minimumFactionRenown !== undefined) {
+    const factionRenown = getFactionRenown(social, faction.id);
+    if (factionRenown < admission.minimumFactionRenown) {
+      reasons.push(`本门声望需达到 ${admission.minimumFactionRenown}（当前 ${factionRenown}）`);
+    }
   }
   if (
     admission.minimumTeacherRelationship !== undefined &&

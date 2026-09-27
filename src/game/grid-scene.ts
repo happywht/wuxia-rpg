@@ -1414,6 +1414,7 @@ export class GridScene extends Phaser.Scene {
     panel.open({
       factions: this.progression.factions,
       membership: this.factionState.membership,
+      social: this.social,
       npcNames: new Map((this.world?.assembly.npcs ?? []).map((npc) => [npc.record.id, npc.record.name])),
       quests: this.quests,
     });

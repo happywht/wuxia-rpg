@@ -3,12 +3,14 @@ import Phaser from 'phaser';
 import type { FactionData } from '../engine/character-progression';
 import type { FactionMembership } from '../engine/faction-system';
 import type { QuestData } from '../engine/quest-system';
+import { getFactionRenown, type SocialState } from '../engine/social-state';
 import { uiFontSize } from './settings';
 import { addPixelPanelChrome, UI_FONT_FAMILY, UI_PALETTE } from './ui-theme';
 
 export interface FactionPanelModel {
   factions: ReadonlyMap<string, FactionData>;
   membership: FactionMembership | null;
+  social: Readonly<SocialState>;
   npcNames: ReadonlyMap<string, string>;
   quests: ReadonlyMap<string, QuestData>;
 }
@@ -103,8 +105,15 @@ export class FactionPanel {
     } else {
       this.addText(left + 30, top + 88, '当前尚无门派；以下为已登记门派与入门条件。', 14, UI_PALETTE.jade);
     }
+    this.addText(
+      left + 30,
+      top + 110,
+      `个人行声：善恶 ${this.signed(model.social.morality)} · 江湖声望 ${model.social.renown}/1000`,
+      12,
+      UI_PALETTE.muted,
+    );
 
-    let y = top + 124;
+    let y = top + 137;
     const factions = [...model.factions.values()];
     if (factions.length === 0) {
       this.addWrapped('当前没有有效门派资料。', left + 30, y, width - 60, 13, UI_PALETTE.muted);
@@ -114,13 +123,14 @@ export class FactionPanel {
       const isCurrent = membership?.factionId === faction.id;
       const mentors = faction.mentorNpcIds.map((id) => model.npcNames.get(id) ?? id);
       const admission = this.admissionSummary(faction, model);
+      const factionRenown = getFactionRenown(model.social, faction.id);
       const departure = faction.departure.allowed
-        ? `退门代价：善恶 ${this.signed(faction.departure.moralityDelta)}、声望 ${this.signed(faction.departure.renownDelta)}；${faction.departure.forgetFactionMartialArts ? '遗忘本门武学' : '保留已学武学'}`
+        ? `退门代价：善恶 ${this.signed(faction.departure.moralityDelta)}、江湖声望 ${this.signed(faction.departure.renownDelta)}、本门声望 ${this.signed(faction.departure.factionRenownDelta)}；${faction.departure.forgetFactionMartialArts ? '遗忘本门武学' : '保留已学武学'}`
         : '退门：门规不许';
       const heading = `${isCurrent ? '◆ ' : '◇ '}${faction.name}${mentors.length > 0 ? ` · 师父：${mentors.join('、')}` : ' · 暂无登记师父'}`;
       this.addText(left + 30, y, heading, 13, isCurrent ? UI_PALETTE.accent : UI_PALETTE.text);
       y += 24;
-      const detail = `入门：${admission}。${departure}。`;
+      const detail = `本门声望：${factionRenown}/1000。入门：${admission}。${departure}。`;
       const node = this.addWrapped(detail, left + 48, y, width - 88, 11, UI_PALETTE.muted);
       y += Math.max(28, node.height) + 13;
     }
@@ -137,6 +147,9 @@ export class FactionPanel {
       requirements.push(`善恶 ${admission.minimumMorality ?? '无下限'}～${admission.maximumMorality ?? '无上限'}`);
     }
     if (admission.minimumRenown !== undefined) requirements.push(`声望≥${admission.minimumRenown}`);
+    if (admission.minimumFactionRenown !== undefined) {
+      requirements.push(`本门声望≥${admission.minimumFactionRenown}`);
+    }
     if (admission.minimumTeacherRelationship !== undefined) {
       requirements.push(`师父关系≥${admission.minimumTeacherRelationship}`);
     }

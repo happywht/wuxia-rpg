@@ -70,6 +70,7 @@
               "minimumMorality": { "type": "integer", "minimum": -100, "maximum": 100 },
               "maximumMorality": { "type": "integer", "minimum": -100, "maximum": 100 },
               "minimumRenown": { "type": "integer", "minimum": 0, "maximum": 1000 },
+              "minimumFactionRenown": { "type": "integer", "minimum": 0, "maximum": 1000 },
               "minimumTeacherRelationship": { "type": "integer", "minimum": -100, "maximum": 100 },
               "requiredQuestIds": {
                 "type": "array",
@@ -87,6 +88,7 @@
               "allowed": { "type": "boolean" },
               "moralityDelta": { "type": "integer", "minimum": -100, "maximum": 100 },
               "renownDelta": { "type": "integer", "minimum": -1000, "maximum": 1000 },
+              "factionRenownDelta": { "type": "integer", "minimum": -1000, "maximum": 1000 },
               "forgetFactionMartialArts": { "type": "boolean" }
             }
           }
