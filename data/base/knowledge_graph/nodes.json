@@ -47,6 +47,12 @@
     { "id": "item.ningshen-wan-shang", "kind": "item", "title": "宁神丸·上乘", "summary": "药力醇和的宁神丸，入口回甘。", "knownByDefault": false },
     { "id": "item.shuanghe-dan-cu", "kind": "item", "title": "双和丹·粗制", "summary": "形色稍逊的双和丹，双补之力尚浅。", "knownByDefault": false },
     { "id": "item.shuanghe-dan-zhong", "kind": "item", "title": "双和丹·中正", "summary": "三味合和得当的双和丹，气血两调。", "knownByDefault": false },
-    { "id": "item.shuanghe-dan-shang", "kind": "item", "title": "双和丹·上乘", "summary": "火候俱全的双和丹，丹香透壳。", "knownByDefault": false }
+    { "id": "item.shuanghe-dan-shang", "kind": "item", "title": "双和丹·上乘", "summary": "火候俱全的双和丹，丹香透壳。", "knownByDefault": false },
+    { "id": "char.liu-tinglan", "kind": "character", "title": "柳听澜", "summary": "寒山书院设坛讲学的教习，掌录江湖盟书；收徒先看心正不正，再看笔稳不稳。", "knownByDefault": false },
+    { "id": "char.zhu-jiuxian", "kind": "character", "title": "祝九弦", "summary": "盘舷刀场常驻渡口的教头，一手缆绳一手短刀，教弟子的第一课是护人。", "knownByDefault": false },
+    { "id": "char.bai-luzhou", "kind": "character", "title": "白鹭洲", "summary": "雾雨渡口的渡董，掌渡籍正本；药道轮值章程由他立约、寒山书院誊抄存档。", "knownByDefault": true },
+    { "id": "faction.hanshan-shuyuan", "kind": "faction", "title": "寒山书院", "summary": "掌录江湖盟书、编纂武录的书院，以文养气、以武证道，遇争端先笔墨后刀兵。", "knownByDefault": true },
+    { "id": "faction.panzhou-daochang", "kind": "faction", "title": "盘舷刀场", "summary": "以渡口为根的水路刀客行会，护船队走南闯北，规矩是先护人、再动手。", "knownByDefault": true },
+    { "id": "event.ferry-passage-registry", "kind": "event", "title": "渡籍·轮值章程", "summary": "渡口公所立的药道通行章程：药队过桥按时辰轮值，误时让位，争执以渡籍为凭；寒山书院存有誊抄副本。", "knownByDefault": false }
   ]
 }

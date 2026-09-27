@@ -69,6 +69,52 @@
         "factionRenownDelta": -10,
         "forgetFactionMartialArts": false
       }
+    },
+    {
+      "id": "faction.hanshan-shuyuan",
+      "name": "寒山书院",
+      "stance": "设在寒山脚下的书院，弟子多为寒门士子；以掌录江湖盟书、编纂武录、见证契立闻名。遇争端先笔墨后刀兵，各派都卖它几分薄面。",
+      "philosophy": "「以文养气，以武证道。」读书养的是胸中浩然之气，习武护的是心中所学之道；书院不争一时胜负，只求道理立得住、写得下。",
+      "martialStyle": "以判官笔为器、长衫广袖为架；点穴封脉、小擒拿近身拆招，落笔如批阅文章，一式一句都点在关节要害上。",
+      "mentorNpcIds": ["char.liu-tinglan"],
+      "admission": {
+        "minimumLevel": 1,
+        "minimumAttributes": { "insight": 8 },
+        "minimumMorality": 5,
+        "minimumRenown": 0,
+        "minimumTeacherRelationship": 5,
+        "requiredQuestIds": []
+      },
+      "departure": {
+        "allowed": true,
+        "moralityDelta": 0,
+        "renownDelta": -15,
+        "factionRenownDelta": -15,
+        "forgetFactionMartialArts": true
+      }
+    },
+    {
+      "id": "faction.panzhou-daochang",
+      "name": "盘舷刀场",
+      "stance": "以雾雨渡口为根的水路刀客行会，护着往来船队走南闯北；行事讲信义，认报酬也认人情，与官府船帮若即若离。",
+      "philosophy": "「刀在舷上，人在船头。」护得住一船人，才配谈刀法。刀场的规矩是先护人、再动手，护船的刀不兴先出鞘。",
+      "martialStyle": "船头窄地里的短刀功夫：低桩、贴身、连环劈拦；借舷板起伏借力换劲，专克岸上大开大合的路数。",
+      "mentorNpcIds": ["char.zhu-jiuxian"],
+      "admission": {
+        "minimumLevel": 2,
+        "minimumAttributes": { "body": 9, "agility": 8 },
+        "minimumMorality": -100,
+        "minimumRenown": 5,
+        "minimumTeacherRelationship": 0,
+        "requiredQuestIds": []
+      },
+      "departure": {
+        "allowed": true,
+        "moralityDelta": -5,
+        "renownDelta": -30,
+        "factionRenownDelta": -30,
+        "forgetFactionMartialArts": true
+      }
     }
   ]
 }

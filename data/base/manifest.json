@@ -41,6 +41,11 @@
       "schema": "dialogue-set"
     },
     {
+      "id": "dialogue.round-30-set",
+      "path": "dialogues/round-30-conversations.json",
+      "schema": "dialogue-set"
+    },
+    {
       "id": "character-profile.round-04-set",
       "path": "characters/round-04-profiles.json",
       "schema": "character-profiles"

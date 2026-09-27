@@ -136,7 +136,6 @@ export const WORLD_MAP_RESOURCE_ID = 'world.atlas';
 const CALENDAR_RESOURCE_ID = 'calendar.base';
 const CLIMATE_RESOURCE_ID = 'climate.base';
 const NPC_RESOURCE_ID = 'npc.round-03-set';
-const DIALOGUE_RESOURCE_ID = 'dialogue.round-03-set';
 const CHARACTER_PROFILE_RESOURCE_ID = 'character-profile.round-04-set';
 const FACTION_RESOURCE_ID = 'faction.round-04-set';
 const MARTIAL_ART_RESOURCE_ID = 'martial-art.round-04-set';
@@ -156,58 +155,48 @@ const COMPANION_RESOURCE_ID = 'companion.round-19-set';
 const KNOWLEDGE_NODE_RESOURCE_ID = 'knowledge.round-11-nodes';
 const KNOWLEDGE_EDGE_RESOURCE_ID = 'knowledge.round-11-edges';
 
-/** Optional NPC/dialogue/progression/battle/trade/companion content the world can lose without dying. */
-const OPTIONAL_RESOURCE_IDS = new Set([
-  NPC_RESOURCE_ID,
-  DIALOGUE_RESOURCE_ID,
-  CHARACTER_PROFILE_RESOURCE_ID,
-  FACTION_RESOURCE_ID,
-  MARTIAL_ART_RESOURCE_ID,
-  ENCOUNTER_RESOURCE_ID,
-  ARENA_RESOURCE_ID,
-  FACTION_WAR_RESOURCE_ID,
-  MARTIAL_ART_COMPONENT_RESOURCE_ID,
-  MERIDIAN_RESOURCE_ID,
-  EQUIPMENT_FORGE_RESOURCE_ID,
-  ALCHEMY_RESOURCE_ID,
-  ENDING_RESOURCE_ID,
-  ACHIEVEMENT_RESOURCE_ID,
-  ITEM_RESOURCE_ID,
-  SHOP_RESOURCE_ID,
-  QUEST_RESOURCE_ID,
-  COMPANION_RESOURCE_ID,
-  KNOWLEDGE_NODE_RESOURCE_ID,
-  KNOWLEDGE_EDGE_RESOURCE_ID,
+/**
+ * Optional-content schema families: every manifest resource whose schema is
+ * listed here is content the world can lose without dying, no matter how many
+ * resources of that family the manifest declares (dialogue-set files may be
+ * split across rounds like grid maps).
+ */
+const OPTIONAL_CONTENT_SCHEMAS = new Set([
+  'npc-set',
+  'dialogue-set',
+  'character-profiles',
+  'faction-set',
+  'martial-arts-set',
+  'battle-encounters',
+  'arena-set',
+  'faction-war-set',
+  'martial-art-components',
+  'meridian-set',
+  'equipment-forge-set',
+  'alchemy-set',
+  'ending-set',
+  'achievement-set',
+  'items-set',
+  'shops-set',
+  'quest-set',
+  'companion-set',
+  'knowledge-nodes',
+  'knowledge-edges',
 ]);
 
 /** Optional-content schemas; schema-level failures carry no resource id, so match by origin. */
-const OPTIONAL_SCHEMA_ORIGINS = new Set([
-  'schema:npc-set',
-  'schema:dialogue-set',
-  'schema:character-profiles',
-  'schema:faction-set',
-  'schema:martial-arts-set',
-  'schema:battle-encounters',
-  'schema:arena-set',
-  'schema:faction-war-set',
-  'schema:martial-art-components',
-  'schema:meridian-set',
-  'schema:equipment-forge-set',
-  'schema:alchemy-set',
-  'schema:ending-set',
-  'schema:achievement-set',
-  'schema:items-set',
-  'schema:shops-set',
-  'schema:quest-set',
-  'schema:companion-set',
-  'schema:knowledge-nodes',
-  'schema:knowledge-edges',
-]);
+const OPTIONAL_SCHEMA_ORIGINS = new Set(
+  [...OPTIONAL_CONTENT_SCHEMAS].map((schema) => `schema:${schema}`),
+);
 
-function isOptionalContentDiagnostic(diagnostic: Diagnostic): boolean {
+function isOptionalContentDiagnostic(
+  diagnostic: Diagnostic,
+  schemaByResourceId: ReadonlyMap<string, string>,
+): boolean {
   return (
-    (diagnostic.resource !== undefined && OPTIONAL_RESOURCE_IDS.has(diagnostic.resource)) ||
-    OPTIONAL_SCHEMA_ORIGINS.has(diagnostic.origin)
+    OPTIONAL_SCHEMA_ORIGINS.has(diagnostic.origin) ||
+    (diagnostic.resource !== undefined &&
+      OPTIONAL_CONTENT_SCHEMAS.has(schemaByResourceId.get(diagnostic.resource) ?? ''))
   );
 }
 
@@ -389,10 +378,17 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
     });
 
     // Optional NPC/dialogue problems degrade to warnings; everything else
-    // (manifest, schemas, the required map) stays fatal like Round 02.
+    // (manifest, schemas, the required map) stays fatal like Round 02. The
+    // manifest maps every resource id to its schema family, so any number of
+    // optional-family resources (e.g. per-round dialogue files) degrade the
+    // same way without enumerating ids here.
+    const schemaByResourceId = new Map(
+      (result.manifest?.resources ?? []).map((resource) => [resource.id, resource.schema]),
+    );
     const blocking = result.diagnostics.filter(
       (diagnostic) =>
-        (diagnostic.severity ?? 'error') === 'error' && !isOptionalContentDiagnostic(diagnostic),
+        (diagnostic.severity ?? 'error') === 'error' &&
+        !isOptionalContentDiagnostic(diagnostic, schemaByResourceId),
     );
     if (blocking.length > 0) {
       return { ok: false, title: '资料加载诊断', lines: formatDiagnostics(blocking) };
@@ -402,7 +398,8 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
     );
     const optionalWarnings = result.diagnostics.filter(
       (diagnostic) =>
-        (diagnostic.severity ?? 'error') === 'error' && isOptionalContentDiagnostic(diagnostic),
+        (diagnostic.severity ?? 'error') === 'error' &&
+        isOptionalContentDiagnostic(diagnostic, schemaByResourceId),
     );
 
     const worldResource = result.resources.get(WORLD_MAP_RESOURCE_ID);
@@ -679,53 +676,65 @@ function assembleOptionalContent(
     }
   }
 
-  // Conversations first: NPC validation resolves against the valid set.
+  // Conversations first: NPC validation resolves against the valid set. Like
+  // grid maps, every manifest resource whose schema is `dialogue-set`
+  // contributes conversations; duplicate ids across resources keep the first
+  // declaration in manifest order and failures disable one resource's talks
+  // (or one conversation), never the whole family.
   let dialogues = new Map<string, DialogueData>();
-  const dialogueResource = resources.get(DIALOGUE_RESOURCE_ID);
-  if (dialogueResource !== undefined) {
-    const parsed = parseDialogueSet(dialogueResource.value);
+  const conversationOwners = new Map<string, string>();
+  const allConversations: DialogueData[] = [];
+  for (const resource of resources.values()) {
+    if (resource.schema !== 'dialogue-set') continue;
+    const parsed = parseDialogueSet(resource.value);
     if (!parsed.ok) {
       warnings.push({
-        resource: DIALOGUE_RESOURCE_ID,
+        resource: resource.id,
         origin: 'dialogue-assembly',
         severity: 'warning',
-        message: '对话资料结构不合规，本轮禁用全部对话',
+        message: `对话资料结构不合规，已禁用资源 "${resource.id}" 的全部对话`,
         details: parsed.errors,
       });
+      continue;
+    }
+    for (const warning of parsed.warnings) {
+      warnings.push({
+        resource: resource.id,
+        origin: 'dialogue-assembly',
+        severity: 'warning',
+        message: warning,
+        details: [],
+      });
+    }
+    for (const conversation of parsed.set.conversations) {
+      if (!conversationOwners.has(conversation.id)) {
+        conversationOwners.set(conversation.id, resource.id);
+      }
+      allConversations.push(conversation);
+    }
+  }
+  const dialogueIndex = indexConversations({ conversations: allConversations });
+  for (const id of dialogueIndex.duplicateIds) {
+    warnings.push({
+      resource: conversationOwners.get(id),
+      origin: 'dialogue-assembly',
+      severity: 'warning',
+      message: `对话 id "${id}" 重复，保留先声明者`,
+      details: [],
+    });
+  }
+  for (const [id, conversation] of dialogueIndex.byId) {
+    const problems = validateConversation(conversation);
+    if (problems.length > 0) {
+      warnings.push({
+        resource: conversationOwners.get(id),
+        origin: 'dialogue-assembly',
+        severity: 'warning',
+        message: `对话 "${id}" 已禁用：${problems.join('；')}`,
+        details: [],
+      });
     } else {
-      for (const warning of parsed.warnings) {
-        warnings.push({
-          resource: DIALOGUE_RESOURCE_ID,
-          origin: 'dialogue-assembly',
-          severity: 'warning',
-          message: warning,
-          details: [],
-        });
-      }
-      const index = indexConversations(parsed.set);
-      for (const id of index.duplicateIds) {
-        warnings.push({
-          resource: DIALOGUE_RESOURCE_ID,
-          origin: 'dialogue-assembly',
-          severity: 'warning',
-          message: `对话 id "${id}" 重复，保留先声明者`,
-          details: [],
-        });
-      }
-      for (const [id, conversation] of index.byId) {
-        const problems = validateConversation(conversation);
-        if (problems.length > 0) {
-          warnings.push({
-            resource: DIALOGUE_RESOURCE_ID,
-            origin: 'dialogue-assembly',
-            severity: 'warning',
-            message: `对话 "${id}" 已禁用：${problems.join('；')}`,
-            details: [],
-          });
-        } else {
-          dialogues.set(id, conversation);
-        }
-      }
+      dialogues.set(id, conversation);
     }
   }
 
@@ -1310,8 +1319,9 @@ function assembleOptionalContent(
     timeOfDayPeriodIds,
   });
   for (const message of dialogueReferences.warnings) {
+    // The message names the offending conversation id already, and talks may
+    // come from any number of dialogue-set resources, so no resource label.
     warnings.push({
-      resource: DIALOGUE_RESOURCE_ID,
       origin: 'dialogue-assembly',
       severity: 'warning',
       message,

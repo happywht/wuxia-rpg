@@ -4,7 +4,35 @@
 
 ---
 
-## Round 29 — 江湖图鉴与百科收集进度（2026-09-27，已完成）
+## Round 30 — 原创人物、门派与关系资料扩充（2026-09-27，已完成）
+
+### 计划与实现
+
+- 按 `iterations/round-30/plan.md` 先做只读扫描：确认引擎内无任何按门派 id 的硬编码检查（结局、门派战、成就全部数据驱动且为 AND 条件）；确认 `world-loader.ts` 此前只按固定资源 id 读取单一对话文件，新对话文件登记 manifest 后不会被装配——这是本轮唯一的引擎障碍。
+- 引擎通用化（不含任何剧情/人名/门派名）：`data-loader.ts` 的 `loadGameData` 返回解析后的 manifest；`world-loader.ts` 的对话装配改为合并 manifest 中所有 `dialogue-set` 资源（与 grid-map 多资源装配同一模式，重复对话 id 保留清单先声明者并警告，结构失败只禁用该资源），可选内容坏档降级改按 manifest 声明的 schema 家族判断（`OPTIONAL_CONTENT_SCHEMAS`），删除按固定资源 id 枚举的 `OPTIONAL_RESOURCE_IDS`。
+- 资料落地：`round-03-npcs.json` 新增 3 名 NPC——柳听澜（寒山书院教习，方格试炼场 (5,3)，日中 (6,3)）、祝九弦（盘舷刀场教头，雾雨渡口 (11,3)，晨光 (12,3)）、白鹭洲（渡董，雾雨渡口 (4,4)，黄昏 (3,4)）；坐标经全量固定互动格核对（遭遇/擂台/工位/药炉/门派战入口/终章入口/关口端点/区域事件），尤其避开了芦苇河滩事件格 (5,4)，不挡死河灯结局的见闻链；Round 30 烟测另按七个时段检查人物与区域事件从出生点的实际连通性。
+- 独立可达性复核发现：柳听澜最初的 (6,1) 虽是非固体格，却因墙体与玩家所在区域隔离，不能从出生点接近；已移至连通路径上的 (5,3)，日中移至 (6,3)。烟测新增逐时段 BFS 检查新增人物邻接互动格和全部区域事件；修正后七个时段、两地图检查均通过。
+- `round-04-factions.json` 新增寒山书院（悟性 8/善名 5/师徒关系 5，退门声望 −15）与盘舷刀场（等级 2/体魄 9/身法 8/声望 5，退门声望 −30）；两家门槛均按初始抄书学徒+成长路线核验可达，复用现有 admission/departure 协议。祝九弦传艺复用既有通用武学 `skill.lanmen-daofa`；寒山书院暂不授专属武学，对话不引用武学条件。
+- 新建 `dialogues/round-30-conversations.json` 并登记 `dialogue.round-30-set`：柳听澜、祝九弦导师对话提供拜师/退门/门中事务/会盟三报分支；白鹭洲对话承担渡口地方知识（发现见闻「渡籍·轮值章程」）、五派格局讲解、会盟结果报备入渡籍（`shareKnowledgeNode`）、门派弟子登记四项叙事职责。
+- 知识图谱新增 6 节点（三名人物、两门派、`event.ferry-passage-registry`）与 13 条关系边（belongsTo/locatedAt/knows/influences，其中 4 条人物态度传播边带 attitudeSpread，均符合 character→character 端点约束）。
+- 新增 `docs/CHARACTERS.md`（12 人物志）与 `docs/FACTIONS.md`（5 门派志），更新 `docs/DATA-GUIDE.md`、`CHANGELOG.md`、`ROADMAP.md` 与本日志。
+- 新增 `scripts/smoke-round-30.mjs` 与 `smoke:round-30` 命令：断言覆盖数量下限与新增恰数、全局 id 唯一（含跨对话文件冲突）、两图 NPC 放置与日程编译零警告、固定互动格全避让、逐时段地图连通性（新 NPC 可从出生点走到相邻交互格，3 个区域事件仍可抵达）、导师引用闭合、用通用对话运行时真跑拜师/授艺/退门事务与拒绝路径零变更、对话合并解析、图谱端点/态度边校验、完整世界装配及兼容负向保护（结局门派条件与门派战双方仍只指向三家基础门派）。
+
+### 验证
+
+- `npm run typecheck`：通过。
+- `npm run validate:data`：通过，manifest 与 26 个基础资源 Schema 有效（新增 `dialogue.round-30-set`）。
+- `npm run smoke:round-30`：通过（首跑捕获两处烟测自身缺陷——旧 NPC 无 `schedule` 字段的空值处理、结局无 factionId 条件的过滤——修正后全绿）。
+- `npm run smoke:round-29`：通过，图鉴八类投影与完整世界装配回归正常。
+- `npm run smoke:round-28`：通过，成就协议与 v1 存档路径回归正常。
+- `npm run smoke:round-27`：通过，五结局条件评估、终章格装配与完整世界加载回归正常。
+- `npm run build`：通过，127 个模块构建成功（744ms）；主 JS chunk 1,866.60 kB（gzip 491.05 kB），仍超过 Vite 500 kB 默认建议线。
+- `git diff --check`：通过，无空白错误；Git 提示部分 LF 工作区文件将在下次触碰时规范为 CRLF（与既往轮次一致）。
+- 未进行浏览器手动游玩，导师对话与渡董交互的键盘流程经引擎事务与完整装配烟测验证，不宣称浏览器实测。
+
+### 后续
+
+- 下一轮按路线图进入 Round 31 原创任务链扩充；本轮现有未跟踪 `.serena/` 用户目录保持未触碰且不纳入提交。
 
 ### 计划与实现
 

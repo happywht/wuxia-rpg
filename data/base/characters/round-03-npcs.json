@@ -88,6 +88,38 @@
       "mapResourceId": "map.round-10-mist-ferry",
       "position": { "col": 12, "row": 2 },
       "dialogueId": "dlg.rong-su-qing-herbalist"
+    },
+    {
+      "id": "char.liu-tinglan",
+      "name": "柳听澜",
+      "mapResourceId": "map.round-01-grid",
+      "position": { "col": 5, "row": 3 },
+      "dialogueId": "dlg.liu-tinglan-mentor",
+      "schedule": [
+        { "periodId": "period.midday", "position": { "col": 6, "row": 3 } },
+        { "periodId": "period.dusk", "position": { "col": 5, "row": 3 } }
+      ]
+    },
+    {
+      "id": "char.zhu-jiuxian",
+      "name": "祝九弦",
+      "mapResourceId": "map.round-10-mist-ferry",
+      "position": { "col": 11, "row": 3 },
+      "dialogueId": "dlg.zhu-jiuxian-mentor",
+      "schedule": [
+        { "periodId": "period.morning", "position": { "col": 12, "row": 3 } },
+        { "periodId": "period.night", "position": { "col": 11, "row": 3 } }
+      ]
+    },
+    {
+      "id": "char.bai-luzhou",
+      "name": "白鹭洲",
+      "mapResourceId": "map.round-10-mist-ferry",
+      "position": { "col": 4, "row": 4 },
+      "dialogueId": "dlg.bai-luzhou-ferry-master",
+      "schedule": [
+        { "periodId": "period.dusk", "position": { "col": 3, "row": 4 } }
+      ]
     }
   ]
 }

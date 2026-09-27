@@ -44,6 +44,19 @@
     { "id": "kg.edge.ningshen-rewards-shang", "fromId": "event.formula-ningshen-wan", "toId": "item.ningshen-wan-shang", "relation": "rewards", "summary": "悟性纯熟时，此方出上乘一档。" },
     { "id": "kg.edge.shuanghe-rewards-cu", "fromId": "event.formula-shuanghe-dan", "toId": "item.shuanghe-dan-cu", "relation": "rewards", "summary": "悟性初入门时，此方只出粗制一档。" },
     { "id": "kg.edge.shuanghe-rewards-zhong", "fromId": "event.formula-shuanghe-dan", "toId": "item.shuanghe-dan-zhong", "relation": "rewards", "summary": "悟性渐长后，此方能出中正一档。" },
-    { "id": "kg.edge.shuanghe-rewards-shang", "fromId": "event.formula-shuanghe-dan", "toId": "item.shuanghe-dan-shang", "relation": "rewards", "summary": "悟性纯熟时，此方出上乘一档。" }
+    { "id": "kg.edge.shuanghe-rewards-shang", "fromId": "event.formula-shuanghe-dan", "toId": "item.shuanghe-dan-shang", "relation": "rewards", "summary": "悟性纯熟时，此方出上乘一档。" },
+    { "id": "kg.edge.liu-belongs-hanshan", "fromId": "char.liu-tinglan", "toId": "faction.hanshan-shuyuan", "relation": "belongsTo", "summary": "柳听澜代表书院在镇中讲书堂收徒授业。" },
+    { "id": "kg.edge.liu-located-trial", "fromId": "char.liu-tinglan", "toId": "map.round-01-grid", "relation": "locatedAt", "summary": "柳听澜在方格试炼场一侧的讲书堂设案誊录。" },
+    { "id": "kg.edge.liu-knows-registry", "fromId": "char.liu-tinglan", "toId": "event.ferry-passage-registry", "relation": "knows", "summary": "渡籍轮值章程的誊抄副本存在寒山书院，由柳听澜执笔。" },
+    { "id": "kg.edge.zhu-belongs-panzhou", "fromId": "char.zhu-jiuxian", "toId": "faction.panzhou-daochang", "relation": "belongsTo", "summary": "祝九弦是刀场常驻渡口的教头，负责护航排班与授刀。" },
+    { "id": "kg.edge.zhu-located-ferry", "fromId": "char.zhu-jiuxian", "toId": "map.round-10-mist-ferry", "relation": "locatedAt", "summary": "祝九弦常在雾雨渡口的栈桥头清点缆绳。" },
+    { "id": "kg.edge.bai-located-ferry", "fromId": "char.bai-luzhou", "toId": "map.round-10-mist-ferry", "relation": "locatedAt", "summary": "白鹭洲在渡口公所檐下掌管船票与渡籍。" },
+    { "id": "kg.edge.bai-knows-registry", "fromId": "char.bai-luzhou", "toId": "event.ferry-passage-registry", "relation": "knows", "summary": "轮值章程由渡董立约，渡籍正本始终在白鹭洲袖中。" },
+    { "id": "kg.edge.registry-influences-panzhou", "fromId": "event.ferry-passage-registry", "toId": "faction.panzhou-daochang", "relation": "influences", "summary": "轮值章程定下药队过桥时辰，刀场的护航排班随之而动。" },
+    { "id": "kg.edge.mist-pact-stalemate-panzhou", "fromId": "event.mist-pact-stalemate", "toId": "faction.panzhou-daochang", "relation": "influences", "summary": "轮值成约后，刀场按章程承接两派药队的护航班次。" },
+    { "id": "kg.edge.bai-knows-zhu", "fromId": "char.bai-luzhou", "toId": "char.zhu-jiuxian", "relation": "knows", "summary": "渡董与刀场教头每日对排班，交情在账目往来之中。", "attitudeSpread": 0.4 },
+    { "id": "kg.edge.zhu-knows-bai", "fromId": "char.zhu-jiuxian", "toId": "char.bai-luzhou", "relation": "knows", "summary": "祝九弦敬白鹭洲记账分明，坏约的船他一眼就挑得出来。", "attitudeSpread": 0.5 },
+    { "id": "kg.edge.bai-knows-wen", "fromId": "char.bai-luzhou", "toId": "char.wen-suxin", "relation": "knows", "summary": "轮值章程本为云隐药队而立，渡董与庄主书信往来多年。", "attitudeSpread": 0.3 },
+    { "id": "kg.edge.liu-knows-ye", "fromId": "char.liu-tinglan", "toId": "char.ye-tingzhou", "relation": "knows", "summary": "书院教习与剑阁教习以诗文相往来，彼此欣赏对方压得住性子。", "attitudeSpread": 0.5 }
   ]
 }

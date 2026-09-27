@@ -1,0 +1,257 @@
+{
+  "conversations": [
+    {
+      "id": "dlg.liu-tinglan-mentor",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "柳听澜坐在讲书堂的案前，笔未停，先抬眼把你打量一遍：「堂中在誊一份要紧文书，不便喧哗。你要问学，还是要问路？」",
+          "options": [
+            {
+              "text": "先生誊的是什么文书？",
+              "nextNodeId": "papers",
+              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.ferry-passage-registry" }]
+            },
+            {
+              "text": "晚辈斗胆，想请教文章。",
+              "nextNodeId": "essay-talk",
+              "conditions": [
+                { "kind": "npcRelationship", "npcId": "char.liu-tinglan", "maxValue": 4 }
+              ],
+              "effects": [{ "kind": "adjustRelationship", "delta": 5 }]
+            },
+            {
+              "text": "我愿拜入寒山书院。",
+              "nextNodeId": "accepted",
+              "conditions": [{ "kind": "factionMembership", "isMember": false }],
+              "effects": [
+                { "kind": "joinFaction", "factionId": "faction.hanshan-shuyuan" },
+                { "kind": "adjustFactionRenown", "factionId": "faction.hanshan-shuyuan", "delta": 10 }
+              ]
+            },
+            {
+              "text": "门中课业可有新吩咐？",
+              "nextNodeId": "tasked",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.hanshan-shuyuan", "isMember": true },
+                { "kind": "factionRenown", "factionId": "faction.hanshan-shuyuan", "minValue": 10 }
+              ]
+            },
+            {
+              "text": "我想退出寒山书院。",
+              "nextNodeId": "departed",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.hanshan-shuyuan", "isMember": true }
+              ],
+              "effects": [{ "kind": "leaveFaction" }]
+            },
+            { "text": "不叨扰了，先生请便。", "nextNodeId": "farewell" }
+          ]
+        },
+        {
+          "id": "papers",
+          "text": "他把誊到一半的纸页晾在镇石下：「雾渡药道的轮值盟书。渡口公所立约，书院受托誊抄存档——江湖上的约，白纸黑字才立得住。你若要查章程，去渡口寻渡董白鹭洲，他掌着正本。」",
+          "options": [
+            { "text": "原来书院管着这些文书。", "nextNodeId": "scribe-duty" },
+            { "text": "多谢先生，我去渡口看看。", "nextNodeId": "farewell" }
+          ]
+        },
+        {
+          "id": "scribe-duty",
+          "text": "「盟书、武录、地契、讼状，各派不愿自己记的账，都推给读书人记。」柳听澜把笔搁回笔山，「所以书院的弟子，笔要稳，眼要公。手上的功夫，倒是其次。」"
+        },
+        {
+          "id": "essay-talk",
+          "text": "「请教文章，先请教做人。」柳听澜取过一册抄本推到你面前，「字是人的骨。你抄一页看看——笔锋急躁的，心先急了；心急的人，读再多的书也只是认字。」"
+        },
+        {
+          "id": "accepted",
+          "text": "柳听澜搁笔起身，替你正了正衣冠：「入书院不为求一块招牌。从今日起，晨间抄书，午后习礼，武课在申时——先学把话说清楚，再学把笔拿稳，最后才轮到判官笔。」"
+        },
+        {
+          "id": "tasked",
+          "text": "「课业倒有一桩。」他从案头取出一叠空纸，「去渡口把轮值盟约的执行情况记回来——哪派守约、哪派误时，只记事实，不添褒贬。书院的笔，不偏不倚才有分量。」"
+        },
+        { "id": "departed", "text": "柳听澜沉默片刻，把你的名字从课业簿上圈去：「学籍除名，笔墨两清。书院的门不锁，但誊过的盟书里，不会再有你的手笔。」" },
+        { "id": "farewell", "text": "「去吧。」柳听澜重新蘸墨，「路上少说多看——见过的事，都是文章。」" }
+      ]
+    },
+    {
+      "id": "dlg.zhu-jiuxian-mentor",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "祝九弦蹲在栈桥头清点缆绳，指节粗大，动作却极利落。见你停步，他头也不抬：「借过便借过，站着不动，是要问刀，还是要问船？」",
+          "options": [
+            {
+              "text": "我愿拜入盘舷刀场。",
+              "nextNodeId": "accepted",
+              "conditions": [{ "kind": "factionMembership", "isMember": false }],
+              "effects": [
+                { "kind": "joinFaction", "factionId": "faction.panzhou-daochang" },
+                { "kind": "adjustFactionRenown", "factionId": "faction.panzhou-daochang", "delta": 10 }
+              ]
+            },
+            {
+              "text": "请师父传我拦门刀法。",
+              "nextNodeId": "taught",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.panzhou-daochang", "isMember": true },
+                { "kind": "martialArtEligible", "martialArtId": "skill.lanmen-daofa" }
+              ],
+              "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.lanmen-daofa" }]
+            },
+            {
+              "text": "我想退出盘舷刀场。",
+              "nextNodeId": "departed",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.panzhou-daochang", "isMember": true }
+              ],
+              "effects": [{ "kind": "leaveFaction" }]
+            },
+            {
+              "text": "雾渡药道会盟争得先约，特来告知。",
+              "nextNodeId": "war-victory",
+              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-victory" }]
+            },
+            {
+              "text": "药道按轮值成约了，来报个信。",
+              "nextNodeId": "war-stalemate",
+              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-stalemate" }]
+            },
+            {
+              "text": "会盟没争下先约，跟您说一声。",
+              "nextNodeId": "war-defeat",
+              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-defeat" }]
+            },
+            {
+              "text": "渡口的轮值章程，去哪里查？",
+              "nextNodeId": "registry-point"
+            },
+            { "text": "随便看看，这就走。", "nextNodeId": "farewell" }
+          ]
+        },
+        {
+          "id": "accepted",
+          "text": "祝九弦把一截缆绳抛过来，看你接住了才咧嘴一笑：「接得稳，就有得教。刀场的规矩记牢——上船先认缆桩，出刀先认人。哪条船要护、哪步不能退，比刀法先学。」"
+        },
+        {
+          "id": "taught",
+          "text": "他让你立在栈桥窄板上练劈拦：「拦门刀是岸上看家护院的功夫，到了船上就是护船的刀——低桩、贴身、连环三刀，脚下借舷板的劲。练熟了，船头船尾你都站得住。」"
+        },
+        { "id": "departed", "text": "祝九弦把缆绳收拢，半天说了一句：「船开了就不追。刀场的名号你带走，刀场的规矩留下——往后护人护己，自己掂量。」" },
+        { "id": "war-victory", "text": "「先约争到手，船期便定得早。」祝九弦点点头，「不过赢得时辰不算赢——替我把那句『对方药队照旧过桥』也记全了，护船的只认章程，不认输赢。」" },
+        { "id": "war-stalemate", "text": "「轮值？」他把缆绳结了个死扣，「这是最省事的结局。两派药队各走各的时辰，我们护航的排班也最稳。都赢一点，就都少赔一点。」" },
+        { "id": "war-defeat", "text": "「先约让了就让了。」祝九弦不以为意，「药道又没封，轮值照旧，船照开。下回会盟前把船上功夫练扎实，比在这儿懊恼强。」" },
+        { "id": "registry-point", "text": "「轮值章程？」祝九弦朝渡口公所的方向一抬下巴，「找渡董白鹭洲，渡籍正本在他手上。哪派哪个时辰过桥、误时怎么罚，白纸黑字，比十个教头记性都牢。」" },
+        { "id": "farewell", "text": "「栈桥湿滑，走稳些。」祝九弦重新蹲下去盘他的缆绳，不再看你。" }
+      ]
+    },
+    {
+      "id": "dlg.bai-luzhou-ferry-master",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "渡口公所的檐下，白鹭洲正把一册翻旧的船票簿合上。他把算盘拨了一颗，抬眼道：「渡籍在此。要过桥的问班次，要讲理的查章程——你是哪一种？」",
+          "options": [
+            {
+              "text": "想请教渡口的通行章程。",
+              "nextNodeId": "registry-talk",
+              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.ferry-passage-registry" }]
+            },
+            { "text": "渡口如今有哪些门派走动？", "nextNodeId": "factions-talk" },
+            {
+              "text": "我已列入门墙，渡籍上可要登记？",
+              "nextNodeId": "registry-joined",
+              "conditions": [{ "kind": "factionMembership", "isMember": true }]
+            },
+            {
+              "text": "雾渡药道会盟争得先约，报与渡籍。",
+              "nextNodeId": "logged-victory",
+              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-victory" }],
+              "effects": [
+                { "kind": "shareKnowledgeNode", "nodeId": "event.mist-pact-victory" },
+                { "kind": "adjustRelationship", "npcId": "char.bai-luzhou", "delta": 5 }
+              ]
+            },
+            {
+              "text": "药道按轮值成了约，我来报备。",
+              "nextNodeId": "logged-stalemate",
+              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-stalemate" }],
+              "effects": [
+                { "kind": "shareKnowledgeNode", "nodeId": "event.mist-pact-stalemate" },
+                { "kind": "adjustRelationship", "npcId": "char.bai-luzhou", "delta": 5 }
+              ]
+            },
+            {
+              "text": "会盟没争到先约，也该记上一笔。",
+              "nextNodeId": "logged-defeat",
+              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-defeat" }],
+              "effects": [
+                { "kind": "shareKnowledgeNode", "nodeId": "event.mist-pact-defeat" },
+                { "kind": "adjustRelationship", "npcId": "char.bai-luzhou", "delta": 5 }
+              ]
+            },
+            {
+              "text": "渡籍里记下的轮值之约，执行得如何？",
+              "nextNodeId": "remembered-pact",
+              "conditions": [{ "kind": "npcKnows", "nodeId": "event.mist-pact-stalemate" }]
+            },
+            { "text": "都不是，随便看看。", "nextNodeId": "farewell" }
+          ]
+        },
+        {
+          "id": "registry-talk",
+          "text": "「章程三条。」白鹭洲竖起手指，「一，药队过桥按时辰轮值，先约者先行，后约者不得抢渡；二，误时半刻，下轮让位；三，争执不下的，渡籍为凭，两家各执一份。」他把簿子翻开一页，「寒山书院誊的抄本，连墨迹深浅都校过三遍——江湖上的约，得有人肯这么记。」",
+          "options": [
+            { "text": "记得这样细，渡口从不误事么？", "nextNodeId": "registry-strict" },
+            { "text": "受教了，告辞。", "nextNodeId": "farewell" }
+          ]
+        },
+        {
+          "id": "registry-strict",
+          "text": "「误事年年有。」他不否认，「但渡籍在手，误事便只是误一次，不是结一世。上年两支药队抢渡，差点把栈桥踏断——自打立了轮值，桥上再没红过脸。规矩不近人情，可它护的是大多数人的活路。」"
+        },
+        {
+          "id": "factions-talk",
+          "text": "白鹭洲翻开渡籍首页，一条条数给你听：「渡口眼下五家走动。听雨剑阁居中调停，不偏不倚；铁嶂派护矿队走北道，认死理也认约；云隐山庄的药队最要紧，轮值就是为它立的；寒山书院掌录文书，渡籍抄本出自他家；盘舷刀场承包护航，栈桥上的缆桩一半是他家的刀疤。」",
+          "options": [
+            { "text": "五家都在，渡口倒热闹。", "nextNodeId": "factions-balance" },
+            { "text": "多谢渡董，长见识了。", "nextNodeId": "farewell" }
+          ]
+        },
+        {
+          "id": "factions-balance",
+          "text": "「热闹是表面，平衡才是里子。」他合上簿子，「剑阁压得住场面，书院记得住账，铁嶂守得住北道，云隐走得了药，刀场护得了船——少一家，这渡口就得乱半年。所以谁来了都接待，谁走了都不留，渡籍只认章程，不认门墙。」"
+        },
+        {
+          "id": "registry-joined",
+          "text": "「入册不问出身。」白鹭洲提笔蘸墨，「门派弟子在渡口行事，渡籍另记一行——守约的，章程庇护；坏约的，连门派一并记上。你家师门的名声，往后也在这本簿子里跟着你走。」",
+          "options": [
+            { "text": "一笔一划，都记下了。", "nextNodeId": "farewell" }
+          ]
+        },
+        {
+          "id": "logged-victory",
+          "text": "白鹭洲在渡籍上落笔，先记时辰再记事：「先约争得，章程照旧，对方药队保留通行约期——嗯，最后这句最要紧，替我把原话描清楚。」他抬眼看你，「记全了，比十场切磋都值钱。」"
+        },
+        {
+          "id": "logged-stalemate",
+          "text": "「轮值成约，两不耽误。」白鹭洲的笔走得又稳又快，「这条是渡籍上最好写的一笔——没有输家，就只有排班。」写罢他把簿子转过来给你过目，「你瞧，江湖事落到纸上，也就一行。」"
+        },
+        {
+          "id": "logged-defeat",
+          "text": "「让出先约，轮值仍在。」白鹭洲照记不误，末了在页脚补了一句小字，「他补的是『无药队滞留』。」他把笔搁下，「败讯也要记全——记全了，下回排班才知道哪里松了。」"
+        },
+        {
+          "id": "remembered-pact",
+          "text": "白鹭洲翻到你方才报备的那一页，指腹压住墨迹未干的「轮值成约」四字：「自今日起，两派药队按簿上时辰过桥。误时的罚则、抢渡的处置，都照章程来——你既亲历会盟，往后若见有人坏约，渡口公所随时受理。」"
+        },
+        { "id": "farewell", "text": "白鹭洲把渡籍收回袖中，重新拨响算盘：「栈桥上人多，慢行。章程之外的事，渡口不问。」" }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：Round 03–29 已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台、门派战、自创武学、经脉、装备锻造、炼丹、存档、区域旅行、知识图谱、NPC 私有记忆、江湖图鉴、昼夜气候、日程、条件奇遇、多层社会声望、多结局与成就；Round 29 专项、资料校验、R28 回归和生产构建均已通过；详情分别见 `docs/SAVES.md`、`docs/KNOWLEDGE-GRAPH.md`、`docs/ENDINGS.md`、`docs/ACHIEVEMENTS.md`、`docs/COMPANIONS.md`、`docs/FACTION_WAR_DESIGN.md`、`docs/MARTIAL_ART_FORGE.md`、`docs/EQUIPMENT-FORGING.md` 与 `docs/ALCHEMY.md`。
+- 状态：Round 03–30 已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台、门派战、自创武学、经脉、装备锻造、炼丹、存档、区域旅行、知识图谱、NPC 私有记忆、江湖图鉴、昼夜气候、日程、条件奇遇、多层社会声望、多结局、成就与原创人物/门派扩充（12 名 NPC、5 个门派、对话多文件装配）；Round 30 专项、资料校验、R29/R28 回归和生产构建均已通过；详情分别见 `docs/SAVES.md`、`docs/KNOWLEDGE-GRAPH.md`、`docs/ENDINGS.md`、`docs/ACHIEVEMENTS.md`、`docs/COMPANIONS.md`、`docs/CHARACTERS.md`、`docs/FACTIONS.md`、`docs/FACTION_WAR_DESIGN.md`、`docs/MARTIAL_ART_FORGE.md`、`docs/EQUIPMENT-FORGING.md` 与 `docs/ALCHEMY.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -70,6 +70,8 @@ Round 28 新增可选 `achievement-set` 资源，使用 `achievement-set.schema.
 
 Round 29 图鉴不增加额外词条 Schema 或数据文件：它投影 `knowledge-nodes` 的八类条目并复用既有发现 id。`projectKnowledgeCollection` 是 Phaser-free 只读统计；`discoverObservedKnowledge` 只接受 character/place/item/martialArt 四组事实中同 id 且 kind 匹配的节点。图鉴列表只呈现已知词条及汇总的未知数量，K 百科则保留叙事关联浏览。发现 id 仍存入 v1 `knownKnowledgeNodeIds`，旧档、MOD 节点删除过滤与原规则相同。详细 UI 行为、解锁观察点与隔离规则见 [`KNOWLEDGE-GRAPH.md`](KNOWLEDGE-GRAPH.md)。
 
+Round 30 状态：对话族改为**多资源装配**——manifest 中每个 `dialogue-set` 资源（如 `dialogue.round-03-set` 与 `dialogue.round-30-set`）都参与合并，重复对话 id 保留清单先声明者并警告；任一对话资源的结构失败只禁用该资源的对话（或单段），NPC 的 `dialogueId` 可指向任一文件中的对话。可选内容的降级判断同样改为按 manifest 声明的 schema 家族（任何数量的可选族资源坏档都只产生警告，不再按固定资源 id 枚举）。基础世界扩至 12 名 NPC 与 5 个门派：新增寒山书院（导师柳听澜，方格试炼场）与盘舷刀场（导师祝九弦，雾雨渡口），均复用现有拜师/退门协议；祝九弦传授既有通用武学拦门刀法，寒山书院暂不授专属武学（对话不引用武学条件，避免不可用选项）。第三名新人物白鹭洲为渡口渡董，承担地方知识传递与跨门派议事（渡籍轮值章程见闻、会盟结果报备、门派弟子登记）。人物与门派设定见 [`CHARACTERS.md`](CHARACTERS.md) 与 [`FACTIONS.md`](FACTIONS.md)。新 NPC 的基础位与日程位须避开全部固定互动格（遭遇/擂台/工位/药炉/门派战入口/终章入口/关口/区域事件），防止挡死既有内容。
+
 Round 20 新增擂台资料族：manifest 中的可选 arena-set 资源按地图入口、角色模板、赛程武学、彩头物品逐项校验；坏入口只禁用对应擂台。赛事文件可由 MOD 使用同路径覆盖，资料字段和玩法边界见 docs/ARENA_DESIGN.md。
 
 Round 21 新增可选 `faction-war-set` 战事资料族：每个阶段为两支参战派分别声明对手属性/武学，组装校验入口、门派、武学和结局图谱节点。E 邻接报名限在籍参战弟子，贡献、结局声望变化和见闻发现均可由 JSON 调整；同名 MOD 资源可覆盖默认会盟。字段与贡献结算见 `docs/FACTION_WAR_DESIGN.md`。
@@ -118,7 +120,7 @@ Round 22 新增可选 `martial-art-forge-components` 资源（`martial-art-compo
 - 改世界 → 只动 `data/base/`；想替换官方内容 → 写到 `mods/`，不要直接改基础数据。
 - 新增数据先在 `data/base/manifest.json` 登记资源 id、相对路径及 schema id，并在 `data/schema/` 提供 draft-07 schema；`npm run dev` 会在启动时校验并把错误逐条写到控制台/场景。
 - 新增 NPC：在 npc-set JSON 里加条目（稳定 id 建议 `char.` 前缀、姓名、`mapResourceId` 用已登记地图资源 id、`position` 填可走格、`dialogueId` 指向已登记对话）；可选 `schedule` 按已登记日历的 `periodId` 声明地图内 `position`，具体校验和冲突回退见 [`NPC-SCHEDULES.md`](NPC-SCHEDULES.md)。基础 NPC 坐标/引用无效会禁用该 NPC；单独坏掉的日程项只回退该人物该时段的基础位置。
-- 新增对话：在 dialogue-set JSON 里加一段（id 建议 `dlg.` 前缀、`startNodeId` 指向存在节点、选项 `nextNodeId` 必须可达；无 `options` 的节点即结束节点）。断裂引用只禁用该段对话及引用它的 NPC。选项可声明 `conditions`（全满足才可见：任务状态、物品数量、善恶/声望/NPC 关系闭区间、玩家已知词条或 NPC 私有记忆）与 `effects`（确认时原子执行：接取/放弃任务、给予/交付物品、修善良恶/声望/关系、向 NPC 分享玩家已知见闻；见 §4 对话条件与效果）；坏跨资源引用只剔除该选项，draft-07 Schema 可表达的结构/协议错误仍按资源级拒绝，解析器额外发现的单段语义错误（如反向上下界）只禁用该段并警告。示例：马尚义对话按任务 offered/active/completed 显示不同分支，顾夜尘带话后关系达标解锁新选项；陆贞娘在玩家分享脚印线索后可按她自己的记忆回应。
+- 新增对话：在 dialogue-set JSON 里加一段（id 建议 `dlg.` 前缀、`startNodeId` 指向存在节点、选项 `nextNodeId` 必须可达；无 `options` 的节点即结束节点）。Round 30 起对话文件可按轮次拆分：在 manifest 登记多个 `dialogue-set` 资源即可，加载器合并全部资源，重复对话 id 保留清单先声明者；NPC 的 `dialogueId` 可指向任一对话文件中的对话。断裂引用只禁用该段对话及引用它的 NPC。选项可声明 `conditions`（全满足才可见：任务状态、物品数量、善恶/声望/NPC 关系闭区间、玩家已知词条或 NPC 私有记忆）与 `effects`（确认时原子执行：接取/放弃任务、给予/交付物品、修善良恶/声望/关系、向 NPC 分享玩家已知见闻；见 §4 对话条件与效果）；坏跨资源引用只剔除该选项，draft-07 Schema 可表达的结构/协议错误仍按资源级拒绝，解析器额外发现的单段语义错误（如反向上下界）只禁用该段并警告。示例：马尚义对话按任务 offered/active/completed 显示不同分支，顾夜尘带话后关系达标解锁新选项；陆贞娘在玩家分享脚印线索后可按她自己的记忆回应。
 - 新增角色模板：在 character-profiles JSON 里加条目（id 建议 `char.` 前缀；五项属性 `body/force/agility/insight/resolve` 键与 1–999 值域是协议，显示名称写在 `attributeLabels`；`maxLevel` 必须大于 `startingLevel`，属性起点不得超过 `attributeCap`，否则整个资源在加载期被拒；`startingMartialArtIds` 列出起始武学——引用必须存在、未禁用并满足模板起始等级/属性（起始视为无门派），坏引用只剔除该武学并警告）。
 - 新增门派：在 faction-set JSON 里加条目（id 建议 `faction.` 前缀，名称/立场/宗旨/武学风格全为原创文本）。id 重复只保留先声明者并警告。
 - 新增武学：在 martial-arts-set JSON 里加条目（id 建议 `skill.` 前缀；类别取六枚举之一：拳脚/剑法/刀法/身法/内功/外功；`factionIds` 空数组表示不限门派，非空时每个 id 必须指向已加载的有效门派——悬空引用只禁用该武学；`requirements.level` 与 `requirements.attributes` 填最低门槛；`initialProficiency` 不得超过 `proficiencyCap`；`combat` 必填——kind 取 attack/heal，power 为作用基数，qiCost 为每次使用的内力消耗，内力不足时该行动不可用）。
@@ -214,3 +216,4 @@ NPC 当前坐标是由地图、时钟和人物日程派生的临时运行状态�
 | 2026-09-27 | Round 26 | 加入 NPC 私有知识、对白分享与图谱关系态度传播规则，并扩展 v1 兼容字段 |
 | 2026-09-27 | Round 28 | 登记可选 achievement-set 资源族、条件/奖励契约、逐条隔离规则与 `achievementState` 存档字段；专项烟测与回归通过 |
 | 2026-09-27 | Round 29 | 从知识图谱派生八类图鉴进度，以稳定 ID 观察人物/地图/物品/武学发现；复用 v1 已知见闻字段 |
+| 2026-09-27 | Round 30 | 基础世界扩至 12 名 NPC、5 个门派；对话族多资源合并装配，可选内容降级改按 manifest schema 家族；新增寒山书院、盘舷刀场、柳听澜、祝九弦、白鹭洲与渡籍轮值章程见闻；详见 `docs/CHARACTERS.md`、`docs/FACTIONS.md` |

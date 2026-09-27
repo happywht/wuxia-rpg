@@ -68,6 +68,8 @@ export interface Diagnostic {
 export interface DataLoadResult {
   /** Only resources whose final value passed schema validation. */
   resources: ReadonlyMap<string, LoadedResource>;
+  /** The parsed manifest behind `resources`; null when it failed to load. */
+  manifest: GameManifest | null;
   diagnostics: Diagnostic[];
 }
 
@@ -505,13 +507,13 @@ export async function loadGameData(options: DataLoaderOptions = {}): Promise<Dat
           }
         : { origin: 'manifest', message: fetchedManifest.message, details: fetchedManifest.details },
     );
-    return { resources, diagnostics };
+    return { resources, manifest: null, diagnostics };
   }
 
   const manifestSchema = await compileSchema(ajv, baseUrl, 'manifest');
   if (!manifestSchema.ok) {
     report(manifestSchema.diagnostic);
-    return { resources, diagnostics };
+    return { resources, manifest: null, diagnostics };
   }
   if (!manifestSchema.validate(fetchedManifest.data)) {
     report({
@@ -519,7 +521,7 @@ export async function loadGameData(options: DataLoaderOptions = {}): Promise<Dat
       message: '清单不符合 manifest schema',
       details: formatSchemaErrors(manifestSchema.validate.errors),
     });
-    return { resources, diagnostics };
+    return { resources, manifest: null, diagnostics };
   }
   const manifest = fetchedManifest.data as GameManifest;
 
@@ -530,7 +532,7 @@ export async function loadGameData(options: DataLoaderOptions = {}): Promise<Dat
       message: '清单包含不安全的路径或标识符，已拒绝加载',
       details: manifestProblems,
     });
-    return { resources, diagnostics };
+    return { resources, manifest: null, diagnostics };
   }
 
   const validators = new Map<string, ValidateFunction<unknown>>();
@@ -562,5 +564,5 @@ export async function loadGameData(options: DataLoaderOptions = {}): Promise<Dat
     bus?.emit('data:resource-loaded', { id: loaded.id, source: loaded.source });
   }
 
-  return { resources, diagnostics };
+  return { resources, manifest, diagnostics };
 }
