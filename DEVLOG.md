@@ -4,6 +4,28 @@
 
 ---
 
+## Round 33 — 知识图谱目录全量映射与结局关系闭环（2026-09-27，已完成）
+
+### 计划与实现
+
+- 先写 `iterations/round-33/plan.md`：以当前基础目录真实资源 id 为准补齐图谱，不用虚构角色、空摘要或无意义关系凑数。
+- 只读盘点确认起点：nodes.json 54 节点（物品 50 件只映射 15、武学 30 种只映射 3、任务 20 项只映射 2），edges.json 58 条；`discoverObservedKnowledge` 已支持按 id+kind 观察式解锁物品/武学，`assembleEndingSet` 的 NPC/门派引用直接取自图谱人物/门派节点。
+- nodes.json 新增 80 节点至 134：35 件物品 + 27 种武学 + 18 项任务，title/summary 逐条复制 canonical JSON 的 `name`/`description`（脚本核对 0 处不一致；既有 54 节点原样保留）。新增物品/武学 `knownByDefault: false`（首次持有/学会时解锁），新增任务沿用基础任务节点公开惯例 `true`，结局节点保持 `false`。
+- edges.json 新增 144 条至 202，五类闭环：27 条门派武学 `belongsTo`（含既有点击雨剑法/云隐身法两处补课）、31 条姜百味货架 `holds`（说明常备/限量）、24 条锻造结果 → 投入材料 `requires`（9 条配方全覆盖）、20 条发布人 `participatesIn` + 15 条前置 `requires` + 9 条收集目标 `requires` + 12 条谈话目标 `participatesIn`、6 条结局条件影响边补齐（陆贞娘/叶庭舟/石北/闻素心关系条件与铁嶂/云隐两条差事条件）。遭遇 id 不伪造节点；纯数值条件不造边。每条新边唯一稳定 id + 原创说明。
+- 新增 `scripts/smoke-round-33.mjs`（纯数据断言，不启动引擎、不依赖中文措辞）与 `smoke:round-33` 命令：目录 kind 双向集合相等、≥100 节点、节点/边 id 唯一、端点闭合、货架/锻造/武学归属/任务链路全量核验、遭遇不入侵图谱、五结局条件来源影响边与结局默认未知。开发中修正过一处自查：第 11 条断言最初写成硬编码白名单，改为按 `item.r32.` / `skill.r32-` id 约定校验新增条目默认未知。
+- 更新 `docs/KNOWLEDGE-GRAPH.md`（清除过期 48 节点/45 关系计数，新增 R33 专节）、`docs/ENDINGS.md`、`docs/DATA-GUIDE.md`、`CHANGELOG.md`、`ROADMAP.md` 与本日志。文档初稿把原始关系数误写为 60/前置数误写为 16，经 `git show HEAD` 与脚本复核改为 58/15。
+- 未改动任何引擎、Schema 与存档代码；工作区原有未跟踪 `.serena/` 保持不动；未执行 git commit（留待审查）。
+
+### 验证
+
+- `npm run validate:data`：通过，manifest Schema 与 26 个基础资源 Schema。
+- `npm run smoke:round-33`：通过（134 节点/202 关系；目录映射、唯一 id、端点闭合、货架持有、锻造投入、武学归属、20 任务链路、遭遇不伪造节点、五结局影响边与默认未知）。
+- `npm run smoke:round-27`：通过（五结局条件评估/边界、锁定提示、MOD 引用隔离、终章格装配/邻接及完整世界加载——图谱扩充未破坏结局装配）。
+- `npm run typecheck`：通过（tsc --noEmit 无输出）。
+- `npm run build`：通过（独立复核 858ms）；主 JS chunk 1,867.95 kB（gzip 491.51 kB），与 R32 相同的 Vite 默认 500 kB 分包建议警告仍在（本轮未改代码，属既有提示）。
+
+---
+
 ## Round 32 — 原创物品与武学目录扩充（2026-09-27，已完成）
 
 ### 计划与实现
