@@ -36,6 +36,27 @@
       "position": { "col": 12, "row": 1 },
       "dialogueId": "dlg.ma-shangyi-notice-board",
       "questGiver": true
+    },
+    {
+      "id": "char.ye-tingzhou",
+      "name": "叶庭舟",
+      "mapResourceId": "map.round-01-grid",
+      "position": { "col": 2, "row": 1 },
+      "dialogueId": "dlg.ye-tingzhou-mentor"
+    },
+    {
+      "id": "char.shi-bei",
+      "name": "石北",
+      "mapResourceId": "map.round-10-mist-ferry",
+      "position": { "col": 3, "row": 1 },
+      "dialogueId": "dlg.shi-bei-mentor"
+    },
+    {
+      "id": "char.wen-suxin",
+      "name": "闻素心",
+      "mapResourceId": "map.round-10-mist-ferry",
+      "position": { "col": 12, "row": 7 },
+      "dialogueId": "dlg.wen-suxin-mentor"
     }
   ]
 }

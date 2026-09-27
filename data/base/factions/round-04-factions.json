@@ -5,21 +5,67 @@
       "name": "听雨剑阁",
       "stance": "江南水乡的剑派，门下多士子出身，尚文重礼，与官府若即若离；江湖恩怨之中常持调停人的立场。",
       "philosophy": "「檐下听雨三十年，剑上无尘心自明。」听雨剑阁以静制动、后发先至，讲究先察人心，再出剑锋。",
-      "martialStyle": "剑走轻灵，以悟性察敌、以身法游斗；招式如雨落屋檐，连绵而克制，不争一时之锋。"
+      "martialStyle": "剑走轻灵，以悟性察敌、以身法游斗；招式如雨落屋檐，连绵而克制，不争一时之锋。",
+      "mentorNpcIds": ["char.ye-tingzhou"],
+      "admission": {
+        "minimumLevel": 1,
+        "minimumAttributes": { "insight": 9 },
+        "minimumMorality": -20,
+        "maximumMorality": 80,
+        "minimumRenown": 0,
+        "minimumTeacherRelationship": 5,
+        "requiredQuestIds": []
+      },
+      "departure": {
+        "allowed": true,
+        "moralityDelta": 0,
+        "renownDelta": -20,
+        "forgetFactionMartialArts": true
+      }
     },
     {
       "id": "faction.tiezhang-pai",
       "name": "铁嶂派",
       "stance": "盘踞北地铁嶂山的硬派外功门派，门人多矿工驮夫出身，行事直率，恩怨分明，不轻易与人结盟。",
       "philosophy": "「山不让尘，骨不让锤。」铁嶂派信奉筋骨即道理、苦功即捷径，一桩一站皆是修行。",
-      "martialStyle": "桩功沉厚、硬桥硬马，以体魄硬撼对手；善防御反击，招式简朴而力道惊人。"
+      "martialStyle": "桩功沉厚、硬桥硬马，以体魄硬撼对手；善防御反击，招式简朴而力道惊人。",
+      "mentorNpcIds": ["char.shi-bei"],
+      "admission": {
+        "minimumLevel": 2,
+        "minimumAttributes": { "body": 11 },
+        "minimumMorality": -100,
+        "minimumRenown": 5,
+        "minimumTeacherRelationship": 0,
+        "requiredQuestIds": ["quest.round-07-clear-alley"]
+      },
+      "departure": {
+        "allowed": true,
+        "moralityDelta": -5,
+        "renownDelta": -50,
+        "forgetFactionMartialArts": true
+      }
     },
     {
       "id": "faction.yunyin-shanzhuang",
       "name": "云隐山庄",
       "stance": "隐于云雾山间的半医半武庄园，行走江湖兼济世人；不问朝堂是非，也不卷入门派纷争。",
       "philosophy": "「身似云行，心若止水。」云隐山庄以养生济世为本，武学只为护身救人而练。",
-      "martialStyle": "身法飘逸、吐纳内修，避实就虚、以巧破力；兼通疗伤导引之术，久战不疲。"
+      "martialStyle": "身法飘逸、吐纳内修，避实就虚、以巧破力；兼通疗伤导引之术，久战不疲。",
+      "mentorNpcIds": ["char.wen-suxin"],
+      "admission": {
+        "minimumLevel": 1,
+        "minimumAttributes": { "resolve": 7 },
+        "minimumMorality": 0,
+        "minimumRenown": 0,
+        "minimumTeacherRelationship": 0,
+        "requiredQuestIds": []
+      },
+      "departure": {
+        "allowed": true,
+        "moralityDelta": -10,
+        "renownDelta": 0,
+        "forgetFactionMartialArts": false
+      }
     }
   ]
 }

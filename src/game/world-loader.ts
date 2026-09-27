@@ -687,8 +687,39 @@ function assembleOptionalContent(
     });
   }
 
-  // Round 08: resolve condition/effect references now that quests, items
-  // and placed NPCs are all known. A dangling reference drops exactly its
+  const resolvedFactions = new Map<string, FactionData>();
+  for (const [factionId, faction] of progressionAssembled.assembly.factions) {
+    const mentorNpcIds = faction.mentorNpcIds.filter((npcId) => {
+      if (allNpcs.some((npc) => npc.record.id === npcId)) return true;
+      warnings.push({
+        resource: FACTION_RESOURCE_ID,
+        origin: 'faction-assembly',
+        severity: 'warning',
+        message: `门派 "${factionId}" 登记的导师 "${npcId}" 不存在或未通过地图校验，已移除该导师资格`,
+        details: [],
+      });
+      return false;
+    });
+    for (const questId of faction.admission.requiredQuestIds) {
+      if (!questAssembly.quests.has(questId)) {
+        warnings.push({
+          resource: FACTION_RESOURCE_ID,
+          origin: 'faction-assembly',
+          severity: 'warning',
+          message: `门派 "${factionId}" 的入门前置差事 "${questId}" 不存在或无效，拜师将保持锁定`,
+          details: [],
+        });
+      }
+    }
+    resolvedFactions.set(factionId, { ...faction, mentorNpcIds });
+  }
+  const progression: ProgressionAssembly = {
+    ...progressionAssembled.assembly,
+    factions: resolvedFactions,
+  };
+
+  // Resolve condition/effect references now that quests, items, mentors and
+  // placed NPCs are all known. A dangling reference drops exactly its
   // option; the conversation (and its referencing NPC) stays playable.
   const placedNpcIds = new Set(allNpcs.map((npc) => npc.record.id));
   const dialogueReferences = assembleDialogueReferences({
@@ -697,6 +728,8 @@ function assembleOptionalContent(
     items: itemAssembly.items,
     placedNpcIds,
     knowledgeNodeIds,
+    factionIds: new Set(progression.factions.keys()),
+    martialArtIds: new Set(progression.martialArts.keys()),
   });
   for (const message of dialogueReferences.warnings) {
     warnings.push({
@@ -711,7 +744,7 @@ function assembleOptionalContent(
   return {
     npcs: allNpcs,
     dialogues: dialogueReferences.conversations,
-    progression: progressionAssembled.assembly,
+    progression,
     encounters,
     items: itemAssembly.items,
     shops: shopAssembly.shops,

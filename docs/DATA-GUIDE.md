@@ -93,6 +93,10 @@ Round 11 状态：manifest 登记可选 `knowledge-nodes` 与 `knowledge-edges` 
 - 新增任务：在 quest-set JSON 的 `quests` 数组新增任务（`id` 建议 `quest.` 前缀；`giverNpcId` 必须指向有效 NPC，并在 NPC 条目声明 `questGiver: true`；`prerequisiteQuestIds` 只能引用无环任务；目标 `kind` 选 `collectItem`/`defeatEncounter`，`targetId` 分别引用有效物品/遭遇，`requiredCount` 为正整数；`failOnEncounterIds` 声明败北失败的遭遇；`rewards` 声明非负 experience/currency）。收集目标接取时以当前背包数量为起点，物品变化后同步目标数量；击败目标在战斗胜利后推进；任务奖励恰发一次。E 打开发布人名录，Q 打开日志，A 放弃活动任务；Round 09 起任务阶段和进度随本地存档持久化。
 - 所有内容必须原创（红线见 `docs/ORIGINAL-FIDELITY.md`）；命名避开任何原作专有名称。
 
+## Round 13：门派与师承资料
+
+在 faction-set 的 faction 条目声明 `mentorNpcIds`、`admission` 与 `departure`；导师必须引用可放置 NPC。`admission` 可设 `minimumLevel`、五项 `minimumAttributes`、善恶上下限、声望/师徒关系下限及 `requiredQuestIds`；缺失任务引用会令该门派不可入门并产生警告。`departure.allowed` 控制能否离门，`moralityDelta`/`renownDelta` 设置代价，`forgetFactionMartialArts` 决定退门时是否遗忘 `factionIds` 包含该派的武学。NPC 对话通过 `factionMembership` / `martialArtEligible` 条件及 `joinFaction` / `leaveFaction` / `learnMartialArt` 效果提供流程；J 打开师门档案。旧 faction 资料未写扩展字段时采用无门槛、可退门且保留武学的默认值。
+
 ## 变更记录
 
 | 日期 | 轮次 | 变更 |
@@ -109,3 +113,4 @@ Round 11 状态：manifest 登记可选 `knowledge-nodes` 与 `knowledge-edges` 
 | 2026-09-27 | Round 08 语义追修 | 反向区间由防御解析器逐段拒绝并隔离，不再使同集合其他对话失效 |
 | 2026-09-27 | Round 09 | 记录存档与设置不属于世界资料、引用兼容检查及各系统状态恢复语义 |
 | 2026-09-27 | Round 10–11 | 记录多区域地图资源、知识图谱节点/关系、百科、知识对话条件与存档恢复 |
+| 2026-09-27 | Round 13 | 增加导师、拜师/授艺/退门资料字段、规则说明及旧资料缺省语义 |

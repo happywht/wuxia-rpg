@@ -28,9 +28,11 @@
  * economy (`startingCurrency`/`inventoryCapacity`/`startingItems` — validated
  * per reference by the item system at assembly time).
  *
- * Joining and practicing remain out of scope (Round 13+). Runtime state is
- * serialized by the separate, versioned save protocol rather than by this
- * progression engine.
+ * Runtime state is serialized by the separate, versioned save protocol
+ * rather than by this progression engine. Round 13 adds data contracts for
+ * faction admission/departure and connects its existing faction-aware art
+ * eligibility check to dialogue teaching effects; proficiency progression
+ * remains a later feature.
  */
 
 /** Canonical attribute ids (protocol; display names and values stay in data). */
@@ -120,6 +122,23 @@ export interface CombatActionData {
   qiCost: number;
 }
 
+export interface FactionAdmissionData {
+  minimumLevel?: number;
+  minimumAttributes: PartialAttributeMap;
+  minimumMorality?: number;
+  maximumMorality?: number;
+  minimumRenown?: number;
+  minimumTeacherRelationship?: number;
+  requiredQuestIds: string[];
+}
+
+export interface FactionDepartureData {
+  allowed: boolean;
+  moralityDelta: number;
+  renownDelta: number;
+  forgetFactionMartialArts: boolean;
+}
+
 /** Wire format of one faction inside a faction-set JSON file. */
 export interface FactionData {
   id: string;
@@ -127,6 +146,10 @@ export interface FactionData {
   stance: string;
   philosophy: string;
   martialStyle: string;
+  /** Valid dialogue speakers who may formally accept a student. */
+  mentorNpcIds: string[];
+  admission: FactionAdmissionData;
+  departure: FactionDepartureData;
 }
 
 /** Wire format of a faction-set JSON file under `data/base/factions/`. */
@@ -514,9 +537,91 @@ export function parseCharacterProfileSet(raw: unknown): SetParseResult<Character
   return { ok: true, set: { profiles } };
 }
 
+function parseFactionAdmission(raw: unknown): FactionAdmissionData | null {
+  if (raw === undefined) {
+    return { minimumAttributes: {}, requiredQuestIds: [] };
+  }
+  const source = isPlainObject(raw) ? raw : null;
+  if (source === null) return null;
+  const minimumLevel = source.minimumLevel === undefined
+    ? undefined
+    : requireIntegerInRange(source.minimumLevel, 1, 99);
+  const minimumAttributes = source.minimumAttributes === undefined
+    ? {}
+    : requireAttributeRequirementMap(source.minimumAttributes);
+  const minimumMorality = source.minimumMorality === undefined
+    ? undefined
+    : requireIntegerInRange(source.minimumMorality, -100, 100);
+  const maximumMorality = source.maximumMorality === undefined
+    ? undefined
+    : requireIntegerInRange(source.maximumMorality, -100, 100);
+  const minimumRenown = source.minimumRenown === undefined
+    ? undefined
+    : requireIntegerInRange(source.minimumRenown, 0, 1000);
+  const minimumTeacherRelationship = source.minimumTeacherRelationship === undefined
+    ? undefined
+    : requireIntegerInRange(source.minimumTeacherRelationship, -100, 100);
+  const requiredQuestIds: string[] = [];
+  if (source.requiredQuestIds !== undefined) {
+    if (!Array.isArray(source.requiredQuestIds)) return null;
+    for (const questId of source.requiredQuestIds) {
+      const id = requireNonEmptyString(questId);
+      if (id === null || requiredQuestIds.includes(id)) return null;
+      requiredQuestIds.push(id);
+    }
+  }
+  if (
+    minimumLevel === null ||
+    minimumAttributes === null ||
+    minimumMorality === null ||
+    maximumMorality === null ||
+    minimumRenown === null ||
+    minimumTeacherRelationship === null
+  ) return null;
+  if (
+    minimumMorality !== undefined &&
+    maximumMorality !== undefined &&
+    minimumMorality > maximumMorality
+  ) return null;
+  return {
+    ...(minimumLevel !== undefined ? { minimumLevel } : {}),
+    minimumAttributes,
+    ...(minimumMorality !== undefined ? { minimumMorality } : {}),
+    ...(maximumMorality !== undefined ? { maximumMorality } : {}),
+    ...(minimumRenown !== undefined ? { minimumRenown } : {}),
+    ...(minimumTeacherRelationship !== undefined ? { minimumTeacherRelationship } : {}),
+    requiredQuestIds,
+  };
+}
+
+function parseFactionDeparture(raw: unknown): FactionDepartureData | null {
+  if (raw === undefined) {
+    return { allowed: true, moralityDelta: 0, renownDelta: 0, forgetFactionMartialArts: false };
+  }
+  const source = isPlainObject(raw) ? raw : null;
+  if (source === null) return null;
+  const allowed = source.allowed === undefined ? true : source.allowed;
+  const moralityDelta = source.moralityDelta === undefined
+    ? 0
+    : requireIntegerInRange(source.moralityDelta, -100, 100);
+  const renownDelta = source.renownDelta === undefined
+    ? 0
+    : requireIntegerInRange(source.renownDelta, -1000, 1000);
+  const forgetFactionMartialArts = source.forgetFactionMartialArts === undefined
+    ? false
+    : source.forgetFactionMartialArts;
+  if (
+    typeof allowed !== 'boolean' ||
+    moralityDelta === null ||
+    renownDelta === null ||
+    typeof forgetFactionMartialArts !== 'boolean'
+  ) return null;
+  return { allowed, moralityDelta, renownDelta, forgetFactionMartialArts };
+}
+
 /**
- * Defensive re-parse of a faction-set document. Factions are pure lore
- * records; the only extra semantics here is shape re-verification.
+ * Defensive re-parse of a faction-set document. Membership rules are
+ * optional for legacy MODs and normalize to open admission/no-cost departure.
  */
 export function parseFactionSet(raw: unknown): SetParseResult<FactionSetData> {
   if (!isPlainObject(raw) || !Array.isArray(raw.factions)) {
@@ -537,6 +642,21 @@ export function parseFactionSet(raw: unknown): SetParseResult<FactionSetData> {
     const stance = requireNonEmptyString(entry.stance);
     const philosophy = requireNonEmptyString(entry.philosophy);
     const martialStyle = requireNonEmptyString(entry.martialStyle);
+    const mentorNpcIds: string[] = [];
+    if (entry.mentorNpcIds !== undefined) {
+      if (Array.isArray(entry.mentorNpcIds)) {
+        for (const npcId of entry.mentorNpcIds) {
+          const id = requireNonEmptyString(npcId);
+          if (id === null || mentorNpcIds.includes(id)) {
+            mentorNpcIds.length = 0;
+            break;
+          }
+          mentorNpcIds.push(id);
+        }
+      }
+    }
+    const admission = parseFactionAdmission(entry.admission);
+    const departure = parseFactionDeparture(entry.departure);
 
     const problems: string[] = [];
     if (id === null) {
@@ -554,18 +674,31 @@ export function parseFactionSet(raw: unknown): SetParseResult<FactionSetData> {
     if (martialStyle === null) {
       problems.push(`${label}.martialStyle：应为非空字符串`);
     }
+    if (entry.mentorNpcIds !== undefined && (!Array.isArray(entry.mentorNpcIds) ||
+      (entry.mentorNpcIds.length > 0 && mentorNpcIds.length === 0))) {
+      problems.push(`${label}.mentorNpcIds：应为不重复的 NPC id 字符串数组`);
+    }
+    if (admission === null) {
+      problems.push(`${label}.admission：入门条件无效`);
+    }
+    if (departure === null) {
+      problems.push(`${label}.departure：退门规则无效`);
+    }
     if (
       id === null ||
       name === null ||
       stance === null ||
       philosophy === null ||
-      martialStyle === null
+      martialStyle === null ||
+      admission === null ||
+      departure === null ||
+      (entry.mentorNpcIds !== undefined && !Array.isArray(entry.mentorNpcIds))
     ) {
       errors.push(...problems);
       return;
     }
 
-    factions.push({ id, name, stance, philosophy, martialStyle });
+    factions.push({ id, name, stance, philosophy, martialStyle, mentorNpcIds, admission, departure });
   });
 
   if (errors.length > 0) {

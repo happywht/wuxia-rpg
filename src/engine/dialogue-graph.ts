@@ -52,7 +52,9 @@ export type DialogueConditionData =
   | { kind: 'morality'; minValue?: number; maxValue?: number }
   | { kind: 'renown'; minValue?: number; maxValue?: number }
   | { kind: 'npcRelationship'; npcId: string; minValue?: number; maxValue?: number }
-  | { kind: 'knowledgeKnown'; nodeId: string };
+  | { kind: 'knowledgeKnown'; nodeId: string }
+  | { kind: 'factionMembership'; factionId?: string; isMember: boolean }
+  | { kind: 'martialArtEligible'; martialArtId: string };
 
 /**
  * One effect executed when its option is confirmed. The runtime validates
@@ -68,7 +70,10 @@ export type DialogueEffectData =
   | { kind: 'adjustMorality'; delta: number }
   | { kind: 'adjustRenown'; delta: number }
   | { kind: 'adjustRelationship'; npcId?: string; delta: number }
-  | { kind: 'discoverKnowledgeNode'; nodeId: string };
+  | { kind: 'discoverKnowledgeNode'; nodeId: string }
+  | { kind: 'joinFaction'; factionId: string }
+  | { kind: 'leaveFaction' }
+  | { kind: 'learnMartialArt'; martialArtId: string };
 
 /** One player-selectable branch leading to another node. */
 export interface DialogueOptionData {
@@ -229,6 +234,21 @@ function parseCondition(raw: unknown): DialogueConditionData | null {
       const nodeId = requireNonEmptyString(source.nodeId);
       return nodeId === null ? null : { kind: 'knowledgeKnown', nodeId };
     }
+    case 'factionMembership': {
+      if (!hasOnlyKeys(source, ['kind', 'factionId', 'isMember'])) return null;
+      const factionId = source.factionId === undefined ? undefined : requireNonEmptyString(source.factionId);
+      if (factionId === null || typeof source.isMember !== 'boolean') return null;
+      return {
+        kind: 'factionMembership',
+        ...(factionId !== undefined ? { factionId } : {}),
+        isMember: source.isMember,
+      };
+    }
+    case 'martialArtEligible': {
+      if (!hasOnlyKeys(source, ['kind', 'martialArtId'])) return null;
+      const martialArtId = requireNonEmptyString(source.martialArtId);
+      return martialArtId === null ? null : { kind: 'martialArtEligible', martialArtId };
+    }
     default:
       return null;
   }
@@ -288,6 +308,18 @@ function parseEffect(raw: unknown): DialogueEffectData | null {
       if (!hasOnlyKeys(source, ['kind', 'nodeId'])) return null;
       const nodeId = requireNonEmptyString(source.nodeId);
       return nodeId === null ? null : { kind: 'discoverKnowledgeNode', nodeId };
+    }
+    case 'joinFaction': {
+      if (!hasOnlyKeys(source, ['kind', 'factionId'])) return null;
+      const factionId = requireNonEmptyString(source.factionId);
+      return factionId === null ? null : { kind: 'joinFaction', factionId };
+    }
+    case 'leaveFaction':
+      return hasOnlyKeys(source, ['kind']) ? { kind: 'leaveFaction' } : null;
+    case 'learnMartialArt': {
+      if (!hasOnlyKeys(source, ['kind', 'martialArtId'])) return null;
+      const martialArtId = requireNonEmptyString(source.martialArtId);
+      return martialArtId === null ? null : { kind: 'learnMartialArt', martialArtId };
     }
     default:
       return null;

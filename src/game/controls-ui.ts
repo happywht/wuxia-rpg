@@ -48,7 +48,7 @@ export class ControlsPanel {
     this.addText('方向键 / WASD　移动', left + 44, top + 93, 14, UI_PALETTE.text);
     this.addText('E　调查相邻人物、关口或区域事件', left + 44, top + 122, 14, UI_PALETTE.text);
     this.addText('F　与相邻人物直接交谈', left + 44, top + 151, 14, UI_PALETTE.text);
-    this.addText('B 背包　Q 差事　M 舆图　K 百科　Esc 暂停', left + 44, top + 180, 13, UI_PALETTE.text);
+    this.addText('B 背包　J 师门　Q 差事　M 舆图　K 百科　Esc 暂停', left + 44, top + 180, 13, UI_PALETTE.text);
 
     this.addText('面板', left + 28, top + 224, 13, UI_PALETTE.jade);
     this.addText('↑/↓ 或 W/S　选择条目　·　Enter　确认', left + 44, top + 251, 13, UI_PALETTE.text);

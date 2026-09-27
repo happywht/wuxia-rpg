@@ -66,6 +66,7 @@ import {
   createQuestJournal,
 } from './quest-system';
 import { type SocialState, MORALITY_RANGE, RENOWN_RANGE, RELATIONSHIP_RANGE } from './social-state';
+import type { FactionMembership } from './faction-system';
 
 // ---------------------------------------------------------------------------
 // Protocol constants
@@ -110,6 +111,8 @@ export interface SavePlayerData {
   qiCurrent: number;
   /** Martial-art ids the character has mastered (validated on restore). */
   martialArtIds: string[];
+  /** Current school and master; absent in older v1 saves means unaffiliated. */
+  factionMembership: FactionMembership | null;
 }
 
 export interface SaveStackData {
@@ -303,6 +306,19 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
   const martialArtIds = playerSource === null ? null : requireUniqueNonEmptyStringArray(playerSource.martialArtIds);
   if (martialArtIds === null) {
     errors.push('player.martialArtIds：应为非重复的非空字符串数组');
+  }
+  let factionMembership: FactionMembership | null = null;
+  if (playerSource !== null && playerSource.factionMembership !== undefined && playerSource.factionMembership !== null) {
+    const membershipSource = isPlainObject(playerSource.factionMembership)
+      ? playerSource.factionMembership
+      : null;
+    const factionId = membershipSource === null ? null : requireNonEmptyString(membershipSource.factionId);
+    const masterNpcId = membershipSource === null ? null : requireNonEmptyString(membershipSource.masterNpcId);
+    if (factionId === null || masterNpcId === null) {
+      errors.push('player.factionMembership：应为含 factionId/masterNpcId 的门派师承，或 null');
+    } else {
+      factionMembership = { factionId, masterNpcId };
+    }
   }
 
   const inventorySource = isPlainObject(raw.inventory) ? raw.inventory : null;
@@ -542,9 +558,9 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     level === null ||
     experience === null ||
     baseAttributes === null ||
-    healthCurrent === null ||
-    qiCurrent === null ||
-    martialArtIds === null ||
+      healthCurrent === null ||
+      qiCurrent === null ||
+      martialArtIds === null ||
     currency === null ||
     capacity === null ||
     morality === null ||
@@ -570,6 +586,7 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
       healthCurrent,
       qiCurrent,
       martialArtIds,
+      factionMembership,
     },
     inventory: { currency, capacity, stacks, equipped },
     shopStocks,
@@ -835,6 +852,8 @@ export interface CaptureInput {
   completedEncounters: ReadonlySet<string>;
   completedRegionalEvents: ReadonlySet<string>;
   knownKnowledgeNodeIds: ReadonlySet<string>;
+  /** Absent in older callers/snapshots means currently unaffiliated. */
+  factionMembership?: FactionMembership | null;
   /** Injectable clock for deterministic tests. */
   now?: () => Date;
 }
@@ -856,6 +875,9 @@ export function captureSaveSnapshot(input: CaptureInput): SaveSnapshotV1 {
       healthCurrent: input.character.health.current,
       qiCurrent: input.character.qi.current,
       martialArtIds: [...input.character.martialArtIds],
+      factionMembership: input.factionMembership === undefined || input.factionMembership === null
+        ? null
+        : { ...input.factionMembership },
     },
     inventory: {
       currency: input.inventory.currency,
@@ -926,6 +948,10 @@ export interface SaveWorldReferences {
   /** Current knowledge graph ids and immutable public baseline. */
   knowledgeNodeIds?: ReadonlySet<string>;
   defaultKnowledgeNodeIds?: ReadonlySet<string>;
+  /** Current valid faction ids; missing saved membership is a soft reference. */
+  factionIds?: ReadonlySet<string>;
+  /** Current faction id → NPC ids permitted to serve as that player's master. */
+  factionMentorNpcIds?: ReadonlyMap<string, ReadonlySet<string>>;
 }
 
 export type RestorePlanResult =
@@ -984,6 +1010,21 @@ export function planSnapshotRestore(
     warnings.push(`已掌握的武学 "${artId}" 在当前资料中不存在或已被禁用，已遗忘`);
     return false;
   });
+
+  let factionMembership = snapshot.player.factionMembership === undefined
+    ? null
+    : snapshot.player.factionMembership;
+  if (factionMembership !== null && refs.factionIds !== undefined && !refs.factionIds.has(factionMembership.factionId)) {
+    warnings.push(`所属门派 "${factionMembership.factionId}" 在当前资料中不存在，已恢复为无门派`);
+    factionMembership = null;
+  }
+  if (factionMembership !== null && refs.factionMentorNpcIds !== undefined) {
+    const mentors = refs.factionMentorNpcIds.get(factionMembership.factionId);
+    if (mentors === undefined || !mentors.has(factionMembership.masterNpcId)) {
+      warnings.push(`师父 "${factionMembership.masterNpcId}" 已不再是当前门派的有效导师，已恢复为无门派`);
+      factionMembership = null;
+    }
+  }
 
   const baseAttributes = { ...snapshot.player.baseAttributes };
   if (profile !== undefined) {
@@ -1159,7 +1200,7 @@ export function planSnapshotRestore(
     warnings,
     snapshot: {
       ...snapshot,
-      player: { ...snapshot.player, baseAttributes, martialArtIds },
+      player: { ...snapshot.player, baseAttributes, martialArtIds, factionMembership },
       inventory: { ...snapshot.inventory, capacity: inventoryCapacity, stacks, equipped },
       shopStocks,
       quests: { states: questStates, trackedQuestId },
@@ -1195,6 +1236,7 @@ export interface RestoredRunState {
   completedEncounters: string[];
   completedRegionalEvents: string[];
   knownKnowledgeNodeIds: string[];
+  factionMembership: FactionMembership | null;
 }
 
 /**
@@ -1287,6 +1329,9 @@ export function restoreRunState(input: RestoreRunInput): RestoredRunState {
     completedEncounters: [...snapshot.completedEncounters],
     completedRegionalEvents: [...snapshot.completedRegionalEvents],
     knownKnowledgeNodeIds: [...snapshot.knownKnowledgeNodeIds],
+    factionMembership: snapshot.player.factionMembership === null
+      ? null
+      : { ...snapshot.player.factionMembership },
   };
 }
 

@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://wuxia-rpg.invalid/schema/faction-set",
   "title": "门派集合",
-  "description": "门派集合 JSON 的静态结构契约：字段名、类型与长度。门派是纯资料条目——立场、宗旨与武学风格全部来自数据；成员资格变更、声望与拜师流程不在本契约范围（由后续轮次扩展）。id 在集合内的唯一性与被武学引用的可达性由运行时索引补足。",
+  "description": "门派集合 JSON 的静态结构契约：设定、导师、入门门槛与退门后果全部由数据声明。导师 NPC 与前置任务是否存在、重复门派 id 及被武学引用的可达性由运行时装配补足。拜师、授艺与退门效果由通用对话运行时执行。",
   "type": "object",
   "additionalProperties": false,
   "required": ["factions"],
@@ -43,6 +43,52 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 500
+          },
+          "mentorNpcIds": {
+            "description": "可在对话中正式收徒的导师 NPC id；省略时该门派仅作设定资料。",
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "type": "string", "minLength": 1, "maxLength": 64 }
+          },
+          "admission": {
+            "description": "可选入门条件；每一项都必须满足。省略字段按无额外门槛处理。",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "minimumLevel": { "type": "integer", "minimum": 1, "maximum": 99 },
+              "minimumAttributes": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "body": { "type": "integer", "minimum": 1, "maximum": 999 },
+                  "force": { "type": "integer", "minimum": 1, "maximum": 999 },
+                  "agility": { "type": "integer", "minimum": 1, "maximum": 999 },
+                  "insight": { "type": "integer", "minimum": 1, "maximum": 999 },
+                  "resolve": { "type": "integer", "minimum": 1, "maximum": 999 }
+                }
+              },
+              "minimumMorality": { "type": "integer", "minimum": -100, "maximum": 100 },
+              "maximumMorality": { "type": "integer", "minimum": -100, "maximum": 100 },
+              "minimumRenown": { "type": "integer", "minimum": 0, "maximum": 1000 },
+              "minimumTeacherRelationship": { "type": "integer", "minimum": -100, "maximum": 100 },
+              "requiredQuestIds": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": { "type": "string", "minLength": 1, "maxLength": 64 }
+              }
+            }
+          },
+          "departure": {
+            "description": "可选退门规则；省略表示允许退门、无数值代价并保留门派武学。",
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["allowed", "moralityDelta", "renownDelta", "forgetFactionMartialArts"],
+            "properties": {
+              "allowed": { "type": "boolean" },
+              "moralityDelta": { "type": "integer", "minimum": -100, "maximum": 100 },
+              "renownDelta": { "type": "integer", "minimum": -1000, "maximum": 1000 },
+              "forgetFactionMartialArts": { "type": "boolean" }
+            }
           }
         }
       }

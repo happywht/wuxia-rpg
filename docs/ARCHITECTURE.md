@@ -103,6 +103,10 @@ Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id
 - Round 11 的 `knowledge-graph.ts` 负责 Phaser 无关的节点/关系防御解析、唯一 id 索引、悬空端点隔离、公开词条起始状态和已知端点边过滤；`world-loader.ts` 发现知识资源、参与同名 MOD/schema 流程并把有效节点 id 交给对话引用装配。`dialogue-runtime.ts` 以 `knowledgeKnown` 过滤选项、以 `discoverKnowledgeNode` 在效果事务中解锁；知识状态进入 v1 快照。`encyclopedia-ui.ts` 的 K 键面板按类型筛选并只呈现已知词条和双方已知的关系，GridScene 负责与其他面板互斥及探索输入锁。
 - Round 12 的 `ui-theme.ts` 与 `controls-ui.ts` 属于内容无关的游戏胶水：前者提供像素面板框、选中底条、通用色板与程序人物标记，后者显示不含世界设定的键位说明。Phaser 入口启用 `pixelArt`/`roundPixels`，网格 renderer 从资料颜色推导亮/暗边缘。各覆盖层保留自身业务布局与输入，只调用共享视觉原语；GridScene 的字号目标表负责刷新已创建的 HUD/NPC/遭遇文字，暂停设置关闭时同步游戏设置快照。战斗 UI 按选中招式分页显示，任务 UI 按实际文字高度排布说明与目标。
 
+### Round 13：师门规则与对话事务
+
+`faction-system.ts` 是 Phaser-free 的门派规则模块：接收已解析的门派、角色、社会状态、任务状态和当前对话 NPC，统一检查入门条件并操作唯一师承关系。`dialogue-runtime.ts` 通过 staged copy 原子应用拜师、退门惩罚、门派武学遗忘和授艺；`save-system.ts` 将师门身份作为可空 v1 字段保存，恢复时把失效门派/师父隔离为无门派并报告 warning。导师、门槛、退门后果和对白均来自数据文件。
+
 ## 变更记录
 
 | 日期 | 轮次 | 变更 |
@@ -119,3 +123,4 @@ Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id
 | 2026-09-27 | Round 09 | 主菜单/角色创建、版本化三槽存档读写与恢复预检、游戏内暂停/保存及持久音量和文字大小 |
 | 2026-09-27 | Round 10–11 | 多区域旅行与区域事件；知识图谱协议、百科和对话见闻进度 |
 | 2026-09-27 | Round 12 | 共享像素 UI、程序生成地图/人物层次、键位帮助、字号即时刷新与长列表布局 |
+| 2026-09-27 | Round 13 | Phaser-free 师门规则、原子对话效果、导师引用检查及师承存档兼容 |

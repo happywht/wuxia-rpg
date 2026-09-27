@@ -59,6 +59,19 @@ import {
   getRelationship,
 } from './social-state';
 import type { KnowledgeNodeData } from './knowledge-graph';
+import {
+  checkMartialArtEligibility,
+  type CharacterState,
+  type FactionData,
+  type MartialArtData,
+} from './character-progression';
+import {
+  checkFactionAdmission,
+  clearFactionMembership,
+  createFactionMembershipState,
+  setFactionMembership,
+  type FactionMembershipState,
+} from './faction-system';
 
 // ---------------------------------------------------------------------------
 // Runtime context
@@ -79,6 +92,11 @@ export interface DialogueRuntimeContext {
   knowledgeNodes: ReadonlyMap<string, KnowledgeNodeData>;
   /** Optional display names by NPC id for feedback lines (data-driven). */
   npcNames?: ReadonlyMap<string, string>;
+  /** Player progression state; null while running without a profile. */
+  character: CharacterState | null;
+  factions: ReadonlyMap<string, FactionData>;
+  martialArts: ReadonlyMap<string, MartialArtData>;
+  factionState: FactionMembershipState;
 }
 
 // ---------------------------------------------------------------------------
@@ -94,6 +112,8 @@ export interface DialogueReferenceAssemblyInput {
   placedNpcIds: ReadonlySet<string>;
   /** Node ids accepted by the knowledge graph assembler. */
   knowledgeNodeIds: ReadonlySet<string>;
+  factionIds: ReadonlySet<string>;
+  martialArtIds: ReadonlySet<string>;
 }
 
 export interface DialogueReferenceAssemblyResult {
@@ -109,16 +129,23 @@ function optionReferences(option: DialogueOptionData): {
   itemIds: string[];
   npcIds: string[];
   knowledgeNodeIds: string[];
+  factionIds: string[];
+  martialArtIds: string[];
 } {
   const questIds: string[] = [];
   const itemIds: string[] = [];
   const npcIds: string[] = [];
   const knowledgeNodeIds: string[] = [];
+  const factionIds: string[] = [];
+  const martialArtIds: string[] = [];
   for (const condition of option.conditions ?? []) {
     if (condition.kind === 'questStatus') questIds.push(condition.questId);
     else if (condition.kind === 'itemCount') itemIds.push(condition.itemId);
     else if (condition.kind === 'npcRelationship') npcIds.push(condition.npcId);
     else if (condition.kind === 'knowledgeKnown') knowledgeNodeIds.push(condition.nodeId);
+    else if (condition.kind === 'factionMembership' && condition.factionId !== undefined) {
+      factionIds.push(condition.factionId);
+    } else if (condition.kind === 'martialArtEligible') martialArtIds.push(condition.martialArtId);
   }
   for (const effect of option.effects ?? []) {
     if (effect.kind === 'acceptQuest' || effect.kind === 'abandonQuest') questIds.push(effect.questId);
@@ -126,8 +153,10 @@ function optionReferences(option: DialogueOptionData): {
     else if (effect.kind === 'adjustRelationship' && effect.npcId !== undefined) {
       npcIds.push(effect.npcId);
     } else if (effect.kind === 'discoverKnowledgeNode') knowledgeNodeIds.push(effect.nodeId);
+    else if (effect.kind === 'joinFaction') factionIds.push(effect.factionId);
+    else if (effect.kind === 'learnMartialArt') martialArtIds.push(effect.martialArtId);
   }
-  return { questIds, itemIds, npcIds, knowledgeNodeIds };
+  return { questIds, itemIds, npcIds, knowledgeNodeIds, factionIds, martialArtIds };
 }
 
 /**
@@ -163,6 +192,12 @@ export function assembleDialogueReferences(
         }
         for (const nodeId of references.knowledgeNodeIds) {
           if (!input.knowledgeNodeIds.has(nodeId)) problems.push(`引用无效见闻 "${nodeId}"`);
+        }
+        for (const factionId of references.factionIds) {
+          if (!input.factionIds.has(factionId)) problems.push(`引用无效门派 "${factionId}"`);
+        }
+        for (const martialArtId of references.martialArtIds) {
+          if (!input.martialArtIds.has(martialArtId)) problems.push(`引用无效武学 "${martialArtId}"`);
         }
         if (problems.length > 0) {
           changed = true;
@@ -239,6 +274,22 @@ export function isConditionMet(
       );
     case 'knowledgeKnown':
       return context.knownKnowledgeNodeIds.has(condition.nodeId);
+    case 'factionMembership': {
+      const membership = context.factionState.membership;
+      const belongs = membership !== null &&
+        (condition.factionId === undefined || membership.factionId === condition.factionId);
+      return condition.isMember ? belongs : !belongs;
+    }
+    case 'martialArtEligible': {
+      const character = context.character;
+      const art = context.martialArts.get(condition.martialArtId);
+      if (character === null || art === undefined || character.martialArtIds.includes(art.id)) return false;
+      return checkMartialArtEligibility(art, {
+        level: character.level,
+        attributes: character.attributes,
+        factionId: context.factionState.membership?.factionId ?? null,
+      }).eligible;
+    }
   }
 }
 
@@ -336,6 +387,10 @@ function cloneRuntimeContext(context: DialogueRuntimeContext): DialogueRuntimeCo
       renown: context.social.renown,
       relationships: new Map(context.social.relationships),
     },
+    character: context.character === null
+      ? null
+      : { ...context.character, martialArtIds: [...context.character.martialArtIds] },
+    factionState: createFactionMembershipState(context.factionState.membership),
     knownKnowledgeNodeIds: new Set(context.knownKnowledgeNodeIds),
   };
 }
@@ -375,6 +430,16 @@ function commitRuntimeContext(
   }
   target.knownKnowledgeNodeIds.clear();
   for (const nodeId of staged.knownKnowledgeNodeIds) target.knownKnowledgeNodeIds.add(nodeId);
+  target.factionState.membership = staged.factionState.membership === null
+    ? null
+    : { ...staged.factionState.membership };
+  if (target.character !== null && staged.character !== null) {
+    target.character.martialArtIds.splice(
+      0,
+      target.character.martialArtIds.length,
+      ...staged.character.martialArtIds,
+    );
+  }
 }
 
 /**
@@ -442,6 +507,40 @@ function validateEffect(
       return context.knowledgeNodes.has(effect.nodeId)
         ? null
         : `见闻节点 "${effect.nodeId}" 不存在或不可用`;
+    case 'joinFaction': {
+      const faction = context.factions.get(effect.factionId);
+      if (faction === undefined) return `门派资料 "${effect.factionId}" 不存在或不可用`;
+      const result = checkFactionAdmission({
+        faction,
+        speakerNpcId: context.speakerNpcId,
+        membership: context.factionState.membership,
+        character: context.character,
+        social: context.social,
+        quests: context.quests,
+        journal: context.journal,
+      });
+      return result.eligible ? null : `暂不能拜入「${faction.name}」：${result.reasons.join('；')}`;
+    }
+    case 'leaveFaction': {
+      const membership = context.factionState.membership;
+      if (membership === null) return '目前尚未拜入任何门派';
+      const faction = context.factions.get(membership.factionId);
+      if (faction === undefined) return `当前门派资料 "${membership.factionId}" 已不可用，无法按门规退门`;
+      return faction.departure.allowed ? null : `「${faction.name}」门规不许退门`;
+    }
+    case 'learnMartialArt': {
+      const character = context.character;
+      const art = context.martialArts.get(effect.martialArtId);
+      if (character === null) return '当前没有可授艺的角色';
+      if (art === undefined) return `武学资料 "${effect.martialArtId}" 不存在或不可用`;
+      if (character.martialArtIds.includes(art.id)) return `已经掌握「${art.name}」`;
+      const eligibility = checkMartialArtEligibility(art, {
+        level: character.level,
+        attributes: character.attributes,
+        factionId: context.factionState.membership?.factionId ?? null,
+      });
+      return eligibility.eligible ? null : `尚未达到「${art.name}」的习武条件：${eligibility.reasons.join('；')}`;
+    }
     default:
       // adjust* effects: value ranges were pinned at parse time and explicit
       // npcIds at reference-assembly time; they can always commit.
@@ -568,6 +667,46 @@ export function applyDialogueEffects(
           const alreadyKnown = staged.knownKnowledgeNodeIds.has(node.id);
           staged.knownKnowledgeNodeIds.add(node.id);
           lines.push(alreadyKnown ? `已记下「${node.title}」` : `新增见闻「${node.title}」`);
+        }
+        break;
+      }
+      case 'joinFaction': {
+        const faction = staged.factions.get(effect.factionId);
+        if (faction !== undefined) {
+          setFactionMembership(staged.factionState, faction.id, staged.speakerNpcId);
+          const master = staged.npcNames?.get(staged.speakerNpcId);
+          lines.push(master === undefined
+            ? `拜入「${faction.name}」`
+            : `拜入「${faction.name}」，师从「${master}」`);
+        }
+        break;
+      }
+      case 'leaveFaction': {
+        const previous = staged.factionState.membership;
+        const faction = previous === null ? undefined : staged.factions.get(previous.factionId);
+        if (faction !== undefined) {
+          adjustMorality(staged.social, faction.departure.moralityDelta);
+          adjustRenown(staged.social, faction.departure.renownDelta);
+          if (faction.departure.forgetFactionMartialArts && staged.character !== null) {
+            staged.character.martialArtIds = staged.character.martialArtIds.filter((artId) =>
+              !staged.martialArts.get(artId)?.factionIds.includes(faction.id),
+            );
+          }
+          clearFactionMembership(staged.factionState);
+          const artConsequence = faction.departure.forgetFactionMartialArts
+            ? '，门派武学亦将遗忘'
+            : '，已学武学保留';
+          lines.push(
+            `退出「${faction.name}」：善恶 ${faction.departure.moralityDelta >= 0 ? '+' : ''}${faction.departure.moralityDelta}，声望 ${faction.departure.renownDelta >= 0 ? '+' : ''}${faction.departure.renownDelta}${artConsequence}`,
+          );
+        }
+        break;
+      }
+      case 'learnMartialArt': {
+        const art = staged.martialArts.get(effect.martialArtId);
+        if (art !== undefined && staged.character !== null) {
+          staged.character.martialArtIds.push(art.id);
+          lines.push(`学会「${art.name}」`);
         }
         break;
       }

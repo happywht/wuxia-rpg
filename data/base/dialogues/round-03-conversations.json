@@ -374,6 +374,155 @@
         },
         { "id": "leave", "text": "不妨事，路上留神便好。" }
       ]
+    },
+    {
+      "id": "dlg.ye-tingzhou-mentor",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "叶庭舟看过你手中折旧的纸页，轻轻摇头：「字里藏锋，终究还要落到脚下。你想问剑，还是问路？」",
+          "options": [
+            {
+              "text": "请教剑意。",
+              "nextNodeId": "sword-talk",
+              "conditions": [
+                { "kind": "npcRelationship", "npcId": "char.ye-tingzhou", "maxValue": 4 }
+              ],
+              "effects": [
+                { "kind": "adjustRelationship", "delta": 5 }
+              ]
+            },
+            {
+              "text": "愿拜入听雨剑阁门下。",
+              "nextNodeId": "accepted",
+              "conditions": [
+                { "kind": "factionMembership", "isMember": false }
+              ],
+              "effects": [
+                { "kind": "joinFaction", "factionId": "faction.tingyu-jiange" }
+              ]
+            },
+            {
+              "text": "请师父传我听雨剑法。",
+              "nextNodeId": "taught",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.tingyu-jiange", "isMember": true },
+                { "kind": "martialArtEligible", "martialArtId": "skill.tingyu-jianfa" }
+              ],
+              "effects": [
+                { "kind": "learnMartialArt", "martialArtId": "skill.tingyu-jianfa" }
+              ]
+            },
+            {
+              "text": "我想退出听雨剑阁。",
+              "nextNodeId": "departed",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.tingyu-jiange", "isMember": true }
+              ],
+              "effects": [ { "kind": "leaveFaction" } ]
+            },
+            { "text": "多谢指点，告辞。", "nextNodeId": "farewell" }
+          ]
+        },
+        { "id": "sword-talk", "text": "叶庭舟以枝代剑，点出你眼中尚急的锋芒：「先看清对面，再谈出剑。等你心与手不再相争，我再看你的根骨。」" },
+        { "id": "accepted", "text": "叶庭舟替你正了衣襟：「入门不是求一块招牌。从今日起，先学听雨，再学听人。」" },
+        { "id": "taught", "text": "叶庭舟将剑谱交到你手中：「招式已授，往后要在每一场交手里读懂它。」" },
+        { "id": "departed", "text": "叶庭舟收回目光：「缘分既尽，便各走各路。门中剑法也随今日一并还来。」" },
+        { "id": "farewell", "text": "叶庭舟将纸页收进袖中：「沿路多看，答案不在一处。」" }
+      ]
+    },
+    {
+      "id": "dlg.shi-bei-mentor",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "石北赤着双臂立在渡口石桩旁：「想入铁嶂，先把身子站稳。你若连一趟苦差都扛不住，山门不收。」",
+          "options": [
+            {
+              "text": "我愿拜入铁嶂派。",
+              "nextNodeId": "accepted",
+              "conditions": [
+                { "kind": "factionMembership", "isMember": false }
+              ],
+              "effects": [
+                { "kind": "joinFaction", "factionId": "faction.tiezhang-pai" }
+              ]
+            },
+            {
+              "text": "请师父传我铁嶂桩功。",
+              "nextNodeId": "taught",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.tiezhang-pai", "isMember": true },
+                { "kind": "martialArtEligible", "martialArtId": "skill.tiezhang-zhuanggong" }
+              ],
+              "effects": [
+                { "kind": "learnMartialArt", "martialArtId": "skill.tiezhang-zhuanggong" }
+              ]
+            },
+            {
+              "text": "我想退出铁嶂派。",
+              "nextNodeId": "departed",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.tiezhang-pai", "isMember": true }
+              ],
+              "effects": [ { "kind": "leaveFaction" } ]
+            },
+            { "text": "这便去磨练筋骨。", "nextNodeId": "farewell" }
+          ]
+        },
+        { "id": "accepted", "text": "石北将一根磨旧的木桩递给你：「铁嶂弟子先立桩。打熬筋骨的差事完成了，再来领桩功。」" },
+        { "id": "taught", "text": "石北让你沿着石桩走完三遍，才把桩功要诀交给你：「力从地起，脚下别虚。」" },
+        { "id": "departed", "text": "石北沉默片刻：「既然心不在桩上，就下山去吧。铁嶂的功夫与旧日情分都留在这里。」" },
+        { "id": "farewell", "text": "石北又将双掌按回桩上，不再多言。" }
+      ]
+    },
+    {
+      "id": "dlg.wen-suxin-mentor",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "闻素心正在渡口为人包扎伤处。她洗净手上的药草汁，问道：「练武是为了赢，还是为了让身边的人少受一次伤？」",
+          "options": [
+            {
+              "text": "我愿拜入云隐山庄。",
+              "nextNodeId": "accepted",
+              "conditions": [
+                { "kind": "factionMembership", "isMember": false }
+              ],
+              "effects": [
+                { "kind": "joinFaction", "factionId": "faction.yunyin-shanzhuang" }
+              ]
+            },
+            {
+              "text": "请庄主传我云隐身法。",
+              "nextNodeId": "taught",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.yunyin-shanzhuang", "isMember": true },
+                { "kind": "martialArtEligible", "martialArtId": "skill.yunyin-shenfa" }
+              ],
+              "effects": [
+                { "kind": "learnMartialArt", "martialArtId": "skill.yunyin-shenfa" }
+              ]
+            },
+            {
+              "text": "我想退出云隐山庄。",
+              "nextNodeId": "departed",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.yunyin-shanzhuang", "isMember": true }
+              ],
+              "effects": [ { "kind": "leaveFaction" } ]
+            },
+            { "text": "我还想再想一想。", "nextNodeId": "farewell" }
+          ]
+        },
+        { "id": "accepted", "text": "闻素心递给你一卷药典：「既然入庄，先记住药能救人，也能害人。心不稳时，先别出手。」" },
+        { "id": "taught", "text": "闻素心教你辨风听叶，再示范云隐身法的起落：「脚步轻，不代表心可以轻。」" },
+        { "id": "departed", "text": "闻素心轻轻颔首：「庄门不拦去路。只是从今日起，救人之责也由你自己承担。」" },
+        { "id": "farewell", "text": "闻素心将药箱背起：「答案想清楚再来，不迟。」" }
+      ]
     }
   ]
 }

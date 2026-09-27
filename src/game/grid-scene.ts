@@ -5,6 +5,7 @@ import { GridMap } from '../engine/grid-map';
 import { cellCenterOffset, renderGridMap } from '../engine/grid-map-renderer';
 import { selectAdjacentTransition, type RegionTransitionData } from '../engine/world-map';
 import { createKnowledgeState } from '../engine/knowledge-graph';
+import { createFactionMembershipState, type FactionMembershipState } from '../engine/faction-system';
 import {
   type DialogueData,
   type DialogueSession,
@@ -73,6 +74,7 @@ import { WorldMapPanel } from './world-map-ui';
 import { EncyclopediaPanel } from './encyclopedia-ui';
 import { PauseMenuPanel } from './pause-menu';
 import { ControlsPanel } from './controls-ui';
+import { FactionPanel } from './faction-ui';
 import { type GameSettings, applyGameSettings, loadGameSettings, uiFontSize } from './settings';
 import { createPixelPerson, UI_FONT_FAMILY } from './ui-theme';
 import { type GridStartupData } from './menu-scene';
@@ -198,6 +200,8 @@ export class GridScene extends Phaser.Scene {
 
   /** Round 08 social state (morality/renown/NPC relationships). */
   private social: SocialState = createSocialState();
+  /** Current student→master relationship, persisted independently of lore. */
+  private factionState: FactionMembershipState = createFactionMembershipState();
   /** Discovered encyclopedia entries are run state and participate in saves. */
   private knownKnowledgeNodeIds = new Set<string>();
 
@@ -208,6 +212,7 @@ export class GridScene extends Phaser.Scene {
   private questPanel: QuestPanel | null = null;
   private pauseMenu: PauseMenuPanel | null = null;
   private controlsPanel: ControlsPanel | null = null;
+  private factionPanel: FactionPanel | null = null;
   private worldMapPanel: WorldMapPanel | null = null;
   private encyclopediaPanel: EncyclopediaPanel | null = null;
   private activeSession: CombatSession | null = null;
@@ -312,6 +317,7 @@ export class GridScene extends Phaser.Scene {
       world.knowledgeGraph,
       restoredRun?.knownKnowledgeNodeIds ?? [],
     );
+    this.factionState = createFactionMembershipState(restoredRun?.factionMembership ?? null);
     this.currentMapResourceId = restoredRun?.mapResourceId ?? world.mapResourceId;
     const activeMap = world.maps.get(this.currentMapResourceId) ?? map;
     this.map = activeMap;
@@ -377,6 +383,7 @@ export class GridScene extends Phaser.Scene {
       this.playerDisplayName = '';
       this.questJournal = createQuestJournal(this.quests);
       this.social = createSocialState();
+      this.factionState = createFactionMembershipState();
       this.shopStocks.clear();
       for (const shop of this.shops.values()) {
         this.shopStocks.set(shop.record.id, createShopStockRuntime(shop));
@@ -480,6 +487,7 @@ export class GridScene extends Phaser.Scene {
       },
     });
     this.controlsPanel = new ControlsPanel(this);
+    this.factionPanel = new FactionPanel(this, () => this.noteOverlayClosed());
     this.worldMapPanel = new WorldMapPanel(this, () => this.noteOverlayClosed());
     this.encyclopediaPanel = new EncyclopediaPanel(this, { onClose: () => this.noteOverlayClosed() });
     this.updateQuestTrackerHud();
@@ -621,6 +629,13 @@ export class GridScene extends Phaser.Scene {
           .filter((node) => node.knownByDefault)
           .map((node) => node.id),
       ),
+      factionIds: new Set(world.assembly.progression.factions.keys()),
+      factionMentorNpcIds: new Map(
+        [...world.assembly.progression.factions.entries()].map(([factionId, faction]) => [
+          factionId,
+          new Set(faction.mentorNpcIds),
+        ]),
+      ),
     };
   }
 
@@ -642,6 +657,7 @@ export class GridScene extends Phaser.Scene {
       completedEncounters: this.completedEncounters,
       completedRegionalEvents: this.completedRegionalEvents,
       knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
+      factionMembership: this.factionState.membership,
     });
     const result = writeSaveSlot(this.storage, slotId, snapshot);
     if (result.ok) {
@@ -671,6 +687,11 @@ export class GridScene extends Phaser.Scene {
 
   /** Escape while exploring: toggle the pause menu (never over another overlay). */
   private togglePauseMenu(): void {
+    if (this.factionPanel?.isOpen) {
+      this.factionPanel.close();
+      this.noteOverlayClosed();
+      return;
+    }
     if (this.controlsPanel?.isOpen) {
       this.controlsPanel.close();
       this.noteOverlayClosed();
@@ -984,8 +1005,28 @@ export class GridScene extends Phaser.Scene {
       (this.pauseMenu !== null && this.pauseMenu.isOpen) ||
       (this.worldMapPanel !== null && this.worldMapPanel.isOpen) ||
       (this.encyclopediaPanel !== null && this.encyclopediaPanel.isOpen) ||
+      (this.factionPanel !== null && this.factionPanel.isOpen) ||
       (this.controlsPanel !== null && this.controlsPanel.isOpen)
     );
+  }
+
+  /** J key: inspect all faction rules and the current recorded lineage. */
+  private toggleFactionPanel(): void {
+    const panel = this.factionPanel;
+    if (panel === null) return;
+    if (panel.isOpen) {
+      panel.close();
+      this.noteOverlayClosed();
+      return;
+    }
+    if (this.anyOverlayOpen()) return;
+    panel.open({
+      factions: this.progression.factions,
+      membership: this.factionState.membership,
+      npcNames: new Map((this.world?.assembly.npcs ?? []).map((npc) => [npc.record.id, npc.record.name])),
+      quests: this.quests,
+    });
+    this.updateInteractHint();
   }
 
   /** H key: show the keyboard reference without allowing world input through. */
@@ -1210,6 +1251,10 @@ export class GridScene extends Phaser.Scene {
     const onEncyclopedia = (): void => this.toggleEncyclopedia();
     encyclopediaKey.on('down', onEncyclopedia);
 
+    const factionKey = keyboard.addKey(KeyCodes.J);
+    const onFaction = (): void => this.toggleFactionPanel();
+    factionKey.on('down', onFaction);
+
     const controlsKey = keyboard.addKey(KeyCodes.H);
     const onControls = (): void => this.toggleControlsPanel();
     controlsKey.on('down', onControls);
@@ -1225,6 +1270,7 @@ export class GridScene extends Phaser.Scene {
       pauseKey.off('down', onPause);
       worldMapKey.off('down', onWorldMap);
       encyclopediaKey.off('down', onEncyclopedia);
+      factionKey.off('down', onFaction);
       controlsKey.off('down', onControls);
       this.dialoguePanel?.destroy();
       this.dialoguePanel = null;
@@ -1242,6 +1288,8 @@ export class GridScene extends Phaser.Scene {
       this.worldMapPanel = null;
       this.encyclopediaPanel?.destroy();
       this.encyclopediaPanel = null;
+      this.factionPanel?.destroy();
+      this.factionPanel = null;
       this.controlsPanel?.destroy();
       this.controlsPanel = null;
       this.activeSession = null;
@@ -1356,6 +1404,10 @@ export class GridScene extends Phaser.Scene {
       knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
       knowledgeNodes: this.world?.knowledgeGraph.nodes ?? new Map(),
       npcNames: new Map(this.placedNpcs.map((npc) => [npc.record.id, npc.record.name])),
+      character: this.playerState,
+      factions: this.progression.factions,
+      martialArts: this.progression.martialArts,
+      factionState: this.factionState,
     };
   }
 

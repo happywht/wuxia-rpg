@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://wuxia-rpg.invalid/schema/dialogue-set",
   "title": "对话集合",
-  "description": "对话集合 JSON 的静态结构契约：字段名、类型与长度。静态 Schema 违规由资源加载器拒绝。图语义（startNodeId 是否存在于 nodes、每个选项 nextNodeId 是否指向有效节点、节点 id 是否重复）和 draft-07 无法表达的条件上下界次序（同时给出时 minValue 必须不大于 maxValue）由运行时逐段校验；单段坏对话只禁用自身，不拖垮其他合法对话。无 options 的节点是结束节点。Round 08 起选项可声明 conditions（全部满足才可见）与 effects（确认时原子执行）；条件/效果 kind 与字段为封闭枚举，未知字段或类型一律拒绝；跨资源 id（questId/itemId/npcId）由装配期校验，坏引用只剔除相应选项。",
+  "description": "对话集合 JSON 的静态结构契约：字段名、类型与长度。静态 Schema 违规由资源加载器拒绝。图语义和条件上下界由运行时逐段校验；单段坏对话只禁用自身。选项可声明 conditions（全部满足才可见）与 effects（确认时原子执行）；条件/效果 kind 与字段为封闭枚举。任务/物品/NPC/见闻/门派/武学引用在装配期校验，坏引用只剔除相应选项。拜师、授艺与退门沿用同一事务协议。",
   "type": "object",
   "additionalProperties": false,
   "required": ["conversations"],
@@ -158,6 +158,27 @@
             "kind": { "const": "knowledgeKnown" },
             "nodeId": { "type": "string", "minLength": 1, "maxLength": 64 }
           }
+        },
+        {
+          "description": "玩家属于或不属于指定门派；省略 factionId 时检查是否加入任意门派。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "isMember"],
+          "properties": {
+            "kind": { "const": "factionMembership" },
+            "factionId": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "isMember": { "type": "boolean" }
+          }
+        },
+        {
+          "description": "玩家尚未掌握且满足指定武学的等级、属性与门派要求时成立。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "martialArtId"],
+          "properties": {
+            "kind": { "const": "martialArtEligible" },
+            "martialArtId": { "type": "string", "minLength": 1, "maxLength": 64 }
+          }
         }
       ]
     },
@@ -259,6 +280,33 @@
           "properties": {
             "kind": { "const": "discoverKnowledgeNode" },
             "nodeId": { "type": "string", "minLength": 1, "maxLength": 64 }
+          }
+        },
+        {
+          "description": "由当前对话对象（门派登记的师父）收徒；校验门派入门条件并记录师父关系。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "factionId"],
+          "properties": {
+            "kind": { "const": "joinFaction" },
+            "factionId": { "type": "string", "minLength": 1, "maxLength": 64 }
+          }
+        },
+        {
+          "description": "按当前门派资料声明的规则退门，原子结算声望/善恶并清除师承。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": { "kind": { "const": "leaveFaction" } }
+        },
+        {
+          "description": "向有效角色授予一门已满足等级、属性及当前门派资格的武学。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "martialArtId"],
+          "properties": {
+            "kind": { "const": "learnMartialArt" },
+            "martialArtId": { "type": "string", "minLength": 1, "maxLength": 64 }
           }
         }
       ]
