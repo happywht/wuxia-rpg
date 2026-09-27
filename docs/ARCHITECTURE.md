@@ -1,6 +1,6 @@
 # 架构说明（ARCHITECTURE）
 
-- 状态：Round 03–11 的地图、对话、成长、战斗、经济、任务、社会状态、存档、区域旅行与知识图谱/百科运行时均已落地。
+- 状态：Round 03–11 的地图、对话、成长、战斗、经济、任务、社会状态、存档、区域旅行与知识图谱/百科运行时，以及 Round 14 的数据驱动历法/游戏时钟均已落地。
 - 关联：`docs/ADR.md`（技术选型依据）、`docs/DATA-GUIDE.md`（数据面细节）
 
 ---
@@ -33,18 +33,20 @@
 
 Round 01 已实现地图加载切片：Vite 将 `data/` 作为静态目录服务，场景请求 `/base/maps/round-01-grid.json`（部署使用 `BASE_URL` 前缀）。地图文件随生产构建复制到输出目录。缺失/HTTP 错误、JSON 无法解析或结构检查失败时，场景保留画布并显示可读错误面板。当前结构检查只覆盖网格地图所需字段，不等同于正式 Schema 管线。
 
-Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id、相对路径、schema id 和按顺序启用的 MOD。加载顺序为：Ajv 校验 manifest → 加载并编译被引用的 schema → 加载并校验基础资源 → 按启用顺序读取同路径 MOD 覆盖并重复校验 → 通过事件总线广播结果 → 场景消费资源。Round 03 起 manifest 注册地图/NPC/对话，Round 04 登记角色/门派/武学，Round 05 登记战斗遭遇，Round 06 登记物品/商店，Round 07 登记任务；Round 10 根据 `grid-map` schema 家族收集全部地图，并要求 `world-map` 资源解析出有效起始地图；Round 11 将知识节点与关系作为两个可选、独立 schema 资源登记，缺失任一者时以空集合继续，坏引用只隔离相关关系或对话选项。区域与图谱的语义检查由 Phaser 无关模块执行。运行状态仍独立保存到浏览器本地存储，不混入世界资料。
+Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id、相对路径、schema id 和按顺序启用的 MOD。加载顺序为：Ajv 校验 manifest → 加载并编译被引用的 schema → 加载并校验基础资源 → 按启用顺序读取同路径 MOD 覆盖并重复校验 → 通过事件总线广播结果 → 场景消费资源。Round 03 起 manifest 注册地图/NPC/对话，Round 04 登记角色/门派/武学，Round 05 登记战斗遭遇，Round 06 登记物品/商店，Round 07 登记任务；Round 10 根据 `grid-map` schema 家族收集全部地图，并要求 `world-map` 资源解析出有效起始地图；Round 11 将知识节点与关系作为两个可选、独立 schema 资源登记，缺失任一者时以空集合继续，坏引用只隔离相关关系或对话选项；Round 14 登记**必需**的 `game-calendar` 历法资源，未登记或语义无效（重复 id/时段起点、缺零点时段、悬空起始引用、非法耗时）时提供可读错误并拒绝加载，不做部分降级。区域、图谱与历法的语义检查由 Phaser 无关模块执行。运行状态仍独立保存到浏览器本地存储，不混入世界资料。
 
 缺数据/坏数据的行为按严重度分级：
 
 | 情况 | 行为 | 用户所见 |
 |---|---|---|
 | manifest、manifest/grid-map schema 或当前关键地图缺失/不可解析 | 资源不进入运行状态；场景显示诊断面板并停止装配 | 来源路径、HTTP/解析/schema 原因及修复提示 |
+| 历法资源（game-calendar）未登记、缺失、schema 不符或语义无效（重复月份/时段 id、时段起点重复、缺零点时段、起始月/日/时刻越界、耗时越界） | 同上：历法是必需资料，整资源拒绝，不回退到硬编码历法 | 面板点名 `calendar.base` 与具体未通过的语义条目 |
 | 可选资源（NPC/对话/角色模板/门派/武学/战斗遭遇/物品/商店/任务/知识图谱）或其 schema 缺失、不可解析、schema 不符、未通过语义校验 | 降级为警告；场景继续装配其余内容 | 地图与移动不受影响；HUD 显示"已禁用相应内容"警告行，控制台保留结构化诊断 |
 | 单条 NPC 记录坏（引用不存在、坐标越界/阻挡、压出生点、同格冲突、id 重复） | 只禁用该 NPC，其余照常放置 | 同上；警告消息点名被禁用的 NPC 与原因 |
 | 单段对话坏（起始节点/选项引用断裂、节点 id 重复）或对话 id 重复 | 只禁用该对话及引用它的 NPC，其余照常 | 同上 |
 | 对话条件通过静态 Schema 但语义无效（例如同时提供的 `minValue` 大于 `maxValue`） | 只禁用该对话及引用它的 NPC；其他合法对话保留 | 同上；warning 点名段落与原因。静态 Schema 违规仍按资源级拒绝 |
 | 单个对话选项的条件/效果引用坏（questId/itemId/npcId 悬空） | 只剔除该选项；其所在节点可能因此成为结束节点，对话与其余选项照常 | 同上；警告点名对话、节点与被剔除的选项 |
+| 对话选项的 `timeOfDay` 条件引用历法未声明的时段 id | 只剔除该选项；同时段/其他选项照常 | 同上；警告点名 `引用无效时段` 与悬空 id |
 | 单个对话选项的知识节点引用坏 | 只剔除引用悬空节点的条件/效果选项；其他对话照常 | 同上；知识图谱缺失时百科显示空态 |
 | 知识节点/关系集合缺失，或图谱行重复/关系端点悬空 | 可选集合按空集处理；重复节点/关系保留首条，坏边逐条忽略 | 地图可继续探索；告警包含资源或条目位置与原因 |
 | 角色模板/门派条目 id 重复 | 保留先声明者并警告 | 同上；警告点名重复 id |
@@ -63,9 +65,9 @@ Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id
 
 ## 3. JSON Schema 校验（Ajv，Round 02 已接入）
 
-- 当前 schema 使用 draft-07：`manifest.schema.json`、`grid-map.schema.json`、`world-map.schema.json`、`knowledge-nodes.schema.json`、`knowledge-edges.schema.json`、`npc-set.schema.json`、`dialogue-set.schema.json`、`character-profiles.schema.json`、`faction-set.schema.json`、`martial-arts-set.schema.json`、`battle-encounters.schema.json`、`items-set.schema.json`、`shops-set.schema.json` 与 `quest-set.schema.json`。
+- 当前 schema 使用 draft-07：`manifest.schema.json`、`grid-map.schema.json`、`world-map.schema.json`、`game-calendar.schema.json`、`knowledge-nodes.schema.json`、`knowledge-edges.schema.json`、`npc-set.schema.json`、`dialogue-set.schema.json`、`character-profiles.schema.json`、`faction-set.schema.json`、`martial-arts-set.schema.json`、`battle-encounters.schema.json`、`items-set.schema.json`、`shops-set.schema.json` 与 `quest-set.schema.json`。
 - Ajv 8.x 在加载期校验 manifest、基础资源和每份 MOD 覆盖（开发/生产相同），不在游戏循环内反复校验。
-- 跨字段规则分层完成：地图尺寸/出生点、世界图地图/区域/关口/事件引用、关口坐标和可走性等由语义解析补足；世界图跨地图装配后还会排除与 NPC/战斗遭遇重叠的关口或区域事件。角色成长、武学、物品/商店、任务与对话引用仍按原有模块逐项校验；对话范围顺序由防御解析器隔离。失败时只禁用受影响的最小条目，世界图起始地图等关键资料无效则提供可读启动错误。
+- 跨字段规则分层完成：地图尺寸/出生点、世界图地图/区域/关口/事件引用、关口坐标和可走性、历法 id/时段起点唯一性与零点时段存在性等由语义解析补足；世界图跨地图装配后还会排除与 NPC/战斗遭遇重叠的关口或区域事件。角色成长、武学、物品/商店、任务与对话引用仍按原有模块逐项校验；对话范围顺序由防御解析器隔离。失败时只禁用受影响的最小条目，世界图起始地图、历法等关键资料无效则提供可读启动错误。
 - 错误输出为结构化诊断（来源、资源、消息和字段路径），可被事件总线订阅并显示在场景。
 
 ## 4. mod 覆盖：同名文件优先级（Round 02 已提供基础能力，Round 35 增强作者工具）
@@ -107,6 +109,10 @@ Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id
 
 `faction-system.ts` 是 Phaser-free 的门派规则模块：接收已解析的门派、角色、社会状态、任务状态和当前对话 NPC，统一检查入门条件并操作唯一师承关系。`dialogue-runtime.ts` 通过 staged copy 原子应用拜师、退门惩罚、门派武学遗忘和授艺；`save-system.ts` 将师门身份作为可空 v1 字段保存，恢复时把失效门派/师父隔离为无门派并报告 warning。导师、门槛、退门后果和对白均来自数据文件。
 
+### Round 14：数据驱动历法与游戏时钟
+
+`game-calendar.ts` 是 Phaser-free 的历法协议与时钟引擎：防御解析并语义校验月份/时段/起始时刻/动作耗时（Ajv 语义校验器在资源层拒绝无效历法），`GameClock` 以单一"已过分钟数"为权威状态，按需折算年/月/日/分钟并做循环时段查询——零点时段由校验保证存在，跨午夜时段因此无需特判。`grid-scene.ts` 只在动作确实完成后调用推进：成功移动一步、成功通过关口旅行和 V 键等候分别消耗资料配置的分钟数，被阻挡的移动、被拒的传送与任何打开中的面板一律零消耗。时间 HUD 显示历日/时刻/时段；昼夜调色层以固定深度带（世界 0 < 调色 50 < HUD 60 < 面板 1000+）夹在世界图像与 UI 之间，按当前时段照度渐变，区域切换重建世界层后仍稳定覆盖。`dialogue-runtime.ts` 的 `timeOfDay` 条件读取时钟当前时段 id，装配期对照历法剔除悬空时段引用的选项。存档保存分钟计数而非派生日期，旧 v1 快照缺字段时从历法起始时刻恢复。
+
 ## 变更记录
 
 | 日期 | 轮次 | 变更 |
@@ -124,3 +130,4 @@ Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id
 | 2026-09-27 | Round 10–11 | 多区域旅行与区域事件；知识图谱协议、百科和对话见闻进度 |
 | 2026-09-27 | Round 12 | 共享像素 UI、程序生成地图/人物层次、键位帮助、字号即时刷新与长列表布局 |
 | 2026-09-27 | Round 13 | Phaser-free 师门规则、原子对话效果、导师引用检查及师承存档兼容 |
+| 2026-09-27 | Round 14 | 必需历法资源与语义校验、纯规则游戏时钟、timeOfDay 对话条件、昼夜调色与时间 HUD、分钟计数存档兼容 |

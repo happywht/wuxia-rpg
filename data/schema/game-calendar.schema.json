@@ -1,0 +1,140 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wuxia-rpg.invalid/schema/game-calendar",
+  "title": "游戏历法",
+  "description": "游戏内时间的世界契约：月份、日内时段与照度、起始时刻和动作耗时。静态 Schema 只约束字段与数值范围；跨字段语义（月份/时段 id 唯一、时段起点互异、必须存在零点时段、start 引用与当月天数上限）由加载期语义校验补足，任一无效即整资源拒绝——历法是必需资料，不做部分降级。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "start", "months", "periods", "actionCosts"],
+  "properties": {
+    "id": {
+      "description": "历法资源 id，如 calendar.base。",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+    },
+    "start": {
+      "description": "新开局的游戏内起始时刻；存档只保存相对该时刻的已过分钟数。",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["year", "monthId", "day", "minuteOfDay"],
+      "properties": {
+        "year": {
+          "description": "起始年（1 起）。",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9999
+        },
+        "monthId": {
+          "description": "起始月份 id，必须出现在 months 中（语义校验）。",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "day": {
+          "description": "起始日（1 起；上限为所引月份的天数，由语义校验检查）。",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 60
+        },
+        "minuteOfDay": {
+          "description": "起始时刻的日内分钟（0–1439；一天固定 1440 分钟）。",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1439
+        }
+      }
+    },
+    "months": {
+      "description": "一年的月份序列（按此顺序循环）；id 唯一（语义校验）。",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 24,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "days"],
+        "properties": {
+          "id": {
+            "description": "稳定月份 id，建议前缀 month.。",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+          },
+          "name": {
+            "description": "月份显示名（历法文本，来自资料）。",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32
+          },
+          "days": {
+            "description": "该月包含的游戏日天数。",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 60
+          }
+        }
+      }
+    },
+    "periods": {
+      "description": "日内时段列表，按 startMinute 循环划分一天；必须包含 startMinute 为 0 的零点时段且起点互异（语义校验）。夜间时段可跨午夜。",
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 24,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "startMinute", "lightLevel"],
+        "properties": {
+          "id": {
+            "description": "稳定时段 id（对话 timeOfDay 条件引用此 id），建议前缀 period.。",
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+          },
+          "name": {
+            "description": "时段显示名（如 拂晓、入夜）。",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 16
+          },
+          "startMinute": {
+            "description": "时段开始的日内分钟（0–1439）。",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1439
+          },
+          "lightLevel": {
+            "description": "时段照度（0 全黑–1 全亮）；场景以此推导昼夜调色强度。",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      }
+    },
+    "actionCosts": {
+      "description": "推进游戏时间的动作耗时（分钟）。只有确实完成的动作才消耗时间。",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stepMinutes", "travelMinutes", "waitMinutes"],
+      "properties": {
+        "stepMinutes": {
+          "description": "每成功移动一格消耗的分钟数；0 表示移动不耗时。",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1440
+        },
+        "travelMinutes": {
+          "description": "每次通过区域关口旅行消耗的分钟数。",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1440
+        },
+        "waitMinutes": {
+          "description": "每次主动等候消耗的分钟数。",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1440
+        }
+      }
+    }
+  }
+}

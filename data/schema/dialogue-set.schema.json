@@ -179,6 +179,16 @@
             "kind": { "const": "martialArtEligible" },
             "martialArtId": { "type": "string", "minLength": 1, "maxLength": 64 }
           }
+        },
+        {
+          "description": "游戏内当前时段等于历法声明的 periodId 时成立（时段随移动/旅行/等候推进）。periodId 在装配期对照日历校验，坏引用只剔除相应选项。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "periodId"],
+          "properties": {
+            "kind": { "const": "timeOfDay" },
+            "periodId": { "type": "string", "minLength": 1, "maxLength": 64 }
+          }
         }
       ]
     },

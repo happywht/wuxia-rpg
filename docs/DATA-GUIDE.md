@@ -27,7 +27,7 @@ data/
 │   ├── factions/            # 门派：立场、声望规则、成员关系
 │   ├── battles/             # 战斗：遭遇触发点、敌人、奖励与提示文本
 │   └── endings/             # 结局：触发条件与结局文本
-├── schema/                  # JSON Schema（当前含 manifest、grid-map、world-map、knowledge-nodes、knowledge-edges、npc-set、dialogue-set、character-profiles、faction-set、martial-arts-set、battle-encounters、items-set、shops-set、quest-set）
+├── schema/                  # JSON Schema（当前含 manifest、grid-map、world-map、game-calendar、knowledge-nodes、knowledge-edges、npc-set、dialogue-set、character-profiles、faction-set、martial-arts-set、battle-encounters、items-set、shops-set、quest-set）
 mods/                        # mod 覆盖层：mods/<modId>/ 镜像 data/base/ 相对路径
 ```
 
@@ -40,6 +40,8 @@ Round 10 状态：manifest 可登记多个 `grid-map` 资源；`world.atlas` 是
 Round 11 状态：manifest 登记可选 `knowledge-nodes` 与 `knowledge-edges` 资源，分别使用 `knowledge-nodes.schema.json` 与 `knowledge-edges.schema.json`；节点类别为 character/place/faction/item/martialArt/event/quest/ending，关系类型为 mentorOf/parentOf/hostileTo/belongsTo/locatedAt/holds/triggers/requires/rewards/knows/participatesIn/influences。节点含稳定 id、类型、标题、摘要和 `knownByDefault`；边含稳定 id、两端节点 id、关系类型和说明。解析器对坏单条给警告并隔离，装配时重复 id 保留首项，悬空端点关系逐条丢弃。
 
 玩家新局从 `knownByDefault: true` 节点建立知识状态。对话选项可以声明 `{ "kind": "knowledgeKnown", "nodeId": "kg.node-id" }` 条件，全部条件满足才显示；效果 `{ "kind": "discoverKnowledgeNode", "nodeId": "kg.node-id" }` 会解锁词条，重复发现幂等。悬空引用只剔除对应对话选项。K 打开百科，左右/A/D 切换分类、上下/W/S 浏览、Esc 或 K 关闭。未发现条目只汇总为“未解锁见闻”，不会泄漏标题、摘要或相关边；关系只在两端节点都已知时显示。已知 id 随存档保存。具体内容组织和编辑步骤见 `docs/KNOWLEDGE-GRAPH.md`。
+
+Round 14 状态：manifest 登记**必需**资源 `calendar.base` → `worldview/calendar.json`（`game-calendar` schema）。历法声明月份序列（id/名称/天数 1–60，至多 24 个月）、日内时段（id/名称/起始分钟 0–1439/照度 0–1，至多 24 段；必须存在零点时段且起始分钟互异）、起始时刻（年/月 id/日/日内分钟）与动作耗时（`stepMinutes` 0–1440、`travelMinutes`/`waitMinutes` 1–1440）。语义校验拒绝重复月份/时段 id、重复时段起点、悬空起始月份、超出当月天数的起始日与越界耗时——历法无效即整资源拒绝（可读错误面板），不做部分降级。时段按循环边界划分，可跨午夜；运行时 HUD 显示历日/时刻/时段，世界层按时段照度渐变调色。一天固定 1440 分钟；游戏时间只由成功移动（每步 `stepMinutes`）、成功区域旅行（`travelMinutes`）与 V 键等候（`waitMinutes`）推进，被阻挡或被面板拦截的操作零消耗。存档保存相对起始时刻的分钟计数（`elapsedGameMinutes`），日期随时由当前资料折算。对白写作细节见 `docs/DIALOGUE-GUIDE.md`。
 
 ## 3. 文件与命名约定
 
@@ -91,11 +93,36 @@ Round 11 状态：manifest 登记可选 `knowledge-nodes` 与 `knowledge-edges` 
 - 新增物品：在 items-set JSON 中新增条目（id 建议 `item.` 前缀，`category` 选 consumable/equipment/misc；填写原创名称/说明、`stackLimit`、`buyPrice`/`sellPrice`；消耗品声明 `healthRestore`/`qiRestore` 至少一项为正，装备声明槽位、属性加成和生命/内力上限加成；`sellPrice: 0` 表示不可售）。
 - 新增商店：在 shops-set JSON 中声明稳定 shop id、`npcId`（指向可放置 NPC）、原创 `name`/`greeting`、`sellRate` 及 `stock`（`itemId` 必须存在，quantity 为 -1 无限或非负余量）；在 NPC 条目加 `shopId` 后，玩家四方向相邻按 E 开店，否则仍走其对话。货币与背包起点在角色模板的 `startingCurrency`、`inventoryCapacity` 和 `startingItems` 中配置。
 - 新增任务：在 quest-set JSON 的 `quests` 数组新增任务（`id` 建议 `quest.` 前缀；`giverNpcId` 必须指向有效 NPC，并在 NPC 条目声明 `questGiver: true`；`prerequisiteQuestIds` 只能引用无环任务；目标 `kind` 选 `collectItem`/`defeatEncounter`，`targetId` 分别引用有效物品/遭遇，`requiredCount` 为正整数；`failOnEncounterIds` 声明败北失败的遭遇；`rewards` 声明非负 experience/currency）。收集目标接取时以当前背包数量为起点，物品变化后同步目标数量；击败目标在战斗胜利后推进；任务奖励恰发一次。E 打开发布人名录，Q 打开日志，A 放弃活动任务；Round 09 起任务阶段和进度随本地存档持久化。
+- 修改历法：直接编辑 `data/base/worldview/calendar.json`（或用 MOD 同路径覆盖）。调整月份天数/时段表/耗时都会即时反映到新开局与读档折算（存档只存分钟数）；删除对话正在引用的时段 id 只会剔除相应选项并警告。时段 id 建议 `period.` 前缀、月份 id 建议 `month.` 前缀；照度 0–1 控制夜幕深度（场景按 `1 − 照度` 叠加至多约 0.55 透明度的冷色层，UI 始终保持清晰）。
 - 所有内容必须原创（红线见 `docs/ORIGINAL-FIDELITY.md`）；命名避开任何原作专有名称。
 
 ## Round 13：门派与师承资料
 
 在 faction-set 的 faction 条目声明 `mentorNpcIds`、`admission` 与 `departure`；导师必须引用可放置 NPC。`admission` 可设 `minimumLevel`、五项 `minimumAttributes`、善恶上下限、声望/师徒关系下限及 `requiredQuestIds`；缺失任务引用会令该门派不可入门并产生警告。`departure.allowed` 控制能否离门，`moralityDelta`/`renownDelta` 设置代价，`forgetFactionMartialArts` 决定退门时是否遗忘 `factionIds` 包含该派的武学。NPC 对话通过 `factionMembership` / `martialArtEligible` 条件及 `joinFaction` / `leaveFaction` / `learnMartialArt` 效果提供流程；J 打开师门档案。旧 faction 资料未写扩展字段时采用无门槛、可退门且保留武学的默认值。
+
+## Round 14：历法资料
+
+`data/base/worldview/calendar.json` 是**必需**资源（manifest 登记 `calendar.base`，schema `game-calendar`），包含五块：
+
+```json
+{
+  "id": "calendar.base",
+  "start": { "year": 1, "monthId": "month.qingyang", "day": 1, "minuteOfDay": 480 },
+  "months": [{ "id": "month.qingyang", "name": "青阳", "days": 30 }],
+  "periods": [
+    { "id": "period.midnight", "name": "子夜", "startMinute": 0, "lightLevel": 0.18 },
+    { "id": "period.night", "name": "入夜", "startMinute": 1140, "lightLevel": 0.22 }
+  ],
+  "actionCosts": { "stepMinutes": 1, "travelMinutes": 45, "waitMinutes": 60 }
+}
+```
+
+- `months`：一年的月份序列，按声明顺序循环；天数 1–60，至多 24 个月。
+- `periods`：日内时段划分，一天固定 1440 分钟；必须有一个 `startMinute: 0` 的零点时段，且各时段起始分钟互异（否则语义校验拒绝整个资源）。时段可跨午夜——从其起点持续到下一时段起点（或经午夜回到零点时段）。
+- `start`：新开局的历日时刻；`day` 不得超过所引月份天数。
+- `actionCosts`：成功移动一格 / 通过关口旅行一次 / V 键等候一次分别消耗的分钟数（step 允许 0 表示移动不耗时；travel/wait 至少 1）。
+- 基础资料为原创"青阳—岁除"十二月历（各 30 天）与子夜/拂晓/晨光/日中/午后/黄昏/入夜七时段；照度决定场景夜幕深度。
+- 存档只保存 `elapsedGameMinutes` 分钟计数；读档用**当前**历法折算年月日与时段，因此改月份长度不会产生矛盾日期。
 
 ## 变更记录
 
@@ -114,3 +141,4 @@ Round 11 状态：manifest 登记可选 `knowledge-nodes` 与 `knowledge-edges` 
 | 2026-09-27 | Round 09 | 记录存档与设置不属于世界资料、引用兼容检查及各系统状态恢复语义 |
 | 2026-09-27 | Round 10–11 | 记录多区域地图资源、知识图谱节点/关系、百科、知识对话条件与存档恢复 |
 | 2026-09-27 | Round 13 | 增加导师、拜师/授艺/退门资料字段、规则说明及旧资料缺省语义 |
+| 2026-09-27 | Round 14 | 登记必需历法资源与 game-calendar schema，记录月份/时段/照度/耗时契约、语义校验拒绝规则与分钟计数存档 |

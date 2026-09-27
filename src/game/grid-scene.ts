@@ -15,6 +15,7 @@ import {
   applyDialogueEffects,
   getVisibleOptions,
 } from '../engine/dialogue-runtime';
+import { GameClock } from '../engine/game-calendar';
 import { type SocialState, createSocialState } from '../engine/social-state';
 import {
   NpcOccupancyIndex,
@@ -87,8 +88,12 @@ import {
 /**
  * Round 03 grid scene, extended with the Round 04 progression datasets,
  * the Round 05 battle slice, Round 06 item/trade slice, Round 07 quests,
- * the Round 08 dialogue condition/effect runtime and the Round 09
- * menu/save/settings flow.
+ * the Round 08 dialogue condition/effect runtime, the Round 09
+ * menu/save/settings flow and the Round 14 data-driven in-game clock:
+ * successful moves, region travels and the explicit V-key wait advance the
+ * calendar (blocked or refused actions cost nothing), the HUD shows the
+ * current date/time/period and a depth-sorted daylight wash tints the world
+ * layers per period light level while every overlay stays legible.
  *
  * Since Round 09 the scene starts from {@link GridStartupData} handed over
  * by the menu scene: either a fresh character (`kind:'new'` with the chosen
@@ -130,6 +135,16 @@ const NPC_PALETTE = [0x7ec8a9, 0xc89fd4, 0x8fb7e8, 0xe89f8f] as const;
 const ENCOUNTER_FILL = 0xc96a5a;
 const ENCOUNTER_BORDER = 0x30120e;
 const ENCOUNTER_SIZE_RATIO = 0.66;
+
+/** Daylight wash: cold night tint layered above the world, below the UI. */
+const DAYLIGHT_TINT_COLOR = 0x0a1024;
+/** Deepest tint the darkest configured light level can reach. */
+const DAYLIGHT_MAX_ALPHA = 0.55;
+/** Depth band: world 0 < daylight 50 < HUD text 60 < overlay panels 1000+. */
+const DAYLIGHT_DEPTH = 50;
+const HUD_TEXT_DEPTH = 60;
+/** Duration of the alpha cross-fade when the day period changes. */
+const DAYLIGHT_FADE_MS = 600;
 
 const UI = {
   background: '#0b0e14',
@@ -205,6 +220,13 @@ export class GridScene extends Phaser.Scene {
   /** Discovered encyclopedia entries are run state and participate in saves. */
   private knownKnowledgeNodeIds = new Set<string>();
 
+  /** Round 14 in-game clock; null only before the world finished loading. */
+  private clock: GameClock | null = null;
+  /** Day-period id the daylight wash was last tuned to (change detection). */
+  private lastDaylightPeriodId: string | null = null;
+  /** Full-screen tint rectangle between the world layers and the HUD. */
+  private daylightLayer: Phaser.GameObjects.Rectangle | null = null;
+
   private dialoguePanel: DialoguePanel | null = null;
   private battlePanel: BattlePanel | null = null;
   private inventoryPanel: InventoryPanel | null = null;
@@ -230,6 +252,7 @@ export class GridScene extends Phaser.Scene {
   private lastOverlayCloseAt = -Infinity;
 
   private coordsText: Phaser.GameObjects.Text | null = null;
+  private timeText: Phaser.GameObjects.Text | null = null;
   private interactText: Phaser.GameObjects.Text | null = null;
   private questTrackerText: Phaser.GameObjects.Text | null = null;
   private questNotice: string | null = null;
@@ -298,6 +321,8 @@ export class GridScene extends Phaser.Scene {
           displayName: string;
           mapResourceId: string;
           playerPosition: { col: number; row: number };
+          /** In-game minutes restored from the save (0 for old v1 saves). */
+          elapsedGameMinutes: number;
         })
       | null = null;
 
@@ -313,6 +338,12 @@ export class GridScene extends Phaser.Scene {
     this.children.removeAll(true); // Drop the transient loading hint.
     this.scaledTextTargets.length = 0;
     this.world = world;
+    // Round 14 clock: elapsed minutes come from the save when one was
+    // restored (older v1 snapshots lack the field and restart at 0), which
+    // the calendar start then re-dates using the *current* month table.
+    this.clock = new GameClock(world.calendar, restoredRun?.elapsedGameMinutes ?? 0);
+    this.daylightLayer = null;
+    this.lastDaylightPeriodId = null;
     this.knownKnowledgeNodeIds = createKnowledgeState(
       world.knowledgeGraph,
       restoredRun?.knownKnowledgeNodeIds ?? [],
@@ -456,8 +487,10 @@ export class GridScene extends Phaser.Scene {
 
     this.renderNpcs(activeMap);
     this.renderEncounterMarkers(activeMap);
+    this.ensureDaylightLayer();
     this.buildHud(activeMap, world.optionalWarnings, world.modWarnings);
     this.updateCoordsHud();
+    this.updateTimeHud();
 
     this.dialoguePanel = new DialoguePanel(this, {
       onClose: () => this.noteOverlayClosed(), // Also refreshes the hint.
@@ -515,6 +548,7 @@ export class GridScene extends Phaser.Scene {
       displayName: string;
       mapResourceId: string;
       playerPosition: { col: number; row: number };
+      elapsedGameMinutes: number;
     };
     warnings: string[];
   } | null {
@@ -573,6 +607,7 @@ export class GridScene extends Phaser.Scene {
         displayName: read.snapshot.displayName,
         mapResourceId: read.snapshot.mapResourceId,
         playerPosition: { ...read.snapshot.playerPosition },
+        elapsedGameMinutes: read.snapshot.elapsedGameMinutes,
       },
       warnings: plan.warnings,
     };
@@ -657,6 +692,7 @@ export class GridScene extends Phaser.Scene {
       completedEncounters: this.completedEncounters,
       completedRegionalEvents: this.completedRegionalEvents,
       knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
+      elapsedGameMinutes: this.clock?.elapsedMinutes ?? 0,
       factionMembership: this.factionState.membership,
     });
     const result = writeSaveSlot(this.storage, slotId, snapshot);
@@ -837,13 +873,16 @@ export class GridScene extends Phaser.Scene {
     optionalWarnings: readonly Diagnostic[],
     modWarnings: readonly Diagnostic[],
   ): void {
+    // HUD text lives above the daylight wash (depth 50) so every period's
+    // tint keeps the interface fully legible.
     this.registerScaledText(this.add
-      .text(16, 12, '方向键 / WASD 移动 · E 交互 · H 帮助', {
+      .text(16, 12, '方向键 / WASD 移动 · E 交互 · V 等候 · H 帮助', {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(13),
         color: UI.textMuted,
       })
-      .setOrigin(0, 0), 13);
+      .setOrigin(0, 0)
+      .setDepth(HUD_TEXT_DEPTH), 13);
 
     this.questTrackerText = this.registerScaledText(this.add
       .text(16, 34, '', {
@@ -852,7 +891,8 @@ export class GridScene extends Phaser.Scene {
         color: UI.textMuted,
         wordWrap: { width: 360 },
       })
-      .setOrigin(0, 0), 11);
+      .setOrigin(0, 0)
+      .setDepth(HUD_TEXT_DEPTH), 11);
 
     this.mapNameText = this.registerScaledText(this.add
       .text(VIEW_WIDTH / 2, 14, map.data.name, {
@@ -860,7 +900,8 @@ export class GridScene extends Phaser.Scene {
         fontSize: uiFontSize(14),
         color: UI.textPrimary,
       })
-      .setOrigin(0.5, 0), 14);
+      .setOrigin(0.5, 0)
+      .setDepth(HUD_TEXT_DEPTH), 14);
 
     const lines: { text: string; shown: boolean }[] = [
       {
@@ -882,7 +923,8 @@ export class GridScene extends Phaser.Scene {
           fontSize: uiFontSize(11),
           color: UI.textWarn,
         })
-        .setOrigin(0.5, 0), 11);
+        .setOrigin(0.5, 0)
+        .setDepth(HUD_TEXT_DEPTH), 11);
     });
     for (const diagnostic of optionalWarnings) {
       console.warn(`[optional] ${diagnostic.message}`, diagnostic.details);
@@ -894,7 +936,17 @@ export class GridScene extends Phaser.Scene {
         fontSize: uiFontSize(13),
         color: UI.textPrimary,
       })
-      .setOrigin(1, 0), 13);
+      .setOrigin(1, 0)
+      .setDepth(HUD_TEXT_DEPTH), 13);
+
+    this.timeText = this.registerScaledText(this.add
+      .text(VIEW_WIDTH - 16, 34, '', {
+        fontFamily: UI.fontFamily,
+        fontSize: uiFontSize(13),
+        color: UI.textPrimary,
+      })
+      .setOrigin(1, 0)
+      .setDepth(HUD_TEXT_DEPTH), 13);
 
     // Interaction status line under the map: adjacent-NPC prompt or the
     // explicit empty-state hint required when no NPC is interactable.
@@ -904,7 +956,8 @@ export class GridScene extends Phaser.Scene {
         fontSize: uiFontSize(12),
         color: UI.textWarn,
       })
-      .setOrigin(0.5, 1), 12);
+      .setOrigin(0.5, 1)
+      .setDepth(HUD_TEXT_DEPTH), 12);
   }
 
   private registerScaledText(text: Phaser.GameObjects.Text, base: number): Phaser.GameObjects.Text {
@@ -926,6 +979,102 @@ export class GridScene extends Phaser.Scene {
   private updateCoordsHud(): void {
     const name = this.playerDisplayName.length > 0 ? `${this.playerDisplayName} · ` : '';
     this.coordsText?.setText(`${name}位置 (${this.playerCol}, ${this.playerRow})`);
+  }
+
+  // -------------------------------------------------------------------------
+  // Round 14 in-game time: advancement, waiting, HUD and daylight
+  // -------------------------------------------------------------------------
+
+  /**
+   * Advances the clock by the given action cost and refreshes the time HUD
+   * and daylight wash. Called only after an action actually completed —
+   * blocked moves, refused transitions and open overlays never reach here,
+   * and a zero/non-finite cost (e.g. stepMinutes 0) is a no-op.
+   */
+  private advanceTime(minutes: number): void {
+    const clock = this.clock;
+    if (clock === null || !clock.advance(minutes)) {
+      return;
+    }
+    this.updateTimeHud();
+    this.updateDaylight(true);
+  }
+
+  /** V key: wait in place. Blocked by any open overlay or in-flight move. */
+  private handleWait(): void {
+    const clock = this.clock;
+    if (clock === null || this.moving || this.anyOverlayOpen()) {
+      return;
+    }
+    const minutes = clock.calendar.actionCosts.waitMinutes;
+    this.advanceTime(minutes);
+    const period = clock.currentPeriod();
+    this.showRegionNotice(`静候片刻（${minutes} 分钟），此刻已是「${period.name}」。`);
+  }
+
+  /** Refreshes the calendar HUD line from the clock's derived snapshot. */
+  private updateTimeHud(): void {
+    const clock = this.clock;
+    if (clock === null || this.timeText === null) {
+      return;
+    }
+    const stamp = clock.snapshot();
+    const month = clock.calendar.months[stamp.monthIndex];
+    const hour = String(Math.floor(stamp.minuteOfDay / 60)).padStart(2, '0');
+    const minute = String(stamp.minuteOfDay % 60).padStart(2, '0');
+    const monthName = month === undefined ? '?' : month.name;
+    this.timeText.setText(
+      `第${stamp.year}年 ${monthName}${stamp.day}日 ${hour}:${minute} · ${clock.currentPeriod().name}`,
+    );
+  }
+
+  /**
+   * Recreates the daylight wash after the world layers changed. The fixed
+   * depth band keeps it above every world object (including layers rebuilt
+   * on region switches) and below the HUD text and overlay panels, so the
+   * UI stays legible at any light level.
+   */
+  private ensureDaylightLayer(): void {
+    if (this.daylightLayer !== null && this.daylightLayer.active) {
+      return;
+    }
+    this.daylightLayer = this.add
+      .rectangle(
+        VIEW_WIDTH / 2,
+        HUD_HEIGHT + (VIEW_HEIGHT - HUD_HEIGHT) / 2,
+        VIEW_WIDTH,
+        VIEW_HEIGHT - HUD_HEIGHT,
+        DAYLIGHT_TINT_COLOR,
+        0,
+      )
+      .setDepth(DAYLIGHT_DEPTH);
+    this.updateDaylight(false);
+  }
+
+  /**
+   * Tunes the daylight wash to the current period's light level. The tint
+   * alpha is (1 − lightLevel) × maximum, so full daylight stays untinted and
+   * the darkest period never exceeds the legibility cap; an actual period
+   * change cross-fades instead of snapping.
+   */
+  private updateDaylight(animate: boolean): void {
+    const layer = this.daylightLayer;
+    const clock = this.clock;
+    if (layer === null || clock === null) {
+      return;
+    }
+    const period = clock.currentPeriod();
+    if (this.lastDaylightPeriodId === period.id) {
+      return;
+    }
+    this.lastDaylightPeriodId = period.id;
+    const targetAlpha = Math.max(0, Math.min(1, 1 - period.lightLevel)) * DAYLIGHT_MAX_ALPHA;
+    this.tweens.killTweensOf(layer);
+    if (animate) {
+      this.tweens.add({ targets: layer, alpha: targetAlpha, duration: DAYLIGHT_FADE_MS });
+    } else {
+      layer.setAlpha(targetAlpha);
+    }
   }
 
   /** Refreshes the bottom status line from the current adjacency state. */
@@ -1259,6 +1408,10 @@ export class GridScene extends Phaser.Scene {
     const onControls = (): void => this.toggleControlsPanel();
     controlsKey.on('down', onControls);
 
+    const waitKey = keyboard.addKey(KeyCodes.V);
+    const onWait = (): void => this.handleWait();
+    waitKey.on('down', onWait);
+
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       for (const { key, onDown } of listeners) {
         key.off('down', onDown);
@@ -1272,6 +1425,7 @@ export class GridScene extends Phaser.Scene {
       encyclopediaKey.off('down', onEncyclopedia);
       factionKey.off('down', onFaction);
       controlsKey.off('down', onControls);
+      waitKey.off('down', onWait);
       this.dialoguePanel?.destroy();
       this.dialoguePanel = null;
       this.battlePanel?.destroy();
@@ -1408,6 +1562,7 @@ export class GridScene extends Phaser.Scene {
       factions: this.progression.factions,
       martialArts: this.progression.martialArts,
       factionState: this.factionState,
+      timeOfDayPeriodId: this.clock?.currentPeriod().id ?? '',
     };
   }
 
@@ -1498,6 +1653,7 @@ export class GridScene extends Phaser.Scene {
     this.playerRow = targetRow;
     this.updateCoordsHud();
     this.updateInteractHint();
+    this.advanceTime(this.clock?.calendar.actionCosts.stepMinutes ?? 0);
 
     const target = cellCenterOffset(map, targetCol, targetRow);
     this.moving = true;
@@ -1573,8 +1729,10 @@ export class GridScene extends Phaser.Scene {
     this.marker?.setPosition(this.mapOrigin.x + center.x, this.mapOrigin.y + center.y);
     this.renderNpcs(destinationMap);
     this.renderEncounterMarkers(destinationMap);
+    this.ensureDaylightLayer(); // The rebuilt world layers must sit below the wash again.
     this.mapNameText?.setText(destinationMap.data.name);
     this.updateCoordsHud();
+    this.advanceTime(this.clock?.calendar.actionCosts.travelMinutes ?? 0);
     this.showRegionNotice(`已抵达「${destinationMap.data.name}」。`);
     this.triggerRegionEvents();
   }

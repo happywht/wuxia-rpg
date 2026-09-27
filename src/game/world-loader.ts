@@ -5,11 +5,11 @@
  * Extracted so the main menu and the gameplay scene consume the *same*
  * pipeline — the menu needs the character templates for creation and the
  * same degraded-error behaviour, and duplicating the assembly would drift.
- * Every convention carries over unchanged: the map (manifest/schemas) is
- * required and fatal; NPC/dialogue/progression/battle/item/shop/quest
- * content is optional and degrades per smallest unit with warnings (see
- * docs/ARCHITECTURE.md §2). No world content lives here — ids and text come
- * from `data/` only.
+ * Every convention carries over unchanged: the map (manifest/schemas) and,
+ * since Round 14, the game calendar are required and fatal; NPC/dialogue/
+ * progression/battle/item/shop/quest content is optional and degrades per
+ * smallest unit with warnings (see docs/ARCHITECTURE.md §2). No world
+ * content lives here — ids and text come from `data/` only.
  */
 
 import {
@@ -40,6 +40,7 @@ import {
   validateConversation,
 } from '../engine/dialogue-graph';
 import { assembleDialogueReferences } from '../engine/dialogue-runtime';
+import { type GameCalendarData, parseGameCalendar } from '../engine/game-calendar';
 import {
   type CharacterProfileData,
   type FactionData,
@@ -81,6 +82,7 @@ import {
 
 /** Stable resource ids from data/base/manifest.json — never hard-coded URLs. */
 export const WORLD_MAP_RESOURCE_ID = 'world.atlas';
+const CALENDAR_RESOURCE_ID = 'calendar.base';
 const NPC_RESOURCE_ID = 'npc.round-03-set';
 const DIALOGUE_RESOURCE_ID = 'dialogue.round-03-set';
 const CHARACTER_PROFILE_RESOURCE_ID = 'character-profile.round-04-set';
@@ -168,6 +170,8 @@ export interface LoadedWorld {
   mapResourceId: string;
   maps: ReadonlyMap<string, GridMap>;
   worldMap: WorldMapAssembly;
+  /** Validated game calendar (required resource; time rules derive from it). */
+  calendar: GameCalendarData;
   knowledgeGraph: KnowledgeGraph;
   assembly: WorldAssembly;
   optionalWarnings: readonly Diagnostic[];
@@ -211,6 +215,10 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
         },
         'world-map': (value) => {
           const parsed = parseWorldMap(value);
+          return parsed.ok ? [] : parsed.errors;
+        },
+        'game-calendar': (value) => {
+          const parsed = parseGameCalendar(value);
           return parsed.ok ? [] : parsed.errors;
         },
         'character-profiles': (value) => {
@@ -270,6 +278,26 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
       };
     }
 
+    // The calendar is required world data like the map: a missing resource
+    // or an invalid document refuses the load with readable lines instead of
+    // silently falling back to a hard-coded calendar that data cannot see.
+    const calendarResource = result.resources.get(CALENDAR_RESOURCE_ID);
+    if (calendarResource === undefined) {
+      return {
+        ok: false,
+        title: '游戏历法资料缺失',
+        lines: [`清单中没有 id 为 "${CALENDAR_RESOURCE_ID}" 的资源，请检查 data/base/manifest.json。`],
+      };
+    }
+    const parsedCalendar = parseGameCalendar(calendarResource.value);
+    if (!parsedCalendar.ok) {
+      return {
+        ok: false,
+        title: `历法资源 "${CALENDAR_RESOURCE_ID}" 语义校验未通过`,
+        lines: parsedCalendar.errors,
+      };
+    }
+
     const parsedWorldMap = parseWorldMap(worldResource.value);
     if (!parsedWorldMap.ok) {
       return { ok: false, title: '世界地图数据结构不合规', lines: parsedWorldMap.errors };
@@ -307,8 +335,9 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
     }
 
     const knowledgeResult = assembleKnowledgeGraphContent(result.resources);
+    const calendarPeriodIds = new Set(parsedCalendar.calendar.periods.map((period) => period.id));
     const assembly = assembleOptionalContent(
-      result.resources, maps, new Set(knowledgeResult.graph.nodes.keys()),
+      result.resources, maps, new Set(knowledgeResult.graph.nodes.keys()), calendarPeriodIds,
     );
     assembly.warnings.push(...knowledgeResult.warnings);
     const overlapWarnings: string[] = [];
@@ -355,6 +384,7 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
         mapResourceId: startingMapResourceId,
         maps,
         worldMap: resolvedWorldMap,
+        calendar: parsedCalendar.calendar,
         knowledgeGraph: knowledgeResult.graph,
         assembly,
         optionalWarnings: [...optionalWarnings, ...assembly.warnings],
@@ -448,6 +478,7 @@ function assembleOptionalContent(
   resources: ReadonlyMap<string, LoadedResource>,
   maps: ReadonlyMap<string, GridMap>,
   knowledgeNodeIds: ReadonlySet<string>,
+  timeOfDayPeriodIds: ReadonlySet<string>,
 ): WorldAssembly {
   const warnings: Diagnostic[] = [];
 
@@ -730,6 +761,7 @@ function assembleOptionalContent(
     knowledgeNodeIds,
     factionIds: new Set(progression.factions.keys()),
     martialArtIds: new Set(progression.martialArts.keys()),
+    timeOfDayPeriodIds,
   });
   for (const message of dialogueReferences.warnings) {
     warnings.push({

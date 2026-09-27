@@ -1,0 +1,28 @@
+{
+  "id": "calendar.base",
+  "start": { "year": 1, "monthId": "month.qingyang", "day": 1, "minuteOfDay": 480 },
+  "months": [
+    { "id": "month.qingyang", "name": "青阳", "days": 30 },
+    { "id": "month.huazhao", "name": "花朝", "days": 30 },
+    { "id": "month.taolang", "name": "桃浪", "days": 30 },
+    { "id": "month.meilin", "name": "梅霖", "days": 30 },
+    { "id": "month.liuhuo", "name": "榴火", "days": 30 },
+    { "id": "month.hefeng", "name": "荷风", "days": 30 },
+    { "id": "month.qiaoyun", "name": "巧云", "days": 30 },
+    { "id": "month.guiyue", "name": "桂月", "days": 30 },
+    { "id": "month.shuanghua", "name": "霜华", "days": 30 },
+    { "id": "month.lubai", "name": "露白", "days": 30 },
+    { "id": "month.xuejian", "name": "雪涧", "days": 30 },
+    { "id": "month.suichu", "name": "岁除", "days": 30 }
+  ],
+  "periods": [
+    { "id": "period.midnight", "name": "子夜", "startMinute": 0, "lightLevel": 0.18 },
+    { "id": "period.dawn", "name": "拂晓", "startMinute": 270, "lightLevel": 0.45 },
+    { "id": "period.morning", "name": "晨光", "startMinute": 390, "lightLevel": 0.85 },
+    { "id": "period.midday", "name": "日中", "startMinute": 600, "lightLevel": 1 },
+    { "id": "period.afternoon", "name": "午后", "startMinute": 840, "lightLevel": 0.95 },
+    { "id": "period.dusk", "name": "黄昏", "startMinute": 1050, "lightLevel": 0.5 },
+    { "id": "period.night", "name": "入夜", "startMinute": 1140, "lightLevel": 0.22 }
+  ],
+  "actionCosts": { "stepMinutes": 1, "travelMinutes": 45, "waitMinutes": 60 }
+}

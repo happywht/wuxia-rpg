@@ -14,9 +14,10 @@
  * per-conversation validation here adds the graph semantics a schema cannot
  * express (start node exists, option targets resolve, node ids unique) so a
  * single broken conversation disables exactly itself, not the whole set.
- * Cross-resource id checks (quest/item/NPC/knowledge references inside
- * conditions and effects) run in `assembleDialogueReferences` after world assembly and
- * drop only the offending option.
+ * Cross-resource id checks (quest/item/NPC/knowledge/faction/martial-art/
+ * time-of-day references inside conditions and effects) run in
+ * `assembleDialogueReferences` after world assembly and drop only the
+ * offending option.
  */
 
 import {
@@ -44,7 +45,8 @@ export type DialogueQuestStatusValue = 'locked' | 'offered' | 'active' | 'comple
  * One condition on an option. Options carrying several conditions are only
  * visible while **every** one of them holds. `morality` / `renown` /
  * `npcRelationship` declare at least one of `minValue` / `maxValue`
- * (inclusive bounds).
+ * (inclusive bounds). `timeOfDay` holds while the in-game clock's current
+ * period id matches `periodId` (calendar-defined).
  */
 export type DialogueConditionData =
   | { kind: 'questStatus'; questId: string; status: DialogueQuestStatusValue }
@@ -54,7 +56,8 @@ export type DialogueConditionData =
   | { kind: 'npcRelationship'; npcId: string; minValue?: number; maxValue?: number }
   | { kind: 'knowledgeKnown'; nodeId: string }
   | { kind: 'factionMembership'; factionId?: string; isMember: boolean }
-  | { kind: 'martialArtEligible'; martialArtId: string };
+  | { kind: 'martialArtEligible'; martialArtId: string }
+  | { kind: 'timeOfDay'; periodId: string };
 
 /**
  * One effect executed when its option is confirmed. The runtime validates
@@ -248,6 +251,11 @@ function parseCondition(raw: unknown): DialogueConditionData | null {
       if (!hasOnlyKeys(source, ['kind', 'martialArtId'])) return null;
       const martialArtId = requireNonEmptyString(source.martialArtId);
       return martialArtId === null ? null : { kind: 'martialArtEligible', martialArtId };
+    }
+    case 'timeOfDay': {
+      if (!hasOnlyKeys(source, ['kind', 'periodId'])) return null;
+      const periodId = requireNonEmptyString(source.periodId);
+      return periodId === null ? null : { kind: 'timeOfDay', periodId };
     }
     default:
       return null;

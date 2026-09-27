@@ -30,6 +30,16 @@
             { "text": "好，子时见。", "nextNodeId": "agree" },
             { "text": "掌柜的为何这般谨慎？", "nextNodeId": "why-careful" },
             {
+              "text": "（天色已暗）后巷的灯这会儿点上了么？我今夜便去。",
+              "nextNodeId": "agree",
+              "conditions": [{ "kind": "timeOfDay", "periodId": "period.dusk" }]
+            },
+            {
+              "text": "（夜色正浓）不等子时了，现在就随你去后巷。",
+              "nextNodeId": "agree",
+              "conditions": [{ "kind": "timeOfDay", "periodId": "period.night" }]
+            },
+            {
               "text": "掌柜的，残篇就在我身上，现在交给你。",
               "nextNodeId": "scroll-honest",
               "conditions": [{ "kind": "itemCount", "itemId": "item.xisui-canpian", "minCount": 1 }],

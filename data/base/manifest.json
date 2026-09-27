@@ -16,6 +16,11 @@
       "schema": "world-map"
     },
     {
+      "id": "calendar.base",
+      "path": "worldview/calendar.json",
+      "schema": "game-calendar"
+    },
+    {
       "id": "npc.round-03-set",
       "path": "characters/round-03-npcs.json",
       "schema": "npc-set"

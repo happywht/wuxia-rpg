@@ -97,6 +97,8 @@ export interface DialogueRuntimeContext {
   factions: ReadonlyMap<string, FactionData>;
   martialArts: ReadonlyMap<string, MartialArtData>;
   factionState: FactionMembershipState;
+  /** Current in-game day-period id the `timeOfDay` condition compares to. */
+  timeOfDayPeriodId: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -114,6 +116,8 @@ export interface DialogueReferenceAssemblyInput {
   knowledgeNodeIds: ReadonlySet<string>;
   factionIds: ReadonlySet<string>;
   martialArtIds: ReadonlySet<string>;
+  /** Day-period ids declared by the loaded calendar (timeOfDay conditions). */
+  timeOfDayPeriodIds: ReadonlySet<string>;
 }
 
 export interface DialogueReferenceAssemblyResult {
@@ -131,6 +135,7 @@ function optionReferences(option: DialogueOptionData): {
   knowledgeNodeIds: string[];
   factionIds: string[];
   martialArtIds: string[];
+  periodIds: string[];
 } {
   const questIds: string[] = [];
   const itemIds: string[] = [];
@@ -138,6 +143,7 @@ function optionReferences(option: DialogueOptionData): {
   const knowledgeNodeIds: string[] = [];
   const factionIds: string[] = [];
   const martialArtIds: string[] = [];
+  const periodIds: string[] = [];
   for (const condition of option.conditions ?? []) {
     if (condition.kind === 'questStatus') questIds.push(condition.questId);
     else if (condition.kind === 'itemCount') itemIds.push(condition.itemId);
@@ -146,6 +152,7 @@ function optionReferences(option: DialogueOptionData): {
     else if (condition.kind === 'factionMembership' && condition.factionId !== undefined) {
       factionIds.push(condition.factionId);
     } else if (condition.kind === 'martialArtEligible') martialArtIds.push(condition.martialArtId);
+    else if (condition.kind === 'timeOfDay') periodIds.push(condition.periodId);
   }
   for (const effect of option.effects ?? []) {
     if (effect.kind === 'acceptQuest' || effect.kind === 'abandonQuest') questIds.push(effect.questId);
@@ -156,7 +163,7 @@ function optionReferences(option: DialogueOptionData): {
     else if (effect.kind === 'joinFaction') factionIds.push(effect.factionId);
     else if (effect.kind === 'learnMartialArt') martialArtIds.push(effect.martialArtId);
   }
-  return { questIds, itemIds, npcIds, knowledgeNodeIds, factionIds, martialArtIds };
+  return { questIds, itemIds, npcIds, knowledgeNodeIds, factionIds, martialArtIds, periodIds };
 }
 
 /**
@@ -198,6 +205,9 @@ export function assembleDialogueReferences(
         }
         for (const martialArtId of references.martialArtIds) {
           if (!input.martialArtIds.has(martialArtId)) problems.push(`引用无效武学 "${martialArtId}"`);
+        }
+        for (const periodId of references.periodIds) {
+          if (!input.timeOfDayPeriodIds.has(periodId)) problems.push(`引用无效时段 "${periodId}"`);
         }
         if (problems.length > 0) {
           changed = true;
@@ -290,6 +300,10 @@ export function isConditionMet(
         factionId: context.factionState.membership?.factionId ?? null,
       }).eligible;
     }
+    case 'timeOfDay':
+      // The context carries the clock's current period id (reference
+      // assembly removed dangling ids, so an unknown id never matches).
+      return context.timeOfDayPeriodId === condition.periodId;
   }
 }
 

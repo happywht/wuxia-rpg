@@ -160,6 +160,14 @@ export interface SaveSnapshotV1 {
   completedRegionalEvents: string[];
   /** Discovered encyclopedia nodes; absent from Round 10 and earlier v1 saves. */
   knownKnowledgeNodeIds: string[];
+  /**
+   * In-game minutes elapsed since the calendar start; absent in Round 13 and
+   * earlier v1 saves (the run then resumes at the calendar's start moment).
+   * Only the counter is stored — year/month/day are always re-derived from
+   * the current calendar data, so changing month lengths never contradicts
+   * a save.
+   */
+  elapsedGameMinutes: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -546,6 +554,12 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
   if (knownKnowledgeNodeIds === null) {
     errors.push('knownKnowledgeNodeIds：应为非重复的非空字符串数组');
   }
+  const elapsedGameMinutes = raw.elapsedGameMinutes === undefined
+    ? 0
+    : requireIntegerInRange(raw.elapsedGameMinutes, 0, Number.MAX_SAFE_INTEGER);
+  if (elapsedGameMinutes === null) {
+    errors.push('elapsedGameMinutes：应为非负整数');
+  }
 
   if (
     errors.length > 0 ||
@@ -567,7 +581,8 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     renown === null ||
     completedEncounters === null ||
     completedRegionalEvents === null ||
-    knownKnowledgeNodeIds === null
+    knownKnowledgeNodeIds === null ||
+    elapsedGameMinutes === null
   ) {
     return { ok: false, reason: 'corrupt', message: '存档结构不合规', errors };
   }
@@ -595,6 +610,7 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     completedEncounters,
     completedRegionalEvents,
     knownKnowledgeNodeIds,
+    elapsedGameMinutes,
   };
   return { ok: true, snapshot };
 }
@@ -852,6 +868,8 @@ export interface CaptureInput {
   completedEncounters: ReadonlySet<string>;
   completedRegionalEvents: ReadonlySet<string>;
   knownKnowledgeNodeIds: ReadonlySet<string>;
+  /** In-game minutes elapsed since the calendar start (GameClock counter). */
+  elapsedGameMinutes: number;
   /** Absent in older callers/snapshots means currently unaffiliated. */
   factionMembership?: FactionMembership | null;
   /** Injectable clock for deterministic tests. */
@@ -905,6 +923,7 @@ export function captureSaveSnapshot(input: CaptureInput): SaveSnapshotV1 {
     completedEncounters: [...input.completedEncounters],
     completedRegionalEvents: [...input.completedRegionalEvents],
     knownKnowledgeNodeIds: [...input.knownKnowledgeNodeIds],
+    elapsedGameMinutes: Math.max(0, Math.floor(input.elapsedGameMinutes)),
   };
 }
 
