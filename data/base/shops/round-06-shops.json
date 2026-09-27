@@ -12,7 +12,10 @@
         { "itemId": "item.wuji-dan", "quantity": 2 },
         { "itemId": "item.qingtong-bijian", "quantity": 1 },
         { "itemId": "item.fanbu-duanhe", "quantity": 2 },
-        { "itemId": "item.suwen-yupei", "quantity": 1 }
+        { "itemId": "item.suwen-yupei", "quantity": 1 },
+        { "itemId": "item.iron-sand", "quantity": -1 },
+        { "itemId": "item.tough-leather", "quantity": -1 },
+        { "itemId": "item.jade-polish", "quantity": -1 }
       ]
     }
   ]

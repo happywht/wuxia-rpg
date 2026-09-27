@@ -92,6 +92,78 @@
       "stackLimit": 1,
       "buyPrice": 0,
       "sellPrice": 0
+    },
+    {
+      "id": "item.iron-sand",
+      "name": "熟铁砂",
+      "description": "筛去粗渣后留下的细粒熟铁，可填入刃口细痕，令旧器重新咬住力道。",
+      "category": "misc",
+      "stackLimit": 99,
+      "buyPrice": 12,
+      "sellPrice": 4
+    },
+    {
+      "id": "item.tough-leather",
+      "name": "韧皮料",
+      "description": "经烟熏和桐油浸过的边角皮料，适合补强衣甲受力处。",
+      "category": "misc",
+      "stackLimit": 99,
+      "buyPrice": 10,
+      "sellPrice": 3
+    },
+    {
+      "id": "item.jade-polish",
+      "name": "青玉磨粉",
+      "description": "打磨玉器时收集的细粉，掺入新蜡能让旧玉重现温润光泽。",
+      "category": "misc",
+      "stackLimit": 99,
+      "buyPrice": 15,
+      "sellPrice": 5
+    },
+    {
+      "id": "item.qingtong-jian",
+      "name": "淬锋短剑",
+      "description": "以熟铁砂重理刃口、重新校过重心的短剑，挥刺时更容易贯入力道。",
+      "category": "equipment",
+      "stackLimit": 1,
+      "buyPrice": 150,
+      "sellPrice": 40,
+      "equipment": {
+        "slot": "weapon",
+        "attributeBonuses": { "force": 4 },
+        "healthBonus": 0,
+        "qiBonus": 0
+      }
+    },
+    {
+      "id": "item.yanyu-duanyi",
+      "name": "烟雨护衣",
+      "description": "在帆布短褐的肩肘处补入韧皮，针脚不显，却能卸开更多拳劲。",
+      "category": "equipment",
+      "stackLimit": 1,
+      "buyPrice": 120,
+      "sellPrice": 32,
+      "equipment": {
+        "slot": "garment",
+        "attributeBonuses": { "body": 4 },
+        "healthBonus": 20,
+        "qiBonus": 0
+      }
+    },
+    {
+      "id": "item.qingyu-pei",
+      "name": "润泽青玉佩",
+      "description": "将青玉重新起蜡穿绳后，佩在身上更能安神聚气。",
+      "category": "equipment",
+      "stackLimit": 1,
+      "buyPrice": 180,
+      "sellPrice": 48,
+      "equipment": {
+        "slot": "ornament",
+        "attributeBonuses": { "resolve": 2 },
+        "healthBonus": 0,
+        "qiBonus": 20
+      }
     }
   ]
 }

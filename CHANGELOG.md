@@ -4,6 +4,21 @@
 
 ## [Unreleased]
 
+### Added (Round 24)
+
+- 新增可选 `equipment-forge-set` Schema/资源与同路径 MOD 覆盖；工位校验地图可走格、出生点、NPC、遭遇、擂台、门派战、重复工位占位，坏配方按单条隔离。
+- 新增渡口锻造工位与三条同槽装备转换配方、三种原创材料及行商货架；配方强制基础装备恰一件、其他投入为杂项、结果属性不降级且至少一项提升。
+- 新增 Phaser-free 锻造事务和邻接 E 面板；预览材料库存/银两/进阶装备效果，拒绝已装备投入，克隆背包核验扣料后空间再整体提交；成功后刷新任务收集数量。
+- 产物作为普通装备 item id 穿戴并参与属性与战斗伤害，沿用 v1 物品/装备保存和读档重算，无新增快照字段；更新 GDD、架构、数据、存档、锻造说明、README、开发日志与路线图。
+
+### Verification (Round 24)
+
+- `npm run build`：通过；120 个模块，主 JS 1,809.95 kB（gzip 478.95 kB）；Vite 报告主包超过默认 500 kB 分包建议线。
+- `npm run validate:data`：通过；manifest 与 22 个基础资源 Schema 通过。
+- `npm run smoke:round-24`：通过，覆盖资源解析/跨引用/占位隔离、四向邻接、降级配方隔离、缺钱/缺料/穿戴状态拒绝不变性、满包转换、穿戴后战斗伤害变化与 v1 存档恢复。
+- `npm run smoke:round-23`、`npm run smoke:round-22`：顺序回归均通过。
+- `git diff --check`：通过；Git 提示修改文件将由 LF 规范为 CRLF。本轮未进行浏览器手动流程，锻造 UI 由构建与代码/引擎冒烟覆盖。
+
 ### Added (Round 23)
 
 - 新增可选 `meridian-set` 经脉 Schema/JSON 与同路径 MOD 覆盖；验证修为规则、唯一节点、前置 DAG、材料和效果边界，坏经脉资源只关闭内修入口。

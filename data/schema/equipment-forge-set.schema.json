@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wuxia-rpg.invalid/schema/equipment-forge-set",
+  "title": "装备锻造集合",
+  "description": "声明地图锻造工位以及消耗基础装备、材料和银两后生成固定装备物品的配方。跨资源引用、同槽与强化关系由 Phaser-free 装配层校验。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["stations", "recipes"],
+  "properties": {
+    "stations": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "mapResourceId", "position"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^forge\\.station\\.[A-Za-z0-9._-]+$", "maxLength": 96 },
+          "name": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "mapResourceId": { "type": "string", "pattern": "^map\\.[A-Za-z0-9._-]+$", "maxLength": 96 },
+          "position": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["col", "row"],
+            "properties": {
+              "col": { "type": "integer", "minimum": 0, "maximum": 255 },
+              "row": { "type": "integer", "minimum": 0, "maximum": 255 }
+            }
+          }
+        }
+      }
+    },
+    "recipes": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "description", "stationId", "ingredients", "currencyCost", "resultItemId"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^forge\\.recipe\\.[A-Za-z0-9._-]+$", "maxLength": 96 },
+          "name": { "type": "string", "minLength": 1, "maxLength": 48 },
+          "description": { "type": "string", "minLength": 1, "maxLength": 180 },
+          "stationId": { "type": "string", "pattern": "^forge\\.station\\.[A-Za-z0-9._-]+$", "maxLength": 96 },
+          "ingredients": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 8,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["itemId", "quantity"],
+              "properties": {
+                "itemId": { "type": "string", "pattern": "^item\\.[A-Za-z0-9._-]+$", "maxLength": 96 },
+                "quantity": { "type": "integer", "minimum": 1, "maximum": 99 }
+              }
+            }
+          },
+          "currencyCost": { "type": "integer", "minimum": 1, "maximum": 999999 },
+          "resultItemId": { "type": "string", "pattern": "^item\\.[A-Za-z0-9._-]+$", "maxLength": 96 }
+        }
+      }
+    }
+  }
+}

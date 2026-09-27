@@ -66,6 +66,11 @@
       "schema": "meridian-set"
     },
     {
+      "id": "equipment-forge.round-24-set",
+      "path": "forges/round-24-equipment-forges.json",
+      "schema": "equipment-forge-set"
+    },
+    {
       "id": "encounter.round-05-set",
       "path": "battles/round-05-encounters.json",
       "schema": "battle-encounters"

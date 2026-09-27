@@ -70,6 +70,10 @@ import {
 } from '../engine/faction-war';
 import { craftAndRegisterCustomMartialArt, type MartialArtRecipe } from '../engine/martial-art-forge';
 import {
+  craftEquipment,
+  selectEquipmentForgeStation,
+} from '../engine/equipment-forge';
+import {
   aggregateMeridianEffects,
   applyMeridianEffects,
   awardCultivationPoints,
@@ -124,6 +128,7 @@ import { CompanionPanel } from './companion-ui';
 import { ArenaPanel } from './arena-ui';
 import { FactionWarPanel } from './faction-war-ui';
 import { MartialArtForgePanel } from './martial-art-forge-ui';
+import { EquipmentForgePanel } from './equipment-forge-ui';
 import { MeridianPanel } from './meridian-ui';
 import { type GameSettings, applyGameSettings, loadGameSettings, uiFontSize } from './settings';
 import { createPixelPerson, UI_FONT_FAMILY } from './ui-theme';
@@ -332,6 +337,7 @@ export class GridScene extends Phaser.Scene {
   private arenaPanel: ArenaPanel | null = null;
   private factionWarPanel: FactionWarPanel | null = null;
   private martialArtForgePanel: MartialArtForgePanel | null = null;
+  private equipmentForgePanel: EquipmentForgePanel | null = null;
   private meridianPanel: MeridianPanel | null = null;
   private activeSession: CombatSession | null = null;
   private activeEncounter: PlacedEncounter | null = null;
@@ -624,6 +630,7 @@ export class GridScene extends Phaser.Scene {
     this.renderEncounterMarkers(activeMap);
     this.renderArenaMarkers(activeMap);
     this.renderFactionWarMarkers(activeMap);
+    this.renderEquipmentForgeMarkers(activeMap);
     this.ensureDaylightLayer();
     this.buildHud(activeMap, world.optionalWarnings, world.modWarnings);
     this.updateCoordsHud();
@@ -663,6 +670,7 @@ export class GridScene extends Phaser.Scene {
     this.arenaPanel = new ArenaPanel(this, () => this.noteOverlayClosed());
     this.factionWarPanel = new FactionWarPanel(this, () => this.noteOverlayClosed());
     this.martialArtForgePanel = new MartialArtForgePanel(this, () => this.noteOverlayClosed());
+    this.equipmentForgePanel = new EquipmentForgePanel(this, () => this.noteOverlayClosed());
     this.meridianPanel = new MeridianPanel(this, () => this.noteOverlayClosed());
     this.worldMapPanel = new WorldMapPanel(this, () => this.noteOverlayClosed());
     this.encyclopediaPanel = new EncyclopediaPanel(this, { onClose: () => this.noteOverlayClosed() });
@@ -997,6 +1005,26 @@ export class GridScene extends Phaser.Scene {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(12),
         color: '#d8f4d6',
+      }).setOrigin(0.5).setDepth(5), 12);
+      this.encounterLayer?.add([badge, label]);
+    }
+  }
+
+  /** Amber anvil mark denotes a fixed item-forging station from world data. */
+  private renderEquipmentForgeMarkers(map: GridMap): void {
+    const stations = this.world?.assembly.equipmentForges.filter((station) =>
+      station.record.mapResourceId === this.currentMapResourceId,
+    ) ?? [];
+    for (const station of stations) {
+      const center = cellCenterOffset(map, station.record.position.col, station.record.position.row);
+      const x = this.mapOrigin.x + center.x;
+      const y = this.mapOrigin.y + center.y;
+      const badge = this.add.rectangle(x, y, Math.max(20, map.tileSize * 0.48), Math.max(20, map.tileSize * 0.48), 0x74502a)
+        .setStrokeStyle(2, 0xf0b85a).setDepth(4);
+      const label = this.registerScaledText(this.add.text(x, y, '锻', {
+        fontFamily: UI.fontFamily,
+        fontSize: uiFontSize(12),
+        color: '#fff0c8',
       }).setOrigin(0.5).setDepth(5), 12);
       this.encounterLayer?.add([badge, label]);
     }
@@ -1870,6 +1898,15 @@ export class GridScene extends Phaser.Scene {
       this.interactText.setText(factionWarTarget.record.texts.approach);
       return;
     }
+    const forgeTarget = this.world === null ? null : selectEquipmentForgeStation(
+      this.world.assembly.equipmentForges,
+      this.currentMapResourceId,
+      { col: this.playerCol, row: this.playerRow },
+    );
+    if (forgeTarget !== null) {
+      this.interactText.setText(`按 E 在「${forgeTarget.record.name}」锻造装备 · ${forgeTarget.recipes.length} 种配方`);
+      return;
+    }
     const gate = this.world === null
       ? null
       : selectAdjacentTransition(this.world.worldMap.transitions, this.currentMapResourceId, {
@@ -1905,6 +1942,7 @@ export class GridScene extends Phaser.Scene {
       (this.arenaPanel !== null && this.arenaPanel.isOpen) ||
       (this.factionWarPanel !== null && this.factionWarPanel.isOpen) ||
       (this.martialArtForgePanel !== null && this.martialArtForgePanel.isOpen) ||
+      (this.equipmentForgePanel !== null && this.equipmentForgePanel.isOpen) ||
       (this.meridianPanel !== null && this.meridianPanel.isOpen) ||
       (this.controlsPanel !== null && this.controlsPanel.isOpen)
     );
@@ -2331,6 +2369,8 @@ export class GridScene extends Phaser.Scene {
       this.factionWarPanel = null;
       this.martialArtForgePanel?.destroy();
       this.martialArtForgePanel = null;
+      this.equipmentForgePanel?.destroy();
+      this.equipmentForgePanel = null;
       this.meridianPanel?.destroy();
       this.meridianPanel = null;
       this.controlsPanel?.destroy();
@@ -2406,6 +2446,29 @@ export class GridScene extends Phaser.Scene {
     );
     if (factionWar !== null) {
       this.openFactionWarSignup(factionWar);
+      return;
+    }
+    const forge = this.world === null ? null : selectEquipmentForgeStation(
+      this.world.assembly.equipmentForges,
+      this.currentMapResourceId,
+      { col: this.playerCol, row: this.playerRow },
+    );
+    if (forge !== null && this.inventory !== null && this.equipmentForgePanel !== null) {
+      const inventory = this.inventory;
+      this.equipmentForgePanel.open({
+        station: forge,
+        inventory,
+        items: this.items,
+        attributeLabels: this.playerProfile?.attributeLabels ?? {},
+        onCraft: (recipeId) => {
+          const outcome = craftEquipment({ station: forge, recipeId, inventory, items: this.items });
+          if (outcome.ok) this.refreshQuestCollectObjectives();
+          return outcome.ok
+            ? { ok: true, message: `已锻成「${outcome.result.name}」，剩余银两 ${outcome.remainingCurrency}。` }
+            : { ok: false, message: outcome.reason };
+        },
+      });
+      this.updateInteractHint();
       return;
     }
     const gate = this.world === null
@@ -2666,6 +2729,7 @@ export class GridScene extends Phaser.Scene {
     this.renderEncounterMarkers(destinationMap);
     this.renderArenaMarkers(destinationMap);
     this.renderFactionWarMarkers(destinationMap);
+    this.renderEquipmentForgeMarkers(destinationMap);
     this.ensureDaylightLayer(); // The rebuilt world layers must sit below the wash again.
     this.mapNameText?.setText(destinationMap.data.name);
     this.updateCoordsHud();

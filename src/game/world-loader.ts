@@ -84,6 +84,12 @@ import {
   type MeridianSetData,
 } from '../engine/meridian-system';
 import {
+  assembleEquipmentForges,
+  parseEquipmentForgeSet,
+  type AssembledEquipmentForgeStation,
+  type EquipmentForgeSetData,
+} from '../engine/equipment-forge';
+import {
   assembleBattleEncounters,
   type BattleEncounterSetData,
   parseBattleEncounterSet,
@@ -119,6 +125,7 @@ const ARENA_RESOURCE_ID = 'arena.round-20-set';
 const FACTION_WAR_RESOURCE_ID = 'faction-war.round-21-set';
 const MARTIAL_ART_COMPONENT_RESOURCE_ID = 'martial-art-components.round-22-set';
 const MERIDIAN_RESOURCE_ID = 'meridian.round-23-set';
+const EQUIPMENT_FORGE_RESOURCE_ID = 'equipment-forge.round-24-set';
 const ITEM_RESOURCE_ID = 'item.round-06-set';
 const SHOP_RESOURCE_ID = 'shop.round-06-set';
 const QUEST_RESOURCE_ID = 'quest.round-07-set';
@@ -138,6 +145,7 @@ const OPTIONAL_RESOURCE_IDS = new Set([
   FACTION_WAR_RESOURCE_ID,
   MARTIAL_ART_COMPONENT_RESOURCE_ID,
   MERIDIAN_RESOURCE_ID,
+  EQUIPMENT_FORGE_RESOURCE_ID,
   ITEM_RESOURCE_ID,
   SHOP_RESOURCE_ID,
   QUEST_RESOURCE_ID,
@@ -158,6 +166,7 @@ const OPTIONAL_SCHEMA_ORIGINS = new Set([
   'schema:faction-war-set',
   'schema:martial-art-components',
   'schema:meridian-set',
+  'schema:equipment-forge-set',
   'schema:items-set',
   'schema:shops-set',
   'schema:quest-set',
@@ -206,6 +215,8 @@ export interface WorldAssembly {
   martialArtForgeComponents: MartialArtForgeComponentSet | null;
   /** Optional meridian network/rules; null leaves other progression intact. */
   meridianSet: MeridianSetData | null;
+  /** Optional map-placed item-forging stations; invalid data only disables forging. */
+  equipmentForges: readonly AssembledEquipmentForgeStation[];
   items: ReadonlyMap<string, ItemRecordData>;
   shops: ReadonlyMap<string, AssembledShop>;
   quests: ReadonlyMap<string, QuestData>;
@@ -309,6 +320,10 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
         },
         'meridian-set': (value) => {
           const parsed = parseMeridianSet(value);
+          return parsed.ok ? [] : parsed.errors;
+        },
+        'equipment-forge-set': (value) => {
+          const parsed = parseEquipmentForgeSet(value);
           return parsed.ok ? [] : parsed.errors;
         },
         'items-set': (value) => {
@@ -933,6 +948,53 @@ function assembleOptionalContent(
     details: [],
   });
 
+  let equipmentForgeSet: EquipmentForgeSetData | null = null;
+  const equipmentForgeResource = resources.get(EQUIPMENT_FORGE_RESOURCE_ID);
+  if (equipmentForgeResource !== undefined) {
+    const parsed = parseEquipmentForgeSet(equipmentForgeResource.value);
+    if (!parsed.ok) {
+      warnings.push({
+        resource: EQUIPMENT_FORGE_RESOURCE_ID,
+        origin: 'equipment-forge-assembly',
+        severity: 'warning',
+        message: '装备锻造资料结构不合规，本轮禁用全部锻造工位',
+        details: parsed.errors,
+      });
+    } else {
+      equipmentForgeSet = parsed.set;
+    }
+  }
+  const equipmentForgeBlockedCells = new Map<string, Set<string>>();
+  const blockEquipmentForgeCell = (mapId: string, cell: string): void => {
+    const blocked = equipmentForgeBlockedCells.get(mapId) ?? new Set<string>();
+    blocked.add(cell);
+    equipmentForgeBlockedCells.set(mapId, blocked);
+  };
+  for (const [mapId, map] of maps) blockEquipmentForgeCell(mapId, `${map.data.playerStart.col},${map.data.playerStart.row}`);
+  for (const npc of allNpcs) blockEquipmentForgeCell(npc.record.mapResourceId, `${npc.col},${npc.row}`);
+  for (const encounter of encounters) blockEquipmentForgeCell(encounter.record.mapResourceId, `${encounter.col},${encounter.row}`);
+  for (const arena of arenaAssembly.arenas) {
+    blockEquipmentForgeCell(arena.record.mapResourceId, `${arena.record.position.col},${arena.record.position.row}`);
+  }
+  for (const war of factionWarAssembly.wars) {
+    blockEquipmentForgeCell(war.record.mapResourceId, `${war.record.position.col},${war.record.position.row}`);
+  }
+  const equipmentForgeAssembly = assembleEquipmentForges({
+    set: equipmentForgeSet,
+    knownResourceIds: new Set(resources.keys()),
+    maps,
+    spawns: new Map([...maps].map(([id, map]) => [id, map.data.playerStart])),
+    blockedCells: equipmentForgeBlockedCells,
+    items: itemAssembly.items,
+  });
+  for (const message of equipmentForgeAssembly.warnings) warnings.push({
+    resource: EQUIPMENT_FORGE_RESOURCE_ID,
+    origin: 'equipment-forge-assembly',
+    severity: 'warning',
+    message,
+    details: [],
+  });
+
   // Compile one safe NPC layout per declared calendar period. The base
   // placements remain the stable cast registry for quests/factions; runtime
   // scenes choose the current period's layout from the clock.
@@ -953,6 +1015,12 @@ function assembleOptionalContent(
     const blocked = encounterBlocksByMap.get(war.record.mapResourceId) ?? new Set<string>();
     blocked.add(String(war.record.position.col) + ',' + String(war.record.position.row));
     encounterBlocksByMap.set(war.record.mapResourceId, blocked);
+  }
+  // Crafting workstations are fixed world markers too; keep time-based NPCs clear.
+  for (const station of equipmentForgeAssembly.stations) {
+    const blocked = encounterBlocksByMap.get(station.record.mapResourceId) ?? new Set<string>();
+    blocked.add(`${station.record.position.col},${station.record.position.row}`);
+    encounterBlocksByMap.set(station.record.mapResourceId, blocked);
   }
   const npcSchedules = compileNpcSchedules({
     npcs: allNpcs,
@@ -1096,6 +1164,7 @@ function assembleOptionalContent(
     factionWars: factionWarAssembly.wars,
     martialArtForgeComponents,
     meridianSet,
+    equipmentForges: equipmentForgeAssembly.stations,
     items: itemAssembly.items,
     shops: shopAssembly.shops,
     quests: questAssembly.quests,

@@ -1,0 +1,48 @@
+{
+  "stations": [
+    {
+      "id": "forge.station.mist-ferry-anvil",
+      "name": "渡口铁砧",
+      "mapResourceId": "map.round-10-mist-ferry",
+      "position": { "col": 10, "row": 4 }
+    }
+  ],
+  "recipes": [
+    {
+      "id": "forge.recipe.refine-bronze-pen-sword",
+      "name": "重理笔剑刃口",
+      "description": "以熟铁砂补刃校锋，保留旧器形制并提升力道。",
+      "stationId": "forge.station.mist-ferry-anvil",
+      "ingredients": [
+        { "itemId": "item.qingtong-bijian", "quantity": 1 },
+        { "itemId": "item.iron-sand", "quantity": 2 }
+      ],
+      "currencyCost": 24,
+      "resultItemId": "item.qingtong-jian"
+    },
+    {
+      "id": "forge.recipe.reinforce-canvas-coat",
+      "name": "補強帆布短褐",
+      "description": "在肩肘缝入韧皮，增加体魄与气血承受。",
+      "stationId": "forge.station.mist-ferry-anvil",
+      "ingredients": [
+        { "itemId": "item.fanbu-duanhe", "quantity": 1 },
+        { "itemId": "item.tough-leather", "quantity": 2 }
+      ],
+      "currencyCost": 20,
+      "resultItemId": "item.yanyu-duanyi"
+    },
+    {
+      "id": "forge.recipe.repolish-plain-jade",
+      "name": "重磨素纹玉佩",
+      "description": "以青玉细粉重起玉面与系绳，使其更能安神聚气。",
+      "stationId": "forge.station.mist-ferry-anvil",
+      "ingredients": [
+        { "itemId": "item.suwen-yupei", "quantity": 1 },
+        { "itemId": "item.jade-polish", "quantity": 2 }
+      ],
+      "currencyCost": 28,
+      "resultItemId": "item.qingyu-pei"
+    }
+  ]
+}
