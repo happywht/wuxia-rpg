@@ -49,7 +49,7 @@ export class ControlsPanel {
     this.addText('E　交互相邻人物、关口、区域事件、工位或终章石', left + 44, top + 122, 13, UI_PALETTE.text);
     this.addText('F　与相邻人物直接交谈', left + 44, top + 151, 14, UI_PALETTE.text);
     this.addText('V　原地等候片刻（面板打开时无效）', left + 44, top + 180, 14, UI_PALETTE.text);
-    this.addText('B 背包　N 经脉　C 自创武学　P 伙伴　J 师门　Q 差事　M 舆图　K 百科　Esc 暂停', left + 44, top + 209, 12, UI_PALETTE.text);
+    this.addText('B 背包　N 经脉　C 自创武学　P 伙伴　J 师门　Q 差事　M 舆图　K 百科　G 成就　Esc 暂停', left + 44, top + 209, 12, UI_PALETTE.text);
     this.addText('内修消耗升级修为和背包材料；打通的效果影响战斗属性', left + 44, top + 238, 11, UI_PALETTE.muted);
 
     this.addText('面板', left + 28, top + 266, 13, UI_PALETTE.jade);

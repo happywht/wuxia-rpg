@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wuxia-rpg.invalid/schema/achievement-set",
+  "title": "成就集",
+  "description": "封闭成就资料的对象形状和基本 JSON 类型；数值范围与每条条件语义由防御解析器检查，以支持逐条隔离。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "achievements"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^achievement\\.set\\.[A-Za-z0-9._-]+$" },
+    "achievements": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 128,
+      "items": { "$ref": "#/definitions/achievement" }
+    }
+  },
+  "definitions": {
+    "achievement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "description", "priority", "conditions", "reward"],
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "priority": { "type": "integer" },
+        "conditions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/condition" }
+        },
+        "reward": { "$ref": "#/definitions/reward" }
+      }
+    },
+    "reward": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "experience": { "type": "integer" },
+        "currency": { "type": "integer" }
+      }
+    },
+    "condition": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "type": "string" },
+        "hint": { "type": "string" },
+        "minLevel": { "type": "integer" },
+        "minCount": { "type": "integer" },
+        "nodeId": { "type": "string" },
+        "minValue": { "type": "integer" },
+        "maxValue": { "type": "integer" },
+        "npcId": { "type": "string" },
+        "factionId": { "type": "string" },
+        "isMember": { "type": "boolean" }
+      }
+    }
+  }
+}

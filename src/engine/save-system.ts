@@ -84,6 +84,7 @@ import {
   WORLD_SEED_MIN,
   isWorldSeed,
 } from './climate-system';
+import { createAchievementRunState, type AchievementRunState } from './achievement-system';
 
 // ---------------------------------------------------------------------------
 // Protocol constants
@@ -226,6 +227,8 @@ export interface SaveSnapshotV1 {
   factionWarRecords: FactionWarRecord[];
   /** Complete player-forged definitions; absent in pre-R22 v1 saves. */
   customMartialArts: MartialArtData[];
+  /** Historical unlocks and monotonic activity counts; absent in older v1 saves. */
+  achievementState: AchievementRunState;
 }
 
 // ---------------------------------------------------------------------------
@@ -277,6 +280,24 @@ function requireUniqueNonEmptyStringArray(value: unknown, maxItems?: number): st
     ids.push(id);
   }
   return ids;
+}
+
+function parseAchievementRunState(raw: unknown): AchievementRunState | null {
+  if (raw === undefined) return createAchievementRunState();
+  if (!isPlainObject(raw)) return null;
+  const unlockedIds = requireUniqueNonEmptyStringArray(raw.unlockedIds, 512);
+  const battleVictories = raw.battleVictories === undefined
+    ? 0
+    : requireIntegerInRange(raw.battleVictories, 0, 999_999_999);
+  const equipmentCrafts = raw.equipmentCrafts === undefined
+    ? 0
+    : requireIntegerInRange(raw.equipmentCrafts, 0, 999_999_999);
+  const alchemyCrafts = raw.alchemyCrafts === undefined
+    ? 0
+    : requireIntegerInRange(raw.alchemyCrafts, 0, 999_999_999);
+  if (unlockedIds === null || battleVictories === null ||
+    equipmentCrafts === null || alchemyCrafts === null) return null;
+  return { unlockedIds, battleVictories, equipmentCrafts, alchemyCrafts };
 }
 
 /**
@@ -722,6 +743,8 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
   if (factionWarRecords === null) errors.push('factionWarRecords：门派战战绩结构不合规');
   const customMartialArts = parseSavedCustomMartialArts(raw.customMartialArts);
   if (customMartialArts === null) errors.push('customMartialArts：自创武学结构、唯一性或平衡范围不合规');
+  const achievementState = parseAchievementRunState(raw.achievementState);
+  if (achievementState === null) errors.push('achievementState：成就 id 或活动计数结构不合规');
 
   if (
     errors.length > 0 ||
@@ -748,6 +771,7 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     arenaRecords === null ||
     factionWarRecords === null ||
     customMartialArts === null ||
+    achievementState === null ||
     completedRegionalEvents === null ||
     knownKnowledgeNodeIds === null ||
     elapsedGameMinutes === null ||
@@ -787,6 +811,7 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     arenaRecords,
     factionWarRecords,
     customMartialArts,
+    achievementState,
   };
   return { ok: true, snapshot };
 }
@@ -1056,6 +1081,8 @@ export interface CaptureInput {
   factionWarRecords?: ReadonlyMap<string, FactionWarRecord>;
   /** Optional for older capture callers; omitted means no player-forged arts. */
   customMartialArts?: ReadonlyMap<string, MartialArtData>;
+  /** Optional for older callers; omitted means no earned achievement state. */
+  achievementState?: Readonly<AchievementRunState>;
   /** Absent in older callers/snapshots means currently unaffiliated. */
   factionMembership?: FactionMembership | null;
   /** Injectable clock for deterministic tests. */
@@ -1127,6 +1154,9 @@ export function captureSaveSnapshot(input: CaptureInput): SaveSnapshotV1 {
       requirements: { level: art.requirements.level, attributes: { ...art.requirements.attributes } },
       combat: { ...art.combat },
     })),
+    achievementState: input.achievementState === undefined
+      ? createAchievementRunState()
+      : { ...input.achievementState, unlockedIds: [...input.achievementState.unlockedIds] },
   };
 }
 
@@ -1487,6 +1517,10 @@ export function planSnapshotRestore(
       knownKnowledgeNodeIds,
       activeCompanionId,
       factionWarRecords,
+      achievementState: {
+        ...snapshot.achievementState,
+        unlockedIds: [...snapshot.achievementState.unlockedIds],
+      },
     },
   };
 }
@@ -1520,6 +1554,7 @@ export interface RestoredRunState {
   arenaRecords: ArenaRecord[];
   factionWarRecords: FactionWarRecord[];
   customMartialArts: MartialArtData[];
+  achievementState: AchievementRunState;
 }
 
 /**
@@ -1627,6 +1662,10 @@ export function restoreRunState(input: RestoreRunInput): RestoredRunState {
     activeCompanionId: snapshot.activeCompanionId ?? null,
     arenaRecords: snapshot.arenaRecords.map((record) => ({ ...record })),
     factionWarRecords: snapshot.factionWarRecords.map((record) => ({ ...record })),
+    achievementState: {
+      ...snapshot.achievementState,
+      unlockedIds: [...snapshot.achievementState.unlockedIds],
+    },
     customMartialArts: snapshot.customMartialArts.map((art) => ({
       ...art,
       factionIds: [...art.factionIds],

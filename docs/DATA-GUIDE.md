@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：Round 03–27 已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台、门派战、自创武学、经脉、装备锻造、炼丹、存档、区域旅行、知识图谱、NPC 私有记忆、昼夜气候、日程、条件奇遇、多层社会声望与数据驱动多结局；详情分别见 `docs/SAVES.md`、`docs/KNOWLEDGE-GRAPH.md`、`docs/ENDINGS.md`、`docs/COMPANIONS.md`、`docs/FACTION_WAR_DESIGN.md`、`docs/MARTIAL_ART_FORGE.md`、`docs/EQUIPMENT-FORGING.md` 与 `docs/ALCHEMY.md`。
+- 状态：Round 03–28 已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台、门派战、自创武学、经脉、装备锻造、炼丹、存档、区域旅行、知识图谱、NPC 私有记忆、昼夜气候、日程、条件奇遇、多层社会声望、多结局与成就；Round 28 专项与回归验证已通过；详情分别见 `docs/SAVES.md`、`docs/KNOWLEDGE-GRAPH.md`、`docs/ENDINGS.md`、`docs/ACHIEVEMENTS.md`、`docs/COMPANIONS.md`、`docs/FACTION_WAR_DESIGN.md`、`docs/MARTIAL_ART_FORGE.md`、`docs/EQUIPMENT-FORGING.md` 与 `docs/ALCHEMY.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -30,8 +30,9 @@ data/
 │   ├── skills/              # 武学：招式、元素、修炼需求、战斗作用
 │   ├── factions/            # 门派：立场、声望规则、成员关系
 │   ├── battles/             # 战斗：遭遇触发点、敌人、奖励与提示文本
-│   └── endings/             # 结局：触发条件与结局文本
-├── schema/                  # JSON Schema（含 manifest、grid-map、world-map、game-calendar、knowledge-nodes、knowledge-edges、ending-set、npc-set、companion-set、faction-war-set、martial-art-components、meridian-set、equipment-forge-set、alchemy-set、dialogue-set、character-profiles、faction-set、martial-arts-set、battle-encounters、arena-set、items-set、shops-set、quest-set）
+│   ├── endings/             # 结局：触发条件与结局文本
+│   └── achievements/        # 成就：条件组合、进度提示与一次性奖励
+├── schema/                  # JSON Schema（含 manifest、grid-map、world-map、game-calendar、knowledge-nodes、knowledge-edges、ending-set、achievement-set、npc-set、companion-set、faction-war-set、martial-art-components、meridian-set、equipment-forge-set、alchemy-set、dialogue-set、character-profiles、faction-set、martial-arts-set、battle-encounters、arena-set、items-set、shops-set、quest-set）
 mods/                        # mod 覆盖层：mods/<modId>/ 镜像 data/base/ 相对路径
 ```
 
@@ -65,6 +66,8 @@ Round 26 以 `social.npcKnowledge` 保存动态 NPC 见闻；旧 v1 缺字段时
 
 Round 27 新增可选 `ending-set` 资源，使用 `ending-set.schema.json`，可由同路径 MOD 覆盖。资源为终章声明一个地图入口、多个结局文本和 AND 条件；条件可读取任务状态、善恶、江湖/门派声望、NPC 关系、门派身份及已知图谱节点。加载时逐结局校验引用与地图占格，坏入口使该资源不可用，坏结局只隔离该结局；NPC 日程不会进入终章格。结局评估为纯函数，界面显示未满足条件并在确认时重算。当前原型在读完结局后回主菜单，尚不记录结局选择到存档。资料字段、路线及限制见 [`ENDINGS.md`](ENDINGS.md)。
 
+Round 28 新增可选 `achievement-set` 资源，使用 `achievement-set.schema.json`，成就 JSON 放在 `achievements/` 并可由 MOD 同路径覆盖。每条成就声明 1–12 个 AND 条件（封闭 14 类：等级、任务/见闻/战斗/擂台/经脉/自创武学/锻造/炼丹计数、指定见闻、善恶/声望/人物关系区间、门派身份）和一次性经验/银两奖励；条件必带作者 `hint` 用于面板提示。Schema 校验字段封闭与基本类型，防御解析器逐条隔离语义越界/缺项成就，装配期再校验悬空人物/门派/知识引用。缺资源时世界照常运行；解锁 id 与活动计数保存在 v1 可选 `achievementState`。条件词汇、进度投影、G 键面板与领奖幂等语义见 [`ACHIEVEMENTS.md`](ACHIEVEMENTS.md)。
+
 Round 20 新增擂台资料族：manifest 中的可选 arena-set 资源按地图入口、角色模板、赛程武学、彩头物品逐项校验；坏入口只禁用对应擂台。赛事文件可由 MOD 使用同路径覆盖，资料字段和玩法边界见 docs/ARENA_DESIGN.md。
 
 Round 21 新增可选 `faction-war-set` 战事资料族：每个阶段为两支参战派分别声明对手属性/武学，组装校验入口、门派、武学和结局图谱节点。E 邻接报名限在籍参战弟子，贡献、结局声望变化和见闻发现均可由 JSON 调整；同名 MOD 资源可覆盖默认会盟。字段与贡献结算见 `docs/FACTION_WAR_DESIGN.md`。
@@ -72,7 +75,7 @@ Round 21 新增可选 `faction-war-set` 战事资料族：每个阶段为两支�
 Round 22 新增可选 `martial-art-forge-components` 资源（`martial-art-components.schema.json`），组件文件放在 `skills/` 并可由 MOD 同路径覆盖。每项组件属于 `intent`（attack/heal 招式）、`form`（架势）或 `breath`（吐纳）之一；Schema 限制字段和值类型，Phaser-free 解析器补充唯一 id、槽位/种类一致和整数范围检查。资源缺失、Schema 不符或语义错误时只禁用创制入口，不影响已有武学、战斗和地图。作品生成后作为玩家运行时状态存档，不写回世界资料；详细预算和存档边界见 `docs/MARTIAL_ART_FORGE.md`。
 
 - 文件名：小写 kebab-case，如 `data/base/maps/qingxi-town.json`（示例名，内容待后续轮次原创编写）。
-- 每个数据对象有稳定 `id`，前缀按族区分（建议 `char.` / `map.` / `quest.` / `dlg.` / `kg.` / `item.` / `skill.` / `faction.` / `ending.`）；跨族引用一律用 id，不用文件路径。
+- 每个数据对象有稳定 `id`，前缀按族区分（建议 `char.` / `map.` / `quest.` / `dlg.` / `kg.` / `item.` / `skill.` / `faction.` / `ending.` / `achievement.`）；跨族引用一律用 id，不用文件路径。
 - 同行伙伴 id 使用 `companion.` 前缀；伙伴必须引用有效 `npcId`，同一 NPC 可由独立伙伴资料赋予招募和支援规则。
 - 每族目录可多文件；加载器合并为该族的"对象集合"。
 - 具体字段以 `data/schema/<族>.schema.json` 为准（schema 进入后，本文件仅维护约定，不复制字段定义，避免双份真相）。
@@ -90,7 +93,7 @@ Round 22 新增可选 `martial-art-forge-components` 资源（`martial-art-compo
 - **多地图与世界区域（Round 10）**：已登记地图资源按 `grid-map` schema 收集，并要求地图内 `id` 与 manifest 资源 id 一致。必需 `world-map` 定义起始地图、图册节点、跨图关口与区域事件；舆图位置为 0–100 相对坐标，关口端点/事件格须引用有效地图并落在可走格。往返旅行需分别声明去程和回程端点。与 NPC/遭遇占格冲突的端点或事件会被逐条隔离并给出警告。事件 `once: true` 时只在首次踩入时结算并将 id 记入存档；`false` 允许每次进入重复提示。M 打开舆图且锁定探索输入；E 按 NPC → 遭遇 → 关口的顺序仲裁。详细字段及资料流程见 `docs/MAP-ATLAS.md`。
 - **资料驱动的区域奇遇（Round 17）**：`world-map.events[].conditions` 可用 `knowledgeNodeIds`（全部已知）、`periodIds`（任一当前时段）、`weatherIds`（任一天气）组合门槛；所有已声明条件组都必须满足。`discoverKnowledgeNodeId` 在事件成功触发时发现一个百科节点。静态 Schema 校验形状，装配阶段跨图谱/历法/气候逐事件检查引用，坏事件独立隔离。等候时重新检查当前格，未满足的事件不会被消耗。
 - **值与变化量分开看**：声望条件读取的当前声望范围为 0…1000；`adjustRenown.delta` 是有符号变化量，范围为 -1000…1000（排除 0）。负变化合法，执行后的声望仍钳制在 0…1000。Ajv Schema 与引擎防御解析必须接受同一合法变化范围。
-- **未登记的数据族**：地图是当前场景的关键资源，缺失时加载器会生成错误诊断并显示修复说明。NPC/对话、角色成长/武学/战斗、物品/商店、任务、伙伴、擂台、门派战、经脉、装备锻造和知识图谱均为可选资源：未登记或有效集合为空时地图正常显示；玩家运行状态只要求有有效角色模板，不要求遭遇、任务、伙伴、门派战、经脉或锻造数据。其余空目录尚未进入运行时资料集。
+- **未登记的数据族**：地图是当前场景的关键资源，缺失时加载器会生成错误诊断并显示修复说明。NPC/对话、角色成长/武学/战斗、物品/商店、任务、伙伴、擂台、门派战、经脉、装备锻造、炼丹、结局、成就和知识图谱均为可选资源：未登记或有效集合为空时地图正常显示；玩家运行状态只要求有有效角色模板，不要求遭遇、任务、伙伴、门派战、经脉、锻造、炼丹、结局或成就数据。其余空目录尚未进入运行时资料集。
 - **关键单点缺失**（如出生点地图缺失）：启动失败，输出单一明确错误（缺什么、去哪补）。
 
 ## 5. mod 覆盖规则（同名文件优先）
@@ -123,6 +126,7 @@ Round 22 新增可选 `martial-art-forge-components` 资源（`martial-art-compo
 - 新增任务：在 quest-set JSON 的 `quests` 数组新增任务（`id` 建议 `quest.` 前缀；`giverNpcId` 必须指向有效 NPC，并在 NPC 条目声明 `questGiver: true`；`prerequisiteQuestIds` 只能引用无环任务；目标 `kind` 选 `collectItem`/`defeatEncounter`，`targetId` 分别引用有效物品/遭遇，`requiredCount` 为正整数；`failOnEncounterIds` 声明败北失败的遭遇；`rewards` 声明非负 experience/currency）。收集目标接取时以当前背包数量为起点，物品变化后同步目标数量；击败目标在战斗胜利后推进；任务奖励恰发一次。E 打开发布人名录，Q 打开日志，A 放弃活动任务；Round 09 起任务阶段和进度随本地存档持久化。
 - 修改历法：直接编辑 `data/base/worldview/calendar.json`（或用 MOD 同路径覆盖）。调整月份天数/时段表/耗时都会即时反映到新开局与读档折算（存档只存分钟数）；删除对话正在引用的时段 id 只会剔除相应选项并警告。时段 id 建议 `period.` 前缀、月份 id 建议 `month.` 前缀；照度 0–1 控制夜幕深度（场景按 `1 − 照度` 叠加至多约 0.55 透明度的冷色层，UI 始终保持清晰）。
 - 修改季节/天气：编辑 `data/base/worldview/climate.json`（或用 MOD 同路径覆盖），必须保留至少一种天气并确保各季节恰好覆盖历法的每个月份。季节 `monthIds` 引用 `calendar.json` 的稳定月份 id；`weatherWeights` 引用同文件的天气 id，权重为相对非负整数且每季总和需大于 0；天气声明 `#RRGGBB` 色调、0–0.45 透明度、0–1440 步耗时，以及可选的雨/雪粒子类型和 0–1 密度。相同世界种子/历日会稳定抽得相同天气。雨雪步耗时只叠加到成功单格行走；改动示例和扩展边界见 `docs/CLIMATE.md`。
+- 新增成就：在 achievement-set JSON 的 `achievements` 数组追加条目（`id` 建议 `achievement.` 前缀且保持历史稳定——解锁状态按 id 记入存档，改名等同于新成就；`title`/`description` 原创；`priority` 控制面板排序；`conditions` 选封闭 14 类并各带 `hint`，全部满足才解锁；`reward` 声明 1–100000 经验和/或 1–1000000 银两，至少一项）。坏条目或悬空人物/门派/知识引用只禁用该成就并警告。Schema 校验结构与字段类型，数值范围由解析器逐条执行。完整条件表、进度展示与领奖规则见 `docs/ACHIEVEMENTS.md`。
 - 所有内容必须原创（红线见 `docs/ORIGINAL-FIDELITY.md`）；命名避开任何原作专有名称。
 
 ## Round 13：门派与师承资料
@@ -206,3 +210,4 @@ NPC 当前坐标是由地图、时钟和人物日程派生的临时运行状态�
 | 2026-09-27 | Round 16 | NPC 可选时段日程、跨资源位置校验、基础位置回退、存读档派生与时段占位同步 |
 | 2026-09-27 | Round 19 | 新增可选伙伴资料族、NPC 引用装配、攻疗支援字段与 MOD 覆盖语义；详见 `docs/COMPANIONS.md` |
 | 2026-09-27 | Round 26 | 加入 NPC 私有知识、对白分享与图谱关系态度传播规则，并扩展 v1 兼容字段 |
+| 2026-09-27 | Round 28 | 登记可选 achievement-set 资源族、条件/奖励契约、逐条隔离规则与 `achievementState` 存档字段；专项烟测与回归通过 |

@@ -4,6 +4,20 @@
 
 ## [Unreleased]
 
+### Added (Round 28)
+
+- 新增可选 `achievement-set` 资料族与 schema（draft-07）；成就条件、展示文本与经验/银两奖励由 JSON/MOD 声明，封闭 14 类条件按 AND 组合，逐条坏成就只禁用自身。
+- 新增 `achievement-system` Phaser-free 规则：防御解析、跨资料引用装配、纯函数进度投影（计数/区间/布尔三类展示）与一次性解锁领奖；奖励经验沿用成长协议并联动经脉修为，银两按存档上限截断。
+- 新增 v1 可选 `achievementState` 存档字段（历史解锁 id 与战斗/锻造/炼丹三个单调计数器）；旧 v1 缺字段按空基线兼容，解锁 id 不按当前资料过滤以防 MOD 重复发奖。
+- 新增 G 键成就面板：锁定/进行中/已解锁状态、逐条件进度、奖励与汇总；帮助面板与状态行加入 G 键提示；战斗胜利、锻造、炼丹与对白/任务等收口点即时重评。
+- 新增 14 条基础成就，覆盖等级、差事、见闻、善恶、声望、门派、关系、战斗、擂台、经脉、自创武学、锻造与炼丹。
+- 新增 `docs/ACHIEVEMENTS.md`，并更新存档、数据指南、架构、GDD、开发日志与路线图。
+
+### Verification (Round 28)
+
+- `npm run smoke:round-28`、R27/R26/R25 串行回归、`npm run validate:data`、`npm run typecheck` 与 `npm run build` 均通过；构建有主 JS chunk 超过 500 kB 的体积建议。
+- `git diff --check` 通过；未进行浏览器手动游玩，G 键面板、键位输入和实际奖励提示未做交互实测。
+
 ### Added (Round 27)
 
 - 新增可选 ending-set 资料族与 schema；地图终章入口、结局叙事和任务/善恶/声望/关系/门派/见闻条件均由 JSON/MOD 声明。

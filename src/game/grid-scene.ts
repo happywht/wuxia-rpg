@@ -27,6 +27,13 @@ import {
 } from '../engine/dialogue-runtime';
 import { GameClock } from '../engine/game-calendar';
 import { selectAdjacentEndingGate, type EndingEvaluationContext } from '../engine/ending-system';
+import {
+  createAchievementRunState,
+  recordAchievementCounter,
+  unlockReadyAchievements,
+  type AchievementEvaluationContext,
+  type AchievementRunState,
+} from '../engine/achievement-system';
 import { resolveNpcPlacementsForPlayer } from '../engine/npc-schedule';
 import {
   ClimateRuntime,
@@ -133,6 +140,7 @@ import { MartialArtForgePanel } from './martial-art-forge-ui';
 import { EquipmentForgePanel } from './equipment-forge-ui';
 import { AlchemyPanel } from './alchemy-ui';
 import { EndingPanel } from './ending-ui';
+import { AchievementPanel } from './achievement-ui';
 import { MeridianPanel } from './meridian-ui';
 import { type GameSettings, applyGameSettings, loadGameSettings, uiFontSize } from './settings';
 import { createPixelPerson, UI_FONT_FAMILY } from './ui-theme';
@@ -306,6 +314,8 @@ export class GridScene extends Phaser.Scene {
   private factionState: FactionMembershipState = createFactionMembershipState();
   /** Discovered encyclopedia entries are run state and participate in saves. */
   private knownKnowledgeNodeIds = new Set<string>();
+  /** Historical achievements and durable activity counters belong to this save slot. */
+  private achievementState: AchievementRunState = createAchievementRunState();
 
   /** Round 14 in-game clock; null only before the world finished loading. */
   private clock: GameClock | null = null;
@@ -344,6 +354,7 @@ export class GridScene extends Phaser.Scene {
   private equipmentForgePanel: EquipmentForgePanel | null = null;
   private alchemyPanel: AlchemyPanel | null = null;
   private endingPanel: EndingPanel | null = null;
+  private achievementPanel: AchievementPanel | null = null;
   private meridianPanel: MeridianPanel | null = null;
   private activeSession: CombatSession | null = null;
   private activeEncounter: PlacedEncounter | null = null;
@@ -449,6 +460,7 @@ export class GridScene extends Phaser.Scene {
     this.children.removeAll(true); // Drop the transient loading hint.
     this.scaledTextTargets.length = 0;
     this.world = world;
+    this.achievementState = restoredRun?.achievementState ?? createAchievementRunState();
     this.arenaRecords.clear();
     for (const record of restoredRun?.arenaRecords ?? []) {
       this.arenaRecords.set(record.arenaId, { ...record });
@@ -682,6 +694,7 @@ export class GridScene extends Phaser.Scene {
     this.equipmentForgePanel = new EquipmentForgePanel(this, () => this.noteOverlayClosed());
     this.alchemyPanel = new AlchemyPanel(this, () => this.noteOverlayClosed());
     this.endingPanel = new EndingPanel(this, () => this.noteOverlayClosed());
+    this.achievementPanel = new AchievementPanel(this, () => this.noteOverlayClosed());
     this.meridianPanel = new MeridianPanel(this, () => this.noteOverlayClosed());
     this.worldMapPanel = new WorldMapPanel(this, () => this.noteOverlayClosed());
     this.encyclopediaPanel = new EncyclopediaPanel(this, { onClose: () => this.noteOverlayClosed() });
@@ -887,6 +900,7 @@ export class GridScene extends Phaser.Scene {
       arenaRecords: this.arenaRecords,
       factionWarRecords: this.factionWarRecords,
       customMartialArts: this.customMartialArts,
+      achievementState: this.achievementState,
     });
     const result = writeSaveSlot(this.storage, slotId, snapshot);
     if (result.ok) {
@@ -1311,6 +1325,9 @@ export class GridScene extends Phaser.Scene {
    */
   private settleBattleClose(): void {
     const session = this.activeSession;
+    if (session?.finalResult?.outcome === 'victory') {
+      this.achievementState = recordAchievementCounter(this.achievementState, 'battleVictories');
+    }
     const encounter = this.activeEncounter;
     const factionWarRun = this.activeFactionWarRun;
     const arenaRun = this.activeArenaRun;
@@ -1881,6 +1898,7 @@ export class GridScene extends Phaser.Scene {
 
   /** Refreshes the bottom status line from the current adjacency state. */
   private updateInteractHint(): void {
+    this.refreshAchievementUnlocks();
     if (this.interactText === null) {
       return;
     }
@@ -1990,7 +2008,7 @@ export class GridScene extends Phaser.Scene {
         : 'P 同行伙伴 · 暂无可交互人物');
       return;
     }
-    this.interactText.setText('N 经脉 · C 自创武学 · H 操作帮助 · Esc 暂停');
+    this.interactText.setText('N 经脉 · C 自创武学 · G 成就 · H 操作帮助 · Esc 暂停');
   }
 
   /** True while any keyboard overlay owns the input (dialogue/battle/backpack/shop/quest/pause). */
@@ -2012,6 +2030,7 @@ export class GridScene extends Phaser.Scene {
       (this.equipmentForgePanel !== null && this.equipmentForgePanel.isOpen) ||
       (this.alchemyPanel !== null && this.alchemyPanel.isOpen) ||
       (this.endingPanel !== null && this.endingPanel.isOpen) ||
+      (this.achievementPanel !== null && this.achievementPanel.isOpen) ||
       (this.meridianPanel !== null && this.meridianPanel.isOpen) ||
       (this.controlsPanel !== null && this.controlsPanel.isOpen)
     );
@@ -2200,6 +2219,72 @@ export class GridScene extends Phaser.Scene {
     if (this.anyOverlayOpen()) return;
     panel.open({ graph: world.knowledgeGraph, knownNodeIds: this.knownKnowledgeNodeIds });
     this.updateInteractHint();
+  }
+
+  /** G key: inspect data-authored achievements and current journey progress. */
+  private toggleAchievements(): void {
+    const panel = this.achievementPanel;
+    const set = this.world?.assembly.achievements ?? null;
+    if (panel === null) return;
+    if (panel.isOpen) {
+      panel.close();
+      return;
+    }
+    if (this.anyOverlayOpen()) return;
+    if (set === null || set.achievements.length === 0) {
+      this.showRegionNotice('当前世界没有可用的成就资料。');
+      return;
+    }
+    this.refreshAchievementUnlocks();
+    const context = this.achievementEvaluationContext();
+    if (context === null) return;
+    panel.open({ set, state: this.achievementState, context });
+    this.updateInteractHint();
+  }
+
+  private achievementEvaluationContext(): AchievementEvaluationContext | null {
+    const character = this.playerState;
+    if (character === null) return null;
+    return {
+      character,
+      customMartialArtCount: this.customMartialArts.size,
+      questStatuses: new Map([...this.questJournal.states].map(([id, state]) => [id, state.status])),
+      knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
+      social: this.social,
+      factionMembership: this.factionState.membership,
+      relationships: this.social.relationships,
+      arenaRecords: this.arenaRecords,
+      state: this.achievementState,
+    };
+  }
+
+  /** Latches eligible achievements and awards each authored reward once per save. */
+  private refreshAchievementUnlocks(): void {
+    const set = this.world?.assembly.achievements ?? null;
+    const profile = this.playerProfile;
+    const character = this.playerState;
+    const inventory = this.inventory;
+    if (set === null || profile === null || character === null || inventory === null) return;
+    const notices: string[] = [];
+    for (let pass = 0; pass <= set.achievements.length; pass += 1) {
+      const context = this.achievementEvaluationContext();
+      if (context === null) return;
+      const result = unlockReadyAchievements(set, this.achievementState, context);
+      if (result.newlyUnlocked.length === 0) break;
+      this.achievementState = result.state;
+      for (const achievement of result.newlyUnlocked) {
+        const currency = achievement.reward.currency ?? 0;
+        inventory.currency = Math.min(999_999_999, inventory.currency + currency);
+        const experience = grantExperience(profile, character, achievement.reward.experience ?? 0);
+        if (this.meridianSet !== null) {
+          awardCultivationPoints(character, experience.levelsGained, this.meridianSet.resource);
+        }
+        notices.push(achievement.title);
+        console.info('[achievement] 已解锁 "%s"：经验 +%d，银两 +%d',
+          achievement.id, achievement.reward.experience ?? 0, currency);
+      }
+    }
+    if (notices.length > 0) this.showRegionNotice('成就达成：' + notices.join('、'));
   }
 
   private questItemCounts(): ReadonlyMap<string, number> {
@@ -2395,6 +2480,10 @@ export class GridScene extends Phaser.Scene {
     const onWait = (): void => this.handleWait();
     waitKey.on('down', onWait);
 
+    const achievementKey = keyboard.addKey(KeyCodes.G);
+    const onAchievements = (): void => this.toggleAchievements();
+    achievementKey.on('down', onAchievements);
+
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       for (const { key, onDown } of listeners) {
         key.off('down', onDown);
@@ -2412,6 +2501,7 @@ export class GridScene extends Phaser.Scene {
       meridianKey.off('down', onMeridian);
       companionKey.off('down', onCompanions);
       waitKey.off('down', onWait);
+      achievementKey.off('down', onAchievements);
       this.dialoguePanel?.destroy();
       this.dialoguePanel = null;
       this.battlePanel?.destroy();
@@ -2444,6 +2534,8 @@ export class GridScene extends Phaser.Scene {
       this.alchemyPanel = null;
       this.endingPanel?.destroy();
       this.endingPanel = null;
+      this.achievementPanel?.destroy();
+      this.achievementPanel = null;
       this.meridianPanel?.destroy();
       this.meridianPanel = null;
       this.controlsPanel?.destroy();
@@ -2535,7 +2627,10 @@ export class GridScene extends Phaser.Scene {
         attributeLabels: this.playerProfile?.attributeLabels ?? {},
         onCraft: (recipeId) => {
           const outcome = craftEquipment({ station: forge, recipeId, inventory, items: this.items });
-          if (outcome.ok) this.refreshQuestCollectObjectives();
+          if (outcome.ok) {
+            this.achievementState = recordAchievementCounter(this.achievementState, 'equipmentCrafts');
+            this.refreshQuestCollectObjectives();
+          }
           return outcome.ok
             ? { ok: true, message: `已锻成「${outcome.result.name}」，剩余银两 ${outcome.remainingCurrency}。` }
             : { ok: false, message: outcome.reason };
@@ -2568,6 +2663,7 @@ export class GridScene extends Phaser.Scene {
             items: this.items,
           });
           if (!outcome.ok) return { ok: false, message: outcome.reason };
+          this.achievementState = recordAchievementCounter(this.achievementState, 'alchemyCrafts');
           this.refreshQuestCollectObjectives();
           if (this.world?.knowledgeGraph.nodes.has(outcome.result.id)) this.knownKnowledgeNodeIds.add(outcome.result.id);
           return { ok: true, message: `已炼成「${outcome.result.name}」，剩余银两 ${outcome.remainingCurrency}。` };
@@ -2712,6 +2808,10 @@ export class GridScene extends Phaser.Scene {
       if (this.companionState.activeCompanionId !== companionBefore) {
         this.refreshNpcPlacements();
       }
+      // Dialogue effects can alter morality, relationships, faction, knowledge,
+      // or learned arts without changing a quest. Re-evaluate while this
+      // conversation is still active so those achievements unlock immediately.
+      this.refreshAchievementUnlocks();
       const feedback =
         result.summary.lines.length > 0 ? result.summary.lines.join(' · ') : null;
       session.choose(choice.index);

@@ -1,0 +1,145 @@
+{
+  "id": "achievement.set.round-28",
+  "achievements": [
+    {
+      "id": "achievement.first-breath",
+      "title": "初窥门径",
+      "description": "把一次次磨砺化作自己的本领。",
+      "priority": 100,
+      "conditions": [
+        { "kind": "playerLevel", "minLevel": 2, "hint": "角色达到 2 级" }
+      ],
+      "reward": { "experience": 30, "currency": 20 }
+    },
+    {
+      "id": "achievement.first-promise",
+      "title": "初承差事",
+      "description": "接住江湖递来的第一桩托付。",
+      "priority": 95,
+      "conditions": [
+        { "kind": "completedQuestCount", "minCount": 1, "hint": "完成 1 项差事" }
+      ],
+      "reward": { "experience": 45, "currency": 35 }
+    },
+    {
+      "id": "achievement.footprints-known",
+      "title": "雨夜识踪",
+      "description": "把一段无人留意的旧事查出眉目。",
+      "priority": 90,
+      "conditions": [
+        { "kind": "knowledgeKnown", "nodeId": "event.old-footprints", "hint": "查明雨后脚印的线索" }
+      ],
+      "reward": { "experience": 40, "currency": 25 }
+    },
+    {
+      "id": "achievement.river-of-stories",
+      "title": "江湖百闻",
+      "description": "把沿途听来的消息，一条条辨成自己的见识。",
+      "priority": 88,
+      "conditions": [
+        { "kind": "knownKnowledgeCount", "minCount": 16, "hint": "发现至少 16 条江湖见闻" }
+      ],
+      "reward": { "experience": 40, "currency": 25 }
+    },
+    {
+      "id": "achievement.kind-deed",
+      "title": "善念初明",
+      "description": "在取舍之间，仍愿给陌生人留一盏灯。",
+      "priority": 85,
+      "conditions": [
+        { "kind": "morality", "minValue": 5, "hint": "善恶值达到 5" }
+      ],
+      "reward": { "experience": 35, "currency": 30 }
+    },
+    {
+      "id": "achievement.name-in-the-rivers",
+      "title": "小有名声",
+      "description": "你的所作所为开始在街巷间传开。",
+      "priority": 80,
+      "conditions": [
+        { "kind": "renown", "minValue": 10, "hint": "江湖声望达到 10" }
+      ],
+      "reward": { "experience": 45, "currency": 40 }
+    },
+    {
+      "id": "achievement.find-a-home",
+      "title": "择门而入",
+      "description": "以自己的选择，写下师门一笔。",
+      "priority": 75,
+      "conditions": [
+        { "kind": "factionMembership", "isMember": true, "hint": "拜入一个门派" }
+      ],
+      "reward": { "experience": 50, "currency": 30 }
+    },
+    {
+      "id": "achievement.trust-at-the-tea-house",
+      "title": "茶棚知交",
+      "description": "让一次次真诚的交谈结成信任。",
+      "priority": 70,
+      "conditions": [
+        { "kind": "npcRelationship", "npcId": "char.lu-zhenniang", "minValue": 15, "hint": "与茶棚主人关系达到 15" }
+      ],
+      "reward": { "experience": 40, "currency": 40 }
+    },
+    {
+      "id": "achievement.first-victories",
+      "title": "三战有成",
+      "description": "历经三场胜负，不再被初次交锋所困。",
+      "priority": 65,
+      "conditions": [
+        { "kind": "battleVictories", "minCount": 3, "hint": "赢得 3 场战斗" }
+      ],
+      "reward": { "experience": 55, "currency": 35 }
+    },
+    {
+      "id": "achievement.arena-champion",
+      "title": "擂台留名",
+      "description": "在连战之中守住最后一场胜利。",
+      "priority": 60,
+      "conditions": [
+        { "kind": "arenaChampionships", "minCount": 1, "hint": "夺得 1 次擂台魁首" }
+      ],
+      "reward": { "experience": 80, "currency": 60 }
+    },
+    {
+      "id": "achievement.first-meridian",
+      "title": "气行一脉",
+      "description": "以修为与药材打通一处经脉。",
+      "priority": 55,
+      "conditions": [
+        { "kind": "meridianNodes", "minCount": 1, "hint": "打通 1 个经脉节点" }
+      ],
+      "reward": { "experience": 65, "currency": 40 }
+    },
+    {
+      "id": "achievement.self-made-art",
+      "title": "自成一招",
+      "description": "把所学拆解重组，创出属于自己的武学。",
+      "priority": 50,
+      "conditions": [
+        { "kind": "customMartialArts", "minCount": 1, "hint": "创制 1 种自创武学" }
+      ],
+      "reward": { "experience": 75, "currency": 55 }
+    },
+    {
+      "id": "achievement.forged-gear",
+      "title": "百炼成器",
+      "description": "亲手改良一件趁手装备。",
+      "priority": 45,
+      "conditions": [
+        { "kind": "equipmentCrafts", "minCount": 1, "hint": "完成 1 次装备锻造" }
+      ],
+      "reward": { "experience": 60, "currency": 45 }
+    },
+    {
+      "id": "achievement.first-elixir",
+      "title": "炉火初温",
+      "description": "辨明药性，炼成第一炉丹药。",
+      "priority": 40,
+      "conditions": [
+        { "kind": "alchemyCrafts", "minCount": 1, "hint": "完成 1 次炼丹" }
+      ],
+      "reward": { "experience": 60, "currency": 45 }
+    }
+  ]
+}

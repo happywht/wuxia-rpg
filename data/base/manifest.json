@@ -81,6 +81,11 @@
       "schema": "ending-set"
     },
     {
+      "id": "achievement.round-28-set",
+      "path": "achievements/round-28-achievements.json",
+      "schema": "achievement-set"
+    },
+    {
       "id": "encounter.round-05-set",
       "path": "battles/round-05-encounters.json",
       "schema": "battle-encounters"

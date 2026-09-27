@@ -1,6 +1,6 @@
 # 本地存档与设置协议
 
-Round 09 引入本地单机存档；Round 10 扩展到多地图行程与区域事件；Round 11 增加已发现知识词条；Round 13 保存玩家当前门派与师父；Round 14 记录已流逝的游戏内分钟数；Round 15 保存世界气候种子；Round 16 以分钟数派生 NPC 日程位置；Round 17 的条件奇遇复用已完成事件 id 和已发现知识 id，不增加存档字段；Round 18 将逐门派声望保存在 `social.factionRenown`；Round 19 添加当前同行伙伴 id；Round 20 加入擂台战绩册；Round 21 加入门派战绩册；Round 22 保存自创武学完整定义；Round 23 加入未用修为与已打通经脉节点 id；Round 24 的锻造结果和 Round 25 的成药都沿用普通物品/装备与 `knownKnowledgeNodeIds`；Round 26 将玩家分享给 NPC 的私有见闻保存为 `social.npcKnowledge`，仍沿用 v1 可选字段兼容策略。缺字段的旧 v1 档中伙伴归一为 null，战绩/自创作品/经脉节点/动态 NPC 记忆归一为空集合，修为归零；恢复后仍会由当前图谱重建 NPC 静态 `knows` 记忆。存档是运行时状态的版本化 JSON 快照，不是世界资料：不会写回 `data/base/`，也不会被 MOD 覆盖。协议实现位于 `src/engine/save-system.ts`，菜单与游戏场景负责呈现和调用。
+Round 09 引入本地单机存档；Round 10 扩展到多地图行程与区域事件；Round 11 增加已发现知识词条；Round 13 保存玩家当前门派与师父；Round 14 记录已流逝的游戏内分钟数；Round 15 保存世界气候种子；Round 16 以分钟数派生 NPC 日程位置；Round 17 的条件奇遇复用已完成事件 id 和已发现知识 id，不增加存档字段；Round 18 将逐门派声望保存在 `social.factionRenown`；Round 19 添加当前同行伙伴 id；Round 20 加入擂台战绩册；Round 21 加入门派战绩册；Round 22 保存自创武学完整定义；Round 23 加入未用修为与已打通经脉节点 id；Round 24 的锻造结果和 Round 25 的成药都沿用普通物品/装备与 `knownKnowledgeNodeIds`；Round 26 将玩家分享给 NPC 的私有见闻保存为 `social.npcKnowledge`；Round 28 新增可选 `achievementState`（历史解锁 id 与战斗/锻造/炼丹计数），仍沿用 v1 可选字段兼容策略。缺字段的旧 v1 档中伙伴归一为 null，战绩/自创作品/经脉节点/动态 NPC 记忆归一为空集合，修为归零；恢复后仍会由当前图谱重建 NPC 静态 `knows` 记忆。存档是运行时状态的版本化 JSON 快照，不是世界资料：不会写回 `data/base/`，也不会被 MOD 覆盖。协议实现位于 `src/engine/save-system.ts`，菜单与游戏场景负责呈现和调用。
 
 ## 槽位与存储
 
@@ -33,6 +33,7 @@ Round 20 的 `arenaRecords` 按擂台 id 保存报名次数、历史最佳胜场
 - 当前同行伙伴（`activeCompanionId`，Round 19 起）：伙伴数据 id 或 `null`。旧 v1 快照缺字段时解析为 `null`；恢复时伙伴已被移除则清空并给出 warning。
 - 门派战战绩（`factionWarRecords`，Round 21 起）：战事 id、报名/结果计数、最高与最近贡献、最近结果。旧 v1 快照缺字段时解析为空数组；恢复时当前资料已移除该战事则仅过滤对应战绩并给出 warning。
 - 经脉状态（Round 23）：`cultivationPoints` 保存未用修为（0–999），`unlockedMeridianNodeIds` 保存至多 64 个唯一节点 id。节点效果是派生值，不直接存档；恢复时按当前经脉资源重算。旧 v1 快照缺字段归一为 0/空数组，MOD 删除节点后仅过滤相应 id 并警告。
+- 成就运行态（Round 28，可选 `achievementState`）：`unlockedIds` 保存历史解锁的成就 id（至多 512 个唯一字符串），`battleVictories`/`equipmentCrafts`/`alchemyCrafts` 保存三个单调计数器（各 0–999999999，饱和不回退）。成就进度与奖励结算均为派生值，不写入快照。
 - NPC 当前地图坐标不入档（Round 16）：由地图 id、`elapsedGameMinutes`、当前日程资料和玩家位置派生；时段变化时玩家格优先，NPC 会按运行时占位规则回退基础位置或暂不显示。
 
 快照只保存 JSON 安全的数组/普通对象；不会保存 Phaser 对象、对话面板会话或可从角色模板和装备重算的派生属性/生命内力上限。读档时会按当前有效数据重新计算派生值。
@@ -44,7 +45,7 @@ Round 20 的 `arenaRecords` 按擂台 id 保存报名次数、历史最佳胜场
 3. 次要引用已经从世界资料删除时，恢复计划会逐项移除无效武学、物品、商店、任务、关系、遭遇或区域事件，并提供警告；容量、物品堆叠、角色属性和任务目标进度按当前资料的新上限收敛。
 4. 只有预检成功后才创建并恢复运行状态，装备重新经过装备引擎应用效果；不会把半恢复的状态提交到场景。
 
-当前只实现 v1，不做跨协议版本迁移。Round 10 在 v1 中新增 `completedRegionalEvents`，Round 11 新增 `knownKnowledgeNodeIds`，Round 13 新增可空 `factionMembership`，Round 14 新增 `elapsedGameMinutes`，Round 15 新增 `worldSeed`，Round 18 新增 `social.factionRenown`，Round 19 新增可空 `activeCompanionId`，Round 20 新增 `arenaRecords`，Round 21 新增 `factionWarRecords`，Round 26 新增可选 `social.npcKnowledge`；解析缺少这些字段的旧 v1 快照时，分别按空数组、无门派、0 分钟、固定种子 `1`、空门派声望、无伙伴或空动态记忆归一，因此所有 Round 09 起的旧 v1 存档仍可读取。Round 16、17、24、25 不增加协议字段。恢复时已删除门派的声望 id 逐项忽略并给出 warning，不拒绝其余进度；同行伙伴资料失效则清除当前队伍并附 warning；战事资料移除时只过滤对应战绩。其他社会状态按各自范围校验。世界预检恢复时会重新加入资料中的 `knownByDefault` 节点，并过滤已删除的节点 id；NPC 私有见闻也会逐 NPC/节点过滤，场景随后合并当前图谱中的静态 `knows` 边。若当前门派或登记师父已从资料中删除，只清除该次师承并附带 warning，不拒绝其余进度。未知协议版本会明确报告为不支持，原槽内容保留。存档仅限浏览器本地；跨设备同步和云存档尚未实现。浏览器清理站点数据也会移除本地存档。
+当前只实现 v1，不做跨协议版本迁移。Round 10 在 v1 中新增 `completedRegionalEvents`，Round 11 新增 `knownKnowledgeNodeIds`，Round 13 新增可空 `factionMembership`，Round 14 新增 `elapsedGameMinutes`，Round 15 新增 `worldSeed`，Round 18 新增 `social.factionRenown`，Round 19 新增可空 `activeCompanionId`，Round 20 新增 `arenaRecords`，Round 21 新增 `factionWarRecords`，Round 26 新增可选 `social.npcKnowledge`，Round 28 新增可选 `achievementState`；解析缺少这些字段的旧 v1 快照时，分别按空数组、无门派、0 分钟、固定种子 `1`、空门派声望、无伙伴、空动态记忆或空成就名单/零计数归一，因此所有 Round 09 起的旧 v1 存档仍可读取。Round 16、17、24、25 不增加协议字段。恢复时已删除门派的声望 id 逐项忽略并给出 warning，不拒绝其余进度；同行伙伴资料失效则清除当前队伍并附 warning；战事资料移除时只过滤对应战绩。其他社会状态按各自范围校验。世界预检恢复时会重新加入资料中的 `knownByDefault` 节点，并过滤已删除的节点 id；NPC 私有见闻也会逐 NPC/节点过滤，场景随后合并当前图谱中的静态 `knows` 边。若当前门派或登记师父已从资料中删除，只清除该次师承并附带 warning，不拒绝其余进度。未知协议版本会明确报告为不支持，原槽内容保留。存档仅限浏览器本地；跨设备同步和云存档尚未实现。浏览器清理站点数据也会移除本地存档。
 
 ### Round 22：自创武学兼容
 
@@ -67,6 +68,12 @@ v1 快照的可选 `customMartialArts` 数组保存玩家自创作品完整定�
 ### Round 26：NPC 私有见闻
 
 玩家已知词条仍保存在 `knownKnowledgeNodeIds`；每名 NPC 运行中通过对白分享得知的词条独立保存在 `social.npcKnowledge`。捕获将 `Map<string, Set<string>>` 转为 `{ npcId, nodeIds }[]`，恢复预检按当前 NPC 与知识节点集软过滤；旧 v1 缺字段时解析为空数组。场景随后将当前图谱中 NPC 起点的 `knows` 边合并为静态初始记忆，所以既能恢复旧数据定义下的 NPC 知情，也不会把玩家私有百科误当成所有人的知识。
+
+### Round 28：成就状态与活动计数
+
+`achievementState` 保存两类不可由当前资料重建的运行时状态：历史解锁的成就 id 名单，以及战斗胜利/装备锻造/炼丹三个单调计数器（计数器只增不减，在 999999999 饱和；失败路径不计入）。解析器对名单执行唯一 id 与 512 项边界检查、对计数器执行 0–999999999 整数检查，任何越界拒绝整份快照。
+
+与大多数次要引用不同，`unlockedIds` 在解析与恢复时**不**按当前成就资料过滤：id 是历史事实，MOD 成就临时移除后再启用不会重复发奖。旧 v1 快照缺字段时归一为空名单/零计数；恢复后场景的首次成就会为"在新成就发布前已满足门槛"的进度补发一次奖励，此后由该名单保证幂等。条件投影、达成判定与奖励结算都由当前资料在运行中重算，不存派生值。协议、面板与一次性领奖语义见 `docs/ACHIEVEMENTS.md`；Round 28 专项烟测与 R27–R25 回归验证已通过，未进行浏览器手动游玩。
 
 ## 设置
 

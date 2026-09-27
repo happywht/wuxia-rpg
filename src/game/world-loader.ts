@@ -105,6 +105,11 @@ import {
   type EndingSetData,
 } from '../engine/ending-system';
 import {
+  assembleAchievementSet,
+  parseAchievementSet,
+  type AchievementSetData,
+} from '../engine/achievement-system';
+import {
   assembleBattleEncounters,
   type BattleEncounterSetData,
   parseBattleEncounterSet,
@@ -143,6 +148,7 @@ const MERIDIAN_RESOURCE_ID = 'meridian.round-23-set';
 const EQUIPMENT_FORGE_RESOURCE_ID = 'equipment-forge.round-24-set';
 const ALCHEMY_RESOURCE_ID = 'alchemy.round-25-set';
 const ENDING_RESOURCE_ID = 'ending.round-27-set';
+const ACHIEVEMENT_RESOURCE_ID = 'achievement.round-28-set';
 const ITEM_RESOURCE_ID = 'item.round-06-set';
 const SHOP_RESOURCE_ID = 'shop.round-06-set';
 const QUEST_RESOURCE_ID = 'quest.round-07-set';
@@ -165,6 +171,7 @@ const OPTIONAL_RESOURCE_IDS = new Set([
   EQUIPMENT_FORGE_RESOURCE_ID,
   ALCHEMY_RESOURCE_ID,
   ENDING_RESOURCE_ID,
+  ACHIEVEMENT_RESOURCE_ID,
   ITEM_RESOURCE_ID,
   SHOP_RESOURCE_ID,
   QUEST_RESOURCE_ID,
@@ -188,6 +195,7 @@ const OPTIONAL_SCHEMA_ORIGINS = new Set([
   'schema:equipment-forge-set',
   'schema:alchemy-set',
   'schema:ending-set',
+  'schema:achievement-set',
   'schema:items-set',
   'schema:shops-set',
   'schema:quest-set',
@@ -242,6 +250,8 @@ export interface WorldAssembly {
   alchemyStations: readonly AssembledAlchemyStation[];
   /** Optional data-authored ending conditions and their map gate. */
   endings: AssembledEndingSet | null;
+  /** Optional data-authored achievement conditions, progress and rewards. */
+  achievements: AchievementSetData | null;
   items: ReadonlyMap<string, ItemRecordData>;
   shops: ReadonlyMap<string, AssembledShop>;
   quests: ReadonlyMap<string, QuestData>;
@@ -357,6 +367,10 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
         },
         'ending-set': (value) => {
           const parsed = parseEndingSet(value);
+          return parsed.ok ? [] : parsed.errors;
+        },
+        'achievement-set': (value) => {
+          const parsed = parseAchievementSet(value);
           return parsed.ok ? [] : parsed.errors;
         },
         'items-set': (value) => {
@@ -1316,6 +1330,43 @@ function assembleOptionalContent(
     details: [],
   });
 
+  let achievementSet: AchievementSetData | null = null;
+  const achievementResource = resources.get(ACHIEVEMENT_RESOURCE_ID);
+  if (achievementResource !== undefined) {
+    const parsed = parseAchievementSet(achievementResource.value);
+    if (!parsed.ok) {
+      warnings.push({
+        resource: ACHIEVEMENT_RESOURCE_ID,
+        origin: 'achievement-assembly',
+        severity: 'warning',
+        message: '成就资料结构无效，已关闭成就系统',
+        details: parsed.errors,
+      });
+    } else {
+      achievementSet = parsed.set;
+      for (const message of parsed.warnings) warnings.push({
+        resource: ACHIEVEMENT_RESOURCE_ID,
+        origin: 'achievement-assembly',
+        severity: 'warning',
+        message,
+        details: [],
+      });
+    }
+  }
+  const achievementAssembly = assembleAchievementSet({
+    set: achievementSet,
+    npcIds: placedNpcIds,
+    factionIds: new Set(progression.factions.keys()),
+    knowledgeNodeIds,
+  });
+  for (const message of achievementAssembly.warnings) warnings.push({
+    resource: ACHIEVEMENT_RESOURCE_ID,
+    origin: 'achievement-assembly',
+    severity: 'warning',
+    message,
+    details: [],
+  });
+
   return {
     npcs: allNpcs,
     npcsByPeriod: npcSchedules.placementsByPeriod,
@@ -1329,6 +1380,7 @@ function assembleOptionalContent(
     equipmentForges: equipmentForgeAssembly.stations,
     alchemyStations: alchemyAssembly.stations,
     endings: endingAssembly.endingSet,
+    achievements: achievementAssembly.set,
     items: itemAssembly.items,
     shops: shopAssembly.shops,
     quests: questAssembly.quests,
