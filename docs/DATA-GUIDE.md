@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：Round 03–25 已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台、门派战、自创武学、经脉、装备锻造、炼丹、存档、区域旅行、知识图谱、昼夜气候、日程、条件奇遇与多层社会声望；详情分别见 `docs/SAVES.md`、`docs/KNOWLEDGE-GRAPH.md`、`docs/COMPANIONS.md`、`docs/FACTION_WAR_DESIGN.md`、`docs/MARTIAL_ART_FORGE.md`、`docs/EQUIPMENT-FORGING.md` 与 `docs/ALCHEMY.md`。
+- 状态：Round 03–26 已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台、门派战、自创武学、经脉、装备锻造、炼丹、存档、区域旅行、知识图谱、NPC 私有记忆、昼夜气候、日程、条件奇遇与多层社会声望；详情分别见 `docs/SAVES.md`、`docs/KNOWLEDGE-GRAPH.md`、`docs/COMPANIONS.md`、`docs/FACTION_WAR_DESIGN.md`、`docs/MARTIAL_ART_FORGE.md`、`docs/EQUIPMENT-FORGING.md` 与 `docs/ALCHEMY.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -47,7 +47,7 @@ Round 18 状态：善恶（−100…100）、江湖个人声望（0…1000）、
 
 Round 19 状态：`companion.round-19-set` 登记可选伙伴集合。伙伴由 `companion-set` Schema 校验，`npcId` 在世界装配期对照有效 NPC；单条伙伴引用失效时只禁用该伙伴。对白用 `recruitCompanion` 效果和 `npcRelationship` 条件实现邀请；单队伍槽、跨区安全跟随与攻/疗支援参数见 `docs/COMPANIONS.md`。MOD 可通过同路径覆盖伙伴 JSON，跟随坐标不写入存档。
 
-Round 11 状态：manifest 登记可选 `knowledge-nodes` 与 `knowledge-edges` 资源，分别使用 `knowledge-nodes.schema.json` 与 `knowledge-edges.schema.json`；节点类别为 character/place/faction/item/martialArt/event/quest/ending，关系类型为 mentorOf/parentOf/hostileTo/belongsTo/locatedAt/holds/triggers/requires/rewards/knows/participatesIn/influences。节点含稳定 id、类型、标题、摘要和 `knownByDefault`；边含稳定 id、两端节点 id、关系类型和说明。解析器对坏单条给警告并隔离，装配时重复 id 保留首项，悬空端点关系逐条丢弃。
+Round 11 状态：manifest 登记可选 `knowledge-nodes` 与 `knowledge-edges` 资源，分别使用 `knowledge-nodes.schema.json` 与 `knowledge-edges.schema.json`；节点类别为 character/place/faction/item/martialArt/event/quest/ending，关系类型为 mentorOf/parentOf/hostileTo/belongsTo/locatedAt/holds/triggers/requires/rewards/knows/participatesIn/influences。节点含稳定 id、类型、标题、摘要和 `knownByDefault`；边含稳定 id、两端节点 id、关系类型和说明。Round 26 允许人物到人物边增加可选非零 `attitudeSpread`（-1…1）；parser 与图装配验证值域和端点类型。解析器对坏单条给警告并隔离，装配时重复 id 保留首项，悬空端点关系逐条丢弃。
 
 玩家新局从 `knownByDefault: true` 节点建立知识状态。对话选项可以声明 `{ "kind": "knowledgeKnown", "nodeId": "kg.node-id" }` 条件，全部条件满足才显示；效果 `{ "kind": "discoverKnowledgeNode", "nodeId": "kg.node-id" }` 会解锁词条，重复发现幂等。悬空引用只剔除对应对话选项。K 打开百科，左右/A/D 切换分类、上下/W/S 浏览、Esc 或 K 关闭。未发现条目只汇总为“未解锁见闻”，不会泄漏标题、摘要或相关边；关系只在两端节点都已知时显示。已知 id 随存档保存。具体内容组织和编辑步骤见 `docs/KNOWLEDGE-GRAPH.md`。
 
@@ -60,6 +60,8 @@ Round 23 新增可选 `meridian-set`（`meridian-set.schema.json`），经脉 JS
 Round 24 新增可选 `equipment-forge-set`，配方和地图工位定义放在 `forges/`，通过 manifest 同名路径 MOD 覆盖。工位引用地图资源与坐标；配方引用当前 item id、一个未穿戴基础装备、杂项材料、银两和同槽强化结果。装配会检查可走格、静态与日程占位，以及物品类别、槽位和属性不降级约束。配方投入数量和交易值域见 `data/schema/equipment-forge-set.schema.json`，运行规则与示例见 [`EQUIPMENT-FORGING.md`](EQUIPMENT-FORGING.md)。
 
 Round 25 新增可选 `alchemy-set`，药炉和药方定义放在 `alchemy/`，通过 manifest 同名路径 MOD 覆盖。药方引用一个需要先发现的知识节点、杂项药材、正银两成本和按悟性阈值递增的 2–5 档普通消耗品结果。Schema 检查字段边界；装配器校验地图占位、物品/知识跨引用、门槛排序及恢复效果单调性。投入和结果定义见 `data/schema/alchemy-set.schema.json`，内容流程见 [`ALCHEMY.md`](ALCHEMY.md)。
+
+Round 26 以 `social.npcKnowledge` 保存动态 NPC 见闻；旧 v1 缺字段时仍按空动态记忆恢复，并从当前有效 `knows` 边重建静态认知。`attitudeSpread` 人物关系边使态度按声明系数单跳传播。`npcKnows` 与 `shareKnowledgeNode` 仅影响 NPC 私有记忆，不把玩家百科状态混入 NPC 认知。规则及 MOD/存档行为见 [`KNOWLEDGE-GRAPH.md`](KNOWLEDGE-GRAPH.md)、[`SAVES.md`](SAVES.md) 和 [`DIALOGUE-GUIDE.md`](DIALOGUE-GUIDE.md)。
 
 Round 20 新增擂台资料族：manifest 中的可选 arena-set 资源按地图入口、角色模板、赛程武学、彩头物品逐项校验；坏入口只禁用对应擂台。赛事文件可由 MOD 使用同路径覆盖，资料字段和玩法边界见 docs/ARENA_DESIGN.md。
 
@@ -109,7 +111,7 @@ Round 22 新增可选 `martial-art-forge-components` 资源（`martial-art-compo
 - 改世界 → 只动 `data/base/`；想替换官方内容 → 写到 `mods/`，不要直接改基础数据。
 - 新增数据先在 `data/base/manifest.json` 登记资源 id、相对路径及 schema id，并在 `data/schema/` 提供 draft-07 schema；`npm run dev` 会在启动时校验并把错误逐条写到控制台/场景。
 - 新增 NPC：在 npc-set JSON 里加条目（稳定 id 建议 `char.` 前缀、姓名、`mapResourceId` 用已登记地图资源 id、`position` 填可走格、`dialogueId` 指向已登记对话）；可选 `schedule` 按已登记日历的 `periodId` 声明地图内 `position`，具体校验和冲突回退见 [`NPC-SCHEDULES.md`](NPC-SCHEDULES.md)。基础 NPC 坐标/引用无效会禁用该 NPC；单独坏掉的日程项只回退该人物该时段的基础位置。
-- 新增对话：在 dialogue-set JSON 里加一段（id 建议 `dlg.` 前缀、`startNodeId` 指向存在节点、选项 `nextNodeId` 必须可达；无 `options` 的节点即结束节点）。断裂引用只禁用该段对话及引用它的 NPC。选项可声明 `conditions`（全满足才可见：任务状态、物品数量、善恶/声望/NPC 关系闭区间）与 `effects`（确认时原子执行：接取/放弃任务、给予/交付物品、修善良恶/声望/关系；见 §4 对话条件与效果）；坏跨资源引用只剔除该选项，draft-07 Schema 可表达的结构/协议错误仍按资源级拒绝，解析器额外发现的单段语义错误（如反向上下界）只禁用该段并警告。示例：马尚义对话按任务 offered/active/completed 显示不同分支，顾夜尘带话后关系达标解锁新选项。
+- 新增对话：在 dialogue-set JSON 里加一段（id 建议 `dlg.` 前缀、`startNodeId` 指向存在节点、选项 `nextNodeId` 必须可达；无 `options` 的节点即结束节点）。断裂引用只禁用该段对话及引用它的 NPC。选项可声明 `conditions`（全满足才可见：任务状态、物品数量、善恶/声望/NPC 关系闭区间、玩家已知词条或 NPC 私有记忆）与 `effects`（确认时原子执行：接取/放弃任务、给予/交付物品、修善良恶/声望/关系、向 NPC 分享玩家已知见闻；见 §4 对话条件与效果）；坏跨资源引用只剔除该选项，draft-07 Schema 可表达的结构/协议错误仍按资源级拒绝，解析器额外发现的单段语义错误（如反向上下界）只禁用该段并警告。示例：马尚义对话按任务 offered/active/completed 显示不同分支，顾夜尘带话后关系达标解锁新选项；陆贞娘在玩家分享脚印线索后可按她自己的记忆回应。
 - 新增角色模板：在 character-profiles JSON 里加条目（id 建议 `char.` 前缀；五项属性 `body/force/agility/insight/resolve` 键与 1–999 值域是协议，显示名称写在 `attributeLabels`；`maxLevel` 必须大于 `startingLevel`，属性起点不得超过 `attributeCap`，否则整个资源在加载期被拒；`startingMartialArtIds` 列出起始武学——引用必须存在、未禁用并满足模板起始等级/属性（起始视为无门派），坏引用只剔除该武学并警告）。
 - 新增门派：在 faction-set JSON 里加条目（id 建议 `faction.` 前缀，名称/立场/宗旨/武学风格全为原创文本）。id 重复只保留先声明者并警告。
 - 新增武学：在 martial-arts-set JSON 里加条目（id 建议 `skill.` 前缀；类别取六枚举之一：拳脚/剑法/刀法/身法/内功/外功；`factionIds` 空数组表示不限门派，非空时每个 id 必须指向已加载的有效门派——悬空引用只禁用该武学；`requirements.level` 与 `requirements.attributes` 填最低门槛；`initialProficiency` 不得超过 `proficiencyCap`；`combat` 必填——kind 取 attack/heal，power 为作用基数，qiCost 为每次使用的内力消耗，内力不足时该行动不可用）。
@@ -201,3 +203,4 @@ NPC 当前坐标是由地图、时钟和人物日程派生的临时运行状态�
 | 2026-09-27 | Round 15 | 登记必需气候资源与 climate schema，记录季节月份分区、天气分布/表现/步耗时和稳定种子存档 |
 | 2026-09-27 | Round 16 | NPC 可选时段日程、跨资源位置校验、基础位置回退、存读档派生与时段占位同步 |
 | 2026-09-27 | Round 19 | 新增可选伙伴资料族、NPC 引用装配、攻疗支援字段与 MOD 覆盖语义；详见 `docs/COMPANIONS.md` |
+| 2026-09-27 | Round 26 | 加入 NPC 私有知识、对白分享与图谱关系态度传播规则，并扩展 v1 兼容字段 |

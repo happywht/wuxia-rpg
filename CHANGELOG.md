@@ -4,6 +4,19 @@
 
 ## [Unreleased]
 
+### Added (Round 26)
+
+- 新增 NPC 私有见闻状态：由图谱 `knows` 边初始化，玩家可在对白中分享已知节点，后续对白用 `npcKnows` 区分 NPC 实际知情与玩家百科状态。
+- 知识图谱人物边支持 `attitudeSpread`；关系变化按有符号系数传播一跳，不递归，端点、范围与零系数规则均经 Schema/parser 检查。
+- 新增可选 v1 `social.npcKnowledge` 存档字段与 MOD 删除引用软过滤；旧 v1 读档时根据当前图谱重建 NPC 静态记忆。
+- 新增 Round26 专项烟测，覆盖图谱种子、对白引用隔离、事务回滚、态度传播、旧新存档和失效引用过滤。
+
+### Verification (Round 26)
+
+- `npm run validate:data`：通过，manifest 与 23 个基础资源 Schema 均通过。
+- `npm run smoke:round-26`：通过 NPC 见闻隔离/分享/后续回应、事务回滚、态度传播系数与方向、v1 新旧兼容及 MOD 引用软过滤。
+- 生产构建、Round 23–25 回归及 `git diff --check` 结果在 `DEVLOG.md` 中记录。
+
 ### Added (Round 25)
 
 - 新增可选 `alchemy-set` Schema/manifest 资源和同路径 MOD 覆盖；地图药炉、药师、方子、材料/产物跨引用及日程占位可独立校验，无资料时世界可正常运行。

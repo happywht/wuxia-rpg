@@ -15,7 +15,8 @@
     "smoke:round-22": "node scripts/smoke-round-22.mjs",
     "smoke:round-23": "node scripts/smoke-round-23.mjs",
     "smoke:round-24": "node scripts/smoke-round-24.mjs",
-    "smoke:round-25": "node scripts/smoke-round-25.mjs"
+    "smoke:round-25": "node scripts/smoke-round-25.mjs",
+    "smoke:round-26": "node scripts/smoke-round-26.mjs"
   },
   "dependencies": {
     "ajv": "^8.20.0",

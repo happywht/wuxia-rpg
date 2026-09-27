@@ -57,6 +57,7 @@
 | `factionRenown` | `factionId` + `minValue`/`maxValue`（至少其一） | 与指定门派的独立声望位于闭区间（0–1000） |
 | `npcRelationship` | `npcId` + 区间 | 与指定 NPC 的关系（−100–100） |
 | `knowledgeKnown` | `nodeId` | 已获知指定知识图谱词条 |
+| `npcKnows` | `nodeId`、可选 `npcId` | 当前对话对象（或指定人物）已知该图谱词条 |
 | `factionMembership` | `factionId`（可省）、`isMember` | 属于/不属于指定门派；省略 id 时检查是否加入任意门派 |
 | `martialArtEligible` | `martialArtId` | 尚未掌握且满足该武学的等级/属性/门派资格 |
 | `timeOfDay` | `periodId` | **游戏内当前时段**等于历法声明的时段 id |
@@ -81,6 +82,7 @@
 | `adjustFactionRenown` | `factionId`、`delta`（非零） | 调整指定门派的独立声望 |
 | `adjustRelationship` | `npcId`（可省）、`delta` | 关系调整；省略 npcId 时作用于当前对话对象 |
 | `discoverKnowledgeNode` | `nodeId` | 解锁知识词条（反馈显示其标题） |
+| `shareKnowledgeNode` | `nodeId` | 玩家将自己已知的词条告知当前对话对象，后续可由 `npcKnows` 检查 |
 | `joinFaction` | `factionId` | 由当前对话对象（须为该门派登记导师）拜师 |
 | `leaveFaction` | — | 按当前门派资料声明的规则退门（善恶/江湖声望/本门声望代价、是否遗忘门派武学） |
 | `learnMartialArt` | `martialArtId` | 授予一门当前已满足资格的武学 |
@@ -91,6 +93,14 @@
 - `adjustFactionRenown` 和 `factionRenown` 条件都必须带 `factionId`，且在装配期检查门派是否有效。未记录的门派声望按 `0` 读取。
 - 所有 signed delta 都按同一“当前值 + 变化量 → 各自范围钳制”规则处理。门派退门配置中的 `factionRenownDelta` 只作用于刚离开的门派；旧资料缺少该字段时为 `0`。
 - 通过对白反复改变数值时，资料作者应结合任务状态、物品交付或其他进度条件限制奖励重复领取；引擎不会猜测某段叙事是否只能发生一次。
+
+### 4.2 NPC 私有记忆与关系传播（Round 26）
+
+- `knowledgeKnown` 检查玩家；`npcKnows` 检查 NPC 私有记忆，二者不能互相替代。省略 `npcId` 时，`npcKnows` 检查当前对话对象。
+- `shareKnowledgeNode` 要求玩家先发现该节点；成功后只记录给当前对话对象，不解锁玩家新词条。重复分享仍可执行，但回报“对方已知道”，不会重复增加存档数据。
+- 图谱 `knows` 边若起点是人物，会在开局为该人物初始化其静态知识；运行中从对白分享得到的记忆在存档里单独保存。
+- 知识图谱人物到人物边可选声明 `attitudeSpread`，范围为 `-1…1` 且不可为 0。该人物关系变化会对边终点产生一跳、一次的按系数变化，不继续传播；按最近整数舍入（半数远离 0），结果为 0 时不写入。只有两端均为人物的边才生效。
+- 人物与知识节点等跨资源引用仍在装配期校验；图谱关系列出关系摘要以供百科，`attitudeSpread` 是额外运行规则，不能替代 `summary`。
 
 ## 5. 引用装配与故障隔离
 
@@ -108,11 +118,11 @@
 - 效果数值范围由 Schema 固定（数量 1–99、善恶/江湖声望/门派声望分别 ±100/±1000/±1000、关系 ±100）；超出即资源级拒绝。
 - 对话应当能在**任何时段**至少有一条出路：不要把某节点的全部选项都加上互斥的时段条件，除非接受该时段对话直接结束。
 
-### 4.2 同行伙伴（Round 19）
+### 同行伙伴（Round 19）
 
 - `recruitCompanion` 携带 `companionId`，世界装配会核对该 id 是否存在于有效伙伴集合；无效时只剔除引用该伙伴的选项。
 - `dismissCompanion` 不带参数，让当前同行伙伴暂离。对白效果仍先在独立副本中校验、全量提交；一个后续效果拒绝时，前面的招募/暂离也不会泄漏。
 - 招募门槛建议使用 `npcRelationship` 指向伙伴的 `npcId`，也可与任务、物品、声望、时段等既有条件组合。伙伴和 NPC 是不同的数据身份，关系条件始终引用 NPC id。
 - 伙伴资料字段、支援数值、跨资源隔离和存档规则见 `docs/COMPANIONS.md`。
 
-Round 19 以后，引用装配覆盖任务、物品、NPC、见闻、门派、武学、时段与伙伴 id。
+Round 19 以后，引用装配覆盖任务、物品、NPC、见闻、门派、武学、时段与伙伴 id；Round 26 的人物私有见闻条件和分享效果也参与同一对话选项隔离。

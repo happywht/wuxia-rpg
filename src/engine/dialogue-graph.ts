@@ -58,6 +58,7 @@ export type DialogueConditionData =
   | { kind: 'factionRenown'; factionId: string; minValue?: number; maxValue?: number }
   | { kind: 'npcRelationship'; npcId: string; minValue?: number; maxValue?: number }
   | { kind: 'knowledgeKnown'; nodeId: string }
+  | { kind: 'npcKnows'; npcId?: string; nodeId: string }
   | { kind: 'factionMembership'; factionId?: string; isMember: boolean }
   | { kind: 'martialArtEligible'; martialArtId: string }
   | { kind: 'timeOfDay'; periodId: string };
@@ -78,6 +79,7 @@ export type DialogueEffectData =
   | { kind: 'adjustFactionRenown'; factionId: string; delta: number }
   | { kind: 'adjustRelationship'; npcId?: string; delta: number }
   | { kind: 'discoverKnowledgeNode'; nodeId: string }
+  | { kind: 'shareKnowledgeNode'; nodeId: string }
   | { kind: 'joinFaction'; factionId: string }
   | { kind: 'leaveFaction' }
   | { kind: 'learnMartialArt'; martialArtId: string }
@@ -255,6 +257,14 @@ function parseCondition(raw: unknown): DialogueConditionData | null {
       const nodeId = requireNonEmptyString(source.nodeId);
       return nodeId === null ? null : { kind: 'knowledgeKnown', nodeId };
     }
+    case 'npcKnows': {
+      if (!hasOnlyKeys(source, ['kind', 'npcId', 'nodeId'])) return null;
+      const nodeId = requireNonEmptyString(source.nodeId);
+      const npcId = source.npcId === undefined ? undefined : requireNonEmptyString(source.npcId);
+      return nodeId === null || npcId === null
+        ? null
+        : { kind: 'npcKnows', ...(npcId !== undefined ? { npcId } : {}), nodeId };
+    }
     case 'factionMembership': {
       if (!hasOnlyKeys(source, ['kind', 'factionId', 'isMember'])) return null;
       const factionId = source.factionId === undefined ? undefined : requireNonEmptyString(source.factionId);
@@ -342,6 +352,11 @@ function parseEffect(raw: unknown): DialogueEffectData | null {
       if (!hasOnlyKeys(source, ['kind', 'nodeId'])) return null;
       const nodeId = requireNonEmptyString(source.nodeId);
       return nodeId === null ? null : { kind: 'discoverKnowledgeNode', nodeId };
+    }
+    case 'shareKnowledgeNode': {
+      if (!hasOnlyKeys(source, ['kind', 'nodeId'])) return null;
+      const nodeId = requireNonEmptyString(source.nodeId);
+      return nodeId === null ? null : { kind: 'shareKnowledgeNode', nodeId };
     }
     case 'joinFaction': {
       if (!hasOnlyKeys(source, ['kind', 'factionId'])) return null;

@@ -20,7 +20,8 @@
             "type": "string",
             "enum": ["mentorOf", "parentOf", "hostileTo", "belongsTo", "locatedAt", "holds", "triggers", "requires", "rewards", "knows", "participatesIn", "influences"]
           },
-          "summary": { "type": "string", "minLength": 1, "maxLength": 400 }
+          "summary": { "type": "string", "minLength": 1, "maxLength": 400 },
+          "attitudeSpread": { "type": "number", "minimum": -1, "maximum": 1, "not": { "enum": [0] } }
         }
       }
     }

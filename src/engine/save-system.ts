@@ -155,6 +155,12 @@ export interface SaveStackData {
   quantity: number;
 }
 
+/** NPC-specific known graph entries; absent in earlier v1 snapshots. */
+export interface SaveNpcKnowledgeData {
+  npcId: string;
+  nodeIds: string[];
+}
+
 /** Everything the Round 06+ run state needs to come back identically. */
 export interface SaveSnapshotV1 {
   protocolVersion: typeof SAVE_PROTOCOL_VERSION;
@@ -189,6 +195,8 @@ export interface SaveSnapshotV1 {
     renown: number;
     factionRenown: IdEntry<number>[];
     relationships: IdEntry<number>[];
+    /** Personal memories shared or learned during play; absent in older v1 saves. */
+    npcKnowledge?: SaveNpcKnowledgeData[];
   };
   /** One-shot encounter ids already beaten this run. */
   completedEncounters: string[];
@@ -638,6 +646,41 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
       relationships.push({ id: npcId, value });
     }
   }
+  const npcKnowledge: SaveNpcKnowledgeData[] = [];
+  const npcKnowledgeRaw = socialSource?.npcKnowledge;
+  if (socialSource === null || (npcKnowledgeRaw !== undefined && !Array.isArray(npcKnowledgeRaw))) {
+    errors.push('social.npcKnowledge：应为 NPC 见闻条目数组');
+  } else if (Array.isArray(npcKnowledgeRaw)) {
+    if (npcKnowledgeRaw.length > 512) errors.push('social.npcKnowledge：条目不得超过 512 个');
+    const seenNpcs = new Set<string>();
+    for (const [index, entry] of npcKnowledgeRaw.slice(0, 512).entries()) {
+      const label = `social.npcKnowledge[${index}]`;
+      const source = isPlainObject(entry) ? entry : null;
+      const npcId = source === null ? null : requireNonEmptyString(source.npcId);
+      const nodeIdsRaw = source?.nodeIds;
+      if (npcId === null || !Array.isArray(nodeIdsRaw) || nodeIdsRaw.length > 512) {
+        errors.push(`${label}：应含 NPC id 和最多 512 项的 nodeIds 数组`);
+        continue;
+      }
+      if (seenNpcs.has(npcId)) {
+        errors.push(`${label}.npcId：人物 "${npcId}" 的见闻条目重复出现`);
+        continue;
+      }
+      seenNpcs.add(npcId);
+      const nodeIds: string[] = [];
+      const seenNodes = new Set<string>();
+      for (const [nodeIndex, rawNodeId] of nodeIdsRaw.entries()) {
+        const nodeId = requireNonEmptyString(rawNodeId);
+        if (nodeId === null || seenNodes.has(nodeId)) {
+          errors.push(`${label}.nodeIds[${nodeIndex}]：应为非重复的非空知识节点 id`);
+          continue;
+        }
+        seenNodes.add(nodeId);
+        nodeIds.push(nodeId);
+      }
+      npcKnowledge.push({ npcId, nodeIds });
+    }
+  }
 
   const completedEncounters = requireUniqueNonEmptyStringArray(raw.completedEncounters);
   if (completedEncounters === null) {
@@ -734,7 +777,7 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     inventory: { currency, capacity, stacks, equipped },
     shopStocks,
     quests: { states: questStates, trackedQuestId },
-    social: { morality, renown, factionRenown, relationships },
+    social: { morality, renown, factionRenown, relationships, npcKnowledge },
     completedEncounters,
     completedRegionalEvents,
     knownKnowledgeNodeIds,
@@ -1065,6 +1108,10 @@ export function captureSaveSnapshot(input: CaptureInput): SaveSnapshotV1 {
       renown: input.social.renown,
       factionRenown: [...input.social.factionRenown.entries()].map(([id, value]) => ({ id, value })),
       relationships: [...input.social.relationships.entries()].map(([id, value]) => ({ id, value })),
+      npcKnowledge: [...input.social.npcKnowledge.entries()].map(([npcId, nodeIds]) => ({
+        npcId,
+        nodeIds: [...nodeIds],
+      })),
     },
     completedEncounters: [...input.completedEncounters],
     completedRegionalEvents: [...input.completedRegionalEvents],
@@ -1365,6 +1412,18 @@ export function planSnapshotRestore(
     warnings.push(`门派声望所属门派 "${entry.id}" 在当前资料中不存在，已忽略`);
     return false;
   });
+  const npcKnowledge = (snapshot.social.npcKnowledge ?? []).flatMap((entry) => {
+    if (!refs.npcIds.has(entry.npcId)) {
+      warnings.push(`人物 "${entry.npcId}" 的私有见闻在当前资料中无对应 NPC，已忽略`);
+      return [];
+    }
+    const nodeIds = entry.nodeIds.filter((nodeId) => {
+      if (refs.knowledgeNodeIds?.has(nodeId) ?? true) return true;
+      warnings.push(`人物 "${entry.npcId}" 的见闻 "${nodeId}" 在当前图谱中不存在，已忽略`);
+      return false;
+    });
+    return [{ ...entry, nodeIds }];
+  });
 
   const completedEncounters = snapshot.completedEncounters.filter((encounterId) => {
     if (refs.encounterIds.has(encounterId)) {
@@ -1422,7 +1481,7 @@ export function planSnapshotRestore(
       inventory: { ...snapshot.inventory, capacity: inventoryCapacity, stacks, equipped },
       shopStocks,
       quests: { states: questStates, trackedQuestId },
-      social: { ...snapshot.social, factionRenown, relationships },
+      social: { ...snapshot.social, factionRenown, relationships, npcKnowledge },
       completedEncounters,
       completedRegionalEvents,
       knownKnowledgeNodeIds,
@@ -1548,6 +1607,9 @@ export function restoreRunState(input: RestoreRunInput): RestoredRunState {
     renown: snapshot.social.renown,
     factionRenown: new Map(snapshot.social.factionRenown.map((entry) => [entry.id, entry.value])),
     relationships: new Map(snapshot.social.relationships.map((entry) => [entry.id, entry.value])),
+    npcKnowledge: new Map(
+      (snapshot.social.npcKnowledge ?? []).map((entry) => [entry.npcId, new Set(entry.nodeIds)]),
+    ),
   };
 
   return {

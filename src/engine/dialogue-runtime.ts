@@ -59,8 +59,10 @@ import {
   adjustRenown,
   getFactionRenown,
   getRelationship,
+  npcKnows,
+  teachNpcKnowledge,
 } from './social-state';
-import type { KnowledgeNodeData } from './knowledge-graph';
+import type { KnowledgeEdgeData, KnowledgeNodeData } from './knowledge-graph';
 import {
   checkMartialArtEligibility,
   type CharacterState,
@@ -93,6 +95,8 @@ export interface DialogueRuntimeContext {
   /** Known node ids plus their validated, data-driven details. */
   knownKnowledgeNodeIds: Set<string>;
   knowledgeNodes: ReadonlyMap<string, KnowledgeNodeData>;
+  /** Valid directed graph edges; only data-authored coefficients spread attitudes. */
+  knowledgeEdges?: readonly KnowledgeEdgeData[];
   /** Optional display names by NPC id for feedback lines (data-driven). */
   npcNames?: ReadonlyMap<string, string>;
   /** Player progression state; null while running without a profile. */
@@ -157,7 +161,10 @@ function optionReferences(option: DialogueOptionData): {
     if (condition.kind === 'questStatus') questIds.push(condition.questId);
     else if (condition.kind === 'itemCount') itemIds.push(condition.itemId);
     else if (condition.kind === 'npcRelationship') npcIds.push(condition.npcId);
-    else if (condition.kind === 'factionRenown') factionIds.push(condition.factionId);
+    else if (condition.kind === 'npcKnows') {
+      knowledgeNodeIds.push(condition.nodeId);
+      if (condition.npcId !== undefined) npcIds.push(condition.npcId);
+    } else if (condition.kind === 'factionRenown') factionIds.push(condition.factionId);
     else if (condition.kind === 'knowledgeKnown') knowledgeNodeIds.push(condition.nodeId);
     else if (condition.kind === 'factionMembership' && condition.factionId !== undefined) {
       factionIds.push(condition.factionId);
@@ -169,8 +176,9 @@ function optionReferences(option: DialogueOptionData): {
     else if (effect.kind === 'giveItem' || effect.kind === 'takeItem') itemIds.push(effect.itemId);
     else if (effect.kind === 'adjustRelationship' && effect.npcId !== undefined) {
       npcIds.push(effect.npcId);
-    } else if (effect.kind === 'discoverKnowledgeNode') knowledgeNodeIds.push(effect.nodeId);
-    else if (effect.kind === 'joinFaction') factionIds.push(effect.factionId);
+    } else if (effect.kind === 'discoverKnowledgeNode' || effect.kind === 'shareKnowledgeNode') {
+      knowledgeNodeIds.push(effect.nodeId);
+    } else if (effect.kind === 'joinFaction') factionIds.push(effect.factionId);
     else if (effect.kind === 'adjustFactionRenown') factionIds.push(effect.factionId);
     else if (effect.kind === 'learnMartialArt') martialArtIds.push(effect.martialArtId);
     else if (effect.kind === 'recruitCompanion') companionIds.push(effect.companionId);
@@ -305,6 +313,8 @@ export function isConditionMet(
       );
     case 'knowledgeKnown':
       return context.knownKnowledgeNodeIds.has(condition.nodeId);
+    case 'npcKnows':
+      return npcKnows(context.social, condition.npcId ?? context.speakerNpcId, condition.nodeId);
     case 'factionMembership': {
       const membership = context.factionState.membership;
       const belongs = membership !== null &&
@@ -422,6 +432,9 @@ function cloneRuntimeContext(context: DialogueRuntimeContext): DialogueRuntimeCo
       renown: context.social.renown,
       factionRenown: new Map(context.social.factionRenown),
       relationships: new Map(context.social.relationships),
+      npcKnowledge: new Map(
+        [...context.social.npcKnowledge].map(([npcId, nodeIds]) => [npcId, new Set(nodeIds)]),
+      ),
     },
     character: context.character === null
       ? null
@@ -470,6 +483,10 @@ function commitRuntimeContext(
   target.social.relationships.clear();
   for (const [npcId, relationship] of staged.social.relationships) {
     target.social.relationships.set(npcId, relationship);
+  }
+  target.social.npcKnowledge.clear();
+  for (const [npcId, nodeIds] of staged.social.npcKnowledge) {
+    target.social.npcKnowledge.set(npcId, new Set(nodeIds));
   }
   target.knownKnowledgeNodeIds.clear();
   for (const nodeId of staged.knownKnowledgeNodeIds) target.knownKnowledgeNodeIds.add(nodeId);
@@ -553,6 +570,12 @@ function validateEffect(
       return context.knowledgeNodes.has(effect.nodeId)
         ? null
         : `见闻节点 "${effect.nodeId}" 不存在或不可用`;
+    case 'shareKnowledgeNode': {
+      const node = context.knowledgeNodes.get(effect.nodeId);
+      if (node === undefined) return `见闻节点 "${effect.nodeId}" 不存在或不可用`;
+      if (!context.knownKnowledgeNodeIds.has(effect.nodeId)) return `你还不知道「${node.title}」，无法相告`;
+      return null;
+    }
     case 'adjustFactionRenown':
       return context.factions.has(effect.factionId)
         ? null
@@ -722,7 +745,9 @@ export function applyDialogueEffects(
       }
       case 'adjustRelationship': {
         const targetId = effect.npcId ?? staged.speakerNpcId;
+        const before = getRelationship(staged.social, targetId);
         adjustRelationship(staged.social, targetId, effect.delta);
+        const appliedDelta = getRelationship(staged.social, targetId) - before;
         const sign = effect.delta > 0 ? '+' : '−';
         const magnitude = Math.abs(effect.delta);
         const displayName = staged.npcNames?.get(targetId);
@@ -731,6 +756,24 @@ export function applyDialogueEffects(
             ? `关系 ${sign}${magnitude}`
             : `与「${displayName}」关系 ${sign}${magnitude}`,
         );
+        if (appliedDelta !== 0) {
+          for (const edge of staged.knowledgeEdges ?? []) {
+            if (edge.fromId !== targetId || edge.attitudeSpread === undefined || edge.toId === targetId) continue;
+            const scaledDelta = appliedDelta * edge.attitudeSpread;
+            const relatedDelta = Math.sign(scaledDelta) * Math.round(Math.abs(scaledDelta));
+            if (relatedDelta === 0) continue;
+            const relatedBefore = getRelationship(staged.social, edge.toId);
+            adjustRelationship(staged.social, edge.toId, relatedDelta);
+            const relatedApplied = getRelationship(staged.social, edge.toId) - relatedBefore;
+            if (relatedApplied === 0) continue;
+            const relatedName = staged.npcNames?.get(edge.toId);
+            const relatedSign = relatedApplied > 0 ? '+' : '−';
+            const relatedMagnitude = Math.abs(relatedApplied);
+            lines.push(relatedName === undefined
+              ? `关系沿图谱传播 ${relatedSign}${relatedMagnitude}`
+              : `与「${relatedName}」的关系受牵连 ${relatedSign}${relatedMagnitude}`);
+          }
+        }
         break;
       }
       case 'discoverKnowledgeNode': {
@@ -739,6 +782,23 @@ export function applyDialogueEffects(
           const alreadyKnown = staged.knownKnowledgeNodeIds.has(node.id);
           staged.knownKnowledgeNodeIds.add(node.id);
           lines.push(alreadyKnown ? `已记下「${node.title}」` : `新增见闻「${node.title}」`);
+        }
+        break;
+      }
+      case 'shareKnowledgeNode': {
+        const node = staged.knowledgeNodes.get(effect.nodeId);
+        if (node !== undefined) {
+          const added = teachNpcKnowledge(staged.social, staged.speakerNpcId, node.id);
+          const speakerName = staged.npcNames?.get(staged.speakerNpcId);
+          if (added) {
+            lines.push(speakerName === undefined
+              ? `已将「${node.title}」相告`
+              : `已把「${node.title}」告诉「${speakerName}」`);
+          } else {
+            lines.push(speakerName === undefined
+              ? `对方已知道「${node.title}」`
+              : `「${speakerName}」已知道「${node.title}」`);
+          }
         }
         break;
       }

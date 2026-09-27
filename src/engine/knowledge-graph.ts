@@ -53,6 +53,8 @@ export interface KnowledgeEdgeData {
   toId: string;
   relation: KnowledgeRelation;
   summary: string;
+  /** Signed fraction of a source character's relationship change copied to the target. */
+  attitudeSpread?: number;
 }
 
 export interface KnowledgeEdgeSetData {
@@ -129,7 +131,9 @@ export function parseKnowledgeEdgeSet(raw: unknown): KnowledgeParseResult<Knowle
   const warnings: string[] = [];
   raw.edges.forEach((entry, index) => {
     const label = `edges[${index}]`;
-    if (!isObject(entry) || !hasOnlyKeys(entry, ['id', 'fromId', 'toId', 'relation', 'summary'])) {
+    if (!isObject(entry) || !hasOnlyKeys(entry, [
+      'id', 'fromId', 'toId', 'relation', 'summary', 'attitudeSpread',
+    ])) {
       warnings.push(`${label}：关系形状无效，已忽略`);
       return;
     }
@@ -137,7 +141,11 @@ export function parseKnowledgeEdgeSet(raw: unknown): KnowledgeParseResult<Knowle
     if (
       !isNonEmptyString(entry.id, 64) || !isNonEmptyString(entry.fromId, 64) ||
       !isNonEmptyString(entry.toId, 64) || relation === undefined ||
-      !isNonEmptyString(entry.summary, 400)
+      !isNonEmptyString(entry.summary, 400) ||
+      (entry.attitudeSpread !== undefined && (
+        typeof entry.attitudeSpread !== 'number' || !Number.isFinite(entry.attitudeSpread) ||
+        entry.attitudeSpread < -1 || entry.attitudeSpread > 1 || entry.attitudeSpread === 0
+      ))
     ) {
       warnings.push(`${label}：字段值无效，已忽略`);
       return;
@@ -148,6 +156,7 @@ export function parseKnowledgeEdgeSet(raw: unknown): KnowledgeParseResult<Knowle
       toId: entry.toId,
       relation,
       summary: entry.summary,
+      ...(entry.attitudeSpread !== undefined ? { attitudeSpread: entry.attitudeSpread as number } : {}),
     });
   });
   return { ok: true, data: { edges }, warnings };
@@ -183,6 +192,14 @@ export function assembleKnowledgeGraph(
       warnings.push(`知识关系 "${edge.id}" 引用不存在的节点，已忽略`);
       continue;
     }
+    if (edge.attitudeSpread !== undefined && (
+      nodes.get(edge.fromId)?.kind !== 'character' || nodes.get(edge.toId)?.kind !== 'character'
+    )) {
+      const { attitudeSpread: _invalidSpread, ...withoutSpread } = edge;
+      warnings.push(`知识关系 "${edge.id}" 的态度传播端点不是两名人物，已忽略传播系数`);
+      edges.push(withoutSpread);
+      continue;
+    }
     edges.push(edge);
   }
   return { nodes, edges, warnings };
@@ -201,6 +218,43 @@ export function createKnowledgeState(
     if (graph.nodes.has(id)) known.add(id);
   }
   return known;
+}
+
+/** Static NPC knowledge comes only from directed, valid NPC `knows` edges. */
+export function createNpcKnowledgeSeeds(
+  graph: Pick<KnowledgeGraph, 'nodes' | 'edges'>,
+): Map<string, Set<string>> {
+  const memories = new Map<string, Set<string>>();
+  for (const edge of graph.edges) {
+    if (edge.relation !== 'knows' || graph.nodes.get(edge.fromId)?.kind !== 'character') continue;
+    let known = memories.get(edge.fromId);
+    if (known === undefined) {
+      known = new Set();
+      memories.set(edge.fromId, known);
+    }
+    known.add(edge.toId);
+  }
+  return memories;
+}
+
+/** Combines static graph knowledge with saved additions, filtering stale ids. */
+export function mergeNpcKnowledge(
+  graph: Pick<KnowledgeGraph, 'nodes' | 'edges'>,
+  saved?: ReadonlyMap<string, ReadonlySet<string>>,
+): Map<string, Set<string>> {
+  const merged = createNpcKnowledgeSeeds(graph);
+  for (const [npcId, nodeIds] of saved ?? []) {
+    if (graph.nodes.get(npcId)?.kind !== 'character') continue;
+    let known = merged.get(npcId);
+    if (known === undefined) {
+      known = new Set();
+      merged.set(npcId, known);
+    }
+    for (const nodeId of nodeIds) {
+      if (graph.nodes.has(nodeId)) known.add(nodeId);
+    }
+  }
+  return merged;
 }
 
 /** Returns the graph edges visible to a player who knows both endpoints. */

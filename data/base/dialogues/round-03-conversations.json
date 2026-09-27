@@ -122,6 +122,20 @@
               "text": "关于那串雨后的脚印，我还有一事要问。",
               "nextNodeId": "footprints",
               "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.old-footprints" }]
+            },
+            {
+              "text": "把雨后脚印的事告诉她。",
+              "nextNodeId": "share-footprints",
+              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.old-footprints" }],
+              "effects": [
+                { "kind": "shareKnowledgeNode", "nodeId": "event.old-footprints" },
+                { "kind": "adjustRelationship", "npcId": "char.lu-zhenniang", "delta": 6 }
+              ]
+            },
+            {
+              "text": "你还记得我说过的雨后脚印么？",
+              "nextNodeId": "remembered-footprints",
+              "conditions": [{ "kind": "npcKnows", "nodeId": "event.old-footprints" }]
             }
           ]
         },
@@ -158,6 +172,14 @@
         {
           "id": "footprints",
           "text": "脚印后来被雨冲散了，可河滩上有一串更浅的，像是有人回头看过。你既然留了心，这条旧路便不算全无来处。"
+        },
+        {
+          "id": "share-footprints",
+          "text": "陆贞娘把你说的方位记在茶账背面，又顺手替你添了热茶。往后这条消息便不只在你一人心里。"
+        },
+        {
+          "id": "remembered-footprints",
+          "text": "记得。那串脚印沿着旧船道折回河滩，镇上的巡夜人也该多留意这条路。"
         },
         {
           "id": "thanks",

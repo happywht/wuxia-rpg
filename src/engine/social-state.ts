@@ -6,7 +6,7 @@
  * The module knows only the numeric protocol — what "morality" or "renown"
  * *means* in the world is authored in dialogue JSON effects, and every
  * visible consequence line stays out of here (see docs/ARCHITECTURE.md).
- * Values live in memory during play; the save engine serializes maps as
+ * Values live in memory during play; the save engine serializes maps/sets as
  * JSON-safe entry arrays.
  */
 
@@ -43,11 +43,36 @@ export interface SocialState {
   factionRenown: Map<string, number>;
   /** NPC id → relationship value; unknown NPCs read as 0. */
   relationships: Map<string, number>;
+  /** NPC id → knowledge-node ids that NPC personally knows. */
+  npcKnowledge: Map<string, Set<string>>;
 }
 
 /** Creates the social state every fresh run starts from (all zeros). */
 export function createSocialState(): SocialState {
-  return { morality: 0, renown: 0, factionRenown: new Map(), relationships: new Map() };
+  return {
+    morality: 0,
+    renown: 0,
+    factionRenown: new Map(),
+    relationships: new Map(),
+    npcKnowledge: new Map(),
+  };
+}
+
+/** Whether `npcId` knows one particular piece of authored knowledge. */
+export function npcKnows(state: Readonly<SocialState>, npcId: string, nodeId: string): boolean {
+  return state.npcKnowledge.get(npcId)?.has(nodeId) ?? false;
+}
+
+/** Adds a knowledge id to one NPC's private memory; returns false if repeated. */
+export function teachNpcKnowledge(state: SocialState, npcId: string, nodeId: string): boolean {
+  let memory = state.npcKnowledge.get(npcId);
+  if (memory === undefined) {
+    memory = new Set();
+    state.npcKnowledge.set(npcId, memory);
+  }
+  if (memory.has(nodeId)) return false;
+  memory.add(nodeId);
+  return true;
 }
 
 /** Clamps `value` into `range` (dialogue deltas may overshoot by design). */

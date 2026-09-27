@@ -9,7 +9,7 @@ import {
   selectTriggeredRegionEvents,
   type RegionTransitionData,
 } from '../engine/world-map';
-import { createKnowledgeState } from '../engine/knowledge-graph';
+import { createKnowledgeState, mergeNpcKnowledge } from '../engine/knowledge-graph';
 import {
   createCompanionState,
   resolveCompanionFollowCell,
@@ -298,7 +298,7 @@ export class GridScene extends Phaser.Scene {
   private quests: ReadonlyMap<string, QuestData> = new Map();
   private questJournal: QuestJournal = { states: new Map(), trackedQuestId: null };
 
-  /** Round 08 social state (morality/renown/NPC relationships). */
+  /** Player social values plus NPC-specific memories (Rounds 08 and 26). */
   private social: SocialState = createSocialState();
   /** Current student→master relationship, persisted independently of lore. */
   private factionState: FactionMembershipState = createFactionMembershipState();
@@ -586,6 +586,7 @@ export class GridScene extends Phaser.Scene {
       this.playerCol = map.playerStart.col;
       this.playerRow = map.playerStart.row;
     }
+    this.social.npcKnowledge = mergeNpcKnowledge(world.knowledgeGraph, this.social.npcKnowledge);
     if (this.playerProfile !== null && this.playerState !== null) {
       applyMeridianEffects(
         this.playerProfile,
@@ -2599,6 +2600,7 @@ export class GridScene extends Phaser.Scene {
       speakerNpcId,
       knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
       knowledgeNodes: this.world?.knowledgeGraph.nodes ?? new Map(),
+      knowledgeEdges: this.world?.knowledgeGraph.edges ?? [],
       npcNames: new Map((this.world?.assembly.npcs ?? []).map((npc) => [npc.record.id, npc.record.name])),
       character: this.playerState,
       factions: this.progression.factions,

@@ -173,6 +173,17 @@
           }
         },
         {
+          "description": "当前对话对象（或指定 NPC）已知指定知识节点时成立。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "nodeId"],
+          "properties": {
+            "kind": { "const": "npcKnows" },
+            "npcId": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "nodeId": { "type": "string", "minLength": 1, "maxLength": 64 }
+          }
+        },
+        {
           "description": "玩家属于或不属于指定门派；省略 factionId 时检查是否加入任意门派。",
           "type": "object",
           "additionalProperties": false,
@@ -318,6 +329,16 @@
           "required": ["kind", "nodeId"],
           "properties": {
             "kind": { "const": "discoverKnowledgeNode" },
+            "nodeId": { "type": "string", "minLength": 1, "maxLength": 64 }
+          }
+        },
+        {
+          "description": "玩家把自己已知的图谱见闻分享给当前对话对象；已分享的记忆保持幂等。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "nodeId"],
+          "properties": {
+            "kind": { "const": "shareKnowledgeNode" },
             "nodeId": { "type": "string", "minLength": 1, "maxLength": 64 }
           }
         },
