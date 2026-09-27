@@ -1,6 +1,6 @@
 # 参考来源与使用边界（REFERENCES）
 
-核验日期：2026-09-28。历史/回忆类来源统一编号 **#1–#5**，官方技术来源统一编号 **#6–#18**；软件包元数据在独立表格中按精确包版本记录，不参与原作对照编号。来源授权状态只在核验到明确许可时标为已知；没有核验页面许可时，仅作事实性查阅，不复制内容。
+核验日期：2026-09-28。历史/回忆类来源统一编号 **#1–#5**，官方技术来源统一编号 **#6–#20**；软件包元数据在独立表格中按精确包版本记录，不参与原作对照编号。来源授权状态只在核验到明确许可时标为已知；没有核验页面许可时，仅作事实性查阅，不复制内容。
 
 ---
 
@@ -39,6 +39,8 @@
 | 16 | [Vitest 官方基准指南](https://vitest.dev/guide/benchmarking) 与 [迁移指南](https://vitest.dev/guide/migration/) | Round 40 基准通道依据：Vitest 5 起 `bench` 从顶层导入改为 `test()` 回调的 bench fixture、`*.bench.ts` 按 `benchmark.include` 与普通测试互不可见、`vitest bench` 命令语义、模块 runner export-getter 开销警示及"测构建产物/局部捕获"缓解建议 | 页面许可未逐页核实；只查阅/转述技术事实，不复制文档段落、示例代码或素材 |
 | 17 | [Phaser Gamepad 官方 API 文档](https://docs.phaser.io/api-documentation/class/input-gamepad-gamepad) | Round 41 手柄输入的设备模型依据：标准映射 D-pad 布尔（up/down/left/right）、左摇杆 `leftStick` 向量、A/B 按钮簇语义、`getAxisValue` 取值范围及按钮需先按下浏览器才开放设备的行为 | 页面许可未逐页核实；只查阅/转述技术事实，不复制文档段落、示例代码或素材 |
 | 18 | [Phaser GamepadPlugin 官方 API 文档](https://docs.phaser.io/api-documentation/class/input-gamepad-gamepadplugin) | Round 41 场景接入依据：`this.input.gamepad` 场景级插件、`input: { gamepad: true }` 配置启用、`pad1`–`pad4`/`getAll()`/`total` 设备发现、`enabled` 开关与 SSL/浏览器安全限制说明 | 页面许可未逐页核实；只查阅/转述技术事实，不复制文档段落、示例代码或素材 |
+| 19 | [GitHub Pages 配置发布源文档](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site) | Round 47 静态发布方案与人工 Pages source 配置依据；Actions 发布由静态构建、Pages artifact 与独立 deploy job 组成 | 文档页面许可未逐页核实；只查阅/转述操作事实，不复制文档段落、示例代码或素材 |
+| 20 | GitHub 官方 Actions 仓库：[upload-pages-artifact](https://github.com/actions/upload-pages-artifact)、[deploy-pages](https://github.com/actions/deploy-pages)、[upload-artifact](https://github.com/actions/upload-artifact) | Round 47 将生产 `dist/` 上传 Pages、部署此前 Pages artifact，并保留版本包为短期 Actions artifact；workflow 按官方 action 文档声明独立权限和环境 | 各仓库为官方维护开源 action；本轮未逐版本核验仓库内全部依赖许可，不复制 action 源码或文档段落；按官方发布列表锁定 major/minor/patch 标签 |
 
 ## 四、软件包许可核验（npm 元数据）
 
@@ -52,6 +54,11 @@
 | `ajv@8.20.0` | https://registry.npmjs.org/ajv/8.20.0 | MIT | Round 02 起 JSON Schema 数据校验 |
 | `@types/node@26.6.3` | https://registry.npmjs.org/@types/node/26.6.3 | MIT | Round 02 Vite 配置的 Node API 开发期类型 |
 | `vitest@5.0.2` | https://registry.npmjs.org/vitest/5.0.2 | MIT | Round 38 自动化测试 |
+| `eventemitter3@5.0.4` | https://registry.npmjs.org/eventemitter3/5.0.4 | MIT | Phaser 4 运行时依赖；版本包的第三方通知附带其 license 文本 |
+| `fast-deep-equal@3.1.3` | https://registry.npmjs.org/fast-deep-equal/3.1.3 | MIT | Ajv 运行时比较依赖；版本包通知列出确切版本及许可原文 |
+| `fast-uri@3.1.8` | https://registry.npmjs.org/fast-uri/3.1.8 | BSD-3-Clause | Ajv 运行时 URI 依赖；版本包通知列出确切版本及许可原文 |
+| `json-schema-traverse@1.0.0` | https://registry.npmjs.org/json-schema-traverse/1.0.0 | MIT | Ajv 运行时 Schema 遍历依赖；版本包通知列出确切版本及许可原文 |
+| `require-from-string@2.0.2` | https://registry.npmjs.org/require-from-string/2.0.2 | MIT | Ajv 运行时依赖；版本包通知列出确切版本及许可原文 |
 
 > 版本号核验方式：npm registry（`registry.npmjs.org`）元数据查询，结果记录于 `docs/ADR.md` 版本表与 `DEVLOG.md` 对应轮次条目。
 

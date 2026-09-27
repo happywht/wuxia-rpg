@@ -2,7 +2,7 @@
 
 本文件记录已接受的技术决策及其依据。决策一经冻结，不得随意更换；推翻须新增 ADR 并注明取代关系。
 
-版本核验日期：2026-09-26（核验方法与来源见各条目及 `docs/REFERENCES.md`）。
+版本核验日期：2026-09-28（核验方法与来源见各条目及 `docs/REFERENCES.md`）。
 
 ---
 
@@ -92,6 +92,18 @@
 
 **后果**：事件契约在 TypeScript 编译期检查，不增加运行时依赖；事件同步派发，监听器异常会沿调用栈传播，调用方须避免在 listener 中抛出未处理异常。
 
+## ADR-0007：首个托管目标采用手动确认的 GitHub Pages 静态站点
+
+**状态**：已接受（Round 47；部署配置已实现，远端发布尚未执行）
+
+**背景**：游戏已经是 Phaser/Vite 浏览器应用，世界资料以静态 JSON 加载，不要求服务器端代码。Round 39 的 CI 明确没有发布步骤。当前工作区也没有配置 Git remote，因此不能由本机完成托管帐号/仓库设置或宣称已发布。
+
+**决策**：提供 GitHub Pages workflow，手动 `workflow_dispatch` 并要求显式勾选公开发布确认，且只接受默认分支；push/PR 不发布。workflow 的构建 job 运行完整 `npm run package:release`，将 Vite 静态目录交给官方 Pages artifact action，并暂存版本归档 30 天；独立 deploy job 才获得 Pages/OIDC 写权限。Vite 产物用 `./` 相对基址，支持域名根和项目仓库子路径。版本包由临时 staging 白名单构造，不直接归档仓库根目录。
+
+**替代方案**：每次 push 自动公开部署——被否，容易在未经内容/授权复核时发布；提交 `dist/` 到 `gh-pages` 分支——被否，污染源码历史且不复用 Pages Actions artifact；桌面客户端——不属于当前 Web 发布目标，若再实施须新建平台 ADR。
+
+**后果**：可以本地重复构建/检查版本包并在维护者同意后发布；首次远端使用须将 Pages source 设为 GitHub Actions。公开站点状态及真实 URL 尚未验证；见 `docs/RELEASE.md` 与 `docs/REFERENCES.md` #19–20。
+
 ---
 
 ## 版本冻结总表
@@ -112,3 +124,4 @@
 | 2026-09-26 | Round 00 建立 ADR-0001 ~ 0005 与版本冻结总表 |
 | 2026-09-27 | Round 02 接入 Ajv，并记录 typed EventBus 与本地 MOD 静态分发决策 |
 | 2026-09-28 | Round 38 实施 Vitest 测试基线；依 ADR-0005 核验结果将 Vitest 版本从计划的 4.x 修订为 5.0.2 |
+| 2026-09-28 | Round 47 冻结可复现静态版本包与显式手动确认的 GitHub Pages 发布路线（ADR-0007）；未执行远端发布 |

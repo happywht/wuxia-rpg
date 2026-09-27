@@ -148,11 +148,14 @@ function modsDistribution(): Plugin {
 
 /**
  * Keep world data as plain files and serve it from the same `data/` directory
- * during development and production. Vite serves a public directory at the
- * site root, so `data/base/maps/example.json` is fetched from `/base/maps/example.json`
- * and `data/schema/<id>.schema.json` from `/schema/<id>.schema.json`.
- * MOD overrides live in the repository-root `mods/` directory (outside the
- * public dir) and are exposed by the plugin above at `/mods/<modId>/…`.
+ * during development and production. Vite copies the `data/` contents to
+ * the deployment root inside `dist/`. With the relative `base: './'`,
+ * `data/base/maps/example.json` is fetched from
+ * `<deployment-base>/base/maps/example.json` and schemas from
+ * `<deployment-base>/schema/<id>.schema.json`, including a repository-page
+ * subpath. MOD overrides live in repository-root `mods/` (outside the public
+ * dir); the plugin exposes `/mods/<modId>/…` in dev and emits `dist/mods/…`
+ * for production, where the runtime loader joins it to the same base URL.
  * If `data/` is removed, Vite skips the missing public directory and the scene
  * reports the failed manifest request in-game.
  *
@@ -168,6 +171,10 @@ export default defineConfig(async () => {
     dataHotReload: (root: string) => Plugin;
   };
   return {
+    // Relative asset/data paths keep the same build usable at `/` and under
+    // a project-page prefix such as `/<repository>/` without repo-specific
+    // configuration or root-origin fetches.
+    base: './',
     publicDir: 'data',
     plugins: [modsDistribution(), dataHotReload(projectRoot)],
     server: {

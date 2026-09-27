@@ -4,6 +4,36 @@
 
 ---
 
+## Round 47 — 静态版本打包与手动 Pages 部署（2026-09-28，已完成）
+
+### 计划与实现
+
+- 开发前计划写入 `iterations/round-47/plan.md`，拆为路径/主机兼容、版本化静态包、手动发布工作流、复核与提交四项；预计人类工程师 60–90 分钟。
+- Round 47 先对默认 npm 文件收集作只读检查：`npm pack --dry-run --json` 会把 `src/`、`tests/`、`.github/`、`data/` 及预存 untracked `.serena/project.yml` 一起纳入宽泛包。此结果未用于发布；实际打包改为临时 staging 加显式 npm `files` 白名单，发布脚本只覆盖 `release/` 下相同版本的归档与 checksum。
+- Vite 使用 `base: './'`。新增 R47 smoke 在临时 HTTP server 的 `/preview/wuxia-rpg/` 子路径实际托管从 tarball 解出的网页，并经 Vite SSR 导入真实 `loadGameData`；验证入口 JS/CSS、示例 MOD、manifest 指向的 26 项 JSON/Schema 全部可达，diagnostics 为零。
+- 新增 `npm run package:release`：先走完整 `build`（即 `check` + Vite），再从 `dist/` 和必要说明构造隔离包；移除无运行意义的 `.gitkeep`，拒绝隐藏文件与符号链接，包内 manifest 对 staging 每个文件记字节数/SHA-256，npm pack 实际文件表必须与 allowlist 完全相同，并旁置 tarball 的 SHA-256 文件。
+- 打包器解析 `npm ls --omit=dev --all` 生产依赖闭包，按已安装精确版本收集 license 字段与发行目录中的 license 文本，覆盖 Ajv/Phaser 及 5 个传递依赖，共 7 包；`THIRD-PARTY-NOTICES.md` 同时进入静态站点与版本包。此清单不授予项目本身代码/资料许可；根仓库仍无 LICENSE，见 `docs/RELEASE.md`。
+- 新增 `tests/release-package.test.ts` 4 项，覆盖清单排序/哈希、版本与提交校验、必需文件、重复/危险/递归路径及精确包 allowlist。R47 smoke 解包 0.0.1 归档，对 63 个登记文件重新计算字节数与哈希，并实际 HTTP 读取子路径页面/资源/基础资料。
+- 新增 ADR-0007 与 `.github/workflows/deploy-pages.yml`：只响应人工触发，默认不确认公开发布；需在默认分支并明确勾选后才运行完整打包/Pages artifact 上传，再由权限独立的 job 部署。版本包作为 30 天 GitHub Actions artifact 保留。添加 `docs/RELEASE.md` 与 GitHub Pages 官方参考；普通 CI 未添加发布步骤。
+- 当前工作区 `git remote -v` 为空。只完成了可审查的发布配置、本机静态归档和路径验收，没有 GitHub Actions 托管结果、Pages URL 或实际公开部署。
+
+### 验证（本机实际命令与结果）
+
+- `npm run package:release`：通过完整质量门槛和生产构建；26 个基础资源 Schema、MOD 0 问题、严格类型、14 个测试文件/133 项、Round 34 文档审计通过；Vite 132 modules 成功。仅有主 JS >500 kB 非阻断提示。
+- 生成 `release/wuxia-rpg-web-0.0.1.tgz`：616,513 bytes；SHA-256 `0e564cf8b1782ec91a28790d295895427e859fe2948a249406288ab829b078ce`；归档 64 entries，清单验证 63 个文件。`release/` 被 Git 忽略。
+- `npm run smoke:round-47`：通过，64 项归档可解包，63 个文件与清单大小/hash 全部一致；项目子路径下可读 HTML/JS/CSS、示例 MOD、第三方许可证文本及全部 26 项基础 JSON/Schema。
+- `npm run smoke:round-35`、`npm run smoke:round-36`、`npm run smoke:round-37`：通过。
+- Python PyYAML `BaseLoader` 解析 `.github/workflows/deploy-pages.yml`，并静态断言唯一事件是 `workflow_dispatch`、确认项默认为 false 且必填、默认分支门控及 deploy permissions：通过。没有可用 `actionlint`，workflow 未在 GitHub Actions 上执行。
+- `git diff --check`：最终日志更新前通过，提交前将对完整 staged diff 再复核。
+
+### 未覆盖因素
+
+- 该本机 smoke 在真实解包网页上验证资源与 JSON 世界资料 HTTP 路径，但未启动浏览器或 Phaser、未手动游玩，也未验证 GitHub Pages 服务器返回头与真实浏览器安全策略。
+- 没有 remote，无法运行托管 workflow 或证明公开站点可用。实际发布仍需维护者配置 Pages source、审查公开资料和来源授权，并在默认分支手动确认。
+- npm 生产依赖当前均提供明确 license 元数据和 license 文件；项目自有代码/数据授权政策仍未由 Round 47 决定，因此此原型包不是 1.0 或商业分发许可。
+
+---
+
 ## Round 46 — 真实资料纵向切片验收（2026-09-28，已完成）
 
 ### 计划与实现

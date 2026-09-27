@@ -4,6 +4,19 @@
 
 ## [Unreleased]
 
+### Added (Round 47)
+
+- **部署基址**：Vite 生产输出改用 `./` 相对路径，支持根路径和 GitHub Pages 仓库子路径；新增真实 HTTP 子路径 smoke，使用实际 data-loader 请求全部基础 JSON/Schema、静态资源与示例 MOD。
+- **白名单版本包**：新增 `npm run package:release`，质量门槛与生产构建通过后，经系统临时 staging 生成 `wuxia-rpg-web-<version>.tgz`、外置 SHA-256 sidecar、包内逐文件清单；逐文件收集 production npm 依赖及 LICENSE/NOTICE 文本到 `THIRD-PARTY-NOTICES.md`，站点和归档均附带。归档审核拒绝缺文件、隐藏/危险路径、符号链接及 staging 白名单外内容，不携带源码、测试、Git 历史或 `.serena/`。
+- **人工门控的 Pages 工作流**：新增 `.github/workflows/deploy-pages.yml` 与 `docs/RELEASE.md` / ADR-0007。仅 `workflow_dispatch`、确认默认 false、必须显式勾选并在默认分支；普通 push/PR 不发布；建包和 Pages deploy 分 job，部署 job 拥有独立最小权限。新增 4 项打包协议测试与 1 条归档解压/路径加载 smoke。
+
+### Verification (Round 47)
+
+- `npm run package:release`：完整 `check` / Vite 构建通过（14 个测试文件、133 项；26 个基础资料 Schema；132 modules）；产物 `release/wuxia-rpg-web-0.0.1.tgz`，616,513 bytes，SHA-256 `0e564cf8b1782ec91a28790d295895427e859fe2948a249406288ab829b078ce`。
+- `npm run smoke:round-47`：可解包；63 个文件逐项字节数/SHA-256 与包内清单一致；静态文件挂载在 `/preview/wuxia-rpg/` 后，可获取 HTML/JS/CSS、示例 MOD 和全部 26 项 JSON/Schema；烟测另核验许可证文件和外部归档 checksum。
+- `smoke:round-35`、`smoke:round-36`、`smoke:round-37`：通过；PyYAML workflow 解析与人工门控/default-branch/Pages 权限静态断言通过；`git diff --check`：通过。
+- 此工作区没有 Git remote，因此 GitHub Actions 托管运行与公开 Pages URL 未验证；没有执行远端部署。Vite >500 kB chunk 仍为非阻断提示。
+
 ### Added (Round 46)
 
 - **真实资料纵向切片**：新增 `tests/round46-vertical-slice.test.ts`，由基础角色、地图、对白、任务、遭遇、物品、武学、图谱和结局资料驱动；覆盖开局走格/阻挡、NPC 对话接任务、巷战成长与奖励、拜师学艺、存档往返恢复及 R42 两条互斥路线各自的结局判定。

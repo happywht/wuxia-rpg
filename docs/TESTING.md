@@ -9,6 +9,7 @@ npm run check       # 统一质量门槛（R39 起）：validate:data → inspec
 npm test            # vitest run，单次运行全部测试（CI 语义；不包含性能基准）
 npm run benchmark:round-40 # 性能/内存基准（R40 起；与 npm test 双向隔离，见下文）
 npm run smoke:round-46 # 真实资料驱动的开局→故事分支→多结局纵向集成回归
+npm run package:release # 质量门槛 + 生产构建 + R47 归档/路径 smoke + 版本化 Web 包
 npm run typecheck   # tsc --noEmit，严格模式，包含 tests/ 与 vitest.config.ts
 npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现，见下文）
 ```
@@ -29,7 +30,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 
 - 测试框架：Vitest 5.0.2。官方指南要求 Vite >=6.4.0、Node >=22.12.0；本仓库使用 Vite 8.3.1 与 Node 22.18.0，符合要求（详见 [`docs/REFERENCES.md`](REFERENCES.md) #12；基准 API 见同文件 #16）。
 - 运行环境：Node（无 DOM、无浏览器、无网络、无真实时钟依赖）。
-- 覆盖统计：13 个测试文件、129 个用例（R38 建立四组 53 个，R40 新增渲染器结构回归 10 个，R41 新增设置与输入 42 个，R42 新增主线集成 3 个，R43 新增漫游事件 6 个与门派支线集成 3 个，R44 新增日程漫游/奖励协议/双路线集成 6 个，R45 新增战斗成长基线与擂台奖品边界 4 个，R46 新增真实资料纵向切片 2 个；详见 `CHANGELOG.md` 对应条目）。
+- 覆盖统计：14 个测试文件、133 个用例（R38 建立四组 53 个，R40 新增渲染器结构回归 10 个，R41 新增设置与输入 42 个，R42 新增主线集成 3 个，R43 新增漫游事件 6 个与门派支线集成 3 个，R44 新增日程漫游/奖励协议/双路线集成 6 个，R45 新增战斗成长基线与擂台奖品边界 4 个，R46 新增真实资料纵向切片 2 个，R47 新增版本清单/路径白名单测试 4 个；详见 `CHANGELOG.md` 对应条目）。
 
 ## 配置：为什么有独立的 `vitest.config.ts`
 
@@ -66,6 +67,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 | `tests/round44-dynamic-events.test.ts` | `npc-schedule.ts`、`world-map.ts`、任务/对白/声望协议与基础资料 | R44 集成：解析真实日程并证明黄昏玩家邻接/日中离场；双 NPC 条件、时辰条件；两项互斥任务的对白入口、目标、一次性声望/知识奖励和声望钳制 |
 | `tests/round45-balance.test.ts` | `arena-challenge.ts`、`turn-based-combat.ts`、角色成长和基础战斗/擂台资料 | R45 平衡回归：首夺一次性银两/物品、失败和重赛奖品为零、旧 `championships` 记录兼容、擂台每场战斗经验保留；无装备/无伙伴/起始散手开场实战 5 招胜出并验证升级补血 |
 | `tests/round46-vertical-slice.test.ts` | 真实基础角色、地图、任务、对白、物品、战斗、武学、存档、图谱与结局资料及对应 Phaser-free 引擎 API | R46 纵向验收：开局和地图阻挡、真实 NPC 对白接任务、巷战经验/奖励、拜师学艺、快照往返与恢复、R42 两条互斥路线各自抵达一个结局；不会模拟浏览器 UI |
+| `tests/release-package.test.ts` | `scripts/lib/release-package.mjs` | R47 发布协议：稳定排序的 SHA-256 清单、版本/提交约束、强制静态运行文件、拒绝路径穿越/隐藏目录/重复与递归清单，并要求归档精确符合 staging allowlist |
 
 测试只调用**公共导出函数**并断言行为，不做源码文本匹配；引擎模块均为 Phaser-free 设计，无需启动任何场景。
 
@@ -99,6 +101,7 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 | `npm run smoke:round-43` | Round 43 漫游事件协议及五派支线资格/对白/见闻集成回归 |
 | `npm run smoke:round-44` | Round 44 NPC 日程附近条件、任务声望/见闻奖励与渡口互斥分支回归 |
 | `npm run smoke:round-46` | Round 46 真实资料驱动的开局、任务/战斗/成长、存档恢复和两条结局路线纵向回归 |
+| `npm run smoke:round-47` | Round 47 npm 版本归档解包/哈希核验及部署前非根路径 HTML/JS/CSS/MOD/26 项资料加载验证（先运行 `npm run package:release`） |
 | `npm run smoke:round-20` | 擂台首夺货币/物品彩头、逐场经验、连战与旧/新 v1 存档回归（R45 扩展） |
 | `npm run typecheck` | 严格类型检查（check 的第 3 步） |
 | `npm run benchmark:round-40` | 性能/内存基准（R40 起）：渲染对象数与耗时双口径、26 资源加载、50 轮长跑堆观察；与 `npm test` 双向隔离、不进门槛（读数与局限见 `docs/PERFORMANCE.md`） |
@@ -111,6 +114,7 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 - 2026-09-28（Round 44）：新增 nearby NPC 条件和任务声望/图谱奖励的解析、装配、幂等结算测试；新增真实渡口日程/邻接和两条互斥路线集成用例；新增 `npm run smoke:round-44`。完整覆盖统计更新为 11 文件 123 用例。
 - 2026-09-28（Round 45）：新增 `tests/round45-balance.test.ts` 4 用例，覆盖首次夺魁奖品、未完成/重赛边界、逐场经验保留和开场战斗升级基线；扩展 `npm run smoke:round-20` 检查首夺彩头及每轮经验。完整覆盖统计更新为 12 文件 127 用例。
 - 2026-09-28（Round 46）：新增 `tests/round46-vertical-slice.test.ts` 2 用例，以真实基础资料串联开局、网格阻挡、NPC 对白、任务、战斗成长、拜师学艺、快照恢复与 R42 两条互斥结局路线；新增 `npm run smoke:round-46`。完整覆盖统计更新为 13 文件 129 用例；不声称覆盖浏览器 UI。
+- 2026-09-28（Round 47）：新增 `tests/release-package.test.ts` 4 用例，验证版本清单、哈希与路径 allowlist；`npm run smoke:round-47` 解包版本归档并检查全部文件哈希后，将其挂载到非根路径实际加载 26 项基础资料/Schema；新增 `npm run package:release` 与手动 Pages 流程。完整覆盖统计更新为 14 文件 133 用例。
 - 2026-09-28（Round 42）：新增 `tests/round42-story.test.ts` 3 用例，验证 R31→R42 任务解锁、两份对白图引用、分支互斥/兄弟失败及两条数据结局可达性；新增 `npm run smoke:round-42` 专项入口；覆盖统计更新为 8 文件 108 用例。
 - 2026-09-28（Round 41）：新增 `tests/settings.test.ts`（21 用例：v1 旧载荷迁移、验证/持久化、声音总线与画布外观应用、五档字号、共享设置行/调整语义）与 `tests/input-settings.test.ts`（21 用例：键位布局、摇杆死区/主导轴、D-pad 基数优先、标准映射采样、边沿检测）；覆盖统计更新为 7 文件 105 用例。手柄路由的浏览器内行为另经生产构建 + Playwright 烟测（设置导航/画布滤镜/布局门控），物理控制器硬件未测试——见 `DEVLOG.md` Round 41。
 - 2026-09-28（Round 40）：新增性能/内存基准通道 `npm run benchmark:round-40`（`benchmark.include` 独立匹配 `*.bench.ts`，与 `npm test` 双向隔离）；新增 `tests/grid-map-renderer.test.ts` 10 用例锁定 R40 单 Graphics 渲染器结构契约；覆盖统计更新为 5 文件 63 用例。
