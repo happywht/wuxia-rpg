@@ -75,6 +75,10 @@ import {
   type FactionWarSetData,
 } from '../engine/faction-war';
 import {
+  parseMartialArtForgeComponents,
+  type MartialArtForgeComponentSet,
+} from '../engine/martial-art-forge';
+import {
   assembleBattleEncounters,
   type BattleEncounterSetData,
   parseBattleEncounterSet,
@@ -108,6 +112,7 @@ const MARTIAL_ART_RESOURCE_ID = 'martial-art.round-04-set';
 const ENCOUNTER_RESOURCE_ID = 'encounter.round-05-set';
 const ARENA_RESOURCE_ID = 'arena.round-20-set';
 const FACTION_WAR_RESOURCE_ID = 'faction-war.round-21-set';
+const MARTIAL_ART_COMPONENT_RESOURCE_ID = 'martial-art-components.round-22-set';
 const ITEM_RESOURCE_ID = 'item.round-06-set';
 const SHOP_RESOURCE_ID = 'shop.round-06-set';
 const QUEST_RESOURCE_ID = 'quest.round-07-set';
@@ -125,6 +130,7 @@ const OPTIONAL_RESOURCE_IDS = new Set([
   ENCOUNTER_RESOURCE_ID,
   ARENA_RESOURCE_ID,
   FACTION_WAR_RESOURCE_ID,
+  MARTIAL_ART_COMPONENT_RESOURCE_ID,
   ITEM_RESOURCE_ID,
   SHOP_RESOURCE_ID,
   QUEST_RESOURCE_ID,
@@ -143,6 +149,7 @@ const OPTIONAL_SCHEMA_ORIGINS = new Set([
   'schema:battle-encounters',
   'schema:arena-set',
   'schema:faction-war-set',
+  'schema:martial-art-components',
   'schema:items-set',
   'schema:shops-set',
   'schema:quest-set',
@@ -187,6 +194,8 @@ export interface WorldAssembly {
   encounters: PlacedEncounter[];
   arenas: AssembledArena[];
   factionWars: AssembledFactionWar[];
+  /** Optional data-authored parts; null cleanly disables the Round 22 forge. */
+  martialArtForgeComponents: MartialArtForgeComponentSet | null;
   items: ReadonlyMap<string, ItemRecordData>;
   shops: ReadonlyMap<string, AssembledShop>;
   quests: ReadonlyMap<string, QuestData>;
@@ -282,6 +291,10 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
         },
         'faction-war-set': (value) => {
           const parsed = parseFactionWarSet(value);
+          return parsed.ok ? [] : parsed.errors;
+        },
+        'martial-art-components': (value) => {
+          const parsed = parseMartialArtForgeComponents(value);
           return parsed.ok ? [] : parsed.errors;
         },
         'items-set': (value) => {
@@ -561,6 +574,23 @@ function assembleOptionalContent(
   calendarPeriods: GameCalendarData['periods'],
 ): WorldAssembly {
   const warnings: Diagnostic[] = [];
+
+  let martialArtForgeComponents: MartialArtForgeComponentSet | null = null;
+  const forgeResource = resources.get(MARTIAL_ART_COMPONENT_RESOURCE_ID);
+  if (forgeResource !== undefined) {
+    const parsed = parseMartialArtForgeComponents(forgeResource.value);
+    if (!parsed.ok) {
+      warnings.push({
+        resource: MARTIAL_ART_COMPONENT_RESOURCE_ID,
+        origin: 'martial-art-forge',
+        severity: 'warning',
+        message: '自创武学组件资料无效，已关闭创制入口',
+        details: parsed.errors,
+      });
+    } else {
+      martialArtForgeComponents = parsed.set;
+    }
+  }
 
   // Conversations first: NPC validation resolves against the valid set.
   let dialogues = new Map<string, DialogueData>();
@@ -1023,6 +1053,7 @@ function assembleOptionalContent(
     encounters,
     arenas: arenaAssembly.arenas,
     factionWars: factionWarAssembly.wars,
+    martialArtForgeComponents,
     items: itemAssembly.items,
     shops: shopAssembly.shops,
     quests: questAssembly.quests,

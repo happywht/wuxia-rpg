@@ -56,6 +56,11 @@
       "schema": "martial-arts-set"
     },
     {
+      "id": "martial-art-components.round-22-set",
+      "path": "skills/round-22-components.json",
+      "schema": "martial-art-components"
+    },
+    {
       "id": "encounter.round-05-set",
       "path": "battles/round-05-encounters.json",
       "schema": "battle-encounters"

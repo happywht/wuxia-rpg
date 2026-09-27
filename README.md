@@ -4,12 +4,12 @@
 
 - 设计文档：`docs/GDD.md`
 - 逐轮路线图（R00–R50）：`ROADMAP.md`
-- 当前进度：**Round 16 已完成；下一轮 Round 17（奇遇与传闻）**
+- 当前进度：**Round 22 已完成；下一轮 Round 23（经脉与内修）**
 
 ## 范围
 
-- ✅ 已完成（R00–R16）：双区域网格世界、任务/物品/战斗闭环、存档读档；22 个图谱节点、K 键百科、见闻发现与知识条件对话；原创像素面板、角色标记、操作帮助、可读字号反馈；可拜入三派、向原创导师授艺并按门规退门；数据驱动历法、昼夜和季节天气；六名 NPC 按两地图的历法时段移动，时钟和现有 v1 存档派生日程位置。
-- ❌ 后续轮次：奇遇/传闻、伙伴、更多原创内容与路线图中的其他玩法；正式 Vitest 基线仍排在 Round 38。
+- ✅ 已完成（R00–R22）：网格探索、任务/物品/战斗与存档闭环；知识图谱百科、奇遇、善恶声望、三派师门、昼夜天气、NPC 日程、伙伴、擂台、门派战及自创武学；后续逐步扩充人物/门派/任务/物品/武学/结局/图谱数量并完善测试与发布。
+- ⏳ 正在按路线图逐轮推进：共 51 轮（R00–R50）；正式 Vitest 基线仍排在 Round 38，最终内容数量与发布验收尚未完成。
 - 永久边界：不做多人联网；不含原作内容；mod 仅限同名 JSON 覆盖（见 `docs/DATA-GUIDE.md`）。
 
 ## 技术栈（版本已核验并冻结，见 `docs/ADR.md`）
@@ -36,6 +36,8 @@ npm run dev        # 启动开发服务器（默认 http://localhost:5173）
 npm run build      # 类型检查（tsc --noEmit）+ 生产构建
 npm run preview    # 预览生产构建
 npm run typecheck  # 仅类型检查
+npm run validate:data # 校验 manifest 登记的基础资料/schema
+npm run smoke:round-22 # 自创武学规则、战斗与存档冒烟
 ```
 
 > Round 10 验证：`npm run build` 通过；Ajv 检查 manifest 下登记资料；浏览器手动验证 M 舆图/输入锁、关口往返、一次性事件去重、跨区保存/读档以及 Round 09 快照兼容。Phaser 主包 chunk 仍超过 500 kB 建议阈值；基础数据与 schema 位于 `data/`，启用 MOD 列表见 `data/base/manifest.json`，区域协议见 `docs/MAP-ATLAS.md`，存档协议见 `docs/SAVES.md`。
@@ -54,7 +56,7 @@ npm run typecheck  # 仅类型检查
 │   └── schema/           # 所有已登记数据族的 JSON Schema
 ├── mods/                 # mod 同名覆盖层（含未启用的 example）
 ├── docs/                 # 设计与规范文档
-├── iterations/           # 逐轮计划（Round 00–Round 16）
+├── iterations/           # 逐轮计划（Round 00–Round 22）
 ├── ROADMAP.md            # R00–R50 路线图
 ├── CHANGELOG.md          # 变更日志
 └── DEVLOG.md             # 开发日志（含核验记录）

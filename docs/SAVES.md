@@ -1,6 +1,6 @@
 # 本地存档与设置协议
 
-Round 09 引入本地单机存档；Round 10 扩展到多地图行程与区域事件；Round 11 增加已发现知识词条；Round 13 保存玩家当前门派与师父；Round 14 记录已流逝的游戏内分钟数；Round 15 保存世界气候种子；Round 16 以分钟数派生 NPC 日程位置；Round 17 的条件奇遇复用已完成事件 id 和已发现知识 id，不增加存档字段；Round 18 将逐门派声望保存在 `social.factionRenown`；Round 19 添加当前同行伙伴 id；Round 20 加入擂台战绩册；Round 21 加入门派战绩册。缺字段的旧 v1 档中伙伴归一为 null，两类战绩归一为空数组。存档是运行时状态的版本化 JSON 快照，不是世界资料：不会写回 `data/base/`，也不会被 MOD 覆盖。协议实现位于 `src/engine/save-system.ts`，菜单与游戏场景负责呈现和调用。
+Round 09 引入本地单机存档；Round 10 扩展到多地图行程与区域事件；Round 11 增加已发现知识词条；Round 13 保存玩家当前门派与师父；Round 14 记录已流逝的游戏内分钟数；Round 15 保存世界气候种子；Round 16 以分钟数派生 NPC 日程位置；Round 17 的条件奇遇复用已完成事件 id 和已发现知识 id，不增加存档字段；Round 18 将逐门派声望保存在 `social.factionRenown`；Round 19 添加当前同行伙伴 id；Round 20 加入擂台战绩册；Round 21 加入门派战绩册；Round 22 保存自创武学完整定义。缺字段的旧 v1 档中伙伴归一为 null，战绩/自创作品归一为空数组。存档是运行时状态的版本化 JSON 快照，不是世界资料：不会写回 `data/base/`，也不会被 MOD 覆盖。协议实现位于 `src/engine/save-system.ts`，菜单与游戏场景负责呈现和调用。
 
 ## 槽位与存储
 
@@ -43,6 +43,12 @@ Round 20 的 `arenaRecords` 按擂台 id 保存报名次数、历史最佳胜场
 4. 只有预检成功后才创建并恢复运行状态，装备重新经过装备引擎应用效果；不会把半恢复的状态提交到场景。
 
 当前只实现 v1，不做跨协议版本迁移。Round 10 在 v1 中新增 `completedRegionalEvents`，Round 11 新增 `knownKnowledgeNodeIds`，Round 13 新增可空 `factionMembership`，Round 14 新增 `elapsedGameMinutes`，Round 15 新增 `worldSeed`，Round 18 新增 `social.factionRenown`，Round 19 新增可空 `activeCompanionId`，Round 20 新增 `arenaRecords`，Round 21 新增 `factionWarRecords`；解析缺少这些字段的旧 v1 快照时，分别按空数组、无门派、0 分钟、固定种子 `1`、空门派声望或无伙伴归一，因此所有 Round 09 起的旧 v1 存档仍可读取。Round 16 和 Round 17 不增加协议字段。恢复时已删除门派的声望 id 逐项忽略并给出 warning，不拒绝其余进度；同行伙伴资料失效则清除当前队伍并附 warning；战事资料移除时只过滤对应战绩。其他社会状态按各自范围校验。世界预检恢复时会重新加入资料中的 `knownByDefault` 节点，并过滤已删除的节点 id；若当前门派或登记师父已从资料中删除，只清除该次师承并附带 warning，不拒绝其余进度。未知协议版本会明确报告为不支持，原槽内容保留。存档仅限浏览器本地；跨设备同步和云存档尚未实现。浏览器清理站点数据也会移除本地存档。
+
+### Round 22：自创武学兼容
+
+v1 快照的可选 `customMartialArts` 数组保存玩家自创作品完整定义（而非组件配方），因此后续组件 MOD 修改或移除仍不会损坏已创作品。旧 v1 档缺字段时解析为空数组；恢复预检允许 `player.martialArtIds` 引用快照自带作品。解析会再次检查最多 5 门、`custom-art.N` 命名空间、名称唯一且为 2–16 个 Unicode 字符、固定资格/熟练度字段，以及功力≤18、内力≤12、`power + 2×qiCost ≤34`；任何坏作品会拒绝该快照，避免经编辑存档绕过创制规则。
+
+自创武学验证通过 `npm run smoke:round-22`，覆盖作品定义捕获/读回、旧档缺字段、恢复保留玩家招式引用和越界篡改拒绝。本轮未执行浏览器手动存读档测试。
 
 ## 设置
 

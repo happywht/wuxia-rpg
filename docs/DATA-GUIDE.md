@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：Round 03–21 已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台、门派战、存档、区域旅行、知识图谱、昼夜气候、日程、条件奇遇与多层社会声望；详情分别见 `docs/SAVES.md`、`docs/KNOWLEDGE-GRAPH.md`、`docs/COMPANIONS.md` 与 `docs/FACTION_WAR_DESIGN.md`。
+- 状态：Round 03–22 已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台、门派战、自创武学、存档、区域旅行、知识图谱、昼夜气候、日程、条件奇遇与多层社会声望；详情分别见 `docs/SAVES.md`、`docs/KNOWLEDGE-GRAPH.md`、`docs/COMPANIONS.md`、`docs/FACTION_WAR_DESIGN.md` 与 `docs/MARTIAL_ART_FORGE.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -29,7 +29,7 @@ data/
 │   ├── factions/            # 门派：立场、声望规则、成员关系
 │   ├── battles/             # 战斗：遭遇触发点、敌人、奖励与提示文本
 │   └── endings/             # 结局：触发条件与结局文本
-├── schema/                  # JSON Schema（含 manifest、grid-map、world-map、game-calendar、knowledge-nodes、knowledge-edges、npc-set、companion-set、faction-war-set、dialogue-set、character-profiles、faction-set、martial-arts-set、battle-encounters、arena-set、items-set、shops-set、quest-set）
+├── schema/                  # JSON Schema（含 manifest、grid-map、world-map、game-calendar、knowledge-nodes、knowledge-edges、npc-set、companion-set、faction-war-set、martial-art-components、dialogue-set、character-profiles、faction-set、martial-arts-set、battle-encounters、arena-set、items-set、shops-set、quest-set）
 mods/                        # mod 覆盖层：mods/<modId>/ 镜像 data/base/ 相对路径
 ```
 
@@ -56,6 +56,8 @@ Round 14 状态：manifest 登记**必需**资源 `calendar.base` → `worldview
 Round 20 新增擂台资料族：manifest 中的可选 arena-set 资源按地图入口、角色模板、赛程武学、彩头物品逐项校验；坏入口只禁用对应擂台。赛事文件可由 MOD 使用同路径覆盖，资料字段和玩法边界见 docs/ARENA_DESIGN.md。
 
 Round 21 新增可选 `faction-war-set` 战事资料族：每个阶段为两支参战派分别声明对手属性/武学，组装校验入口、门派、武学和结局图谱节点。E 邻接报名限在籍参战弟子，贡献、结局声望变化和见闻发现均可由 JSON 调整；同名 MOD 资源可覆盖默认会盟。字段与贡献结算见 `docs/FACTION_WAR_DESIGN.md`。
+
+Round 22 新增可选 `martial-art-forge-components` 资源（`martial-art-components.schema.json`），组件文件放在 `skills/` 并可由 MOD 同路径覆盖。每项组件属于 `intent`（attack/heal 招式）、`form`（架势）或 `breath`（吐纳）之一；Schema 限制字段和值类型，Phaser-free 解析器补充唯一 id、槽位/种类一致和整数范围检查。资源缺失、Schema 不符或语义错误时只禁用创制入口，不影响已有武学、战斗和地图。作品生成后作为玩家运行时状态存档，不写回世界资料；详细预算和存档边界见 `docs/MARTIAL_ART_FORGE.md`。
 
 - 文件名：小写 kebab-case，如 `data/base/maps/qingxi-town.json`（示例名，内容待后续轮次原创编写）。
 - 每个数据对象有稳定 `id`，前缀按族区分（建议 `char.` / `map.` / `quest.` / `dlg.` / `kg.` / `item.` / `skill.` / `faction.` / `ending.`）；跨族引用一律用 id，不用文件路径。

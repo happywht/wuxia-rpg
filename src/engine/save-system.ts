@@ -45,6 +45,7 @@ import {
   type AttributeId,
   type CharacterProfileData,
   type CharacterState,
+  type MartialArtData,
   applyEquipmentBonuses,
   computeVitalMaxima,
   createCharacterState,
@@ -74,6 +75,7 @@ import {
 } from './social-state';
 import { parseArenaRecords, type ArenaRecord } from './arena-challenge';
 import { parseFactionWarRecords, type FactionWarRecord } from './faction-war';
+import { parseSavedCustomMartialArts } from './martial-art-forge';
 import type { FactionMembership } from './faction-system';
 import {
   DEFAULT_WORLD_SEED,
@@ -195,6 +197,8 @@ export interface SaveSnapshotV1 {
   arenaRecords: ArenaRecord[];
   /** Faction-war record book; absent in pre-R21 v1 saves. */
   factionWarRecords: FactionWarRecord[];
+  /** Complete player-forged definitions; absent in pre-R22 v1 saves. */
+  customMartialArts: MartialArtData[];
 }
 
 // ---------------------------------------------------------------------------
@@ -632,6 +636,8 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
   if (arenaRecords === null) errors.push('arenaRecords：擂台战绩结构不合规');
   const factionWarRecords = parseFactionWarRecords(raw.factionWarRecords);
   if (factionWarRecords === null) errors.push('factionWarRecords：门派战战绩结构不合规');
+  const customMartialArts = parseSavedCustomMartialArts(raw.customMartialArts);
+  if (customMartialArts === null) errors.push('customMartialArts：自创武学结构、唯一性或平衡范围不合规');
 
   if (
     errors.length > 0 ||
@@ -655,6 +661,7 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     completedEncounters === null ||
     arenaRecords === null ||
     factionWarRecords === null ||
+    customMartialArts === null ||
     completedRegionalEvents === null ||
     knownKnowledgeNodeIds === null ||
     elapsedGameMinutes === null ||
@@ -691,6 +698,7 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     activeCompanionId,
     arenaRecords,
     factionWarRecords,
+    customMartialArts,
   };
   return { ok: true, snapshot };
 }
@@ -958,6 +966,8 @@ export interface CaptureInput {
   arenaRecords?: ReadonlyMap<string, ArenaRecord>;
   /** Optional for older capture callers; omitted means no faction-war records. */
   factionWarRecords?: ReadonlyMap<string, FactionWarRecord>;
+  /** Optional for older capture callers; omitted means no player-forged arts. */
+  customMartialArts?: ReadonlyMap<string, MartialArtData>;
   /** Absent in older callers/snapshots means currently unaffiliated. */
   factionMembership?: FactionMembership | null;
   /** Injectable clock for deterministic tests. */
@@ -1017,6 +1027,12 @@ export function captureSaveSnapshot(input: CaptureInput): SaveSnapshotV1 {
     activeCompanionId: input.activeCompanionId ?? null,
     arenaRecords: [...(input.arenaRecords?.values() ?? [])].map((record) => ({ ...record })),
     factionWarRecords: [...(input.factionWarRecords?.values() ?? [])].map((record) => ({ ...record })),
+    customMartialArts: [...(input.customMartialArts?.values() ?? [])].map((art) => ({
+      ...art,
+      factionIds: [...art.factionIds],
+      requirements: { level: art.requirements.level, attributes: { ...art.requirements.attributes } },
+      combat: { ...art.combat },
+    })),
   };
 }
 
@@ -1120,7 +1136,7 @@ export function planSnapshotRestore(
   }
 
   const martialArtIds = snapshot.player.martialArtIds.filter((artId) => {
-    if (refs.martialArtIds.has(artId)) {
+    if (refs.martialArtIds.has(artId) || snapshot.customMartialArts.some((art) => art.id === artId)) {
       return true;
     }
     warnings.push(`已掌握的武学 "${artId}" 在当前资料中不存在或已被禁用，已遗忘`);
@@ -1373,6 +1389,7 @@ export interface RestoredRunState {
   activeCompanionId: string | null;
   arenaRecords: ArenaRecord[];
   factionWarRecords: FactionWarRecord[];
+  customMartialArts: MartialArtData[];
 }
 
 /**
@@ -1472,6 +1489,12 @@ export function restoreRunState(input: RestoreRunInput): RestoredRunState {
     activeCompanionId: snapshot.activeCompanionId ?? null,
     arenaRecords: snapshot.arenaRecords.map((record) => ({ ...record })),
     factionWarRecords: snapshot.factionWarRecords.map((record) => ({ ...record })),
+    customMartialArts: snapshot.customMartialArts.map((art) => ({
+      ...art,
+      factionIds: [...art.factionIds],
+      requirements: { level: art.requirements.level, attributes: { ...art.requirements.attributes } },
+      combat: { ...art.combat },
+    })),
   };
 }
 

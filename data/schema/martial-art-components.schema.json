@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wuxia-rpg.invalid/schema/martial-art-components",
+  "title": "自创武学组件资料集",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["components"],
+  "properties": {
+    "components": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 48,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "slot", "name", "category", "style", "description", "power", "qiCost", "silverCost", "kind"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "slot": { "type": "string", "enum": ["intent", "form", "breath"] },
+          "name": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "category": { "type": "string", "minLength": 1, "maxLength": 24 },
+          "style": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "description": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "power": { "type": "integer", "minimum": -10, "maximum": 18 },
+          "qiCost": { "type": "integer", "minimum": -10, "maximum": 12 },
+          "silverCost": { "type": "integer", "minimum": 1, "maximum": 10000 },
+          "kind": { "type": ["string", "null"], "enum": ["attack", "heal", null] }
+        }
+      }
+    }
+  }
+}

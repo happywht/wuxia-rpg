@@ -1,0 +1,100 @@
+{
+  "components": [
+    {
+      "id": "forge.intent.strike",
+      "slot": "intent",
+      "name": "破敌",
+      "category": "拳脚",
+      "style": "以攻代守",
+      "description": "汇力出招，直取对手空门",
+      "power": 8,
+      "qiCost": 2,
+      "silverCost": 20,
+      "kind": "attack"
+    },
+    {
+      "id": "forge.intent.mend",
+      "slot": "intent",
+      "name": "调息",
+      "category": "内功",
+      "style": "以静养气",
+      "description": "收摄心神，将内息化为疗愈之力",
+      "power": 9,
+      "qiCost": 4,
+      "silverCost": 24,
+      "kind": "heal"
+    },
+    {
+      "id": "forge.form.heavy",
+      "slot": "form",
+      "name": "沉肩压步",
+      "category": "架势",
+      "style": "沉肩压步",
+      "description": "以稳固下盘换取更沉的劲力",
+      "power": 4,
+      "qiCost": 2,
+      "silverCost": 22,
+      "kind": null
+    },
+    {
+      "id": "forge.form.balanced",
+      "slot": "form",
+      "name": "圆转护中",
+      "category": "架势",
+      "style": "圆转护中",
+      "description": "攻守周全，不偏不倚",
+      "power": 2,
+      "qiCost": 1,
+      "silverCost": 16,
+      "kind": null
+    },
+    {
+      "id": "forge.form.swift",
+      "slot": "form",
+      "name": "轻灵抢势",
+      "category": "架势",
+      "style": "轻灵抢势",
+      "description": "先机在手，以巧劲压住对方节奏",
+      "power": 1,
+      "qiCost": -1,
+      "silverCost": 12,
+      "kind": null
+    },
+    {
+      "id": "forge.breath.deep",
+      "slot": "breath",
+      "name": "深纳长息",
+      "category": "吐纳",
+      "style": "深纳长息",
+      "description": "蓄气而发，出手更见绵长",
+      "power": 3,
+      "qiCost": 2,
+      "silverCost": 20,
+      "kind": null
+    },
+    {
+      "id": "forge.breath.steady",
+      "slot": "breath",
+      "name": "匀息守中",
+      "category": "吐纳",
+      "style": "匀息守中",
+      "description": "呼吸匀缓，维持招式的稳定",
+      "power": 1,
+      "qiCost": 1,
+      "silverCost": 12,
+      "kind": null
+    },
+    {
+      "id": "forge.breath.economical",
+      "slot": "breath",
+      "name": "留力惜气",
+      "category": "吐纳",
+      "style": "留力惜气",
+      "description": "不求一击尽胜，只取运力节省",
+      "power": 0,
+      "qiCost": -1,
+      "silverCost": 10,
+      "kind": null
+    }
+  ]
+}

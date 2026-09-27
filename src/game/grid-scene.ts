@@ -43,6 +43,7 @@ import {
 import {
   type CharacterProfileData,
   type CharacterState,
+  type MartialArtData,
   createCharacterState,
   grantExperience,
   resolveStartingMartialArts,
@@ -67,6 +68,7 @@ import {
   type AssembledFactionWar,
   type FactionWarRecord,
 } from '../engine/faction-war';
+import { craftAndRegisterCustomMartialArt, type MartialArtRecipe } from '../engine/martial-art-forge';
 import {
   type AssembledShop,
   type InventoryState,
@@ -114,6 +116,7 @@ import { FactionPanel } from './faction-ui';
 import { CompanionPanel } from './companion-ui';
 import { ArenaPanel } from './arena-ui';
 import { FactionWarPanel } from './faction-war-ui';
+import { MartialArtForgePanel } from './martial-art-forge-ui';
 import { type GameSettings, applyGameSettings, loadGameSettings, uiFontSize } from './settings';
 import { createPixelPerson, UI_FONT_FAMILY } from './ui-theme';
 import { type GridStartupData } from './menu-scene';
@@ -234,6 +237,7 @@ export class GridScene extends Phaser.Scene {
   private dialogues: ReadonlyMap<string, DialogueData> = new Map();
   private companions: LoadedWorld['assembly']['companions'] = new Map();
   private companionState: CompanionState = createCompanionState();
+  private readonly customMartialArts = new Map<string, MartialArtData>();
   private readonly arenaRecords = new Map<string, ArenaRecord>();
   private activeArenaRun: { arena: AssembledArena; roundIndex: number; wins: number } | null = null;
   private readonly factionWarRecords = new Map<string, FactionWarRecord>();
@@ -317,6 +321,7 @@ export class GridScene extends Phaser.Scene {
   private companionPanel: CompanionPanel | null = null;
   private arenaPanel: ArenaPanel | null = null;
   private factionWarPanel: FactionWarPanel | null = null;
+  private martialArtForgePanel: MartialArtForgePanel | null = null;
   private activeSession: CombatSession | null = null;
   private activeEncounter: PlacedEncounter | null = null;
 
@@ -431,6 +436,10 @@ export class GridScene extends Phaser.Scene {
       this.factionWarRecords.set(record.warId, { ...record });
     }
     this.activeFactionWarRun = null;
+    this.customMartialArts.clear();
+    for (const art of restoredRun?.customMartialArts ?? []) {
+      this.customMartialArts.set(art.id, art);
+    }
     // Round 14 clock: elapsed minutes come from the save when one was
     // restored (older v1 snapshots lack the field and restart at 0), which
     // the calendar start then re-dates using the *current* month table.
@@ -634,6 +643,7 @@ export class GridScene extends Phaser.Scene {
     this.companionPanel = new CompanionPanel(this, () => this.noteOverlayClosed());
     this.arenaPanel = new ArenaPanel(this, () => this.noteOverlayClosed());
     this.factionWarPanel = new FactionWarPanel(this, () => this.noteOverlayClosed());
+    this.martialArtForgePanel = new MartialArtForgePanel(this, () => this.noteOverlayClosed());
     this.worldMapPanel = new WorldMapPanel(this, () => this.noteOverlayClosed());
     this.encyclopediaPanel = new EncyclopediaPanel(this, { onClose: () => this.noteOverlayClosed() });
     this.updateQuestTrackerHud();
@@ -836,6 +846,7 @@ export class GridScene extends Phaser.Scene {
       activeCompanionId: this.companionState.activeCompanionId,
       arenaRecords: this.arenaRecords,
       factionWarRecords: this.factionWarRecords,
+      customMartialArts: this.customMartialArts,
     });
     const result = writeSaveSlot(this.storage, slotId, snapshot);
     if (result.ok) {
@@ -1061,7 +1072,7 @@ export class GridScene extends Phaser.Scene {
       encounter: placed.record,
       profile,
       player,
-      martialArts: this.progression.martialArts,
+      martialArts: this.combatMartialArts(),
       ...(activeCompanion !== undefined && companionNpc !== undefined
         ? { companion: { name: companionNpc.record.name, support: activeCompanion.combatSupport } }
         : {}),
@@ -1159,7 +1170,7 @@ export class GridScene extends Phaser.Scene {
       encounter,
       profile,
       player,
-      martialArts: this.progression.martialArts,
+      martialArts: this.combatMartialArts(),
       ...(activeCompanion !== undefined && companionNpc !== undefined
         ? { companion: { name: companionNpc.record.name, support: activeCompanion.combatSupport } }
         : {}),
@@ -1852,7 +1863,7 @@ export class GridScene extends Phaser.Scene {
         : 'P 同行伙伴 · 暂无可交互人物');
       return;
     }
-    this.interactText.setText('H 操作帮助 · Esc 暂停');
+    this.interactText.setText('C 自创武学 · H 操作帮助 · Esc 暂停');
   }
 
   /** True while any keyboard overlay owns the input (dialogue/battle/backpack/shop/quest/pause). */
@@ -1870,6 +1881,7 @@ export class GridScene extends Phaser.Scene {
       (this.companionPanel !== null && this.companionPanel.isOpen) ||
       (this.arenaPanel !== null && this.arenaPanel.isOpen) ||
       (this.factionWarPanel !== null && this.factionWarPanel.isOpen) ||
+      (this.martialArtForgePanel !== null && this.martialArtForgePanel.isOpen) ||
       (this.controlsPanel !== null && this.controlsPanel.isOpen)
     );
   }
@@ -1894,6 +1906,42 @@ export class GridScene extends Phaser.Scene {
     this.updateInteractHint();
   }
 
+  /** C key: create a balanced player martial art from loaded data components. */
+  private toggleMartialArtForge(): void {
+    const panel = this.martialArtForgePanel;
+    const components = this.world?.assembly.martialArtForgeComponents ?? null;
+    const inventory = this.inventory;
+    const player = this.playerState;
+    if (panel === null) return;
+    if (panel.isOpen || this.anyOverlayOpen()) return;
+    if (components === null || inventory === null || player === null) {
+      this.showRegionNotice(components === null
+        ? '自创武学组件资料暂不可用，创制入口已关闭。'
+        : '当前角色或背包状态不可用，暂时不能创制。');
+      return;
+    }
+    panel.open({
+      components,
+      existingArts: [...this.customMartialArts.values()],
+      occupiedIds: new Set([...this.progression.martialArts.keys(), ...this.customMartialArts.keys()]),
+      currency: inventory.currency,
+      onCraft: (recipe: MartialArtRecipe, name: string) => {
+        const result = craftAndRegisterCustomMartialArt({
+          components, recipe, name,
+          existingArts: [...this.customMartialArts.values()],
+          occupiedIds: new Set([...this.progression.martialArts.keys(), ...this.customMartialArts.keys()]),
+          inventory,
+          learnedArtIds: player.martialArtIds,
+          customArts: this.customMartialArts,
+        });
+        if (!result.ok) return { ok: false, message: result.reason };
+        this.showRegionNotice(`自创武学「${result.art.name}」已成，内力 ${result.art.combat.qiCost}，银两 -${result.silverCost}。`);
+        return { ok: true, message: '创制成功' };
+      },
+    });
+    this.updateInteractHint();
+  }
+
   /** P key: inspect the party and let the current companion temporarily leave. */
   private toggleCompanionPanel(): void {
     const panel = this.companionPanel;
@@ -1914,6 +1962,11 @@ export class GridScene extends Phaser.Scene {
       },
     });
     this.updateInteractHint();
+  }
+
+  /** Player combat sees data-authored arts plus this run's bounded creations. */
+  private combatMartialArts(): ReadonlyMap<string, MartialArtData> {
+    return new Map([...this.progression.martialArts, ...this.customMartialArts]);
   }
 
   /** H key: show the keyboard reference without allowing world input through. */
@@ -2142,6 +2195,12 @@ export class GridScene extends Phaser.Scene {
     const onFaction = (): void => this.toggleFactionPanel();
     factionKey.on('down', onFaction);
 
+    const martialArtForgeKey = keyboard.addKey(KeyCodes.C);
+    const onMartialArtForge = (): void => {
+      if (!this.anyOverlayOpen()) this.toggleMartialArtForge();
+    };
+    martialArtForgeKey.on('down', onMartialArtForge);
+
     const controlsKey = keyboard.addKey(KeyCodes.H);
     const onControls = (): void => this.toggleControlsPanel();
     controlsKey.on('down', onControls);
@@ -2166,6 +2225,7 @@ export class GridScene extends Phaser.Scene {
       worldMapKey.off('down', onWorldMap);
       encyclopediaKey.off('down', onEncyclopedia);
       factionKey.off('down', onFaction);
+      martialArtForgeKey.off('down', onMartialArtForge);
       controlsKey.off('down', onControls);
       companionKey.off('down', onCompanions);
       waitKey.off('down', onWait);
@@ -2193,6 +2253,8 @@ export class GridScene extends Phaser.Scene {
       this.arenaPanel = null;
       this.factionWarPanel?.destroy();
       this.factionWarPanel = null;
+      this.martialArtForgePanel?.destroy();
+      this.martialArtForgePanel = null;
       this.controlsPanel?.destroy();
       this.controlsPanel = null;
       this.activeSession = null;
@@ -2400,7 +2462,7 @@ export class GridScene extends Phaser.Scene {
       encounter: encounter.record,
       profile: this.playerProfile,
       player: this.playerState,
-      martialArts: this.progression.martialArts,
+      martialArts: this.combatMartialArts(),
       ...(activeCompanion !== undefined && companionNpc !== undefined
         ? { companion: { name: companionNpc.record.name, support: activeCompanion.combatSupport } }
         : {}),
