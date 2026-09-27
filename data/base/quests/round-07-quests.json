@@ -500,6 +500,96 @@
         "experience": 68,
         "currency": 40
       }
+    },
+    {
+      "id": "quest.r43-tingyu-eave-rain",
+      "name": "檐雨听锋",
+      "description": "赶路人带来的匿名信提到芦苇岸边有一段不合潮声的剑鸣。听雨剑阁不愿只凭传闻指认来客，叶庭舟请你把信中时辰交柳听澜核对，辨清究竟是剑声还是船索回荡。",
+      "giverNpcId": "char.ye-tingzhou",
+      "requiredFactionId": "faction.tingyu-jiange",
+      "requiredKnowledgeNodeId": "event.r43-wayfarer-letter",
+      "objectives": [
+        {
+          "id": "objective.r43-tingyu-compare",
+          "kind": "talkToNpc",
+          "targetId": "char.liu-tinglan",
+          "requiredCount": 1,
+          "text": "请柳听澜核对信中剑鸣时辰"
+        }
+      ],
+      "rewards": { "experience": 36, "currency": 22 }
+    },
+    {
+      "id": "quest.r43-tiezhang-stone-post",
+      "name": "石桩回声",
+      "description": "信中说芦苇岸旧桩夜里会传来三下空响。铁嶂派不信邪说，石北让你去问走过旧船道的顾夜尘：先弄清是桩脚松动，还是有人借声引路，再回报是否需要加固。",
+      "giverNpcId": "char.shi-bei",
+      "requiredFactionId": "faction.tiezhang-pai",
+      "requiredKnowledgeNodeId": "event.r43-wayfarer-letter",
+      "objectives": [
+        {
+          "id": "objective.r43-tiezhang-ask-gu",
+          "kind": "talkToNpc",
+          "targetId": "char.gu-yechen",
+          "requiredCount": 1,
+          "text": "向顾夜尘问清旧系缆桩的底脚"
+        }
+      ],
+      "rewards": { "experience": 40, "currency": 18 }
+    },
+    {
+      "id": "quest.r43-yunyin-herb-road",
+      "name": "药路余香",
+      "description": "匿名信的封蜡沾着一味不该出现在江风里的苦香。闻素心不肯贸然辨药，托你去问容素青最近是否有人将湿药材带过旧船道；若能对上药气，庄中才好提前备下解潮方。",
+      "giverNpcId": "char.wen-suxin",
+      "requiredFactionId": "faction.yunyin-shanzhuang",
+      "requiredKnowledgeNodeId": "event.r43-wayfarer-letter",
+      "objectives": [
+        {
+          "id": "objective.r43-yunyin-ask-rong",
+          "kind": "talkToNpc",
+          "targetId": "char.rong-su-qing",
+          "requiredCount": 1,
+          "text": "向容素青确认封蜡残留的药香"
+        }
+      ],
+      "rewards": { "experience": 34, "currency": 20 }
+    },
+    {
+      "id": "quest.r43-hanshan-copybook",
+      "name": "副页留白",
+      "description": "五封信里有一封提到旧渡籍曾少抄一列船名。柳听澜不愿把缺字补成猜测，请你向沈墨涵核一核书铺旧抄的墨色和纸龄，再决定那一栏该留白还是补注。",
+      "giverNpcId": "char.liu-tinglan",
+      "requiredFactionId": "faction.hanshan-shuyuan",
+      "requiredKnowledgeNodeId": "event.r43-wayfarer-letter",
+      "objectives": [
+        {
+          "id": "objective.r43-hanshan-ask-shen",
+          "kind": "talkToNpc",
+          "targetId": "char.shen-mohan",
+          "requiredCount": 1,
+          "text": "请沈墨涵辨认旧抄的纸龄与墨色"
+        }
+      ],
+      "rewards": { "experience": 38, "currency": 24 }
+    },
+    {
+      "id": "quest.r43-panzhou-return-tide",
+      "name": "回潮验缆",
+      "description": "信上画了三道缆痕，却没有写船名。祝九弦要你将潮时与痕迹交给白鹭洲核对公所旧簿；若只是往来船队留下的磨损，刀场便不必惊动整条水路。",
+      "giverNpcId": "char.zhu-jiuxian",
+      "requiredFactionId": "faction.panzhou-daochang",
+      "requiredKnowledgeNodeId": "event.r43-wayfarer-letter",
+      "objectives": [
+        {
+          "id": "objective.r43-panzhou-ask-bai",
+          "kind": "talkToNpc",
+          "targetId": "char.bai-luzhou",
+          "requiredCount": 1,
+          "text": "请白鹭洲核对三道缆痕对应的渡船"
+        }
+      ],
+      "rewards": { "experience": 42, "currency": 26 }
     }
   ]
 }

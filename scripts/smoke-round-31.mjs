@@ -55,8 +55,8 @@ try {
     readJson('data/base/endings/round-27-endings.json'),
   ]);
 
-  // ── 1. 数量与唯一性：保留 20 项既有任务，R31 新增 18，R42 新增 5；任务/目标 id 全局唯一。
-  assert.equal(rawQuests.quests.length, 25, 'the base quest set holds 25 quests through Round 42');
+  // ── 1. 数量与唯一性：保留 20 项既有任务，R31 新增 18，R42 新增 5，R43 新增 5；任务/目标 id 全局唯一。
+  assert.equal(rawQuests.quests.length, 30, 'the base quest set holds 30 quests through Round 43');
   assert.deepEqual(
     rawQuests.quests.map((quest) => quest.id).filter((id) => id.startsWith('quest.r31-')).length,
     18,
@@ -64,6 +64,8 @@ try {
   );
   assert.equal(rawQuests.quests.filter((quest) => quest.id.startsWith('quest.r42-')).length, 5,
     'Round 42 adds exactly five main-story quests');
+  assert.equal(rawQuests.quests.filter((quest) => quest.id.startsWith('quest.r43-')).length, 5,
+    'Round 43 adds exactly five faction quests');
   const questIds = rawQuests.quests.map((quest) => quest.id);
   assert.equal(new Set(questIds).size, questIds.length, 'quest ids stay globally unique');
   const objectiveIds = rawQuests.quests.flatMap((quest) => quest.objectives.map((objective) => objective.id));
@@ -91,7 +93,7 @@ try {
   // ── 2. 解析：扩展协议（talkToNpc、exclusiveGroupId）通过防御解析。
   const parsedQuests = questEngine.parseQuestSet(rawQuests);
   assert.equal(parsedQuests.ok, true, `the extended quest set parses (${parsedQuests.ok ? '' : parsedQuests.errors.join('；')})`);
-  assert.equal(parsedQuests.set.quests.length, 25, 'all 25 quests parse');
+  assert.equal(parsedQuests.set.quests.length, 30, 'all 30 quests parse');
   const guardData = parsedQuests.set.quests.find((quest) => quest.id === 'quest.r31-guard-the-caravan');
   const mendData = parsedQuests.set.quests.find((quest) => quest.id === 'quest.r31-mend-the-pier');
   assert.equal(guardData.exclusiveGroupId, BRANCH_GROUP);
@@ -194,7 +196,7 @@ try {
   assert.ok(miniAssembly.quests.has('q.ok-talk'),
     'talk objectives validate against placed NPCs, not just quest givers');
 
-  // ── 4. 完整世界装配：25 项任务全部入库，无任务装配警告，遭遇与发布人齐备。
+  // ── 4. 完整世界装配：30 项任务全部入库，无任务装配警告，遭遇与发布人齐备。
   const originalInfo = console.info;
   console.info = () => {};
   let loaded;
@@ -205,7 +207,7 @@ try {
   }
   assert.equal(loaded.ok, true, 'the full base world loads');
   const quests = loaded.world.assembly.quests;
-  assert.equal(quests.size, 25, 'every quest survives assembly');
+  assert.equal(quests.size, 30, 'every quest survives assembly');
   assert.deepEqual(
     loaded.world.optionalWarnings.filter((diagnostic) => diagnostic.origin === 'quest-assembly'),
     [],
@@ -509,7 +511,7 @@ try {
     assert.equal(restoredLegacy.journal.states.get('quest.r31-caravan-gratitude').status, 'locked');
   }
 
-  console.info('[round-31] 任务链烟测通过：25 项任务（R31 新增恰 18、R42 新增恰 5）数量与全局 id 唯一、三型目标与互斥组结构解析、坏引用逐条隔离与互斥组整组校验（坏成员/前置不一/单成员均不留假单选）、完整世界装配零任务警告、三新遭遇槽位避让全部固定格且可达、谈话信号只认真实对话且接取不自动完成、物品接取快照与单次奖励、败北失败原子锁链、互斥分支确定性失败报告/幂等拒绝/双向各自后续、npc-talk 唯一入口源码断言、v1 快照往返与 R31 前旧档免迁移恢复。');
+  console.info('[round-31] 任务链烟测通过：30 项任务（R31 新增恰 18、R42 新增恰 5、R43 新增恰 5）数量与全局 id 唯一、三型目标与互斥组结构解析、坏引用逐条隔离与互斥组整组校验（坏成员/前置不一/单成员均不留假单选）、完整世界装配零任务警告、三新遭遇槽位避让全部固定格且可达、谈话信号只认真实对话且接取不自动完成、物品接取快照与单次奖励、败北失败原子锁链、互斥分支确定性失败报告/幂等拒绝/双向各自后续、npc-talk 唯一入口源码断言、v1 快照往返与 R31 前旧档免迁移恢复。');
 } finally {
   globalThis.fetch = originalFetch;
   await server.close();

@@ -44,7 +44,7 @@ const worldFamily = await loadFamily('world-map');
 if (worldFamily.length !== 1) {
   fail('MAP-ATLAS.md', `manifest 应登记唯一 world-map 资源，实际 ${worldFamily.length} 个`);
 }
-const world = worldFamily[0]?.data ?? { regions: [], transitions: [], events: [] };
+const world = worldFamily[0]?.data ?? { regions: [], transitions: [], events: [], randomEvents: [] };
 
 const npcById = new Map();
 for (const { data } of await loadFamily('npc-set')) {
@@ -63,8 +63,12 @@ for (const { data } of await loadFamily('quest-set')) {
   for (const quest of data.quests ?? []) quests.push(quest);
 }
 const factionNames = [];
+const factionById = new Map();
 for (const { data } of await loadFamily('faction-set')) {
-  for (const faction of data.factions ?? []) factionNames.push(faction.name);
+  for (const faction of data.factions ?? []) {
+    factionNames.push(faction.name);
+    factionById.set(faction.id, faction);
+  }
 }
 const profiles = [];
 for (const { data } of await loadFamily('character-profiles')) {
@@ -73,8 +77,12 @@ for (const { data } of await loadFamily('character-profiles')) {
 const calendar = (await loadFamily('game-calendar'))[0]?.data;
 const climate = (await loadFamily('climate'))[0]?.data;
 const knowledgeNodeIds = new Set();
+const knowledgeNodeById = new Map();
 for (const { data } of await loadFamily('knowledge-nodes')) {
-  for (const node of data.nodes ?? []) knowledgeNodeIds.add(node.id);
+  for (const node of data.nodes ?? []) {
+    knowledgeNodeIds.add(node.id);
+    knowledgeNodeById.set(node.id, node);
+  }
 }
 const dialogueSchema = await readJson(resolve(root, 'data/schema/dialogue-set.schema.json'));
 const questSchema = await readJson(resolve(root, 'data/schema/quest-set.schema.json'));
@@ -144,6 +152,26 @@ for (const event of world.events ?? []) {
   }
   if (event.discoverKnowledgeNodeId !== undefined && !knowledgeNodeIds.has(event.discoverKnowledgeNodeId)) {
     fail('MAP-ATLAS.md', `区域事件 "${event.id}" 的发现节点 "${event.discoverKnowledgeNodeId}" 未登记`);
+  }
+}
+for (const event of world.randomEvents ?? []) {
+  if (!regionMapIds.has(event.mapResourceId)) {
+    fail('MAP-ATLAS.md', `漫游奇遇 "${event.id}" 的地图 "${event.mapResourceId}" 不在世界图区域中`);
+  }
+  if (!Number.isFinite(event.chance) || event.chance < 0 || event.chance > 1) {
+    fail('MAP-ATLAS.md', `漫游奇遇 "${event.id}" 的 chance 不在 0–1 范围内`);
+  }
+  for (const nodeId of event.conditions?.knowledgeNodeIds ?? []) {
+    if (!knowledgeNodeIds.has(nodeId)) fail('MAP-ATLAS.md', `漫游奇遇 "${event.id}" 条件引用的知识节点 "${nodeId}" 未登记`);
+  }
+  for (const periodId of event.conditions?.periodIds ?? []) {
+    if (!periodIds.has(periodId)) fail('MAP-ATLAS.md', `漫游奇遇 "${event.id}" 条件引用的时段 "${periodId}" 未登记`);
+  }
+  for (const weatherId of event.conditions?.weatherIds ?? []) {
+    if (!weatherIds.has(weatherId)) fail('MAP-ATLAS.md', `漫游奇遇 "${event.id}" 条件引用的天气 "${weatherId}" 未登记`);
+  }
+  if (event.discoverKnowledgeNodeId !== undefined && !knowledgeNodeIds.has(event.discoverKnowledgeNodeId)) {
+    fail('MAP-ATLAS.md', `漫游奇遇 "${event.id}" 的发现节点 "${event.discoverKnowledgeNodeId}" 未登记`);
   }
 }
 
@@ -232,6 +260,40 @@ for (const event of world.events ?? []) {
   }
 }
 
+// 5.3.1 地图图册：每个漫游奇遇都要登记地图、概率、条件和发现节点。
+const randomTableStart = atlas.indexOf('### 随机漫游奇遇');
+const randomTableEnd = atlas.indexOf('## 资料协议', randomTableStart);
+const randomTable = randomTableStart < 0 || randomTableEnd < 0
+  ? ''
+  : atlas.slice(randomTableStart, randomTableEnd);
+for (const event of world.randomEvents ?? []) {
+  const row = randomTable.split(/\r?\n/).find((line) => line.includes(event.id) && line.startsWith('|'));
+  if (row === undefined) {
+    fail('MAP-ATLAS.md', `漫游奇遇清单缺少 "${event.id}"`);
+    continue;
+  }
+  const mapName = world.regions.find((region) => region.mapResourceId === event.mapResourceId)?.name;
+  if (mapName !== undefined && !row.includes(mapName)) fail('MAP-ATLAS.md', `漫游奇遇 "${event.id}" 所在行缺少地图名 "${mapName}"`);
+  if (!row.includes(event.mapResourceId)) fail('MAP-ATLAS.md', `漫游奇遇 "${event.id}" 所在行缺少地图 id "${event.mapResourceId}"`);
+  if (!row.includes(`${Math.round(event.chance * 100)}%`)) fail('MAP-ATLAS.md', `漫游奇遇 "${event.id}" 所在行缺少概率`);
+  const onceLabel = event.once === true ? '是' : '否';
+  if (!row.includes(onceLabel)) fail('MAP-ATLAS.md', `漫游奇遇 "${event.id}" 所在行缺少一次性值 "${onceLabel}"`);
+  for (const nodeId of event.conditions?.knowledgeNodeIds ?? []) {
+    if (!row.includes(nodeId)) fail('MAP-ATLAS.md', `漫游奇遇 "${event.id}" 所在行缺少见闻条件 "${nodeId}"`);
+  }
+  for (const periodId of event.conditions?.periodIds ?? []) {
+    const name = calendar?.periods?.find((period) => period.id === periodId)?.name;
+    if (name !== undefined && !row.includes(name)) fail('MAP-ATLAS.md', `漫游奇遇 "${event.id}" 所在行缺少时段条件 "${name}"`);
+  }
+  for (const weatherId of event.conditions?.weatherIds ?? []) {
+    const name = climate?.weathers?.find((weather) => weather.id === weatherId)?.name;
+    if (name !== undefined && !row.includes(name)) fail('MAP-ATLAS.md', `漫游奇遇 "${event.id}" 所在行缺少天气条件 "${name}"`);
+  }
+  if (event.discoverKnowledgeNodeId !== undefined && !row.includes(event.discoverKnowledgeNodeId)) {
+    fail('MAP-ATLAS.md', `漫游奇遇 "${event.id}" 所在行缺少发现节点 "${event.discoverKnowledgeNodeId}"`);
+  }
+}
+
 // 5.4 对白指南：Schema 的每个条件/效果 kind 逐一覆盖。
 for (const kind of conditionKinds) {
   if (!dialogueGuide.includes('`' + kind + '`')) fail('DIALOGUE-GUIDE.md', `缺少对白条件 kind "${kind}" 的条目`);
@@ -299,8 +361,19 @@ for (const quest of quests) {
       else objectiveNames.push(target.name);
     }
   }
+  const eligibilityNames = [];
+  if (quest.requiredFactionId !== undefined) {
+    const faction = factionById.get(quest.requiredFactionId);
+    if (faction === undefined) fail('QUESTS.md', `任务 "${quest.name}" 的资格门派 "${quest.requiredFactionId}" 未登记（数据侧错误）`);
+    else eligibilityNames.push(faction.name);
+  }
+  if (quest.requiredKnowledgeNodeId !== undefined) {
+    const node = knowledgeNodeById.get(quest.requiredKnowledgeNodeId);
+    if (node === undefined) fail('QUESTS.md', `任务 "${quest.name}" 的资格见闻 "${quest.requiredKnowledgeNodeId}" 未登记（数据侧错误）`);
+    else eligibilityNames.push(node.title);
+  }
   const required = [quest.name, giver.name, regionName, reward, ...encounterNames.filter(Boolean),
-    ...prerequisiteNames.filter(Boolean), ...objectiveNames].filter(Boolean);
+    ...prerequisiteNames.filter(Boolean), ...objectiveNames, ...eligibilityNames].filter(Boolean);
   const missing = required.filter((token) => !row.includes(token));
   if (missing.length > 0) {
     fail('QUESTS.md', `任务 "${quest.name}" 同一总表行缺少：${missing.join('、')}`);
@@ -331,7 +404,8 @@ if (failures.length > 0) {
 }
 console.log('通过：文档一致性审计。核验范围（计数由数据推导）：' +
   `${mapById.size} 张地图/${world.regions.length} 个区域/` +
-  `${world.transitions?.length ?? 0} 个关口/${world.events?.length ?? 0} 个区域事件、` +
+  `${world.transitions?.length ?? 0} 个关口/${world.events?.length ?? 0} 个定点事件/` +
+  `${world.randomEvents?.length ?? 0} 个漫游奇遇、` +
   `对白条件 ${conditionKinds} + 效果 ${effectKinds}、` +
   `${quests.length} 项任务（目标 kind：${objectiveKinds.join('/')}）、` +
   `${factionNames.length} 个门派名。`);

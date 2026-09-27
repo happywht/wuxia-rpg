@@ -666,14 +666,18 @@ export function applyDialogueEffects(
     switch (effect.kind) {
       case 'acceptQuest': {
         const quest = staged.quests.get(effect.questId);
-        const result = staged.inventory === null
-          ? acceptQuest(staged.quests, staged.journal, effect.questId)
-          : acceptQuest(
-              staged.quests,
-              staged.journal,
-              effect.questId,
-              objectiveItemCounts(staged.quests, staged.inventory),
-            );
+        const result = acceptQuest(
+          staged.quests,
+          staged.journal,
+          effect.questId,
+          staged.inventory === null
+            ? new Map()
+            : objectiveItemCounts(staged.quests, staged.inventory),
+          {
+            factionId: staged.factionState.membership?.factionId ?? null,
+            knownKnowledgeNodeIds: staged.knownKnowledgeNodeIds,
+          },
+        );
         if (!result.ok) {
           return { ok: false, reason: `无法接取差事「${quest?.name ?? effect.questId}」` };
         }

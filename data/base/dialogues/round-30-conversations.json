@@ -53,6 +53,49 @@
               ],
               "effects": [{ "kind": "leaveFaction" }]
             },
+            {
+              "text": "我已核实「tingyu-eave-rain」所托之事。",
+              "nextNodeId": "r43-resolved-tingyu-eave-rain",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r43-tingyu-eave-rain",
+                  "status": "completed"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r43-tingyu-eave-rain"
+                }
+              ]
+            },
+            {
+              "text": "信里说旧渡籍少抄了一列船名，愿替寒山书院向沈墨涵查查旧抄纸龄吗？",
+              "nextNodeId": "r43-accepted-hanshan-copybook",
+              "conditions": [
+                {
+                  "kind": "factionMembership",
+                  "factionId": "faction.hanshan-shuyuan",
+                  "isMember": true
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r43-wayfarer-letter"
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r43-hanshan-copybook",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r43-hanshan-copybook"
+                }
+              ]
+            },
             { "text": "不叨扰了，先生请便。", "nextNodeId": "farewell" },
             {
               "text": "白鹭洲托我来对一对旧渡籍。",
@@ -132,6 +175,14 @@
         {
           "id": "r42-public-result",
           "text": "柳听澜把副册摊开，指着新添的一行：「证词、拓本、疑问都在。日后若有人能证实另一种说法，也有空白处可添；立册是让事情可复查，不是把今天的判断钉死。」"
+        },
+        {
+          "id": "r43-resolved-tingyu-eave-rain",
+          "text": "柳听澜将信中时辰与讲书堂旧记逐一对过：「那不是剑鸣，是索环回弹。误认成剑声，足以让无辜的人背上嫌名。」"
+        },
+        {
+          "id": "r43-accepted-hanshan-copybook",
+          "text": "柳听澜在信封背面记下一行：「只核纸墨，不补人名。副页要能复查，空处也有空处的用处。」"
         }
       ]
     },
@@ -185,6 +236,32 @@
             {
               "text": "渡口的轮值章程，去哪里查？",
               "nextNodeId": "registry-point"
+            },
+            {
+              "text": "信上画着三道缆痕，愿替盘舷刀场请白鹭洲核对旧渡簿吗？",
+              "nextNodeId": "r43-accepted-panzhou-return-tide",
+              "conditions": [
+                {
+                  "kind": "factionMembership",
+                  "factionId": "faction.panzhou-daochang",
+                  "isMember": true
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r43-wayfarer-letter"
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r43-panzhou-return-tide",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r43-panzhou-return-tide"
+                }
+              ]
             },
             { "text": "随便看看，这就走。", "nextNodeId": "farewell" },
             {
@@ -245,6 +322,10 @@
         {
           "id": "r42-protect-result",
           "text": "祝九弦把拓本放进干燥的木匣，另留一张无名收据：「东西在这儿，来人却不记名。等当事人愿意开口，再把两边的页合起来；纸没丢，话也没被逼出来。」"
+        },
+        {
+          "id": "r43-accepted-panzhou-return-tide",
+          "text": "祝九弦收拢缆绳：「三道痕先问清是哪条船留下的。刀场护路，不替没对上的账先出刀。」"
         }
       ]
     },
@@ -298,6 +379,23 @@
               "text": "渡籍里记下的轮值之约，执行得如何？",
               "nextNodeId": "remembered-pact",
               "conditions": [{ "kind": "npcKnows", "nodeId": "event.mist-pact-stalemate" }]
+            },
+            {
+              "text": "我已核实「panzhou-return-tide」所托之事。",
+              "nextNodeId": "r43-resolved-panzhou-return-tide",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r43-panzhou-return-tide",
+                  "status": "completed"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r43-panzhou-return-tide"
+                }
+              ]
             },
             { "text": "都不是，随便看看。", "nextNodeId": "farewell" },
             {
@@ -387,7 +485,11 @@
           "text": "白鹭洲点头：「证人不必先把名字放到众目下。祝九弦守船守人有分寸，你将拓本交他封存，往后若有人问起，至少还有纸可对。」",
           "options": [{ "text": "我去找祝师父收存。", "nextNodeId": "r42-protect-accepted" }, { "text": "我记下了。", "nextNodeId": "farewell" }]
         },
-        { "id": "r42-protect-accepted", "text": "「渡籍仍按原章走。」白鹭洲把拓本的去向记在自己手边的私簿里，「护住证人，不等于替谁抹账。」" }
+        { "id": "r42-protect-accepted", "text": "「渡籍仍按原章走。」白鹭洲把拓本的去向记在自己手边的私簿里，「护住证人，不等于替谁抹账。」" },
+        {
+          "id": "r43-resolved-panzhou-return-tide",
+          "text": "白鹭洲翻过两册旧账：「是三艘运盐船先后靠岸磨出的痕，不是夜航私船。记下船次就够了，暂且不用封渡盘查。」"
+        }
       ]
     }
   ]

@@ -61,5 +61,20 @@
       },
       "discoverKnowledgeNodeId": "place.reedbank"
     }
+  ],
+  "randomEvents": [
+    {
+      "id": "event.r43-wayfarer-letter",
+      "mapResourceId": "map.round-10-mist-ferry",
+      "text": "黄昏雨脚里，一个赶路人将五封各带不同门派暗记的求助信交给你。他说五派都在寻一双走过芦苇岸的脚，愿你代为核问；信上没有署名。",
+      "once": true,
+      "chance": 0.12,
+      "conditions": {
+        "knowledgeNodeIds": ["event.old-footprints"],
+        "periodIds": ["period.dusk", "period.night"],
+        "weatherIds": ["weather.drizzle", "weather.rain", "weather.storm"]
+      },
+      "discoverKnowledgeNodeId": "event.r43-wayfarer-letter"
+    }
   ]
 }

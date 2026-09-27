@@ -2,12 +2,14 @@ import Phaser from 'phaser';
 
 import {
   type QuestData,
+  type QuestAccessContext,
   type QuestJournal,
   type QuestStatus,
   type QuestUpdateResult,
   abandonQuest,
   acceptQuest,
   getQuestObjectiveProgress,
+  hasQuestAccess,
   toggleTrackedQuest,
 } from '../engine/quest-system';
 import { uiFontSize } from './settings';
@@ -69,6 +71,8 @@ export interface QuestPanelModel {
   giverName?: string;
   /** Current item quantities used to initialize collect goals on acceptance. */
   itemCounts: ReadonlyMap<string, number>;
+  /** Current membership and discoveries for quest eligibility checks. */
+  access: QuestAccessContext;
 }
 
 export interface QuestPanelOptions {
@@ -175,9 +179,13 @@ export class QuestPanel {
   private get rows(): QuestData[] {
     const model = this.model;
     if (model === null) return [];
-    return [...model.quests.values()].filter(
-      (quest) => model.giverNpcId === undefined || quest.giverNpcId === model.giverNpcId,
-    );
+    return [...model.quests.values()].filter((quest) => {
+      if (model.giverNpcId !== undefined && quest.giverNpcId !== model.giverNpcId) return false;
+      const status = model.journal.states.get(quest.id)?.status;
+      if (status !== 'offered') return true; // Keep accepted tasks visible after leaving a faction.
+        if (!hasQuestAccess(quest, model.access)) return false;
+      return true;
+    });
   }
 
   private moveSelection(delta: number): void {
@@ -198,7 +206,7 @@ export class QuestPanel {
     if (model === null || quest === undefined) return;
     const state = model.journal.states.get(quest.id);
     if (state?.status === 'offered') {
-      const result = acceptQuest(model.quests, model.journal, quest.id, model.itemCounts);
+      const result = acceptQuest(model.quests, model.journal, quest.id, model.itemCounts, model.access);
       if (!result.ok) {
         this.status = `无法接取：${result.reason}`;
         this.render();

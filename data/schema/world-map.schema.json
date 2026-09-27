@@ -50,6 +50,22 @@
           "discoverKnowledgeNodeId": { "type": "string", "minLength": 1 }
         }
       }
+    },
+    "randomEvents": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "mapResourceId", "text", "once", "chance"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "mapResourceId": { "type": "string", "minLength": 1 },
+          "text": { "type": "string", "minLength": 1 },
+          "once": { "type": "boolean" },
+          "chance": { "type": "number", "minimum": 0, "maximum": 1 },
+          "conditions": { "$ref": "#/definitions/regionEventConditions" },
+          "discoverKnowledgeNodeId": { "type": "string", "minLength": 1 }
+        }
+      }
     }
   },
   "definitions": {

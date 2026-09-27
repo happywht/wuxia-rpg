@@ -27,6 +27,9 @@ export interface QuestData {
   description: string;
   giverNpcId: string;
   prerequisiteQuestIds: string[];
+  /** Optional eligibility gates checked by the quest board and acceptance API. */
+  requiredFactionId?: string;
+  requiredKnowledgeNodeId?: string;
   /**
    * Optional exclusive branch group: members with the same group id and the
    * same prerequisites form one player choice; accepting any member fails its
@@ -60,6 +63,9 @@ export interface QuestAssemblyInput {
   npcIds: ReadonlySet<string>;
   itemIds: ReadonlySet<string>;
   encounterIds: ReadonlySet<string>;
+  /** Optional reference catalogs; required quest gates are checked when provided. */
+  factionIds?: ReadonlySet<string>;
+  knowledgeNodeIds?: ReadonlySet<string>;
 }
 
 export interface QuestAssemblyResult {
@@ -82,6 +88,12 @@ export interface QuestJournal {
   trackedQuestId: string | null;
 }
 
+/** Live facts required by quests which declare faction/lore eligibility. */
+export interface QuestAccessContext {
+  factionId?: string | null;
+  knownKnowledgeNodeIds?: ReadonlySet<string>;
+}
+
 export interface QuestRewardGrant {
   questId: string;
   experience: number;
@@ -102,7 +114,7 @@ export type QuestSignal =
 
 export type QuestActionResult =
   | { ok: true; update: QuestUpdateResult }
-  | { ok: false; reason: 'unknown-quest' | 'not-offered' | 'not-active'; update: QuestUpdateResult };
+  | { ok: false; reason: 'unknown-quest' | 'not-offered' | 'not-active' | 'wrong-faction' | 'missing-knowledge'; update: QuestUpdateResult };
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -190,6 +202,12 @@ export function parseQuestSet(raw: unknown): QuestSetParseResult {
     const exclusiveGroupId = entry.exclusiveGroupId === undefined
       ? undefined
       : string(entry.exclusiveGroupId);
+    const requiredFactionId = entry.requiredFactionId === undefined
+      ? undefined
+      : string(entry.requiredFactionId);
+    const requiredKnowledgeNodeId = entry.requiredKnowledgeNodeId === undefined
+      ? undefined
+      : string(entry.requiredKnowledgeNodeId);
     const prerequisiteQuestIds = parseIdList(
       entry.prerequisiteQuestIds,
       `${label}.prerequisiteQuestIds`,
@@ -220,6 +238,12 @@ export function parseQuestSet(raw: unknown): QuestSetParseResult {
     if (entry.exclusiveGroupId !== undefined && exclusiveGroupId === null) {
       problems.push('exclusiveGroupId 应为非空字符串');
     }
+    if (entry.requiredFactionId !== undefined && requiredFactionId === null) {
+      problems.push('requiredFactionId 应为非空字符串');
+    }
+    if (entry.requiredKnowledgeNodeId !== undefined && requiredKnowledgeNodeId === null) {
+      problems.push('requiredKnowledgeNodeId 应为非空字符串');
+    }
     if (prerequisiteQuestIds === null) problems.push('prerequisiteQuestIds 格式无效');
     if (failOnEncounterIds === null) problems.push('failOnEncounterIds 格式无效');
     if (rawRewards === null || experience === null || currency === null) {
@@ -238,6 +262,12 @@ export function parseQuestSet(raw: unknown): QuestSetParseResult {
       giverNpcId,
       ...(exclusiveGroupId !== null && exclusiveGroupId !== undefined
         ? { exclusiveGroupId }
+        : {}),
+      ...(requiredFactionId !== null && requiredFactionId !== undefined
+        ? { requiredFactionId }
+        : {}),
+      ...(requiredKnowledgeNodeId !== null && requiredKnowledgeNodeId !== undefined
+        ? { requiredKnowledgeNodeId }
         : {}),
       prerequisiteQuestIds,
       objectives,
@@ -272,6 +302,14 @@ export function assembleQuests(input: QuestAssemblyInput): QuestAssemblyResult {
     const problems: string[] = [];
     if (!input.questGiverNpcIds.has(quest.giverNpcId)) {
       problems.push(`发布 NPC "${quest.giverNpcId}" 不存在或未声明为任务发布人`);
+    }
+    if (quest.requiredFactionId !== undefined && input.factionIds !== undefined &&
+        !input.factionIds.has(quest.requiredFactionId)) {
+      problems.push(`资格门派 "${quest.requiredFactionId}" 未登记`);
+    }
+    if (quest.requiredKnowledgeNodeId !== undefined && input.knowledgeNodeIds !== undefined &&
+        !input.knowledgeNodeIds.has(quest.requiredKnowledgeNodeId)) {
+      problems.push(`资格见闻 "${quest.requiredKnowledgeNodeId}" 未登记`);
     }
     const objectiveIds = new Set<string>();
     for (const objective of quest.objectives) {
@@ -380,6 +418,14 @@ function isPrerequisiteComplete(journal: QuestJournal, quest: QuestData): boolea
   );
 }
 
+/** Shared eligibility predicate for UI visibility, dialogue and direct acceptance. */
+export function hasQuestAccess(quest: QuestData, access: QuestAccessContext = {}): boolean {
+  if (quest.requiredFactionId !== undefined && access.factionId !== quest.requiredFactionId) return false;
+  if (quest.requiredKnowledgeNodeId !== undefined &&
+      !access.knownKnowledgeNodeIds?.has(quest.requiredKnowledgeNodeId)) return false;
+  return true;
+}
+
 /** Order-insensitive prerequisite comparison key for exclusive group checks. */
 function prerequisiteSignature(quest: QuestData): string {
   return [...quest.prerequisiteQuestIds].sort().join('|');
@@ -436,6 +482,7 @@ export function acceptQuest(
   journal: QuestJournal,
   questId: string,
   itemCounts: ReadonlyMap<string, number> = new Map(),
+  access: QuestAccessContext = {},
 ): QuestActionResult {
   const quest = quests.get(questId);
   const state = journal.states.get(questId);
@@ -444,6 +491,13 @@ export function acceptQuest(
   }
   if (state.status !== 'offered' || !isPrerequisiteComplete(journal, quest)) {
     return { ok: false, reason: 'not-offered', update: emptyUpdate() };
+  }
+  if (quest.requiredFactionId !== undefined && access.factionId !== quest.requiredFactionId) {
+    return { ok: false, reason: 'wrong-faction', update: emptyUpdate() };
+  }
+  if (quest.requiredKnowledgeNodeId !== undefined &&
+      !access.knownKnowledgeNodeIds?.has(quest.requiredKnowledgeNodeId)) {
+    return { ok: false, reason: 'missing-knowledge', update: emptyUpdate() };
   }
   state.status = 'active';
   const failedQuestIds: string[] = [];

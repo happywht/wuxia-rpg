@@ -7,6 +7,8 @@ export interface WorldMapData {
   regions: WorldRegionData[];
   transitions: RegionTransitionData[];
   events: RegionEventData[];
+  /** Optional one-shot/random-step encounters; absent in older world maps. */
+  randomEvents: RandomRegionEventData[];
 }
 
 export interface WorldRegionData {
@@ -37,6 +39,17 @@ export interface RegionEventData extends CellPosition {
   discoverKnowledgeNodeId?: string;
 }
 
+/** A roaming event attempted after a successful player grid step. */
+export interface RandomRegionEventData {
+  id: string;
+  mapResourceId: string;
+  text: string;
+  once: boolean;
+  chance: number;
+  conditions?: RegionEventConditionsData;
+  discoverKnowledgeNodeId?: string;
+}
+
 /** All declared condition groups must pass; ids inside each group are alternatives. */
 export interface RegionEventConditionsData {
   knowledgeNodeIds?: string[];
@@ -63,6 +76,7 @@ export interface WorldMapAssembly {
   regions: WorldRegionData[];
   transitions: RegionTransitionData[];
   events: RegionEventData[];
+  randomEvents: RandomRegionEventData[];
   warnings: string[];
 }
 
@@ -205,9 +219,49 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
       });
     }
   });
+  const randomEvents: RandomRegionEventData[] = [];
+  const rawRandomEvents = raw.randomEvents === undefined ? [] : raw.randomEvents;
+  if (!Array.isArray(rawRandomEvents)) errors.push('randomEvents：应为数组');
+  else rawRandomEvents.forEach((entry, index) => {
+    const label = `randomEvents[${index}]`;
+    if (!isObject(entry)) { errors.push(`${label}：应为对象`); return; }
+    const id = nonEmpty(entry.id) ? entry.id : null;
+    const mapResourceId = nonEmpty(entry.mapResourceId) ? entry.mapResourceId : null;
+    const text = nonEmpty(entry.text) ? entry.text : null;
+    const once = typeof entry.once === 'boolean' ? entry.once : null;
+    const chance = typeof entry.chance === 'number' && Number.isFinite(entry.chance) &&
+      entry.chance >= 0 && entry.chance <= 1 ? entry.chance : null;
+    const conditions = entry.conditions === undefined
+      ? undefined
+      : parseRegionEventConditions(entry.conditions, `${label}.conditions`, errors);
+    const discoverKnowledgeNodeId = entry.discoverKnowledgeNodeId === undefined
+      ? undefined
+      : nonEmpty(entry.discoverKnowledgeNodeId) ? entry.discoverKnowledgeNodeId : null;
+    if (id === null) errors.push(`${label}.id：应为非空字符串`);
+    if (mapResourceId === null) errors.push(`${label}.mapResourceId：应为非空字符串`);
+    if (text === null) errors.push(`${label}.text：应为非空字符串`);
+    if (once === null) errors.push(`${label}.once：应为布尔值`);
+    if (chance === null) errors.push(`${label}.chance：应为 0–1 之间的有限数值`);
+    if (discoverKnowledgeNodeId === null) errors.push(`${label}.discoverKnowledgeNodeId：应为非空字符串`);
+    if (id !== null && mapResourceId !== null && text !== null && once !== null && chance !== null &&
+      conditions !== null && discoverKnowledgeNodeId !== null) {
+      randomEvents.push({
+        id, mapResourceId, text, once, chance,
+        ...(conditions === undefined ? {} : { conditions }),
+        ...(discoverKnowledgeNodeId === undefined ? {} : { discoverKnowledgeNodeId }),
+      });
+    }
+  });
   return errors.length > 0
     ? { ok: false, errors }
-    : { ok: true, data: { id: raw.id as string, startingMapResourceId: raw.startingMapResourceId as string, regions, transitions, events } };
+    : { ok: true, data: {
+      id: raw.id as string,
+      startingMapResourceId: raw.startingMapResourceId as string,
+      regions,
+      transitions,
+      events,
+      randomEvents,
+    } };
 }
 
 /** Resolves map references and isolates bad region links/events to their row. */
@@ -252,6 +306,7 @@ export function assembleWorldMap(
     else transitions.push(transition);
   }
   const events: RegionEventData[] = [];
+  const randomEvents: RandomRegionEventData[] = [];
   const seenEvents = new Set<string>();
   for (const event of data.events) {
     const map = maps.get(event.mapResourceId);
@@ -278,11 +333,39 @@ export function assembleWorldMap(
     if (problems.length > 0) warnings.push(`区域事件 "${event.id}" 已禁用：${problems.join('；')}`);
     else events.push(event);
   }
-  return { data, regions, transitions, events, warnings };
+  for (const event of data.randomEvents) {
+    const problems: string[] = [];
+    if (seenEvents.has(event.id)) problems.push('id 与其他区域事件重复');
+    if (!regions.some((region) => region.mapResourceId === event.mapResourceId)) {
+      problems.push('地图不在世界图区域中');
+    }
+    if (eventReferences !== undefined) {
+      if (event.discoverKnowledgeNodeId !== undefined &&
+        !eventReferences.knowledgeNodeIds.has(event.discoverKnowledgeNodeId)) {
+        problems.push(`发现节点未登记：${event.discoverKnowledgeNodeId}`);
+      }
+      for (const nodeId of event.conditions?.knowledgeNodeIds ?? []) {
+        if (!eventReferences.knowledgeNodeIds.has(nodeId)) problems.push(`条件节点未登记：${nodeId}`);
+      }
+      for (const periodId of event.conditions?.periodIds ?? []) {
+        if (!eventReferences.periodIds.has(periodId)) problems.push(`引用无效时段：${periodId}`);
+      }
+      for (const weatherId of event.conditions?.weatherIds ?? []) {
+        if (!eventReferences.weatherIds.has(weatherId)) problems.push(`引用无效天气：${weatherId}`);
+      }
+    }
+    seenEvents.add(event.id);
+    if (problems.length > 0) warnings.push(`漫游奇遇「${event.id}」已禁用：${problems.join('；')}`);
+    else randomEvents.push(event);
+  }
+  return { data, regions, transitions, events, randomEvents, warnings };
 }
 
 /** True when every condition group on this event is satisfied by live state. */
-export function regionEventConditionsMet(event: RegionEventData, context: RegionEventContext): boolean {
+export function regionEventConditionsMet(
+  event: Pick<RegionEventData, 'conditions'>,
+  context: RegionEventContext,
+): boolean {
   const conditions = event.conditions;
   if (conditions === undefined) return true;
   if (conditions.knowledgeNodeIds?.some((id) => !context.knownKnowledgeNodeIds.has(id))) return false;
@@ -310,7 +393,7 @@ export function selectTriggeredRegionEvents(
 
 /** Returns first-time node discoveries for a ready batch without mutating the save state. */
 export function selectNewRegionEventKnowledgeIds(
-  events: readonly RegionEventData[],
+  events: readonly { discoverKnowledgeNodeId?: string }[],
   knownKnowledgeNodeIds: ReadonlySet<string>,
 ): string[] {
   const seen = new Set(knownKnowledgeNodeIds);
@@ -322,6 +405,34 @@ export function selectNewRegionEventKnowledgeIds(
     discoveries.push(nodeId);
   }
   return discoveries;
+}
+
+/**
+ * Picks at most one eligible roaming event for a successful step. The first
+ * random sample selects uniformly from stable id order; the second tests its
+ * authored chance. No candidate means the random source is never consulted.
+ */
+export function selectTriggeredRandomRegionEvent(
+  events: readonly RandomRegionEventData[],
+  mapResourceId: string,
+  completedEventIds: ReadonlySet<string>,
+  context: RegionEventContext,
+  random: () => number = Math.random,
+): RandomRegionEventData | null {
+  const candidates = events.filter((event) =>
+    event.mapResourceId === mapResourceId && event.chance > 0 &&
+    (!event.once || !completedEventIds.has(event.id)) &&
+    regionEventConditionsMet(event, context),
+  ).sort((a, b) => a.id.localeCompare(b.id));
+  if (candidates.length === 0) return null;
+  const selectionSample = normalizeRandomSample(random());
+  const selected = candidates[Math.min(candidates.length - 1, Math.floor(selectionSample * candidates.length))]!;
+  return normalizeRandomSample(random()) < selected.chance ? selected : null;
+}
+
+function normalizeRandomSample(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(0, Math.min(value, 1 - Number.EPSILON));
 }
 
 export function selectAdjacentTransition(

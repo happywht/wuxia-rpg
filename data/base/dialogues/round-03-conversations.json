@@ -20,6 +20,23 @@
               "text": "（旁人正低声议论你做下的事）……掌柜的，墨多少钱一锭？",
               "nextNodeId": "wary",
               "conditions": [{ "kind": "morality", "maxValue": -5 }]
+            },
+            {
+              "text": "我已核实「hanshan-copybook」所托之事。",
+              "nextNodeId": "r43-resolved-hanshan-copybook",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r43-hanshan-copybook",
+                  "status": "completed"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r43-hanshan-copybook"
+                }
+              ]
             }
           ]
         },
@@ -92,6 +109,10 @@
         {
           "id": "browse",
           "text": "行，慢慢看。看中了唤我一声便是。"
+        },
+        {
+          "id": "r43-resolved-hanshan-copybook",
+          "text": "沈墨涵举起旧抄迎着窗光：「纸纤维和墨色都早于那场争执。缺的一列当时就没誊进去，眼下只能注明缺页，不能替旧人猜名。」"
         }
       ]
     },
@@ -219,6 +240,23 @@
               "nextNodeId": "r42-rubbing-offer",
               "conditions": [{ "kind": "questStatus", "questId": "quest.r42-seal-rubbing", "status": "offered" }],
               "effects": [{ "kind": "acceptQuest", "questId": "quest.r42-seal-rubbing" }]
+            },
+            {
+              "text": "我已核实「tiezhang-stone-post」所托之事。",
+              "nextNodeId": "r43-resolved-tiezhang-stone-post",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r43-tiezhang-stone-post",
+                  "status": "completed"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r43-tiezhang-stone-post"
+                }
+              ]
             }
           ]
         },
@@ -314,6 +352,10 @@
         {
           "id": "r42-rubbing-made",
           "text": "顾夜尘将薄纸递过来：「收好。纸上只存着一道痕，能拿来对，不该拿来栽人。」"
+        },
+        {
+          "id": "r43-resolved-tiezhang-stone-post",
+          "text": "顾夜尘沿着桩脚比了比潮线：「底下有一道空槽，涨潮时水气灌进去才响。拿铁楔压住就行，没人藏在桩里。」"
         }
       ]
     },
@@ -514,6 +556,32 @@
               ],
               "effects": [ { "kind": "leaveFaction" } ]
             },
+            {
+              "text": "信中提到芦苇岸有一段不合潮声的剑鸣，愿替听雨剑阁向柳教习核实吗？",
+              "nextNodeId": "r43-accepted-tingyu-eave-rain",
+              "conditions": [
+                {
+                  "kind": "factionMembership",
+                  "factionId": "faction.tingyu-jiange",
+                  "isMember": true
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r43-wayfarer-letter"
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r43-tingyu-eave-rain",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r43-tingyu-eave-rain"
+                }
+              ]
+            },
             { "text": "多谢指点，告辞。", "nextNodeId": "farewell" }
           ]
         },
@@ -542,7 +610,11 @@
           ]
         },
         { "id": "departed", "text": "叶庭舟收回目光：「缘分既尽，便各走各路。门中剑法也随今日一并还来。」" },
-        { "id": "farewell", "text": "叶庭舟将纸页收进袖中：「沿路多看，答案不在一处。」" }
+        { "id": "farewell", "text": "叶庭舟将纸页收进袖中：「沿路多看，答案不在一处。」" },
+        {
+          "id": "r43-accepted-tingyu-eave-rain",
+          "text": "叶庭舟把剑穗压在信角上：「先核准时辰。江湖话传得快，剑阁不替传闻磨出锋刃。」"
+        }
       ]
     },
     {
@@ -594,6 +666,32 @@
               "nextNodeId": "war-defeat",
               "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-defeat" }]
             },
+            {
+              "text": "信里说芦苇岸旧桩夜里会空响，愿替铁嶂派问问顾夜尘的旧船道经验吗？",
+              "nextNodeId": "r43-accepted-tiezhang-stone-post",
+              "conditions": [
+                {
+                  "kind": "factionMembership",
+                  "factionId": "faction.tiezhang-pai",
+                  "isMember": true
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r43-wayfarer-letter"
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r43-tiezhang-stone-post",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r43-tiezhang-stone-post"
+                }
+              ]
+            },
             { "text": "这便去磨练筋骨。", "nextNodeId": "farewell" }
           ]
         },
@@ -623,7 +721,11 @@
         { "id": "war-victory", "text": "石北听完经过，抬手在你肩上重重一拍：「先约拿到了，药道也没封死。记住，赢下约期不等于赢尽人心。」" },
         { "id": "war-stalemate", "text": "石北点头道：「轮值也好，谁的药队都耽误不得。能把人送过桥，才算这场没白打。」" },
         { "id": "war-defeat", "text": "石北听罢沉默片刻：「先后时辰让了便让了，约既仍在，就把筋骨练硬，下次护好该护的人。」" },
-        { "id": "farewell", "text": "石北又将双掌按回桩上，不再多言。" }
+        { "id": "farewell", "text": "石北又将双掌按回桩上，不再多言。" },
+        {
+          "id": "r43-accepted-tiezhang-stone-post",
+          "text": "石北把手掌按在旧桩上：「先听懂回声再动锤。桩若只是松了，补牢就好，别把人也当石头敲。」"
+        }
       ]
     },
     {
@@ -675,6 +777,32 @@
               "nextNodeId": "war-defeat",
               "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-defeat" }]
             },
+            {
+              "text": "匿名信的封蜡带着一味苦香，愿替云隐山庄问问容医师近日收过什么湿药材吗？",
+              "nextNodeId": "r43-accepted-yunyin-herb-road",
+              "conditions": [
+                {
+                  "kind": "factionMembership",
+                  "factionId": "faction.yunyin-shanzhuang",
+                  "isMember": true
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r43-wayfarer-letter"
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r43-yunyin-herb-road",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r43-yunyin-herb-road"
+                }
+              ]
+            },
             { "text": "我还想再想一想。", "nextNodeId": "farewell" }
           ]
         },
@@ -704,7 +832,11 @@
         { "id": "war-victory", "text": "闻素心听完会盟经过，先问了两支药队是否都能按约过桥，随后才道：「赢得时辰，也记得给人留路。」" },
         { "id": "war-stalemate", "text": "闻素心微微一笑：「各让一步，药便能按时送到。把争胜的心收回来些，便能看见约定的用处。」" },
         { "id": "war-defeat", "text": "闻素心替你重新包好伤处：「胜负是一时的，药路仍然开着。下回先记住，护送药队本身也是本分。」" },
-        { "id": "farewell", "text": "闻素心将药箱背起：「答案想清楚再来，不迟。」" }
+        { "id": "farewell", "text": "闻素心将药箱背起：「答案想清楚再来，不迟。」" },
+        {
+          "id": "r43-accepted-yunyin-herb-road",
+          "text": "闻素心将一片干净纱布递给你：「只问药香，不要碰不明的封蜡。救人之前，先护好自己的手。」"
+        }
       ]
     },
     {
@@ -730,13 +862,34 @@
               "nextNodeId": "teach-shuanghe",
               "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.formula-shuanghe-dan" }]
             },
+            {
+              "text": "我已核实「yunyin-herb-road」所托之事。",
+              "nextNodeId": "r43-resolved-yunyin-herb-road",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r43-yunyin-herb-road",
+                  "status": "completed"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r43-yunyin-herb-road"
+                }
+              ]
+            },
             { "text": "只是路过，叨扰了。", "nextNodeId": "farewell" }
           ]
         },
         { "id": "teach-shengji", "text": "她抓起一把寒珠草，又按上两段苍崖根：「寒珠败火定血，苍崖托气生肌，二比一下料，文火收霜，宁少勿多。记住了——散是死的，伤口是活的。」" },
         { "id": "teach-ningshen", "text": "「落蝶花带半分辛香，能引寒珠的凉性往心经走。」她以指轻叩药匾，「蜜炼成丸，含服徐化；火候老了发苦，药力便钝三分。」" },
         { "id": "teach-shuanghe", "text": "「双和丹不稀奇，稀奇的是肯守炉。」她三味各拈一撮，在匾上摆成鼎足，「武火催香，缓火固形，少看一眼便前功尽弃。去炉子那边练手，别烧了我的匾。」" },
-        { "id": "farewell", "text": "「炉子就在这渡口里，趁雾散前动手。」她低头继续翻匾，不再多言。" }
+        { "id": "farewell", "text": "「炉子就在这渡口里，趁雾散前动手。」她低头继续翻匾，不再多言。" },
+        {
+          "id": "r43-resolved-yunyin-herb-road",
+          "text": "容素青拈了拈封蜡边的细末：「是陈艾受潮后的苦气，药性已散，不会伤人。若有人把它当毒香，倒会白白惊动药队。」"
+        }
       ]
     }
   ]

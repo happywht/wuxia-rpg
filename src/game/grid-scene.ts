@@ -6,6 +6,7 @@ import { cellCenterOffset, renderGridMap } from '../engine/grid-map-renderer';
 import {
   selectAdjacentTransition,
   selectNewRegionEventKnowledgeIds,
+  selectTriggeredRandomRegionEvent,
   selectTriggeredRegionEvents,
   type RegionTransitionData,
 } from '../engine/world-map';
@@ -952,7 +953,10 @@ export class GridScene extends Phaser.Scene {
       shopRecords: world.assembly.shops,
       questRecords: world.assembly.quests,
       npcIds: new Set(world.assembly.npcs.map((npc) => npc.record.id)),
-      regionalEventIds: new Set(world.worldMap.events.map((event) => event.id)),
+      regionalEventIds: new Set([
+        ...world.worldMap.events.map((event) => event.id),
+        ...world.worldMap.randomEvents.map((event) => event.id),
+      ]),
       knowledgeNodeIds: new Set(world.knowledgeGraph.nodes.keys()),
       defaultKnowledgeNodeIds: new Set(
         [...world.knowledgeGraph.nodes.values()]
@@ -2502,6 +2506,10 @@ export class GridScene extends Phaser.Scene {
       quests: this.quests,
       journal: this.questJournal,
       itemCounts: this.questItemCounts(),
+      access: {
+        factionId: this.factionState.membership?.factionId ?? null,
+        knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
+      },
     });
     this.updateInteractHint();
   }
@@ -2985,6 +2993,10 @@ export class GridScene extends Phaser.Scene {
           giverNpcId: target.record.id,
           giverName: target.record.name,
           itemCounts: this.questItemCounts(),
+          access: {
+            factionId: this.factionState.membership?.factionId ?? null,
+            knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
+          },
         });
         this.updateInteractHint();
         return;
@@ -3303,7 +3315,7 @@ export class GridScene extends Phaser.Scene {
     const finishMove = (): void => {
       this.moving = false;
       this.refreshCompanionFollower(previousCell);
-      this.triggerRegionEvents();
+      this.triggerRegionEvents('', true);
       void this.runPendingDataReload(); // Safe boundary for a latched data change.
     };
     this.moving = true;
@@ -3408,7 +3420,7 @@ export class GridScene extends Phaser.Scene {
   }
 
   /** Fires ready events authored for the exact current cell. */
-  private triggerRegionEvents(prefix = ''): void {
+  private triggerRegionEvents(prefix = '', afterPlayerStep = false): void {
     const world = this.world;
     if (world === null) {
       if (prefix.length > 0) this.showRegionNotice(prefix);
@@ -3424,13 +3436,26 @@ export class GridScene extends Phaser.Scene {
         weatherId: this.currentClimate()?.weather.id ?? null,
       },
     );
+    const randomEvent = afterPlayerStep
+      ? selectTriggeredRandomRegionEvent(
+          world.worldMap.randomEvents,
+          this.currentMapResourceId,
+          this.completedRegionalEvents,
+          {
+            knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
+            periodId: this.clock?.currentPeriod().id ?? null,
+            weatherId: this.currentClimate()?.weather.id ?? null,
+          },
+        )
+      : null;
+    const allEvents = randomEvent === null ? events : [...events, randomEvent];
     const notices = prefix.length > 0 ? [prefix] : [];
-    for (const event of events) {
+    for (const event of allEvents) {
       if (event.once) this.completedRegionalEvents.add(event.id);
       notices.push(event.text);
     }
     const newlyDiscoveredTitles = new Set<string>();
-    for (const nodeId of selectNewRegionEventKnowledgeIds(events, this.knownKnowledgeNodeIds)) {
+    for (const nodeId of selectNewRegionEventKnowledgeIds(allEvents, this.knownKnowledgeNodeIds)) {
       const node = world.knowledgeGraph.nodes.get(nodeId);
       if (node === undefined) continue;
       this.knownKnowledgeNodeIds.add(nodeId);

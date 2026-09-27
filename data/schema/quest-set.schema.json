@@ -31,6 +31,8 @@
           "description": "可选互斥分支组：同组且前置一致的任务构成一次玩家选择，接取其一会将其余已解锁成员记为失败；装配时整组校验。",
           "$ref": "#/definitions/id"
         },
+        "requiredFactionId": { "$ref": "#/definitions/id" },
+        "requiredKnowledgeNodeId": { "$ref": "#/definitions/id" },
         "prerequisiteQuestIds": {
           "type": "array",
           "uniqueItems": true,

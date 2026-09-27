@@ -224,6 +224,83 @@
       "title": "灯下留痕",
       "summary": "先护住证人和纸上凭据，待各方愿意对页，再将未决之事交给后来人。",
       "knownByDefault": false
+    },
+    {
+      "id": "event.r43-wayfarer-letter",
+      "kind": "event",
+      "title": "风雨传函",
+      "summary": "黄昏雨夜在雾雨渡口偶遇赶路人，他带来五派各自托寻的一封匿名求助信。",
+      "knownByDefault": false
+    },
+    {
+      "id": "quest.r43-tingyu-eave-rain",
+      "kind": "quest",
+      "title": "檐雨听锋",
+      "summary": "听雨剑阁请门人核实芦苇岸传闻中的剑鸣，避免只凭回声指认行人。",
+      "knownByDefault": true
+    },
+    {
+      "id": "quest.r43-tiezhang-stone-post",
+      "kind": "quest",
+      "title": "石桩回声",
+      "summary": "铁嶂派请门人确认旧系缆桩夜间空响来自松动还是藏人。",
+      "knownByDefault": true
+    },
+    {
+      "id": "quest.r43-yunyin-herb-road",
+      "kind": "quest",
+      "title": "药路余香",
+      "summary": "云隐山庄追查匿名信封蜡的药香，防止把受潮药材误认作毒物。",
+      "knownByDefault": true
+    },
+    {
+      "id": "quest.r43-hanshan-copybook",
+      "kind": "quest",
+      "title": "副页留白",
+      "summary": "寒山书院核验旧渡籍缺抄的一列船名，选择保留空白并注明缺页。",
+      "knownByDefault": true
+    },
+    {
+      "id": "quest.r43-panzhou-return-tide",
+      "kind": "quest",
+      "title": "回潮验缆",
+      "summary": "盘舷刀场请门人把三道缆痕交给白鹭洲对照渡船旧簿。",
+      "knownByDefault": true
+    },
+    {
+      "id": "event.r43-tingyu-eave-rain",
+      "kind": "event",
+      "title": "索环似剑鸣",
+      "summary": "柳听澜核对后发现，所谓剑鸣其实是涨潮时索环回弹。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r43-tiezhang-stone-post",
+      "kind": "event",
+      "title": "石桩空槽",
+      "summary": "旧桩底有一道空槽，涨潮灌入水气便会发声，以铁楔加固即可。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r43-yunyin-herb-road",
+      "kind": "event",
+      "title": "陈艾苦香",
+      "summary": "封蜡边的苦气来自受潮陈艾，药性已散，并非毒香。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r43-hanshan-copybook",
+      "kind": "event",
+      "title": "旧抄缺页",
+      "summary": "书铺旧抄早于争执，船名一列当时就没有誊入；应注明缺页而不猜人名。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r43-panzhou-return-tide",
+      "kind": "event",
+      "title": "运盐船缆痕",
+      "summary": "三道缆痕来自先后靠岸的运盐船，并非夜航私船。",
+      "knownByDefault": false
     }
   ]
 }

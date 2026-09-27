@@ -1270,6 +1270,8 @@ function assembleOptionalContent(
     npcIds: new Set(allNpcs.map((npc) => npc.record.id)),
     itemIds: new Set(itemAssembly.items.keys()),
     encounterIds: new Set(encounters.map((encounter) => encounter.record.id)),
+    factionIds: new Set(progressionAssembled.assembly.factions.keys()),
+    knowledgeNodeIds,
   });
   for (const message of questAssembly.warnings) {
     warnings.push({
