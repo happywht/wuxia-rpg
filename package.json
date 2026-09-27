@@ -9,6 +9,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "validate:data": "node scripts/validate-data.mjs",
     "inspect:mods": "node scripts/inspect-mods.mjs",
     "content:export": "node scripts/content-package.mjs export",
@@ -39,7 +40,8 @@
   "devDependencies": {
     "@types/node": "^26.6.3",
     "typescript": "^5.9.3",
-    "vite": "^8.3.1"
+    "vite": "^8.3.1",
+    "vitest": "^5.0.2"
   },
   "engines": {
     "node": ">=22.12.0"

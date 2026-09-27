@@ -1,27 +1,23 @@
-import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
+/**
+ * Thin CLI entry for `npm run validate:data` (Round 38).
+ *
+ * All validation logic lives in `scripts/lib/data-validation.mjs`, shared
+ * with the Vitest suite. This entry only maps the structured result to the
+ * console: the success line is byte-identical to the previous behaviour and
+ * a failure still exits non-zero (problems go to stderr).
+ */
+
 import { dirname, resolve } from 'node:path';
-import Ajv from 'ajv';
+import { fileURLToPath } from 'node:url';
+import { validateBaseData } from './lib/data-validation.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const readJson = async (path) => JSON.parse(await readFile(path, 'utf8'));
-const ajv = new Ajv({ allErrors: true, strict: false });
-const manifest = await readJson(resolve(root, 'data/base/manifest.json'));
-const manifestSchema = await readJson(resolve(root, 'data/schema/manifest.schema.json'));
-const validateManifest = ajv.compile(manifestSchema);
-assert(validateManifest(manifest), JSON.stringify(validateManifest.errors, null, 2));
-let validated = 0;
-const compiled = new Map();
-for (const resource of manifest.resources) {
-  let validate = compiled.get(resource.schema);
-  if (validate === undefined) {
-    const schema = await readJson(resolve(root, 'data/schema', resource.schema + '.schema.json'));
-    validate = ajv.compile(schema);
-    compiled.set(resource.schema, validate);
+const result = await validateBaseData(root);
+if (result.ok) {
+  console.log('通过：manifest Schema 与 ' + result.validated + ' 个基础资源 Schema。');
+} else {
+  for (const problem of result.problems) {
+    console.error('校验失败：' + problem);
   }
-  const data = await readJson(resolve(root, 'data/base', resource.path));
-  assert(validate(data), resource.id + ': ' + JSON.stringify(validate.errors, null, 2));
-  validated += 1;
+  process.exitCode = 1;
 }
-console.log('通过：manifest Schema 与 ' + validated + ' 个基础资源 Schema。');

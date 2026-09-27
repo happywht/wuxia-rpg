@@ -1,6 +1,6 @@
 # 参考来源与使用边界（REFERENCES）
 
-核验日期：2026-09-27。历史/回忆类来源统一编号 **#1–#5**，官方技术来源统一编号 **#6–#13**；软件包元数据在独立表格中按精确包版本记录，不参与原作对照编号。来源授权状态只在核验到明确许可时标为已知；没有核验页面许可时，仅作事实性查阅，不复制内容。
+核验日期：2026-09-28。历史/回忆类来源统一编号 **#1–#5**，官方技术来源统一编号 **#6–#13**；软件包元数据在独立表格中按精确包版本记录，不参与原作对照编号。来源授权状态只在核验到明确许可时标为已知；没有核验页面许可时，仅作事实性查阅，不复制内容。
 
 ---
 
@@ -32,12 +32,12 @@
 | 9 | [Vite 官方指南](https://vite.dev/guide/) | 构建配置与 Node 兼容条件参考（ADR-0003） | 页面许可未逐页核实；只查阅技术事实，不复制文档文字、示例代码或素材 |
 | 10 | [TypeScript 官方文档](https://www.typescriptlang.org/docs/) | 语言与编译器选项参考（ADR-0002） | 页面许可未逐页核实；只查阅技术事实，不复制文档文字、示例代码或素材 |
 | 11 | [Ajv 官方文档](https://ajv.js.org/) | Round 02 JSON Schema 校验管线参考（ADR-0004） | 页面许可未逐页核实；只查阅技术事实，不复制文档文字、示例代码或素材 |
-| 12 | [Vitest 官方指南](https://vitest.dev/guide/) | 后续测试体系参考（ADR-0005） | 页面许可未逐页核实；只查阅技术事实，不复制文档文字、示例代码或素材 |
+| 12 | [Vitest 官方指南](https://vitest.dev/guide/) | ADR-0005、Round 38：确认 Vitest 安装方式、独立配置可用，以及最低兼容条件 Vite >=6.4.0、Node >=22.12.0 | 页面许可未逐页核实；只查阅技术事实，不复制文档文字、示例代码或素材 |
 | 13 | [Vite HMR API](https://vite.dev/guide/api-hmr) 与 [Vite Plugin API](https://vite.dev/guide/api-plugin) | Round 36 自定义客户端 HMR 事件及 Vite Environment API `hotUpdate` 钩子的实现依据 | 页面许可未逐页核实；只查阅/转述技术事实，不复制文档段落、示例代码或素材 |
 
 ## 四、软件包许可核验（npm 元数据）
 
-下表记录被选用/规划的软件包及 npm registry 在指定版本发布元数据中的许可证标识。该标识是软件包许可证元数据，不代表 npm 网站、官方文档页面或包内所有第三方内容的许可。本项目通过包管理器引用依赖，没有复制或提交第三方库源码；分发时仍须核对包内许可证文件与 NOTICE，并随构建物提供适用的第三方许可声明。Round 02 已安装 Ajv 与 Node 类型声明；Vitest 仍留给路线图中的测试轮次。
+下表记录被选用的软件包及 npm registry 在指定版本发布元数据中的许可证标识。该标识是软件包许可证元数据，不代表 npm 网站、官方文档页面或包内所有第三方内容的许可。本项目通过包管理器引用依赖，没有复制或提交第三方库源码；分发时仍须核对包内许可证文件与 NOTICE，并随构建物提供适用的第三方许可声明。Round 02 已安装 Ajv 与 Node 类型声明；Round 38 加入 Vitest。
 
 | 软件包 | Registry 元数据 URL | 许可 | 用途 |
 |---|---|---|---|
@@ -46,9 +46,9 @@
 | `typescript@5.9.3` | https://registry.npmjs.org/typescript/5.9.3 | Apache-2.0 | 类型检查与语言工具链 |
 | `ajv@8.20.0` | https://registry.npmjs.org/ajv/8.20.0 | MIT | Round 02 起 JSON Schema 数据校验 |
 | `@types/node@26.6.3` | https://registry.npmjs.org/@types/node/26.6.3 | MIT | Round 02 Vite 配置的 Node API 开发期类型 |
-| `vitest@4.1.11` | https://registry.npmjs.org/vitest/4.1.11 | MIT | 后续自动化测试 |
+| `vitest@5.0.2` | https://registry.npmjs.org/vitest/5.0.2 | MIT | Round 38 自动化测试 |
 
-> 版本号核验方式：npm registry（`registry.npmjs.org`）元数据查询，结果记录于 `docs/ADR.md` 版本冻结总表与 `DEVLOG.md`（2026-09-26 条目）。
+> 版本号核验方式：npm registry（`registry.npmjs.org`）元数据查询，结果记录于 `docs/ADR.md` 版本表与 `DEVLOG.md` 对应轮次条目。
 
 ## 五、使用规则（对本仓库所有贡献者生效）
 

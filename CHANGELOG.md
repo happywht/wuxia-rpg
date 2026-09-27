@@ -4,6 +4,21 @@
 
 ## [Unreleased]
 
+### Added (Round 38)
+
+- **Vitest 测试基线**：新增 dev 依赖 Vitest 5.0.2（官方 Vite >=6.4、Node >=22.12 要求与本仓库 Vite 8.3.1、Node 22.18 相符；npm peer/engine 元数据已核验）与 `npm test`（`vitest run`）。测试使用**独立 `vitest.config.ts`**（Node 环境、`tests/**/*.test.ts`）：Vitest 在两配置并存时只读测试配置、完全不加载异步的 `vite.config.ts`，避免其动态加载开发态 HMR 插件和注册 `mods/` dev 中间件；`tsconfig.json` include 纳入 `tests/` 与 `vitest.config.ts`，测试代码接受同等严格类型检查（含 `noUncheckedIndexedAccess`）。ADR-0005 与来源/精确版本许可表已按实施核验更新。
+- **数据校验器抽取为可导入共享模块** `scripts/lib/data-validation.mjs`：`validateBaseData(root)` 校验 manifest Schema 与全部基础资源 Schema，返回结构化结果 `{ ok, validated }` / `{ ok: false, problems }`，不打印、不抛错；文件缺失/JSON 损坏、无效 Schema 编译与 JSON `null` 均折叠为可读 problem 而非异常。`scripts/validate-data.mjs` 变为薄 CLI：成功输出与历史逐字节一致，失败逐条打印 problem 到 stderr 并保留非零退出语义；附 `data-validation.d.mts` 类型声明供严格 TS 测试直接导入同一实现（CLI 与测试永不双轨）。
+- **四组 53 个单元测试**（只调公共 API、断言行为；无 Phaser/DOM/网络/时钟依赖）：
+  - `tests/event-bus.test.ts`（10）：`on`/`off`/unsubscribe 身份语义与幂等、`once` 恰好一次、**once 重入**（监听器内重发自身事件不再触发自身、重入投递达新订阅者）、`emit` 快照迭代（投递中新增订阅不收当次）、`clear`/`listenerCount`。
+  - `tests/dialogue.test.ts`（18）：`parseDialogueSet` 正反向（信封破损整份拒绝、单段坏对话仅隔离自身并警告）、`validateConversation` 图语义（重复节点/缺失起始节点/悬空目标）、`isConditionMet` 六类条件（含道德区间端点、itemCount 无背包防御、npcKnows 默认说话人）、`getVisibleOptions` 多条件全满足/索引指向原始数组/空结果即结束节点、`DialogueSession` 播放与敌意输入忽略。
+  - `tests/quest-system.test.ts`（18）：`parseQuestSet` 防御解析、`assembleQuests` 装配（坏发布人剔除、前置循环禁用、互斥组整组校验）、`createQuestJournal` 初始 offered/locked、接受/推进/完成/失败全生命周期（npc-talk 推进与奖励结算、item-count 绝对数量同步并按需求钳制、接取时背包快照即时完成、encounter-defeat 失败并清追踪、abandon 终态、互斥分支连带失败、前置完成后解锁）。
+  - `tests/data-validation.test.ts`（7）：**真实仓库**全量正向校验 + 临时 fixture 反向五例（资源违反 Schema、manifest 违反 Schema、资源文件缺失、无效资源 Schema、JSON `null` 数据）及真实 CLI 子进程失败输出/非零退出断言；fixture 于 `mkdtemp` 临时目录构造并在 `afterEach` 清理，受版本控制的 `data/` 零改动。
+- 新增 `docs/TESTING.md`（命令、配置取舍、覆盖矩阵、CLI/测试同源关系与编写约定）。
+
+### Verification (Round 38)
+
+- `npm test`：4 个测试文件、53 个用例全部通过；`npm run typecheck`：通过；`npm run validate:data`：通过（manifest + 26 个基础资源 Schema）；`npm run smoke:round-37`：通过（内容包回归）；`npm run build`：通过（130 modules；Vite 保留既有非阻断 chunk 建议）；`git diff --check`：通过。初稿复核补齐了无效 Schema 编译错误、JSON `null` 数据和真实 CLI 失败退出三条边界路径，详见 `DEVLOG.md`。
+
 ### Added (Round 37)
 
 - **单文件 v1 内容包格式**：新增 `data/schema/content-package.schema.json` 约束包层结构（`formatVersion`、包 id/名/版本、`minimumEngineVersion`、资源 id + SHA-256 + 数据本体）；资源条目禁止携带任何文件路径——安装路径唯一来源是目标仓库 manifest 的资源登记。校验和基于递归键排序的规范 JSON（UTF-8、无空白），与源文件排版无关。

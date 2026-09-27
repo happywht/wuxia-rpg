@@ -4,6 +4,44 @@
 
 ---
 
+## Round 38 — Vitest 测试基线：引擎单元与共享数据校验（2026-09-28，已完成）
+
+### 计划与实现
+
+- 先写 `iterations/round-38/plan.md`，子任务为：Vitest 依赖/配置/脚本与类型检查范围、纯引擎模块与数据校验器正反向单元测试、验证与文档。
+- `npm install -D vitest` 解析为 **Vitest 5.0.2**；重新核对官方指南要求 Vite >=6.4、Node >=22.12，registry peer/engine 范围覆盖仓库 Vite 8.3.1、Node 22.18、`@types/node` 26.6.3。ADR-0005 从 Round 00 计划的 4.x 修订为 5.0.2，框架仍是 Vitest；`docs/REFERENCES.md` 登记官方指南和精确 registry 版本/许可。`package.json` 新增 `"test": "vitest run"`。
+- 新增独立 `vitest.config.ts`（Node 环境、`include: tests/**/*.test.ts`）。关键取舍：仓库 `vite.config.ts` 是异步工厂，会动态加载 `scripts/data-hmr-plugin.mjs` 并注册 `mods/` dev 中间件；Vitest 在 `vitest.config.ts` 与 `vite.config.ts` 并存时只读前者、完全不加载应用配置，测试进程零 dev-server 副作用。
+- `tsconfig.json` include 由 `["src", "vite.config.ts"]` 扩为 `["src", "tests", "vite.config.ts", "vitest.config.ts"]`，测试与测试配置接受同等严格检查（`noUncheckedIndexedAccess` 等全部生效）。
+- 校验器抽取：`scripts/validate-data.mjs` 原先在模块顶层 `await` + `assert` 直接执行，不可安全导入。新增 `scripts/lib/data-validation.mjs` 导出 `validateBaseData(root)`（Ajv allErrors、按 schema id 复用编译结果；成功 `{ ok: true, validated }`，失败 `{ ok: false, problems }`；文件读写、JSON 解析、Schema 编译错误均折叠为 problem，全程不打印不抛错；有效 JSON `null` 仍照常送入 Schema 校验）。`validate-data.mjs` 变薄 CLI：成功行与历史逐字节一致（`通过：manifest Schema 与 26 个基础资源 Schema。`），失败逐条 problem 到 stderr 并 `process.exitCode = 1`（保留非零退出语义）。新增 `scripts/lib/data-validation.d.mts` 类型声明，TS 测试直接导入同一实现。
+- 新增四组测试（只调公共 API、断言行为，无 Phaser/DOM/网络/真实时钟）：
+  - `tests/event-bus.test.ts`：订阅/退订/`off` 身份与幂等、`once` 一次投递与 `off` 取消、once 重入（handler 内重发自身事件：自身不再触发、新订阅者收到重入投递）、emit 快照迭代（投递中新增订阅不收当次）、`clear` 通道/全部与 `listenerCount`。
+  - `tests/dialogue.test.ts`：`parseDialogueSet` 合法/坏信封整份拒绝/单段坏对话隔离/未知条件 kind 拒绝；`validateConversation` 重复节点、缺起始节点、悬空目标；`isConditionMet`（questStatus 精确匹配、itemCount 无背包防御与数量边界、道德区间端点含入、timeOfDay、npcKnows 默认说话人且可被教授、knowledgeKnown）；`getVisibleOptions`（无条件恒可见、多条件全满足、index 指原始数组、全滤空=结束节点）；`DialogueSession` 走到终点/reset/越界与悬空 choose 忽略。运行时上下文 fixture 以真实 `createQuestJournal`/`createSocialState`/`createFactionMembershipState` 构造。
+  - `tests/quest-system.test.ts`：`parseQuestSet` 合法/缺字段（分项+汇总两条错误）/坏信封；`assembleQuests` 全通过、坏发布人剔除并点名、前置循环双禁用、互斥组同前置保留/单成员整组禁用、null 装配空结果；生命周期（无前置 offered/有前置 locked、接受激活并追踪、unknown/not-offered 拒绝与重复接取拒绝、npc-talk 完成结算奖励并解锁后续、后续信号不再影响已完成任务、item-count 绝对数量同步并按 requiredCount 钳制（1→进行中、5→一步完成）、接取时背包快照 7 株即时完成、encounter-defeat 命中 failOn 失败并清追踪、abandon 终态与 not-active/unknown 拒绝、互斥分支接取连带失败兄弟）。
+  - `tests/data-validation.test.ts`：真实仓库全量正向（`validated` === manifest resources 计数）；五例反向 fixture（资源违反 Schema、manifest `resources: []` 违反 minItems、资源文件缺失、Ajv 无法编译的 Schema、JSON `null` 数据必须被 Schema 拒绝）；另将 CLI 与共享模块复制到临时 root，启动真实 Node 子进程确认失败输出可读且退出码为 1。fixture 用 `mkdtemp`，`afterEach` 递归清理，tracked `data/` 零改动。
+- 新增 `docs/TESTING.md`（命令、独立配置原因、覆盖矩阵、CLI/测试同源说明、编写约定、与其他验证手段的关系）。
+- 新增 `.vitest/` 到 `.gitignore`，避免测试工具后续生成的本地缓存进入版本控制。
+
+### 验证
+
+- `npm test`：**4 文件 / 53 用例全部通过**（event-bus 10、dialogue 18、quest-system 18、data-validation 7）。
+- 首跑暴露并修复三处测试自身问题（非引擎缺陷）：
+  1. quest 测试对 `assembleQuests` 解构结果误写 `quests.quests`（`quests` 已是 Map）导致 11 个用例 TypeError——统一改引用；
+  2. 缺失文件 fixture 未携带 quest-set Schema，校验器先报 Schema ENOENT 而非目标资源缺失——fixture 补 Schema 以到达目标失败路径（顺带确认了"先 schema 后资源"的读取顺序是实际行为）；
+  3. `parseQuestSet` 缺字段实际产出"分项+汇总"两条错误，断言由 `toHaveLength(1)` 改为拼接检查关键字。
+- `npm run typecheck`：首跑报 1 处测试类型错误（`validDocument` 字面量缺少上下文类型致条件判别联合不匹配），补显式 `DialogueSetData` 注解后通过（无输出）。
+- `npm run validate:data`：通过，成功行与重构前逐字节一致。
+- `npm run smoke:round-37`：通过（exit 0，内容包导出/预检/安装回归，真实 `mods/` 与 manifest 字节不变）。
+- `npm run build`：通过，TypeScript 检查及 Vite 生产构建成功（130 modules）；JS bundle 1,881.37 kB / gzip 495.56 kB，Vite 保留既有超过默认 500 kB 的非阻断分包建议。
+- `git diff --check`：通过（exit 0；仅 Git 对 package.json/package-lock.json/scripts/validate-data.mjs/tsconfig.json 的 LF→CRLF 换行提示，无空白错误）。
+- 独立复核时发现并补齐两个缺口：Ajv 对结构无效但 JSON 合法的 Schema 会抛异常，现转为可读 problem；合法 JSON `null` 曾与文件读取失败哨兵混淆，现使用独立 `Symbol` 哨兵并测试。另新增真实 CLI 临时副本子进程测试，明确锁定错误输出与 exit code 1。
+
+### 未实现/限制
+
+- 测试基线聚焦纯引擎规则与数据校验；Phaser 场景/UI 层仍由各轮专项烟测脚本覆盖，未引入 jsdom/浏览器环境。
+- 尚未接入 CI（Round 39 规划构建期校验与质量门槛时一并考虑）。
+
+---
+
 ## Round 37 — 单文件 v1 内容包：导出、只读预检与显式安装（2026-09-28，已完成）
 
 ### 计划与实现

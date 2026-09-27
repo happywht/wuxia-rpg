@@ -70,15 +70,15 @@
 
 **后果**：运行时必须处理"数据缺失/非法"的降级路径（空世界或可读错误，见 `docs/ARCHITECTURE.md`）；数据结构演进需要 schema 版本意识。
 
-## ADR-0005：测试框架规划采用 Vitest 4.x（暂不安装）
+## ADR-0005：自动化测试框架采用 Vitest
 
-**状态**：已接受（Round 00；安装与首批测试延后至测试体系轮次，见 ROADMAP）
+**状态**：已接受并实施（Round 38 修订版本决策）
 
-**背景**：brief 要求规划 Vitest 4.x。核验（2026-09-26）：npm `vitest@latest` 已是 5.0.2；4.x 线最新为 **4.1.11**。
+**背景**：项目 brief 建议 Vitest。Round 00 曾冻结 Vitest 4.x：当时（2026-09-26）registry 中 `vitest@latest` 为 5.0.2、4.x 最新为 4.1.11，因此计划使用 4.1.11；实际接入延后到 Round 38。实施时重新核验官方指南和 npm registry：Vitest 5 要求 Vite >=6.4.0、Node >=22.12.0，精确版本 5.0.2 的 peer 范围包含 Vite 8 与 Node 类型 >=24，本仓库 Vite 8.3.1、Node 22.18.0、`@types/node` 26.6.3 均满足。
 
-**决策**：冻结 Vitest 主版本 4，届时安装 `^4.1.11`。本轮不安装任何测试依赖、不编写测试文件，也不预制任何测试结果——测试随实现轮次产生。
+**决策**：测试框架维持 Vitest，不更换技术栈。Round 38 接入时采用 registry 当前版本 `vitest@5.0.2`（`^5.0.2`），因为官方兼容范围覆盖本仓库的 Vite/Node 组合；原 Round 00 冻结的 4.x 是实施前的版本计划，由本次兼容性核验结果修订。准确来源及许可记录在 `docs/REFERENCES.md`。
 
-**后果**：Round 02 已加入运行时 Ajv 与 Vite 配置使用的 `@types/node`；自动化测试仍待 Round 38 加入 `vitest`（其 Node 引擎要求 `^22.12.0 || ^24.0.0 || >=26.0.0`，本机 Node 22.18.0 满足）。
+**后果**：Round 38 已加入 `vitest` 与自动化测试基线；独立 `vitest.config.ts` 隔离异步 Vite 应用配置。`npm test` 单次运行测试，`npm run typecheck` 同时检查测试代码。
 
 ## ADR-0006：引擎事件采用本地 typed EventBus
 
@@ -96,14 +96,14 @@
 
 ## 版本冻结总表
 
-| 依赖 | 锁定 | 核验版本（2026-09-26，npm registry / 官方站） | 进入 `package.json` 的时机 |
+| 依赖 | 锁定 | 核验版本（npm registry / 官方站） | 进入 `package.json` 的时机 |
 |---|---|---|---|
 | phaser | `^4.2.1`（主版本 4） | 4.2.1（官方 v4 归档 2026-07-09 发布） | Round 00（已写入） |
 | typescript | `^5.9.3`（5.x 线） | 5.9.3（latest 为 7.0.2，见 ADR-0002） | Round 00（已写入） |
 | vite | `^8.3.1`（主版本 8） | 8.3.1 | Round 00（已写入） |
 | ajv | `^8.20.0`（主版本 8） | 8.20.0 | Round 02（已接入数据加载/校验） |
 | @types/node | `^26.6.3`（仅开发期类型） | 26.6.3 | Round 02（Vite MOD 分发插件） |
-| vitest | `^4.1.11`（主版本 4） | 4.1.11（latest 为 5.0.2，见 ADR-0005） | 测试体系轮（ROADMAP Round 38） |
+| vitest | `^5.0.2`（主版本 5） | 5.0.2 | Round 38（Vitest 自动化测试基线） |
 
 ## ADR 索引与变更
 
@@ -111,3 +111,4 @@
 |---|---|
 | 2026-09-26 | Round 00 建立 ADR-0001 ~ 0005 与版本冻结总表 |
 | 2026-09-27 | Round 02 接入 Ajv，并记录 typed EventBus 与本地 MOD 静态分发决策 |
+| 2026-09-28 | Round 38 实施 Vitest 测试基线；依 ADR-0005 核验结果将 Vitest 版本从计划的 4.x 修订为 5.0.2 |

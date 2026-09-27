@@ -1,0 +1,66 @@
+# 测试说明（TESTING）
+
+Round 38 起本项目拥有可重复运行的 Vitest 自动化测试基线。本文说明测试命令、配置取舍、覆盖范围与编写约定。
+
+## 快速开始
+
+```bash
+npm test            # vitest run，单次运行全部测试（CI 语义）
+npm run typecheck   # tsc --noEmit，严格模式，包含 tests/ 与 vitest.config.ts
+npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现，见下文）
+```
+
+- 测试框架：Vitest 5.0.2。官方指南要求 Vite >=6.4.0、Node >=22.12.0；本仓库使用 Vite 8.3.1 与 Node 22.18.0，符合要求（详见 [`docs/REFERENCES.md`](REFERENCES.md) #12）。
+- 运行环境：Node（无 DOM、无浏览器、无网络、无真实时钟依赖）。
+- 覆盖统计：4 个测试文件、53 个用例（详见 `CHANGELOG.md` Round 38 条目）。
+
+## 配置：为什么有独立的 `vitest.config.ts`
+
+仓库的 `vite.config.ts` 是一个**异步工厂**：它会动态加载开发态资料热重载插件（`scripts/data-hmr-plugin.mjs`）并注册 `mods/` 开发服务器中间件。这些是 dev-server 副作用，测试运行器绝不能启动。
+
+因此测试使用独立的 `vitest.config.ts`：当两个配置文件同时存在时，Vitest 只读取 `vitest.config.ts`、完全不加载应用配置。测试配置只声明两件事：
+
+- `environment: 'node'` — 引擎单元是纯 TypeScript，无 Phaser 场景依赖；
+- `include: ['tests/**/*.test.ts']` — 测试统一放在 `tests/` 目录。
+
+## 测试覆盖范围
+
+| 文件 | 覆盖对象 | 要点 |
+| --- | --- | --- |
+| `tests/event-bus.test.ts` | `src/engine/event-bus.ts` | `on`/`off`/unsubscribe 身份语义与幂等；`once` 恰好投递一次；**once 重入**（监听器内部重发同一事件时自身不再触发，重入投递仍达新订阅者）；`emit` 快照迭代（投递期间新订阅的监听器不收当次事件）；`clear`/`listenerCount` |
+| `tests/dialogue.test.ts` | `src/engine/dialogue-graph.ts`、`dialogue-runtime.ts` | `parseDialogueSet` 正反向（信封破损整份拒绝、单段坏对话仅隔离自身）；`validateConversation` 图语义（重复节点 id、缺失起始节点、悬空选项目标）；运行时条件可见性 `isConditionMet`/`getVisibleOptions`（questStatus/itemCount/道德边界含端点/timeOfDay/npcKnows/knowledgeKnown；多条件全满足才可见、空结果即结束节点、索引指向原始数组）；`DialogueSession` 播放与敌意输入忽略 |
+| `tests/quest-system.test.ts` | `src/engine/quest-system.ts` | `parseQuestSet` 防御解析；`assembleQuests` 跨资源装配（坏发布人剔除、前置循环禁用、互斥组整组校验）；`createQuestJournal` 初始 offered/locked；接受/推进/完成/失败全生命周期（npc-talk 推进、item-count 绝对数量同步并钳制、接取时背包快照即时完成、encounter-defeat 失败、abandon 终态、互斥分支连带失败、奖励结算、前置完成后解锁） |
+| `tests/data-validation.test.ts` | `scripts/lib/data-validation.mjs`、`scripts/validate-data.mjs` | **真实仓库**正向校验（manifest + 全部基础资源计数一致）；临时 fixture 反向校验（资源违反 Schema、manifest 违反 Schema、资源文件缺失、无效 Schema、JSON `null`）；另以临时 CLI 副本启动真实 Node 子进程，锁定可读错误输出与非零退出码 |
+
+测试只调用**公共导出函数**并断言行为，不做源码文本匹配；引擎模块均为 Phaser-free 设计，无需启动任何场景。
+
+## 数据校验：CLI 与测试共享同一条代码路径
+
+Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（顶层 `await` + `assert`），无法被安全导入。现在：
+
+- **`scripts/lib/data-validation.mjs`** — 唯一的校验实现：`validateBaseData(root)` 返回结构化结果 `{ ok: true, validated }` 或 `{ ok: false, problems }`，不打印、不抛错、不触碰进程状态；文件缺失、JSON 损坏、Schema 编译失败都被折叠为 `problems` 条目；合法 JSON `null` 会被送入 Schema 校验而不是误认作读取失败。
+- **`scripts/validate-data.mjs`** — 薄 CLI 入口：成功时输出与历史逐字节一致的成功行；失败时把每条 problem 打到 stderr 并置非零退出码（与旧的 assert 抛错同样以非零退出）。
+- **`scripts/lib/data-validation.d.mts`** — 类型声明，让严格 TypeScript 测试直接导入该模块而不重复实现规则。
+
+因此 `npm run validate:data` 的结果与 `tests/data-validation.test.ts` 的正向用例**永远同源**：任何 Schema 或校验行为的变更都会同时体现在 CLI 与测试中。
+
+## 编写约定
+
+1. **断言行为而非实现**：只经公共 API 触发与验证；不断言源码文本、模块私有结构。
+2. **失败案例用临时 fixture**：反向数据校验在 `mkdtemp` 临时目录构造（Schema 从仓库复制、数据手写破坏），`afterEach` 清理，绝不修改 `data/` 下受版本控制的资料。
+3. **确定性优先**：不依赖真实时间、随机数、网络或跨用例共享可变状态；每个用例自建 fixture（如任务、对话、运行时上下文）。
+4. **类型即测试**：`tests/` 与 `vitest.config.ts` 均在 `tsconfig.json` 的 `include` 内，`npm run typecheck` 对测试代码执行同等严格检查（`noUncheckedIndexedAccess` 等全部生效）。
+5. **保持隔离**：不引入 DOM/浏览器环境需求；需要 Phaser 场景的 UI 层验证仍走各轮专项烟测脚本（`npm run smoke:round-*`）。
+
+## 与既有验证手段的关系
+
+| 手段 | 定位 |
+| --- | --- |
+| `npm test`（Vitest） | 引擎规则与数据校验的快速单元回归，毫秒级、可重复 |
+| `npm run validate:data` | 内容作者的提交前资料检查（与测试共享实现） |
+| `npm run smoke:round-*` | 各轮专项端到端烟测（含真实 Vite 服务器、CLI 全链路） |
+| `npm run typecheck` / `npm run build` | 类型与生产构建门槛 |
+
+## 变更记录
+
+- 2026-09-28（Round 38）：建立 Vitest 5 测试基线；抽取共享数据校验器 `scripts/lib/data-validation.mjs`（CLI 变薄）；新增四组 53 个单元测试；`tsconfig.json` 纳入 `tests/` 与 `vitest.config.ts` 严格检查。

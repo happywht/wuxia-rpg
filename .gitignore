@@ -21,6 +21,7 @@ Thumbs.db
 
 # Vite cache
 .vite/
+.vitest/
 
 # Local workspace automation templates (not game/project source)
 .spec-workflow/
