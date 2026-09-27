@@ -4,6 +4,17 @@
 
 ## [Unreleased]
 
+### Added (Round 46)
+
+- **真实资料纵向切片**：新增 `tests/round46-vertical-slice.test.ts`，由基础角色、地图、对白、任务、遭遇、物品、武学、图谱和结局资料驱动；覆盖开局走格/阻挡、NPC 对话接任务、巷战成长与奖励、拜师学艺、存档往返恢复及 R42 两条互斥路线各自的结局判定。
+- **专项回归入口**：新增 `npm run smoke:round-46`。该测试直接驱动 Phaser-free 引擎 API，不等同于浏览器内完整游玩。
+
+### Verification (Round 46)
+
+- `npm run smoke:round-46`：1 个文件、2 项通过。
+- `npm run check` / `npm run build`：资料 Schema 26/26、启用 MOD 问题 0、严格类型检查、13 个测试文件/129 项、Round 34 文档审计和 Vite 生产构建均通过（132 模块）；主 JS 1,895.16 kB / gzip 499.54 kB，chunk 体积提示为非阻断警告。
+- `smoke:round-42`（3 项）、`smoke:round-43`（11 项）、`smoke:round-44`（30 项）、`smoke:round-20`、`smoke:round-27`、`smoke:round-30`、`smoke:round-31`、`smoke:round-33` 均通过。未做浏览器手动游玩。
+
 ### Changed (Round 45)
 
 - **擂台经济与战绩**：银两/物品彩头仅在首次完整夺魁时发放；逐场胜利仍给数据配置的战斗经验，重赛仍计胜场、夺魁次数，并允许满包/满钱袋玩家仅为战绩再战。首次彩头结算后立即刷新擂台成就，旧 v1 存档通过已有 `championships` 字段兼容，无存档迁移。
