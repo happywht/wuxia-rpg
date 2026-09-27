@@ -64,13 +64,17 @@ describe('world map roaming events', () => {
       ['map.round-01-grid', mapStub('map.round-01-grid')],
       ['map.round-10-mist-ferry', mapStub('map.round-10-mist-ferry')],
     ]), {
-      knowledgeNodeIds: new Set(['event.old-footprints', 'event.r43-wayfarer-letter', 'place.reedbank']),
+      knowledgeNodeIds: new Set(['event.old-footprints', 'event.r43-wayfarer-letter', 'place.reedbank', 'event.r44-dock-claim']),
       periodIds: new Set(['period.dusk', 'period.night']),
       weatherIds: new Set(['weather.drizzle', 'weather.rain', 'weather.storm']),
+      npcIds: new Set(['char.shi-bei', 'char.bai-luzhou']),
     });
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
-    expect(assembled.randomEvents.map((event) => event.id)).toEqual(['event.r43-wayfarer-letter']);
+    expect(assembled.randomEvents.map((event) => event.id)).toEqual([
+      'event.r43-wayfarer-letter',
+      'event.r44-dock-claim',
+    ]);
     expect(assembled.warnings).toHaveLength(1);
     expect(assembled.warnings[0]).toContain('event.deleted-by-mod');
   });
@@ -122,5 +126,63 @@ describe('world map roaming events', () => {
     })).toBeNull();
     const repeatable = { ...event, once: false };
     expect(selectTriggeredRandomRegionEvent([repeatable], event.mapResourceId, new Set([event.id]), context, roll(0, 0))).toEqual(repeatable);
+  });
+
+  it('requires every authored nearby NPC id to be in the four-way interaction context', () => {
+    const [source] = parseBaseWorld().randomEvents;
+    expect(source).toBeDefined();
+    const event = {
+      ...source!,
+      conditions: {
+        ...source!.conditions,
+        nearbyNpcIds: ['char.shi-bei', 'char.bai-luzhou'],
+      },
+    };
+    const bothPresent = { ...context, nearbyNpcIds: new Set(['char.shi-bei', 'char.bai-luzhou']) };
+    expect(selectTriggeredRandomRegionEvent([event], event.mapResourceId, new Set(), bothPresent, () => 0)).toEqual(event);
+    expect(selectTriggeredRandomRegionEvent([event], event.mapResourceId, new Set(), {
+      ...bothPresent,
+      nearbyNpcIds: new Set(['char.shi-bei']),
+    }, () => { throw new Error('missing required NPC should not roll'); })).toBeNull();
+    expect(selectTriggeredRandomRegionEvent([event], event.mapResourceId, new Set(), context, () => {
+      throw new Error('missing nearby NPC context should count as nobody present');
+    })).toBeNull();
+  });
+
+  it('isolates only an event whose nearby NPC reference is invalid', () => {
+    const raw = readWorld();
+    const events = raw.randomEvents as Array<Record<string, unknown>>;
+    events.push({
+      ...events[0],
+      id: 'event.r44-broken-nearby-npc-example',
+      conditions: {
+        knowledgeNodeIds: ['event.r43-wayfarer-letter'],
+        nearbyNpcIds: ['char.deleted-by-mod'],
+      },
+    });
+    const parsed = parseWorldMap(raw);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    const mapStub = (id: string): GridMap => ({
+      data: { id, name: id, columns: 16, rows: 9, playerStart: { col: 7, row: 7 } },
+      playerStart: { col: 7, row: 7 },
+      canEnter: () => true,
+    }) as unknown as GridMap;
+    const assembled = assembleWorldMap(parsed.data, new Map([
+      ['map.round-01-grid', mapStub('map.round-01-grid')],
+      ['map.round-10-mist-ferry', mapStub('map.round-10-mist-ferry')],
+    ]), {
+      knowledgeNodeIds: new Set(['event.old-footprints', 'event.r43-wayfarer-letter', 'place.reedbank', 'event.r44-dock-claim']),
+      periodIds: new Set(['period.dusk', 'period.night']),
+      weatherIds: new Set(['weather.drizzle', 'weather.rain', 'weather.storm']),
+      npcIds: new Set(['char.shi-bei', 'char.bai-luzhou']),
+    });
+    expect('ok' in assembled).toBe(false);
+    if ('ok' in assembled) return;
+    expect(assembled.randomEvents.map((event) => event.id)).toEqual([
+      'event.r43-wayfarer-letter',
+      'event.r44-dock-claim',
+    ]);
+    expect(assembled.warnings.join('\n')).toContain('char.deleted-by-mod');
   });
 });

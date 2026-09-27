@@ -49,6 +49,7 @@ import {
   type ClimateWeatherData,
 } from '../engine/climate-system';
 import { type SocialState, applySocialChange, createSocialState } from '../engine/social-state';
+import { applyQuestRewardConsequences } from '../engine/quest-consequences';
 import {
   NpcOccupancyIndex,
   type PlacedNpc,
@@ -2506,6 +2507,9 @@ export class GridScene extends Phaser.Scene {
       quests: this.quests,
       journal: this.questJournal,
       itemCounts: this.questItemCounts(),
+      factionNames: new Map([...this.progression.factions].map(([id, faction]) => [id, faction.name])),
+      knowledgeNodeTitles: new Map([...(this.world?.knowledgeGraph.nodes ?? new Map())]
+        .map(([id, node]) => [id, node.title])),
       access: {
         factionId: this.factionState.membership?.factionId ?? null,
         knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
@@ -2706,10 +2710,25 @@ export class GridScene extends Phaser.Scene {
         const paidExperience = reward.experience - experience.discardedExperience;
         this.inventory.currency += reward.currency;
         const cultivationText = cultivation > 0 ? ` · 修为 +${cultivation}` : '';
+        const consequences = applyQuestRewardConsequences(
+          reward,
+          this.social,
+          this.knownKnowledgeNodeIds,
+        );
+        const factionText = consequences.factionRenown.map((standing) => {
+          const name = this.progression.factions.get(standing.factionId)?.name ?? standing.factionId;
+          return `${name}声望 ${standing.delta > 0 ? '+' : ''}${standing.delta}`;
+        });
+        const knowledgeText = consequences.discoveredKnowledgeNodeIds.flatMap((nodeId) => {
+          const node = this.world?.knowledgeGraph.nodes.get(nodeId);
+          return node === undefined ? [] : [`新见闻「${node.title}」`];
+        });
+        const consequenceText = [...factionText, ...knowledgeText].join(' · ');
+        const rewardText = consequenceText.length > 0 ? ` · ${consequenceText}` : '';
         this.questNotice = quest === undefined
-          ? `差事完成：经验 +${paidExperience} · 银两 +${reward.currency}${cultivationText}`
-          : `完成「${quest.name}」：经验 +${paidExperience} · 银两 +${reward.currency}${cultivationText}`;
-        console.info('[quest] 任务 "%s" 完成：经验 +%d，银两 +%d', reward.questId, paidExperience, reward.currency);
+          ? `差事完成：经验 +${paidExperience} · 银两 +${reward.currency}${cultivationText}${rewardText}`
+          : `完成「${quest.name}」：经验 +${paidExperience} · 银两 +${reward.currency}${cultivationText}${rewardText}`;
+        console.info('[quest] 任务 "%s" 完成：经验 +%d，银两 +%d%s', reward.questId, paidExperience, reward.currency, rewardText);
       }
     }
     if (update.failedQuestIds.length > 0) {
@@ -2993,6 +3012,9 @@ export class GridScene extends Phaser.Scene {
           giverNpcId: target.record.id,
           giverName: target.record.name,
           itemCounts: this.questItemCounts(),
+          factionNames: new Map([...this.progression.factions].map(([id, faction]) => [id, faction.name])),
+          knowledgeNodeTitles: new Map([...(this.world?.knowledgeGraph.nodes ?? new Map())]
+            .map(([id, node]) => [id, node.title])),
           access: {
             factionId: this.factionState.membership?.factionId ?? null,
             knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
@@ -3426,26 +3448,29 @@ export class GridScene extends Phaser.Scene {
       if (prefix.length > 0) this.showRegionNotice(prefix);
       return;
     }
+    const nearbyNpcIds = new Set(this.placedNpcs
+      .filter((npc) =>
+        Math.abs(npc.col - this.playerCol) + Math.abs(npc.row - this.playerRow) === 1,
+      )
+      .map((npc) => npc.record.id));
+    const eventContext = {
+      knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
+      periodId: this.clock?.currentPeriod().id ?? null,
+      weatherId: this.currentClimate()?.weather.id ?? null,
+      nearbyNpcIds,
+    };
     const events = selectTriggeredRegionEvents(
       world.worldMap.events,
       { mapResourceId: this.currentMapResourceId, col: this.playerCol, row: this.playerRow },
       this.completedRegionalEvents,
-      {
-        knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
-        periodId: this.clock?.currentPeriod().id ?? null,
-        weatherId: this.currentClimate()?.weather.id ?? null,
-      },
+      eventContext,
     );
     const randomEvent = afterPlayerStep
       ? selectTriggeredRandomRegionEvent(
           world.worldMap.randomEvents,
           this.currentMapResourceId,
           this.completedRegionalEvents,
-          {
-            knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
-            periodId: this.clock?.currentPeriod().id ?? null,
-            weatherId: this.currentClimate()?.weather.id ?? null,
-          },
+          eventContext,
         )
       : null;
     const allEvents = randomEvent === null ? events : [...events, randomEvent];

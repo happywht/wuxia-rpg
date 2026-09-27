@@ -248,6 +248,15 @@
     {"id":"kg.edge.r43-gu-participates-tiezhang","fromId":"char.gu-yechen","toId":"quest.r43-tiezhang-stone-post","relation":"participatesIn","summary":"顾夜尘检查旧系缆桩底脚，找出涨潮空响的来由。"},
     {"id":"kg.edge.r43-rong-participates-yunyin","fromId":"char.rong-su-qing","toId":"quest.r43-yunyin-herb-road","relation":"participatesIn","summary":"容素青辨认封蜡残留的药香，确认是受潮陈艾。"},
     {"id":"kg.edge.r43-shen-participates-hanshan","fromId":"char.shen-mohan","toId":"quest.r43-hanshan-copybook","relation":"participatesIn","summary":"沈墨涵对照书铺旧抄的纸龄与墨色，确认缺页早于争执。"},
-    {"id":"kg.edge.r43-bai-participates-panzhou","fromId":"char.bai-luzhou","toId":"quest.r43-panzhou-return-tide","relation":"participatesIn","summary":"白鹭洲核对三道缆痕与渡船旧簿，确认来自运盐船。"}
+    {"id":"kg.edge.r43-bai-participates-panzhou","fromId":"char.bai-luzhou","toId":"quest.r43-panzhou-return-tide","relation":"participatesIn","summary":"白鹭洲核对三道缆痕与渡船旧簿，确认来自运盐船。"},
+    {"id":"kg.edge.r44-letter-triggers-dispute","fromId":"event.r43-wayfarer-letter","toId":"event.r44-dock-claim","relation":"triggers","summary":"风雨传函将玩家引到雾雨渡口，随后可能遇见旧系缆桩争执。"},
+    {"id":"kg.edge.r44-post-requires-dispute","fromId":"quest.r44-post-first","toId":"event.r44-dock-claim","relation":"requires","summary":"先固旧桩须先亲历石北与白鹭洲的争执。"},
+    {"id":"kg.edge.r44-ledger-requires-dispute","fromId":"quest.r44-ledger-first","toId":"event.r44-dock-claim","relation":"requires","summary":"先核渡簿须先亲历石北与白鹭洲的争执。"},
+    {"id":"kg.edge.r44-bai-participates-post","fromId":"char.bai-luzhou","toId":"quest.r44-post-first","relation":"participatesIn","summary":"白鹭洲提供互斥的处置选择，玩家可先采纳加固方案。"},
+    {"id":"kg.edge.r44-bai-participates-ledger","fromId":"char.bai-luzhou","toId":"quest.r44-ledger-first","relation":"participatesIn","summary":"白鹭洲提供互斥的处置选择，玩家可先采纳核簿方案。"},
+    {"id":"kg.edge.r44-shi-participates-post","fromId":"char.shi-bei","toId":"quest.r44-post-first","relation":"participatesIn","summary":"石北确认旧系缆桩的加固办法。"},
+    {"id":"kg.edge.r44-liu-participates-ledger","fromId":"char.liu-tinglan","toId":"quest.r44-ledger-first","relation":"participatesIn","summary":"柳听澜以书院抄本复核渡簿上的潮时。"},
+    {"id":"kg.edge.r44-post-triggers-outcome","fromId":"quest.r44-post-first","toId":"event.r44-pier-reinforced","relation":"triggers","summary":"铁嶂派按潮痕补入铁楔并记录固桩结果。"},
+    {"id":"kg.edge.r44-ledger-triggers-outcome","fromId":"quest.r44-ledger-first","toId":"event.r44-ledger-verified","relation":"triggers","summary":"寒山书院用抄本核验潮时并记录渡簿结果。"}
   ]
 }

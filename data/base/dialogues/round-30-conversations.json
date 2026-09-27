@@ -114,6 +114,11 @@
               "nextNodeId": "r42-public-result",
               "conditions": [{ "kind": "questStatus", "questId": "quest.r42-open-register", "status": "completed" }],
               "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.r42-public-record-vow" }]
+            },
+            {
+              "text": "白鹭洲说旧桩已固，我来核对当夜潮时。",
+              "nextNodeId": "r44-ledger-verified",
+              "conditions": [{ "kind": "questStatus", "questId": "quest.r44-ledger-first", "status": "completed" }]
             }
           ]
         },
@@ -183,6 +188,10 @@
         {
           "id": "r43-accepted-hanshan-copybook",
           "text": "柳听澜在信封背面记下一行：「只核纸墨，不补人名。副页要能复查，空处也有空处的用处。」"
+        },
+        {
+          "id": "r44-ledger-verified",
+          "text": "柳听澜将渡簿和书院副页并排压平：「潮时对得上，旧桩松动也就有了时辰。先把记录誊清，明日再按潮痕补桩，便不会把先后颠倒。」"
         }
       ]
     },
@@ -414,6 +423,24 @@
               "nextNodeId": "r42-protect-vow",
               "conditions": [{ "kind": "questStatus", "questId": "quest.r42-protect-witness", "status": "offered" }],
               "effects": [{ "kind": "acceptQuest", "questId": "quest.r42-protect-witness" }]
+            },
+            {
+              "text": "这桩争议，我想先照石北的法子补牢。",
+              "nextNodeId": "r44-post-first-accepted",
+              "conditions": [
+                { "kind": "knowledgeKnown", "nodeId": "event.r44-dock-claim" },
+                { "kind": "questStatus", "questId": "quest.r44-post-first", "status": "offered" }
+              ],
+              "effects": [{ "kind": "acceptQuest", "questId": "quest.r44-post-first" }]
+            },
+            {
+              "text": "这桩争议，我想先依渡簿核清潮时。",
+              "nextNodeId": "r44-ledger-first-accepted",
+              "conditions": [
+                { "kind": "knowledgeKnown", "nodeId": "event.r44-dock-claim" },
+                { "kind": "questStatus", "questId": "quest.r44-ledger-first", "status": "offered" }
+              ],
+              "effects": [{ "kind": "acceptQuest", "questId": "quest.r44-ledger-first" }]
             }
           ]
         },
@@ -489,6 +516,14 @@
         {
           "id": "r43-resolved-panzhou-return-tide",
           "text": "白鹭洲翻过两册旧账：「是三艘运盐船先后靠岸磨出的痕，不是夜航私船。记下船次就够了，暂且不用封渡盘查。」"
+        },
+        {
+          "id": "r44-post-first-accepted",
+          "text": "白鹭洲将你所选的一路记进渡籍边注：「先固桩，先保船索不断。你去与石北定好铁楔落点，我随后补上对应潮时，免得明日只剩半本账。」"
+        },
+        {
+          "id": "r44-ledger-first-accepted",
+          "text": "白鹭洲按住渡簿一角：「先核账，先把船次和潮时摆清。你去请柳听澜对副页，若记录相合，我再约石北按潮痕修桩。」"
         }
       ]
     }

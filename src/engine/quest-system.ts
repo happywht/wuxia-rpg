@@ -19,6 +19,15 @@ export interface QuestObjectiveData {
 export interface QuestRewardsData {
   experience: number;
   currency: number;
+  /** Optional one-time standing changes paid only when the task completes. */
+  factionRenown?: QuestFactionRenownReward[];
+  /** Optional knowledge discoveries paid with the same completion transition. */
+  discoverKnowledgeNodeIds?: string[];
+}
+
+export interface QuestFactionRenownReward {
+  factionId: string;
+  delta: number;
 }
 
 export interface QuestData {
@@ -98,6 +107,8 @@ export interface QuestRewardGrant {
   questId: string;
   experience: number;
   currency: number;
+  factionRenown?: readonly QuestFactionRenownReward[];
+  discoverKnowledgeNodeIds?: readonly string[];
 }
 
 export interface QuestUpdateResult {
@@ -150,6 +161,39 @@ function parseIdList(value: unknown, label: string, errors: string[]): string[] 
     result.push(id);
   }
   return result;
+}
+
+function parseFactionRenownRewards(
+  value: unknown,
+  label: string,
+  errors: string[],
+): QuestFactionRenownReward[] | null {
+  if (value === undefined) return [];
+  if (!Array.isArray(value)) {
+    errors.push(`${label}：应为门派声望奖励数组`);
+    return null;
+  }
+  const seen = new Set<string>();
+  const rewards: QuestFactionRenownReward[] = [];
+  value.forEach((entry, index) => {
+    const itemLabel = `${label}[${index}]`;
+    if (!isPlainObject(entry)) {
+      errors.push(`${itemLabel}：应为对象`);
+      return;
+    }
+    const factionId = string(entry.factionId);
+    const delta = entry.delta;
+    const validDelta = typeof delta === 'number' && Number.isSafeInteger(delta) &&
+      delta !== 0 && delta >= -1000 && delta <= 1000;
+    if (factionId === null) errors.push(`${itemLabel}.factionId：应为非空字符串`);
+    else if (seen.has(factionId)) errors.push(`${itemLabel}.factionId：同一任务不可重复奖励此门派`);
+    if (!validDelta) errors.push(`${itemLabel}.delta：应为 -1000…1000 之间的非零安全整数`);
+    if (factionId !== null && validDelta && !seen.has(factionId)) {
+      seen.add(factionId);
+      rewards.push({ factionId, delta: delta as number });
+    }
+  });
+  return rewards;
 }
 
 const OBJECTIVE_KINDS: readonly QuestObjectiveKind[] = ['collectItem', 'defeatEncounter', 'talkToNpc'];
@@ -230,6 +274,12 @@ export function parseQuestSet(raw: unknown): QuestSetParseResult {
     const rawRewards = isPlainObject(entry.rewards) ? entry.rewards : null;
     const experience = rawRewards === null ? null : safeNonNegativeInteger(rawRewards.experience);
     const currency = rawRewards === null ? null : safeNonNegativeInteger(rawRewards.currency);
+    const factionRenownRewards = rawRewards === null
+      ? null
+      : parseFactionRenownRewards(rawRewards.factionRenown, `${label}.rewards.factionRenown`, errors);
+    const discoverKnowledgeNodeIds = rawRewards === null || rawRewards.discoverKnowledgeNodeIds === undefined
+      ? []
+      : parseIdList(rawRewards.discoverKnowledgeNodeIds, `${label}.rewards.discoverKnowledgeNodeIds`, errors);
     const problems: string[] = [];
     if (id === null) problems.push('id 应为非空字符串');
     if (name === null) problems.push('name 应为非空字符串');
@@ -246,12 +296,14 @@ export function parseQuestSet(raw: unknown): QuestSetParseResult {
     }
     if (prerequisiteQuestIds === null) problems.push('prerequisiteQuestIds 格式无效');
     if (failOnEncounterIds === null) problems.push('failOnEncounterIds 格式无效');
-    if (rawRewards === null || experience === null || currency === null) {
+    if (rawRewards === null || experience === null || currency === null ||
+        factionRenownRewards === null || discoverKnowledgeNodeIds === null) {
       problems.push('rewards 必须声明非负安全整数 experience 与 currency');
     }
     if (problems.length > 0 || id === null || name === null || description === null ||
         giverNpcId === null || prerequisiteQuestIds === null || failOnEncounterIds === null ||
-        experience === null || currency === null) {
+        experience === null || currency === null || factionRenownRewards === null ||
+        discoverKnowledgeNodeIds === null) {
       errors.push(`${label}：${problems.join('；')}`);
       return;
     }
@@ -272,7 +324,12 @@ export function parseQuestSet(raw: unknown): QuestSetParseResult {
       prerequisiteQuestIds,
       objectives,
       failOnEncounterIds,
-      rewards: { experience, currency },
+      rewards: {
+        experience,
+        currency,
+        ...(factionRenownRewards.length > 0 ? { factionRenown: factionRenownRewards } : {}),
+        ...(discoverKnowledgeNodeIds.length > 0 ? { discoverKnowledgeNodeIds } : {}),
+      },
     });
   });
   return errors.length > 0 ? { ok: false, errors } : { ok: true, set: { quests } };
@@ -310,6 +367,16 @@ export function assembleQuests(input: QuestAssemblyInput): QuestAssemblyResult {
     if (quest.requiredKnowledgeNodeId !== undefined && input.knowledgeNodeIds !== undefined &&
         !input.knowledgeNodeIds.has(quest.requiredKnowledgeNodeId)) {
       problems.push(`资格见闻 "${quest.requiredKnowledgeNodeId}" 未登记`);
+    }
+    for (const reward of quest.rewards.factionRenown ?? []) {
+      if (input.factionIds !== undefined && !input.factionIds.has(reward.factionId)) {
+        problems.push(`声望奖励引用无效门派 "${reward.factionId}"`);
+      }
+    }
+    for (const nodeId of quest.rewards.discoverKnowledgeNodeIds ?? []) {
+      if (input.knowledgeNodeIds !== undefined && !input.knowledgeNodeIds.has(nodeId)) {
+        problems.push(`结算见闻节点 "${nodeId}" 未登记`);
+      }
     }
     const objectiveIds = new Set<string>();
     for (const objective of quest.objectives) {
@@ -457,6 +524,12 @@ function completeQuest(
     questId: quest.id,
     experience: quest.rewards.experience,
     currency: quest.rewards.currency,
+    ...(quest.rewards.factionRenown !== undefined
+      ? { factionRenown: quest.rewards.factionRenown.map((reward) => ({ ...reward })) }
+      : {}),
+    ...(quest.rewards.discoverKnowledgeNodeIds !== undefined
+      ? { discoverKnowledgeNodeIds: [...quest.rewards.discoverKnowledgeNodeIds] }
+      : {}),
   };
 }
 

@@ -73,6 +73,8 @@ export interface QuestPanelModel {
   itemCounts: ReadonlyMap<string, number>;
   /** Current membership and discoveries for quest eligibility checks. */
   access: QuestAccessContext;
+  factionNames?: ReadonlyMap<string, string>;
+  knowledgeNodeTitles?: ReadonlyMap<string, string>;
 }
 
 export interface QuestPanelOptions {
@@ -319,18 +321,30 @@ export class QuestPanel {
         const objective = this.addWrappedText(line, left + PADDING, detailY, contentWidth, 11, UI.muted);
         detailY += Math.max(16, objective.height) + 3;
       });
-      this.addText(
-        `${LABELS.reward}：${LABELS.experience} +${selected.rewards.experience} · ${LABELS.currency} +${selected.rewards.currency}`,
+      const rewardDetails = [
+        `${LABELS.experience} +${selected.rewards.experience}`,
+        `${LABELS.currency} +${selected.rewards.currency}`,
+        ...(selected.rewards.factionRenown ?? []).map((reward) =>
+          `${model.factionNames?.get(reward.factionId) ?? reward.factionId}声望 ${reward.delta > 0 ? '+' : ''}${reward.delta}`,
+        ),
+        ...(selected.rewards.discoverKnowledgeNodeIds ?? []).map((nodeId) =>
+          `见闻「${model.knowledgeNodeTitles?.get(nodeId) ?? nodeId}」`,
+        ),
+      ];
+      const rewardText = this.addWrappedText(
+        `${LABELS.reward}：${rewardDetails.join(' · ')}`,
         left + PADDING,
         detailY + 2,
+        contentWidth,
         11,
         UI.warning,
       );
+      const actionY = detailY + Math.max(18, rewardText.height) + 5;
       if (state?.status === 'active') {
         this.addText(
           model.journal.trackedQuestId === selected.id ? LABELS.untrack : LABELS.track,
           left + PADDING,
-          detailY + 22,
+          actionY,
           10,
           UI.muted,
         );

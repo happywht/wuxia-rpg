@@ -16,6 +16,8 @@ import {
   createQuestJournal,
   parseQuestSet,
 } from '../src/engine/quest-system';
+import { applyQuestRewardConsequences } from '../src/engine/quest-consequences';
+import { createSocialState, getFactionRenown } from '../src/engine/social-state';
 
 // ---------------------------------------------------------------------------
 // Fixtures
@@ -137,6 +139,31 @@ describe('parseQuestSet', () => {
     expect(joined).toContain('giverNpcId');
     expect(joined).toContain('objectives');
     expect(joined).toContain('rewards');
+  });
+
+  it('parses optional standing and knowledge rewards while rejecting duplicates and zero deltas', () => {
+    const base = {
+      id: 'q', name: '名', description: '说明', giverNpcId: 'npc-elder',
+      objectives: [{ id: 'o', kind: 'talkToNpc', targetId: 'npc-farmer', requiredCount: 1, text: '目标' }],
+      rewards: {
+        experience: 1, currency: 2,
+        factionRenown: [{ factionId: 'faction-a', delta: 6 }],
+        discoverKnowledgeNodeIds: ['event-result'],
+      },
+    };
+    const parsed = parseQuestSet({ quests: [base] });
+    expect(parsed.ok).toBe(true);
+    if (parsed.ok) expect(parsed.set.quests[0]?.rewards).toEqual({
+      experience: 1,
+      currency: 2,
+      factionRenown: [{ factionId: 'faction-a', delta: 6 }],
+      discoverKnowledgeNodeIds: ['event-result'],
+    });
+
+    expect(parseQuestSet({ quests: [{ ...base, rewards: {
+      ...base.rewards,
+      factionRenown: [{ factionId: 'faction-a', delta: 0 }, { factionId: 'faction-a', delta: 4 }],
+    } }] }).ok).toBe(false);
   });
 
   it('rejects a non-array envelope', () => {
@@ -301,6 +328,57 @@ describe('quest lifecycle', () => {
     expect(update.failedQuestIds).toEqual(['quest-errand']);
     expect(journal.states.get('quest-errand')!.status).toBe('failed');
     expect(journal.trackedQuestId).toBeNull();
+  });
+
+  it('validates, applies and pays data-driven standing and knowledge rewards only on completion', () => {
+    const rewardQuest: QuestData = {
+      ...errandQuest,
+      rewards: {
+        experience: 30,
+        currency: 10,
+        factionRenown: [{ factionId: 'faction.a', delta: 6 }],
+        discoverKnowledgeNodeIds: ['event.r44-result'],
+      },
+    };
+    const assemble = (factionIds: Set<string>, knowledgeNodeIds: Set<string>) => assembleQuests({
+      questSet: { quests: [rewardQuest] },
+      questGiverNpcIds: new Set(['npc-elder']),
+      npcIds: new Set(['npc-elder', 'npc-farmer']),
+      itemIds: new Set(),
+      encounterIds: new Set(['encounter-ambush']),
+      factionIds,
+      knowledgeNodeIds,
+    });
+    const broken = assemble(new Set(), new Set());
+    expect(broken.quests.has(rewardQuest.id)).toBe(false);
+    expect(broken.warnings.join('\n')).toContain('faction.a');
+    expect(broken.warnings.join('\n')).toContain('event.r44-result');
+
+    const assembled = assemble(new Set(['faction.a']), new Set(['event.r44-result']));
+    expect(assembled.warnings).toEqual([]);
+    const journal = createQuestJournal(assembled.quests);
+    acceptQuest(assembled.quests, journal, rewardQuest.id);
+    const completion = applyQuestSignal(assembled.quests, journal, { type: 'npc-talk', npcId: 'npc-farmer' });
+    expect(completion.completed).toEqual([{
+      questId: rewardQuest.id,
+      experience: 30,
+      currency: 10,
+      factionRenown: [{ factionId: 'faction.a', delta: 6 }],
+      discoverKnowledgeNodeIds: ['event.r44-result'],
+    }]);
+
+    const social = createSocialState();
+    social.factionRenown.set('faction.a', 998);
+    const known = new Set<string>();
+    const applied = applyQuestRewardConsequences(completion.completed[0]!, social, known);
+    expect(applied.factionRenown).toEqual([{ factionId: 'faction.a', delta: 6, value: 1000 }]);
+    expect(getFactionRenown(social, 'faction.a')).toBe(1000);
+    expect(applied.discoveredKnowledgeNodeIds).toEqual(['event.r44-result']);
+    expect(known.has('event.r44-result')).toBe(true);
+
+    const repeatedSignal = applyQuestSignal(assembled.quests, journal, { type: 'npc-talk', npcId: 'npc-farmer' });
+    expect(repeatedSignal.completed).toEqual([]);
+    expect(applyQuestRewardConsequences(completion.completed[0]!, social, known).discoveredKnowledgeNodeIds).toEqual([]);
   });
 
   it('abandoning an active quest records a terminal failure', () => {

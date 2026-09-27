@@ -99,7 +99,8 @@
       "properties": {
         "knowledgeNodeIds": { "$ref": "#/definitions/nonEmptyIdList" },
         "periodIds": { "$ref": "#/definitions/nonEmptyIdList" },
-        "weatherIds": { "$ref": "#/definitions/nonEmptyIdList" }
+        "weatherIds": { "$ref": "#/definitions/nonEmptyIdList" },
+        "nearbyNpcIds": { "$ref": "#/definitions/nonEmptyIdList" }
       }
     },
     "nonEmptyIdList": {

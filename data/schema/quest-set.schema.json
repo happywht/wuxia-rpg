@@ -99,7 +99,30 @@
       "required": ["experience", "currency"],
       "properties": {
         "experience": { "type": "integer", "minimum": 0, "maximum": 999999 },
-        "currency": { "type": "integer", "minimum": 0, "maximum": 999999 }
+        "currency": { "type": "integer", "minimum": 0, "maximum": 999999 },
+        "factionRenown": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/faction-renown-reward" }
+        },
+        "discoverKnowledgeNodeIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/definitions/id" }
+        }
+      }
+    },
+    "faction-renown-reward": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["factionId", "delta"],
+      "properties": {
+        "factionId": { "$ref": "#/definitions/id" },
+        "delta": {
+          "type": "integer",
+          "minimum": -1000,
+          "maximum": 1000,
+          "not": { "const": 0 }
+        }
       }
     }
   }

@@ -55,6 +55,8 @@ export interface RegionEventConditionsData {
   knowledgeNodeIds?: string[];
   periodIds?: string[];
   weatherIds?: string[];
+  /** Every listed NPC must be orthogonally adjacent to the player. */
+  nearbyNpcIds?: string[];
 }
 
 /** Live player/world state read by the pure region-event evaluator. */
@@ -62,6 +64,8 @@ export interface RegionEventContext {
   knownKnowledgeNodeIds: ReadonlySet<string>;
   periodId: string | null;
   weatherId: string | null;
+  /** NPCs on this map in the player's four-way interaction range. */
+  nearbyNpcIds?: ReadonlySet<string>;
 }
 
 /** Cross-resource ids used to disable only events with dangling references. */
@@ -69,6 +73,8 @@ export interface RegionEventReferenceIds {
   knowledgeNodeIds: ReadonlySet<string>;
   periodIds: ReadonlySet<string>;
   weatherIds: ReadonlySet<string>;
+  /** Optional for compatibility with direct engine consumers. */
+  npcIds?: ReadonlySet<string>;
 }
 
 export interface WorldMapAssembly {
@@ -113,7 +119,7 @@ function parseRegionEventConditions(value: unknown, label: string, errors: strin
     errors.push(`${label}：应为对象`);
     return null;
   }
-  const allowedKeys = new Set(['knowledgeNodeIds', 'periodIds', 'weatherIds']);
+  const allowedKeys = new Set(['knowledgeNodeIds', 'periodIds', 'weatherIds', 'nearbyNpcIds']);
   for (const key of Object.keys(value)) {
     if (!allowedKeys.has(key)) errors.push(`${label}.${key}：不是受支持的条件`);
   }
@@ -124,7 +130,8 @@ function parseRegionEventConditions(value: unknown, label: string, errors: strin
     if (ids === null) continue;
     if (key === 'knowledgeNodeIds') conditions.knowledgeNodeIds = ids;
     else if (key === 'periodIds') conditions.periodIds = ids;
-    else conditions.weatherIds = ids;
+    else if (key === 'weatherIds') conditions.weatherIds = ids;
+    else conditions.nearbyNpcIds = ids;
   }
   if (Object.keys(conditions).length === 0) {
     errors.push(`${label}：至少需要一种线索、时段或天气条件`);
@@ -328,6 +335,11 @@ export function assembleWorldMap(
       for (const weatherId of event.conditions?.weatherIds ?? []) {
         if (!eventReferences.weatherIds.has(weatherId)) problems.push(`引用无效天气：${weatherId}`);
       }
+      for (const npcId of event.conditions?.nearbyNpcIds ?? []) {
+        if (eventReferences.npcIds !== undefined && !eventReferences.npcIds.has(npcId)) {
+          problems.push(`附近 NPC 未登记：${npcId}`);
+        }
+      }
     }
     seenEvents.add(event.id);
     if (problems.length > 0) warnings.push(`区域事件 "${event.id}" 已禁用：${problems.join('；')}`);
@@ -353,6 +365,11 @@ export function assembleWorldMap(
       for (const weatherId of event.conditions?.weatherIds ?? []) {
         if (!eventReferences.weatherIds.has(weatherId)) problems.push(`引用无效天气：${weatherId}`);
       }
+      for (const npcId of event.conditions?.nearbyNpcIds ?? []) {
+        if (eventReferences.npcIds !== undefined && !eventReferences.npcIds.has(npcId)) {
+          problems.push(`附近 NPC 未登记：${npcId}`);
+        }
+      }
     }
     seenEvents.add(event.id);
     if (problems.length > 0) warnings.push(`漫游奇遇「${event.id}」已禁用：${problems.join('；')}`);
@@ -373,6 +390,8 @@ export function regionEventConditionsMet(
     (context.periodId === null || !conditions.periodIds.includes(context.periodId))) return false;
   if (conditions.weatherIds !== undefined &&
     (context.weatherId === null || !conditions.weatherIds.includes(context.weatherId))) return false;
+  const nearbyNpcIds = context.nearbyNpcIds ?? new Set<string>();
+  if (conditions.nearbyNpcIds?.some((id) => !nearbyNpcIds.has(id))) return false;
   return true;
 }
 

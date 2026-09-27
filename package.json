@@ -35,7 +35,8 @@
     "smoke:round-36": "node scripts/smoke-round-36.mjs",
     "smoke:round-37": "node scripts/smoke-round-37.mjs",
     "smoke:round-42": "vitest run tests/round42-story.test.ts",
-    "smoke:round-43": "vitest run tests/world-map.test.ts tests/round43-faction-routes.test.ts"
+    "smoke:round-43": "vitest run tests/world-map.test.ts tests/round43-faction-routes.test.ts",
+    "smoke:round-44": "vitest run tests/world-map.test.ts tests/quest-system.test.ts tests/round44-dynamic-events.test.ts"
   },
   "dependencies": {
     "ajv": "^8.20.0",

@@ -301,6 +301,41 @@
       "title": "运盐船缆痕",
       "summary": "三道缆痕来自先后靠岸的运盐船，并非夜航私船。",
       "knownByDefault": false
+    },
+    {
+      "id": "event.r44-dock-claim",
+      "kind": "event",
+      "title": "雨夜旧桩之争",
+      "summary": "石北主张先加固系缆桩，白鹭洲主张先核验渡簿潮时，两种判断都等待现场证据。",
+      "knownByDefault": false
+    },
+    {
+      "id": "quest.r44-post-first",
+      "kind": "quest",
+      "title": "先固旧桩",
+      "summary": "接受石北所主张的先行加固方案，并由铁嶂派记录处置。",
+      "knownByDefault": false
+    },
+    {
+      "id": "quest.r44-ledger-first",
+      "kind": "quest",
+      "title": "先核渡簿",
+      "summary": "接受白鹭洲所主张的先核潮时方案，并由寒山书院记录处置。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r44-pier-reinforced",
+      "kind": "event",
+      "title": "铁楔固桩",
+      "summary": "按潮痕补入铁楔后，旧系缆桩在夜雨中的松动得到处置。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r44-ledger-verified",
+      "kind": "event",
+      "title": "潮时复核",
+      "summary": "书院抄本与渡簿的潮时互相印证，争执暂以记录可查的船期收束。",
+      "knownByDefault": false
     }
   ]
 }

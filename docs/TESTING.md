@@ -28,7 +28,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 
 - 测试框架：Vitest 5.0.2。官方指南要求 Vite >=6.4.0、Node >=22.12.0；本仓库使用 Vite 8.3.1 与 Node 22.18.0，符合要求（详见 [`docs/REFERENCES.md`](REFERENCES.md) #12；基准 API 见同文件 #16）。
 - 运行环境：Node（无 DOM、无浏览器、无网络、无真实时钟依赖）。
-- 覆盖统计：10 个测试文件、117 个用例（R38 建立四组 53 个，R40 新增渲染器结构回归 10 个，R41 新增设置与输入 42 个，R42 新增主线集成 3 个，R43 新增漫游事件 6 个与门派支线集成 3 个；详见 `CHANGELOG.md` 对应条目）。
+- 覆盖统计：11 个测试文件、123 个用例（R38 建立四组 53 个，R40 新增渲染器结构回归 10 个，R41 新增设置与输入 42 个，R42 新增主线集成 3 个，R43 新增漫游事件 6 个与门派支线集成 3 个，R44 新增日程漫游/奖励协议/双路线集成 6 个；详见 `CHANGELOG.md` 对应条目）。
 
 ## 配置：为什么有独立的 `vitest.config.ts`
 
@@ -54,14 +54,15 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 | --- | --- | --- |
 | `tests/event-bus.test.ts` | `src/engine/event-bus.ts` | `on`/`off`/unsubscribe 身份语义与幂等；`once` 恰好投递一次；**once 重入**（监听器内部重发同一事件时自身不再触发，重入投递仍达新订阅者）；`emit` 快照迭代（投递期间新订阅的监听器不收当次事件）；`clear`/`listenerCount` |
 | `tests/dialogue.test.ts` | `src/engine/dialogue-graph.ts`、`dialogue-runtime.ts` | `parseDialogueSet` 正反向（信封破损整份拒绝、单段坏对话仅隔离自身）；`validateConversation` 图语义（重复节点 id、缺失起始节点、悬空选项目标）；运行时条件可见性 `isConditionMet`/`getVisibleOptions`（questStatus/itemCount/道德边界含端点/timeOfDay/npcKnows/knowledgeKnown；多条件全满足才可见、空结果即结束节点、索引指向原始数组）；`DialogueSession` 播放与敌意输入忽略 |
-| `tests/quest-system.test.ts` | `src/engine/quest-system.ts` | `parseQuestSet` 防御解析；`assembleQuests` 跨资源装配（坏发布人剔除、前置循环禁用、互斥组整组校验）；`createQuestJournal` 初始 offered/locked；接受/推进/完成/失败全生命周期（npc-talk 推进、item-count 绝对数量同步并钳制、接取时背包快照即时完成、encounter-defeat 失败、abandon 终态、互斥分支连带失败、奖励结算、前置完成后解锁） |
+| `tests/quest-system.test.ts` | `src/engine/quest-system.ts`、`quest-consequences.ts` | `parseQuestSet` 防御解析；`assembleQuests` 跨资源装配（坏发布人/奖励引用剔除、前置循环禁用、互斥组整组校验）；接受/推进/完成/失败生命周期及互斥分支连带失败；声望/见闻奖励随首次完成发放、声望边界钳制与重复信号不重发 |
 | `tests/data-validation.test.ts` | `scripts/lib/data-validation.mjs`、`scripts/validate-data.mjs` | **真实仓库**正向校验（manifest + 全部基础资源计数一致）；临时 fixture 反向校验（资源违反 Schema、manifest 违反 Schema、资源文件缺失、无效 Schema、JSON `null`）；另以临时 CLI 副本启动真实 Node 子进程，锁定可读错误输出与非零退出码 |
 | `tests/grid-map-renderer.test.ts` | `src/engine/grid-map-renderer.ts` | R40 渲染器结构回归：场景对象数随面积增长恒为 2（O(1) 契约）；逐格命令顺序（底色→边线→亮边→暗边）与几何/颜色/alpha 精确锁定；绘制范围与地图像素尺寸一致；Graphics 挂在返回容器内（地图切换 `destroy()` 级联语义）；样式去重；`cellCenterOffset` 普通坐标返回 |
 | `tests/settings.test.ts` | `src/game/settings.ts` | R41 设置回归：Round 09 旧载荷 `{volume,textScaleIndex}` 迁移（新字段补默认、旧存储字节不动）；完整六字段往返；新字段"存在但无效"整载荷拒绝且不动存储；音量/字号越界与 JSON 损坏回退默认；写入拒绝（会话内仍生效）；`applyGameSettings` 声音总线音量与画布高对比度滤镜（mock game 结构替身，无浏览器依赖）；五档字号单调与 `uiFontSize`；`settingsRows`/`adjustGameSetting` 共享行数、循环与钳制语义 |
 | `tests/input-settings.test.ts` | `src/game/input-settings.ts` | R41 输入回归：三档移动键位解析与键集（arrows 恰 4 键 / wasd 恰 4 键 / both 8 键）、逐键启用判定与帮助文本；摇杆死区（默认 0.5 与自定义）、主导轴、对角水平优先、非有限值；D-pad 基数优先于摇杆与对向键消解；标准映射采样（D-pad/左摇杆/A→confirm、B→back）；`GamepadEdgeTracker` 按住只发一次、换向即新边沿、释放重触发、confirm/back 边沿与 `reset()` |
 | `tests/round42-story.test.ts` | `src/engine/quest-system.ts`、`dialogue-graph.ts`、`ending-system.ts` 与基础故事资料 | R42 主线集成：完整载入并装配任务和四张目标对白图；校验 R31 渡籍补录到三段主线、共享前置互斥分支、对话任务/物品/图谱引用；实际驱动任务状态机完成两条路线，验证兄弟失败和各自唯一新结局可达 |
-| `tests/world-map.test.ts` | `src/engine/world-map.ts` 与 world-map schema | R43 漫游奇遇：旧地图缺省兼容、概率值拒绝、坏发现节点隔离、稳定候选顺序、无资格候选不消耗随机源、概率/一次性/可重复语义 |
+| `tests/world-map.test.ts` | `src/engine/world-map.ts` 与 world-map schema | R43 漫游奇遇：旧地图缺省兼容、概率值拒绝、坏发现节点隔离、稳定候选顺序、无资格候选不消耗随机源、概率/一次性/可重复语义；R44 nearbyNpcIds 全员邻接判定与坏人物引用隔离 |
 | `tests/round43-faction-routes.test.ts` | `src/engine/quest-system.ts`、`dialogue-runtime.ts` 与五派基础资料 | R43 门派支线：五项门派/见闻门槛与对白一致性、真实接取拒绝/成功、谈话完成及结果见闻发现、坏门派引用隔离 |
+| `tests/round44-dynamic-events.test.ts` | `npc-schedule.ts`、`world-map.ts`、任务/对白/声望协议与基础资料 | R44 集成：解析真实日程并证明黄昏玩家邻接/日中离场；双 NPC 条件、时辰条件；两项互斥任务的对白入口、目标、一次性声望/知识奖励和声望钳制 |
 
 测试只调用**公共导出函数**并断言行为，不做源码文本匹配；引擎模块均为 Phaser-free 设计，无需启动任何场景。
 
@@ -93,6 +94,7 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 | `npm run smoke:round-*` | 各轮专项端到端烟测（含真实 Vite 服务器、CLI 全链路）；R35–37 三条进入 CI |
 | `npm run smoke:round-42` | Round 42 主线专项集成验证（章节状态机、对白图引用、互斥分支与结局可达性） |
 | `npm run smoke:round-43` | Round 43 漫游事件协议及五派支线资格/对白/见闻集成回归 |
+| `npm run smoke:round-44` | Round 44 NPC 日程附近条件、任务声望/见闻奖励与渡口互斥分支回归 |
 | `npm run typecheck` | 严格类型检查（check 的第 3 步） |
 | `npm run benchmark:round-40` | 性能/内存基准（R40 起）：渲染对象数与耗时双口径、26 资源加载、50 轮长跑堆观察；与 `npm test` 双向隔离、不进门槛（读数与局限见 `docs/PERFORMANCE.md`） |
 | `npm run build` | `check` 全部通过后的 Vite 生产构建门槛（R39 起含完整 check） |
@@ -101,6 +103,7 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 ## 变更记录
 
 - 2026-09-28（Round 43）：新增 `tests/world-map.test.ts` 6 用例与 `tests/round43-faction-routes.test.ts` 3 用例，覆盖可选随机事件协议及五派任务资格、真实状态机/对白发现；覆盖统计更新为 10 文件 117 用例，新增 `npm run smoke:round-43`。
+- 2026-09-28（Round 44）：新增 nearby NPC 条件和任务声望/图谱奖励的解析、装配、幂等结算测试；新增真实渡口日程/邻接和两条互斥路线集成用例；新增 `npm run smoke:round-44`。完整覆盖统计更新为 11 文件 123 用例。
 - 2026-09-28（Round 42）：新增 `tests/round42-story.test.ts` 3 用例，验证 R31→R42 任务解锁、两份对白图引用、分支互斥/兄弟失败及两条数据结局可达性；新增 `npm run smoke:round-42` 专项入口；覆盖统计更新为 8 文件 108 用例。
 - 2026-09-28（Round 41）：新增 `tests/settings.test.ts`（21 用例：v1 旧载荷迁移、验证/持久化、声音总线与画布外观应用、五档字号、共享设置行/调整语义）与 `tests/input-settings.test.ts`（21 用例：键位布局、摇杆死区/主导轴、D-pad 基数优先、标准映射采样、边沿检测）；覆盖统计更新为 7 文件 105 用例。手柄路由的浏览器内行为另经生产构建 + Playwright 烟测（设置导航/画布滤镜/布局门控），物理控制器硬件未测试——见 `DEVLOG.md` Round 41。
 - 2026-09-28（Round 40）：新增性能/内存基准通道 `npm run benchmark:round-40`（`benchmark.include` 独立匹配 `*.bench.ts`，与 `npm test` 双向隔离）；新增 `tests/grid-map-renderer.test.ts` 10 用例锁定 R40 单 Graphics 渲染器结构契约；覆盖统计更新为 5 文件 63 用例。

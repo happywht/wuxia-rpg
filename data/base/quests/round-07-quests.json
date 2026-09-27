@@ -590,6 +590,52 @@
         }
       ],
       "rewards": { "experience": 42, "currency": 26 }
+    },
+    {
+      "id": "quest.r44-post-first",
+      "name": "先固旧桩",
+      "description": "石北主张先以铁楔补牢旧系缆桩，免得雨夜再有船索脱落；请亲自与他确认落桩位置，随后由铁嶂派记下这次处置。",
+      "giverNpcId": "char.bai-luzhou",
+      "requiredKnowledgeNodeId": "event.r44-dock-claim",
+      "exclusiveGroupId": "branch.r44-ferry-dispute",
+      "objectives": [
+        {
+          "id": "objective.r44-confirm-post",
+          "kind": "talkToNpc",
+          "targetId": "char.shi-bei",
+          "requiredCount": 1,
+          "text": "与石北确认旧桩的加固办法"
+        }
+      ],
+      "rewards": {
+        "experience": 26,
+        "currency": 18,
+        "factionRenown": [{ "factionId": "faction.tiezhang-pai", "delta": 6 }],
+        "discoverKnowledgeNodeIds": ["event.r44-pier-reinforced"]
+      }
+    },
+    {
+      "id": "quest.r44-ledger-first",
+      "name": "先核渡簿",
+      "description": "白鹭洲坚持先以渡簿核准最近船期，再判断系缆桩是否失修；请向柳听澜核对抄本上的潮时，随后由寒山书院记下这次处置。",
+      "giverNpcId": "char.bai-luzhou",
+      "requiredKnowledgeNodeId": "event.r44-dock-claim",
+      "exclusiveGroupId": "branch.r44-ferry-dispute",
+      "objectives": [
+        {
+          "id": "objective.r44-confirm-ledger",
+          "kind": "talkToNpc",
+          "targetId": "char.liu-tinglan",
+          "requiredCount": 1,
+          "text": "向柳听澜核对渡簿上的潮时"
+        }
+      ],
+      "rewards": {
+        "experience": 28,
+        "currency": 20,
+        "factionRenown": [{ "factionId": "faction.hanshan-shuyuan", "delta": 6 }],
+        "discoverKnowledgeNodeIds": ["event.r44-ledger-verified"]
+      }
     }
   ]
 }

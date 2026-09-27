@@ -150,6 +150,9 @@ for (const event of world.events ?? []) {
   for (const weatherId of event.conditions?.weatherIds ?? []) {
     if (!weatherIds.has(weatherId)) fail('MAP-ATLAS.md', `区域事件 "${event.id}" 条件引用的天气 "${weatherId}" 未登记`);
   }
+  for (const npcId of event.conditions?.nearbyNpcIds ?? []) {
+    if (!npcById.has(npcId)) fail('MAP-ATLAS.md', `区域事件 "${event.id}" 条件引用的人物 "${npcId}" 未登记`);
+  }
   if (event.discoverKnowledgeNodeId !== undefined && !knowledgeNodeIds.has(event.discoverKnowledgeNodeId)) {
     fail('MAP-ATLAS.md', `区域事件 "${event.id}" 的发现节点 "${event.discoverKnowledgeNodeId}" 未登记`);
   }
@@ -169,6 +172,9 @@ for (const event of world.randomEvents ?? []) {
   }
   for (const weatherId of event.conditions?.weatherIds ?? []) {
     if (!weatherIds.has(weatherId)) fail('MAP-ATLAS.md', `漫游奇遇 "${event.id}" 条件引用的天气 "${weatherId}" 未登记`);
+  }
+  for (const npcId of event.conditions?.nearbyNpcIds ?? []) {
+    if (!npcById.has(npcId)) fail('MAP-ATLAS.md', `漫游奇遇 "${event.id}" 条件引用的人物 "${npcId}" 未登记`);
   }
   if (event.discoverKnowledgeNodeId !== undefined && !knowledgeNodeIds.has(event.discoverKnowledgeNodeId)) {
     fail('MAP-ATLAS.md', `漫游奇遇 "${event.id}" 的发现节点 "${event.discoverKnowledgeNodeId}" 未登记`);
@@ -289,6 +295,14 @@ for (const event of world.randomEvents ?? []) {
     const name = climate?.weathers?.find((weather) => weather.id === weatherId)?.name;
     if (name !== undefined && !row.includes(name)) fail('MAP-ATLAS.md', `漫游奇遇 "${event.id}" 所在行缺少天气条件 "${name}"`);
   }
+  for (const npcId of event.conditions?.nearbyNpcIds ?? []) {
+    const npc = npcById.get(npcId);
+    if (npc === undefined) {
+      fail('MAP-ATLAS.md', `漫游奇遇 "${event.id}" 条件引用的人物 "${npcId}" 未登记（数据侧错误）`);
+    } else if (!row.includes(npc.id) || !row.includes(npc.name)) {
+      fail('MAP-ATLAS.md', `漫游奇遇 "${event.id}" 所在行须同时列出人物 id "${npc.id}" 与姓名 "${npc.name}"`);
+    }
+  }
   if (event.discoverKnowledgeNodeId !== undefined && !row.includes(event.discoverKnowledgeNodeId)) {
     fail('MAP-ATLAS.md', `漫游奇遇 "${event.id}" 所在行缺少发现节点 "${event.discoverKnowledgeNodeId}"`);
   }
@@ -330,6 +344,22 @@ for (const quest of quests) {
     continue;
   }
   const reward = `${quest.rewards.experience} / ${quest.rewards.currency}`;
+  const standingRewards = (quest.rewards.factionRenown ?? []).map(({ factionId, delta }) => {
+    const faction = factionById.get(factionId);
+    if (faction === undefined) {
+      fail('QUESTS.md', `任务 "${quest.name}" 的声望奖励门派 "${factionId}" 未登记（数据侧错误）`);
+      return null;
+    }
+    return `声望 ${faction.name} ${delta > 0 ? '+' : ''}${delta}`;
+  });
+  const rewardKnowledgeTitles = (quest.rewards.discoverKnowledgeNodeIds ?? []).map((id) => {
+    const node = knowledgeNodeById.get(id);
+    if (node === undefined) {
+      fail('QUESTS.md', `任务 "${quest.name}" 的结算见闻节点 "${id}" 未登记（数据侧错误）`);
+      return null;
+    }
+    return `见闻 ${node.title}`;
+  });
   const encounterNames = (quest.failOnEncounterIds ?? []).map((id) => {
     const encounter = encounterById.get(id);
     if (encounter === undefined) {
@@ -372,7 +402,8 @@ for (const quest of quests) {
     if (node === undefined) fail('QUESTS.md', `任务 "${quest.name}" 的资格见闻 "${quest.requiredKnowledgeNodeId}" 未登记（数据侧错误）`);
     else eligibilityNames.push(node.title);
   }
-  const required = [quest.name, giver.name, regionName, reward, ...encounterNames.filter(Boolean),
+  const required = [quest.name, giver.name, regionName, reward,
+    ...standingRewards.filter(Boolean), ...rewardKnowledgeTitles.filter(Boolean), ...encounterNames.filter(Boolean),
     ...prerequisiteNames.filter(Boolean), ...objectiveNames, ...eligibilityNames].filter(Boolean);
   const missing = required.filter((token) => !row.includes(token));
   if (missing.length > 0) {

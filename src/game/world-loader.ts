@@ -503,10 +503,13 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
       maps.set(resource.id, parsedMap.map);
     }
     const knowledgeResult = assembleKnowledgeGraphContent(result.resources);
+    const npcResource = result.resources.get(NPC_RESOURCE_ID);
+    const parsedNpcReferences = npcResource === undefined ? null : parseNpcSet(npcResource.value);
     const worldMapResult = assembleWorldMap(parsedWorldMap.data, maps, {
       knowledgeNodeIds: new Set(knowledgeResult.graph.nodes.keys()),
       periodIds: new Set(parsedCalendar.calendar.periods.map((period) => period.id)),
       weatherIds: new Set(parsedClimate.climate.weathers.map((weather) => weather.id)),
+      npcIds: new Set(parsedNpcReferences?.ok ? parsedNpcReferences.set.npcs.map((npc) => npc.id) : []),
     });
     if ('ok' in worldMapResult && !worldMapResult.ok) {
       return { ok: false, title: '世界地图引用无效', lines: worldMapResult.errors };
