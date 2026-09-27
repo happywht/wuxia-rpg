@@ -29,7 +29,7 @@ data/
 │   ├── factions/            # 门派：立场、声望规则、成员关系
 │   ├── battles/             # 战斗：遭遇触发点、敌人、奖励与提示文本
 │   └── endings/             # 结局：触发条件与结局文本
-├── schema/                  # JSON Schema（含 manifest、grid-map、world-map、game-calendar、knowledge-nodes、knowledge-edges、npc-set、companion-set、faction-war-set、martial-art-components、dialogue-set、character-profiles、faction-set、martial-arts-set、battle-encounters、arena-set、items-set、shops-set、quest-set）
+├── schema/                  # JSON Schema（含 manifest、grid-map、world-map、game-calendar、knowledge-nodes、knowledge-edges、npc-set、companion-set、faction-war-set、martial-art-components、meridian-set、dialogue-set、character-profiles、faction-set、martial-arts-set、battle-encounters、arena-set、items-set、shops-set、quest-set）
 mods/                        # mod 覆盖层：mods/<modId>/ 镜像 data/base/ 相对路径
 ```
 
@@ -52,6 +52,8 @@ Round 11 状态：manifest 登记可选 `knowledge-nodes` 与 `knowledge-edges` 
 Round 14 状态：manifest 登记**必需**资源 `calendar.base` → `worldview/calendar.json`（`game-calendar` schema）。历法声明月份序列（id/名称/天数 1–60，至多 24 个月）、日内时段（id/名称/起始分钟 0–1439/照度 0–1，至多 24 段；必须存在零点时段且起始分钟互异）、起始时刻（年/月 id/日/日内分钟）与动作耗时（`stepMinutes` 0–1440、`travelMinutes`/`waitMinutes` 1–1440）。语义校验拒绝重复月份/时段 id、重复时段起点、悬空起始月份、超出当月天数的起始日与越界耗时——历法无效即整资源拒绝（可读错误面板），不做部分降级。时段按循环边界划分，可跨午夜；运行时 HUD 显示历日/时刻/时段，世界层按时段照度渐变调色。一天固定 1440 分钟；游戏时间只由成功移动（每步 `stepMinutes`）、成功区域旅行（`travelMinutes`）与 V 键等候（`waitMinutes`）推进，被阻挡或被面板拦截的操作零消耗。存档保存相对起始时刻的分钟计数（`elapsedGameMinutes`），日期随时由当前资料折算。对白写作细节见 `docs/DIALOGUE-GUIDE.md`。
 
 ## 3. 文件与命名约定
+
+Round 23 新增可选 `meridian-set`（`meridian-set.schema.json`），经脉 JSON 放在 `meridians/` 并可由 MOD 同路径覆盖。资源声明初始修为、逐级修为和上限；每个节点声明 level/point 门槛、依赖节点、物品消耗及属性/气血/内力上限效果。依赖图须无环，材料引用会在世界装配期对照物品集，失效材料只关闭相关节点链。节点进度在运行存档，派生加成不写入世界资料。具体边界见 [`MERIDIANS.md`](MERIDIANS.md)。
 
 Round 20 新增擂台资料族：manifest 中的可选 arena-set 资源按地图入口、角色模板、赛程武学、彩头物品逐项校验；坏入口只禁用对应擂台。赛事文件可由 MOD 使用同路径覆盖，资料字段和玩法边界见 docs/ARENA_DESIGN.md。
 

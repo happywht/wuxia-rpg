@@ -1002,6 +1002,13 @@ export interface EquipmentBonusData {
   qi: number;
 }
 
+/** Independent additive source; recalculated from node ids, never baked into base attributes. */
+export interface ProgressionBonusData {
+  attributes: PartialAttributeMap;
+  health: number;
+  qi: number;
+}
+
 /** Runtime state; the versioned save engine snapshots its pure data fields. */
 export interface CharacterState {
   profileId: string;
@@ -1022,6 +1029,12 @@ export interface CharacterState {
   qi: CharacterVitals;
   /** Equipment bonuses currently applied to {@link attributes} and the maxima. */
   equipmentBonuses: EquipmentBonusData;
+  /** Current unspent cultivation resource; awarded by data-configured level gains. */
+  cultivationPoints: number;
+  /** Stable meridian node ids; their effects are rebuilt from current data. */
+  unlockedMeridianNodeIds: string[];
+  /** Separate bonus source so equipment changes and level-ups cannot erase it. */
+  meridianBonuses: ProgressionBonusData;
   /**
    * Martial-art ids the character has mastered. Copied verbatim from the
    * profile's declared starting list; callers validate the references first
@@ -1039,7 +1052,7 @@ export interface CharacterState {
  * settles on the next {@link grantExperience} call, not implicitly here.
  * Equipment bonuses start at zero (nothing equipped).
  */
-export function createCharacterState(profile: CharacterProfileData): CharacterState {
+export function createCharacterState(profile: CharacterProfileData, initialCultivationPoints = 0): CharacterState {
   const { healthMax, qiMax } = computeVitalMaxima(
     profile,
     profile.startingLevel,
@@ -1054,16 +1067,20 @@ export function createCharacterState(profile: CharacterProfileData): CharacterSt
     health: { current: healthMax, max: healthMax },
     qi: { current: qiMax, max: qiMax },
     equipmentBonuses: { attributes: {}, health: 0, qi: 0 },
+    cultivationPoints: Number.isSafeInteger(initialCultivationPoints)
+      ? Math.max(0, initialCultivationPoints)
+      : 0,
+    unlockedMeridianNodeIds: [],
+    meridianBonuses: { attributes: {}, health: 0, qi: 0 },
     martialArtIds: [...profile.startingMartialArtIds],
   };
 }
 
 /**
  * Applies a new set of equipment bonuses (Round 06): stores them on the state
- * and recomputes the effective attributes from the untouched base values, so
- * re-equipping never compounds and level-up growth is never rolled back. The
- * caller owns vital-maximum adjustment and current-value clamping (see the
- * item system); level-ups refresh both through this same function.
+ * and recomputes effective attributes from untouched base values plus both
+ * independent bonus sources, so re-equipping never compounds, rolls back
+ * level-up growth or erases meridian training. The caller owns vital maxima.
  */
 export function applyEquipmentBonuses(state: CharacterState, bonuses: EquipmentBonusData): void {
   state.equipmentBonuses = {
@@ -1073,7 +1090,9 @@ export function applyEquipmentBonuses(state: CharacterState, bonuses: EquipmentB
   };
   for (const attributeId of ATTRIBUTE_IDS) {
     state.attributes[attributeId] =
-      state.baseAttributes[attributeId] + (bonuses.attributes[attributeId] ?? 0);
+      state.baseAttributes[attributeId] +
+      (bonuses.attributes[attributeId] ?? 0) +
+      (state.meridianBonuses.attributes[attributeId] ?? 0);
   }
 }
 
@@ -1115,9 +1134,9 @@ export interface ExperienceGainResult {
 /**
  * Grants experience and settles every resulting level-up in one pass:
  * base attributes grow by the profile's per-level amounts (capped at
- * `attributeCap` — equipment bonuses never eat into the cap), effective
- * attributes resynchronize as base + equipment, vital maxima recompute from
- * the data formulas plus the equipment bonuses, and the maxima delta heals
+ * `attributeCap` — equipment/meridian bonuses never eat into the cap), effective
+ * attributes resynchronize as base + equipment + meridian, vital maxima recompute from
+ * the data formulas plus both independent bonus sources, and the maxima delta heals
  * into the current values (a fully healthy character stays fully healthy).
  * Experience beyond the max-level threshold is discarded — max level does not
  * bank experience. Non-positive or non-finite amounts are no-ops. Mutates
@@ -1165,8 +1184,8 @@ export function grantExperience(
   if (levelsGained > 0) {
     applyEquipmentBonuses(state, state.equipmentBonuses); // Resync effective attributes.
     const { healthMax, qiMax } = computeVitalMaxima(profile, state.level, state.attributes);
-    const newHealthMax = healthMax + state.equipmentBonuses.health;
-    const newQiMax = qiMax + state.equipmentBonuses.qi;
+    const newHealthMax = healthMax + state.equipmentBonuses.health + state.meridianBonuses.health;
+    const newQiMax = qiMax + state.equipmentBonuses.qi + state.meridianBonuses.qi;
     state.health.max = newHealthMax;
     state.qi.max = newQiMax;
     state.health.current = Math.min(

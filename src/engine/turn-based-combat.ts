@@ -37,6 +37,7 @@ import {
 import { type CellPosition, type GridMap } from './grid-map';
 import { manhattanDistance } from './npc-placement';
 import type { CompanionSupportData } from './companion-system';
+import { awardCultivationPoints, type MeridianResourceRules } from './meridian-system';
 
 // ---------------------------------------------------------------------------
 // Wire formats
@@ -555,6 +556,8 @@ export interface CombatSessionConfig {
   martialArts: ReadonlyMap<string, MartialArtData>;
   /** Optional automatic support resolved after successful player turns. */
   companion?: { name: string; support: CompanionSupportData };
+  /** Optional data-driven cultivation reward applied when victory grants levels. */
+  meridianResourceRules?: MeridianResourceRules;
 }
 
 /**
@@ -573,6 +576,7 @@ export class CombatSession {
   private readonly playerArts: MartialArtData[];
   private readonly playerName: string;
   private readonly companion: CombatSessionConfig['companion'];
+  private readonly meridianResourceRules: MeridianResourceRules | undefined;
   private successfulPlayerActions = 0;
 
   private readonly enemy: CombatantView & { attributes: AttributeMap; arts: MartialArtData[] };
@@ -588,6 +592,7 @@ export class CombatSession {
     this.player = config.player;
     this.playerName = config.profile.name;
     this.companion = config.companion;
+    this.meridianResourceRules = config.meridianResourceRules;
     this.playerArts = this.player.martialArtIds
       .map((artId) => config.martialArts.get(artId))
       .filter((art): art is MartialArtData => art !== undefined);
@@ -803,6 +808,9 @@ export class CombatSession {
     if (!this.experienceAwarded) {
       this.experienceAwarded = true;
       const granted = grantExperience(this.profile, this.player, this.encounter.victoryExperience);
+      if (this.meridianResourceRules !== undefined) {
+        awardCultivationPoints(this.player, granted.levelsGained, this.meridianResourceRules);
+      }
       experienceGained = this.encounter.victoryExperience - granted.discardedExperience;
       levelsGained = granted.levelsGained;
     }

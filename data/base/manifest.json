@@ -61,6 +61,11 @@
       "schema": "martial-art-components"
     },
     {
+      "id": "meridian.round-23-set",
+      "path": "meridians/round-23-meridians.json",
+      "schema": "meridian-set"
+    },
+    {
       "id": "encounter.round-05-set",
       "path": "battles/round-05-encounters.json",
       "schema": "battle-encounters"

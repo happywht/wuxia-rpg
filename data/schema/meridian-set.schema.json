@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wuxia-rpg.invalid/schema/meridian-set",
+  "title": "经脉与内修资料",
+  "description": "升级修为、经脉前置、修炼材料与属性效果；物品引用由世界装配层校验。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["resource", "nodes"],
+  "properties": {
+    "resource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["initialPoints", "pointsPerLevel", "maximumPoints"],
+      "properties": {
+        "initialPoints": { "type": "integer", "minimum": 0, "maximum": 20 },
+        "pointsPerLevel": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "maximumPoints": { "type": "integer", "minimum": 1, "maximum": 999 }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "description", "minimumLevel", "pointCost", "prerequisites", "itemCosts", "effects"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^meridian\\.[A-Za-z0-9._-]+$", "maxLength": 80 },
+          "name": { "type": "string", "minLength": 1, "maxLength": 40 },
+          "description": { "type": "string", "minLength": 1, "maxLength": 180 },
+          "minimumLevel": { "type": "integer", "minimum": 1, "maximum": 99 },
+          "pointCost": { "type": "integer", "minimum": 1, "maximum": 20 },
+          "prerequisites": {
+            "type": "array",
+            "maxItems": 12,
+            "uniqueItems": true,
+            "items": { "type": "string", "pattern": "^meridian\\.[A-Za-z0-9._-]+$", "maxLength": 80 }
+          },
+          "itemCosts": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["itemId", "quantity"],
+              "properties": {
+                "itemId": { "type": "string", "pattern": "^item\\.[A-Za-z0-9._-]+$", "maxLength": 80 },
+                "quantity": { "type": "integer", "minimum": 1, "maximum": 99 }
+              }
+            }
+          },
+          "effects": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["attributes", "health", "qi"],
+            "properties": {
+              "attributes": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "body": { "type": "integer", "minimum": 0, "maximum": 3 },
+                  "force": { "type": "integer", "minimum": 0, "maximum": 3 },
+                  "agility": { "type": "integer", "minimum": 0, "maximum": 3 },
+                  "insight": { "type": "integer", "minimum": 0, "maximum": 3 },
+                  "resolve": { "type": "integer", "minimum": 0, "maximum": 3 }
+                }
+              },
+              "health": { "type": "integer", "minimum": 0, "maximum": 50 },
+              "qi": { "type": "integer", "minimum": 0, "maximum": 50 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

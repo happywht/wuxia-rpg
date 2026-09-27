@@ -28,7 +28,8 @@
  *    *current* loaded world. A dangling character profile, a different map
  *    resource or an unloadable player position refuses the whole save
  *    (fatal); dangling secondary ids (items, quests, encounters, shops, NPC
- *    relationships) drop exactly those entries with readable warnings, which
+ *    relationships, meridian nodes) drop exactly those entries with readable
+ *    warnings, which
  *    mirrors the smallest-unit isolation philosophy of the data pipeline.
  * 6. {@link captureSaveSnapshot} / {@link restoreRunState} — lossless
  *    round-trip between live engine runtime objects and the wire format.
@@ -106,6 +107,16 @@ export const SAVE_KEY_PREFIX = 'wuxia-rpg.save.';
 /** Display-name protocol: trimmed length between 1 and this bound. */
 export const DISPLAY_NAME_MAX_LENGTH = 24;
 
+/**
+ * Saved cultivation-point ceiling; mirrors the meridian engine's
+ * data-configured maximumPoints bound so saves can never claim more than
+ * the strongest legal ruleset could award.
+ */
+export const CULTIVATION_POINTS_MAX = 999;
+
+/** Saved unlocked meridian node ids; the data caps every set at 64 nodes. */
+export const UNLOCKED_MERIDIAN_NODE_IDS_MAX = 64;
+
 // ---------------------------------------------------------------------------
 // Wire format (v1)
 // ---------------------------------------------------------------------------
@@ -129,6 +140,14 @@ export interface SavePlayerData {
   martialArtIds: string[];
   /** Current school and master; absent in older v1 saves means unaffiliated. */
   factionMembership: FactionMembership | null;
+  /** Unspent cultivation points; absent in pre-R23 v1 saves means 0. */
+  cultivationPoints: number;
+  /**
+   * Unlocked meridian node ids; absent in pre-R23 v1 saves means none. The
+   * resulting bonuses are rebuilt from the *current* node data on restore —
+   * only the stable ids travel through a save.
+   */
+  unlockedMeridianNodeIds: string[];
 }
 
 export interface SaveStackData {
@@ -234,9 +253,9 @@ function requireIntegerInRange(value: unknown, min: number, max: number): number
   return value;
 }
 
-/** Array of non-empty unique strings or null. */
-function requireUniqueNonEmptyStringArray(value: unknown): string[] | null {
-  if (!Array.isArray(value)) {
+/** Array of non-empty unique strings (at most `maxItems`, when given) or null. */
+function requireUniqueNonEmptyStringArray(value: unknown, maxItems?: number): string[] | null {
+  if (!Array.isArray(value) || (maxItems !== undefined && value.length > maxItems)) {
     return null;
   }
   const ids: string[] = [];
@@ -358,6 +377,28 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     } else {
       factionMembership = { factionId, masterNpcId };
     }
+  }
+
+  // Pre-R23 v1 saves predate the meridian network: absent means 0 points and
+  // no unlocked nodes; present values must satisfy the engine protocol.
+  const cultivationPoints =
+    playerSource === null || playerSource.cultivationPoints === undefined
+      ? 0
+      : requireIntegerInRange(playerSource.cultivationPoints, 0, CULTIVATION_POINTS_MAX);
+  if (cultivationPoints === null) {
+    errors.push(`player.cultivationPoints：应为 0–${CULTIVATION_POINTS_MAX} 的整数`);
+  }
+  const unlockedMeridianNodeIds =
+    playerSource === null || playerSource.unlockedMeridianNodeIds === undefined
+      ? []
+      : requireUniqueNonEmptyStringArray(
+          playerSource.unlockedMeridianNodeIds,
+          UNLOCKED_MERIDIAN_NODE_IDS_MAX,
+        );
+  if (unlockedMeridianNodeIds === null) {
+    errors.push(
+      `player.unlockedMeridianNodeIds：应为最多 ${UNLOCKED_MERIDIAN_NODE_IDS_MAX} 项、非重复的非空字符串数组`,
+    );
   }
 
   const inventorySource = isPlainObject(raw.inventory) ? raw.inventory : null;
@@ -653,6 +694,8 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
       healthCurrent === null ||
       qiCurrent === null ||
       martialArtIds === null ||
+      cultivationPoints === null ||
+      unlockedMeridianNodeIds === null ||
     currency === null ||
     capacity === null ||
     morality === null ||
@@ -685,6 +728,8 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
       qiCurrent,
       martialArtIds,
       factionMembership,
+      cultivationPoints,
+      unlockedMeridianNodeIds,
     },
     inventory: { currency, capacity, stacks, equipped },
     shopStocks,
@@ -994,6 +1039,8 @@ export function captureSaveSnapshot(input: CaptureInput): SaveSnapshotV1 {
       factionMembership: input.factionMembership === undefined || input.factionMembership === null
         ? null
         : { ...input.factionMembership },
+      cultivationPoints: input.character.cultivationPoints,
+      unlockedMeridianNodeIds: [...input.character.unlockedMeridianNodeIds],
     },
     inventory: {
       currency: input.inventory.currency,
@@ -1084,6 +1131,11 @@ export interface SaveWorldReferences {
   companionIds?: ReadonlySet<string>;
   /** Current valid faction-war ids; records for removed MOD content drop softly. */
   factionWarIds?: ReadonlySet<string>;
+  /**
+   * Node ids of the currently enabled meridian set; unlocked ids missing
+   * from it drop softly (data updates never invalidate a whole save).
+   */
+  meridianNodeIds?: ReadonlySet<string>;
 }
 
 export type RestorePlanResult =
@@ -1157,6 +1209,19 @@ export function planSnapshotRestore(
       factionMembership = null;
     }
   }
+
+  // Meridian unlocks follow the martial-art rule: a node id dangling in the
+  // current enabled set drops exactly its own entry with a warning instead
+  // of refusing the whole save.
+  const unlockedMeridianNodeIds = (snapshot.player.unlockedMeridianNodeIds ?? []).filter(
+    (nodeId) => {
+      if (refs.meridianNodeIds?.has(nodeId) ?? true) {
+        return true;
+      }
+      warnings.push(`已打通的经脉节点 "${nodeId}" 在当前经脉资料中不存在或已被禁用，已重置该节点`);
+      return false;
+    },
+  );
 
   const baseAttributes = { ...snapshot.player.baseAttributes };
   if (profile !== undefined) {
@@ -1347,7 +1412,13 @@ export function planSnapshotRestore(
     warnings,
     snapshot: {
       ...snapshot,
-      player: { ...snapshot.player, baseAttributes, martialArtIds, factionMembership },
+      player: {
+        ...snapshot.player,
+        baseAttributes,
+        martialArtIds,
+        factionMembership,
+        unlockedMeridianNodeIds,
+      },
       inventory: { ...snapshot.inventory, capacity: inventoryCapacity, stacks, equipped },
       shopStocks,
       quests: { states: questStates, trackedQuestId },
@@ -1413,6 +1484,11 @@ export function restoreRunState(input: RestoreRunInput): RestoredRunState {
   character.experience = snapshot.player.experience;
   character.baseAttributes = { ...snapshot.player.baseAttributes };
   character.martialArtIds = [...snapshot.player.martialArtIds];
+  // Meridian bonuses stay derived: only the resource and stable node ids
+  // restore here — the caller rebuilds bonuses from the current node data
+  // (createCharacterState has already zeroed them).
+  character.cultivationPoints = snapshot.player.cultivationPoints ?? 0;
+  character.unlockedMeridianNodeIds = [...(snapshot.player.unlockedMeridianNodeIds ?? [])];
   applyEquipmentBonuses(character, { attributes: {}, health: 0, qi: 0 });
   const { healthMax, qiMax } = computeVitalMaxima(profile, character.level, character.attributes);
   character.health = {

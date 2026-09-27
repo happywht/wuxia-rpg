@@ -12,7 +12,8 @@
     "validate:data": "node scripts/validate-data.mjs",
     "smoke:round-20": "node scripts/smoke-round-20.mjs",
     "smoke:round-21": "node scripts/smoke-round-21.mjs",
-    "smoke:round-22": "node scripts/smoke-round-22.mjs"
+    "smoke:round-22": "node scripts/smoke-round-22.mjs",
+    "smoke:round-23": "node scripts/smoke-round-23.mjs"
   },
   "dependencies": {
     "ajv": "^8.20.0",

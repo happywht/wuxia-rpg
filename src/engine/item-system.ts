@@ -827,8 +827,8 @@ function reconcileEquipment(context: EquipmentContext): void {
 
   applyEquipmentBonuses(character, totals);
   const { healthMax, qiMax } = computeVitalMaxima(profile, character.level, character.attributes);
-  const newHealthMax = healthMax + totals.health;
-  const newQiMax = qiMax + totals.qi;
+  const newHealthMax = healthMax + totals.health + character.meridianBonuses.health;
+  const newQiMax = qiMax + totals.qi + character.meridianBonuses.qi;
   character.health.current = Math.min(character.health.current, newHealthMax);
   character.qi.current = Math.min(character.qi.current, newQiMax);
   character.health.max = newHealthMax;

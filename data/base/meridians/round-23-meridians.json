@@ -1,0 +1,69 @@
+{
+  "resource": {
+    "initialPoints": 2,
+    "pointsPerLevel": 1,
+    "maximumPoints": 12
+  },
+  "nodes": [
+    {
+      "id": "meridian.qihai",
+      "name": "气海初开",
+      "description": "静息守中，拓展丹田容纳内息的余地。",
+      "minimumLevel": 1,
+      "pointCost": 1,
+      "prerequisites": [],
+      "itemCosts": [],
+      "effects": { "attributes": {}, "health": 0, "qi": 8 }
+    },
+    {
+      "id": "meridian.shouyang",
+      "name": "手阳循经",
+      "description": "以吐纳带动肩臂，运劲更为沉稳。",
+      "minimumLevel": 2,
+      "pointCost": 1,
+      "prerequisites": ["meridian.qihai"],
+      "itemCosts": [{ "itemId": "item.qingxin-wan", "quantity": 1 }],
+      "effects": { "attributes": { "force": 1 }, "health": 0, "qi": 0 }
+    },
+    {
+      "id": "meridian.zuyang",
+      "name": "足阳固本",
+      "description": "引息循腿，步履之间气血不滞。",
+      "minimumLevel": 2,
+      "pointCost": 1,
+      "prerequisites": ["meridian.qihai"],
+      "itemCosts": [{ "itemId": "item.huichun-gao", "quantity": 1 }],
+      "effects": { "attributes": { "body": 1 }, "health": 8, "qi": 0 }
+    },
+    {
+      "id": "meridian.yintang",
+      "name": "印堂清明",
+      "description": "凝神内观，使听息辨势更易专注。",
+      "minimumLevel": 3,
+      "pointCost": 2,
+      "prerequisites": ["meridian.shouyang"],
+      "itemCosts": [{ "itemId": "item.qingxin-wan", "quantity": 1 }],
+      "effects": { "attributes": { "insight": 1 }, "health": 0, "qi": 0 }
+    },
+    {
+      "id": "meridian.xuanji",
+      "name": "璇玑周流",
+      "description": "诸息相承，内力运转绵长。",
+      "minimumLevel": 5,
+      "pointCost": 2,
+      "prerequisites": ["meridian.yintang", "meridian.zuyang"],
+      "itemCosts": [{ "itemId": "item.wuji-dan", "quantity": 1 }],
+      "effects": { "attributes": { "resolve": 1 }, "health": 0, "qi": 16 }
+    },
+    {
+      "id": "meridian.tianfu",
+      "name": "天府藏息",
+      "description": "调匀气血，使久战之后仍能稳住根基。",
+      "minimumLevel": 4,
+      "pointCost": 2,
+      "prerequisites": ["meridian.zuyang"],
+      "itemCosts": [{ "itemId": "item.wuji-dan", "quantity": 1 }],
+      "effects": { "attributes": { "body": 1 }, "health": 18, "qi": 0 }
+    }
+  ]
+}

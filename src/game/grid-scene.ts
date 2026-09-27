@@ -70,6 +70,13 @@ import {
 } from '../engine/faction-war';
 import { craftAndRegisterCustomMartialArt, type MartialArtRecipe } from '../engine/martial-art-forge';
 import {
+  aggregateMeridianEffects,
+  applyMeridianEffects,
+  awardCultivationPoints,
+  unlockMeridianNode,
+  type MeridianSetData,
+} from '../engine/meridian-system';
+import {
   type AssembledShop,
   type InventoryState,
   type ItemRecordData,
@@ -117,6 +124,7 @@ import { CompanionPanel } from './companion-ui';
 import { ArenaPanel } from './arena-ui';
 import { FactionWarPanel } from './faction-war-ui';
 import { MartialArtForgePanel } from './martial-art-forge-ui';
+import { MeridianPanel } from './meridian-ui';
 import { type GameSettings, applyGameSettings, loadGameSettings, uiFontSize } from './settings';
 import { createPixelPerson, UI_FONT_FAMILY } from './ui-theme';
 import { type GridStartupData } from './menu-scene';
@@ -256,6 +264,8 @@ export class GridScene extends Phaser.Scene {
     factions: new Map(),
     martialArts: new Map(),
   };
+  /** Optional data-authored cultivation network; progression otherwise remains available. */
+  private meridianSet: MeridianSetData | null = null;
 
   /** Placed battle encounters and their per-run completion state (Round 05). */
   private encounters: PlacedEncounter[] = [];
@@ -322,6 +332,7 @@ export class GridScene extends Phaser.Scene {
   private arenaPanel: ArenaPanel | null = null;
   private factionWarPanel: FactionWarPanel | null = null;
   private martialArtForgePanel: MartialArtForgePanel | null = null;
+  private meridianPanel: MeridianPanel | null = null;
   private activeSession: CombatSession | null = null;
   private activeEncounter: PlacedEncounter | null = null;
 
@@ -470,6 +481,7 @@ export class GridScene extends Phaser.Scene {
     this.companions = assembly.companions;
     this.companionState = createCompanionState(restoredRun?.activeCompanionId ?? null);
     this.progression = assembly.progression;
+    this.meridianSet = assembly.meridianSet;
     this.occupancy = new NpcOccupancyIndex(this.placedNpcs);
     this.encounters = assembly.encounters.filter(
       (encounter) => encounter.record.mapResourceId === this.currentMapResourceId,
@@ -540,7 +552,7 @@ export class GridScene extends Phaser.Scene {
         null;
       if (profile !== null) {
         this.playerProfile = profile;
-        this.playerState = createCharacterState(profile);
+        this.playerState = createCharacterState(profile, assembly.meridianSet?.resource.initialPoints ?? 0);
         const startingArts = resolveStartingMartialArts(
           profile,
           assembly.progression.martialArts,
@@ -564,6 +576,13 @@ export class GridScene extends Phaser.Scene {
       }
       this.playerCol = map.playerStart.col;
       this.playerRow = map.playerStart.row;
+    }
+    if (this.playerProfile !== null && this.playerState !== null) {
+      applyMeridianEffects(
+        this.playerProfile,
+        this.playerState,
+        aggregateMeridianEffects(this.meridianSet, this.playerState.unlockedMeridianNodeIds),
+      );
     }
     this.lastNpcSchedulePeriodId = this.clock.currentPeriod().id;
     this.placedNpcs = this.resolveNpcPlacements(this.lastNpcSchedulePeriodId);
@@ -644,6 +663,7 @@ export class GridScene extends Phaser.Scene {
     this.arenaPanel = new ArenaPanel(this, () => this.noteOverlayClosed());
     this.factionWarPanel = new FactionWarPanel(this, () => this.noteOverlayClosed());
     this.martialArtForgePanel = new MartialArtForgePanel(this, () => this.noteOverlayClosed());
+    this.meridianPanel = new MeridianPanel(this, () => this.noteOverlayClosed());
     this.worldMapPanel = new WorldMapPanel(this, () => this.noteOverlayClosed());
     this.encyclopediaPanel = new EncyclopediaPanel(this, { onClose: () => this.noteOverlayClosed() });
     this.updateQuestTrackerHud();
@@ -819,6 +839,7 @@ export class GridScene extends Phaser.Scene {
       ),
       companionIds: new Set(world.assembly.companions.keys()),
       factionWarIds: new Set(world.assembly.factionWars.map((war) => war.record.id)),
+      meridianNodeIds: new Set(world.assembly.meridianSet?.nodes.map((node) => node.id) ?? []),
     };
   }
 
@@ -1073,6 +1094,7 @@ export class GridScene extends Phaser.Scene {
       profile,
       player,
       martialArts: this.combatMartialArts(),
+      ...(this.meridianSet !== null ? { meridianResourceRules: this.meridianSet.resource } : {}),
       ...(activeCompanion !== undefined && companionNpc !== undefined
         ? { companion: { name: companionNpc.record.name, support: activeCompanion.combatSupport } }
         : {}),
@@ -1171,6 +1193,7 @@ export class GridScene extends Phaser.Scene {
       profile,
       player,
       martialArts: this.combatMartialArts(),
+      ...(this.meridianSet !== null ? { meridianResourceRules: this.meridianSet.resource } : {}),
       ...(activeCompanion !== undefined && companionNpc !== undefined
         ? { companion: { name: companionNpc.record.name, support: activeCompanion.combatSupport } }
         : {}),
@@ -1863,7 +1886,7 @@ export class GridScene extends Phaser.Scene {
         : 'P 同行伙伴 · 暂无可交互人物');
       return;
     }
-    this.interactText.setText('C 自创武学 · H 操作帮助 · Esc 暂停');
+    this.interactText.setText('N 经脉 · C 自创武学 · H 操作帮助 · Esc 暂停');
   }
 
   /** True while any keyboard overlay owns the input (dialogue/battle/backpack/shop/quest/pause). */
@@ -1882,6 +1905,7 @@ export class GridScene extends Phaser.Scene {
       (this.arenaPanel !== null && this.arenaPanel.isOpen) ||
       (this.factionWarPanel !== null && this.factionWarPanel.isOpen) ||
       (this.martialArtForgePanel !== null && this.martialArtForgePanel.isOpen) ||
+      (this.meridianPanel !== null && this.meridianPanel.isOpen) ||
       (this.controlsPanel !== null && this.controlsPanel.isOpen)
     );
   }
@@ -1937,6 +1961,49 @@ export class GridScene extends Phaser.Scene {
         if (!result.ok) return { ok: false, message: result.reason };
         this.showRegionNotice(`自创武学「${result.art.name}」已成，内力 ${result.art.combat.qiCost}，银两 -${result.silverCost}。`);
         return { ok: true, message: '创制成功' };
+      },
+    });
+    this.updateInteractHint();
+  }
+
+  /** N key: study an available data-authored meridian node outside combat. */
+  private toggleMeridianPanel(): void {
+    const panel = this.meridianPanel;
+    if (panel === null) return;
+    if (panel.isOpen) {
+      panel.close();
+      return;
+    }
+    if (this.anyOverlayOpen()) return;
+    const set = this.meridianSet;
+    const character = this.playerState;
+    const inventory = this.inventory;
+    const profile = this.playerProfile;
+    if (set === null || set.nodes.length === 0) {
+      this.showRegionNotice('经脉资料暂不可用，内修入口已关闭。');
+      return;
+    }
+    if (character === null || inventory === null || profile === null) {
+      this.showRegionNotice('当前角色或背包状态不可用，暂时不能内修。');
+      return;
+    }
+    panel.open({
+      set,
+      character,
+      inventory,
+      items: this.items,
+      onUnlock: (nodeId) => {
+        const result = unlockMeridianNode({ set, nodeId, character, inventory, items: this.items });
+        if (!result.ok) return { ok: false, message: result.reason };
+        applyMeridianEffects(profile, character, aggregateMeridianEffects(set, character.unlockedMeridianNodeIds));
+        const effectNames: string[] = [];
+        if (result.node.effects.health > 0) effectNames.push(`气血 +${result.node.effects.health}`);
+        if (result.node.effects.qi > 0) effectNames.push(`内力 +${result.node.effects.qi}`);
+        for (const [id, amount] of Object.entries(result.node.effects.attributes)) {
+          if (amount > 0) effectNames.push(`${id} +${amount}`);
+        }
+        this.showRegionNotice(`打通「${result.node.name}」：${effectNames.join('、')}。`);
+        return { ok: true, message: `已打通「${result.node.name}」，剩余修为 ${result.remainingPoints}。` };
       },
     });
     this.updateInteractHint();
@@ -2068,11 +2135,15 @@ export class GridScene extends Phaser.Scene {
       for (const reward of update.completed) {
         const quest = this.quests.get(reward.questId);
         const experience = grantExperience(this.playerProfile, this.playerState, reward.experience);
+        const cultivation = this.meridianSet === null
+          ? 0
+          : awardCultivationPoints(this.playerState, experience.levelsGained, this.meridianSet.resource);
         const paidExperience = reward.experience - experience.discardedExperience;
         this.inventory.currency += reward.currency;
+        const cultivationText = cultivation > 0 ? ` · 修为 +${cultivation}` : '';
         this.questNotice = quest === undefined
-          ? `差事完成：经验 +${paidExperience} · 银两 +${reward.currency}`
-          : `完成「${quest.name}」：经验 +${paidExperience} · 银两 +${reward.currency}`;
+          ? `差事完成：经验 +${paidExperience} · 银两 +${reward.currency}${cultivationText}`
+          : `完成「${quest.name}」：经验 +${paidExperience} · 银两 +${reward.currency}${cultivationText}`;
         console.info('[quest] 任务 "%s" 完成：经验 +%d，银两 +%d', reward.questId, paidExperience, reward.currency);
       }
     }
@@ -2205,6 +2276,10 @@ export class GridScene extends Phaser.Scene {
     const onControls = (): void => this.toggleControlsPanel();
     controlsKey.on('down', onControls);
 
+    const meridianKey = keyboard.addKey(KeyCodes.N);
+    const onMeridian = (): void => this.toggleMeridianPanel();
+    meridianKey.on('down', onMeridian);
+
     const companionKey = keyboard.addKey(KeyCodes.P);
     const onCompanions = (): void => this.toggleCompanionPanel();
     companionKey.on('down', onCompanions);
@@ -2227,6 +2302,7 @@ export class GridScene extends Phaser.Scene {
       factionKey.off('down', onFaction);
       martialArtForgeKey.off('down', onMartialArtForge);
       controlsKey.off('down', onControls);
+      meridianKey.off('down', onMeridian);
       companionKey.off('down', onCompanions);
       waitKey.off('down', onWait);
       this.dialoguePanel?.destroy();
@@ -2255,6 +2331,8 @@ export class GridScene extends Phaser.Scene {
       this.factionWarPanel = null;
       this.martialArtForgePanel?.destroy();
       this.martialArtForgePanel = null;
+      this.meridianPanel?.destroy();
+      this.meridianPanel = null;
       this.controlsPanel?.destroy();
       this.controlsPanel = null;
       this.activeSession = null;
@@ -2463,6 +2541,7 @@ export class GridScene extends Phaser.Scene {
       profile: this.playerProfile,
       player: this.playerState,
       martialArts: this.combatMartialArts(),
+      ...(this.meridianSet !== null ? { meridianResourceRules: this.meridianSet.resource } : {}),
       ...(activeCompanion !== undefined && companionNpc !== undefined
         ? { companion: { name: companionNpc.record.name, support: activeCompanion.combatSupport } }
         : {}),

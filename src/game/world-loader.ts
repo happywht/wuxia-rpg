@@ -79,6 +79,11 @@ import {
   type MartialArtForgeComponentSet,
 } from '../engine/martial-art-forge';
 import {
+  parseMeridianSet,
+  resolveMeridianItemReferences,
+  type MeridianSetData,
+} from '../engine/meridian-system';
+import {
   assembleBattleEncounters,
   type BattleEncounterSetData,
   parseBattleEncounterSet,
@@ -113,6 +118,7 @@ const ENCOUNTER_RESOURCE_ID = 'encounter.round-05-set';
 const ARENA_RESOURCE_ID = 'arena.round-20-set';
 const FACTION_WAR_RESOURCE_ID = 'faction-war.round-21-set';
 const MARTIAL_ART_COMPONENT_RESOURCE_ID = 'martial-art-components.round-22-set';
+const MERIDIAN_RESOURCE_ID = 'meridian.round-23-set';
 const ITEM_RESOURCE_ID = 'item.round-06-set';
 const SHOP_RESOURCE_ID = 'shop.round-06-set';
 const QUEST_RESOURCE_ID = 'quest.round-07-set';
@@ -131,6 +137,7 @@ const OPTIONAL_RESOURCE_IDS = new Set([
   ARENA_RESOURCE_ID,
   FACTION_WAR_RESOURCE_ID,
   MARTIAL_ART_COMPONENT_RESOURCE_ID,
+  MERIDIAN_RESOURCE_ID,
   ITEM_RESOURCE_ID,
   SHOP_RESOURCE_ID,
   QUEST_RESOURCE_ID,
@@ -150,6 +157,7 @@ const OPTIONAL_SCHEMA_ORIGINS = new Set([
   'schema:arena-set',
   'schema:faction-war-set',
   'schema:martial-art-components',
+  'schema:meridian-set',
   'schema:items-set',
   'schema:shops-set',
   'schema:quest-set',
@@ -196,6 +204,8 @@ export interface WorldAssembly {
   factionWars: AssembledFactionWar[];
   /** Optional data-authored parts; null cleanly disables the Round 22 forge. */
   martialArtForgeComponents: MartialArtForgeComponentSet | null;
+  /** Optional meridian network/rules; null leaves other progression intact. */
+  meridianSet: MeridianSetData | null;
   items: ReadonlyMap<string, ItemRecordData>;
   shops: ReadonlyMap<string, AssembledShop>;
   quests: ReadonlyMap<string, QuestData>;
@@ -295,6 +305,10 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
         },
         'martial-art-components': (value) => {
           const parsed = parseMartialArtForgeComponents(value);
+          return parsed.ok ? [] : parsed.errors;
+        },
+        'meridian-set': (value) => {
+          const parsed = parseMeridianSet(value);
           return parsed.ok ? [] : parsed.errors;
         },
         'items-set': (value) => {
@@ -704,6 +718,33 @@ function assembleOptionalContent(
   const itemAssembly = assembleItemContent(resources);
   warnings.push(...itemAssembly.warnings);
 
+  let meridianSet: MeridianSetData | null = null;
+  const meridianResource = resources.get(MERIDIAN_RESOURCE_ID);
+  if (meridianResource !== undefined) {
+    const parsed = parseMeridianSet(meridianResource.value);
+    if (!parsed.ok) {
+      warnings.push({
+        resource: MERIDIAN_RESOURCE_ID,
+        origin: 'meridian-assembly',
+        severity: 'warning',
+        message: '经脉资料无效，已关闭内修入口',
+        details: parsed.errors,
+      });
+    } else {
+      const resolved = resolveMeridianItemReferences(parsed.set, new Set(itemAssembly.items.keys()));
+      meridianSet = resolved.set;
+      for (const message of resolved.warnings) {
+        warnings.push({
+          resource: MERIDIAN_RESOURCE_ID,
+          origin: 'meridian-assembly',
+          severity: 'warning',
+          message,
+          details: [],
+        });
+      }
+    }
+  }
+
   const shopAssembly = assembleShops({
     shopSet: itemAssembly.shopSet,
     placedNpcIds: new Set(allNpcs.map((npc) => npc.record.id)),
@@ -1054,6 +1095,7 @@ function assembleOptionalContent(
     arenas: arenaAssembly.arenas,
     factionWars: factionWarAssembly.wars,
     martialArtForgeComponents,
+    meridianSet,
     items: itemAssembly.items,
     shops: shopAssembly.shops,
     quests: questAssembly.quests,

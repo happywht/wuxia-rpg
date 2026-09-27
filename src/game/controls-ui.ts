@@ -49,8 +49,8 @@ export class ControlsPanel {
     this.addText('E　调查相邻人物、关口或区域事件', left + 44, top + 122, 14, UI_PALETTE.text);
     this.addText('F　与相邻人物直接交谈', left + 44, top + 151, 14, UI_PALETTE.text);
     this.addText('V　原地等候片刻（面板打开时无效）', left + 44, top + 180, 14, UI_PALETTE.text);
-    this.addText('B 背包　C 自创武学　P 伙伴　J 师门　Q 差事　M 舆图　K 百科　Esc 暂停', left + 44, top + 209, 13, UI_PALETTE.text);
-    this.addText('天气随日期变化，雨雪增加步耗时；NPC 随时段移动', left + 44, top + 238, 12, UI_PALETTE.muted);
+    this.addText('B 背包　N 经脉　C 自创武学　P 伙伴　J 师门　Q 差事　M 舆图　K 百科　Esc 暂停', left + 44, top + 209, 12, UI_PALETTE.text);
+    this.addText('内修消耗升级修为和背包材料；打通的效果影响战斗属性', left + 44, top + 238, 11, UI_PALETTE.muted);
 
     this.addText('面板', left + 28, top + 266, 13, UI_PALETTE.jade);
     this.addText('↑/↓ 或 W/S　选择条目　·　Enter　确认', left + 44, top + 293, 13, UI_PALETTE.text);

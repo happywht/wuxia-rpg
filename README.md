@@ -4,11 +4,11 @@
 
 - 设计文档：`docs/GDD.md`
 - 逐轮路线图（R00–R50）：`ROADMAP.md`
-- 当前进度：**Round 22 已完成；下一轮 Round 23（经脉与内修）**
+- 当前进度：**Round 23 已完成；下一轮 Round 24（锻造与装备强化）**
 
 ## 范围
 
-- ✅ 已完成（R00–R22）：网格探索、任务/物品/战斗与存档闭环；知识图谱百科、奇遇、善恶声望、三派师门、昼夜天气、NPC 日程、伙伴、擂台、门派战及自创武学；后续逐步扩充人物/门派/任务/物品/武学/结局/图谱数量并完善测试与发布。
+- ✅ 已完成（R00–R23）：网格探索、任务/物品/战斗与存档闭环；知识图谱百科、奇遇、善恶声望、三派师门、昼夜天气、NPC 日程、伙伴、擂台、门派战、自创武学与经脉内修。后续逐步扩充人物/门派/任务/物品/武学/结局/图谱数量并完善测试与发布。
 - ⏳ 正在按路线图逐轮推进：共 51 轮（R00–R50）；正式 Vitest 基线仍排在 Round 38，最终内容数量与发布验收尚未完成。
 - 永久边界：不做多人联网；不含原作内容；mod 仅限同名 JSON 覆盖（见 `docs/DATA-GUIDE.md`）。
 
@@ -38,6 +38,7 @@ npm run preview    # 预览生产构建
 npm run typecheck  # 仅类型检查
 npm run validate:data # 校验 manifest 登记的基础资料/schema
 npm run smoke:round-22 # 自创武学规则、战斗与存档冒烟
+npm run smoke:round-23 # 经脉内修规则、战斗、资料与存档冒烟
 ```
 
 > Round 10 验证：`npm run build` 通过；Ajv 检查 manifest 下登记资料；浏览器手动验证 M 舆图/输入锁、关口往返、一次性事件去重、跨区保存/读档以及 Round 09 快照兼容。Phaser 主包 chunk 仍超过 500 kB 建议阈值；基础数据与 schema 位于 `data/`，启用 MOD 列表见 `data/base/manifest.json`，区域协议见 `docs/MAP-ATLAS.md`，存档协议见 `docs/SAVES.md`。
@@ -56,7 +57,7 @@ npm run smoke:round-22 # 自创武学规则、战斗与存档冒烟
 │   └── schema/           # 所有已登记数据族的 JSON Schema
 ├── mods/                 # mod 同名覆盖层（含未启用的 example）
 ├── docs/                 # 设计与规范文档
-├── iterations/           # 逐轮计划（Round 00–Round 22）
+├── iterations/           # 逐轮计划（Round 00 起逐轮推进）
 ├── ROADMAP.md            # R00–R50 路线图
 ├── CHANGELOG.md          # 变更日志
 └── DEVLOG.md             # 开发日志（含核验记录）
@@ -77,6 +78,7 @@ npm run smoke:round-22 # 自创武学规则、战斗与存档冒烟
 | `docs/CLIMATE.md` | 季节/天气资源协议、确定性日天气、画面表现与行动耗时 |
 | `docs/NPC-SCHEDULES.md` | NPC 时段日程资料契约、冲突优先级、回退与跨区域/存档规则 |
 | `docs/SAVES.md` | 本地存档与设置存储协议、恢复预检和兼容边界 |
+| `docs/MERIDIANS.md` | 经脉节点资料、修为奖励、材料消耗与效果规则 |
 | `docs/MAP-ATLAS.md` | 世界舆图、区域地图资源、关口、区域事件及占位校验 |
 
 ## 原创性与授权声明
