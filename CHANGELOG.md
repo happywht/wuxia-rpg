@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+### Fixed (Round 00 reference audit)
+
+- 给 `docs/REFERENCES.md` 的历史/回忆来源与官方技术资料统一分配不重复编号（#1–#12），并明确官网文档页面许可未逐页核实、仅作事实查阅；npm 包许可证仅按精确版本 registry 元数据记录，不代表文档页面许可。
+- 保留 `docs/ORIGINAL-FIDELITY.md` 中 #1–#5 的历史来源引用语义，不改变原作证据等级或已冻结技术栈。
+
 ### Added (Round 09)
 
 - 新增版本 1 纯数据本地存档协议 `src/engine/save-system.ts`：三个命名槽位支持列举、保存、读取与删除；快照包含角色成长/位置、背包装备、商店库存、任务进度、善恶声望关系和一次性遭遇状态，恢复时重算派生属性。
