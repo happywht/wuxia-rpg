@@ -11,6 +11,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "benchmark:round-40": "node scripts/benchmark-round-40.mjs",
     "validate:data": "node scripts/validate-data.mjs",
     "inspect:mods": "node scripts/inspect-mods.mjs",
     "content:export": "node scripts/content-package.mjs export",

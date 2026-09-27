@@ -36,6 +36,7 @@
 | 13 | [Vite HMR API](https://vite.dev/guide/api-hmr) 与 [Vite Plugin API](https://vite.dev/guide/api-plugin) | Round 36 自定义客户端 HMR 事件及 Vite Environment API `hotUpdate` 钩子的实现依据 | 页面许可未逐页核实；只查阅/转述技术事实，不复制文档段落、示例代码或素材 |
 | 14 | [GitHub Actions 官方文档](https://docs.github.com/actions) | Round 39 持续集成工作流的触发事件（push/pull_request/workflow_dispatch）、`permissions`、`timeout-minutes` 与 `npm ci` 缓存等语法依据 | 页面许可未逐页核实；只查阅/转述技术事实，不复制文档段落、示例代码或素材 |
 | 15 | [actions/checkout](https://github.com/actions/checkout) 与 [actions/setup-node](https://github.com/actions/setup-node) 官方仓库 | Round 39 CI 检出代码与 Node 22/npm 缓存环境搭建（`@v7`）所用官方 action 的用法与版本依据 | 仓库许可未逐项核实（两者为 GitHub 官方维护的开源 action）；只查阅用法事实，不复制其源码或文档段落 |
+| 16 | [Vitest 官方基准指南](https://vitest.dev/guide/benchmarking) 与 [迁移指南](https://vitest.dev/guide/migration/) | Round 40 基准通道依据：Vitest 5 起 `bench` 从顶层导入改为 `test()` 回调的 bench fixture、`*.bench.ts` 按 `benchmark.include` 与普通测试互不可见、`vitest bench` 命令语义、模块 runner export-getter 开销警示及"测构建产物/局部捕获"缓解建议 | 页面许可未逐页核实；只查阅/转述技术事实，不复制文档段落、示例代码或素材 |
 
 ## 四、软件包许可核验（npm 元数据）
 

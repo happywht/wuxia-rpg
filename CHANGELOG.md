@@ -4,6 +4,17 @@
 
 ## [Unreleased]
 
+### Added (Round 40)
+
+- **可重复性能/内存基准 `npm run benchmark:round-40`**（与常规 `npm test` 双向隔离）：入口 `scripts/benchmark-round-40.mjs` 串联两段——① Vitest bench 通道（`tests/performance-round-40.bench.ts`，由 `vitest.config.ts` 新增的 `benchmark.include` 只匹配 `tests/` 下 `*.bench.ts`；普通 `npm test` 的 `*.test.ts` glob 与 Vitest 普通 `run` 模式都看不到基准文件），以 `NODE_OPTIONS=--expose-gc` 把 GC 暴露给 worker；② 裸 Node 通道（`scripts/benchmark-round-40-bare.mjs`）用 Vite `build.ssr` API 打包真实渲染器后纯 Node 计时。Vitest 5 的基准 API 已改为 `test()` 回调中的 `bench` fixture（不再是顶层导入），官方来源登记于 `docs/REFERENCES.md` #16。输出 Node/平台/CPU/GC 环境、每图场景对象数与绘制调用数（结构）、四尺寸渲染耗时、真实 26 资源 `loadGameData` 耗时（内存 fetch stub，零网络）与 50 轮长跑的 GC 后堆观察；毫秒/堆读数全部为描述性观察，仅保留结构性断言（每轮 26 资源/0 诊断）。
+- **地图渲染重写为单 Graphics 层：每张图场景对象 O(3N+1) → O(1)（恒 2）**：`src/engine/grid-map-renderer.ts` 新增纯函数 `buildGridMapDrawCommands`（每格 4 条命令：底色 fill → 边线 stroke → 顶部亮边 fill → 右缘暗边 fill；顺序、几何、明暗派生与 alpha 与旧 tile-per-rectangle 渲染逐项一致，瓦片颜色解析/明暗派生按颜色字符串缓存），`renderGridMap` 把命令烘焙进单个 Graphics（连续相同 fillStyle/lineStyle 去重）并挂入返回的 Container——公共签名与地图切换 `mapLayer?.destroy()` 容器销毁语义不变；`cellCenterOffset` 改返回普通 `{ x, y }`；模块改为 `import type Phaser`（运行时零依赖，命令生成可在纯 Node 测试与基准，旧渲染器因运行时导入 Phaser 无法进 Node 进程）。基线（16×9/32×24/64×48/128×96 = 433/2,305/9,217/36,865 个对象）→ 重写后全部恒 2 个；裸 Node 口径 12,288 格命令生成约 4 ms；Vitest 口径（模块 runner 开销主导，绝对值偏大约三个数量级）合成时间运行间噪声内持平。详见新增 `docs/PERFORMANCE.md`（命令、环境、读数与方法局限）。
+- **渲染器结构回归测试 `tests/grid-map-renderer.test.ts`（10 用例）**：场景对象数随面积 16 倍增长恒为 2；逐格命令顺序与几何/颜色/alpha 精确断言；绘制范围与地图像素宽高一致；Graphics 挂在返回容器内（`destroy()` 级联语义）；样式去重（lineStyle 全图一次）；`cellCenterOffset` 坐标计算。`npm test` 更新为 5 文件 63 用例。
+- README（进度至 R40、命令区补 `benchmark:round-40`、用例数 63）；`docs/TESTING.md` 新增「性能基准：与单元测试双向隔离」章节、覆盖表/关系表/变更记录更新；`docs/REFERENCES.md` 登记 Vitest 官方基准/迁移指南（#16）。
+
+### Verification (Round 40)
+
+- 本机（Windows 11、Node v22.18.0、Intel Core Ultra 5 225H）：优化前基线与重写后用同一命令 `npm run benchmark:round-40` 各采集两轮以上，结构读数（对象数）前后对比 433/2,305/9,217/36,865 → 恒 2，50 轮长跑每轮 26 资源 0 诊断、GC 后堆差值 +1.3~3.4 MiB 区间无累积趋势；`npm run check` 通过（26 资源校验、0 MOD 问题、类型检查、5 文件 63 用例、文档审计）；`npm run build` 通过（130 modules、主 JS 1,882.01 kB / gzip 495.80 kB，与 R39 基线一致）；`npm run smoke:round-20/30/33/35/36/37` 全部通过（地图占格、人物、图谱全量映射及 CI 三条回归）；生产构建 + `vite preview` 浏览器烟测：主菜单→创建角色→进入「方格试炼场」渲染正常（网格/边线/明暗边/NPC/敌人/HUD），经关口「石阶渡口」切换「雾渡口」再经「回望石阶」返回，双向 destroy/重建路径渲染完整无残影，无新增 console 错误（仅既有 favicon 404 与 R32 锻造配方可选警告触发的既有聚合通知）。
+
 ### Added (Round 39)
 
 - **统一质量门槛 `npm run check`**：以 `&&` 串联固定顺序——`validate:data`（manifest + 26 个基础资源 Schema）→ `inspect:mods`（manifest 中已启用 MOD 覆盖层的只读校验与最终来源；未启用目录不在其覆盖边界内）→ `typecheck`（严格 tsc，含 `tests/` 与 `vitest.config.ts`）→ `test`（Vitest 53 用例）→ `audit:round-34`（文档一致性审计）。任一步非零退出即中止后续步骤并使 `check` 整体非零退出。

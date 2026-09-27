@@ -11,10 +11,25 @@ import { defineConfig } from 'vitest/config';
  *
  * Tests are Phaser-free engine units plus the shared data validator, so the
  * plain Node environment is enough — no DOM, no browser, no network.
+ *
+ * Round 40 adds the separate benchmark channel: `benchmark.include` matches
+ * every `*.bench.ts` under tests/, which the plain `test.include` glob above
+ * never picks up. `npm test` therefore runs unit tests only, while
+ * `npm run benchmark:round-40` launches `vitest bench` explicitly — the two
+ * never mix in one run.
  */
 export default defineConfig({
   test: {
     environment: 'node',
     include: ['tests/**/*.test.ts'],
+    benchmark: {
+      include: ['tests/**/*.bench.ts'],
+      // The render benchmark intentionally keeps Vitest's module runner (and
+      // its export-getter overhead) ON so before/after runs share one
+      // measurement basis; the overhead itself is documented in
+      // docs/PERFORMANCE.md. This flag only silences the repeated console
+      // warning Vitest prints per benchmark task.
+      suppressExportGetterWarnings: true,
+    },
   },
 });

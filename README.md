@@ -4,12 +4,12 @@
 
 - 设计文档：`docs/GDD.md`
 - 逐轮路线图（R00–R50）：`ROADMAP.md`
-- 当前进度：**Round 39 已完成；下一轮 Round 40（性能与内存测量）**
+- 当前进度：**Round 40 已完成；下一轮 Round 41**
 
 ## 范围
 
-- ✅ 已完成（R00–R39）：网格探索、任务/物品/战斗与存档闭环；五派师门、昼夜天气、NPC 日程、伙伴、擂台、门派战、自创武学、经脉内修、锻造炼丹、多结局、成就与图鉴；基础资料包含 20 项任务、50 件物品、30 种武学及 134 节点知识图谱，并有世界设定和资料规范文档审计；MOD 多层覆盖顺序、来源追踪、游戏内 F2 诊断面板、`inspect:mods` 只读检查、开发模式资料热重载、单文件 v1 内容包（导出/只读预检/显式安装）、Vitest 单元测试基线（53 用例）与统一 `check` 质量门槛（资料/MOD 校验、类型、测试、文档审计）及 GitHub Actions 持续集成。
-- ⏳ 正在按路线图逐轮推进：共 51 轮（R00–R50）；性能测量、内容扩充与发布验收尚未完成。
+- ✅ 已完成（R00–R40）：网格探索、任务/物品/战斗与存档闭环；五派师门、昼夜天气、NPC 日程、伙伴、擂台、门派战、自创武学、经脉内修、锻造炼丹、多结局、成就与图鉴；基础资料包含 20 项任务、50 件物品、30 种武学及 134 节点知识图谱，并有世界设定和资料规范文档审计；MOD 多层覆盖顺序、来源追踪、游戏内 F2 诊断面板、`inspect:mods` 只读检查、开发模式资料热重载、单文件 v1 内容包（导出/只读预检/显式安装）、Vitest 单元测试基线（63 用例）与统一 `check` 质量门槛（资料/MOD 校验、类型、测试、文档审计）及 GitHub Actions 持续集成；地图渲染重写为单 Graphics 层（每图恒定 2 个场景对象，R40）并有可重复性能/内存基准（`npm run benchmark:round-40`，见 `docs/PERFORMANCE.md`）。
+- ⏳ 正在按路线图逐轮推进：共 51 轮（R00–R50）；内容扩充与发布验收尚未完成。
 - 永久边界：不做多人联网；不含原作内容；mod 仅限同名 JSON 覆盖（见 `docs/DATA-GUIDE.md`）。
 
 ## 技术栈（版本已核验并冻结，见 `docs/ADR.md`）
@@ -36,7 +36,8 @@ npm run dev        # 启动开发服务器（默认 http://localhost:5173）
 npm run check      # 统一质量门槛：validate:data → inspect:mods → typecheck → test → audit:round-34，任一失败即中止
 npm run build      # 先完整通过 npm run check，再执行 Vite 生产构建
 npm run preview    # 预览生产构建
-npm test           # Vitest 单元测试（vitest run，53 用例）
+npm test           # Vitest 单元测试（vitest run，63 用例；不含基准）
+npm run benchmark:round-40 # 性能/内存基准（渲染对象数与耗时、26 资源加载、50 轮长跑堆观察；与 npm test 隔离）
 npm run typecheck  # 仅类型检查（tsc --noEmit，严格模式）
 npm run validate:data # 校验 manifest 登记的基础资料/schema
 npm run inspect:mods  # 只读检查已启用 MOD 的覆盖层/最终来源与修复提示
@@ -73,7 +74,7 @@ npm run audit:round-34 # 地图、对白、任务及世界设定文档一致性�
 │   └── schema/           # 所有已登记数据族的 JSON Schema
 ├── mods/                 # mod 同名覆盖层（含未启用的 example）
 ├── docs/                 # 设计与规范文档
-├── tests/                # Vitest 单元测试（Round 38 起）
+├── tests/                # Vitest 单元测试（Round 38 起）与性能基准（*.bench.ts，Round 40 起）
 ├── iterations/           # 逐轮计划（Round 00 起逐轮推进）
 ├── ROADMAP.md            # R00–R50 路线图
 ├── CHANGELOG.md          # 变更日志

@@ -6,7 +6,8 @@ Round 38 起本项目拥有可重复运行的 Vitest 自动化测试基线；Rou
 
 ```bash
 npm run check       # 统一质量门槛（R39 起）：validate:data → inspect:mods → typecheck → test → audit:round-34
-npm test            # vitest run，单次运行全部测试（CI 语义）
+npm test            # vitest run，单次运行全部测试（CI 语义；不包含性能基准）
+npm run benchmark:round-40 # 性能/内存基准（R40 起；与 npm test 双向隔离，见下文）
 npm run typecheck   # tsc --noEmit，严格模式，包含 tests/ 与 vitest.config.ts
 npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现，见下文）
 ```
@@ -25,18 +26,27 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 
 `.github/workflows/quality-gates.yml` 在 push、pull request 与 workflow_dispatch 触发时于 Node 22 运行器上执行 `npm ci`（锁文件精确安装 + npm 缓存）→ `npm run build`（含完整门槛）→ `smoke:round-35`/`36`/`37` 回归烟测；仅 `contents: read` 权限、15 分钟超时、无部署发布步骤。CI 与本地命令完全同源；workflow 首次实际运行状态以 GitHub Actions 页面为准。
 
-- 测试框架：Vitest 5.0.2。官方指南要求 Vite >=6.4.0、Node >=22.12.0；本仓库使用 Vite 8.3.1 与 Node 22.18.0，符合要求（详见 [`docs/REFERENCES.md`](REFERENCES.md) #12）。
+- 测试框架：Vitest 5.0.2。官方指南要求 Vite >=6.4.0、Node >=22.12.0；本仓库使用 Vite 8.3.1 与 Node 22.18.0，符合要求（详见 [`docs/REFERENCES.md`](REFERENCES.md) #12；基准 API 见同文件 #16）。
 - 运行环境：Node（无 DOM、无浏览器、无网络、无真实时钟依赖）。
-- 覆盖统计：4 个测试文件、53 个用例（详见 `CHANGELOG.md` Round 38 条目）。
+- 覆盖统计：5 个测试文件、63 个用例（R38 建立四组 53 个，R40 新增渲染器结构回归 10 个；详见 `CHANGELOG.md` 对应条目）。
 
 ## 配置：为什么有独立的 `vitest.config.ts`
 
 仓库的 `vite.config.ts` 是一个**异步工厂**：它会动态加载开发态资料热重载插件（`scripts/data-hmr-plugin.mjs`）并注册 `mods/` 开发服务器中间件。这些是 dev-server 副作用，测试运行器绝不能启动。
 
-因此测试使用独立的 `vitest.config.ts`：当两个配置文件同时存在时，Vitest 只读取 `vitest.config.ts`、完全不加载应用配置。测试配置只声明两件事：
+因此测试使用独立的 `vitest.config.ts`：当两个配置文件同时存在时，Vitest 只读取 `vitest.config.ts`、完全不加载应用配置。测试配置只声明三件事：
 
 - `environment: 'node'` — 引擎单元是纯 TypeScript，无 Phaser 场景依赖；
-- `include: ['tests/**/*.test.ts']` — 测试统一放在 `tests/` 目录。
+- `include: ['tests/**/*.test.ts']` — 测试统一放在 `tests/` 目录；
+- `benchmark.include: ['tests/**/*.bench.ts']` — 性能基准走独立通道（R40 起，见下节）。
+
+## 性能基准：与单元测试双向隔离（Round 40 起）
+
+性能与内存测量入口是 `npm run benchmark:round-40`（详见 [`docs/PERFORMANCE.md`](PERFORMANCE.md)），不进 `npm run check`/CI 门槛。隔离机制：
+
+- 基准文件 `tests/performance-round-40.bench.ts` 只被 `vitest.config.ts` 的 `benchmark.include`（`tests/` 下全部 `*.bench.ts`）匹配；`npm test` 的 `test.include` 只匹配 `*.test.ts`——普通测试运行永远看不到基准文件，反之 `vitest bench` 只跑基准。Vitest 5 的基准 API（`test()` 回调中的 `bench` fixture）也只在 `*.bench.ts` 文件内可用。
+- 入口 `scripts/benchmark-round-40.mjs` 串联两段：`vitest bench --run --silent=false`（`NODE_OPTIONS=--expose-gc` 使长跑可在读堆前强制 GC）与裸 Node 通道 `scripts/benchmark-round-40-bare.mjs`（Vite `build.ssr` 打包真实渲染器后计时，抵消 Vitest 模块 runner 的 export-getter 开销）。
+- 基准内只做**结构性断言**（每轮 26 资源 / 0 诊断），毫秒与堆读数全部是描述性输出——速度不构成任何通过/失败条件。
 
 ## 测试覆盖范围
 
@@ -46,6 +56,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 | `tests/dialogue.test.ts` | `src/engine/dialogue-graph.ts`、`dialogue-runtime.ts` | `parseDialogueSet` 正反向（信封破损整份拒绝、单段坏对话仅隔离自身）；`validateConversation` 图语义（重复节点 id、缺失起始节点、悬空选项目标）；运行时条件可见性 `isConditionMet`/`getVisibleOptions`（questStatus/itemCount/道德边界含端点/timeOfDay/npcKnows/knowledgeKnown；多条件全满足才可见、空结果即结束节点、索引指向原始数组）；`DialogueSession` 播放与敌意输入忽略 |
 | `tests/quest-system.test.ts` | `src/engine/quest-system.ts` | `parseQuestSet` 防御解析；`assembleQuests` 跨资源装配（坏发布人剔除、前置循环禁用、互斥组整组校验）；`createQuestJournal` 初始 offered/locked；接受/推进/完成/失败全生命周期（npc-talk 推进、item-count 绝对数量同步并钳制、接取时背包快照即时完成、encounter-defeat 失败、abandon 终态、互斥分支连带失败、奖励结算、前置完成后解锁） |
 | `tests/data-validation.test.ts` | `scripts/lib/data-validation.mjs`、`scripts/validate-data.mjs` | **真实仓库**正向校验（manifest + 全部基础资源计数一致）；临时 fixture 反向校验（资源违反 Schema、manifest 违反 Schema、资源文件缺失、无效 Schema、JSON `null`）；另以临时 CLI 副本启动真实 Node 子进程，锁定可读错误输出与非零退出码 |
+| `tests/grid-map-renderer.test.ts` | `src/engine/grid-map-renderer.ts` | R40 渲染器结构回归：场景对象数随面积增长恒为 2（O(1) 契约）；逐格命令顺序（底色→边线→亮边→暗边）与几何/颜色/alpha 精确锁定；绘制范围与地图像素尺寸一致；Graphics 挂在返回容器内（地图切换 `destroy()` 级联语义）；样式去重；`cellCenterOffset` 普通坐标返回 |
 
 测试只调用**公共导出函数**并断言行为，不做源码文本匹配；引擎模块均为 Phaser-free 设计，无需启动任何场景。
 
@@ -76,10 +87,12 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 | `npm run validate:data` | 内容作者的提交前资料检查（与测试共享实现；check 的第 1 步） |
 | `npm run smoke:round-*` | 各轮专项端到端烟测（含真实 Vite 服务器、CLI 全链路）；R35–37 三条进入 CI |
 | `npm run typecheck` | 严格类型检查（check 的第 3 步） |
+| `npm run benchmark:round-40` | 性能/内存基准（R40 起）：渲染对象数与耗时双口径、26 资源加载、50 轮长跑堆观察；与 `npm test` 双向隔离、不进门槛（读数与局限见 `docs/PERFORMANCE.md`） |
 | `npm run build` | `check` 全部通过后的 Vite 生产构建门槛（R39 起含完整 check） |
 | GitHub Actions（`.github/workflows/quality-gates.yml`） | push/PR/手动触发的托管同源门槛 + R35–37 烟测（R39 起） |
 
 ## 变更记录
 
+- 2026-09-28（Round 40）：新增性能/内存基准通道 `npm run benchmark:round-40`（`benchmark.include` 独立匹配 `*.bench.ts`，与 `npm test` 双向隔离）；新增 `tests/grid-map-renderer.test.ts` 10 用例锁定 R40 单 Graphics 渲染器结构契约；覆盖统计更新为 5 文件 63 用例。
 - 2026-09-28（Round 39）：新增统一质量门槛 `npm run check`（资料校验 → MOD 检查 → 类型 → 测试 → 文档审计，`&&` 串联失败即中止）；`npm run build` 改为先过 `check` 再 Vite 生产构建；新增 GitHub Actions `quality-gates.yml`（Node 22、`npm ci`、只读权限、15 分钟超时、build + R35–37 烟测）。
 - 2026-09-28（Round 38）：建立 Vitest 5 测试基线；抽取共享数据校验器 `scripts/lib/data-validation.mjs`（CLI 变薄）；新增四组 53 个单元测试；`tsconfig.json` 纳入 `tests/` 与 `vitest.config.ts` 严格检查。

@@ -4,6 +4,36 @@
 
 ---
 
+## Round 40 — 地图渲染 O(1) 对象与可重复性能/内存基准（2026-09-28，已完成）
+
+### 计划与实现
+
+- 先写 `iterations/round-40/plan.md`，子任务为：先基线（tile-per-rectangle 渲染器、真实数据加载、50 轮长跑）→ 单 Graphics 重写与结构回归测试 → 复测、门槛、烟测、生产构建与文档。计划书所写"32×24 实图尺寸"与实际不符（仓库真实地图为 16×9 两张），基准按计划意图改为"16×9 真实实图 + 32×24/64×48/128×96 确定性合成图"，已在文档注明。
+- **基准基建**：`tests/performance-round-40.bench.ts` + `vitest.config.ts` 新增 `benchmark.include`（只匹配 `tests/` 下 `*.bench.ts`）+ `package.json` 新增 `benchmark:round-40`。落地过程中实证了两个 Vitest 5 事实并按官方指南处置：① `bench` 不再是 `'vitest'` 顶层导出（导入即 `bench is not a function`），官方迁移指南确认 v5 改为 `test()` 回调的 bench fixture，CLI `vitest bench` 仍在；② worker 线程不继承主进程 `--expose-gc`（`globalThis.gc` undefined），改由入口脚本以 `NODE_OPTIONS=--expose-gc` 环境变量传递（实证 worker 内 gc 变为 function）。另实测 async 任务的 tinybench `period` 严重失真（~150 ms 的加载报为 150,532 ms/op），加载与长跑改为显式 wall-clock 自计时；控制台告警提示模块 export-getter 开销，配置 `suppressExportGetterWarnings` 仅静默重复告警、开销如实记录（Vitest 口径 128×96 约 4.8–6.0 s/op，同一代码 Vite 打包后裸 Node 约 3.7–4.2 ms/render——放大约三个数量级），据此新增裸 Node 通道 `scripts/benchmark-round-40-bare.mjs`（Vite `build.ssr` API 打包真实渲染器；初稿用 esbuild 但其不在依赖树内，npx 为临时下载，弃用改以直接依赖 Vite）。基准对旧渲染器的采集经 `vi.mock('phaser')` 实现（重写后渲染器零运行时导入，mock 移除）。
+- **渲染器重写**：`renderGridMap` 由每格 3 个 Rectangle（底色+顶部亮边+右缘暗边）改为纯函数 `buildGridMapDrawCommands`（每格 4 条命令，颜色解析与 ±18/−20 明暗派生按颜色字符串缓存）+ 单 Graphics 烘焙（连续相同样式去重），连同 Graphics 装入返回 Container（签名与 `mapLayer?.destroy()` 销毁语义不变）；`cellCenterOffset` 返回普通 `{ x, y }`（13 处调用均只读 x/y，`tsc` 证实等价）；模块 `import type Phaser` 后零运行时依赖——旧渲染器在 Node 进程因 Phaser 顶层引用 `window` 直接崩，新实现因此获得纯 Node 可测/可基准能力。初稿两处小修：块注释内 `**/` 提前终止注释（vitest.config.ts 与 bench 文件各一处 PARSE_ERROR）；TS 对 `lastFill?.color !== c || lastFill.alpha` 的收窄失败，改为显式 `lastFill === null ||` 判空。
+- **结构回归测试**：`tests/grid-map-renderer.test.ts` 10 用例——每格恰 4 命令、单格几何/颜色/alpha/顺序精确断言（含 shadeColor 手算期望值 0x464e5f/0x202839）、行列偏移、绘制范围=地图像素尺寸、同 tileType 颜色一致、O(1) 对象（16×9 与 64×36 均恒 2）、Graphics 挂在返回容器内（销毁级联）、绘制调用数=命令数与 lineStyle 全图一次、cellCenterOffset。
+- 文档：新增 `docs/PERFORMANCE.md`（命令构成、测量内容、方法边界五条、R40 前后读数与环境）；README 进度至 R40/命令区/目录/用例数 63；`docs/TESTING.md` 新增基准隔离章节与三表更新；`docs/REFERENCES.md` 登记 Vitest 官方基准与迁移指南（#16）。
+
+### 验证（本机实际命令与结果）
+
+- 环境：Windows 11 Home（10.0.26200）、Node v22.18.0（win32 x64）、Intel Core Ultra 5 225H（14 核）、Vitest 5.0.2、Vite 8.3.1。
+- **基线（重写前，同一命令）**：`npm run benchmark:round-40` exit 0——对象数 16×9=433 / 32×24=2,305 / 64×48=9,217 / 128×96=36,865（1 容器 + 3×格数矩形）；Vitest 口径 19.1 / 121.5 / 951.5 / 5,664.7 ms/op；loadGameData 20 轮平均 162.49 ms（min 118.29 / max 372.58）；50 轮长跑每轮 26 资源 0 诊断、平均 146.17 ms/轮、GC 后堆 18.79 → 20.07 MiB（+1,306.5 KiB）。
+- **重写后复测（两次运行）**：对象数全部恒 2（含 12,288 格图）；Vitest 口径 18.1–18.9 / 93.8–99.6 / 885.6–1,032.3 / 4,800.0–5,966.2 ms/op（运行间噪声内，较基线持平至略降）；裸 Node 口径 0.103 / 0.122 / 0.801 / 4.174 ms/render（0.16–0.72 µs/格）；loadGameData 20 轮平均 156.45–181.12 ms（与基线同量级，渲染重写不触及加载管线）；50 轮长跑每轮 26 资源 0 诊断、平均 127.01–144.28 ms/轮、GC 后堆差值 +1,289.6/+2,153.7/+3,382.2 KiB（波动无累积趋势）。
+- `npm run check`：**exit 0**（26 资源校验、0 MOD 问题、typecheck、Vitest 5 文件 63 用例、audit:round-34）。
+- `npm run build`：**exit 0**（完整 check 先行；130 modules、约 0.8 s，主 JS 1,882.01 kB / gzip 495.80 kB，与 R39 的 1,881.37 kB 基本一致；500 kB 分包建议仍为非阻断提示）。
+- 烟测：`smoke:round-20`（擂台/占格）、`smoke:round-30`（人物与门派）、`smoke:round-33`（图谱全量真实映射含 2 地图）、`smoke:round-35/36/37`（CI 三条）全部 **exit 0**。
+- **浏览器烟测（生产构建 + `npx vite preview` + Playwright）**：主菜单 → 创建角色（Enter 默认模板）→ 进入「方格试炼场」——网格瓦片、格线、顶部亮边/右缘暗边、玩家小人、NPC/敌人/HUD 均正常；ArrowRight×7 走到 (14,7) 关口「石阶渡口」切换「雾渡口」（`mapLayer.destroy()` + 单 Graphics 重建路径），画面完整、无上一图残影、水面瓦片正常；经「回望石阶」返回「方格试炼场」后玩家可继续移动（ArrowLeft 至 (12,7)）。控制台全程无新增错误（仅既有 favicon 404 与 R32 锻造配方 `forge.recipe.r32-marsh-amber-seal` 的可选资源警告；HUD 顶部「部分可选资料无效」聚合通知为 `buildHud` 对 optionalWarnings 的既有显示逻辑，与渲染改动无关）。
+- `git diff --check`：通过（仅换行提示）。
+
+### 未实现/限制
+
+- **基准边界**：渲染基准用 recording scene 替身，不含真实 Phaser 构造与 GPU 光栅化；Vitest 口径绝对值被模块 runner export-getter 开销放大约三个数量级（只用于同口径运行间对比，真实数量级以裸 Node 通道为准）；async 任务 tinybench period 失真已绕开（wall-clock 自计时）；堆差值非泄漏证明。全部已在 `docs/PERFORMANCE.md` §方法边界成文。
+- **旧渲染器无裸 Node 读数**：其顶层运行时导入 Phaser 使 Node 进程直接崩（`window is not defined`），"优化前"时间只能在 Vitest 口径 + mock 场景下取得；对象数对比不受影响（结构性）。
+- 基准未进 CI/`check` 门槛（快照式读数不适合作阈值），CI 仍为 R39 的 build + R35–37 烟测。
+- 烟测中观察到的既有非本轮问题：R32 锻造配方 `forge.recipe.r32-marsh-amber-seal`（琥珀嵌扣）在运行时语义校验中被禁用（结果装备须同槽且不降低基础装备任何加成），触发 HUD 聚合通知与一条 console 警告——属数据/语义既有状态，本轮未处理。
+
+---
+
 ## Round 39 — 统一质量门槛与 GitHub Actions 持续集成（2026-09-28，已完成）
 
 ### 计划与实现
