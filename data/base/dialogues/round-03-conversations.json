@@ -196,7 +196,30 @@
           "text": "站住——别再近了。刀还没归鞘，我这手不听使唤。",
           "options": [
             { "text": "阁下好身手。方才那是……", "nextNodeId": "blade" },
-            { "text": "在下无意冒犯，这就绕道。", "nextNodeId": "leave" }
+            { "text": "在下无意冒犯，这就绕道。", "nextNodeId": "leave" },
+            {
+              "text": "顾兄，旧渡籍那夜的潮时，你还记得么？",
+              "nextNodeId": "r42-gu-tide-account",
+              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-two-witnesses", "status": "active" }],
+              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.r42-gu-tide-account" }]
+            },
+            {
+              "text": "顾兄，潮时已经对上，我把你的口述记进副页。",
+              "nextNodeId": "r42-gu-tide-account",
+              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-two-witnesses", "status": "completed" }],
+              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.r42-gu-tide-account" }]
+            },
+            {
+              "text": "我来取一张渡籍水痕的拓本。",
+              "nextNodeId": "r42-rubbing-offer",
+              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-seal-rubbing", "status": "active" }]
+            },
+            {
+              "text": "请顾兄带我把旧印拓下来。",
+              "nextNodeId": "r42-rubbing-offer",
+              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-seal-rubbing", "status": "offered" }],
+              "effects": [{ "kind": "acceptQuest", "questId": "quest.r42-seal-rubbing" }]
+            }
           ]
         },
         {
@@ -270,6 +293,27 @@
         {
           "id": "leave",
           "text": "……雾大，走稳些。"
+        },
+        {
+          "id": "r42-gu-tide-account",
+          "text": "顾夜尘用刀鞘在桌上划出两道水线：「那夜落潮比渡籍写的早了一刻。药船按旧时辰来，桥边的泥印却是回水时才压下的。一个人的记性不算凭据，我只把时辰说清。」",
+              "options": [{ "text": "我再把这句话与船印对照。", "nextNodeId": "leave" }]
+        },
+        {
+          "id": "r42-rubbing-offer",
+          "text": "顾夜尘翻开一册护船旧账，取出一张夹在缝里的薄纸：「这半枚印是当年校缆时压下的，雨水把边缘泡开了。你若要留证，我可以照着纸纹拓一份；拓本只证明纸面有过水印，不替谁判案。」",
+          "options": [
+            {
+              "text": "请顾兄照旧印拓下一份。",
+              "nextNodeId": "r42-rubbing-made",
+              "effects": [{ "kind": "giveItem", "itemId": "item.r42-ferry-seal-rubbing", "quantity": 1 }]
+            },
+            { "text": "先不拓了。", "nextNodeId": "leave" }
+          ]
+        },
+        {
+          "id": "r42-rubbing-made",
+          "text": "顾夜尘将薄纸递过来：「收好。纸上只存着一道痕，能拿来对，不该拿来栽人。」"
         }
       ]
     },

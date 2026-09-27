@@ -67,11 +67,16 @@ try {
   });
   assert(assembly.endingSet, 'the ending gate should assemble');
   assert.equal(assembly.warnings.length, 0, 'all base ending references should resolve');
-  assert.equal(assembly.endingSet.endings.length, 5, 'five authored endings should survive assembly');
+  const legacyEndingIds = new Set([
+    'ending.river-lantern', 'ending.tingyu-oath', 'ending.tiezhang-foundation',
+    'ending.yunyin-healer', 'ending.open-water',
+  ]);
+  assert.equal(assembly.endingSet.endings.filter((ending) => legacyEndingIds.has(ending.id)).length, 5,
+    'all five Round 27 endings should survive assembly');
   assert.deepEqual(
-    assembly.endingSet.endings.map((ending) => ending.id),
+    assembly.endingSet.endings.map((ending) => ending.id).filter((id) => legacyEndingIds.has(id)),
     ['ending.river-lantern', 'ending.tingyu-oath', 'ending.tiezhang-foundation', 'ending.yunyin-healer', 'ending.open-water'],
-    'eligible choices have a stable priority order',
+    'legacy eligible choices keep their relative priority order',
   );
   assert(parsedMap.map.canEnter(rawEndings.gate.position.col, rawEndings.gate.position.row),
     'the mirror-stone cell should be walkable');
@@ -181,7 +186,7 @@ try {
     npcIds: new Set([...graph.nodes.values()].filter((node) => node.kind === 'character').map((node) => node.id)),
     factionIds: new Set([...graph.nodes.values()].filter((node) => node.kind === 'faction').map((node) => node.id)),
   });
-  assert.equal(brokenAssembly.endingSet?.endings.length, 4,
+  assert.equal(brokenAssembly.endingSet?.endings.length, parsedEndings.set.endings.length - 1,
     'one dangling MOD condition should disable only its ending');
   assert.equal(brokenAssembly.warnings.length, 1, 'the isolated ending reference should be reported');
   const blockedAssembly = endingEngine.assembleEndingSet({
@@ -205,8 +210,8 @@ try {
   }
   assert.equal(loaded.ok, true, 'the shared manifest loader should start the full base world');
   assert(loaded.ok);
-  assert.equal(loaded.world.assembly.endings?.endings.length, 5,
-    'the ending set should reach the playable world assembly');
+  assert.equal(loaded.world.assembly.endings?.endings.filter((ending) => legacyEndingIds.has(ending.id)).length, 5,
+    'all Round 27 endings should reach the playable world assembly');
   assert.equal(loaded.world.optionalWarnings.some((warning) => warning.resource === 'ending.round-27-set'), false,
     'base ending data and map references should produce no assembly warnings');
   for (const placements of loaded.world.assembly.npcsByPeriod.values()) {
@@ -216,7 +221,7 @@ try {
     'the fixed ending marker cell must remain clear in every NPC schedule');
   }
 
-  console.log('通过：五结局条件评估/边界、任务/善恶/关系/门派/声望/见闻分支、锁定提示与不可变性、MOD 引用隔离、终章格装配/邻接及完整世界加载。');
+  console.log('通过：五条 Round 27 结局条件评估/边界、任务/善恶/关系/门派/声望/见闻分支、锁定提示与不可变性、MOD 引用隔离、终章格装配/邻接及完整世界加载。');
 } finally {
   globalThis.fetch = originalFetch;
   await server.close();

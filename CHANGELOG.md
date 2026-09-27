@@ -4,6 +4,19 @@
 
 ## [Unreleased]
 
+### Added (Round 42)
+
+- **雾渡旧簿原创主线章节**：接续「渡籍补录」新增「旧簿验痕 → 两家对页 → 封存水痕」三段任务，并由顾夜尘、柳听澜、祝九弦、白鹭洲四名既有 NPC 的资料对白推进。对白条件按任务阶段开放取证；渡籍封印拓痕只通过对话原子授予并作为末段收集目标，不进入商店且不可买卖。
+- **互斥抉择与双结局**：玩家选择「明册立约」或「护证留印」其一后，另一分支失败并锁定；终端对白分别记录「公簿昭潮」或「灯下留痕」见闻，与对应任务状态一起满足结局条件。两种接取入口（NPC 对话或任务名录）共用结局见闻解锁逻辑。
+- **知识图谱与数量更新**：添加 13 个主线/证物/事件/结局节点和 26 条关系。基础资料现有 25 项任务、51 件物品、147 个图谱节点、228 条关系、7 个结局。
+- **R42 集成回归**：新增 `tests/round42-story.test.ts`（3 项，验证完整任务链状态机、互斥失败、两条结局可达及四张对白图无悬空引用）与 `npm run smoke:round-42`；Round 27 烟测的 MOD 孤立结局断言改为随结局集动态计数，Round 33 旧数量输出去固定化。同步任务、结局、物品、知识图谱、测试与 GDD 文档。
+
+### Verification (Round 42)
+
+- `npm run smoke:round-42`、`smoke:round-27`、`smoke:round-30`、`smoke:round-31`、`smoke:round-33` 全部通过；`npm run check` 通过（26 资源 Schema、0 MOD 问题、严格类型检查、8 文件 108 用例、文档一致性审计）；`git diff --check` 通过。
+- `npm run build` 通过（131 modules；主 JS 1,887.10 kB / gzip 497.63 kB）。Vite 给出既有的超过 500 kB chunk 优化提示，不影响构建。
+- 浏览器手动游玩与物理手柄未测；本轮引擎代码未改动，验证聚焦资料装配与剧情闭环。
+
 ### Added (Round 41)
 
 - **六项持久化界面设置（输入方案与无障碍显示）**：`src/game/settings.ts` 的 `GameSettings` 在音量/文字大小之外新增 `movementLayout`（方向键+WASD / 仅方向键 / 仅 WASD）、`gamepadEnabled`、`highContrast`、`reducedMotion`，文字大小新增 1.6"最大"档（五档 0.85–1.6，设置页布局按该档校验）。载荷解析向后兼容 Round 09 的 `{ volume, textScaleIndex }` 旧载荷（缺失新字段补默认；任一已知字段"存在但无效"整载荷拒绝回默认且不动存储——与旧两字段规则同语义）；主菜单与暂停菜单设置页由共享 `settingsRows`/`adjustGameSetting` 渲染与调整（6 行，两处永不漂移），调整即时 `applyGameSettings`（声音总线音量 + 画布高对比度 CSS 滤镜 `contrast(1.4) saturate(1.25)` + 全面板 `uiFontSize`）并持久化。

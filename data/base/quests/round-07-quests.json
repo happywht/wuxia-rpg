@@ -381,6 +381,125 @@
         }
       ],
       "rewards": { "experience": 40, "currency": 35 }
+    },
+    {
+      "id": "quest.r42-ledger-audit",
+      "name": "旧簿验痕",
+      "description": "渡籍补录后，白鹭洲仍觉得旧册有一页不对：那行轮值墨迹干湿不一，边角又留着两道不该有的潮痕。去寒山书院请柳听澜对照副本，先辨出疑处，再决定如何查。",
+      "giverNpcId": "char.bai-luzhou",
+      "prerequisiteQuestIds": [
+        "quest.r31-ferry-ledger"
+      ],
+      "objectives": [
+        {
+          "id": "objective.r42-audit-ledger-copy",
+          "kind": "talkToNpc",
+          "targetId": "char.liu-tinglan",
+          "requiredCount": 1,
+          "text": "请柳听澜对照渡籍副本"
+        }
+      ],
+      "rewards": {
+        "experience": 38,
+        "currency": 24
+      }
+    },
+    {
+      "id": "quest.r42-two-witnesses",
+      "name": "两家对页",
+      "description": "副本只证明誊写时已有异样，不能说明改动何时发生。柳听澜让你分别问顾夜尘与祝九弦：一人熟悉水路潮时，一人当年亲手校过船印。两份口述都记下，再回头看纸上的水痕。",
+      "giverNpcId": "char.liu-tinglan",
+      "prerequisiteQuestIds": [
+        "quest.r42-ledger-audit"
+      ],
+      "objectives": [
+        {
+          "id": "objective.r42-gu-tide-account",
+          "kind": "talkToNpc",
+          "targetId": "char.gu-yechen",
+          "requiredCount": 1,
+          "text": "向顾夜尘核对当夜潮时"
+        },
+        {
+          "id": "objective.r42-zhu-seal-account",
+          "kind": "talkToNpc",
+          "targetId": "char.zhu-jiuxian",
+          "requiredCount": 1,
+          "text": "向祝九弦核对旧船印"
+        }
+      ],
+      "rewards": {
+        "experience": 46,
+        "currency": 28
+      }
+    },
+    {
+      "id": "quest.r42-seal-rubbing",
+      "name": "封存水痕",
+      "description": "两份口述指向同一处旧印。顾夜尘从护船旧账里找出一张压纸，纸面留下半枚水线印痕；将它拓成副本，留作日后核对，不要拿它替任何一方定罪。",
+      "giverNpcId": "char.gu-yechen",
+      "prerequisiteQuestIds": [
+        "quest.r42-two-witnesses"
+      ],
+      "objectives": [
+        {
+          "id": "objective.r42-seal-rubbing",
+          "kind": "collectItem",
+          "targetId": "item.r42-ferry-seal-rubbing",
+          "requiredCount": 1,
+          "text": "取得渡籍半枚水线印痕拓本"
+        }
+      ],
+      "rewards": {
+        "experience": 55,
+        "currency": 32
+      }
+    },
+    {
+      "id": "quest.r42-open-register",
+      "name": "明册立约",
+      "description": "证物已经留存。将拓本与两份证词一并交柳听澜存入书院副册，让日后查账的人都看得到凭据；此举会留下公开记录，也会让渡口各家知道是谁提出复核。",
+      "giverNpcId": "char.bai-luzhou",
+      "exclusiveGroupId": "branch.r42-ferry-record",
+      "prerequisiteQuestIds": [
+        "quest.r42-seal-rubbing"
+      ],
+      "objectives": [
+        {
+          "id": "objective.r42-public-register",
+          "kind": "talkToNpc",
+          "targetId": "char.liu-tinglan",
+          "requiredCount": 1,
+          "text": "请柳听澜将证据誊入公开副册"
+        }
+      ],
+      "rewards": {
+        "experience": 68,
+        "currency": 40
+      }
+    },
+    {
+      "id": "quest.r42-protect-witness",
+      "name": "护证留印",
+      "description": "证物已经留存。先不写涉事人的名字，由祝九弦收好拓本，待当事人和渡口各家都能对页时再议；证据不销毁，证人的身份暂不公开。",
+      "giverNpcId": "char.bai-luzhou",
+      "exclusiveGroupId": "branch.r42-ferry-record",
+      "prerequisiteQuestIds": [
+        "quest.r42-seal-rubbing"
+      ],
+      "objectives": [
+        {
+          "id": "objective.r42-protect-witness",
+          "kind": "talkToNpc",
+          "targetId": "char.zhu-jiuxian",
+          "requiredCount": 1,
+          "text": "请祝九弦收存证词与拓本"
+        }
+      ],
+      "rewards": {
+        "experience": 68,
+        "currency": 40
+      }
     }
   ]
 }

@@ -53,7 +53,25 @@
               ],
               "effects": [{ "kind": "leaveFaction" }]
             },
-            { "text": "不叨扰了，先生请便。", "nextNodeId": "farewell" }
+            { "text": "不叨扰了，先生请便。", "nextNodeId": "farewell" },
+            {
+              "text": "白鹭洲托我来对一对旧渡籍。",
+              "nextNodeId": "r42-copy-mismatch",
+              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-ledger-audit", "status": "completed" }],
+              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.r42-faded-register" }]
+            },
+            {
+              "text": "柳教习，请将两家口述分别记下。",
+              "nextNodeId": "r42-witnesses-accepted",
+              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-two-witnesses", "status": "offered" }],
+              "effects": [{ "kind": "acceptQuest", "questId": "quest.r42-two-witnesses" }]
+            },
+            {
+              "text": "公簿已经立下，往后任人对页。",
+              "nextNodeId": "r42-public-result",
+              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-open-register", "status": "completed" }],
+              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.r42-public-record-vow" }]
+            }
           ]
         },
         {
@@ -101,7 +119,20 @@
           ]
         },
         { "id": "departed", "text": "柳听澜沉默片刻，把你的名字从课业簿上圈去：「学籍除名，笔墨两清。书院的门不锁，但誊过的盟书里，不会再有你的手笔。」" },
-        { "id": "farewell", "text": "「去吧。」柳听澜重新蘸墨，「路上少说多看——见过的事，都是文章。」" }
+        { "id": "farewell", "text": "「去吧。」柳听澜重新蘸墨，「路上少说多看——见过的事，都是文章。」" },
+        {
+          "id": "r42-copy-mismatch",
+          "text": "柳听澜将两张纸举向窗前：「水痕在副本誊出之前已经干了，边角却压着新印。书院只照原页落笔，没有改这一行；要查谁搬动过正本，还须问熟悉水路与船印的人。」",
+          "options": [{ "text": "我去问顾夜尘与祝九弦。", "nextNodeId": "farewell" }]
+        },
+        {
+          "id": "r42-witnesses-accepted",
+          "text": "「两家都问，不替任何一方润色。」柳听澜抽出一张空白对页纸，「顾夜尘熟潮时，祝九弦认旧印。把原话各记一行，字句有出入才看得出疑处。」"
+        },
+        {
+          "id": "r42-public-result",
+          "text": "柳听澜把副册摊开，指着新添的一行：「证词、拓本、疑问都在。日后若有人能证实另一种说法，也有空白处可添；立册是让事情可复查，不是把今天的判断钉死。」"
+        }
       ]
     },
     {
@@ -155,7 +186,25 @@
               "text": "渡口的轮值章程，去哪里查？",
               "nextNodeId": "registry-point"
             },
-            { "text": "随便看看，这就走。", "nextNodeId": "farewell" }
+            { "text": "随便看看，这就走。", "nextNodeId": "farewell" },
+            {
+              "text": "祝师父，旧船印旁那道潮泥，是何时留下的？",
+              "nextNodeId": "r42-zhu-seal-account",
+              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-two-witnesses", "status": "active" }],
+              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.r42-zhu-ferry-seal" }]
+            },
+            {
+              "text": "祝师父，我把你认出的旧印记入副页。",
+              "nextNodeId": "r42-zhu-seal-account",
+              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-two-witnesses", "status": "completed" }],
+              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.r42-zhu-ferry-seal" }]
+            },
+            {
+              "text": "我把证词和拓本交给你封存。",
+              "nextNodeId": "r42-protect-result",
+              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-protect-witness", "status": "completed" }],
+              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.r42-protected-witness-vow" }]
+            }
           ]
         },
         {
@@ -187,7 +236,16 @@
         { "id": "war-stalemate", "text": "「轮值？」他把缆绳结了个死扣，「这是最省事的结局。两派药队各走各的时辰，我们护航的排班也最稳。都赢一点，就都少赔一点。」" },
         { "id": "war-defeat", "text": "「先约让了就让了。」祝九弦不以为意，「药道又没封，轮值照旧，船照开。下回会盟前把船上功夫练扎实，比在这儿懊恼强。」" },
         { "id": "registry-point", "text": "「轮值章程？」祝九弦朝渡口公所的方向一抬下巴，「找渡董白鹭洲，渡籍正本在他手上。哪派哪个时辰过桥、误时怎么罚，白纸黑字，比十个教头记性都牢。」" },
-        { "id": "farewell", "text": "「栈桥湿滑，走稳些。」祝九弦重新蹲下去盘他的缆绳，不再看你。" }
+        { "id": "farewell", "text": "「栈桥湿滑，走稳些。」祝九弦重新蹲下去盘他的缆绳，不再看你。" },
+        {
+          "id": "r42-zhu-seal-account",
+          "text": "祝九弦捻了捻指间旧茧：「那枚印压在缆桩内侧，船退潮后才看得见。泥还湿的时候，我先记了印，没有记人——过了这么些年，我只敢说它不是副本誊出来的。」",
+          "options": [{ "text": "我会把印与口述一并记下。", "nextNodeId": "farewell" }]
+        },
+        {
+          "id": "r42-protect-result",
+          "text": "祝九弦把拓本放进干燥的木匣，另留一张无名收据：「东西在这儿，来人却不记名。等当事人愿意开口，再把两边的页合起来；纸没丢，话也没被逼出来。」"
+        }
       ]
     },
     {
@@ -241,7 +299,24 @@
               "nextNodeId": "remembered-pact",
               "conditions": [{ "kind": "npcKnows", "nodeId": "event.mist-pact-stalemate" }]
             },
-            { "text": "都不是，随便看看。", "nextNodeId": "farewell" }
+            { "text": "都不是，随便看看。", "nextNodeId": "farewell" },
+            {
+              "text": "补录过的旧簿，柳教习发现了不合潮时的水痕。",
+              "nextNodeId": "r42-audit-offer",
+              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-ledger-audit", "status": "offered" }]
+            },
+            {
+              "text": "拓本已存，我愿把证据公开立册。",
+              "nextNodeId": "r42-public-vow",
+              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-open-register", "status": "offered" }],
+              "effects": [{ "kind": "acceptQuest", "questId": "quest.r42-open-register" }]
+            },
+            {
+              "text": "拓本已存，我想先护住作证之人。",
+              "nextNodeId": "r42-protect-vow",
+              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-protect-witness", "status": "offered" }],
+              "effects": [{ "kind": "acceptQuest", "questId": "quest.r42-protect-witness" }]
+            }
           ]
         },
         {
@@ -291,7 +366,28 @@
           "id": "remembered-pact",
           "text": "白鹭洲翻到你方才报备的那一页，指腹压住墨迹未干的「轮值成约」四字：「自今日起，两派药队按簿上时辰过桥。误时的罚则、抢渡的处置，都照章程来——你既亲历会盟，往后若见有人坏约，渡口公所随时受理。」"
         },
-        { "id": "farewell", "text": "白鹭洲把渡籍收回袖中，重新拨响算盘：「栈桥上人多，慢行。章程之外的事，渡口不问。」" }
+        { "id": "farewell", "text": "白鹭洲把渡籍收回袖中，重新拨响算盘：「栈桥上人多，慢行。章程之外的事，渡口不问。」" },
+        {
+          "id": "r42-audit-offer",
+          "text": "白鹭洲把旧册推到你面前：「此页在誊副前后各过一次手。柳教习守着书院副本，先把两页的时辰对上。纸上的水痕说不得人名，咱们先查纸，不先猜人。」",
+          "options": [
+            { "text": "我去请柳教习核页。", "nextNodeId": "r42-audit-accepted", "effects": [{ "kind": "acceptQuest", "questId": "quest.r42-ledger-audit" }] },
+            { "text": "我再想想。", "nextNodeId": "farewell" }
+          ]
+        },
+        { "id": "r42-audit-accepted", "text": "「旧簿不急着定罪。」白鹭洲重新合上渡籍，「你把书院副本看清，回来再谈后面的事。」" },
+        {
+          "id": "r42-public-vow",
+          "text": "白鹭洲听罢，把「公开誊录」四字记在新页眉：「既要给后来人看，就让证据和异议都在同一册里。你把这份意思带给柳教习。」",
+          "options": [{ "text": "我去书院交付公簿。", "nextNodeId": "r42-public-accepted" }, { "text": "明白。", "nextNodeId": "farewell" }]
+        },
+        { "id": "r42-public-accepted", "text": "「新页不抹旧痕。」白鹭洲将空册递给你，「柳教习落笔以后，这一页便不再只属于渡口公所。」" },
+        {
+          "id": "r42-protect-vow",
+          "text": "白鹭洲点头：「证人不必先把名字放到众目下。祝九弦守船守人有分寸，你将拓本交他封存，往后若有人问起，至少还有纸可对。」",
+          "options": [{ "text": "我去找祝师父收存。", "nextNodeId": "r42-protect-accepted" }, { "text": "我记下了。", "nextNodeId": "farewell" }]
+        },
+        { "id": "r42-protect-accepted", "text": "「渡籍仍按原章走。」白鹭洲把拓本的去向记在自己手边的私簿里，「护住证人，不等于替谁抹账。」" }
       ]
     }
   ]

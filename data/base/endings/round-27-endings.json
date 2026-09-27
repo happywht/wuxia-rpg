@@ -73,6 +73,46 @@
         { "kind": "knowledgeKnown", "nodeId": "event.old-footprints", "hint": "至少走出旧渡口，查见雨后的脚印" },
         { "kind": "factionMembership", "isMember": false, "hint": "保持无门无派，或先行离门" }
       ]
+    },
+    {
+      "id": "ending.r42-open-register",
+      "knowledgeNodeId": "ending.r42-open-register",
+      "title": "公簿昭潮",
+      "epilogue": "柳听澜将拓本、潮时与船印一同誊入书院副册。白鹭洲把原页和复核页并排摊在公所檐下，渡口五家各自校看，谁也没被单独写成罪人。旧账没有立刻给出唯一答案，却从此多了一条能供后来人追问的墨线。新汛来时，药队照章轮值，桥头的人也知道：被写下的事可以再查，被遮去的那一行同样有人记得。",
+      "priority": 25,
+      "conditions": [
+        {
+          "kind": "questStatus",
+          "questId": "quest.r42-open-register",
+          "status": "completed",
+          "hint": "完成「明册立约」，将证物誊入书院副册"
+        },
+        {
+          "kind": "knowledgeKnown",
+          "nodeId": "event.r42-public-record-vow",
+          "hint": "选择公开复核并为异议留档"
+        }
+      ]
+    },
+    {
+      "id": "ending.r42-sheltered-witness",
+      "knowledgeNodeId": "ending.r42-sheltered-witness",
+      "title": "灯下留痕",
+      "epilogue": "祝九弦把拓本收进木匣，柳听澜另抄一份无名副页，白鹭洲则在渡籍旁注明「证词待当事人亲校」。没有人被催着当众认下尚未查清的事，药道也没有因此停摆。灯下的纸页仍留着半枚水痕；等证人愿意、各家都肯对页的那天，空白处还会有人提笔。你带着未完的答案离开渡口，却没有让凭据随潮水一道消失。",
+      "priority": 25,
+      "conditions": [
+        {
+          "kind": "questStatus",
+          "questId": "quest.r42-protect-witness",
+          "status": "completed",
+          "hint": "完成「护证留印」，将拓本交祝九弦收存"
+        },
+        {
+          "kind": "knowledgeKnown",
+          "nodeId": "event.r42-protected-witness-vow",
+          "hint": "选择先保护证人并保留待核对的凭据"
+        }
+      ]
     }
   ]
 }

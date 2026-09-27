@@ -133,6 +133,97 @@
     { "id": "quest.r31-river-lantern-promise", "kind": "quest", "title": "河灯之约", "summary": "陆贞娘记得去年灯节渡口放河灯的旧约：茶棚出灯油，渡董出船位。今年她想做三盏落蝶花灯——花开时风一吹，便像一群蝶顺水去。采来花瓣，再把放灯的时辰与白鹭洲约下。", "knownByDefault": true },
     { "id": "quest.r31-wharf-ears", "kind": "quest", "title": "江湖耳目", "summary": "顾夜尘想摸清渡口这条药道往后还安不安生：刀场的态度是一回事，书铺里传抄的消息是另一回事。替他分别去问祝九弦与沈墨涵，把两边的口风都带回来。", "knownByDefault": true },
     { "id": "quest.r31-blade-quench-stock", "kind": "quest", "title": "刀场淬料", "summary": "祝九弦收下荐帖，却先不急着教你刀，只指着炉膛说：盘舷刀场的规矩，进门弟子自己备淬火的熟铁砂。挑两份筛得细的来，炉火一起，第一课便开。", "knownByDefault": true },
-    { "id": "quest.r31-mentor-review", "kind": "quest", "title": "师门勘验", "summary": "叶庭舟听说你已能在药道上走动，便布置下一场勘验：去渡口分别请教容素青与闻素心，把药性与护送的门道各记一页带回来。师门的道理向来是——拳脚之外，还要认得人、认得药。", "knownByDefault": true }
+    { "id": "quest.r31-mentor-review", "kind": "quest", "title": "师门勘验", "summary": "叶庭舟听说你已能在药道上走动，便布置下一场勘验：去渡口分别请教容素青与闻素心，把药性与护送的门道各记一页带回来。师门的道理向来是——拳脚之外，还要认得人、认得药。", "knownByDefault": true },
+    {
+      "id": "quest.r42-ledger-audit",
+      "kind": "quest",
+      "title": "旧簿验痕",
+      "summary": "渡籍补录之后，白鹭洲请柳听澜对照旧册与书院副本，先辨出不合潮时的水痕。",
+      "knownByDefault": true
+    },
+    {
+      "id": "quest.r42-two-witnesses",
+      "kind": "quest",
+      "title": "两家对页",
+      "summary": "顾夜尘提供潮时口述，祝九弦核对旧船印；两份证词并列留档。",
+      "knownByDefault": true
+    },
+    {
+      "id": "quest.r42-seal-rubbing",
+      "kind": "quest",
+      "title": "封存水痕",
+      "summary": "取得渡籍水痕拓本，将纸面证据留存，但不以单一痕迹定罪。",
+      "knownByDefault": true
+    },
+    {
+      "id": "quest.r42-open-register",
+      "kind": "quest",
+      "title": "明册立约",
+      "summary": "选择将拓本与证词公开誊入书院副册，便于各家日后复核。",
+      "knownByDefault": true
+    },
+    {
+      "id": "quest.r42-protect-witness",
+      "kind": "quest",
+      "title": "护证留印",
+      "summary": "选择暂护证人与拓本，待当事人都能对页时再公开议论。",
+      "knownByDefault": true
+    },
+    {
+      "id": "item.r42-ferry-seal-rubbing",
+      "kind": "item",
+      "title": "渡籍水痕拓本",
+      "summary": "只证明纸页曾留下水线印痕，不足以单独证明是谁改动渡籍。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r42-faded-register",
+      "kind": "event",
+      "title": "旧簿水痕",
+      "summary": "书院副本的墨迹说明水痕在誊写前已干，正本边角却留有后来压下的印迹。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r42-gu-tide-account",
+      "kind": "event",
+      "title": "顾夜尘记潮",
+      "summary": "顾夜尘记得药船到岸时已经落潮，与渡籍所记的时辰相差一刻。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r42-zhu-ferry-seal",
+      "kind": "event",
+      "title": "祝九弦辨印",
+      "summary": "祝九弦确认旧船印压在缆桩内侧，但不凭一枚印推断落印人的身份。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r42-public-record-vow",
+      "kind": "event",
+      "title": "公开复核之约",
+      "summary": "玩家选择将证词和拓本公开立册，并承诺为不同说法留出复核余地。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r42-protected-witness-vow",
+      "kind": "event",
+      "title": "护证留名之约",
+      "summary": "玩家选择先保护证人和拓本，待当事人能够对页后再公开讨论。",
+      "knownByDefault": false
+    },
+    {
+      "id": "ending.r42-open-register",
+      "kind": "ending",
+      "title": "公簿昭潮",
+      "summary": "将拓本与多方口述公开存入副册，让渡口各家有据可核，也让异议得以留痕。",
+      "knownByDefault": false
+    },
+    {
+      "id": "ending.r42-sheltered-witness",
+      "kind": "ending",
+      "title": "灯下留痕",
+      "summary": "先护住证人和纸上凭据，待各方愿意对页，再将未决之事交给后来人。",
+      "knownByDefault": false
+    }
   ]
 }

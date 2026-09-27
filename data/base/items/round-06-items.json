@@ -549,6 +549,15 @@
       "stackLimit": 99,
       "buyPrice": 32,
       "sellPrice": 10
+    },
+    {
+      "id": "item.r42-ferry-seal-rubbing",
+      "name": "渡籍水痕拓本",
+      "description": "顾夜尘从护船旧账中取出的薄纸拓本，印痕只剩半圈，边缘压着细碎潮泥。它能证明纸页曾被水浸，却不能单独证明是谁改过渡籍。",
+      "category": "misc",
+      "stackLimit": 1,
+      "buyPrice": 0,
+      "sellPrice": 0
     }
   ]
 }
