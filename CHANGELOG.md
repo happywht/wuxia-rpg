@@ -4,6 +4,19 @@
 
 ## [Unreleased]
 
+### Added (Round 35)
+
+- **MOD 优先级与来源追踪**：`DataLoadResult` 新增 `enabledMods`（manifest 声明顺序原样暴露）；`LoadedResource` 携带 manifest 相对 `path`；成功装配的 `LoadedWorld` 新增 `enabledMods`、`resourceSources`（按 manifest 顺序的每资源最终来源）与 `modDiagnostics`（按 `mod:` origin 过滤）。覆盖语义不变：后声明且校验通过的层获胜，坏覆盖原子回退到上一有效值。
+- **可行动诊断**：`Diagnostic`/`data:resource-error` 事件新增可选 `path`（问题文件 URL）与 `hint`（修复建议）。JSON 语法错误、schema 不符、语义校验失败、文件缺失、manifest 损坏等路径均给出精确文件定位与下一步操作（改哪份文件、按哪个 schema、或如何从 `enabledMods` 移除该 MOD）。
+- **游戏内 F2「MOD / 资料状态」面板**（`src/game/mod-status-ui.ts`）：三页分栏——生效顺序（覆盖规则与每层优先级）、资源来源（每个成功资源的最终来源与基础/覆盖文件路径）、MOD 诊断（失败原因、精确覆盖 URL、逐条错误与修复提示）；也把运行时装配时被部分禁用的 MOD 资源警告归因到最终来源层并补出文件位置。↑/↓ 浏览、←/→ 翻页、F2/Esc 关闭，打开期间探索输入锁定，关闭经 `noteOverlayClosed` 恢复；shutdown 时随场景销毁。帮助面板（H）与 HUD 加入 F2 入口，MOD 回退提示行由"详情见控制台"改为"按 F2 查看原因与修复建议"。
+- **只读检查命令 `npm run inspect:mods`**（`scripts/inspect-mods.mjs`）：按真实 manifest 顺序校验 manifest 自身、每个基础资源与每个已启用覆盖的 JSON 可读性与 schema（Ajv draft-07），输出每资源的基础层/各 MOD 层/最终来源；坏层给出精确文件路径、错误明细与修复提示并以非零退出；明确注明跨资源语义校验仍由运行时加载器执行；检查逻辑可导出复用，全程不写任何文件。
+- **专项烟测 `npm run smoke:round-35`**：用项目 TypeScript 即时转译真实 `data-loader.ts`，配合临时 fixture 目录 + 内存 fetch 驱动真实 `loadGameData`——验证双 MOD 先后覆盖（后有效层获胜）、坏 JSON/schema 覆盖原子回退、最终来源顺序、精确文件路径与修复提示；直接核验运行时跨资源装配警告归因到实际 MOD 来源且基础资料警告不会误标为 MOD。再以 `inspectMods` 交叉核验层状态与最终来源，并覆盖“坏基础资源不能由 MOD 救回”和损坏 manifest 的可读失败；确认真实 manifest 的 `enabledMods` 仍为空，临时产物全部清理。
+- `docs/DATA-GUIDE.md` §5 扩写为「MOD 覆盖规则与作者工作流」：覆盖语义、启用/排序步骤（改 manifest 后重进游戏，热重载在 R36）、`inspect:mods` 提交前检查、F2 游戏内排错；`README.md` 命令表与 MOD 工作流提示同步更新。
+
+### Verification (Round 35)
+
+- `npm run inspect:mods`（真实 manifest：26 项资源全绿、0 问题、exit 0）、`npm run smoke:round-35`、`npm run validate:data`、`npm run typecheck`、`npm run build`、`npm run smoke:round-30`、`npm run smoke:round-31`、`npm run smoke:round-33`、`npm run audit:round-34`：通过；完整输出和构建体积提示见 `DEVLOG.md`。
+
 ### Added (Round 34)
 
 - 新增世界设定总览 **`docs/WORLD-SETTING.md`**：以当前基础 JSON/对白/人物志/门派志/任务志/GDD 为证据源，整理世界背景（大雍末年设定、抄书学徒主角、架空历法气候）、区域地理（方格试炼场、雾雨渡口两张正式地图与「芦苇河滩」图鉴地点的区分）、五派格局、渡籍轮值章程与雾渡药道会盟（铁嶂 vs 云隐）、关键人物分组与已实现冲突走向；每节标注权威数据文件，推断与已实现事实分列，未落地内容只作为路线设想，不虚构额外历史年代/远方地图/后续结局。

@@ -4,11 +4,11 @@
 
 - 设计文档：`docs/GDD.md`
 - 逐轮路线图（R00–R50）：`ROADMAP.md`
-- 当前进度：**Round 34 已完成；下一轮 Round 35（MOD 管理增强）**
+- 当前进度：**Round 35 已完成；下一轮 Round 36（开发模式数据热重载）**
 
 ## 范围
 
-- ✅ 已完成（R00–R34）：网格探索、任务/物品/战斗与存档闭环；五派师门、昼夜天气、NPC 日程、伙伴、擂台、门派战、自创武学、经脉内修、锻造炼丹、多结局、成就与图鉴；基础资料包含 20 项任务、50 件物品、30 种武学及 134 节点知识图谱，并有世界设定和资料规范文档审计。
+- ✅ 已完成（R00–R35）：网格探索、任务/物品/战斗与存档闭环；五派师门、昼夜天气、NPC 日程、伙伴、擂台、门派战、自创武学、经脉内修、锻造炼丹、多结局、成就与图鉴；基础资料包含 20 项任务、50 件物品、30 种武学及 134 节点知识图谱，并有世界设定和资料规范文档审计；MOD 多层覆盖顺序、来源追踪、游戏内 F2 诊断面板与 `inspect:mods` 只读检查。
 - ⏳ 正在按路线图逐轮推进：共 51 轮（R00–R50）；正式 Vitest 基线仍排在 Round 38，最终内容数量与发布验收尚未完成。
 - 永久边界：不做多人联网；不含原作内容；mod 仅限同名 JSON 覆盖（见 `docs/DATA-GUIDE.md`）。
 
@@ -37,15 +37,17 @@ npm run build      # 类型检查（tsc --noEmit）+ 生产构建
 npm run preview    # 预览生产构建
 npm run typecheck  # 仅类型检查
 npm run validate:data # 校验 manifest 登记的基础资料/schema
+npm run inspect:mods  # 只读检查已启用 MOD 的覆盖层/最终来源与修复提示
 npm run smoke:round-22 # 自创武学规则、战斗与存档冒烟
 npm run smoke:round-23 # 经脉内修规则、战斗、资料与存档冒烟
 npm run smoke:round-24 # 装备锻造、占位/配方隔离、战斗与存档冒烟
 npm run smoke:round-25 # 药方发现、悟性品质炼制、原子交易与存档冒烟
 npm run smoke:round-33 # 知识图谱目录覆盖与结局关系闭环
+npm run smoke:round-35 # MOD 优先级、来源报告与坏覆盖回退冒烟
 npm run audit:round-34 # 地图、对白、任务及世界设定文档一致性审计
 ```
 
-> Round 10 验证：`npm run build` 通过；Ajv 检查 manifest 下登记资料；浏览器手动验证 M 舆图/输入锁、关口往返、一次性事件去重、跨区保存/读档以及 Round 09 快照兼容。Phaser 主包 chunk 仍超过 500 kB 建议阈值；基础数据与 schema 位于 `data/`，启用 MOD 列表见 `data/base/manifest.json`，区域协议见 `docs/MAP-ATLAS.md`，存档协议见 `docs/SAVES.md`。
+> Round 10 验证：`npm run build` 通过；Ajv 检查 manifest 下登记资料；浏览器手动验证 M 舆图/输入锁、关口往返、一次性事件去重、跨区保存/读档以及 Round 09 快照兼容。Phaser 主包 chunk 仍超过 500 kB 建议阈值；基础数据与 schema 位于 `data/`，启用 MOD 列表见 `data/base/manifest.json`（覆盖顺序后声明者优先，改后重进游戏生效；游戏内 F2 查看顺序/来源/诊断，提交前跑 `npm run inspect:mods`，工作流见 `docs/DATA-GUIDE.md` §5），区域协议见 `docs/MAP-ATLAS.md`，存档协议见 `docs/SAVES.md`。
 
 ## 目录结构
 

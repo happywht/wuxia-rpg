@@ -44,6 +44,8 @@ export type ResourceSource = { kind: 'base' } | { kind: 'mod'; modId: string };
 
 export interface LoadedResource {
   id: string;
+  /** Manifest-declared relative path under `data/base/`; MODs mirror it. */
+  path: string;
   /** Schema family from the manifest, used by generic multi-resource assemblers. */
   schema: string;
   /** Schema-valid raw JSON; format-specific parsing is up to the consumer. */
@@ -54,7 +56,9 @@ export interface LoadedResource {
 /**
  * One recoverable load problem. `resource` is set when tied to a single
  * resource and absent for manifest/schema-level problems; `origin` names the
- * stage (`manifest`, `schema:<id>`, `base`, `mod:<modId>`).
+ * stage (`manifest`, `schema:<id>`, `base`, `mod:<modId>`). `path` pins the
+ * offending document's URL when one specific file is at fault and `hint`
+ * carries a concrete next step, so panels and CLIs can stay actionable.
  */
 export interface Diagnostic {
   /** MOD-only failures are warnings because the previous valid value survives. */
@@ -63,6 +67,10 @@ export interface Diagnostic {
   origin: string;
   message: string;
   details: string[];
+  /** URL of the offending document, when the problem belongs to one file. */
+  path?: string;
+  /** Concrete repair step the reader can perform right away. */
+  hint?: string;
 }
 
 export interface DataLoadResult {
@@ -70,6 +78,8 @@ export interface DataLoadResult {
   resources: ReadonlyMap<string, LoadedResource>;
   /** The parsed manifest behind `resources`; null when it failed to load. */
   manifest: GameManifest | null;
+  /** `manifest.enabledMods` on success, empty when the manifest failed. */
+  enabledMods: readonly string[];
   diagnostics: Diagnostic[];
 }
 
@@ -85,6 +95,10 @@ export interface ResourceErrorEvent {
   origin: string;
   message: string;
   details: string[];
+  /** URL of the offending document, mirroring `Diagnostic.path`. */
+  path?: string;
+  /** Concrete repair step, mirroring `Diagnostic.hint`. */
+  hint?: string;
 }
 
 export interface DataLoaderEventMap {
@@ -349,16 +363,14 @@ async function resolveResource(
       origin: `schema:${resource.schema}`,
       message: '资源引用的 schema 不可用，已跳过该资源',
       details: [],
+      path: joinUrl(ctx.baseUrl, SCHEMA_URL_SEGMENT, `${resource.schema}.schema.json`),
+      hint: `确认 data/schema/${resource.schema}.schema.json 存在且是合法 JSON Schema，或修正 manifest 中该资源的 schema 引用。`,
     });
     return null;
   }
 
-  const baseValue = await fetchDocument(
-    joinUrl(ctx.baseUrl, 'base', resource.path),
-    resource.id,
-    'base',
-    ctx,
-  );
+  const baseUrl = joinUrl(ctx.baseUrl, 'base', resource.path);
+  const baseValue = await fetchDocument(baseUrl, resource.id, 'base', ctx);
   if (baseValue === null) {
     return null;
   }
@@ -368,6 +380,8 @@ async function resolveResource(
       origin: 'base',
       message: '基础资源不符合 schema',
       details: formatSchemaErrors(validate.errors),
+      path: baseUrl,
+      hint: `按上述错误修正 ${baseUrl}（schema：data/schema/${resource.schema}.schema.json）。`,
     });
     return null;
   }
@@ -378,12 +392,15 @@ async function resolveResource(
       origin: 'base',
       message: '基础资源未通过语义校验',
       details: baseSemanticErrors,
+      path: baseUrl,
+      hint: `按上述错误修正 ${baseUrl} 的跨字段关系（schema 只约束单个文件的结构）。`,
     });
     return null;
   }
 
   let current: LoadedResource = {
     id: resource.id,
+    path: resource.path,
     schema: resource.schema,
     value: baseValue,
     source: { kind: 'base' },
@@ -402,6 +419,8 @@ async function resolveResource(
         severity: 'warning',
         message: 'MOD 覆盖不符合 schema，已保留上一有效版本',
         details: formatSchemaErrors(validate.errors),
+        path: overrideUrl,
+        hint: `修正 ${overrideUrl} 使其符合 data/schema/${resource.schema}.schema.json，或从 data/base/manifest.json 的 enabledMods 中移除 "${modId}"。`,
       });
       continue;
     }
@@ -413,11 +432,14 @@ async function resolveResource(
         severity: 'warning',
         message: 'MOD 覆盖未通过语义校验，已保留上一有效版本',
         details: semanticErrors,
+        path: overrideUrl,
+        hint: `修正 ${overrideUrl} 的跨字段关系（覆盖是整文件替换，需自带全部字段），或从 enabledMods 中移除 "${modId}"。`,
       });
       continue;
     }
     current = {
       id: resource.id,
+      path: resource.path,
       schema: resource.schema,
       value: overrideValue,
       source: { kind: 'mod', modId },
@@ -442,10 +464,22 @@ function runSemanticValidator(
   }
 }
 
+/** Repair advice matching the transport problems {@link fetchJson} reports. */
+function hintForFetchFailure(message: string): string {
+  if (message === 'JSON 解析失败') {
+    return '修复该文件中的 JSON 语法错误（多余/缺失逗号、未闭合的引号或括号等），可用任意 JSON 校验器定位。';
+  }
+  if (message.startsWith('响应不是 JSON')) {
+    return '确认请求命中的是 JSON 文件而非被服务器回退成 HTML 的页面（SPA fallback）。';
+  }
+  return '确认文件已发布、路径拼写与 manifest 一致且网络可用后重试。';
+}
+
 /**
  * Fetches one JSON document, mapping `missing` to `null` without a
  * diagnostic (callers decide whether that is normal) and every transport
- * failure to `null` plus an error diagnostic.
+ * failure to `null` plus an error diagnostic carrying the exact file URL
+ * and a repair hint.
  */
 async function fetchDocument(
   url: string,
@@ -459,7 +493,14 @@ async function fetchDocument(
   }
   if (fetched.status === 'missing') {
     if (!origin.startsWith('mod:')) {
-      ctx.report({ resource: resourceId, origin, message: '资源文件缺失', details: [url] });
+      ctx.report({
+        resource: resourceId,
+        origin,
+        message: '资源文件缺失',
+        details: [url],
+        path: url,
+        hint: `确认 ${url} 已随应用发布，且 manifest 中该资源的 path 拼写正确。`,
+      });
     }
     return null;
   }
@@ -469,6 +510,8 @@ async function fetchDocument(
     severity: origin.startsWith('mod:') ? 'warning' : 'error',
     message: fetched.message,
     details: fetched.details,
+    path: url,
+    hint: hintForFetchFailure(fetched.message),
   });
   return null;
 }
@@ -493,6 +536,8 @@ export async function loadGameData(options: DataLoaderOptions = {}): Promise<Dat
       origin: diagnostic.origin,
       message: diagnostic.message,
       details: diagnostic.details,
+      path: diagnostic.path,
+      hint: diagnostic.hint,
     });
   };
 
@@ -504,24 +549,34 @@ export async function loadGameData(options: DataLoaderOptions = {}): Promise<Dat
             origin: 'manifest',
             message: '清单文件缺失',
             details: [joinUrl(baseUrl, MANIFEST_URL_PATH), '请确认 data/base/manifest.json 已随应用发布。'],
+            path: joinUrl(baseUrl, MANIFEST_URL_PATH),
+            hint: '把 data/base/manifest.json（连同 data/ 目录）发布到站点根路径后刷新。',
           }
-        : { origin: 'manifest', message: fetchedManifest.message, details: fetchedManifest.details },
+        : {
+            origin: 'manifest',
+            message: fetchedManifest.message,
+            details: fetchedManifest.details,
+            path: joinUrl(baseUrl, MANIFEST_URL_PATH),
+            hint: hintForFetchFailure(fetchedManifest.message),
+          },
     );
-    return { resources, manifest: null, diagnostics };
+    return { resources, manifest: null, enabledMods: [], diagnostics };
   }
 
   const manifestSchema = await compileSchema(ajv, baseUrl, 'manifest');
   if (!manifestSchema.ok) {
     report(manifestSchema.diagnostic);
-    return { resources, manifest: null, diagnostics };
+    return { resources, manifest: null, enabledMods: [], diagnostics };
   }
   if (!manifestSchema.validate(fetchedManifest.data)) {
     report({
       origin: 'manifest',
       message: '清单不符合 manifest schema',
       details: formatSchemaErrors(manifestSchema.validate.errors),
+      path: joinUrl(baseUrl, MANIFEST_URL_PATH),
+      hint: '按上述错误修正 data/base/manifest.json（schema：data/schema/manifest.schema.json）。',
     });
-    return { resources, manifest: null, diagnostics };
+    return { resources, manifest: null, enabledMods: [], diagnostics };
   }
   const manifest = fetchedManifest.data as GameManifest;
 
@@ -531,8 +586,10 @@ export async function loadGameData(options: DataLoaderOptions = {}): Promise<Dat
       origin: 'manifest',
       message: '清单包含不安全的路径或标识符，已拒绝加载',
       details: manifestProblems,
+      path: joinUrl(baseUrl, MANIFEST_URL_PATH),
+      hint: '修正 data/base/manifest.json 中上述条目的 path/schema/modId（仅允许安全路径段，禁止穿越与反斜杠）。',
     });
-    return { resources, manifest: null, diagnostics };
+    return { resources, manifest: null, enabledMods: [], diagnostics };
   }
 
   const validators = new Map<string, ValidateFunction<unknown>>();
@@ -564,5 +621,5 @@ export async function loadGameData(options: DataLoaderOptions = {}): Promise<Dat
     bus?.emit('data:resource-loaded', { id: loaded.id, source: loaded.source });
   }
 
-  return { resources, manifest, diagnostics };
+  return { resources, manifest, enabledMods: manifest.enabledMods, diagnostics };
 }

@@ -149,6 +149,7 @@ import { EndingPanel } from './ending-ui';
 import { AchievementPanel } from './achievement-ui';
 import { MeridianPanel } from './meridian-ui';
 import { type GameSettings, applyGameSettings, loadGameSettings, uiFontSize } from './settings';
+import { ModStatusPanel } from './mod-status-ui';
 import { createPixelPerson, UI_FONT_FAMILY } from './ui-theme';
 import { type GridStartupData } from './menu-scene';
 import {
@@ -353,6 +354,7 @@ export class GridScene extends Phaser.Scene {
   private factionPanel: FactionPanel | null = null;
   private worldMapPanel: WorldMapPanel | null = null;
   private encyclopediaPanel: EncyclopediaPanel | null = null;
+  private modStatusPanel: ModStatusPanel | null = null;
   private collectionPanel: CollectionPanel | null = null;
   private companionPanel: CompanionPanel | null = null;
   private arenaPanel: ArenaPanel | null = null;
@@ -706,6 +708,7 @@ export class GridScene extends Phaser.Scene {
     this.meridianPanel = new MeridianPanel(this, () => this.noteOverlayClosed());
     this.worldMapPanel = new WorldMapPanel(this, () => this.noteOverlayClosed());
     this.encyclopediaPanel = new EncyclopediaPanel(this, { onClose: () => this.noteOverlayClosed() });
+    this.modStatusPanel = new ModStatusPanel(this, { onClose: () => this.noteOverlayClosed() });
     this.collectionPanel = new CollectionPanel(this, { onClose: () => this.noteOverlayClosed() });
     this.updateQuestTrackerHud();
     this.updateInteractHint();
@@ -1597,7 +1600,7 @@ export class GridScene extends Phaser.Scene {
     // HUD text lives above the daylight wash (depth 50) so every period's
     // tint keeps the interface fully legible.
     this.registerScaledText(this.add
-      .text(16, 12, '方向键 / WASD 移动 · E 交互 · P 伙伴 · H 帮助', {
+      .text(16, 12, '方向键 / WASD 移动 · E 交互 · P 伙伴 · F2 MOD · H 帮助', {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(13),
         color: UI.textMuted,
@@ -1630,7 +1633,7 @@ export class GridScene extends Phaser.Scene {
         shown: optionalWarnings.length > 0,
       },
       {
-        text: '部分 MOD 覆盖无效，已回退到上一有效数据（详情见控制台）',
+        text: '部分 MOD 覆盖无效，已回退到上一有效数据（按 F2 查看原因与修复建议）',
         shown: modWarnings.length > 0,
       },
     ];
@@ -2033,6 +2036,7 @@ export class GridScene extends Phaser.Scene {
       (this.pauseMenu !== null && this.pauseMenu.isOpen) ||
       (this.worldMapPanel !== null && this.worldMapPanel.isOpen) ||
       (this.encyclopediaPanel !== null && this.encyclopediaPanel.isOpen) ||
+      (this.modStatusPanel !== null && this.modStatusPanel.isOpen) ||
       (this.collectionPanel !== null && this.collectionPanel.isOpen) ||
       (this.factionPanel !== null && this.factionPanel.isOpen) ||
       (this.companionPanel !== null && this.companionPanel.isOpen) ||
@@ -2230,6 +2234,24 @@ export class GridScene extends Phaser.Scene {
     }
     if (this.anyOverlayOpen()) return;
     panel.open({ graph: world.knowledgeGraph, knownNodeIds: this.knownKnowledgeNodeIds });
+    this.updateInteractHint();
+  }
+
+  /** F2 key: inspect MOD order, per-resource final sources and diagnostics. */
+  private toggleModStatus(): void {
+    const panel = this.modStatusPanel;
+    const world = this.world;
+    if (panel === null || world === null) return;
+    if (panel.isOpen) {
+      panel.close();
+      return;
+    }
+    if (this.anyOverlayOpen()) return;
+    panel.open({
+      enabledMods: world.enabledMods,
+      resourceSources: world.resourceSources,
+      modDiagnostics: world.modDiagnostics,
+    });
     this.updateInteractHint();
   }
 
@@ -2501,6 +2523,10 @@ export class GridScene extends Phaser.Scene {
     const onEncyclopedia = (): void => this.toggleEncyclopedia();
     encyclopediaKey.on('down', onEncyclopedia);
 
+    const modStatusKey = keyboard.addKey(KeyCodes.F2);
+    const onModStatus = (): void => this.toggleModStatus();
+    modStatusKey.on('down', onModStatus);
+
     const collectionKey = keyboard.addKey(KeyCodes.L);
     const onCollection = (): void => this.toggleCollection();
     collectionKey.on('down', onCollection);
@@ -2546,6 +2572,7 @@ export class GridScene extends Phaser.Scene {
       pauseKey.off('down', onPause);
       worldMapKey.off('down', onWorldMap);
       encyclopediaKey.off('down', onEncyclopedia);
+      modStatusKey.off('down', onModStatus);
       collectionKey.off('down', onCollection);
       factionKey.off('down', onFaction);
       martialArtForgeKey.off('down', onMartialArtForge);
@@ -2570,6 +2597,8 @@ export class GridScene extends Phaser.Scene {
       this.worldMapPanel = null;
       this.encyclopediaPanel?.destroy();
       this.encyclopediaPanel = null;
+      this.modStatusPanel?.destroy();
+      this.modStatusPanel = null;
       this.collectionPanel?.destroy();
       this.collectionPanel = null;
       this.factionPanel?.destroy();

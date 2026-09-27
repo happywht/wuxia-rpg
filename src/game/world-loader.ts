@@ -17,9 +17,11 @@ import {
   type Diagnostic,
   type DataLoaderEventMap,
   type LoadedResource,
+  type ResourceSource,
   loadGameData,
 } from '../engine/data-loader';
 import { EventBus } from '../engine/event-bus';
+import { collectModDiagnostics } from '../engine/mod-diagnostics';
 import { GridMap, parseGridMap } from '../engine/grid-map';
 import {
   assembleKnowledgeGraph,
@@ -207,8 +209,10 @@ export function formatDiagnostics(diagnostics: readonly Diagnostic[]): string[] 
       diagnostic.resource === undefined
         ? diagnostic.origin
         : `${diagnostic.origin}（资源 ${diagnostic.resource}）`;
+    const path = diagnostic.path === undefined ? '' : `\n文件：${diagnostic.path}`;
     const details = diagnostic.details.length > 0 ? `\n${diagnostic.details.join('\n')}` : '';
-    return `${scope}：${diagnostic.message}${details}`;
+    const hint = diagnostic.hint === undefined ? '' : `\n建议：${diagnostic.hint}`;
+    return `${scope}：${diagnostic.message}${path}${details}${hint}`;
   });
 }
 
@@ -248,6 +252,21 @@ export interface WorldAssembly {
   warnings: Diagnostic[];
 }
 
+/**
+ * One successfully loaded resource with the physical copy that won. Kept
+ * beside the assembled world so the F2 MOD panel and reports can explain
+ * precedence without re-reading the raw loader result.
+ */
+export interface LoadedResourceSource {
+  id: string;
+  /** Manifest-declared path under `data/base/`; MOD overrides mirror it. */
+  path: string;
+  /** Schema family from the manifest. */
+  schema: string;
+  /** Which layer provided the final valid value (`base` or `mod:<id>`). */
+  source: ResourceSource;
+}
+
 /** Successful load: the required map plus the assembled optional content. */
 export interface LoadedWorld {
   /** Default starting map retained for menu/template compatibility. */
@@ -263,6 +282,12 @@ export interface LoadedWorld {
   assembly: WorldAssembly;
   optionalWarnings: readonly Diagnostic[];
   modWarnings: readonly Diagnostic[];
+  /** `enabledMods` exactly as declared (later entries override earlier ones). */
+  enabledMods: readonly string[];
+  /** Final source of every successfully loaded resource, in manifest order. */
+  resourceSources: readonly LoadedResourceSource[];
+  /** MOD-layer diagnostics (rejected overrides etc.) with paths and hints. */
+  modDiagnostics: readonly Diagnostic[];
 }
 
 /** Failed load: readable title/lines for the error panels both scenes show. */
@@ -544,6 +569,10 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
         details: [],
       });
     }
+    const modDiagnostics = collectModDiagnostics(result.resources, result.diagnostics, [
+      ...optionalWarnings,
+      ...assembly.warnings,
+    ]);
     return {
       ok: true,
       world: {
@@ -557,6 +586,11 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
         assembly,
         optionalWarnings: [...optionalWarnings, ...assembly.warnings],
         modWarnings,
+        enabledMods: result.manifest?.enabledMods ?? [],
+        resourceSources: [...result.resources.values()].map(
+          ({ id, path, schema, source }) => ({ id, path, schema, source }),
+        ),
+        modDiagnostics,
       },
     };
   } catch (error) {

@@ -4,6 +4,31 @@
 
 ---
 
+## Round 35 — MOD 优先级、来源追踪与作者工作流（2026-09-27，已完成）
+
+### 计划与实现
+
+- 先读取 `iterations/round-35/plan.md`：本轮把同路径 JSON 覆盖补成可检查、可解释、易排错的 MOD 工作流；不改基础游戏内容、不动存档协议；全程未触碰未跟踪的 `.serena/`，未改 `data/`、`mods/` 任何文件（`git diff --stat data/ mods/` 为空）。
+- `src/engine/data-loader.ts`：`Diagnostic` 与 `data:resource-error` 事件新增可选 `path`（问题文件 URL）与 `hint`（修复建议）；`LoadedResource` 新增 manifest 相对 `path`；`DataLoadResult` 新增 `enabledMods`（manifest 失败时为 `[]`）。所有失败分支补齐定位与提示：覆盖 schema 不符/语义失败（指向 `mods/<modId>/<path>` 与对应 schema、给出移除该 MOD 的备选）、JSON 语法错误（提示用 JSON 校验器定位）、SPA fallback、manifest 缺失/不符/不安全路径。覆盖语义未动：仍按 `enabledMods` 顺序逐层校验，有效后层替换、坏层 `continue` 保留上一有效值。
+- `src/game/world-loader.ts`：新增 `LoadedResourceSource`（id/path/schema/source）；`LoadedWorld` 新增 `enabledMods`、`resourceSources`（`[...result.resources.values()]` 按 manifest 顺序投影）与 `modDiagnostics`。新增 Phaser-free `src/engine/mod-diagnostics.ts`：保留加载器的坏覆盖诊断，并将后续装配阶段资源级警告按该资源最终有效来源归因到 MOD，补上覆盖文件相对路径与修复提示；基础来源警告不误标为 MOD。HUD 提示从完整 MOD 诊断集派生。
+- 新增 `src/game/mod-status-ui.ts`（`ModStatusPanel`，参照 `EncyclopediaPanel` 的绑定/清理模式）：三页（生效顺序/资源来源/MOD 诊断），←/→ 或 A/D 翻页、↑/↓ 或 W/S 选行、F2/Esc 关闭；850×468 面板居中于 960×540 画布，左列表 10 行窗口滚动 + 右详情；空状态文案覆盖"未启用 MOD / 无资源 / 无诊断"三种情况。`GridScene` 接线：`F2` 键、`toggleModStatus`（`anyOverlayOpen` 互斥、`onClose → noteOverlayClosed`）、`bindMovementKeys` 的解绑与 SHUTDOWN 销毁清单；H 帮助面板键位表、HUD 首行与 MOD 回退提示行加入 F2 入口。自审查时移除面板内部对 F2 的重复监听，避免与场景全局切换键在同一事件内双重开关；面板 Esc 仍可关闭，F2 由全局切换器开/关并在关闭时释放 capture。
+- 新增 `scripts/inspect-mods.mjs` 与 `npm run inspect:mods`：导出 `inspectMods(root)` + CLI 双形态。按真实 manifest 顺序校验 manifest（含本地复刻的安全路径段检查）、每资源基础层与各已启用覆盖层的 JSON 可读性/schema（Ajv `allErrors: true`，draft-07），输出逐层状态与最终来源；坏层问题带精确文件路径、错误明细与修复提示，exit 1；结尾注明跨资源语义校验由运行时加载器执行。全程只读。
+- 新增 `scripts/smoke-round-35.mjs` 与 `npm run smoke:round-35`：用项目 `typescript` 包 `transpileModule` 把真实 `data-loader.ts`/`event-bus.ts`/`mod-diagnostics.ts` 即时转译到 `node_modules/.tmp-r35-smoke-*` 的唯一临时目录（裸导入 `ajv` 可解析；跑完即删），以 `globalThis.fetch` 内存 fixture 驱动 `loadGameData({ baseUrl: '/fixture' })`：双 MOD（modA→modB）四资源断言——后有效层获胜（alpha←modB）、坏 JSON 回退（beta←modA）、schema 无效回退（gamma←base）、无覆盖正常（delta←base）、`enabledMods` 暴露、资源按 manifest 顺序、两条 mod 诊断的 severity/message/path/details（`/payload` 字段定位）/hint（schema 文件名与移除方式）；同一 fixture 树再调 `inspectMods(tmpRoot)` 交叉核验层状态/最终来源/问题路径与提示，另断言 MOD 来源的装配警告被归因并补出文件路径、基础来源警告不误标、无效基础资源不能被 MOD 救援、非对象 manifest 能返回可读失败、真实 manifest `enabledMods` 仍为 `[]`。开发中修正一处自查：`compileSchema` 成功分支缓存未携带 `file`，导致 schema-error 提示出现 `schema：undefined`，已补字段并复跑通过。
+- 更新 `docs/DATA-GUIDE.md`（状态行、§5 扩写为覆盖语义/启用排序/inspect:mods/F2 排错/重进游戏生效与 R36 热重载说明、覆盖资源运行时语义警告归因、变更记录）、`README.md`（进度行、范围行、命令表 inspect:mods 与 smoke:round-35、MOD 工作流提示）、`CHANGELOG.md`、`ROADMAP.md`（R35 标已完成）与本日志。
+
+### 验证
+
+- `npm run inspect:mods`：通过（exit 0）。真实 manifest（`enabledMods: []`）：26 项资源基础层全部 ✓、0 问题、最终来源全为 base；输出含两条范围说明（整文件替换语义、运行时语义校验边界）。
+- `npm run smoke:round-35`：通过（exit 0）。断言全部命中：modB 有效层获胜、坏 JSON/schema 无效覆盖分别回退到 modA/base、来源按 manifest 顺序、坏基础资源/坏 manifest 拒绝路径、加载与跨资源诊断精确归因/修复提示、inspectMods 与运行时加载器层结果一致、真实 manifest 未被启用测试 MOD；唯一转译目录与临时 fixture 目录均已清理。
+- `npm run validate:data`：通过（exit 0），manifest Schema 与 26 个基础资源 Schema。
+- `npm run typecheck`：通过（exit 0），`tsc --noEmit` 无输出（期间修复过一次 `noUncheckedIndexedAccess` 报出的 `labels[index]` 可能未定义）。
+- `npm run build`：通过（exit 0），711ms；主 JS chunk 1,877.50 kB（gzip 494.50 kB），较 R34 的 1,867.95 kB 增加约 9.6 kB（新增 F2 面板与诊断字段），Vite 默认 500 kB 分包建议警告仍在。
+- `npm run smoke:round-30` / `npm run smoke:round-31` / `npm run smoke:round-33`：通过（exit 0），人物/门派、任务链、知识图谱回归正常。
+- `npm run audit:round-34`：通过（exit 0），文档一致性审计不受本轮文档改动影响（本轮未改四份被审计文档）。
+- 未做：F2 面板的按键/翻页实机走查。临时 Vite 页面可见为 Phaser 画布；后续 Windows 浏览器控制因无法可靠确认现有 Chrome 标签 URL 而触发安全停止，未发送任何按键。面板视觉和实际按键仍待人工确认。未实现热重载（R36）。
+
+---
+
 ## Round 34 — 世界设定汇编与文档一致性审计（2026-09-27，已完成）
 
 ### 计划与实现
