@@ -18,7 +18,26 @@
         { "itemId": "item.jade-polish", "quantity": -1 },
         { "itemId": "item.hanzhu-cao", "quantity": -1 },
         { "itemId": "item.cangya-gen", "quantity": -1 },
-        { "itemId": "item.luodie-hua", "quantity": -1 }
+        { "itemId": "item.luodie-hua", "quantity": -1 },
+        { "itemId": "item.r32.songzhen-xuesan", "quantity": 3 },
+        { "itemId": "item.r32.ouling-huqitang", "quantity": 3 },
+        { "itemId": "item.r32.shuanglu-fuhe-san", "quantity": 3 },
+        { "itemId": "item.r32.jiangxin-buqi-wan", "quantity": 2 },
+        { "itemId": "item.r32.yushen-huoxue-gao", "quantity": 2 },
+        { "itemId": "item.r32.changqing-yangqi-dan", "quantity": 2 },
+        { "itemId": "item.r32.luwei-shengji-dan", "quantity": 2 },
+        { "itemId": "item.r32.yunhe-wuhua-dan", "quantity": 1 },
+        { "itemId": "item.r32.willow-switch-sword", "quantity": 1 },
+        { "itemId": "item.r32.rain-shed-coat", "quantity": 1 },
+        { "itemId": "item.r32.river-copper", "quantity": 5 },
+        { "itemId": "item.r32.moon-leaf-iron", "quantity": 4 },
+        { "itemId": "item.r32.blue-slate", "quantity": 6 },
+        { "itemId": "item.r32.black-silk-thread", "quantity": 5 },
+        { "itemId": "item.r32.reed-cloth", "quantity": 4 },
+        { "itemId": "item.r32.cloud-wool", "quantity": 4 },
+        { "itemId": "item.r32.ash-bark", "quantity": 4 },
+        { "itemId": "item.r32.clam-shell", "quantity": 4 },
+        { "itemId": "item.r32.marsh-amber", "quantity": 3 }
       ]
     }
   ]

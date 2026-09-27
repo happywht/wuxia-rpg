@@ -39,6 +39,13 @@
               ]
             },
             {
+              "text": "我想请先生指点书院武学。",
+              "nextNodeId": "r32-lessons",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.hanshan-shuyuan", "isMember": true }
+              ]
+            },
+            {
               "text": "我想退出寒山书院。",
               "nextNodeId": "departed",
               "conditions": [
@@ -73,6 +80,26 @@
           "id": "tasked",
           "text": "「课业倒有一桩。」他从案头取出一叠空纸，「去渡口把轮值盟约的执行情况记回来——哪派守约、哪派误时，只记事实，不添褒贬。书院的笔，不偏不倚才有分量。」"
         },
+        {
+          "id": "r32-lessons",
+          "text": "柳听澜翻开武录副本：「笔、步、气各有章法。读懂招式为何如此，再决定是否要学。」",
+          "options": [
+            { "text": "请教朱墨点腕笔。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-hanshan-zhumo-bi" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-hanshan-zhumo-bi" }] },
+            { "text": "请教点津校脉笔。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-hanshan-dianjin-bi" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-hanshan-dianjin-bi" }] },
+            { "text": "请教锋折批隙手。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-hanshan-fengzhe-bi" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-hanshan-fengzhe-bi" }] },
+            { "text": "请教经纶定息篇。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-hanshan-jinglun-xinfa" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-hanshan-jinglun-xinfa" }] },
+            { "text": "请教定理贯脉诀。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-hanshan-dingli-jue" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-hanshan-dingli-jue" }] },
+            { "text": "今日先到这里。", "nextNodeId": "farewell" }
+          ]
+        },
+        {
+          "id": "r32-taught",
+          "text": "柳听澜按你所选的招式逐式讲解，把每一步写在空白页边：「学武也要讲理路，明白为何出手，才知道何时收手。」",
+          "options": [
+            { "text": "再请教一门。", "nextNodeId": "r32-lessons" },
+            { "text": "多谢先生，告辞。", "nextNodeId": "farewell" }
+          ]
+        },
         { "id": "departed", "text": "柳听澜沉默片刻，把你的名字从课业簿上圈去：「学籍除名，笔墨两清。书院的门不锁，但誊过的盟书里，不会再有你的手笔。」" },
         { "id": "farewell", "text": "「去吧。」柳听澜重新蘸墨，「路上少说多看——见过的事，都是文章。」" }
       ]
@@ -95,13 +122,11 @@
               ]
             },
             {
-              "text": "请师父传我拦门刀法。",
-              "nextNodeId": "taught",
+              "text": "请师父指点护船与刀场功夫。",
+              "nextNodeId": "r32-lessons",
               "conditions": [
-                { "kind": "factionMembership", "factionId": "faction.panzhou-daochang", "isMember": true },
-                { "kind": "martialArtEligible", "martialArtId": "skill.lanmen-daofa" }
-              ],
-              "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.lanmen-daofa" }]
+                { "kind": "factionMembership", "factionId": "faction.panzhou-daochang", "isMember": true }
+              ]
             },
             {
               "text": "我想退出盘舷刀场。",
@@ -138,8 +163,24 @@
           "text": "祝九弦把一截缆绳抛过来，看你接住了才咧嘴一笑：「接得稳，就有得教。刀场的规矩记牢——上船先认缆桩，出刀先认人。哪条船要护、哪步不能退，比刀法先学。」"
         },
         {
-          "id": "taught",
-          "text": "他让你立在栈桥窄板上练劈拦：「拦门刀是岸上看家护院的功夫，到了船上就是护船的刀——低桩、贴身、连环三刀，脚下借舷板的劲。练熟了，船头船尾你都站得住。」"
+          "id": "r32-lessons",
+          "text": "祝九弦把几页刀谱压在缆绳下：「先学护船的规矩，再挑合你手脚的一式。窄板上站稳，比一刀劈得响更要紧。」",
+          "options": [
+            { "text": "请教拦门刀法。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.lanmen-daofa" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.lanmen-daofa" }] },
+            { "text": "请教翻桨刀。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-panzhou-fanjing-dao" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-panzhou-fanjing-dao" }] },
+            { "text": "请教截浪回舷刀。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-panzhou-jielan-dao" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-panzhou-jielan-dao" }] },
+            { "text": "请教顺汛换步。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-panzhou-shunxun-bu" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-panzhou-shunxun-bu" }] },
+            { "text": "请教破白连环刀。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-panzhou-pobai-dao" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-panzhou-pobai-dao" }] },
+            { "text": "今日先到这里。", "nextNodeId": "farewell" }
+          ]
+        },
+        {
+          "id": "r32-taught",
+          "text": "祝九弦按你所选的路数带你在窄板上走过一轮：「刀可以收，脚不能乱。护住同船的人，才算真会使刀。」",
+          "options": [
+            { "text": "再请教一门。", "nextNodeId": "r32-lessons" },
+            { "text": "多谢师父，告辞。", "nextNodeId": "farewell" }
+          ]
         },
         { "id": "departed", "text": "祝九弦把缆绳收拢，半天说了一句：「船开了就不追。刀场的名号你带走，刀场的规矩留下——往后护人护己，自己掂量。」" },
         { "id": "war-victory", "text": "「先约争到手，船期便定得早。」祝九弦点点头，「不过赢得时辰不算赢——替我把那句『对方药队照旧过桥』也记全了，护船的只认章程，不认输赢。」" },

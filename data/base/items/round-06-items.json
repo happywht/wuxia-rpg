@@ -308,6 +308,247 @@
         "healthRestore": 26,
         "qiRestore": 24
       }
+    },
+    {
+      "id": "item.r32.songzhen-xuesan",
+      "name": "松针止血散",
+      "description": "松针烘干后研成的青末，敷在皮肉翻卷处先涩后凉，适合行路时应急止血。",
+      "category": "consumable",
+      "stackLimit": 9,
+      "buyPrice": 20,
+      "sellPrice": 8,
+      "consumable": { "healthRestore": 30, "qiRestore": 0 }
+    },
+    {
+      "id": "item.r32.ouling-huqitang",
+      "name": "鸥翎回气汤",
+      "description": "海滨药铺以淡盐、石斛和晒干鸥翎草煎成的清汤，入口微咸，最宜补回耗散的内息。",
+      "category": "consumable",
+      "stackLimit": 9,
+      "buyPrice": 18,
+      "sellPrice": 7,
+      "consumable": { "healthRestore": 0, "qiRestore": 26 }
+    },
+    {
+      "id": "item.r32.shuanglu-fuhe-san",
+      "name": "双露复合散",
+      "description": "清晨采下两种露生药叶合研，药力不猛，却能同时缓解擦伤与气短。",
+      "category": "consumable",
+      "stackLimit": 9,
+      "buyPrice": 34,
+      "sellPrice": 13,
+      "consumable": { "healthRestore": 18, "qiRestore": 18 }
+    },
+    {
+      "id": "item.r32.jiangxin-buqi-wan",
+      "name": "江心补气丸",
+      "description": "渡船医工用江心石斛和晒盐蜜丸，药性温和，服后气息渐稳。",
+      "category": "consumable",
+      "stackLimit": 9,
+      "buyPrice": 40,
+      "sellPrice": 16,
+      "consumable": { "healthRestore": 0, "qiRestore": 42 }
+    },
+    {
+      "id": "item.r32.yushen-huoxue-gao",
+      "name": "雨参活血膏",
+      "description": "雨后挖出的老参须捣成膏，药味辛烈，能把淤滞的伤处重新暖开。",
+      "category": "consumable",
+      "stackLimit": 9,
+      "buyPrice": 48,
+      "sellPrice": 19,
+      "consumable": { "healthRestore": 56, "qiRestore": 0 }
+    },
+    {
+      "id": "item.r32.changqing-yangqi-dan",
+      "name": "长青养气丹",
+      "description": "以老根草木封入蜡衣，药力绵长不冲头，适合内息见底时慢慢调息。",
+      "category": "consumable",
+      "stackLimit": 9,
+      "buyPrice": 54,
+      "sellPrice": 21,
+      "consumable": { "healthRestore": 0, "qiRestore": 60 }
+    },
+    {
+      "id": "item.r32.luwei-shengji-dan",
+      "name": "芦苇生肌丹",
+      "description": "药庐为常走水路的人改良的合剂，既敷养创口，也补回一截散乱气息。",
+      "category": "consumable",
+      "stackLimit": 9,
+      "buyPrice": 62,
+      "sellPrice": 24,
+      "consumable": { "healthRestore": 44, "qiRestore": 25 }
+    },
+    {
+      "id": "item.r32.yunhe-wuhua-dan",
+      "name": "云鹤无暇丹",
+      "description": "云隐山庄封存的双补丹，外壳有细密鹤纹，劲足而不燥，留给长途护送与险战之后。",
+      "category": "consumable",
+      "stackLimit": 5,
+      "buyPrice": 96,
+      "sellPrice": 38,
+      "consumable": { "healthRestore": 72, "qiRestore": 52 }
+    },
+    {
+      "id": "item.r32.willow-switch-sword",
+      "name": "柳叶判官笔",
+      "description": "以软木作柄、薄钢作锋，收笔时像账房的柳叶笔，出手时却能挑开衣甲缝隙。",
+      "category": "equipment",
+      "stackLimit": 1,
+      "buyPrice": 85,
+      "sellPrice": 34,
+      "equipment": { "slot": "weapon", "attributeBonuses": { "force": 2, "agility": 1 }, "healthBonus": 0, "qiBonus": 0 }
+    },
+    {
+      "id": "item.r32.rain-shed-coat",
+      "name": "避雨短褂",
+      "description": "油布与旧棉布夹缝而成，挡不住重兵，却能让肩背少受些风雨与钝击。",
+      "category": "equipment",
+      "stackLimit": 1,
+      "buyPrice": 70,
+      "sellPrice": 28,
+      "equipment": { "slot": "garment", "attributeBonuses": { "body": 2 }, "healthBonus": 10, "qiBonus": 0 }
+    },
+    {
+      "id": "item.r32.tide-folded-sword",
+      "name": "潮折短剑",
+      "description": "柳叶判官笔经重淬后改作短剑，剑脊留有一道潮纹，刃口稳而不滞。",
+      "category": "equipment",
+      "stackLimit": 1,
+      "buyPrice": 0,
+      "sellPrice": 55,
+      "equipment": { "slot": "weapon", "attributeBonuses": { "force": 4, "agility": 1 }, "healthBonus": 0, "qiBonus": 0 }
+    },
+    {
+      "id": "item.r32.mist-piercer-sword",
+      "name": "穿雾短锋",
+      "description": "潮折短剑再校重心、薄刃开出窄槽，近身递招时容易沿着对手兵器滑进空门。",
+      "category": "equipment",
+      "stackLimit": 1,
+      "buyPrice": 0,
+      "sellPrice": 82,
+      "equipment": { "slot": "weapon", "attributeBonuses": { "force": 6, "agility": 1 }, "healthBonus": 0, "qiBonus": 0 }
+    },
+    {
+      "id": "item.r32.reed-stitched-robe",
+      "name": "苇线行衣",
+      "description": "用苇纤线把避雨短褂的受力处重新纳紧，衣身仍轻，肋下却多了一层缓冲。",
+      "category": "equipment",
+      "stackLimit": 1,
+      "buyPrice": 0,
+      "sellPrice": 64,
+      "equipment": { "slot": "garment", "attributeBonuses": { "body": 4 }, "healthBonus": 18, "qiBonus": 0 }
+    },
+    {
+      "id": "item.r32.pier-guard-cloak",
+      "name": "栈桥护肩",
+      "description": "在苇线行衣外添入软甲片，专护肩肘和肋侧，窄桥上撞到栏木也不容易岔气。",
+      "category": "equipment",
+      "stackLimit": 1,
+      "buyPrice": 0,
+      "sellPrice": 92,
+      "equipment": { "slot": "garment", "attributeBonuses": { "body": 6 }, "healthBonus": 28, "qiBonus": 0 }
+    },
+    {
+      "id": "item.r32.clam-light-pendant",
+      "name": "蚌光佩",
+      "description": "取江口厚蚌内层磨成薄片，衬在旧玉背面后温润不冰，佩久能稳住心神。",
+      "category": "equipment",
+      "stackLimit": 1,
+      "buyPrice": 0,
+      "sellPrice": 56,
+      "equipment": { "slot": "ornament", "attributeBonuses": { "resolve": 2 }, "healthBonus": 0, "qiBonus": 15 }
+    },
+    {
+      "id": "item.r32.marsh-amber-seal",
+      "name": "沼琥珀印",
+      "description": "将古沼琥珀嵌进蚌光佩的铜扣，握持时有淡淡暖意，既护心神也聚起一口真气。",
+      "category": "equipment",
+      "stackLimit": 1,
+      "buyPrice": 0,
+      "sellPrice": 76,
+      "equipment": { "slot": "ornament", "attributeBonuses": { "insight": 2 }, "healthBonus": 12, "qiBonus": 14 }
+    },
+    {
+      "id": "item.r32.river-copper",
+      "name": "江铜片",
+      "description": "旧渡船拆下的铜铆片，去掉盐锈后可作刀柄箍与玉佩背扣。",
+      "category": "misc",
+      "stackLimit": 99,
+      "buyPrice": 16,
+      "sellPrice": 5
+    },
+    {
+      "id": "item.r32.moon-leaf-iron",
+      "name": "月叶熟铁",
+      "description": "铁片锤成弯叶形后退火，韧性胜过普通熟铁，适合重理薄刃。",
+      "category": "misc",
+      "stackLimit": 99,
+      "buyPrice": 24,
+      "sellPrice": 8
+    },
+    {
+      "id": "item.r32.blue-slate",
+      "name": "青灰磨石",
+      "description": "渡口山脚采来的细纹磨石，能收净刃口毛刺，也可磨平铜玉接缝。",
+      "category": "misc",
+      "stackLimit": 99,
+      "buyPrice": 14,
+      "sellPrice": 4
+    },
+    {
+      "id": "item.r32.black-silk-thread",
+      "name": "乌蚕韧丝",
+      "description": "手工抽出的黑蚕丝，浸油后不怕潮，缝补衣甲时不易断线。",
+      "category": "misc",
+      "stackLimit": 99,
+      "buyPrice": 19,
+      "sellPrice": 6
+    },
+    {
+      "id": "item.r32.reed-cloth",
+      "name": "苇纤布",
+      "description": "芦苇纤维与棉麻交织的粗布，轻便耐磨，适合补在衣襟和袖口内侧。",
+      "category": "misc",
+      "stackLimit": 99,
+      "buyPrice": 18,
+      "sellPrice": 6
+    },
+    {
+      "id": "item.r32.cloud-wool",
+      "name": "云絮棉",
+      "description": "山庄药圃旁收来的白絮棉，晒干后松软却不易吸水，可填入行衣夹层。",
+      "category": "misc",
+      "stackLimit": 99,
+      "buyPrice": 22,
+      "sellPrice": 7
+    },
+    {
+      "id": "item.r32.ash-bark",
+      "name": "灰桦皮",
+      "description": "灰桦树皮经烟熏后柔韧耐水，裁成薄片可以藏在衣甲的夹层中。",
+      "category": "misc",
+      "stackLimit": 99,
+      "buyPrice": 20,
+      "sellPrice": 6
+    },
+    {
+      "id": "item.r32.clam-shell",
+      "name": "厚蚌壳片",
+      "description": "江口老蚌的内壳，磨薄后有温润微光，镶进玉石背面能隔潮护绳。",
+      "category": "misc",
+      "stackLimit": 99,
+      "buyPrice": 25,
+      "sellPrice": 8
+    },
+    {
+      "id": "item.r32.marsh-amber",
+      "name": "沼泽琥珀",
+      "description": "从旧河道淤泥里淘出的蜜色树脂，质地坚韧，是玉佩和铜扣常用的嵌料。",
+      "category": "misc",
+      "stackLimit": 99,
+      "buyPrice": 32,
+      "sellPrice": 10
     }
   ]
 }

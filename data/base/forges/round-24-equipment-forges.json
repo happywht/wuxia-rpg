@@ -43,6 +43,84 @@
       ],
       "currencyCost": 28,
       "resultItemId": "item.qingyu-pei"
+    },
+    {
+      "id": "forge.recipe.r32-fold-tide-sword",
+      "name": "潮纹重淬",
+      "description": "以江铜稳柄、月叶熟铁补刃，把柳叶判官笔重淬成更稳的短剑。",
+      "stationId": "forge.station.mist-ferry-anvil",
+      "ingredients": [
+        { "itemId": "item.r32.willow-switch-sword", "quantity": 1 },
+        { "itemId": "item.r32.river-copper", "quantity": 2 },
+        { "itemId": "item.r32.moon-leaf-iron", "quantity": 1 }
+      ],
+      "currencyCost": 42,
+      "resultItemId": "item.r32.tide-folded-sword"
+    },
+    {
+      "id": "forge.recipe.r32-pierce-mist-sword",
+      "name": "穿雾开锋",
+      "description": "重校潮折短剑的刃线，再以青灰磨石收口，令近身递招更见锋利。",
+      "stationId": "forge.station.mist-ferry-anvil",
+      "ingredients": [
+        { "itemId": "item.r32.tide-folded-sword", "quantity": 1 },
+        { "itemId": "item.r32.moon-leaf-iron", "quantity": 2 },
+        { "itemId": "item.r32.blue-slate", "quantity": 1 }
+      ],
+      "currencyCost": 68,
+      "resultItemId": "item.r32.mist-piercer-sword"
+    },
+    {
+      "id": "forge.recipe.r32-reed-stitched-robe",
+      "name": "苇线纳衣",
+      "description": "以乌蚕韧丝和苇纤布重新收紧短褂受力处，衣身轻便而更耐拳脚。",
+      "stationId": "forge.station.mist-ferry-anvil",
+      "ingredients": [
+        { "itemId": "item.r32.rain-shed-coat", "quantity": 1 },
+        { "itemId": "item.r32.black-silk-thread", "quantity": 2 },
+        { "itemId": "item.r32.reed-cloth", "quantity": 1 }
+      ],
+      "currencyCost": 38,
+      "resultItemId": "item.r32.reed-stitched-robe"
+    },
+    {
+      "id": "forge.recipe.r32-pier-guard-cloak",
+      "name": "夹层添甲",
+      "description": "在苇线行衣中填入云絮棉，外缝灰桦皮，专护肩肘与肋侧。",
+      "stationId": "forge.station.mist-ferry-anvil",
+      "ingredients": [
+        { "itemId": "item.r32.reed-stitched-robe", "quantity": 1 },
+        { "itemId": "item.r32.cloud-wool", "quantity": 2 },
+        { "itemId": "item.r32.ash-bark", "quantity": 1 }
+      ],
+      "currencyCost": 64,
+      "resultItemId": "item.r32.pier-guard-cloak"
+    },
+    {
+      "id": "forge.recipe.r32-clam-light-pendant",
+      "name": "蚌光衬玉",
+      "description": "磨薄厚蚌壳片、用江铜稳住背扣，让旧玉佩隔潮聚气。",
+      "stationId": "forge.station.mist-ferry-anvil",
+      "ingredients": [
+        { "itemId": "item.suwen-yupei", "quantity": 1 },
+        { "itemId": "item.r32.clam-shell", "quantity": 2 },
+        { "itemId": "item.r32.river-copper", "quantity": 1 }
+      ],
+      "currencyCost": 46,
+      "resultItemId": "item.r32.clam-light-pendant"
+    },
+    {
+      "id": "forge.recipe.r32-marsh-amber-seal",
+      "name": "琥珀嵌扣",
+      "description": "将沼泽琥珀嵌入蚌光佩铜扣，以青灰磨石磨平接缝，成佩后心神与内息兼顾。",
+      "stationId": "forge.station.mist-ferry-anvil",
+      "ingredients": [
+        { "itemId": "item.r32.clam-light-pendant", "quantity": 1 },
+        { "itemId": "item.r32.marsh-amber", "quantity": 2 },
+        { "itemId": "item.r32.blue-slate", "quantity": 1 }
+      ],
+      "currencyCost": 72,
+      "resultItemId": "item.r32.marsh-amber-seal"
     }
   ]
 }

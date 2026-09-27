@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：Round 03–31 已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台、门派战、自创武学、经脉、装备锻造、炼丹、存档、区域旅行、知识图谱、NPC 私有记忆、江湖图鉴、昼夜气候、日程、条件奇遇、多层社会声望、多结局、成就、原创人物/门派扩充（12 名 NPC、5 个门派、对话多文件装配）与原创任务链（20 项差事、互斥分支与谈话目标）；Round 31 专项、资料校验、R30 回归和生产构建均已通过；详情分别见 `docs/SAVES.md`、`docs/KNOWLEDGE-GRAPH.md`、`docs/ENDINGS.md`、`docs/ACHIEVEMENTS.md`、`docs/COMPANIONS.md`、`docs/CHARACTERS.md`、`docs/FACTIONS.md`、`docs/FACTION_WAR_DESIGN.md`、`docs/MARTIAL_ART_FORGE.md`、`docs/EQUIPMENT-FORGING.md`、`docs/ALCHEMY.md` 与 `docs/QUESTS.md`。
+- 状态：Round 03–32 已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台、门派战、自创武学、经脉、装备锻造、炼丹、存档、区域旅行、知识图谱、NPC 私有记忆、江湖图鉴、昼夜气候、日程、条件奇遇、多层社会声望、多结局、成就、原创人物/门派扩充（12 名 NPC、5 个门派）、原创任务链（20 项差事）及原创物品/武学扩充（50 件物品、30 种武学）；Round 32 专项、资料校验、R31 回归和生产构建均已通过；专题目录见 `docs/ITEMS.md` 与 `docs/MARTIAL-ARTS.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -37,6 +37,8 @@ mods/                        # mod 覆盖层：mods/<modId>/ 镜像 data/base/ �
 ```
 
 Round 07 状态：manifest 另登记可选资源 `quest.round-07-set` → `quests/round-07-quests.json`（`quest-set`）。Round 31 起基础资料提供 20 项原创差事（含一组互斥分支与 `talkToNpc` 谈话目标），NPC 可声明可选 `questGiver`（缺省为 false）；Q 打开任务日志，邻接任务发布人按 E 打开只列出其任务的名录。Round 09 起玩家任务、背包、战斗遭遇等运行状态由版本化存档持久化，不写回世界 JSON。此前角色模板、NPC 商店字段与物品数据仍按 Round 06 契约使用。Vite 把整个 `data/` 目录作为静态资源目录，开发期可从站点根路径读取，生产构建时复制到 `dist/`。`mods/example/` 提供未启用的同路径覆盖示例。启用 MOD 只需把其单段 id 按优先顺序加入 manifest 的 `enabledMods` 数组。
+
+Round 32 状态：物品仍由 manifest 的 `item.round-06-set` 资源和 `items-set` schema 装配，基础集扩至 50 项；姜百味货架新增八种消耗品、两件基础装备和九种有限库存材料，六件升级装备由渡口铁砧的连续配方取得。武学仍由 `martial-art.round-04-set` 与 `martial-arts-set` schema 装配，基础集扩至 30 种；24 种新增门派武学通过五位导师的 `martialArtEligible` / `learnMartialArt` 对话分支授予，只有当前门派成员能进入本门目录。价格、材料、属性门槛和战斗作用均由现有 JSON 表达，不新增引擎中的剧情分支。完整目录见 `docs/ITEMS.md`、`docs/MARTIAL-ARTS.md`。
 
 Round 08 状态：dialogue-set 选项新增可选 `conditions`（数组，全部满足才可见）与 `effects`（数组，确认时先全量验证再统一提交）字段，二者均为封闭枚举协议（见 §4 对话条件与效果），旧的无条件对话完全兼容。示例对话扩展覆盖任务接取/放弃/交付、物品赠予/交付、善恶、声望与 NPC 关系分支。Round 09 起相关运行状态通过存档持久化；任务发布人 NPC 保留 E 名录入口，另可用 F 直接交谈。
 
@@ -126,6 +128,7 @@ Round 22 新增可选 `martial-art-forge-components` 资源（`martial-art-compo
 - 新增武学：在 martial-arts-set JSON 里加条目（id 建议 `skill.` 前缀；类别取六枚举之一：拳脚/剑法/刀法/身法/内功/外功；`factionIds` 空数组表示不限门派，非空时每个 id 必须指向已加载的有效门派——悬空引用只禁用该武学；`requirements.level` 与 `requirements.attributes` 填最低门槛；`initialProficiency` 不得超过 `proficiencyCap`；`combat` 必填——kind 取 attack/heal，power 为作用基数，qiCost 为每次使用的内力消耗，内力不足时该行动不可用）。
 - 新增战斗遭遇：在 battle-encounters JSON 里加条目（id 建议 `encounter.` 前缀；`mapResourceId` 用已登记地图资源 id，`position` 填可走格且不压出生点/NPC/其他遭遇格——玩家四方向相邻时按 E 开战，敌人占格阻挡通行；`profileId` 指向有效角色模板（玩家状态以首个有效遭遇的模板创建）；`enemy` 直接给五项属性与生命/内力数值（不走派生公式）及武学 id 列表（须为有效武学）；`victoryExperience` 胜利发放一次，`defeatRecovery` 两项 0–1 比例控制失败恢复，`repeatable` 声明胜利后可否再战；`texts` 五条提示文本全部原创）。坏引用/坏坐标只禁用该遭遇并点名警告。
 - 新增物品：在 items-set JSON 中新增条目（id 建议 `item.` 前缀，`category` 选 consumable/equipment/misc；填写原创名称/说明、`stackLimit`、`buyPrice`/`sellPrice`；消耗品声明 `healthRestore`/`qiRestore` 至少一项为正，装备声明槽位、属性加成和生命/内力上限加成；`sellPrice: 0` 表示不可售）。
+- Round 32 内容：物品目录见 `docs/ITEMS.md`，武学目录见 `docs/MARTIAL-ARTS.md`。扩写消耗品需给出商店/炼丹等取得路径；扩写材料需接入配方或任务；装备需由货架或有效锻造配方获得。门派武学用已有 `martialArtEligible` 条件和 `learnMartialArt` 效果加入对应导师的独立授艺节点；门槛按等级逐层提升，重复学习由现有条件隐藏并由效果校验拒绝。
 - 新增商店：在 shops-set JSON 中声明稳定 shop id、`npcId`（指向可放置 NPC）、原创 `name`/`greeting`、`sellRate` 及 `stock`（`itemId` 必须存在，quantity 为 -1 无限或非负余量）；在 NPC 条目加 `shopId` 后，玩家四方向相邻按 E 开店，否则仍走其对话。货币与背包起点在角色模板的 `startingCurrency`、`inventoryCapacity` 和 `startingItems` 中配置。
 - 新增任务：在 quest-set JSON 的 `quests` 数组新增任务（`id` 建议 `quest.` 前缀；`giverNpcId` 必须指向有效 NPC，并在 NPC 条目声明 `questGiver: true`；`prerequisiteQuestIds` 只能引用无环任务；目标 `kind` 选 `collectItem`/`defeatEncounter`/`talkToNpc`，`targetId` 分别引用有效物品/遭遇/已放置 NPC（谈话对象无须是发布人），`requiredCount` 为正整数；可选 `exclusiveGroupId` 把若干前置完全一致的任务编成一组玩家分支——装配时整组校验，有效成员不足 2 或前置不一致即整组禁用，接取其一会把同组其余已解锁成员记为失败；`failOnEncounterIds` 声明败北失败的遭遇；`rewards` 声明非负 experience/currency）。收集目标接取时以当前背包数量为起点，物品变化后同步目标数量；击败目标在战斗胜利后推进；谈话目标只由玩家实际打开 NPC 对话（F 键交谈，或 E 键对无名录/商店 NPC 的交谈回落）推进，按 E 打开任务告示板不算谈话，接取差事的同一次交互也不自动完成谈话目标；任务奖励恰发一次。E 打开发布人名录（商店 NPC 的 E 优先开店，其差事经 Q 日志接取），Q 打开日志，A 放弃活动任务；Round 09 起任务阶段和进度随本地存档持久化（v1 协议不变，新增目标类型按目标 id 存计数）。20 项基础差事与分支路线见 `docs/QUESTS.md`。
 - 修改历法：直接编辑 `data/base/worldview/calendar.json`（或用 MOD 同路径覆盖）。调整月份天数/时段表/耗时都会即时反映到新开局与读档折算（存档只存分钟数）；删除对话正在引用的时段 id 只会剔除相应选项并警告。时段 id 建议 `period.` 前缀、月份 id 建议 `month.` 前缀；照度 0–1 控制夜幕深度（场景按 `1 − 照度` 叠加至多约 0.55 透明度的冷色层，UI 始终保持清晰）。
@@ -218,3 +221,4 @@ NPC 当前坐标是由地图、时钟和人物日程派生的临时运行状态�
 | 2026-09-27 | Round 29 | 从知识图谱派生八类图鉴进度，以稳定 ID 观察人物/地图/物品/武学发现；复用 v1 已知见闻字段 |
 | 2026-09-27 | Round 30 | 基础世界扩至 12 名 NPC、5 个门派；对话族多资源合并装配，可选内容降级改按 manifest schema 家族；新增寒山书院、盘舷刀场、柳听澜、祝九弦、白鹭洲与渡籍轮值章程见闻；详见 `docs/CHARACTERS.md`、`docs/FACTIONS.md` |
 | 2026-09-27 | Round 31 | 任务协议新增 `talkToNpc` 目标与可选 `exclusiveGroupId` 互斥分支（整组校验、接取即锁定同组其余选项）；基础差事扩至 20 项并新增 3 个任务专用遭遇；详见 `docs/QUESTS.md` |
+| 2026-09-27 | Round 32 | 基础物品扩至 50 项、武学扩至 30 种；新增材料/装备锻造链与五派数据驱动授艺菜单；详见 `docs/ITEMS.md`、`docs/MARTIAL-ARTS.md` |

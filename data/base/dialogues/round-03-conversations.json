@@ -456,14 +456,10 @@
               ]
             },
             {
-              "text": "请师父传我听雨剑法。",
-              "nextNodeId": "taught",
+              "text": "请师父指点门中剑法。",
+              "nextNodeId": "r32-lessons",
               "conditions": [
-                { "kind": "factionMembership", "factionId": "faction.tingyu-jiange", "isMember": true },
-                { "kind": "martialArtEligible", "martialArtId": "skill.tingyu-jianfa" }
-              ],
-              "effects": [
-                { "kind": "learnMartialArt", "martialArtId": "skill.tingyu-jianfa" }
+                { "kind": "factionMembership", "factionId": "faction.tingyu-jiange", "isMember": true }
               ]
             },
             {
@@ -480,7 +476,27 @@
         { "id": "sword-talk", "text": "叶庭舟以枝代剑，点出你眼中尚急的锋芒：「先看清对面，再谈出剑。等你心与手不再相争，我再看你的根骨。」" },
         { "id": "accepted", "text": "叶庭舟替你正了衣襟：「入门不是求一块招牌。从今日起，先学听雨，再学听人。」" },
         { "id": "respected", "text": "叶庭舟点头道：「肯把门中规矩放进心里，这份信任就不是白给的。」" },
-        { "id": "taught", "text": "叶庭舟将剑谱交到你手中：「招式已授，往后要在每一场交手里读懂它。」" },
+        {
+          "id": "r32-lessons",
+          "text": "叶庭舟把几页剑谱依次铺开：「先按你的根基选一式。学会之后，若仍想请教，再把剑谱翻回来。」",
+          "options": [
+            { "text": "请教听雨剑法。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.tingyu-jianfa" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.tingyu-jianfa" }] },
+            { "text": "请教落雨七分剑。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-tingyu-luoyu-jian" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-tingyu-luoyu-jian" }] },
+            { "text": "请教覆水回澜剑。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-tingyu-fushui-jian" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-tingyu-fushui-jian" }] },
+            { "text": "请教回澜照影剑。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-tingyu-huilan-jian" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-tingyu-huilan-jian" }] },
+            { "text": "请教怀音养息诀。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-tingyu-huaiyin-jue" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-tingyu-huaiyin-jue" }] },
+            { "text": "请教听潮入微剑。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-tingyu-tingchao-jian" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-tingyu-tingchao-jian" }] },
+            { "text": "今日先到这里。", "nextNodeId": "farewell" }
+          ]
+        },
+        {
+          "id": "r32-taught",
+          "text": "叶庭舟把你方才所选的剑路拆成数段，让你记清步眼、收势与留白：「招式授了，往后要在每一场交手里读懂它。」",
+          "options": [
+            { "text": "再请教一门。", "nextNodeId": "r32-lessons" },
+            { "text": "多谢师父，告辞。", "nextNodeId": "farewell" }
+          ]
+        },
         { "id": "departed", "text": "叶庭舟收回目光：「缘分既尽，便各走各路。门中剑法也随今日一并还来。」" },
         { "id": "farewell", "text": "叶庭舟将纸页收进袖中：「沿路多看，答案不在一处。」" }
       ]
@@ -505,14 +521,10 @@
               ]
             },
             {
-              "text": "请师父传我铁嶂桩功。",
-              "nextNodeId": "taught",
+              "text": "请师父指点铁嶂门中功夫。",
+              "nextNodeId": "r32-lessons",
               "conditions": [
-                { "kind": "factionMembership", "factionId": "faction.tiezhang-pai", "isMember": true },
-                { "kind": "martialArtEligible", "martialArtId": "skill.tiezhang-zhuanggong" }
-              ],
-              "effects": [
-                { "kind": "learnMartialArt", "martialArtId": "skill.tiezhang-zhuanggong" }
+                { "kind": "factionMembership", "factionId": "faction.tiezhang-pai", "isMember": true }
               ]
             },
             {
@@ -542,7 +554,27 @@
           ]
         },
         { "id": "accepted", "text": "石北将一根磨旧的木桩递给你：「铁嶂弟子先立桩。打熬筋骨的差事完成了，再来领桩功。」" },
-        { "id": "taught", "text": "石北让你沿着石桩走完三遍，才把桩功要诀交给你：「力从地起，脚下别虚。」" },
+        {
+          "id": "r32-lessons",
+          "text": "石北把木桩挪开半尺：「筋骨、落脚和发力各有章法。先挑你能站稳的一路，练熟再回来。」",
+          "options": [
+            { "text": "请教铁嶂桩功。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.tiezhang-zhuanggong" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.tiezhang-zhuanggong" }] },
+            { "text": "请教铁桩靠山拳。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-tiezhang-tiezhuang-quan" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-tiezhang-tiezhuang-quan" }] },
+            { "text": "请教翻磅劲。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-tiezhang-fanbang-jin" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-tiezhang-fanbang-jin" }] },
+            { "text": "请教开山扛鼎刀。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-tiezhang-kaishan-dao" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-tiezhang-kaishan-dao" }] },
+            { "text": "请教截顶护身桩。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-tiezhang-jieding-zhuang" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-tiezhang-jieding-zhuang" }] },
+            { "text": "请教十手推碑腿。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-tiezhang-shishou-tui" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-tiezhang-shishou-tui" }] },
+            { "text": "今日先到这里。", "nextNodeId": "farewell" }
+          ]
+        },
+        {
+          "id": "r32-taught",
+          "text": "石北摆正木桩，按你所选的功夫带你走了一遍发力次序：「练的时候记住，力从地起，脚下别虚。」",
+          "options": [
+            { "text": "再请教一门。", "nextNodeId": "r32-lessons" },
+            { "text": "多谢师父，告辞。", "nextNodeId": "farewell" }
+          ]
+        },
         { "id": "departed", "text": "石北沉默片刻：「既然心不在桩上，就下山去吧。铁嶂的功夫与旧日情分都留在这里。」" },
         { "id": "war-victory", "text": "石北听完经过，抬手在你肩上重重一拍：「先约拿到了，药道也没封死。记住，赢下约期不等于赢尽人心。」" },
         { "id": "war-stalemate", "text": "石北点头道：「轮值也好，谁的药队都耽误不得。能把人送过桥，才算这场没白打。」" },
@@ -570,14 +602,10 @@
               ]
             },
             {
-              "text": "请庄主传我云隐身法。",
-              "nextNodeId": "taught",
+              "text": "请庄主指点云隐门中功夫。",
+              "nextNodeId": "r32-lessons",
               "conditions": [
-                { "kind": "factionMembership", "factionId": "faction.yunyin-shanzhuang", "isMember": true },
-                { "kind": "martialArtEligible", "martialArtId": "skill.yunyin-shenfa" }
-              ],
-              "effects": [
-                { "kind": "learnMartialArt", "martialArtId": "skill.yunyin-shenfa" }
+                { "kind": "factionMembership", "factionId": "faction.yunyin-shanzhuang", "isMember": true }
               ]
             },
             {
@@ -607,7 +635,27 @@
           ]
         },
         { "id": "accepted", "text": "闻素心递给你一卷药典：「既然入庄，先记住药能救人，也能害人。心不稳时，先别出手。」" },
-        { "id": "taught", "text": "闻素心教你辨风听叶，再示范云隐身法的起落：「脚步轻，不代表心可以轻。」" },
+        {
+          "id": "r32-lessons",
+          "text": "闻素心取出几页行功札记：「身法、掌路与调息都为护人。按你如今的根基选一门，莫为争胜强练。」",
+          "options": [
+            { "text": "请教云隐身法。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.yunyin-shenfa" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.yunyin-shenfa" }] },
+            { "text": "请教草木回息篇。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-yunyin-caomu-xinfa" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-yunyin-caomu-xinfa" }] },
+            { "text": "请教步云履。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-yunyin-buyun-lu" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-yunyin-buyun-lu" }] },
+            { "text": "请教清风拂穴掌。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-yunyin-qingfeng-zhang" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-yunyin-qingfeng-zhang" }] },
+            { "text": "请教回阳引气诀。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-yunyin-huiyang-jue" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-yunyin-huiyang-jue" }] },
+            { "text": "请教露墙穿枝步。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-yunyin-luqiang-shenfa" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-yunyin-luqiang-shenfa" }] },
+            { "text": "今日先到这里。", "nextNodeId": "farewell" }
+          ]
+        },
+        {
+          "id": "r32-taught",
+          "text": "闻素心依你所选的功夫示范一遍，随后让你自行重走数回：「记住招式是护身之法，不是争胜的借口。」",
+          "options": [
+            { "text": "再请教一门。", "nextNodeId": "r32-lessons" },
+            { "text": "多谢庄主，告辞。", "nextNodeId": "farewell" }
+          ]
+        },
         { "id": "departed", "text": "闻素心轻轻颔首：「庄门不拦去路。只是从今日起，救人之责也由你自己承担。」" },
         { "id": "war-victory", "text": "闻素心听完会盟经过，先问了两支药队是否都能按约过桥，随后才道：「赢得时辰，也记得给人留路。」" },
         { "id": "war-stalemate", "text": "闻素心微微一笑：「各让一步，药便能按时送到。把争胜的心收回来些，便能看见约定的用处。」" },
