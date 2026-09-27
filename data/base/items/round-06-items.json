@@ -467,7 +467,7 @@
       "stackLimit": 1,
       "buyPrice": 0,
       "sellPrice": 76,
-      "equipment": { "slot": "ornament", "attributeBonuses": { "insight": 2 }, "healthBonus": 12, "qiBonus": 14 }
+      "equipment": { "slot": "ornament", "attributeBonuses": { "resolve": 2, "insight": 2 }, "healthBonus": 12, "qiBonus": 16 }
     },
     {
       "id": "item.r32.river-copper",

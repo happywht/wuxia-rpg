@@ -4,6 +4,37 @@
 
 ---
 
+## Round 49 — 公测前试玩、资料完整性与菜单返回修复（2026-09-28，已完成）
+
+### 计划与实现
+
+- 开发前计划写入 `iterations/round-49/plan.md`；分为真实资料告警定位与修复、资料装配回归、浏览器纵向走查、文档维护与提交四项，预计人类工程师 60–90 分钟。没有可用外部试玩反馈，本轮如实记为本地公测前走查。
+- 从主菜单启动本地 Phaser 游戏时，HUD 提示默认可选资料无效。新增 `tests/round49-default-world-integrity.test.ts`，以仓库真实 manifest/Schema/数据树驱动 `loadWorldData()`，首次运行定位到 `forge.recipe.r32-marsh-amber-seal`：结果“沼琥珀印”把基础“蚌光佩”的 `resolve +2 / qi +15` 降为无定力且 `qi +14`，违反装备锻造同槽且属性不可退步规则。修正为保留 `resolve +2`、增加 `insight +2 / health +12 / qi +16`；完整性检查同时锁定资源全加载、NPC/门派/任务/物品/武学达标与可选资料零装配告警。
+- 浏览器走查发现暂停子页按 Esc 会直接回探索：PauseMenu 与 GridScene 对同一个按键分别处理，设置页尚未回退暂停主页，场景监听便关闭了整个暂停层。GridScene 现让已打开暂停菜单独占该键；设置/保存页 Esc 逐层返回暂停主页，主页 Esc 才恢复探索。
+- 将 R48 手册审计的当前轮次识别改为从 ROADMAP 最新已完成条目动态推导，并同步 README、架构/数据/测试/玩家文档；新增 `docs/PLAYTEST-FEEDBACK.md` 留存两条复现、修复状态、未覆盖边界和后续试玩模板。
+
+### 浏览器走查
+
+- 本地 `http://127.0.0.1:5178/`：新角色进入地图成功，锻造资料告警行消失；在 `(7,7)` 上方墙格不能移动，绕行至 `(4,5)` 后可 F 键打开陆贞娘对白，走入 NPC 占格被阻挡；E 键打开其任务列表并接取「茶棚凉汤」，状态变为进行中 `0/4`。
+- 在起点附近按 E 打开“南市武擂”资料面板；暂停设置页 Esc 回到暂停主页，暂停主页 Esc 恢复探索；保存页展示三个空槽，Esc 回暂停主页。没有点击保存，不覆盖任何存档。
+- 此次浏览器验收没有完成战斗胜利/奖励结算、实际学习武学或存档往返；这些仍只有 Round 46 Phaser-free 集成测试证据，试玩记录未将其说成完整浏览器通关。无外部 beta 反馈来源。
+
+### 验证
+
+- `npm test -- --run tests/round49-default-world-integrity.test.ts`：首次运行因配方的定力/内力属性回退失败，诊断精确指出被禁用的 `forge.recipe.r32-marsh-amber-seal`；修复数据后 1 项回归通过。
+- `npm test -- --run tests/docs-audit-round-48.test.ts tests/round49-default-world-integrity.test.ts`：2 个文件、10 项通过；路线图动态轮次识别反向 fixture 首次发现缺少标准 Rxx 行格式后修正。
+- `node scripts/audit-round-48-docs.mjs`：通过；当前完成轮次由 ROADMAP 推导，并核对 README、架构/数据/玩家指南和 changelog/devlog 同步到 R49。
+- `npm run package:release`：完整 `validate:data` 26/26、启用 MOD 问题 0、严格类型检查、16 个测试文件/143 项、R34 与手册/当前进度文档审计、132 modules Vite 生产构建及 R47 解包/子路径 smoke 全部通过。生成 `release/wuxia-rpg-web-0.0.1.tgz`，621,026 bytes，SHA-256 `52f1ea213941da92b760ec35c8555c6db81fa87c7ea5411d0c444f457ef61f99`；归档 66 entries、65 内容清单文件。
+- `git diff --check`：通过；仅 Git 提示部分修改文件将在仓库 autocrlf 规则下转换行尾。Vite 的 1,895.11 kB 主 JS chunk >500 kB 提示为非阻断项。
+- 当前目标仍需继续 Round 50 及最终交付验收，R49 不代表整个项目目标完成。
+
+### 未覆盖因素
+
+- 没有真实外部试玩用户或收集到的玩家反馈；本轮只有可复现的本地验收结果。
+- 未在浏览器中完成战斗奖励、学武和读档/读档往返；无 Git remote，未进行远端发布验证。
+
+---
+
 ## Round 48 — 玩家手册、MOD 指南与文档一致性审计（2026-09-28，已完成）
 
 ### 计划与实现

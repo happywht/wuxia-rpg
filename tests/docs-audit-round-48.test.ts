@@ -39,16 +39,16 @@ async function makeFixture(): Promise<string> {
     await writeFile(path.join(root, 'data/schema', `${schema}.schema.json`), '{}', 'utf8');
   }
   const files: Record<string, string> = {
-    'README.md': '[玩家](docs/PLAYER-GUIDE.md) [MOD](docs/MOD-GUIDE.md) Round 48',
-    'docs/ARCHITECTURE.md': '截至 Round 48 使用 ./base/ 相对基址；7 项资源、7 个资源 Schema 家族、7 份 draft-07 JSON Schema。',
-    'docs/DATA-GUIDE.md': '截至 Round 47 数据资料，1 名 NPC，1 个门派，1 项任务，1 件物品，1 种武学，1 个图谱节点/1 条边。',
+    'README.md': '[玩家](docs/PLAYER-GUIDE.md) [MOD](docs/MOD-GUIDE.md) Round 49 已完成；下一轮 Round 50',
+    'docs/ARCHITECTURE.md': '截至 Round 49 使用 ./base/ 相对基址；7 项资源、7 个资源 Schema 家族、7 份 draft-07 JSON Schema。',
+    'docs/DATA-GUIDE.md': '截至 Round 49 数据资料，1 名 NPC，1 个门派，1 项任务，1 件物品，1 种武学，1 个图谱节点/1 条边。',
     'docs/RELEASE.md': 'PLAYER-GUIDE.md MOD-GUIDE.md 当前没有单独的项目 LICENSE；这不自动覆盖项目自身代码/资料。',
     'docs/REFERENCES.md': '没有单独的项目 `LICENSE`；历史来源授权未经验证。',
-    'docs/PLAYER-GUIDE.md': '玩家操作。 npm run dev npm run check',
+    'docs/PLAYER-GUIDE.md': 'Round 49 玩家操作。 npm run dev npm run check',
     'docs/MOD-GUIDE.md': 'MOD 工作流。 npm run inspect:mods npm run content:export',
-    'ROADMAP.md': '**R48** 手册 **R49** 反馈',
-    'CHANGELOG.md': '## Round 48',
-    'DEVLOG.md': '## Round 48',
+    'ROADMAP.md': '- **R49** — 试玩（已完成：验收）\n- **R50** — 发布',
+    'CHANGELOG.md': '## Round 49',
+    'DEVLOG.md': '## Round 49',
     'package.json': JSON.stringify({ scripts: { dev: 'vite', check: 'npm test', 'inspect:mods': 'node', 'content:export': 'node' } }),
     'scripts/package-release.mjs': "['PLAYER-GUIDE.md', 'MOD-GUIDE.md']",
     'scripts/smoke-round-47.mjs': "['PLAYER-GUIDE.md', 'MOD-GUIDE.md']",

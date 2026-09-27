@@ -1254,8 +1254,9 @@ export class GridScene extends Phaser.Scene {
       return;
     }
     if (panel.isOpen) {
-      panel.close();
-      this.noteOverlayClosed();
+      // The pause panel owns Escape while open (for example, its settings
+      // page returns to the pause menu). Letting this scene toggle it too
+      // makes one Escape close both layers of navigation.
       return;
     }
     if (this.anyOverlayOpen()) {

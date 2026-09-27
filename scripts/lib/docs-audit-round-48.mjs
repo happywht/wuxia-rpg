@@ -40,19 +40,39 @@ export async function auditRound48Docs({ root }) {
     if (!releaseSmoke.includes(`'${guide}'`)) problems.push(`版本包 smoke 未解包验证 ${guide}`);
   }
 
-  if (!readme.includes('Round 48')) problems.push('README.md 未标记当前 Round 48 进度');
-  if (!roadmap.includes('**R48**') || !roadmap.includes('**R49**')) {
-    problems.push('ROADMAP.md 缺少 Round 48/49 当前及后续条目');
+  const completedRounds = [...roadmap.matchAll(/^- \*\*R(\d{2})\*\* — ([^\r\n]+)/gm)]
+    .filter(([, , summary]) => summary.includes('已完成：'))
+    .map(([, round]) => Number(round))
+    .filter((round) => Number.isInteger(round));
+  const currentRound = Math.max(...completedRounds);
+  if (!Number.isFinite(currentRound)) {
+    problems.push('ROADMAP.md 没有任何带验收摘要的已完成轮次');
+  } else {
+    const currentLabel = `Round ${String(currentRound).padStart(2, '0')}`;
+    const nextLabel = `Round ${String(currentRound + 1).padStart(2, '0')}`;
+    if (!readme.includes(`${currentLabel} 已完成；下一轮 ${nextLabel}`)) {
+      problems.push(`README.md 当前进度应标记为“${currentLabel} 已完成；下一轮 ${nextLabel}”`);
+    }
+    if (!roadmap.includes(`**R${String(currentRound).padStart(2, '0')}**`) ||
+        !roadmap.includes(`**R${String(currentRound + 1).padStart(2, '0')}**`)) {
+      problems.push(`ROADMAP.md 缺少 ${currentLabel}/${nextLabel} 当前及后续条目`);
+    }
+    if (!changelog.includes(currentLabel) || !devlog.includes(currentLabel)) {
+      problems.push(`CHANGELOG.md 与 DEVLOG.md 都必须有 ${currentLabel} 记录`);
+    }
+    if (!architecture.includes(`截至 ${currentLabel}`)) {
+      problems.push(`ARCHITECTURE.md 状态摘要未更新到 ${currentLabel}`);
+    }
+    if (!dataGuide.includes(`截至 ${currentLabel}`)) {
+      problems.push(`DATA-GUIDE.md 状态摘要未更新到 ${currentLabel}`);
+    }
+    if (!playerGuide.includes(`Round ${currentRound}`)) {
+      problems.push(`PLAYER-GUIDE.md 应说明当前 ${currentLabel} 原型状态`);
+    }
   }
-  if (!changelog.includes('Round 48') || !devlog.includes('Round 48')) {
-    problems.push('CHANGELOG.md 与 DEVLOG.md 都必须有 Round 48 记录');
-  }
-  if (!architecture.includes('截至 Round 48')) problems.push('ARCHITECTURE.md 状态摘要未更新到 Round 48');
-  if (!dataGuide.includes('截至 Round 47')) problems.push('DATA-GUIDE.md 状態摘要未更新到 Round 47');
   if (architecture.includes('/base/maps/round-01-grid.json')) {
     problems.push('ARCHITECTURE.md 仍声称请求根绝对路径，与 Round 47 子路径基址不符');
   }
-  if (dataGuide.includes('截至 Round 44')) problems.push('DATA-GUIDE.md 仍以 Round 44 作為当前数据截点');
 
   let packageInfo = null;
   try {

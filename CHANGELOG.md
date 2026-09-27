@@ -4,6 +4,24 @@
 
 ## [Unreleased]
 
+### Fixed (Round 49)
+
+- **锻造配方资料告警**：修正“琥珀嵌扣”升级结果丢失基础装备的定力与内力加成、导致配方被装配器禁用的问题；现保留原加成并实际提升至少一项，开局不再出现默认可选资料告警。
+- **暂停菜单 Esc 越级返回**：暂停面板打开时场景不再同时关闭它；设置/保存子页的 Esc 先回暂停主页，主页 Esc 再回探索。
+- **文档进度审计**：玩家/MOD 手册审计从路线图动态识别最近已完成轮次，避免每轮完成后仍把 README、架构和数据指南锁在 R48 截点。
+
+### Added (Round 49)
+
+- **真实世界装配回归**：新增 `tests/round49-default-world-integrity.test.ts`，从仓库资料装载 manifest 全部资源，检查 NPC/门派/任务/物品/武学数量和默认可选资料零装配告警。
+- **试玩反馈留档**：新增 `docs/PLAYTEST-FEEDBACK.md`，如实区分无外部反馈的本地走查、复现步骤、修复状态与后续反馈模板。
+
+### Verification (Round 49)
+
+- `npm test -- --run tests/round49-default-world-integrity.test.ts`：1 项真实默认世界完整性回归通过；首次失败准确指向 `forge.recipe.r32-marsh-amber-seal`，修复后重新通过。
+- 浏览器手测：新游戏加载且 HUD 无默认资料告警；验证地图步进、墙/NPC 阻挡、F 对话、E 任务列表并接取「茶棚凉汤」；查看擂台入口；暂停设置页与保存页 Esc 正确逐层返回，三个存档槽显示空且未保存/覆盖。
+- `npm run package:release`：数据校验 26/26、MOD 问题 0、严格类型检查、16 个测试文件/143 项、R34 与当前文档审计、132 modules 生产构建及 R47 解包/子路径 smoke 全部通过；归档 66 entries / 65 内容清单文件，621,026 bytes，SHA-256 `52f1ea213941da92b760ec35c8555c6db81fa87c7ea5411d0c444f457ef61f99`。
+- Vite 对 1,895.11 kB 主 JS chunk 的 >500 kB 提示仍为非阻断信息；`git diff --check` 最终复核见提交结果。
+
 ### Added (Round 48)
 
 - **玩家与资料作者手册**：新增 `docs/PLAYER-GUIDE.md` 和 `docs/MOD-GUIDE.md`，按当前操作、Schema/MOD/内容包协议说明开局、探索、战斗、存读档、资料作者校验与静态版 MOD 边界。
