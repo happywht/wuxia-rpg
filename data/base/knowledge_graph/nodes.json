@@ -24,6 +24,9 @@
     { "id": "event.old-footprints", "kind": "event", "title": "雨后的脚印", "summary": "茶棚传出的线索指向芦苇河滩：一串新鲜泥印似乎在寻找某个旧船道。", "knownByDefault": false },
     { "id": "quest.round-07-medicine-run", "kind": "quest", "title": "巷口送药", "summary": "替受伤乡邻备齐回春膏，再由熟悉巷情的人送去安置。", "knownByDefault": true },
     { "id": "quest.round-07-clear-alley", "kind": "quest", "title": "巷口除患", "summary": "击退在巷口滋扰乡邻的刀客，免得其再拦阻行人。", "knownByDefault": true },
-    { "id": "ending.river-lantern", "kind": "ending", "title": "河灯归处", "summary": "一则尚未证实的旧传闻：若有人替沿岸村镇解开多年心结，河灯会为他指一条归路。", "knownByDefault": false }
+    { "id": "ending.river-lantern", "kind": "ending", "title": "河灯归处", "summary": "一则尚未证实的旧传闻：若有人替沿岸村镇解开多年心结，河灯会为他指一条归路。", "knownByDefault": false },
+    { "id": "event.mist-pact-victory", "kind": "event", "title": "雾渡药道会盟：争得先约", "summary": "在雾渡药道切磋中取得足够贡献，本门先定药队轮值时辰，并为对方保留后续通行约期。", "knownByDefault": false },
+    { "id": "event.mist-pact-stalemate", "kind": "event", "title": "雾渡药道会盟：轮值成约", "summary": "双方在雾桥各有胜负，最后以时辰轮换药队，药道按共同约定开放。", "knownByDefault": false },
+    { "id": "event.mist-pact-defeat", "kind": "event", "title": "雾渡药道会盟：让出先约", "summary": "本门未能争得药道先行时辰，但仍保有轮值通行的机会。", "knownByDefault": false }
   ]
 }

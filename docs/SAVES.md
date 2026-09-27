@@ -1,10 +1,10 @@
 # 本地存档与设置协议
 
-Round 09 引入本地单机存档；Round 10 扩展到多地图行程与区域事件；Round 11 增加已发现知识词条；Round 13 保存玩家当前门派与师父；Round 14 记录已流逝的游戏内分钟数；Round 15 保存世界气候种子；Round 16 以分钟数派生 NPC 日程位置；Round 17 的条件奇遇复用已完成事件 id 和已发现知识 id，不增加存档字段；Round 18 将逐门派声望保存在 `social.factionRenown`；Round 19 添加当前同行伙伴 id；Round 20 加入擂台战绩册。缺字段的旧 v1 档中伙伴归一为 null、擂台战绩归一为空数组。存档是运行时状态的版本化 JSON 快照，不是世界资料：不会写回 `data/base/`，也不会被 MOD 覆盖。协议实现位于 `src/engine/save-system.ts`，菜单与游戏场景负责呈现和调用。
+Round 09 引入本地单机存档；Round 10 扩展到多地图行程与区域事件；Round 11 增加已发现知识词条；Round 13 保存玩家当前门派与师父；Round 14 记录已流逝的游戏内分钟数；Round 15 保存世界气候种子；Round 16 以分钟数派生 NPC 日程位置；Round 17 的条件奇遇复用已完成事件 id 和已发现知识 id，不增加存档字段；Round 18 将逐门派声望保存在 `social.factionRenown`；Round 19 添加当前同行伙伴 id；Round 20 加入擂台战绩册；Round 21 加入门派战绩册。缺字段的旧 v1 档中伙伴归一为 null，两类战绩归一为空数组。存档是运行时状态的版本化 JSON 快照，不是世界资料：不会写回 `data/base/`，也不会被 MOD 覆盖。协议实现位于 `src/engine/save-system.ts`，菜单与游戏场景负责呈现和调用。
 
 ## 槽位与存储
 
-Round 20 增补 arenaRecords（报名次数、最佳胜场、夺魁次数、最近挑战胜场）；旧 v1 快照缺字段时解析为空数组，因此不要求升级协议版本。
+Round 20 增补 `arenaRecords`（报名次数、最佳胜场、夺魁次数、最近挑战胜场）；Round 21 增补 `factionWarRecords`（报名次数、胜平负次数、最高/最近贡献和最近结果）。旧 v1 快照缺字段时解析为空数组，因此不要求升级协议版本。
 
 - 使用浏览器 `localStorage`，有三个固定槽位：`slot-1`、`slot-2`、`slot-3`。
 - 键名为 `wuxia-rpg.save.<slotId>`；主音量和文字大小独立存放在 `wuxia-rpg.settings.v1`。
@@ -14,7 +14,7 @@ Round 20 增补 arenaRecords（报名次数、最佳胜场、夺魁次数、最�
 
 ## 快照内容
 
-Round 20 的 arenaRecords 按擂台 id 保存报名次数、历史最佳胜场、夺魁次数与最近挑战胜场。
+Round 20 的 `arenaRecords` 按擂台 id 保存报名次数、历史最佳胜场、夺魁次数与最近挑战胜场；Round 21 的 `factionWarRecords` 按战事 id 保存报名次数、历史胜/平/负数、最高贡献、最近贡献和最近结果。战事结算引起的社会声望和图谱发现复用 `social` 与 `knownKnowledgeNodeIds` 字段。
 
 每份快照包含 `protocolVersion: 1`、保存时间、角色模板 id、玩家显示名、地图资源 id 与网格坐标，以及以下状态：
 
@@ -30,6 +30,7 @@ Round 20 的 arenaRecords 按擂台 id 保存报名次数、历史最佳胜场�
 - 已流逝的游戏内分钟数（`elapsedGameMinutes`，Round 14 起）：相对历法起始时刻的累计计数。存档**只保存分钟数**，年/月/日/时段在读取时由当前历法资料重新折算——修改月份长度或时段表不会与存档日期互相矛盾。
 - 世界气候种子（`worldSeed`，Round 15 起）：无符号 32 位整数；新开局生成一次并随角色世界保存，用于稳定推导同一历日的季节天气。旧 v1 快照没有该字段时解析为固定默认值 `1`，从而在每次读档后保持同一日天气不变。
 - 当前同行伙伴（`activeCompanionId`，Round 19 起）：伙伴数据 id 或 `null`。旧 v1 快照缺字段时解析为 `null`；恢复时伙伴已被移除则清空并给出 warning。
+- 门派战战绩（`factionWarRecords`，Round 21 起）：战事 id、报名/结果计数、最高与最近贡献、最近结果。旧 v1 快照缺字段时解析为空数组；恢复时当前资料已移除该战事则仅过滤对应战绩并给出 warning。
 - NPC 当前地图坐标不入档（Round 16）：由地图 id、`elapsedGameMinutes`、当前日程资料和玩家位置派生；时段变化时玩家格优先，NPC 会按运行时占位规则回退基础位置或暂不显示。
 
 快照只保存 JSON 安全的数组/普通对象；不会保存 Phaser 对象、对话面板会话或可从角色模板和装备重算的派生属性/生命内力上限。读档时会按当前有效数据重新计算派生值。
@@ -41,7 +42,7 @@ Round 20 的 arenaRecords 按擂台 id 保存报名次数、历史最佳胜场�
 3. 次要引用已经从世界资料删除时，恢复计划会逐项移除无效武学、物品、商店、任务、关系、遭遇或区域事件，并提供警告；容量、物品堆叠、角色属性和任务目标进度按当前资料的新上限收敛。
 4. 只有预检成功后才创建并恢复运行状态，装备重新经过装备引擎应用效果；不会把半恢复的状态提交到场景。
 
-当前只实现 v1，不做跨协议版本迁移。Round 10 在 v1 中新增 `completedRegionalEvents`，Round 11 新增 `knownKnowledgeNodeIds`，Round 13 新增可空 `factionMembership`，Round 14 新增 `elapsedGameMinutes`，Round 15 新增 `worldSeed`，Round 18 新增 `social.factionRenown`，Round 19 新增可空 `activeCompanionId`；解析缺少这些字段的旧 v1 快照时，分别按空数组、无门派、0 分钟、固定种子 `1`、空门派声望或无伙伴归一，因此所有 Round 09 起的旧 v1 存档仍可读取。Round 16 和 Round 17 不增加协议字段。恢复时已删除门派的声望 id 逐项忽略并给出 warning，不拒绝其余进度；同行伙伴资料失效则清除当前队伍并附 warning。其他社会状态按各自范围校验。世界预检恢复时会重新加入资料中的 `knownByDefault` 节点，并过滤已删除的节点 id；若当前门派或登记师父已从资料中删除，只清除该次师承并附带 warning，不拒绝其余进度。未知协议版本会明确报告为不支持，原槽内容保留。存档仅限浏览器本地；跨设备同步和云存档尚未实现。浏览器清理站点数据也会移除本地存档。
+当前只实现 v1，不做跨协议版本迁移。Round 10 在 v1 中新增 `completedRegionalEvents`，Round 11 新增 `knownKnowledgeNodeIds`，Round 13 新增可空 `factionMembership`，Round 14 新增 `elapsedGameMinutes`，Round 15 新增 `worldSeed`，Round 18 新增 `social.factionRenown`，Round 19 新增可空 `activeCompanionId`，Round 20 新增 `arenaRecords`，Round 21 新增 `factionWarRecords`；解析缺少这些字段的旧 v1 快照时，分别按空数组、无门派、0 分钟、固定种子 `1`、空门派声望或无伙伴归一，因此所有 Round 09 起的旧 v1 存档仍可读取。Round 16 和 Round 17 不增加协议字段。恢复时已删除门派的声望 id 逐项忽略并给出 warning，不拒绝其余进度；同行伙伴资料失效则清除当前队伍并附 warning；战事资料移除时只过滤对应战绩。其他社会状态按各自范围校验。世界预检恢复时会重新加入资料中的 `knownByDefault` 节点，并过滤已删除的节点 id；若当前门派或登记师父已从资料中删除，只清除该次师承并附带 warning，不拒绝其余进度。未知协议版本会明确报告为不支持，原槽内容保留。存档仅限浏览器本地；跨设备同步和云存档尚未实现。浏览器清理站点数据也会移除本地存档。
 
 ## 设置
 
@@ -49,4 +50,4 @@ Round 20 的 arenaRecords 按擂台 id 保存报名次数、历史最佳胜场�
 
 ## 验证边界
 
-Round 09 使用临时、Phaser 无关的冒烟 harness 验证序列化、字段拒绝、槽位操作、失败存储、世界变化预检及运行状态恢复；Round 10 额外通过浏览器验证跨区保存/恢复、区域事件去重和旧 v1 快照缺省字段路径。Round 11 的冒烟 harness 验证知识 id 缺省兼容、当前图谱引用过滤与公开词条基线；浏览器验证实际发现并保存词条，刷新后读档恢复。Round 13 harness 验证旧 v1 的身份字段缺省，以及失效师父被软隔离。Round 14 harness 验证分钟计数捕获/往返、负数与小数拒绝及旧档缺字段归一为 0；浏览器验证刷新读档恢复到入夜时刻与夜色。Round 15 harness 验证世界种子范围、旧 v1 缺字段归一为固定值 1 及捕获/往返；浏览器验证细雨天气保存、刷新后继续游戏仍在同一时刻显示同一天气。Round 16 浏览器先复现并修复“移动 NPC 的基础格被存档预检误判占用”，再验证日中人物移动、与移动后 NPC 对话、保存至空槽、刷新并读取后玩家位置/时段及 NPC 放置恢复一致；Phaser-free 场景验证覆盖多个地图/时段与运行时玩家格冲突。Round 18 的 Phaser-free harness 41/41 通过，覆盖逐派声望的中心化边界、对白事务与门派退门变化，以及 v1 快照捕获、旧字段缺省、重复/越界拒绝、移除门派过滤和恢复。正式 Vitest 基线仍安排在 Round 38。
+Round 09 使用临时、Phaser 无关的冒烟 harness 验证序列化、字段拒绝、槽位操作、失败存储、世界变化预检及运行状态恢复；Round 10 额外通过浏览器验证跨区保存/恢复、区域事件去重和旧 v1 快照缺省字段路径。Round 11 的冒烟 harness 验证知识 id 缺省兼容、当前图谱引用过滤与公开词条基线；浏览器验证实际发现并保存词条，刷新后读档恢复。Round 13 harness 验证旧 v1 的身份字段缺省，以及失效师父被软隔离。Round 14 harness 验证分钟计数捕获/往返、负数与小数拒绝及旧档缺字段归一为 0；浏览器验证刷新读档恢复到入夜时刻与夜色。Round 15 harness 验证世界种子范围、旧 v1 缺字段归一为固定值 1 及捕获/往返；浏览器验证细雨天气保存、刷新后继续游戏仍在同一时刻显示同一天气。Round 16 浏览器先复现并修复“移动 NPC 的基础格被存档预检误判占用”，再验证日中人物移动、与移动后 NPC 对话、保存至空槽、刷新并读取后玩家位置/时段及 NPC 放置恢复一致；Phaser-free 场景验证覆盖多个地图/时段与运行时玩家格冲突。Round 18 的 Phaser-free harness 41/41 通过，覆盖逐派声望的中心化边界、对白事务与门派退门变化，以及 v1 快照捕获、旧字段缺省、重复/越界拒绝、移除门派过滤和恢复。Round 21 通过 `npm run smoke:round-21` 验证门派战战绩的捕获/解析/恢复、旧 v1 字段缺省和逐战事过滤。正式 Vitest 基线仍安排在 Round 38。

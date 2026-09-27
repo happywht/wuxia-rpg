@@ -501,12 +501,30 @@
               ],
               "effects": [ { "kind": "leaveFaction" } ]
             },
+            {
+              "text": "我已参加雾渡药道会盟，向师父禀报结果。",
+              "nextNodeId": "war-victory",
+              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-victory" }]
+            },
+            {
+              "text": "雾渡药道会盟以轮值收场，我来报个平安。",
+              "nextNodeId": "war-stalemate",
+              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-stalemate" }]
+            },
+            {
+              "text": "雾桥一战未能争下先约，特来复命。",
+              "nextNodeId": "war-defeat",
+              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-defeat" }]
+            },
             { "text": "这便去磨练筋骨。", "nextNodeId": "farewell" }
           ]
         },
         { "id": "accepted", "text": "石北将一根磨旧的木桩递给你：「铁嶂弟子先立桩。打熬筋骨的差事完成了，再来领桩功。」" },
         { "id": "taught", "text": "石北让你沿着石桩走完三遍，才把桩功要诀交给你：「力从地起，脚下别虚。」" },
         { "id": "departed", "text": "石北沉默片刻：「既然心不在桩上，就下山去吧。铁嶂的功夫与旧日情分都留在这里。」" },
+        { "id": "war-victory", "text": "石北听完经过，抬手在你肩上重重一拍：「先约拿到了，药道也没封死。记住，赢下约期不等于赢尽人心。」" },
+        { "id": "war-stalemate", "text": "石北点头道：「轮值也好，谁的药队都耽误不得。能把人送过桥，才算这场没白打。」" },
+        { "id": "war-defeat", "text": "石北听罢沉默片刻：「先后时辰让了便让了，约既仍在，就把筋骨练硬，下次护好该护的人。」" },
         { "id": "farewell", "text": "石北又将双掌按回桩上，不再多言。" }
       ]
     },
@@ -548,12 +566,30 @@
               ],
               "effects": [ { "kind": "leaveFaction" } ]
             },
+            {
+              "text": "我参加了雾渡药道会盟，向师长回报结果。",
+              "nextNodeId": "war-victory",
+              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-victory" }]
+            },
+            {
+              "text": "雾桥药道已按轮值约定，我来报个平安。",
+              "nextNodeId": "war-stalemate",
+              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-stalemate" }]
+            },
+            {
+              "text": "会盟未能争得先约，我来说明经过。",
+              "nextNodeId": "war-defeat",
+              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-defeat" }]
+            },
             { "text": "我还想再想一想。", "nextNodeId": "farewell" }
           ]
         },
         { "id": "accepted", "text": "闻素心递给你一卷药典：「既然入庄，先记住药能救人，也能害人。心不稳时，先别出手。」" },
         { "id": "taught", "text": "闻素心教你辨风听叶，再示范云隐身法的起落：「脚步轻，不代表心可以轻。」" },
         { "id": "departed", "text": "闻素心轻轻颔首：「庄门不拦去路。只是从今日起，救人之责也由你自己承担。」" },
+        { "id": "war-victory", "text": "闻素心听完会盟经过，先问了两支药队是否都能按约过桥，随后才道：「赢得时辰，也记得给人留路。」" },
+        { "id": "war-stalemate", "text": "闻素心微微一笑：「各让一步，药便能按时送到。把争胜的心收回来些，便能看见约定的用处。」" },
+        { "id": "war-defeat", "text": "闻素心替你重新包好伤处：「胜负是一时的，药路仍然开着。下回先记住，护送药队本身也是本分。」" },
         { "id": "farewell", "text": "闻素心将药箱背起：「答案想清楚再来，不迟。」" }
       ]
     }

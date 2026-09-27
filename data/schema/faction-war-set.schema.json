@@ -1,0 +1,113 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wuxia-rpg.invalid/schema/faction-war-set",
+  "title": "门派战资料集",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["wars"],
+  "definitions": {
+    "id": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "enemy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "attributes", "health", "qi", "martialArtIds"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "attributes": {
+          "type": "object", "additionalProperties": false,
+          "required": ["body", "force", "agility", "insight", "resolve"],
+          "properties": {
+            "body": { "type": "integer", "minimum": 1, "maximum": 999 },
+            "force": { "type": "integer", "minimum": 1, "maximum": 999 },
+            "agility": { "type": "integer", "minimum": 1, "maximum": 999 },
+            "insight": { "type": "integer", "minimum": 1, "maximum": 999 },
+            "resolve": { "type": "integer", "minimum": 1, "maximum": 999 }
+          }
+        },
+        "health": { "type": "integer", "minimum": 1, "maximum": 9999 },
+        "qi": { "type": "integer", "minimum": 0, "maximum": 9999 },
+        "martialArtIds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/definitions/id" } }
+      }
+    },
+    "stage": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "title", "contribution", "firstFactionOpponent", "secondFactionOpponent", "victoryExperience", "defeatRecovery", "texts"],
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "contribution": { "type": "integer", "minimum": 1, "maximum": 1000 },
+        "firstFactionOpponent": { "$ref": "#/definitions/factionOpponent" },
+        "secondFactionOpponent": { "$ref": "#/definitions/factionOpponent" },
+        "victoryExperience": { "type": "integer", "minimum": 0, "maximum": 1000000 },
+        "defeatRecovery": {
+          "type": "object", "additionalProperties": false, "required": ["healthRatio", "qiRatio"],
+          "properties": {
+            "healthRatio": { "type": "number", "minimum": 0, "maximum": 1 },
+            "qiRatio": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        "texts": {
+          "type": "object", "additionalProperties": false, "required": ["intro", "victory", "defeat", "flee"],
+          "properties": {
+            "intro": { "type": "string", "minLength": 1, "maxLength": 240 },
+            "victory": { "type": "string", "minLength": 1, "maxLength": 240 },
+            "defeat": { "type": "string", "minLength": 1, "maxLength": 240 },
+            "flee": { "type": "string", "minLength": 1, "maxLength": 240 }
+          }
+        }
+      }
+    },
+    "outcome": {
+      "type": "object", "additionalProperties": false,
+      "required": ["personalRenownDelta", "alliedFactionRenownDelta", "opposingFactionRenownDelta", "knowledgeNodeId", "text"],
+      "properties": {
+        "personalRenownDelta": { "type": "integer", "minimum": -1000, "maximum": 1000 },
+        "alliedFactionRenownDelta": { "type": "integer", "minimum": -1000, "maximum": 1000 },
+        "opposingFactionRenownDelta": { "type": "integer", "minimum": -1000, "maximum": 1000 },
+        "knowledgeNodeId": { "$ref": "#/definitions/id" },
+        "text": { "type": "string", "minLength": 1, "maxLength": 240 }
+      }
+    },
+    "factionOpponent": {
+      "type": "object", "additionalProperties": false,
+      "required": ["enemy"],
+      "properties": { "enemy": { "$ref": "#/definitions/enemy" } }
+    }
+  },
+  "properties": {
+    "wars": {
+      "type": "array", "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "name", "description", "mapResourceId", "position", "firstFactionId", "secondFactionId", "contributionThreshold", "stages", "outcomes", "texts"],
+        "properties": {
+          "id": { "$ref": "#/definitions/id" },
+          "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "description": { "type": "string", "minLength": 1, "maxLength": 400 },
+          "mapResourceId": { "$ref": "#/definitions/id" },
+          "position": {
+            "type": "object", "additionalProperties": false, "required": ["col", "row"],
+            "properties": {
+              "col": { "type": "integer", "minimum": 0, "maximum": 255 },
+              "row": { "type": "integer", "minimum": 0, "maximum": 255 }
+            }
+          },
+          "firstFactionId": { "$ref": "#/definitions/id" },
+          "secondFactionId": { "$ref": "#/definitions/id" },
+          "contributionThreshold": { "type": "integer", "minimum": 1, "maximum": 12000 },
+          "stages": { "type": "array", "minItems": 1, "maxItems": 12, "items": { "$ref": "#/definitions/stage" } },
+          "outcomes": {
+            "type": "object", "additionalProperties": false, "required": ["victory", "stalemate", "defeat"],
+            "properties": {
+              "victory": { "$ref": "#/definitions/outcome" },
+              "stalemate": { "$ref": "#/definitions/outcome" },
+              "defeat": { "$ref": "#/definitions/outcome" }
+            }
+          },
+          "texts": {
+            "type": "object", "additionalProperties": false, "required": ["approach"],
+            "properties": { "approach": { "type": "string", "minLength": 1, "maxLength": 200 } }
+          }
+        }
+      }
+    }
+  }
+}

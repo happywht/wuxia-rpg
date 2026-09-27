@@ -1,0 +1,121 @@
+{
+  "wars": [
+    {
+      "id": "war.mist-ferry-passage",
+      "name": "雾渡药道会盟",
+      "description": "铁嶂派与云隐山庄各护送一支药队，却因旧栈桥的通行时辰争执不下。双方约定以三场切磋决定先后，胜方须保留对方药队通行的时辰。每阶段可胜可负，战后按累计贡献评定；败阵后会获准歇息再战。",
+      "mapResourceId": "map.round-10-mist-ferry",
+      "position": { "col": 7, "row": 4 },
+      "firstFactionId": "faction.tiezhang-pai",
+      "secondFactionId": "faction.yunyin-shanzhuang",
+      "contributionThreshold": 5,
+      "stages": [
+        {
+          "id": "stage.ferry-watch",
+          "title": "栈桥巡守",
+          "contribution": 2,
+          "firstFactionOpponent": { "enemy": {
+            "name": "铁嶂巡桥弟子",
+            "attributes": { "body": 8, "force": 7, "agility": 5, "insight": 4, "resolve": 7 },
+            "health": 36,
+            "qi": 0,
+            "martialArtIds": ["skill.jianghu-sanshou"]
+          } },
+          "secondFactionOpponent": { "enemy": {
+            "name": "云隐巡桥弟子",
+            "attributes": { "body": 7, "force": 6, "agility": 7, "insight": 6, "resolve": 7 },
+            "health": 34,
+            "qi": 4,
+            "martialArtIds": ["skill.yunyin-shenfa"]
+          } },
+          "victoryExperience": 22,
+          "defeatRecovery": { "healthRatio": 0.65, "qiRatio": 0.65 },
+          "texts": {
+            "intro": "雾中木哨三响，巡桥弟子横棍拦路，先要试你的脚步是否站得稳。",
+            "victory": "巡桥弟子退开一步，让出栈桥入口。",
+            "defeat": "你脚下打滑，被扶到岸边调息。",
+            "flee": "你收住招式退回岸边，暂不再争这一阵。"
+          }
+        },
+        {
+          "id": "stage.herb-caravan",
+          "title": "药队护送",
+          "contribution": 3,
+          "firstFactionOpponent": { "enemy": {
+            "name": "铁嶂护药行者",
+            "attributes": { "body": 10, "force": 9, "agility": 6, "insight": 6, "resolve": 9 },
+            "health": 50,
+            "qi": 4,
+            "martialArtIds": ["skill.tiezhang-zhuanggong"]
+          } },
+          "secondFactionOpponent": { "enemy": {
+            "name": "云隐护药行者",
+            "attributes": { "body": 9, "force": 8, "agility": 8, "insight": 7, "resolve": 8 },
+            "health": 48,
+            "qi": 8,
+            "martialArtIds": ["skill.yunyin-shenfa"]
+          } },
+          "victoryExperience": 32,
+          "defeatRecovery": { "healthRatio": 0.6, "qiRatio": 0.6 },
+          "texts": {
+            "intro": "药担在栈桥另一端停下，行者以轻身法绕至你侧后，考你能否护住同行之人。",
+            "victory": "行者收步，药担安稳过桥。",
+            "defeat": "你没能守住桥心，双方约你歇息片刻。",
+            "flee": "你退至桥头，药队暂且停下。"
+          }
+        },
+        {
+          "id": "stage.mist-pledge",
+          "title": "雾桥盟誓",
+          "contribution": 4,
+          "firstFactionOpponent": { "enemy": {
+            "name": "铁嶂守约首徒",
+            "attributes": { "body": 11, "force": 10, "agility": 8, "insight": 8, "resolve": 10 },
+            "health": 62,
+            "qi": 8,
+            "martialArtIds": ["skill.jianghu-sanshou", "skill.tiezhang-zhuanggong"]
+          } },
+          "secondFactionOpponent": { "enemy": {
+            "name": "云隐守约首徒",
+            "attributes": { "body": 10, "force": 9, "agility": 10, "insight": 10, "resolve": 10 },
+            "health": 60,
+            "qi": 14,
+            "martialArtIds": ["skill.jianghu-sanshou", "skill.yunyin-shenfa"]
+          } },
+          "victoryExperience": 45,
+          "defeatRecovery": { "healthRatio": 0.55, "qiRatio": 0.55 },
+          "texts": {
+            "intro": "两队在桥头列开，守约首徒抱拳请招。这一场将决定药路如何轮值。",
+            "victory": "首徒点头认输，双方弟子共同挪开了封桥木桩。",
+            "defeat": "首徒留了余地，扶你坐下，待药队商定下一步。",
+            "flee": "你示意停手，双方将这场会盟暂记未决。"
+          }
+        }
+      ],
+      "outcomes": {
+        "victory": {
+          "personalRenownDelta": 12,
+          "alliedFactionRenownDelta": 18,
+          "opposingFactionRenownDelta": -6,
+          "knowledgeNodeId": "event.mist-pact-victory",
+          "text": "你替本门赢得药道先行时辰，也留出了对方药队的通行约期。"
+        },
+        "stalemate": {
+          "personalRenownDelta": 3,
+          "alliedFactionRenownDelta": 4,
+          "opposingFactionRenownDelta": 4,
+          "knowledgeNodeId": "event.mist-pact-stalemate",
+          "text": "双方各有胜负，最终按时辰轮换药队，雾桥会盟以平局收场。"
+        },
+        "defeat": {
+          "personalRenownDelta": -3,
+          "alliedFactionRenownDelta": -8,
+          "opposingFactionRenownDelta": 9,
+          "knowledgeNodeId": "event.mist-pact-defeat",
+          "text": "你未能为本门争得约期，药路仍开，但轮值由对方先定。"
+        }
+      },
+      "texts": { "approach": "雾渡药道会盟在此设下切磋场。按 E 查看阵营、贡献门槛与战绩。" }
+    }
+  ]
+}

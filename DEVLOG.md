@@ -4,6 +4,30 @@
 
 ---
 
+## Round 21 — 门派战、贡献和世界后果（2026-09-27）
+
+### 计划与实现
+
+- 开发前新增 `iterations/round-21/plan.md`，预计人类工程师工时约 26 小时，拆分资料装配、报名/战斗、后果/存档、验证/文档四个子任务。
+- 新增可选 `faction-war-set` Schema 与 Phaser-free `faction-war.ts`。战事条目声明地图/入口、双方门派、贡献门槛、阶段、三类后果；每阶段分别配置两派弟子，确保玩家只会迎战对方门派。装配检查入口格、出生点/NPC/遭遇/擂台冲突、门派/武学/结局知识节点引用，并逐战隔离坏资料；日程把战事格登记为固定占位。
+- 新增雾雨渡口“雾渡药道会盟”：三阶段、铁嶂/云隐各三名专属对手。邻接 E 面板展示双方名单、贡献门槛与战绩；在籍两派玩家均可报名，复用通用 CombatSession 与伙伴援护。阶段败阵按资料比例恢复后续战；阶段胜利积贡献，达到门槛即胜，未达门槛按贡献判平/负，撤退提前结算；战事战斗不污染普通遭遇和任务状态。
+- 胜/平/负分别从数据读取个人声望、己方/对方门派声望变化及知识事件节点。百科记录新见闻，铁嶂与云隐两位师长都提供知识条件战报对白。运行战绩记录报名、胜平负次数、最高/最近贡献和最近结果。
+- v1 存档加入可选 `factionWarRecords`；旧档缺字段安全默认为空，世界预检会过滤被 MOD 移除的战事战绩并给 warning。补充 `docs/FACTION_WAR_DESIGN.md`，更新 SAVES、KNOWLEDGE-GRAPH、DATA-GUIDE、ARCHITECTURE、GDD、ORIGINAL-FIDELITY、CHANGELOG 和路线图。知识图谱现有 28 节点/19 边；本轮新增 3 个战事结局节点及 6 条影响边。
+
+### 验证
+
+- `npm run build`：通过，TypeScript 检查通过；Vite 生产构建完成 114 模块。主 JS 1,766.77 kB（gzip 467.12 kB），保留超过 500 kB 默认建议的提示。
+- `npm run validate:data`：通过；manifest 与 19 个基础资源通过 JSON Schema/Ajv 校验。
+- `npm run smoke:round-21`：通过；验证资料解析、邻接选择、坏占格和参战门派引用隔离、双方各三阶段的 CombatSession/经验适配、贡献胜平负分档、旧 v1 缺字段、新战绩捕获/解析/恢复及 MOD 移除战事时的存档软过滤。
+- `git diff --check`：通过；仅报告部分 LF 文件后续可能规范为 CRLF。
+- 本轮使用无 Phaser 运行时冒烟验证，没有声称进行浏览器手动游玩验证。
+
+### 兼容性审查补充
+
+- Claude Code 对照计划做只读审查，确认主要流程无阻断问题；发现 schema 允许 12 阶段而单页 UI 会挤压战绩区。补充 Phaser-free 阶段分页协议，面板按可用高度分页，PgUp/PgDn 切页；仅查看会盟不再将空战绩写入运行状态。
+- 更新 `smoke-round-21.mjs`：用 12 阶段数据验证分页边界；MOD 移除与保留两种情况均把 `planSnapshotRestore` 的结果传入 `restoreRunState`，验证真实快照恢复顺序。
+- 复验：`npm run build` 通过（114 模块；JS 1,768.18 kB，gzip 467.62 kB；仅有 Vite 默认分包建议）；`npm run smoke:round-21` 通过，包含 12 阶段分页和预检后恢复；`npm run validate:data` 通过（manifest + 19 项）；`npm run smoke:round-20` 通过；`git diff --check` 通过（只有 LF→CRLF 提示）。
+
 ## Round 20 — 擂台挑战与战绩（2026-09-27）
 
 ### 计划与实现

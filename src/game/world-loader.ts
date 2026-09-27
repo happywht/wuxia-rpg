@@ -69,6 +69,12 @@ import {
   type AssembledArena,
 } from '../engine/arena-challenge';
 import {
+  assembleFactionWars,
+  parseFactionWarSet,
+  type AssembledFactionWar,
+  type FactionWarSetData,
+} from '../engine/faction-war';
+import {
   assembleBattleEncounters,
   type BattleEncounterSetData,
   parseBattleEncounterSet,
@@ -101,6 +107,7 @@ const FACTION_RESOURCE_ID = 'faction.round-04-set';
 const MARTIAL_ART_RESOURCE_ID = 'martial-art.round-04-set';
 const ENCOUNTER_RESOURCE_ID = 'encounter.round-05-set';
 const ARENA_RESOURCE_ID = 'arena.round-20-set';
+const FACTION_WAR_RESOURCE_ID = 'faction-war.round-21-set';
 const ITEM_RESOURCE_ID = 'item.round-06-set';
 const SHOP_RESOURCE_ID = 'shop.round-06-set';
 const QUEST_RESOURCE_ID = 'quest.round-07-set';
@@ -117,6 +124,7 @@ const OPTIONAL_RESOURCE_IDS = new Set([
   MARTIAL_ART_RESOURCE_ID,
   ENCOUNTER_RESOURCE_ID,
   ARENA_RESOURCE_ID,
+  FACTION_WAR_RESOURCE_ID,
   ITEM_RESOURCE_ID,
   SHOP_RESOURCE_ID,
   QUEST_RESOURCE_ID,
@@ -134,6 +142,7 @@ const OPTIONAL_SCHEMA_ORIGINS = new Set([
   'schema:martial-arts-set',
   'schema:battle-encounters',
   'schema:arena-set',
+  'schema:faction-war-set',
   'schema:items-set',
   'schema:shops-set',
   'schema:quest-set',
@@ -177,6 +186,7 @@ export interface WorldAssembly {
   progression: ProgressionAssembly;
   encounters: PlacedEncounter[];
   arenas: AssembledArena[];
+  factionWars: AssembledFactionWar[];
   items: ReadonlyMap<string, ItemRecordData>;
   shops: ReadonlyMap<string, AssembledShop>;
   quests: ReadonlyMap<string, QuestData>;
@@ -268,6 +278,10 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
         },
         'arena-set': (value) => {
           const parsed = parseArenaSet(value);
+          return parsed.ok ? [] : parsed.errors;
+        },
+        'faction-war-set': (value) => {
+          const parsed = parseFactionWarSet(value);
           return parsed.ok ? [] : parsed.errors;
         },
         'items-set': (value) => {
@@ -406,7 +420,9 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
     const overlapsWorldOccupant = (mapResourceId: string, col: number, row: number): boolean =>
       assembly.npcs.some((npc) => npc.record.mapResourceId === mapResourceId && npc.col === col && npc.row === row) ||
       assembly.encounters.some((encounter) => encounter.record.mapResourceId === mapResourceId &&
-        encounter.col === col && encounter.row === row);
+        encounter.col === col && encounter.row === row) ||
+      assembly.factionWars.some((war) => war.record.mapResourceId === mapResourceId &&
+        war.record.position.col === col && war.record.position.row === row);
     const transitions = worldMap.transitions.filter((transition) => {
       const endpoints = [transition.from, transition.to];
       if (endpoints.some((endpoint) => overlapsWorldOccupant(
@@ -796,6 +812,56 @@ function assembleOptionalContent(
     details: [],
   });
 
+  let factionWarSet: FactionWarSetData | null = null;
+  const factionWarResource = resources.get(FACTION_WAR_RESOURCE_ID);
+  if (factionWarResource !== undefined) {
+    const parsed = parseFactionWarSet(factionWarResource.value);
+    if (!parsed.ok) {
+      warnings.push({
+        resource: FACTION_WAR_RESOURCE_ID,
+        origin: 'faction-war-assembly',
+        severity: 'warning',
+        message: '门派战资料结构不合规，本轮禁用全部门派战',
+        details: parsed.errors,
+      });
+    } else {
+      factionWarSet = parsed.set;
+      for (const issue of parsed.errors) warnings.push({
+        resource: FACTION_WAR_RESOURCE_ID,
+        origin: 'faction-war-assembly',
+        severity: 'warning',
+        message: issue,
+        details: [],
+      });
+    }
+  }
+  const factionWarBlockedCells = new Map<string, Set<string>>();
+  const blockFactionWarCell = (mapId: string, cell: string): void => {
+    const cells = factionWarBlockedCells.get(mapId) ?? new Set<string>();
+    cells.add(cell);
+    factionWarBlockedCells.set(mapId, cells);
+  };
+  for (const [mapId, map] of maps) blockFactionWarCell(mapId, map.data.playerStart.col + ',' + map.data.playerStart.row);
+  for (const npc of allNpcs) blockFactionWarCell(npc.record.mapResourceId, npc.col + ',' + npc.row);
+  for (const encounter of encounters) blockFactionWarCell(encounter.record.mapResourceId, encounter.col + ',' + encounter.row);
+  for (const arena of arenaAssembly.arenas) blockFactionWarCell(arena.record.mapResourceId, arena.record.position.col + ',' + arena.record.position.row);
+  const factionWarAssembly = assembleFactionWars({
+    set: factionWarSet,
+    knownResourceIds: new Set(resources.keys()),
+    maps,
+    blockedCells: factionWarBlockedCells,
+    factions: new Set(progressionAssembled.assembly.factions.keys()),
+    martialArts: progressionAssembled.assembly.martialArts,
+    knowledgeNodeIds,
+  });
+  for (const message of factionWarAssembly.warnings) warnings.push({
+    resource: FACTION_WAR_RESOURCE_ID,
+    origin: 'faction-war-assembly',
+    severity: 'warning',
+    message,
+    details: [],
+  });
+
   // Compile one safe NPC layout per declared calendar period. The base
   // placements remain the stable cast registry for quests/factions; runtime
   // scenes choose the current period's layout from the clock.
@@ -811,6 +877,11 @@ function assembleOptionalContent(
     const blocked = encounterBlocksByMap.get(arena.record.mapResourceId) ?? new Set<string>();
     blocked.add(String(arena.record.position.col) + ',' + String(arena.record.position.row));
     encounterBlocksByMap.set(arena.record.mapResourceId, blocked);
+  }
+  for (const war of factionWarAssembly.wars) {
+    const blocked = encounterBlocksByMap.get(war.record.mapResourceId) ?? new Set<string>();
+    blocked.add(String(war.record.position.col) + ',' + String(war.record.position.row));
+    encounterBlocksByMap.set(war.record.mapResourceId, blocked);
   }
   const npcSchedules = compileNpcSchedules({
     npcs: allNpcs,
@@ -951,6 +1022,7 @@ function assembleOptionalContent(
     progression,
     encounters,
     arenas: arenaAssembly.arenas,
+    factionWars: factionWarAssembly.wars,
     items: itemAssembly.items,
     shops: shopAssembly.shops,
     quests: questAssembly.quests,

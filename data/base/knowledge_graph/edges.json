@@ -12,6 +12,12 @@
     { "id": "kg.edge.rumor-influences-ending", "fromId": "event.old-footprints", "toId": "ending.river-lantern", "relation": "influences", "summary": "这条旧路传闻或许会影响江湖最终的去向。" },
     { "id": "kg.edge.ye-belongs-tingyu", "fromId": "char.ye-tingzhou", "toId": "faction.tingyu-jiange", "relation": "belongsTo", "summary": "叶庭舟奉剑阁之命在沿途考察并指点有缘人。" },
     { "id": "kg.edge.shi-belongs-tiezhang", "fromId": "char.shi-bei", "toId": "faction.tiezhang-pai", "relation": "belongsTo", "summary": "石北负责铁嶂派门人的桩功根基与入门考验。" },
-    { "id": "kg.edge.wen-belongs-yunyin", "fromId": "char.wen-suxin", "toId": "faction.yunyin-shanzhuang", "relation": "belongsTo", "summary": "闻素心以庄中医武并重的门训收徒授艺。" }
+    { "id": "kg.edge.wen-belongs-yunyin", "fromId": "char.wen-suxin", "toId": "faction.yunyin-shanzhuang", "relation": "belongsTo", "summary": "闻素心以庄中医武并重的门训收徒授艺。" },
+    { "id": "kg.edge.mist-pact-tiezhang-victory", "fromId": "event.mist-pact-victory", "toId": "faction.tiezhang-pai", "relation": "influences", "summary": "门下弟子参与会盟并争得先行约期，会提升铁嶂派在渡口的声望。" },
+    { "id": "kg.edge.mist-pact-yunyin-victory", "fromId": "event.mist-pact-victory", "toId": "faction.yunyin-shanzhuang", "relation": "influences", "summary": "门下弟子参与会盟并争得先行约期，会影响云隐山庄在渡口的声望。" },
+    { "id": "kg.edge.mist-pact-tiezhang-stalemate", "fromId": "event.mist-pact-stalemate", "toId": "faction.tiezhang-pai", "relation": "influences", "summary": "双方约定轮值药道后，铁嶂派与云隐山庄均维持互通。" },
+    { "id": "kg.edge.mist-pact-yunyin-stalemate", "fromId": "event.mist-pact-stalemate", "toId": "faction.yunyin-shanzhuang", "relation": "influences", "summary": "双方约定轮值药道后，铁嶂派与云隐山庄均维持互通。" },
+    { "id": "kg.edge.mist-pact-tiezhang-defeat", "fromId": "event.mist-pact-defeat", "toId": "faction.tiezhang-pai", "relation": "influences", "summary": "本门让出先行时辰后，铁嶂派仍保留约定轮值的机会。" },
+    { "id": "kg.edge.mist-pact-yunyin-defeat", "fromId": "event.mist-pact-defeat", "toId": "faction.yunyin-shanzhuang", "relation": "influences", "summary": "本门争约失利后，云隐山庄取得先行时辰并继续开放药道。" }
   ]
 }

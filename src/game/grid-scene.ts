@@ -34,7 +34,7 @@ import {
   type ClimateSeasonData,
   type ClimateWeatherData,
 } from '../engine/climate-system';
-import { type SocialState, createSocialState } from '../engine/social-state';
+import { type SocialState, applySocialChange, createSocialState } from '../engine/social-state';
 import {
   NpcOccupancyIndex,
   type PlacedNpc,
@@ -59,6 +59,14 @@ import {
   type ArenaRecord,
   type AssembledArena,
 } from '../engine/arena-challenge';
+import {
+  createFactionWarRecord,
+  factionWarStageAsEncounter,
+  resolveFactionWarOutcome,
+  selectFactionWarTarget,
+  type AssembledFactionWar,
+  type FactionWarRecord,
+} from '../engine/faction-war';
 import {
   type AssembledShop,
   type InventoryState,
@@ -105,6 +113,7 @@ import { ControlsPanel } from './controls-ui';
 import { FactionPanel } from './faction-ui';
 import { CompanionPanel } from './companion-ui';
 import { ArenaPanel } from './arena-ui';
+import { FactionWarPanel } from './faction-war-ui';
 import { type GameSettings, applyGameSettings, loadGameSettings, uiFontSize } from './settings';
 import { createPixelPerson, UI_FONT_FAMILY } from './ui-theme';
 import { type GridStartupData } from './menu-scene';
@@ -227,6 +236,14 @@ export class GridScene extends Phaser.Scene {
   private companionState: CompanionState = createCompanionState();
   private readonly arenaRecords = new Map<string, ArenaRecord>();
   private activeArenaRun: { arena: AssembledArena; roundIndex: number; wins: number } | null = null;
+  private readonly factionWarRecords = new Map<string, FactionWarRecord>();
+  private activeFactionWarRun: {
+    war: AssembledFactionWar;
+    roundIndex: number;
+    contribution: number;
+    alliedFactionId: string;
+    opposingFactionId: string;
+  } | null = null;
   private companionFollower: { marker: Phaser.GameObjects.Container; label: Phaser.GameObjects.Text } | null = null;
 
   /** Validated progression datasets (assembled by the shared world loader). */
@@ -299,6 +316,7 @@ export class GridScene extends Phaser.Scene {
   private encyclopediaPanel: EncyclopediaPanel | null = null;
   private companionPanel: CompanionPanel | null = null;
   private arenaPanel: ArenaPanel | null = null;
+  private factionWarPanel: FactionWarPanel | null = null;
   private activeSession: CombatSession | null = null;
   private activeEncounter: PlacedEncounter | null = null;
 
@@ -408,6 +426,11 @@ export class GridScene extends Phaser.Scene {
       this.arenaRecords.set(record.arenaId, { ...record });
     }
     this.activeArenaRun = null;
+    this.factionWarRecords.clear();
+    for (const record of restoredRun?.factionWarRecords ?? []) {
+      this.factionWarRecords.set(record.warId, { ...record });
+    }
+    this.activeFactionWarRun = null;
     // Round 14 clock: elapsed minutes come from the save when one was
     // restored (older v1 snapshots lack the field and restart at 0), which
     // the calendar start then re-dates using the *current* month table.
@@ -572,6 +595,7 @@ export class GridScene extends Phaser.Scene {
     this.renderNpcs(activeMap);
     this.renderEncounterMarkers(activeMap);
     this.renderArenaMarkers(activeMap);
+    this.renderFactionWarMarkers(activeMap);
     this.ensureDaylightLayer();
     this.buildHud(activeMap, world.optionalWarnings, world.modWarnings);
     this.updateCoordsHud();
@@ -609,6 +633,7 @@ export class GridScene extends Phaser.Scene {
     this.factionPanel = new FactionPanel(this, () => this.noteOverlayClosed());
     this.companionPanel = new CompanionPanel(this, () => this.noteOverlayClosed());
     this.arenaPanel = new ArenaPanel(this, () => this.noteOverlayClosed());
+    this.factionWarPanel = new FactionWarPanel(this, () => this.noteOverlayClosed());
     this.worldMapPanel = new WorldMapPanel(this, () => this.noteOverlayClosed());
     this.encyclopediaPanel = new EncyclopediaPanel(this, { onClose: () => this.noteOverlayClosed() });
     this.updateQuestTrackerHud();
@@ -783,6 +808,7 @@ export class GridScene extends Phaser.Scene {
         ]),
       ),
       companionIds: new Set(world.assembly.companions.keys()),
+      factionWarIds: new Set(world.assembly.factionWars.map((war) => war.record.id)),
     };
   }
 
@@ -809,6 +835,7 @@ export class GridScene extends Phaser.Scene {
       factionMembership: this.factionState.membership,
       activeCompanionId: this.companionState.activeCompanionId,
       arenaRecords: this.arenaRecords,
+      factionWarRecords: this.factionWarRecords,
     });
     const result = writeSaveSlot(this.storage, slotId, snapshot);
     if (result.ok) {
@@ -918,6 +945,26 @@ export class GridScene extends Phaser.Scene {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(12),
         color: '#fff1c4',
+      }).setOrigin(0.5).setDepth(5), 12);
+      this.encounterLayer?.add([badge, label]);
+    }
+  }
+
+  /** Green knot marks a non-blocking faction-war rally point. */
+  private renderFactionWarMarkers(map: GridMap): void {
+    const wars = this.world?.assembly.factionWars.filter((war) =>
+      war.record.mapResourceId === this.currentMapResourceId,
+    ) ?? [];
+    for (const war of wars) {
+      const center = cellCenterOffset(map, war.record.position.col, war.record.position.row);
+      const x = this.mapOrigin.x + center.x;
+      const y = this.mapOrigin.y + center.y;
+      const badge = this.add.rectangle(x, y, Math.max(20, map.tileSize * 0.48), Math.max(20, map.tileSize * 0.48), 0x315c48)
+        .setStrokeStyle(2, 0x88cda0).setDepth(4);
+      const label = this.registerScaledText(this.add.text(x, y, '盟', {
+        fontFamily: UI.fontFamily,
+        fontSize: uiFontSize(12),
+        color: '#d8f4d6',
       }).setOrigin(0.5).setDepth(5), 12);
       this.encounterLayer?.add([badge, label]);
     }
@@ -1058,6 +1105,95 @@ export class GridScene extends Phaser.Scene {
     );
   }
 
+  /** Opens the faction-side eligibility check, authored campaign card and record book. */
+  private openFactionWarSignup(war: AssembledFactionWar): void {
+    const panel = this.factionWarPanel;
+    if (panel === null) return;
+    const record = this.factionWarRecords.get(war.record.id) ?? createFactionWarRecord(war.record.id);
+    const membership = this.factionState.membership;
+    let blocked: string | null = null;
+    if (this.playerProfile === null || this.playerState === null) blocked = '当前角色状态不可用，暂时不能报名。';
+    else if (membership === null ||
+      (membership.factionId !== war.record.firstFactionId && membership.factionId !== war.record.secondFactionId)) {
+      blocked = '只有参战门派的在籍弟子可以报名。';
+    }
+    panel.open({
+      war,
+      factions: this.progression.factions,
+      membership,
+      record,
+      registrationBlockedReason: blocked,
+      onRegister: () => {
+        if (membership === null) return;
+        record.attempts += 1;
+        this.factionWarRecords.set(record.warId, record);
+        const opposingFactionId = membership.factionId === war.record.firstFactionId
+          ? war.record.secondFactionId : war.record.firstFactionId;
+        this.activeFactionWarRun = {
+          war, roundIndex: 0, contribution: 0,
+          alliedFactionId: membership.factionId,
+          opposingFactionId,
+        };
+        this.startFactionWarStage();
+        this.updateInteractHint();
+      },
+    });
+    this.updateInteractHint();
+  }
+
+  /** Starts a war round without registering it as a normal quest encounter. */
+  private startFactionWarStage(): void {
+    const run = this.activeFactionWarRun;
+    const battlePanel = this.battlePanel;
+    const player = this.playerState;
+    const profile = this.playerProfile;
+    if (run === null || battlePanel === null || player === null || profile === null) return;
+    const stage = run.war.record.stages[run.roundIndex];
+    if (stage === undefined) return;
+    const encounter = factionWarStageAsEncounter(run.war.record, stage, profile.id, run.opposingFactionId);
+    const activeCompanion = this.companions.get(this.companionState.activeCompanionId ?? '');
+    const companionNpc = activeCompanion === undefined
+      ? undefined
+      : this.world?.assembly.npcs.find((npc) => npc.record.id === activeCompanion.npcId);
+    this.activeSession = new CombatSession({
+      encounter,
+      profile,
+      player,
+      martialArts: this.progression.martialArts,
+      ...(activeCompanion !== undefined && companionNpc !== undefined
+        ? { companion: { name: companionNpc.record.name, support: activeCompanion.combatSupport } }
+        : {}),
+    });
+    this.activeEncounter = null;
+    battlePanel.open(this.activeSession);
+  }
+
+  /** Commits one result exactly once and makes its social/lore consequences visible. */
+  private finishFactionWarAttempt(
+    run: NonNullable<GridScene['activeFactionWarRun']>,
+    outcomeId: 'victory' | 'stalemate' | 'defeat',
+  ): void {
+    const record = this.factionWarRecords.get(run.war.record.id) ?? createFactionWarRecord(run.war.record.id);
+    const outcome = run.war.record.outcomes[outcomeId];
+    record.bestContribution = Math.max(record.bestContribution, run.contribution);
+    record.lastContribution = run.contribution;
+    record.lastOutcome = outcomeId;
+    if (outcomeId === 'victory') record.victories += 1;
+    else if (outcomeId === 'stalemate') record.stalemates += 1;
+    else record.defeats += 1;
+    this.factionWarRecords.set(record.warId, record);
+    applySocialChange(this.social, { kind: 'renown', delta: outcome.personalRenownDelta });
+    applySocialChange(this.social, { kind: 'factionRenown', factionId: run.alliedFactionId, delta: outcome.alliedFactionRenownDelta });
+    applySocialChange(this.social, { kind: 'factionRenown', factionId: run.opposingFactionId, delta: outcome.opposingFactionRenownDelta });
+    const node = this.world?.knowledgeGraph.nodes.get(outcome.knowledgeNodeId);
+    const discovery = node !== undefined && !this.knownKnowledgeNodeIds.has(node.id)
+      ? (this.knownKnowledgeNodeIds.add(node.id), `新见闻「${node.title}」已记入江湖百闻。`)
+      : '';
+    this.showRegionNotice(outcome.text + (discovery.length > 0 ? ' ' + discovery : ''));
+    console.info('[faction-war] 会盟「%s」结束：贡献 %d/%d，结果 %s',
+      run.war.record.id, run.contribution, run.war.record.contributionThreshold, outcomeId);
+  }
+
   /**
    * Battle-overlay close hook: the session has already settled everything
    * (experience, defeat recovery) inside the engine; the scene only records
@@ -1066,7 +1202,30 @@ export class GridScene extends Phaser.Scene {
   private settleBattleClose(): void {
     const session = this.activeSession;
     const encounter = this.activeEncounter;
+    const factionWarRun = this.activeFactionWarRun;
     const arenaRun = this.activeArenaRun;
+    if (session !== null && factionWarRun !== null) {
+      const result = session.finalResult;
+      if (result?.outcome === 'victory') {
+        const stage = factionWarRun.war.record.stages[factionWarRun.roundIndex];
+        if (stage !== undefined) factionWarRun.contribution += stage.contribution;
+      }
+      this.activeSession = null;
+      this.activeEncounter = null;
+      const reachedThreshold = factionWarRun.contribution >= factionWarRun.war.record.contributionThreshold;
+      const endedEarly = result === null || result.outcome === 'fled';
+      const exhaustedStages = factionWarRun.roundIndex + 1 >= factionWarRun.war.record.stages.length;
+      if (!reachedThreshold && !endedEarly && !exhaustedStages) {
+        factionWarRun.roundIndex += 1;
+        this.startFactionWarStage();
+      } else {
+        const outcome = resolveFactionWarOutcome(factionWarRun.contribution, factionWarRun.war.record.contributionThreshold);
+        this.activeFactionWarRun = null;
+        this.finishFactionWarAttempt(factionWarRun, outcome);
+      }
+      this.noteOverlayClosed();
+      return;
+    }
     if (session !== null && arenaRun !== null) {
       const result = session.finalResult;
       if (result?.outcome === 'victory') arenaRun.wins += 1;
@@ -1668,6 +1827,15 @@ export class GridScene extends Phaser.Scene {
       this.interactText.setText(arenaTarget.record.texts.approach);
       return;
     }
+    const factionWarTarget = this.world === null ? null : selectFactionWarTarget(
+      this.world.assembly.factionWars,
+      this.currentMapResourceId,
+      { col: this.playerCol, row: this.playerRow },
+    );
+    if (factionWarTarget !== null) {
+      this.interactText.setText(factionWarTarget.record.texts.approach);
+      return;
+    }
     const gate = this.world === null
       ? null
       : selectAdjacentTransition(this.world.worldMap.transitions, this.currentMapResourceId, {
@@ -1701,6 +1869,7 @@ export class GridScene extends Phaser.Scene {
       (this.factionPanel !== null && this.factionPanel.isOpen) ||
       (this.companionPanel !== null && this.companionPanel.isOpen) ||
       (this.arenaPanel !== null && this.arenaPanel.isOpen) ||
+      (this.factionWarPanel !== null && this.factionWarPanel.isOpen) ||
       (this.controlsPanel !== null && this.controlsPanel.isOpen)
     );
   }
@@ -2022,11 +2191,14 @@ export class GridScene extends Phaser.Scene {
       this.companionPanel = null;
       this.arenaPanel?.destroy();
       this.arenaPanel = null;
+      this.factionWarPanel?.destroy();
+      this.factionWarPanel = null;
       this.controlsPanel?.destroy();
       this.controlsPanel = null;
       this.activeSession = null;
       this.activeEncounter = null;
       this.activeArenaRun = null;
+      this.activeFactionWarRun = null;
     });
   }
 
@@ -2085,6 +2257,15 @@ export class GridScene extends Phaser.Scene {
     );
     if (arena !== null) {
       this.openArenaSignup(arena);
+      return;
+    }
+    const factionWar = this.world === null ? null : selectFactionWarTarget(
+      this.world.assembly.factionWars,
+      this.currentMapResourceId,
+      { col: this.playerCol, row: this.playerRow },
+    );
+    if (factionWar !== null) {
+      this.openFactionWarSignup(factionWar);
       return;
     }
     const gate = this.world === null
@@ -2343,6 +2524,7 @@ export class GridScene extends Phaser.Scene {
     this.renderNpcs(destinationMap);
     this.renderEncounterMarkers(destinationMap);
     this.renderArenaMarkers(destinationMap);
+    this.renderFactionWarMarkers(destinationMap);
     this.ensureDaylightLayer(); // The rebuilt world layers must sit below the wash again.
     this.mapNameText?.setText(destinationMap.data.name);
     this.updateCoordsHud();

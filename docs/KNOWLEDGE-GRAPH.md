@@ -1,6 +1,6 @@
 # 知识图谱与江湖百科
 
-Round 11 建立可替换的图谱资料和玩家见闻状态。当前实现用于解锁个人线索、支持知识条件对话和展示已知关联；Round 17 的区域奇遇也能记录/发现图谱节点。NPC 之间的情报传播与态度变化留待 Round 26。
+Round 11 建立可替换的图谱资料和玩家见闻状态。当前实现用于解锁个人线索、支持知识条件对话和展示已知关联；Round 17 的区域奇遇和 Round 21 的门派战结局也能记录/发现图谱节点。雾渡药道会盟的胜、平、负分别解锁事件节点，并在两名参战门派师长的对白中呈现对应结果。NPC 之间的一般情报传播与态度变化留待 Round 26。
 
 ## 文件与资源
 
@@ -12,6 +12,8 @@ Round 11 建立可替换的图谱资料和玩家见闻状态。当前实现用�
 每个节点使用 `id`、`kind`、`title`、`summary`、`knownByDefault`。`kind` 可取 `character`、`place`、`faction`、`item`、`martialArt`、`event`、`quest`、`ending`。建议 id 稳定并按族使用 `char.`、`place.`、`faction.`、`item.`、`skill.`、`event.`、`quest.`、`ending.` 前缀。
 
 每条关系使用 `id`、`fromId`、`toId`、`relation` 和 `summary`。关系枚举为 `mentorOf`、`parentOf`、`hostileTo`、`belongsTo`、`locatedAt`、`holds`、`triggers`、`requires`、`rewards`、`knows`、`participatesIn`、`influences`。两个端点必须都声明在节点集内。
+
+当前基础资料包含 28 个节点和 19 条关系。Round 21 新增三种雾渡会盟结局事件节点（胜、平、负），以及分别指向铁嶂派和云隐山庄的 6 条 `influences` 边；实际节点/边文本仍以 JSON 为准。
 
 示例：
 
@@ -62,4 +64,4 @@ Schema 检查资源结构和字段值域；Phaser 无关装配器再处理重复
 
 ## 存档行为
 
-v1 快照字段 `knownKnowledgeNodeIds` 保存玩家已知节点；区域奇遇的一次性状态沿用 `completedRegionalEvents`。Round 17 没有新增存档字段。读取 Round 10 及更早的 v1 存档时，缺失知识/事件字段归一为空数组；恢复预检会补入当前图谱公开词条、过滤当前图谱不存在的 id 并发出警告。移除资料后，相关百科条目和对话选项不再可用，但旧存档仍可加载。
+v1 快照字段 `knownKnowledgeNodeIds` 保存玩家已知节点；区域奇遇的一次性状态沿用 `completedRegionalEvents`。Round 17 没有新增存档字段。Round 21 结局将资料指定的见闻节点加入同一字段。读取 Round 10 及更早的 v1 存档时，缺失知识/事件字段归一为空数组；恢复预检会补入当前图谱公开词条、过滤当前图谱不存在的 id 并发出警告。移除资料后，相关百科条目和对话选项不再可用，但旧存档仍可加载。

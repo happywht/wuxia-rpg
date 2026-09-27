@@ -66,6 +66,11 @@
       "schema": "arena-set"
     },
     {
+      "id": "faction-war.round-21-set",
+      "path": "faction_wars/round-21-wars.json",
+      "schema": "faction-war-set"
+    },
+    {
       "id": "item.round-06-set",
       "path": "items/round-06-items.json",
       "schema": "items-set"

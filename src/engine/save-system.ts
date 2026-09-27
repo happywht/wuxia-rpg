@@ -73,6 +73,7 @@ import {
   RELATIONSHIP_RANGE,
 } from './social-state';
 import { parseArenaRecords, type ArenaRecord } from './arena-challenge';
+import { parseFactionWarRecords, type FactionWarRecord } from './faction-war';
 import type { FactionMembership } from './faction-system';
 import {
   DEFAULT_WORLD_SEED,
@@ -192,6 +193,8 @@ export interface SaveSnapshotV1 {
   activeCompanionId: string | null;
   /** Arena record book; absent in pre-R20 v1 saves. */
   arenaRecords: ArenaRecord[];
+  /** Faction-war record book; absent in pre-R21 v1 saves. */
+  factionWarRecords: FactionWarRecord[];
 }
 
 // ---------------------------------------------------------------------------
@@ -627,6 +630,8 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
   }
   const arenaRecords = parseArenaRecords(raw.arenaRecords);
   if (arenaRecords === null) errors.push('arenaRecords：擂台战绩结构不合规');
+  const factionWarRecords = parseFactionWarRecords(raw.factionWarRecords);
+  if (factionWarRecords === null) errors.push('factionWarRecords：门派战战绩结构不合规');
 
   if (
     errors.length > 0 ||
@@ -649,6 +654,7 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     !factionRenownValid ||
     completedEncounters === null ||
     arenaRecords === null ||
+    factionWarRecords === null ||
     completedRegionalEvents === null ||
     knownKnowledgeNodeIds === null ||
     elapsedGameMinutes === null ||
@@ -684,6 +690,7 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     worldSeed,
     activeCompanionId,
     arenaRecords,
+    factionWarRecords,
   };
   return { ok: true, snapshot };
 }
@@ -949,6 +956,8 @@ export interface CaptureInput {
   activeCompanionId?: string | null;
   /** Optional for older capture callers; omitted means no arena record. */
   arenaRecords?: ReadonlyMap<string, ArenaRecord>;
+  /** Optional for older capture callers; omitted means no faction-war records. */
+  factionWarRecords?: ReadonlyMap<string, FactionWarRecord>;
   /** Absent in older callers/snapshots means currently unaffiliated. */
   factionMembership?: FactionMembership | null;
   /** Injectable clock for deterministic tests. */
@@ -1007,6 +1016,7 @@ export function captureSaveSnapshot(input: CaptureInput): SaveSnapshotV1 {
     worldSeed: isWorldSeed(input.worldSeed) ? input.worldSeed : DEFAULT_WORLD_SEED,
     activeCompanionId: input.activeCompanionId ?? null,
     arenaRecords: [...(input.arenaRecords?.values() ?? [])].map((record) => ({ ...record })),
+    factionWarRecords: [...(input.factionWarRecords?.values() ?? [])].map((record) => ({ ...record })),
   };
 }
 
@@ -1056,6 +1066,8 @@ export interface SaveWorldReferences {
   factionMentorNpcIds?: ReadonlyMap<string, ReadonlySet<string>>;
   /** Current valid companion ids; deleted entries are softly cleared. */
   companionIds?: ReadonlySet<string>;
+  /** Current valid faction-war ids; records for removed MOD content drop softly. */
+  factionWarIds?: ReadonlySet<string>;
 }
 
 export type RestorePlanResult =
@@ -1308,6 +1320,11 @@ export function planSnapshotRestore(
     warnings.push(`同行伙伴 "${activeCompanionId}" 在当前资料中不存在，已恢复为无伙伴`);
     activeCompanionId = null;
   }
+  const factionWarRecords = snapshot.factionWarRecords.filter((record) => {
+    if (refs.factionWarIds?.has(record.warId) ?? true) return true;
+    warnings.push(`门派战「${record.warId}」在当前资料中不存在，已忽略其战绩`);
+    return false;
+  });
 
   return {
     ok: true,
@@ -1323,6 +1340,7 @@ export function planSnapshotRestore(
       completedRegionalEvents,
       knownKnowledgeNodeIds,
       activeCompanionId,
+      factionWarRecords,
     },
   };
 }
@@ -1354,6 +1372,7 @@ export interface RestoredRunState {
   factionMembership: FactionMembership | null;
   activeCompanionId: string | null;
   arenaRecords: ArenaRecord[];
+  factionWarRecords: FactionWarRecord[];
 }
 
 /**
@@ -1452,6 +1471,7 @@ export function restoreRunState(input: RestoreRunInput): RestoredRunState {
       : { ...snapshot.player.factionMembership },
     activeCompanionId: snapshot.activeCompanionId ?? null,
     arenaRecords: snapshot.arenaRecords.map((record) => ({ ...record })),
+    factionWarRecords: snapshot.factionWarRecords.map((record) => ({ ...record })),
   };
 }
 
