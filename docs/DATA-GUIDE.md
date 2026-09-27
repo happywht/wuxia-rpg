@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：Round 03–18 已落地地图、NPC/对话、成长/战斗、物品/任务、存档、区域旅行、知识图谱、昼夜气候、日程、条件奇遇与多层社会声望；详情分别见 `docs/SAVES.md` 与 `docs/KNOWLEDGE-GRAPH.md`。
+- 状态：Round 03–19 已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、存档、区域旅行、知识图谱、昼夜气候、日程、条件奇遇与多层社会声望；详情分别见 `docs/SAVES.md`、`docs/KNOWLEDGE-GRAPH.md` 与 `docs/COMPANIONS.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -18,6 +18,7 @@ data/
 │   ├── world/                # 世界图、区域关系与全局事件
 │   ├── worldview/           # 世界观：时代背景、历法、通则设定
 │   ├── characters/          # 角色：NPC 与主角模板、属性、好恶
+│   ├── companions/          # 同行伙伴及其战斗支援专长
 │   ├── maps/                # 地图：区域、房间/场景、连接与出生点
 │   ├── quests/              # 任务：目标、步骤、条件、奖励
 │   ├── dialogues/           # 对话：节点、选项、条件分支、效果
@@ -27,7 +28,7 @@ data/
 │   ├── factions/            # 门派：立场、声望规则、成员关系
 │   ├── battles/             # 战斗：遭遇触发点、敌人、奖励与提示文本
 │   └── endings/             # 结局：触发条件与结局文本
-├── schema/                  # JSON Schema（当前含 manifest、grid-map、world-map、game-calendar、knowledge-nodes、knowledge-edges、npc-set、dialogue-set、character-profiles、faction-set、martial-arts-set、battle-encounters、items-set、shops-set、quest-set）
+├── schema/                  # JSON Schema（含 manifest、grid-map、world-map、game-calendar、knowledge-nodes、knowledge-edges、npc-set、companion-set、dialogue-set、character-profiles、faction-set、martial-arts-set、battle-encounters、items-set、shops-set、quest-set）
 mods/                        # mod 覆盖层：mods/<modId>/ 镜像 data/base/ 相对路径
 ```
 
@@ -41,6 +42,8 @@ Round 17 状态：`world-map` 事件可省略或声明 `conditions`（知识节�
 
 Round 18 状态：善恶（−100…100）、江湖个人声望（0…1000）、逐派声望（各 0…1000）与逐 NPC 关系（−100…100）由 `social-state.ts` 统一提供有界变化规则。对白支持 `factionRenown` 区间条件和 `adjustFactionRenown` 原子效果；门派资料可声明拜师门槛 `minimumFactionRenown` 与退门代价 `factionRenownDelta`。每派数值在 J 师门页展示；本门声望复用 v1 `social.factionRenown` id/value 列表，旧存档缺失时中立归零，已移除门派的值恢复时逐项忽略。基础导师对白拜师后 +10 本门声望，听雨剑阁对白演示本门声望条件分支。
 
+Round 19 状态：`companion.round-19-set` 登记可选伙伴集合。伙伴由 `companion-set` Schema 校验，`npcId` 在世界装配期对照有效 NPC；单条伙伴引用失效时只禁用该伙伴。对白用 `recruitCompanion` 效果和 `npcRelationship` 条件实现邀请；单队伍槽、跨区安全跟随与攻/疗支援参数见 `docs/COMPANIONS.md`。MOD 可通过同路径覆盖伙伴 JSON，跟随坐标不写入存档。
+
 Round 11 状态：manifest 登记可选 `knowledge-nodes` 与 `knowledge-edges` 资源，分别使用 `knowledge-nodes.schema.json` 与 `knowledge-edges.schema.json`；节点类别为 character/place/faction/item/martialArt/event/quest/ending，关系类型为 mentorOf/parentOf/hostileTo/belongsTo/locatedAt/holds/triggers/requires/rewards/knows/participatesIn/influences。节点含稳定 id、类型、标题、摘要和 `knownByDefault`；边含稳定 id、两端节点 id、关系类型和说明。解析器对坏单条给警告并隔离，装配时重复 id 保留首项，悬空端点关系逐条丢弃。
 
 玩家新局从 `knownByDefault: true` 节点建立知识状态。对话选项可以声明 `{ "kind": "knowledgeKnown", "nodeId": "kg.node-id" }` 条件，全部条件满足才显示；效果 `{ "kind": "discoverKnowledgeNode", "nodeId": "kg.node-id" }` 会解锁词条，重复发现幂等。悬空引用只剔除对应对话选项。K 打开百科，左右/A/D 切换分类、上下/W/S 浏览、Esc 或 K 关闭。未发现条目只汇总为“未解锁见闻”，不会泄漏标题、摘要或相关边；关系只在两端节点都已知时显示。已知 id 随存档保存。具体内容组织和编辑步骤见 `docs/KNOWLEDGE-GRAPH.md`。
@@ -51,6 +54,7 @@ Round 14 状态：manifest 登记**必需**资源 `calendar.base` → `worldview
 
 - 文件名：小写 kebab-case，如 `data/base/maps/qingxi-town.json`（示例名，内容待后续轮次原创编写）。
 - 每个数据对象有稳定 `id`，前缀按族区分（建议 `char.` / `map.` / `quest.` / `dlg.` / `kg.` / `item.` / `skill.` / `faction.` / `ending.`）；跨族引用一律用 id，不用文件路径。
+- 同行伙伴 id 使用 `companion.` 前缀；伙伴必须引用有效 `npcId`，同一 NPC 可由独立伙伴资料赋予招募和支援规则。
 - 每族目录可多文件；加载器合并为该族的"对象集合"。
 - 具体字段以 `data/schema/<族>.schema.json` 为准（schema 进入后，本文件仅维护约定，不复制字段定义，避免双份真相）。
 
@@ -67,7 +71,7 @@ Round 14 状态：manifest 登记**必需**资源 `calendar.base` → `worldview
 - **多地图与世界区域（Round 10）**：已登记地图资源按 `grid-map` schema 收集，并要求地图内 `id` 与 manifest 资源 id 一致。必需 `world-map` 定义起始地图、图册节点、跨图关口与区域事件；舆图位置为 0–100 相对坐标，关口端点/事件格须引用有效地图并落在可走格。往返旅行需分别声明去程和回程端点。与 NPC/遭遇占格冲突的端点或事件会被逐条隔离并给出警告。事件 `once: true` 时只在首次踩入时结算并将 id 记入存档；`false` 允许每次进入重复提示。M 打开舆图且锁定探索输入；E 按 NPC → 遭遇 → 关口的顺序仲裁。详细字段及资料流程见 `docs/MAP-ATLAS.md`。
 - **资料驱动的区域奇遇（Round 17）**：`world-map.events[].conditions` 可用 `knowledgeNodeIds`（全部已知）、`periodIds`（任一当前时段）、`weatherIds`（任一天气）组合门槛；所有已声明条件组都必须满足。`discoverKnowledgeNodeId` 在事件成功触发时发现一个百科节点。静态 Schema 校验形状，装配阶段跨图谱/历法/气候逐事件检查引用，坏事件独立隔离。等候时重新检查当前格，未满足的事件不会被消耗。
 - **值与变化量分开看**：声望条件读取的当前声望范围为 0…1000；`adjustRenown.delta` 是有符号变化量，范围为 -1000…1000（排除 0）。负变化合法，执行后的声望仍钳制在 0…1000。Ajv Schema 与引擎防御解析必须接受同一合法变化范围。
-- **未登记的数据族**：地图是当前场景的关键资源，缺失时加载器会生成错误诊断并显示修复说明。NPC/对话、角色成长/武学/战斗、物品/商店、任务和知识图谱均为可选资源：未登记或有效集合为空时地图正常显示（百科提示图谱资料未加载，NPC/任务面板可显示空状态）；玩家运行状态只要求有有效角色模板，不要求遭遇或任务数据。其余空目录尚未进入运行时资料集。
+- **未登记的数据族**：地图是当前场景的关键资源，缺失时加载器会生成错误诊断并显示修复说明。NPC/对话、角色成长/武学/战斗、物品/商店、任务、伙伴和知识图谱均为可选资源：未登记或有效集合为空时地图正常显示（百科提示图谱资料未加载，NPC/任务/伙伴面板可显示空状态）；玩家运行状态只要求有有效角色模板，不要求遭遇、任务或伙伴数据。其余空目录尚未进入运行时资料集。
 - **关键单点缺失**（如出生点地图缺失）：启动失败，输出单一明确错误（缺什么、去哪补）。
 
 ## 5. mod 覆盖规则（同名文件优先）
@@ -181,3 +185,4 @@ NPC 当前坐标是由地图、时钟和人物日程派生的临时运行状态�
 | 2026-09-27 | Round 14 | 登记必需历法资源与 game-calendar schema，记录月份/时段/照度/耗时契约、语义校验拒绝规则与分钟计数存档 |
 | 2026-09-27 | Round 15 | 登记必需气候资源与 climate schema，记录季节月份分区、天气分布/表现/步耗时和稳定种子存档 |
 | 2026-09-27 | Round 16 | NPC 可选时段日程、跨资源位置校验、基础位置回退、存读档派生与时段占位同步 |
+| 2026-09-27 | Round 19 | 新增可选伙伴资料族、NPC 引用装配、攻疗支援字段与 MOD 覆盖语义；详见 `docs/COMPANIONS.md` |

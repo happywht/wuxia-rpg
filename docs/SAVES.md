@@ -1,6 +1,6 @@
 # 本地存档与设置协议
 
-Round 09 引入本地单机存档；Round 10 扩展到多地图行程与区域事件；Round 11 增加已发现知识词条；Round 13 保存玩家当前门派与师父；Round 14 记录已流逝的游戏内分钟数；Round 15 保存世界气候种子；Round 16 以分钟数派生 NPC 日程位置；Round 17 的条件奇遇复用已完成事件 id 和已发现知识 id，不增加存档字段；Round 18 将逐门派声望保存在 `social.factionRenown`，旧 v1 档缺失时归一为空列表。存档是运行时状态的版本化 JSON 快照，不是世界资料：不会写回 `data/base/`，也不会被 MOD 覆盖。协议实现位于 `src/engine/save-system.ts`，菜单与游戏场景负责呈现和调用。
+Round 09 引入本地单机存档；Round 10 扩展到多地图行程与区域事件；Round 11 增加已发现知识词条；Round 13 保存玩家当前门派与师父；Round 14 记录已流逝的游戏内分钟数；Round 15 保存世界气候种子；Round 16 以分钟数派生 NPC 日程位置；Round 17 的条件奇遇复用已完成事件 id 和已发现知识 id，不增加存档字段；Round 18 将逐门派声望保存在 `social.factionRenown`；Round 19 添加当前同行伙伴 id。兼容缺字段的旧 v1 档时同行伙伴归一为 null。存档是运行时状态的版本化 JSON 快照，不是世界资料：不会写回 `data/base/`，也不会被 MOD 覆盖。协议实现位于 `src/engine/save-system.ts`，菜单与游戏场景负责呈现和调用。
 
 ## 槽位与存储
 
@@ -25,6 +25,7 @@ Round 09 引入本地单机存档；Round 10 扩展到多地图行程与区域�
 - 已发现的知识图谱节点 id；恢复时合并当前图谱公开词条，并移除已从资料中删除的词条 id。
 - 已流逝的游戏内分钟数（`elapsedGameMinutes`，Round 14 起）：相对历法起始时刻的累计计数。存档**只保存分钟数**，年/月/日/时段在读取时由当前历法资料重新折算——修改月份长度或时段表不会与存档日期互相矛盾。
 - 世界气候种子（`worldSeed`，Round 15 起）：无符号 32 位整数；新开局生成一次并随角色世界保存，用于稳定推导同一历日的季节天气。旧 v1 快照没有该字段时解析为固定默认值 `1`，从而在每次读档后保持同一日天气不变。
+- 当前同行伙伴（`activeCompanionId`，Round 19 起）：伙伴数据 id 或 `null`。旧 v1 快照缺字段时解析为 `null`；恢复时伙伴已被移除则清空并给出 warning。
 - NPC 当前地图坐标不入档（Round 16）：由地图 id、`elapsedGameMinutes`、当前日程资料和玩家位置派生；时段变化时玩家格优先，NPC 会按运行时占位规则回退基础位置或暂不显示。
 
 快照只保存 JSON 安全的数组/普通对象；不会保存 Phaser 对象、对话面板会话或可从角色模板和装备重算的派生属性/生命内力上限。读档时会按当前有效数据重新计算派生值。
@@ -36,7 +37,7 @@ Round 09 引入本地单机存档；Round 10 扩展到多地图行程与区域�
 3. 次要引用已经从世界资料删除时，恢复计划会逐项移除无效武学、物品、商店、任务、关系、遭遇或区域事件，并提供警告；容量、物品堆叠、角色属性和任务目标进度按当前资料的新上限收敛。
 4. 只有预检成功后才创建并恢复运行状态，装备重新经过装备引擎应用效果；不会把半恢复的状态提交到场景。
 
-当前只实现 v1，不做跨协议版本迁移。Round 10 在 v1 中新增 `completedRegionalEvents`，Round 11 新增 `knownKnowledgeNodeIds`，Round 13 新增可空 `factionMembership`，Round 14 新增 `elapsedGameMinutes`，Round 15 新增 `worldSeed`，Round 18 新增 `social.factionRenown`；解析缺少这些字段的旧 v1 快照时，分别按空数组、无门派、0 分钟、固定种子 `1` 或空门派声望归一，因此 Round 09–18 存档可继续读取（Round 14 之前的旧档载入后从历法资料声明的起始日期/时刻继续）。Round 16 和 Round 17 不增加协议字段。恢复时已删除门派的声望 id 逐项忽略并给出 warning，不拒绝其余进度；其他社会状态按各自范围校验。世界预检恢复时会重新加入资料中的 `knownByDefault` 节点，并过滤已删除的节点 id；若当前门派或登记师父已从资料中删除，只清除该次师承并附带 warning，不拒绝其余进度。未知协议版本会明确报告为不支持，原槽内容保留。存档仅限浏览器本地；跨设备同步和云存档尚未实现。浏览器清理站点数据也会移除本地存档。
+当前只实现 v1，不做跨协议版本迁移。Round 10 在 v1 中新增 `completedRegionalEvents`，Round 11 新增 `knownKnowledgeNodeIds`，Round 13 新增可空 `factionMembership`，Round 14 新增 `elapsedGameMinutes`，Round 15 新增 `worldSeed`，Round 18 新增 `social.factionRenown`，Round 19 新增可空 `activeCompanionId`；解析缺少这些字段的旧 v1 快照时，分别按空数组、无门派、0 分钟、固定种子 `1`、空门派声望或无伙伴归一，因此所有 Round 09 起的旧 v1 存档仍可读取。Round 16 和 Round 17 不增加协议字段。恢复时已删除门派的声望 id 逐项忽略并给出 warning，不拒绝其余进度；同行伙伴资料失效则清除当前队伍并附 warning。其他社会状态按各自范围校验。世界预检恢复时会重新加入资料中的 `knownByDefault` 节点，并过滤已删除的节点 id；若当前门派或登记师父已从资料中删除，只清除该次师承并附带 warning，不拒绝其余进度。未知协议版本会明确报告为不支持，原槽内容保留。存档仅限浏览器本地；跨设备同步和云存档尚未实现。浏览器清理站点数据也会移除本地存档。
 
 ## 设置
 

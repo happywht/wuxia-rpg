@@ -187,6 +187,8 @@ export interface SaveSnapshotV1 {
    * worlds keep deterministic weather across every future load).
    */
   worldSeed: number;
+  /** Active companion; missing in older v1 saves means no companion. */
+  activeCompanionId: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -614,6 +616,12 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
   if (worldSeed === null) {
     errors.push(`worldSeed：应为 ${WORLD_SEED_MIN}–${WORLD_SEED_MAX} 的整数（32 位世界种子）`);
   }
+  const activeCompanionId = raw.activeCompanionId === undefined || raw.activeCompanionId === null
+    ? null
+    : requireNonEmptyString(raw.activeCompanionId);
+  if (raw.activeCompanionId !== undefined && raw.activeCompanionId !== null && activeCompanionId === null) {
+    errors.push('activeCompanionId：应为非空伙伴 id 或 null');
+  }
 
   if (
     errors.length > 0 ||
@@ -668,6 +676,7 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     knownKnowledgeNodeIds,
     elapsedGameMinutes,
     worldSeed,
+    activeCompanionId,
   };
   return { ok: true, snapshot };
 }
@@ -929,6 +938,8 @@ export interface CaptureInput {
   elapsedGameMinutes: number;
   /** 32-bit world seed the daily weather derives from (Round 15+). */
   worldSeed: number;
+  /** Optional for older capture callers; omitted means no active companion. */
+  activeCompanionId?: string | null;
   /** Absent in older callers/snapshots means currently unaffiliated. */
   factionMembership?: FactionMembership | null;
   /** Injectable clock for deterministic tests. */
@@ -985,6 +996,7 @@ export function captureSaveSnapshot(input: CaptureInput): SaveSnapshotV1 {
     knownKnowledgeNodeIds: [...input.knownKnowledgeNodeIds],
     elapsedGameMinutes: Math.max(0, Math.floor(input.elapsedGameMinutes)),
     worldSeed: isWorldSeed(input.worldSeed) ? input.worldSeed : DEFAULT_WORLD_SEED,
+    activeCompanionId: input.activeCompanionId ?? null,
   };
 }
 
@@ -1032,6 +1044,8 @@ export interface SaveWorldReferences {
   factionIds?: ReadonlySet<string>;
   /** Current faction id → NPC ids permitted to serve as that player's master. */
   factionMentorNpcIds?: ReadonlyMap<string, ReadonlySet<string>>;
+  /** Current valid companion ids; deleted entries are softly cleared. */
+  companionIds?: ReadonlySet<string>;
 }
 
 export type RestorePlanResult =
@@ -1279,6 +1293,11 @@ export function planSnapshotRestore(
       warnings.push(`已发现的知识条目 "${nodeId}" 在当前图谱中不存在，已忽略`);
     }
   }
+  let activeCompanionId = snapshot.activeCompanionId ?? null;
+  if (activeCompanionId !== null && refs.companionIds !== undefined && !refs.companionIds.has(activeCompanionId)) {
+    warnings.push(`同行伙伴 "${activeCompanionId}" 在当前资料中不存在，已恢复为无伙伴`);
+    activeCompanionId = null;
+  }
 
   return {
     ok: true,
@@ -1293,6 +1312,7 @@ export function planSnapshotRestore(
       completedEncounters,
       completedRegionalEvents,
       knownKnowledgeNodeIds,
+      activeCompanionId,
     },
   };
 }
@@ -1322,6 +1342,7 @@ export interface RestoredRunState {
   completedRegionalEvents: string[];
   knownKnowledgeNodeIds: string[];
   factionMembership: FactionMembership | null;
+  activeCompanionId: string | null;
 }
 
 /**
@@ -1418,6 +1439,7 @@ export function restoreRunState(input: RestoreRunInput): RestoredRunState {
     factionMembership: snapshot.player.factionMembership === null
       ? null
       : { ...snapshot.player.factionMembership },
+    activeCompanionId: snapshot.activeCompanionId ?? null,
   };
 }
 

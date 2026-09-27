@@ -14,7 +14,7 @@
  * per-conversation validation here adds the graph semantics a schema cannot
  * express (start node exists, option targets resolve, node ids unique) so a
  * single broken conversation disables exactly itself, not the whole set.
- * Cross-resource id checks (quest/item/NPC/knowledge/faction/martial-art/
+ * Cross-resource id checks (quest/item/NPC/knowledge/faction/martial-art/companion/
  * time-of-day references inside conditions and effects) run in
  * `assembleDialogueReferences` after world assembly and drop only the
  * offending option.
@@ -80,7 +80,9 @@ export type DialogueEffectData =
   | { kind: 'discoverKnowledgeNode'; nodeId: string }
   | { kind: 'joinFaction'; factionId: string }
   | { kind: 'leaveFaction' }
-  | { kind: 'learnMartialArt'; martialArtId: string };
+  | { kind: 'learnMartialArt'; martialArtId: string }
+  | { kind: 'recruitCompanion'; companionId: string }
+  | { kind: 'dismissCompanion' };
 
 /** One player-selectable branch leading to another node. */
 export interface DialogueOptionData {
@@ -353,6 +355,13 @@ function parseEffect(raw: unknown): DialogueEffectData | null {
       const martialArtId = requireNonEmptyString(source.martialArtId);
       return martialArtId === null ? null : { kind: 'learnMartialArt', martialArtId };
     }
+    case 'recruitCompanion': {
+      if (!hasOnlyKeys(source, ['kind', 'companionId'])) return null;
+      const companionId = requireNonEmptyString(source.companionId);
+      return companionId === null ? null : { kind: 'recruitCompanion', companionId };
+    }
+    case 'dismissCompanion':
+      return hasOnlyKeys(source, ['kind']) ? { kind: 'dismissCompanion' } : null;
     default:
       return null;
   }

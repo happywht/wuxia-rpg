@@ -41,6 +41,7 @@ const UI = {
   actionActive: '#f0c96a',
   actionDisabled: '#5a6272',
   logPlayer: '#a8d8b0',
+  logCompanion: '#7ed6bd',
   logEnemy: '#e0a8a8',
   logResult: '#f0c96a',
   fontFamily: UI_FONT_FAMILY,
@@ -361,6 +362,8 @@ export class BattlePanel {
       const color =
         entry.kind === 'player-action'
           ? UI.logPlayer
+          : entry.kind === 'companion-action'
+            ? UI.logCompanion
           : entry.kind === 'enemy-action'
             ? UI.logEnemy
             : entry.kind === 'enemy-idle'

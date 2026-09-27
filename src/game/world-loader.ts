@@ -41,6 +41,7 @@ import {
   validateConversation,
 } from '../engine/dialogue-graph';
 import { assembleDialogueReferences } from '../engine/dialogue-runtime';
+import { assembleCompanions, parseCompanionSet, type CompanionData, type CompanionSetData } from '../engine/companion-system';
 import { type GameCalendarData, parseGameCalendar } from '../engine/game-calendar';
 import { type ClimateData, parseClimate } from '../engine/climate-system';
 import {
@@ -96,10 +97,11 @@ const ENCOUNTER_RESOURCE_ID = 'encounter.round-05-set';
 const ITEM_RESOURCE_ID = 'item.round-06-set';
 const SHOP_RESOURCE_ID = 'shop.round-06-set';
 const QUEST_RESOURCE_ID = 'quest.round-07-set';
+const COMPANION_RESOURCE_ID = 'companion.round-19-set';
 const KNOWLEDGE_NODE_RESOURCE_ID = 'knowledge.round-11-nodes';
 const KNOWLEDGE_EDGE_RESOURCE_ID = 'knowledge.round-11-edges';
 
-/** Optional resources (NPC/dialogue/progression/battle/trade content) the world can lose without dying. */
+/** Optional NPC/dialogue/progression/battle/trade/companion content the world can lose without dying. */
 const OPTIONAL_RESOURCE_IDS = new Set([
   NPC_RESOURCE_ID,
   DIALOGUE_RESOURCE_ID,
@@ -110,6 +112,7 @@ const OPTIONAL_RESOURCE_IDS = new Set([
   ITEM_RESOURCE_ID,
   SHOP_RESOURCE_ID,
   QUEST_RESOURCE_ID,
+  COMPANION_RESOURCE_ID,
   KNOWLEDGE_NODE_RESOURCE_ID,
   KNOWLEDGE_EDGE_RESOURCE_ID,
 ]);
@@ -125,6 +128,7 @@ const OPTIONAL_SCHEMA_ORIGINS = new Set([
   'schema:items-set',
   'schema:shops-set',
   'schema:quest-set',
+  'schema:companion-set',
   'schema:knowledge-nodes',
   'schema:knowledge-edges',
 ]);
@@ -166,6 +170,7 @@ export interface WorldAssembly {
   items: ReadonlyMap<string, ItemRecordData>;
   shops: ReadonlyMap<string, AssembledShop>;
   quests: ReadonlyMap<string, QuestData>;
+  companions: ReadonlyMap<string, CompanionData>;
   warnings: Diagnostic[];
 }
 
@@ -513,7 +518,7 @@ function assembleKnowledgeGraphContent(
 }
 
 /**
- * Assembles optional NPC/dialogue content. Every failure disables the
+ * Assembles optional world content. Every failure disables the
  * smallest possible unit — one conversation or one NPC — and becomes a
  * warning instead of killing the scene. Missing (unregistered) resources
  * are legitimate: the world then has no optional interactions or quests.
@@ -823,11 +828,38 @@ function assembleOptionalContent(
   // placed NPCs are all known. A dangling reference drops exactly its
   // option; the conversation (and its referencing NPC) stays playable.
   const placedNpcIds = new Set(allNpcs.map((npc) => npc.record.id));
+  let companionSet: CompanionSetData | null = null;
+  const companionResource = resources.get(COMPANION_RESOURCE_ID);
+  if (companionResource !== undefined) {
+    const parsed = parseCompanionSet(companionResource.value);
+    if (!parsed.ok) {
+      warnings.push({
+        resource: COMPANION_RESOURCE_ID,
+        origin: 'companion-assembly',
+        severity: 'warning',
+        message: '伙伴资料结构不合规，本轮禁用全部伙伴',
+        details: parsed.errors,
+      });
+    } else {
+      companionSet = parsed.set;
+    }
+  }
+  const companionAssembly = assembleCompanions(companionSet, placedNpcIds);
+  for (const message of companionAssembly.warnings) {
+    warnings.push({
+      resource: COMPANION_RESOURCE_ID,
+      origin: 'companion-assembly',
+      severity: 'warning',
+      message,
+      details: [],
+    });
+  }
   const dialogueReferences = assembleDialogueReferences({
     conversations: dialogues,
     quests: questAssembly.quests,
     items: itemAssembly.items,
     placedNpcIds,
+    companionIds: new Set(companionAssembly.companions.keys()),
     knowledgeNodeIds,
     factionIds: new Set(progression.factions.keys()),
     martialArtIds: new Set(progression.martialArts.keys()),
@@ -852,6 +884,7 @@ function assembleOptionalContent(
     items: itemAssembly.items,
     shops: shopAssembly.shops,
     quests: questAssembly.quests,
+    companions: companionAssembly.companions,
     warnings,
   };
 }

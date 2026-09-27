@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wuxia-rpg.invalid/schema/companion-set",
+  "title": "伙伴集合",
+  "description": "可招募 NPC 及其战斗支援协议；NPC id 的存在性由世界装配层校验。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["companions"],
+  "properties": {
+    "companions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "npcId", "description", "combatSupport"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^companion\\.[A-Za-z0-9._-]+$" },
+          "npcId": { "type": "string", "pattern": "^char\\.[A-Za-z0-9._-]+$" },
+          "description": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "combatSupport": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "power", "everyPlayerActions"],
+            "properties": {
+              "kind": { "enum": ["attack", "heal"] },
+              "power": { "type": "integer", "minimum": 1, "maximum": 999 },
+              "everyPlayerActions": { "type": "integer", "minimum": 1, "maximum": 20 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

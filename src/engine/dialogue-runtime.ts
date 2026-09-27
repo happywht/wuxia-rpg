@@ -74,6 +74,7 @@ import {
   setFactionMembership,
   type FactionMembershipState,
 } from './faction-system';
+import { dismissCompanion, recruitCompanion, type CompanionData, type CompanionState } from './companion-system';
 
 // ---------------------------------------------------------------------------
 // Runtime context
@@ -101,6 +102,9 @@ export interface DialogueRuntimeContext {
   factionState: FactionMembershipState;
   /** Current in-game day-period id the `timeOfDay` condition compares to. */
   timeOfDayPeriodId: string;
+  /** Optional for older headless consumers; required when companion effects are authored. */
+  companions?: ReadonlyMap<string, CompanionData>;
+  companionState?: CompanionState;
 }
 
 // ---------------------------------------------------------------------------
@@ -120,6 +124,7 @@ export interface DialogueReferenceAssemblyInput {
   martialArtIds: ReadonlySet<string>;
   /** Day-period ids declared by the loaded calendar (timeOfDay conditions). */
   timeOfDayPeriodIds: ReadonlySet<string>;
+  companionIds?: ReadonlySet<string>;
 }
 
 export interface DialogueReferenceAssemblyResult {
@@ -138,6 +143,7 @@ function optionReferences(option: DialogueOptionData): {
   factionIds: string[];
   martialArtIds: string[];
   periodIds: string[];
+  companionIds: string[];
 } {
   const questIds: string[] = [];
   const itemIds: string[] = [];
@@ -146,6 +152,7 @@ function optionReferences(option: DialogueOptionData): {
   const factionIds: string[] = [];
   const martialArtIds: string[] = [];
   const periodIds: string[] = [];
+  const companionIds: string[] = [];
   for (const condition of option.conditions ?? []) {
     if (condition.kind === 'questStatus') questIds.push(condition.questId);
     else if (condition.kind === 'itemCount') itemIds.push(condition.itemId);
@@ -166,8 +173,9 @@ function optionReferences(option: DialogueOptionData): {
     else if (effect.kind === 'joinFaction') factionIds.push(effect.factionId);
     else if (effect.kind === 'adjustFactionRenown') factionIds.push(effect.factionId);
     else if (effect.kind === 'learnMartialArt') martialArtIds.push(effect.martialArtId);
+    else if (effect.kind === 'recruitCompanion') companionIds.push(effect.companionId);
   }
-  return { questIds, itemIds, npcIds, knowledgeNodeIds, factionIds, martialArtIds, periodIds };
+  return { questIds, itemIds, npcIds, knowledgeNodeIds, factionIds, martialArtIds, periodIds, companionIds };
 }
 
 /**
@@ -212,6 +220,9 @@ export function assembleDialogueReferences(
         }
         for (const periodId of references.periodIds) {
           if (!input.timeOfDayPeriodIds.has(periodId)) problems.push(`引用无效时段 "${periodId}"`);
+        }
+        for (const companionId of references.companionIds) {
+          if (!input.companionIds?.has(companionId)) problems.push(`引用无效伙伴 "${companionId}"`);
         }
         if (problems.length > 0) {
           changed = true;
@@ -417,6 +428,9 @@ function cloneRuntimeContext(context: DialogueRuntimeContext): DialogueRuntimeCo
       : { ...context.character, martialArtIds: [...context.character.martialArtIds] },
     factionState: createFactionMembershipState(context.factionState.membership),
     knownKnowledgeNodeIds: new Set(context.knownKnowledgeNodeIds),
+    companionState: context.companionState === undefined
+      ? undefined
+      : { activeCompanionId: context.companionState.activeCompanionId },
   };
 }
 
@@ -462,6 +476,9 @@ function commitRuntimeContext(
   target.factionState.membership = staged.factionState.membership === null
     ? null
     : { ...staged.factionState.membership };
+  if (target.companionState !== undefined && staged.companionState !== undefined) {
+    target.companionState.activeCompanionId = staged.companionState.activeCompanionId;
+  }
   if (target.character !== null && staged.character !== null) {
     target.character.martialArtIds.splice(
       0,
@@ -574,6 +591,20 @@ function validateEffect(
       });
       return eligibility.eligible ? null : `尚未达到「${art.name}」的习武条件：${eligibility.reasons.join('；')}`;
     }
+    case 'recruitCompanion': {
+      if (context.companions === undefined || context.companionState === undefined) return '当前队伍资料不可用';
+      const companion = context.companions.get(effect.companionId);
+      if (companion === undefined) return `伙伴资料 "${effect.companionId}" 不存在或不可用`;
+      return context.companionState.activeCompanionId === null
+        ? null
+        : context.companionState.activeCompanionId === companion.id
+          ? '这位伙伴已经与你同行'
+          : '已有伙伴同行，请先让其暂离';
+    }
+    case 'dismissCompanion':
+      return context.companionState?.activeCompanionId !== undefined && context.companionState.activeCompanionId !== null
+        ? null
+        : '当前没有伙伴同行';
     default:
       // adjust* effects: value ranges were pinned at parse time and explicit
       // npcIds at reference-assembly time; they can always commit.
@@ -750,6 +781,26 @@ export function applyDialogueEffects(
           staged.character.martialArtIds.push(art.id);
           lines.push(`学会「${art.name}」`);
         }
+        break;
+      }
+      case 'recruitCompanion': {
+        const companions = staged.companions;
+        const state = staged.companionState;
+        const companion = companions?.get(effect.companionId);
+        if (companions !== undefined && state !== undefined && companion !== undefined) {
+          recruitCompanion(state, effect.companionId, companions);
+          const name = staged.npcNames?.get(companion.npcId) ?? companion.npcId;
+          lines.push(`邀「${name}」同行`);
+        }
+        break;
+      }
+      case 'dismissCompanion': {
+        const previous = staged.companionState === undefined ? null : dismissCompanion(staged.companionState);
+        const companion = previous === null ? undefined : staged.companions?.get(previous);
+        const name = companion === undefined
+          ? undefined
+          : staged.npcNames?.get(companion.npcId) ?? companion.npcId;
+        lines.push(name === undefined ? '伙伴暂离' : `「${name}」暂离队伍`);
         break;
       }
     }

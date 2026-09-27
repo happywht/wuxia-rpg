@@ -31,6 +31,11 @@
       "schema": "npc-set"
     },
     {
+      "id": "companion.round-19-set",
+      "path": "companions/round-19-companions.json",
+      "schema": "companion-set"
+    },
+    {
       "id": "dialogue.round-03-set",
       "path": "dialogues/round-03-conversations.json",
       "schema": "dialogue-set"

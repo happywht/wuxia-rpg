@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://wuxia-rpg.invalid/schema/dialogue-set",
   "title": "对话集合",
-  "description": "对话集合 JSON 的静态结构契约：字段名、类型与长度。静态 Schema 违规由资源加载器拒绝。图语义和条件上下界由运行时逐段校验；单段坏对话只禁用自身。选项可声明 conditions（全部满足才可见）与 effects（确认时原子执行）；条件/效果 kind 与字段为封闭枚举。任务/物品/NPC/见闻/门派/武学引用在装配期校验，坏引用只剔除相应选项。拜师、授艺与退门沿用同一事务协议。",
+  "description": "对话集合 JSON 的静态结构契约：字段名、类型与长度。静态 Schema 违规由资源加载器拒绝。图语义和条件上下界由运行时逐段校验；单段坏对话只禁用自身。选项可声明 conditions（全部满足才可见）与 effects（确认时原子执行）；条件/效果 kind 与字段为封闭枚举。任务/物品/NPC/见闻/门派/武学/伙伴引用在装配期校验，坏引用只剔除相应选项。拜师、授艺、退门、招募与暂离沿用同一事务协议。",
   "type": "object",
   "additionalProperties": false,
   "required": ["conversations"],
@@ -347,6 +347,23 @@
             "kind": { "const": "learnMartialArt" },
             "martialArtId": { "type": "string", "minLength": 1, "maxLength": 64 }
           }
+        },
+        {
+          "description": "邀请有效伙伴加入当前同行队伍；队伍当前仅允许一名伙伴。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "companionId"],
+          "properties": {
+            "kind": { "const": "recruitCompanion" },
+            "companionId": { "type": "string", "pattern": "^companion\\.[A-Za-z0-9._-]+$" }
+          }
+        },
+        {
+          "description": "让当前同行伙伴暂离。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": { "kind": { "const": "dismissCompanion" } }
         }
       ]
     }

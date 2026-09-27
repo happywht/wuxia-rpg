@@ -10,6 +10,11 @@ import {
   type RegionTransitionData,
 } from '../engine/world-map';
 import { createKnowledgeState } from '../engine/knowledge-graph';
+import {
+  createCompanionState,
+  resolveCompanionFollowCell,
+  type CompanionState,
+} from '../engine/companion-system';
 import { createFactionMembershipState, type FactionMembershipState } from '../engine/faction-system';
 import {
   type DialogueData,
@@ -89,6 +94,7 @@ import { EncyclopediaPanel } from './encyclopedia-ui';
 import { PauseMenuPanel } from './pause-menu';
 import { ControlsPanel } from './controls-ui';
 import { FactionPanel } from './faction-ui';
+import { CompanionPanel } from './companion-ui';
 import { type GameSettings, applyGameSettings, loadGameSettings, uiFontSize } from './settings';
 import { createPixelPerson, UI_FONT_FAMILY } from './ui-theme';
 import { type GridStartupData } from './menu-scene';
@@ -207,6 +213,9 @@ export class GridScene extends Phaser.Scene {
     label: Phaser.GameObjects.Text;
   }>();
   private dialogues: ReadonlyMap<string, DialogueData> = new Map();
+  private companions: LoadedWorld['assembly']['companions'] = new Map();
+  private companionState: CompanionState = createCompanionState();
+  private companionFollower: { marker: Phaser.GameObjects.Container; label: Phaser.GameObjects.Text } | null = null;
 
   /** Validated progression datasets (assembled by the shared world loader). */
   private progression: ProgressionAssembly = {
@@ -276,6 +285,7 @@ export class GridScene extends Phaser.Scene {
   private factionPanel: FactionPanel | null = null;
   private worldMapPanel: WorldMapPanel | null = null;
   private encyclopediaPanel: EncyclopediaPanel | null = null;
+  private companionPanel: CompanionPanel | null = null;
   private activeSession: CombatSession | null = null;
   private activeEncounter: PlacedEncounter | null = null;
 
@@ -386,6 +396,7 @@ export class GridScene extends Phaser.Scene {
     this.clock = new GameClock(world.calendar, restoredRun?.elapsedGameMinutes ?? 0);
     this.lastNpcSchedulePeriodId = null;
     this.npcVisuals.clear();
+    this.companionFollower = null;
     this.climateRuntime = new ClimateRuntime(world.climate, world.calendar);
     this.worldSeed = restoredRun?.worldSeed ?? generateWorldSeed();
     this.daylightLayer = null;
@@ -406,6 +417,8 @@ export class GridScene extends Phaser.Scene {
       (npc) => npc.record.mapResourceId === this.currentMapResourceId,
     );
     this.dialogues = assembly.dialogues;
+    this.companions = assembly.companions;
+    this.companionState = createCompanionState(restoredRun?.activeCompanionId ?? null);
     this.progression = assembly.progression;
     this.occupancy = new NpcOccupancyIndex(this.placedNpcs);
     this.encounters = assembly.encounters.filter(
@@ -575,6 +588,7 @@ export class GridScene extends Phaser.Scene {
     });
     this.controlsPanel = new ControlsPanel(this);
     this.factionPanel = new FactionPanel(this, () => this.noteOverlayClosed());
+    this.companionPanel = new CompanionPanel(this, () => this.noteOverlayClosed());
     this.worldMapPanel = new WorldMapPanel(this, () => this.noteOverlayClosed());
     this.encyclopediaPanel = new EncyclopediaPanel(this, { onClose: () => this.noteOverlayClosed() });
     this.updateQuestTrackerHud();
@@ -673,11 +687,18 @@ export class GridScene extends Phaser.Scene {
   private saveWorldReferences(world: LoadedWorld, snapshot: SaveSnapshotV1) {
     const map = world.map;
     const completedEncounters = new Set(snapshot.completedEncounters);
+    const activeCompanionNpcId = snapshot.activeCompanionId === null
+      ? null
+      : world.assembly.companions.get(snapshot.activeCompanionId)?.npcId ?? null;
     const periodId = new GameClock(world.calendar, snapshot.elapsedGameMinutes).currentPeriod().id;
     const periodNpcs = world.assembly.npcsByPeriod.get(periodId) ?? world.assembly.npcs;
     const maps = new Map([...world.maps.entries()].map(([mapId, regionMap]) => {
-      const baseNpcs = world.assembly.npcs.filter((npc) => npc.record.mapResourceId === mapId);
-      const scheduledNpcs = periodNpcs.filter((npc) => npc.record.mapResourceId === mapId);
+      const baseNpcs = world.assembly.npcs.filter((npc) =>
+        npc.record.mapResourceId === mapId && npc.record.id !== activeCompanionNpcId,
+      );
+      const scheduledNpcs = periodNpcs.filter((npc) =>
+        npc.record.mapResourceId === mapId && npc.record.id !== activeCompanionNpcId,
+      );
       const activeEncounters = world.assembly.encounters.filter((encounter) =>
         encounter.record.mapResourceId === mapId &&
         (encounter.record.repeatable || !completedEncounters.has(encounter.record.id)),
@@ -741,6 +762,7 @@ export class GridScene extends Phaser.Scene {
           new Set(faction.mentorNpcIds),
         ]),
       ),
+      companionIds: new Set(world.assembly.companions.keys()),
     };
   }
 
@@ -765,6 +787,7 @@ export class GridScene extends Phaser.Scene {
       elapsedGameMinutes: this.clock?.elapsedMinutes ?? 0,
       worldSeed: this.worldSeed,
       factionMembership: this.factionState.membership,
+      activeCompanionId: this.companionState.activeCompanionId,
     });
     const result = writeSaveSlot(this.storage, slotId, snapshot);
     if (result.ok) {
@@ -919,7 +942,11 @@ export class GridScene extends Phaser.Scene {
   private renderNpcs(map: GridMap): void {
     this.npcLayer = this.add.container();
     this.npcVisuals.clear();
-    this.placedNpcs.forEach((npc) => this.createNpcVisual(npc, map));
+    (this.world?.assembly.npcs ?? [])
+      .filter((npc) => npc.record.mapResourceId === this.currentMapResourceId)
+      .forEach((npc) => this.createNpcVisual(npc, map));
+    this.syncNpcVisuals(false);
+    this.refreshCompanionFollower(null);
   }
 
   private createNpcVisual(npc: PlacedNpc, map: GridMap): void {
@@ -952,9 +979,12 @@ export class GridScene extends Phaser.Scene {
     const map = this.map;
     if (world === null || map === null) return [];
 
-    const compiled = world.assembly.npcsByPeriod.get(periodId) ?? world.assembly.npcs;
+    const activeNpcId = this.activeCompanionNpc()?.record.id ?? null;
+    const withoutFollower = (npcs: readonly PlacedNpc[]): PlacedNpc[] =>
+      activeNpcId === null ? [...npcs] : npcs.filter((npc) => npc.record.id !== activeNpcId);
+    const compiled = withoutFollower(world.assembly.npcsByPeriod.get(periodId) ?? world.assembly.npcs);
     return resolveNpcPlacementsForPlayer({
-      baseNpcs: world.assembly.npcs,
+      baseNpcs: withoutFollower(world.assembly.npcs),
       periodNpcs: compiled,
       mapResourceId: this.currentMapResourceId,
       map,
@@ -975,6 +1005,27 @@ export class GridScene extends Phaser.Scene {
     const nextNpcs = this.resolveNpcPlacements(periodId);
     this.placedNpcs = nextNpcs;
     this.occupancy = new NpcOccupancyIndex(nextNpcs);
+    this.syncNpcVisuals(animate);
+    this.refreshCompanionFollower(null);
+    this.updateInteractHint();
+  }
+
+  /** Reapplies the current schedule after a partner joins or leaves. */
+  private refreshNpcPlacements(): void {
+    const periodId = this.clock?.currentPeriod().id;
+    if (periodId === undefined) return;
+    this.lastNpcSchedulePeriodId = periodId;
+    this.placedNpcs = this.resolveNpcPlacements(periodId);
+    this.occupancy = new NpcOccupancyIndex(this.placedNpcs);
+    this.syncNpcVisuals(false);
+    this.refreshCompanionFollower(null);
+    this.updateInteractHint();
+  }
+
+  private syncNpcVisuals(animate: boolean): void {
+    const map = this.map;
+    if (map === null) return;
+    const nextNpcs = this.placedNpcs;
     const nextById = new Map(nextNpcs.map((npc) => [npc.record.id, npc]));
     for (const [npcId, visual] of this.npcVisuals) {
       const npc = nextById.get(npcId);
@@ -998,7 +1049,59 @@ export class GridScene extends Phaser.Scene {
         visual.label.setPosition(x, y - map.tileSize * 0.42 - 4);
       }
     }
-    this.updateInteractHint();
+  }
+
+  private activeCompanionNpc(): PlacedNpc | undefined {
+    const id = this.companions.get(this.companionState.activeCompanionId ?? '')?.npcId;
+    return id === undefined ? undefined : this.world?.assembly.npcs.find((npc) => npc.record.id === id);
+  }
+
+  /** Places a non-blocking companion marker on a safe orthogonal trail cell. */
+  private refreshCompanionFollower(preferred: { col: number; row: number } | null): void {
+    const map = this.map;
+    const companion = this.companions.get(this.companionState.activeCompanionId ?? '');
+    const npc = companion === undefined
+      ? undefined
+      : this.world?.assembly.npcs.find((candidate) => candidate.record.id === companion.npcId);
+    if (map === null || companion === undefined || npc === undefined) {
+      this.companionFollower?.marker.setVisible(false);
+      this.companionFollower?.label.setVisible(false);
+      return;
+    }
+    if (this.companionFollower === null) {
+      const center = cellCenterOffset(map, this.playerCol, this.playerRow);
+      const marker = createPixelPerson(this, this.mapOrigin.x + center.x, this.mapOrigin.y + center.y, map.tileSize, 0x48c8a3, 0x173a32);
+      const label = this.registerScaledText(this.add.text(
+        this.mapOrigin.x + center.x,
+        this.mapOrigin.y + center.y - map.tileSize * 0.42 - 4,
+        npc.record.name,
+        { fontFamily: UI_FONT_FAMILY, fontSize: uiFontSize(10), color: UI.textPrimary },
+      ).setOrigin(0.5, 1), 10);
+      this.npcLayer?.add([marker, label]);
+      this.companionFollower = { marker, label };
+    }
+    const blocked = new Set([
+      ...this.placedNpcs.map((entry) => `${entry.col},${entry.row}`),
+      ...this.encounterCells.keys(),
+    ]);
+    const cell = resolveCompanionFollowCell(
+      map,
+      { col: this.playerCol, row: this.playerRow },
+      preferred,
+      blocked,
+    );
+    const visual = this.companionFollower;
+    if (cell === null || visual === null) {
+      visual?.marker.setVisible(false);
+      visual?.label.setVisible(false);
+      return;
+    }
+    const center = cellCenterOffset(map, cell.col, cell.row);
+    const x = this.mapOrigin.x + center.x;
+    const y = this.mapOrigin.y + center.y;
+    visual.label.setText(npc.record.name);
+    visual.marker.setPosition(x, y).setVisible(true);
+    visual.label.setPosition(x, y - map.tileSize * 0.42 - 4).setVisible(true);
   }
 
   private buildHud(
@@ -1009,7 +1112,7 @@ export class GridScene extends Phaser.Scene {
     // HUD text lives above the daylight wash (depth 50) so every period's
     // tint keeps the interface fully legible.
     this.registerScaledText(this.add
-      .text(16, 12, '方向键 / WASD 移动 · E 交互 · V 等候 · H 帮助', {
+      .text(16, 12, '方向键 / WASD 移动 · E 交互 · P 伙伴 · H 帮助', {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(13),
         color: UI.textMuted,
@@ -1038,7 +1141,7 @@ export class GridScene extends Phaser.Scene {
 
     const lines: { text: string; shown: boolean }[] = [
       {
-        text: '部分可选资料（NPC/对话/角色模板/门派/武学/战斗遭遇/物品/商店）无效，已禁用相应内容（详情见控制台）',
+        text: '部分可选资料（NPC/伙伴/对话/成长/战斗/物品/商店/任务）无效，已禁用相应内容（详情见控制台）',
         shown: optionalWarnings.length > 0,
       },
       {
@@ -1379,7 +1482,9 @@ export class GridScene extends Phaser.Scene {
       return;
     }
     if (this.placedNpcs.length === 0 && this.activeEncounters().length === 0) {
-      this.interactText.setText('暂无可交互人物');
+      this.interactText.setText(this.companionState.activeCompanionId === null
+        ? '暂无可交互人物'
+        : 'P 同行伙伴 · 暂无可交互人物');
       return;
     }
     this.interactText.setText('H 操作帮助 · Esc 暂停');
@@ -1397,6 +1502,7 @@ export class GridScene extends Phaser.Scene {
       (this.worldMapPanel !== null && this.worldMapPanel.isOpen) ||
       (this.encyclopediaPanel !== null && this.encyclopediaPanel.isOpen) ||
       (this.factionPanel !== null && this.factionPanel.isOpen) ||
+      (this.companionPanel !== null && this.companionPanel.isOpen) ||
       (this.controlsPanel !== null && this.controlsPanel.isOpen)
     );
   }
@@ -1417,6 +1523,28 @@ export class GridScene extends Phaser.Scene {
       social: this.social,
       npcNames: new Map((this.world?.assembly.npcs ?? []).map((npc) => [npc.record.id, npc.record.name])),
       quests: this.quests,
+    });
+    this.updateInteractHint();
+  }
+
+  /** P key: inspect the party and let the current companion temporarily leave. */
+  private toggleCompanionPanel(): void {
+    const panel = this.companionPanel;
+    if (panel === null) return;
+    if (panel.isOpen) {
+      panel.close();
+      return;
+    }
+    if (this.anyOverlayOpen()) return;
+    panel.open({
+      companions: this.companions,
+      activeCompanionId: this.companionState.activeCompanionId,
+      npcNames: new Map((this.world?.assembly.npcs ?? []).map((npc) => [npc.record.id, npc.record.name])),
+      social: this.social,
+      onDismiss: () => {
+        this.companionState.activeCompanionId = null;
+        this.refreshNpcPlacements();
+      },
     });
     this.updateInteractHint();
   }
@@ -1651,6 +1779,10 @@ export class GridScene extends Phaser.Scene {
     const onControls = (): void => this.toggleControlsPanel();
     controlsKey.on('down', onControls);
 
+    const companionKey = keyboard.addKey(KeyCodes.P);
+    const onCompanions = (): void => this.toggleCompanionPanel();
+    companionKey.on('down', onCompanions);
+
     const waitKey = keyboard.addKey(KeyCodes.V);
     const onWait = (): void => this.handleWait();
     waitKey.on('down', onWait);
@@ -1668,6 +1800,7 @@ export class GridScene extends Phaser.Scene {
       encyclopediaKey.off('down', onEncyclopedia);
       factionKey.off('down', onFaction);
       controlsKey.off('down', onControls);
+      companionKey.off('down', onCompanions);
       waitKey.off('down', onWait);
       this.dialoguePanel?.destroy();
       this.dialoguePanel = null;
@@ -1687,6 +1820,8 @@ export class GridScene extends Phaser.Scene {
       this.encyclopediaPanel = null;
       this.factionPanel?.destroy();
       this.factionPanel = null;
+      this.companionPanel?.destroy();
+      this.companionPanel = null;
       this.controlsPanel?.destroy();
       this.controlsPanel = null;
       this.activeSession = null;
@@ -1800,12 +1935,14 @@ export class GridScene extends Phaser.Scene {
       speakerNpcId,
       knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
       knowledgeNodes: this.world?.knowledgeGraph.nodes ?? new Map(),
-      npcNames: new Map(this.placedNpcs.map((npc) => [npc.record.id, npc.record.name])),
+      npcNames: new Map((this.world?.assembly.npcs ?? []).map((npc) => [npc.record.id, npc.record.name])),
       character: this.playerState,
       factions: this.progression.factions,
       martialArts: this.progression.martialArts,
       factionState: this.factionState,
       timeOfDayPeriodId: this.clock?.currentPeriod().id ?? '',
+      companions: this.companions,
+      companionState: this.companionState,
     };
   }
 
@@ -1830,6 +1967,7 @@ export class GridScene extends Phaser.Scene {
     }
     const effects = choice.option.effects ?? [];
     if (effects.length > 0) {
+      const companionBefore = this.companionState.activeCompanionId;
       const result = applyDialogueEffects(effects, context);
       if (!result.ok) {
         console.info('[dialogue] 效果被拒绝：%s', result.reason);
@@ -1837,6 +1975,9 @@ export class GridScene extends Phaser.Scene {
       }
       if (result.summary.questUpdate.changed) {
         this.applyQuestUpdate(result.summary.questUpdate);
+      }
+      if (this.companionState.activeCompanionId !== companionBefore) {
+        this.refreshNpcPlacements();
       }
       const feedback =
         result.summary.lines.length > 0 ? result.summary.lines.join(' · ') : null;
@@ -1860,11 +2001,18 @@ export class GridScene extends Phaser.Scene {
     if (encounter === null || this.playerProfile === null || this.playerState === null) {
       return encounter !== null; // A foe keeps priority over a gate even without a profile.
     }
+    const activeCompanion = this.companions.get(this.companionState.activeCompanionId ?? '');
+    const companionNpc = activeCompanion === undefined
+      ? undefined
+      : this.world?.assembly.npcs.find((npc) => npc.record.id === activeCompanion.npcId);
     const session = new CombatSession({
       encounter: encounter.record,
       profile: this.playerProfile,
       player: this.playerState,
       martialArts: this.progression.martialArts,
+      ...(activeCompanion !== undefined && companionNpc !== undefined
+        ? { companion: { name: companionNpc.record.name, support: activeCompanion.combatSupport } }
+        : {}),
     });
     this.activeSession = session;
     this.activeEncounter = encounter;
@@ -1880,6 +2028,7 @@ export class GridScene extends Phaser.Scene {
       return; // Also locked while a dialogue, battle, backpack or shop panel is open.
     }
 
+    const previousCell = { col: this.playerCol, row: this.playerRow };
     const targetCol = this.playerCol + dCol;
     const targetRow = this.playerRow + dRow;
     if (!map.canEnter(targetCol, targetRow)) {
@@ -1909,6 +2058,7 @@ export class GridScene extends Phaser.Scene {
       duration: MOVE_DURATION_MS,
       onComplete: () => {
         this.moving = false;
+        this.refreshCompanionFollower(previousCell);
         this.triggerRegionEvents();
       },
     });
@@ -1931,8 +2081,10 @@ export class GridScene extends Phaser.Scene {
     arrivalClock.advance(travelMinutes);
     const arrivalPeriodId = arrivalClock.currentPeriod().id;
     const arrivalNpcs = world.assembly.npcsByPeriod.get(arrivalPeriodId) ?? world.assembly.npcs;
+    const activeCompanionNpcId = this.activeCompanionNpc()?.record.id ?? null;
     const occupiedByNpc = arrivalNpcs.some((npc) =>
       npc.record.mapResourceId === transition.to.mapResourceId &&
+      npc.record.id !== activeCompanionNpcId &&
       npc.col === transition.to.col && npc.row === transition.to.row,
     );
     const occupiedByEncounter = world.assembly.encounters.some((encounter) =>
@@ -1952,6 +2104,7 @@ export class GridScene extends Phaser.Scene {
     this.npcLayer = null;
     this.encounterLayer = null;
     this.npcVisuals.clear();
+    this.companionFollower = null;
     this.encounterMarkers.clear();
 
     this.currentMapResourceId = transition.to.mapResourceId;
@@ -1983,6 +2136,7 @@ export class GridScene extends Phaser.Scene {
     this.mapNameText?.setText(destinationMap.data.name);
     this.updateCoordsHud();
     this.advanceTime(travelMinutes);
+    this.refreshCompanionFollower(null);
     this.showRegionNotice(`已抵达「${destinationMap.data.name}」。`);
     this.triggerRegionEvents();
   }

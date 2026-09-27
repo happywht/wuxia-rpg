@@ -36,6 +36,7 @@ import {
 } from './character-progression';
 import { type CellPosition, type GridMap } from './grid-map';
 import { manhattanDistance } from './npc-placement';
+import type { CompanionSupportData } from './companion-system';
 
 // ---------------------------------------------------------------------------
 // Wire formats
@@ -517,7 +518,7 @@ export type CombatPhase = 'player-turn' | 'enemy-turn' | 'victory' | 'defeat' | 
 export type ActionRefusalReason = 'not-player-turn' | 'unknown-art' | 'insufficient-qi';
 
 export interface CombatLogEntry {
-  kind: 'intro' | 'player-action' | 'enemy-action' | 'enemy-idle' | 'victory' | 'defeat' | 'fled';
+  kind: 'intro' | 'player-action' | 'companion-action' | 'enemy-action' | 'enemy-idle' | 'victory' | 'defeat' | 'fled';
   text: string;
 }
 
@@ -552,6 +553,8 @@ export interface CombatSessionConfig {
   player: CharacterState;
   /** Valid martial arts by id (player and enemy arts resolve here). */
   martialArts: ReadonlyMap<string, MartialArtData>;
+  /** Optional automatic support resolved after successful player turns. */
+  companion?: { name: string; support: CompanionSupportData };
 }
 
 /**
@@ -569,6 +572,8 @@ export class CombatSession {
   private readonly player: CharacterState;
   private readonly playerArts: MartialArtData[];
   private readonly playerName: string;
+  private readonly companion: CombatSessionConfig['companion'];
+  private successfulPlayerActions = 0;
 
   private readonly enemy: CombatantView & { attributes: AttributeMap; arts: MartialArtData[] };
 
@@ -582,6 +587,7 @@ export class CombatSession {
     this.profile = config.profile;
     this.player = config.player;
     this.playerName = config.profile.name;
+    this.companion = config.companion;
     this.playerArts = this.player.martialArtIds
       .map((artId) => config.martialArts.get(artId))
       .filter((art): art is MartialArtData => art !== undefined);
@@ -692,8 +698,36 @@ export class CombatSession {
       return { ok: true };
     }
 
+    this.successfulPlayerActions += 1;
+    this.companionTurn();
+    if (this.enemy.health.current <= 0) {
+      this.settleVictory();
+      return { ok: true };
+    }
+
     this.enemyTurn();
     return { ok: true };
+  }
+
+  /** Data-authored support fires every N accepted player actions. */
+  private companionTurn(): void {
+    const companion = this.companion;
+    if (companion === undefined || this.successfulPlayerActions % companion.support.everyPlayerActions !== 0) return;
+    if (companion.support.kind === 'attack') {
+      const damage = companion.support.power;
+      this.enemy.health.current = Math.max(0, this.enemy.health.current - damage);
+      this.logEntries.push({
+        kind: 'companion-action',
+        text: `${companion.name}援手一击，对${this.enemy.name}造成 ${damage} 点伤害`,
+      });
+      return;
+    }
+    const healed = Math.min(companion.support.power, this.player.health.max - this.player.health.current);
+    this.player.health.current += healed;
+    this.logEntries.push({
+      kind: 'companion-action',
+      text: `${companion.name}出手相助，为${this.playerName}恢复 ${healed} 点生命`,
+    });
   }
 
   /**

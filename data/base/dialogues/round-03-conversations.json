@@ -227,7 +227,19 @@
         },
         {
           "id": "ally",
-          "text": "（顾夜尘把刀归了鞘，抱拳一礼）话带到了，账便清了。你这份信义，比许多提刀的都硬。往后雾大路黑，报我的名字，好使。"
+          "text": "（顾夜尘把刀归了鞘，抱拳一礼）话带到了，账便清了。你这份信义，比许多提刀的都硬。往后雾大路黑，报我的名字，好使。",
+          "options": [
+            {
+              "text": "顾兄若愿同行，往后的路也好彼此照应。",
+              "nextNodeId": "companion-joined",
+              "conditions": [{ "kind": "npcRelationship", "npcId": "char.gu-yechen", "minValue": 15 }],
+              "effects": [{ "kind": "recruitCompanion", "companionId": "companion.gu-yechen" }]
+            }
+          ]
+        },
+        {
+          "id": "companion-joined",
+          "text": "顾夜尘略一沉吟，将刀背往肩头一搭：「同路便同路。前头遇上不平事，你只管看我。」"
         },
         {
           "id": "why-here",

@@ -4,6 +4,19 @@
 
 ## [Unreleased]
 
+### Added (Round 19)
+
+- 新增独立伙伴资料与 draft-07 Schema；伙伴引用有效 NPC，支援专长及行动间隔来自数据。
+- 对话加入招募/暂离效果，沿用 NPC 关系条件；场景以不阻挡玩家的同行标记跟随，并可跨区重置位置。
+- 回合战斗加入伙伴攻/疗援护与专属战报；P 键伙伴册展示关系/专长并可让伙伴暂离。
+- v1 存档记录当前同行伙伴，旧档缺字段归一为空伙伴，已移除伙伴在恢复时清理并警告。
+- 新增伙伴数据作者与架构说明，更新对白、存档、GDD 和路线图。
+
+### Verification (Round 19)
+
+- `npm run build`：通过；TypeScript 检查与 Vite 生产构建完成，主 JS 包仍超过 500 kB 建议线。
+- Ajv / Phaser-free 冒烟及 `git diff --check` 结果见本轮 DEVLOG。
+
 ### Added (Round 18)
 
 - 社会数值统一经 `SocialChange` 按善恶、个人声望、逐派声望与逐 NPC 关系的独立范围变化和钳制。

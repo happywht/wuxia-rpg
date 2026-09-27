@@ -1,0 +1,14 @@
+{
+  "companions": [
+    {
+      "id": "companion.gu-yechen",
+      "npcId": "char.gu-yechen",
+      "description": "雾路刀客。每两次成功的玩家行动后，以精准的一击援护队友。",
+      "combatSupport": {
+        "kind": "attack",
+        "power": 9,
+        "everyPlayerActions": 2
+      }
+    }
+  ]
+}
