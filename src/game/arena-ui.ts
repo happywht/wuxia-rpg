@@ -90,7 +90,7 @@ export class ArenaPanel {
         13, UI_PALETTE.text);
     });
     const rowsTop = top + 151 + arena.record.opponents.length * 25 + 8;
-    this.addText(left + 30, rowsTop, '夺魁彩头', 14, UI_PALETTE.jade);
+    this.addText(left + 30, rowsTop, '首夺彩头 / 重赛规则', 14, UI_PALETTE.jade);
     this.addText(left + 42, rowsTop + 26, model.rewardLines.join('　'), 13, UI_PALETTE.text);
     const stats = model.record;
     this.addText(left + 30, rowsTop + 62,

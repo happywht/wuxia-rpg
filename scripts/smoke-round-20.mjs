@@ -75,6 +75,17 @@ try {
   const encounter = arenas.arenaOpponentAsEncounter(arena, arena.opponents[1], arena.profileId);
   assert.equal(encounter.id, arena.id + '.' + arena.opponents[1].id);
   assert.equal(encounter.repeatable, true);
+  assert.equal(encounter.victoryExperience, arena.opponents[1].victoryExperience, 'real round wins keep their training XP');
+  assert.deepEqual(arenas.resolveArenaAttemptPayout(arena, 0, true), {
+    firstChampionship: true,
+    currency: 45,
+    items: [{ itemId: 'item.qingxin-wan', quantity: 1 }],
+  });
+  assert.deepEqual(arenas.resolveArenaAttemptPayout(arena, 1, true), {
+    firstChampionship: false,
+    currency: 0,
+    items: [],
+  });
   const record = arenas.createArenaRecord(arena.id);
   assert.deepEqual(arenas.parseArenaRecords(undefined), []);
   assert.deepEqual(arenas.parseArenaRecords([record]), [record]);
@@ -138,7 +149,7 @@ try {
     });
     assert.deepEqual(restored.arenaRecords, [record]);
   }
-  console.log('通过：擂台/跨资源装配与占格隔离、邻接选择、两轮通用战斗、奖品容量/发放及旧/新 v1 存档解析/恢复。');
+  console.log('通过：擂台/跨资源装配与占格隔离、邻接选择、首夺货币/物品彩头、各轮战斗经验及旧/新 v1 存档解析/恢复。');
 } finally {
   await server.close();
 }

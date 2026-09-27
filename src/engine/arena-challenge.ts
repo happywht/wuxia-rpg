@@ -32,6 +32,13 @@ export interface ArenaRecord {
   championships: number;
   lastWins: number;
 }
+
+export interface ArenaAttemptPayout {
+  /** True only for the first complete championship in this save. */
+  firstChampionship: boolean;
+  currency: number;
+  items: { itemId: string; quantity: number }[];
+}
 export interface AssembledArena {
   record: ArenaData;
   enemyArts: ReadonlyMap<string, readonly MartialArtData[]>;
@@ -204,6 +211,30 @@ export function selectArenaTarget(arenas: readonly AssembledArena[], mapId: stri
   }
   return result;
 }
+
+/**
+ * Resolves the fixed money/item clear prize once per arena. Battle experience
+ * remains attached to each opponent win as repeatable training; repeat
+ * champions keep their record progression without an unlimited economic
+ * prize source. `championships` already lives in v1 saves, so no reward-claim
+ * migration is needed.
+ */
+export function resolveArenaAttemptPayout(
+  arena: ArenaData,
+  previousChampionships: number,
+  completedChampionship: boolean,
+): ArenaAttemptPayout {
+  const firstChampionship = completedChampionship && previousChampionships === 0;
+  if (!firstChampionship) {
+    return { firstChampionship: false, currency: 0, items: [] };
+  }
+  return {
+    firstChampionship: true,
+    currency: arena.reward.currency,
+    items: arena.reward.items.map((item) => ({ ...item })),
+  };
+}
+
 export function createArenaRecord(arenaId: string): ArenaRecord {
   return { arenaId, attempts: 0, bestWins: 0, championships: 0, lastWins: 0 };
 }

@@ -28,7 +28,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 
 - 测试框架：Vitest 5.0.2。官方指南要求 Vite >=6.4.0、Node >=22.12.0；本仓库使用 Vite 8.3.1 与 Node 22.18.0，符合要求（详见 [`docs/REFERENCES.md`](REFERENCES.md) #12；基准 API 见同文件 #16）。
 - 运行环境：Node（无 DOM、无浏览器、无网络、无真实时钟依赖）。
-- 覆盖统计：11 个测试文件、123 个用例（R38 建立四组 53 个，R40 新增渲染器结构回归 10 个，R41 新增设置与输入 42 个，R42 新增主线集成 3 个，R43 新增漫游事件 6 个与门派支线集成 3 个，R44 新增日程漫游/奖励协议/双路线集成 6 个；详见 `CHANGELOG.md` 对应条目）。
+- 覆盖统计：12 个测试文件、127 个用例（R38 建立四组 53 个，R40 新增渲染器结构回归 10 个，R41 新增设置与输入 42 个，R42 新增主线集成 3 个，R43 新增漫游事件 6 个与门派支线集成 3 个，R44 新增日程漫游/奖励协议/双路线集成 6 个，R45 新增战斗成长基线与擂台奖品边界 4 个；详见 `CHANGELOG.md` 对应条目）。
 
 ## 配置：为什么有独立的 `vitest.config.ts`
 
@@ -63,6 +63,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 | `tests/world-map.test.ts` | `src/engine/world-map.ts` 与 world-map schema | R43 漫游奇遇：旧地图缺省兼容、概率值拒绝、坏发现节点隔离、稳定候选顺序、无资格候选不消耗随机源、概率/一次性/可重复语义；R44 nearbyNpcIds 全员邻接判定与坏人物引用隔离 |
 | `tests/round43-faction-routes.test.ts` | `src/engine/quest-system.ts`、`dialogue-runtime.ts` 与五派基础资料 | R43 门派支线：五项门派/见闻门槛与对白一致性、真实接取拒绝/成功、谈话完成及结果见闻发现、坏门派引用隔离 |
 | `tests/round44-dynamic-events.test.ts` | `npc-schedule.ts`、`world-map.ts`、任务/对白/声望协议与基础资料 | R44 集成：解析真实日程并证明黄昏玩家邻接/日中离场；双 NPC 条件、时辰条件；两项互斥任务的对白入口、目标、一次性声望/知识奖励和声望钳制 |
+| `tests/round45-balance.test.ts` | `arena-challenge.ts`、`turn-based-combat.ts`、角色成长和基础战斗/擂台资料 | R45 平衡回归：首夺一次性银两/物品、失败和重赛奖品为零、旧 `championships` 记录兼容、擂台每场战斗经验保留；无装备/无伙伴/起始散手开场实战 5 招胜出并验证升级补血 |
 
 测试只调用**公共导出函数**并断言行为，不做源码文本匹配；引擎模块均为 Phaser-free 设计，无需启动任何场景。
 
@@ -95,6 +96,7 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 | `npm run smoke:round-42` | Round 42 主线专项集成验证（章节状态机、对白图引用、互斥分支与结局可达性） |
 | `npm run smoke:round-43` | Round 43 漫游事件协议及五派支线资格/对白/见闻集成回归 |
 | `npm run smoke:round-44` | Round 44 NPC 日程附近条件、任务声望/见闻奖励与渡口互斥分支回归 |
+| `npm run smoke:round-20` | 擂台首夺货币/物品彩头、逐场经验、连战与旧/新 v1 存档回归（R45 扩展） |
 | `npm run typecheck` | 严格类型检查（check 的第 3 步） |
 | `npm run benchmark:round-40` | 性能/内存基准（R40 起）：渲染对象数与耗时双口径、26 资源加载、50 轮长跑堆观察；与 `npm test` 双向隔离、不进门槛（读数与局限见 `docs/PERFORMANCE.md`） |
 | `npm run build` | `check` 全部通过后的 Vite 生产构建门槛（R39 起含完整 check） |
@@ -104,6 +106,7 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 
 - 2026-09-28（Round 43）：新增 `tests/world-map.test.ts` 6 用例与 `tests/round43-faction-routes.test.ts` 3 用例，覆盖可选随机事件协议及五派任务资格、真实状态机/对白发现；覆盖统计更新为 10 文件 117 用例，新增 `npm run smoke:round-43`。
 - 2026-09-28（Round 44）：新增 nearby NPC 条件和任务声望/图谱奖励的解析、装配、幂等结算测试；新增真实渡口日程/邻接和两条互斥路线集成用例；新增 `npm run smoke:round-44`。完整覆盖统计更新为 11 文件 123 用例。
+- 2026-09-28（Round 45）：新增 `tests/round45-balance.test.ts` 4 用例，覆盖首次夺魁奖品、未完成/重赛边界、逐场经验保留和开场战斗升级基线；扩展 `npm run smoke:round-20` 检查首夺彩头及每轮经验。完整覆盖统计更新为 12 文件 127 用例。
 - 2026-09-28（Round 42）：新增 `tests/round42-story.test.ts` 3 用例，验证 R31→R42 任务解锁、两份对白图引用、分支互斥/兄弟失败及两条数据结局可达性；新增 `npm run smoke:round-42` 专项入口；覆盖统计更新为 8 文件 108 用例。
 - 2026-09-28（Round 41）：新增 `tests/settings.test.ts`（21 用例：v1 旧载荷迁移、验证/持久化、声音总线与画布外观应用、五档字号、共享设置行/调整语义）与 `tests/input-settings.test.ts`（21 用例：键位布局、摇杆死区/主导轴、D-pad 基数优先、标准映射采样、边沿检测）；覆盖统计更新为 7 文件 105 用例。手柄路由的浏览器内行为另经生产构建 + Playwright 烟测（设置导航/画布滤镜/布局门控），物理控制器硬件未测试——见 `DEVLOG.md` Round 41。
 - 2026-09-28（Round 40）：新增性能/内存基准通道 `npm run benchmark:round-40`（`benchmark.include` 独立匹配 `*.bench.ts`，与 `npm test` 双向隔离）；新增 `tests/grid-map-renderer.test.ts` 10 用例锁定 R40 单 Graphics 渲染器结构契约；覆盖统计更新为 5 文件 63 用例。

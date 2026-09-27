@@ -71,6 +71,7 @@ import {
 import {
   arenaOpponentAsEncounter,
   createArenaRecord,
+  resolveArenaAttemptPayout,
   selectArenaTarget,
   type ArenaRecord,
   type AssembledArena,
@@ -1419,12 +1420,13 @@ export class GridScene extends Phaser.Scene {
     const record = this.arenaRecords.get(arena.record.id) ?? createArenaRecord(arena.record.id);
     this.arenaRecords.set(record.arenaId, record);
     const blocked = this.arenaRegistrationBlock(arena);
-    const rewardLines = [
-      arena.record.reward.currency + ' 文钱',
-      ...arena.record.reward.items.map((entry) =>
+    const firstPayout = resolveArenaAttemptPayout(arena.record, record.championships, true);
+    const rewardLines = firstPayout.firstChampionship ? [
+      firstPayout.currency + ' 文钱',
+      ...firstPayout.items.map((entry) =>
         (this.items.get(entry.itemId)?.name ?? entry.itemId) + ' ×' + entry.quantity,
       ),
-    ];
+    ] : ['首夺银两与物品彩头已领取', '重赛仍按胜场获得经验'];
     panel.open({
       arena,
       record,
@@ -1448,7 +1450,9 @@ export class GridScene extends Phaser.Scene {
     if (this.playerProfile.id !== arena.record.profileId) {
       return '当前角色不符合这座擂台的报名模板。';
     }
-    if (this.inventory.currency + arena.record.reward.currency > 999_999_999) {
+    const payout = resolveArenaAttemptPayout(arena.record, this.arenaRecords.get(arena.record.id)?.championships ?? 0, true);
+    if (!payout.firstChampionship) return null;
+    if (this.inventory.currency + payout.currency > 999_999_999) {
       return '钱袋已满，先花用一些文钱再来报名。';
     }
     const trial = {
@@ -1456,7 +1460,7 @@ export class GridScene extends Phaser.Scene {
       stacks: this.inventory.stacks.map((stack) => ({ ...stack })),
       equipped: { ...this.inventory.equipped },
     };
-    for (const entry of arena.record.reward.items) {
+    for (const entry of payout.items) {
       const item = this.items.get(entry.itemId);
       if (item === undefined || additionalCapacityFor(trial, item) < entry.quantity) {
         return '背包空位不足以收下全部夺魁彩头，请先整理背包。';
@@ -1509,21 +1513,27 @@ export class GridScene extends Phaser.Scene {
     const record = this.arenaRecords.get(run.arena.record.id) ?? createArenaRecord(run.arena.record.id);
     record.bestWins = Math.max(record.bestWins, run.wins);
     record.lastWins = run.wins;
-    if (champion && this.inventory !== null) {
+    if (champion && this.inventory !== null && this.playerProfile !== null && this.playerState !== null) {
+      const payout = resolveArenaAttemptPayout(run.arena.record, record.championships, true);
       record.championships += 1;
-      this.inventory.currency += run.arena.record.reward.currency;
-      for (const reward of run.arena.record.reward.items) {
-        const item = this.items.get(reward.itemId);
-        if (item !== undefined) grantItems(this.inventory, item, reward.quantity);
+      if (payout.firstChampionship) {
+        this.inventory.currency += payout.currency;
+        for (const reward of payout.items) {
+          const item = this.items.get(reward.itemId);
+          if (item !== undefined) grantItems(this.inventory, item, reward.quantity);
+        }
+        this.syncKnowledgeFromRunFacts();
+        const prizes = [
+          payout.currency + ' 文钱',
+          ...payout.items.map((reward) =>
+            (this.items.get(reward.itemId)?.name ?? reward.itemId) + ' ×' + reward.quantity,
+          ),
+        ].join('、');
+        this.showRegionNotice(run.arena.record.texts.champion + ' 首夺彩头：' + prizes + '。');
+      } else {
+        this.showRegionNotice(run.arena.record.texts.champion + ' 首夺彩头已领，本次按胜场获取经验并更新战绩。');
       }
-      this.syncKnowledgeFromRunFacts();
-      const prizes = [
-        run.arena.record.reward.currency + ' 文钱',
-        ...run.arena.record.reward.items.map((reward) =>
-          (this.items.get(reward.itemId)?.name ?? reward.itemId) + ' ×' + reward.quantity,
-        ),
-      ].join('、');
-      this.showRegionNotice(run.arena.record.texts.champion + ' 彩头：' + prizes + '。');
+      this.refreshAchievementUnlocks();
     } else {
       this.showRegionNotice(run.arena.record.texts.retreat + ' 本次胜场：' + run.wins + '。');
     }
