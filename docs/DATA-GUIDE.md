@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：Round 03–33 已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台、门派战、自创武学、经脉、装备锻造、炼丹、存档、区域旅行、知识图谱、NPC 私有记忆、江湖图鉴、昼夜气候、日程、条件奇遇、多层社会声望、多结局、成就、原创人物/门派扩充（12 名 NPC、5 个门派）、原创任务链（20 项差事）、原创物品/武学扩充（50 件物品、30 种武学）及知识图谱目录全量映射（134 节点）；Round 33 专项、资料校验、R27 回归和生产构建均已通过；专题目录见 `docs/ITEMS.md` 与 `docs/MARTIAL-ARTS.md`。
+- 状态：Round 03–34 已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台、门派战、自创武学、经脉、装备锻造、炼丹、存档、区域旅行、知识图谱、NPC 私有记忆、江湖图鉴、昼夜气候、日程、条件奇遇、多层社会声望、多结局、成就、原创人物/门派扩充（12 名 NPC、5 个门派）、原创任务链（20 项差事）、原创物品/武学扩充（50 件物品、30 种武学）、知识图谱目录全量映射（134 节点）及文档一致性审计（`npm run audit:round-34`）；Round 33 专项、资料校验、R27 回归和生产构建均已通过；专题目录见 `docs/ITEMS.md` 与 `docs/MARTIAL-ARTS.md`，世界设定总览见 `docs/WORLD-SETTING.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -41,6 +41,8 @@ Round 07 状态：manifest 另登记可选资源 `quest.round-07-set` → `quest
 Round 32 状态：物品仍由 manifest 的 `item.round-06-set` 资源和 `items-set` schema 装配，基础集扩至 50 项；姜百味货架新增八种消耗品、两件基础装备和九种有限库存材料，六件升级装备由渡口铁砧的连续配方取得。武学仍由 `martial-art.round-04-set` 与 `martial-arts-set` schema 装配，基础集扩至 30 种；24 种新增门派武学通过五位导师的 `martialArtEligible` / `learnMartialArt` 对话分支授予，只有当前门派成员能进入本门目录。价格、材料、属性门槛和战斗作用均由现有 JSON 表达，不新增引擎中的剧情分支。完整目录见 `docs/ITEMS.md`、`docs/MARTIAL-ARTS.md`。
 
 Round 33 状态：知识图谱两份资源（`knowledge.round-11-nodes` / `knowledge.round-11-edges`）扩至 134 节点/202 关系，与当前基础目录全量对齐——50 件物品、30 种武学、20 项任务、5 个门派、12 名 NPC 和 2 张地图资源全部按稳定业务 id 映射到正确 `kind`，无占位或虚构条目。新增物品/武学节点 `knownByDefault: false`（由 Round 29 观察式发现解锁），新增任务节点沿用基础差事公开惯例，结局节点保持未知。关系闭环覆盖武学门派归属（27 条 `belongsTo`）、姜百味货架持有（31 条 `holds`）、锻造配方投入（24 条 `requires`）、任务发布人/前置/收集/谈话链路（20+15+9+12 条）与结局条件影响边（见 `docs/KNOWLEDGE-GRAPH.md`）。遭遇等无图谱节点的业务 id 不伪造节点；MOD 删除条目时沿用既有悬空端点逐条隔离规则。
+
+Round 34 状态：新增只读文档审计 `npm run audit:round-34`（`scripts/audit-round-34-docs.mjs`）。脚本按 manifest schema 家族收集地图/NPC/遭遇/任务/门派/历法/气候/图谱事实，从 `dialogue-set` 与 `quest-set` Schema 的封闭枚举提取条件/效果/目标 kind，核验 `docs/MAP-ATLAS.md`（地图资源 id、尺寸、起点、舆图坐标、关口两端坐标、区域事件触发格及数据侧通行性/引用）、`docs/DIALOGUE-GUIDE.md`（每个条件/效果 kind）、`docs/QUESTS.md`（每项任务的名称/发布人/前置/失败遭遇/报酬行与目标 kind）和 `docs/WORLD-SETTING.md`（门派名与正式区域名）与数据一致；计数全部由数据推导，不依赖 UI 文案措辞；发现漂移时逐条给出文档路径与缺失项并以非零退出。世界设定总览（背景/地理/五派/会盟/叙事边界，标注权威数据文件）见 `docs/WORLD-SETTING.md`。
 
 Round 08 状态：dialogue-set 选项新增可选 `conditions`（数组，全部满足才可见）与 `effects`（数组，确认时先全量验证再统一提交）字段，二者均为封闭枚举协议（见 §4 对话条件与效果），旧的无条件对话完全兼容。示例对话扩展覆盖任务接取/放弃/交付、物品赠予/交付、善恶、声望与 NPC 关系分支。Round 09 起相关运行状态通过存档持久化；任务发布人 NPC 保留 E 名录入口，另可用 F 直接交谈。
 
@@ -225,3 +227,4 @@ NPC 当前坐标是由地图、时钟和人物日程派生的临时运行状态�
 | 2026-09-27 | Round 31 | 任务协议新增 `talkToNpc` 目标与可选 `exclusiveGroupId` 互斥分支（整组校验、接取即锁定同组其余选项）；基础差事扩至 20 项并新增 3 个任务专用遭遇；详见 `docs/QUESTS.md` |
 | 2026-09-27 | Round 32 | 基础物品扩至 50 项、武学扩至 30 种；新增材料/装备锻造链与五派数据驱动授艺菜单；详见 `docs/ITEMS.md`、`docs/MARTIAL-ARTS.md` |
 | 2026-09-27 | Round 33 | 知识图谱扩至 134 节点/202 关系，物品/武学/任务/门派/NPC/地图目录全量映射，补齐武学归属、货架持有、锻造投入、任务链路与结局影响边；详见 `docs/KNOWLEDGE-GRAPH.md` |
+| 2026-09-27 | Round 34 | 新增 `audit:round-34` 只读文档审计（数据/Schema 驱动核验地图、对白协议、任务与门派覆盖）；新增世界设定总览 `docs/WORLD-SETTING.md` 并校准地图图册/对白指南/任务志 |

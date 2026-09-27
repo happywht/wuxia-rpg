@@ -4,6 +4,32 @@
 
 ---
 
+## Round 34 — 世界设定汇编与文档一致性审计（2026-09-27，已完成）
+
+### 计划与实现
+
+- 先读取 `iterations/round-34/plan.md`：本轮只整理文档与新增只读审计脚本，不改引擎、Schema、存档协议与任何游戏数据；全程未触碰未跟踪的 `.serena/`。
+- 只读盘点确认事实基线：manifest 登记两个 `grid-map`（`map.round-01-grid` 16×9 起点 (7,7)、`map.round-10-mist-ferry` 16×9 起点 (7,7)，同名瓦片 `~` 在两图中 solid 声明相反）；`world.atlas` 两区域/两关口/三区域事件；`dialogue-set` Schema 封闭枚举为条件 11 种 + 效果 15 种；`quest-set` 20 项任务、目标 kind 三种；五派/12 NPC/遭遇 4 个/会盟为铁嶂 vs 云隐（入口渡口 (7,4)，三阶段，贡献门槛 5）。
+- 新增 `docs/WORLD-SETTING.md`：以 JSON/对白/人物志/门派志/任务志/GDD 为证据源整理背景（大雍末年仅见于 GDD、基础 JSON 无王朝叙事）、区域地理（明确「芦苇河滩」是 `place.reedbank` 图谱地点而非第三张地图）、五派格局（白鹭洲「五家走动」对白为官方总结）、渡籍轮值章程 → 雾渡药道会盟 → 药队启程互斥抉择的三层叙事、人物分组与已实现冲突走向、五条结局；每节标注权威数据文件，归纳性表述标（推断），未落地内容单列为路线设想。
+- 校准 `docs/MAP-ATLAS.md`：新增地图资源总表（id/区域名/舆图坐标/尺寸/起点/瓦片通行性）、关口端点表（含 `assembleWorldMap` 的 from 可走且不压出生点、to 可走、往返须双向显式声明的装配规则）与区域事件触发格表（坐标/一次性/条件/发现节点），并消除与原协议段的重复叙述。
+- 校准 `docs/DIALOGUE-GUIDE.md`：效果主表补 `recruitCompanion`/`dismissCompanion` 两行（原仅见于伙伴小节），§5 改写为「校验分层与故障隔离」——Ajv Schema 静态校验（整资源拒绝）→ `dialogue-graph.ts` 防御图解析（单段隔离，含 draft-07 表达不了的 `minValue <= maxValue`）→ `dialogue-runtime.ts` 跨资源装配（逐选项剔除）三层边界表；原「同行伙伴」小节改编号 4.3 并保留细节。
+- 校准 `docs/QUESTS.md`：`talkToNpc` 语义精确到信号来源（场景 `openDialogueWith` 唯一入口：F 键交谈与对无名录/无商店 NPC 的 E 键回落都算谈话，E 键任务告示板不算，接取同一次交互不自动完成）；补充审计核验说明。总表经逐项人工核对与 JSON 一致（20 项的发布人/前置/目标/失败遭遇/奖励未发现漂移）。
+- 新增 `scripts/audit-round-34-docs.mjs` 与 `audit:round-34`：按 manifest schema 家族合并加载地图/NPC/遭遇/任务/门派/历法/气候/图谱，从 `dialogue-set`/`quest-set` Schema 的 oneOf const 提取全部条件/效果/目标 kind；数据侧核验地图 id↔manifest 一致、regions↔grid-map 双向、关口/事件坐标边界与按 `tileTypes` 复现的通行性（from 另查不压出生点）、事件引用的时段/天气/知识节点；文档侧核验 MAP-ATLAS（地图 id、尺寸 `C×R`、起点/舆图坐标、关口行两端坐标、事件行坐标）、DIALOGUE-GUIDE（每个 kind 反引号条目）、QUESTS（每项任务「名称+发布人+前置+失败遭遇+报酬」行级匹配）、WORLD-SETTING（门派名与正式区域名）。全程只读、无网络、计数由集合长度推导、不引用 UI 文案。
+- 失败路径验证（系统临时目录完整副本，未触碰真实仓库）：删除地图表行、任务表行、门派名和对白条件 kind，并把关口 from 改到越界坐标 (-1,-1)；审计 exit 1，且断言命中全部 6 条预期诊断（关口坐标导致两条），随后清理临时目录。
+- 更新 `README.md`（文档索引加 WORLD-SETTING 行）、`docs/GDD.md`（§1 链接世界设定与三份手册、状态行补 R34）、`docs/DATA-GUIDE.md`（状态行、Round 34 段、变更记录）、`ROADMAP.md`（R34 标完成、下一轮 R35）、`CHANGELOG.md` 与本日志。
+
+### 验证
+
+- `npm run audit:round-34`：通过（exit 0）。核验范围（计数由数据推导）：2 张地图/2 个区域/2 个关口/3 个区域事件、条件 11 种 + 效果 15 种、20 项任务（collectItem/defeatEncounter/talkToNpc）、5 个门派名。
+- `npm run validate:data`：通过（exit 0），manifest Schema 与 26 个基础资源 Schema。
+- `npm run typecheck`：通过（exit 0），`tsc --noEmit` 无输出。
+- `npm run build`：通过（exit 0），127 个模块，920ms；主 JS chunk 1,867.95 kB（gzip 491.51 kB），与 R32/R33 相同的 Vite 默认 500 kB 分包建议警告仍在（本轮未改引擎代码，属既有提示）。
+- `npm run smoke:round-33`：通过（exit 0），134 节点/202 关系图谱全量映射、五结局影响边闭环回归正常。
+- `npm run smoke:round-31`：通过（exit 0），20 项任务链、互斥分支、谈话信号与 v1 存档回归正常。
+- 失败路径（临时副本故意制造五类漂移）：exit 1，断言的 6 条错误均报告对应文档路径与缺失项；真实仓库文件全程未动。
+
+---
+
 ## Round 33 — 知识图谱目录全量映射与结局关系闭环（2026-09-27，已完成）
 
 ### 计划与实现

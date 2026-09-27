@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "validate:data": "node scripts/validate-data.mjs",
+    "audit:round-34": "node scripts/audit-round-34-docs.mjs",
     "smoke:round-20": "node scripts/smoke-round-20.mjs",
     "smoke:round-21": "node scripts/smoke-round-21.mjs",
     "smoke:round-22": "node scripts/smoke-round-22.mjs",

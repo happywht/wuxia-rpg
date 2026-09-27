@@ -4,6 +4,16 @@
 
 ## [Unreleased]
 
+### Added (Round 34)
+
+- 新增世界设定总览 **`docs/WORLD-SETTING.md`**：以当前基础 JSON/对白/人物志/门派志/任务志/GDD 为证据源，整理世界背景（大雍末年设定、抄书学徒主角、架空历法气候）、区域地理（方格试炼场、雾雨渡口两张正式地图与「芦苇河滩」图鉴地点的区分）、五派格局、渡籍轮值章程与雾渡药道会盟（铁嶂 vs 云隐）、关键人物分组与已实现冲突走向；每节标注权威数据文件，推断与已实现事实分列，未落地内容只作为路线设想，不虚构额外历史年代/远方地图/后续结局。
+- 校准三份资料手册：`docs/MAP-ATLAS.md` 补全地图资源总表（id、尺寸、玩家起点、瓦片通行性、舆图坐标）、全部关口端点坐标表（含引擎装配规则）与区域事件触发格表（坐标/一次性/条件/发现节点）；`docs/DIALOGUE-GUIDE.md` 效果主表补齐 `recruitCompanion`/`dismissCompanion`，新增「校验分层」章节明确 Ajv Schema 静态校验（资源级）、防御性图解析（单段隔离）与跨资源装配（逐选项剔除）三层边界；`docs/QUESTS.md` 精确化 `talkToNpc` 谈话信号语义（`openDialogueWith` 唯一入口：F 键交谈与无名录/商店 NPC 的 E 键回落都算，任务告示板不算）并注明审计核验范围。
+- 新增 `scripts/audit-round-34-docs.mjs` 与 `npm run audit:round-34`：只读文档一致性审计。按 manifest schema 家族收集地图/NPC/遭遇/任务/门派/历法/气候/图谱事实，从 `dialogue-set`/`quest-set` Schema 封闭枚举提取全部条件/效果/目标 kind；核验地图资源与 world region 双向一致、每个关口/事件的坐标边界与按 `tileTypes` 复现的通行性、事件引用的时段/天气/知识节点、四份文档对上述事实的覆盖（含每项任务「名称+发布人+前置+失败遭遇+报酬」行级匹配）；计数全部由数据推导，不硬编码任务/地图总数，不依赖 app UI 易变中文措辞；漂移时逐条输出文档路径与缺失项并以非零退出。临时目录故意制造五类漂移并验证 exit 1，六条预期诊断全部命中（关口坐标缺陷报告两条）。
+
+### Verification (Round 34)
+
+- `npm run audit:round-34`、`npm run validate:data`、`npm run typecheck`、`npm run build`、`npm run smoke:round-33`、`npm run smoke:round-31`：通过；完整输出和构建体积提示见 `DEVLOG.md`。
+
 ### Added (Round 33)
 
 - 知识图谱由 54 节点扩至 **134 节点**，与当前基础目录全量对齐：50 件物品、30 种武学、20 项任务全部按稳定业务 id 映射到正确 `kind`（此前三类分别只映射 15/3/2 条）；12 名 NPC、5 个门派、2 张地图资源与 5 个结局节点覆盖不变。新增物品/武学词条首次取得或学会前保持未知（沿用 Round 29 观察式发现），新增任务词条沿用基础差事公开惯例，结局词条默认未知。

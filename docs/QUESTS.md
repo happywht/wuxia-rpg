@@ -5,10 +5,11 @@
 
 ## 协议速览
 
-- **目标三型**：`collectItem`（按当前持有量推进，接取时快照）、`defeatEncounter`（对应遭遇胜利一次记一功）、`talkToNpc`（按 F 键与目标人物实际交谈一次记一功；E 键打开任务告示板不算谈话，接取差事的同一次交互也不会自动完成谈话目标）。
+- **目标三型**：`collectItem`（按当前持有量推进，接取时快照）、`defeatEncounter`（对应遭遇胜利一次记一功）、`talkToNpc`（玩家实际打开目标人物对话一次记一功）。谈话信号只由场景的 `openDialogueWith` 发出：**F 键交谈**与**对无名录/无商店 NPC 的 E 键交谈回落**都算谈话；**E 键打开任务告示板不算**，接取差事的同一次交互也不会自动完成谈话目标。
 - **互斥分支**：声明相同 `exclusiveGroupId` 且前置完全一致的任务构成一次玩家选择，装配时整组校验（有效成员 ≥ 2）；本轮药道组选项同列在白鹭洲的告示板，接取其一，其余已解锁成员立即记为失败（`failed`），各自后续只由对应选择解锁。
 - **失败条件**：`failOnEncounterIds` 声明的遭遇一旦战败，该差事立即失败；放弃进行中的差事同样记为终态。
 - **状态与存档**：全部复用 `locked/offered/active/completed/failed` 五态与按目标 id 存储的 v1 快照，无新存档字段。
+- 本页总表、分支路线与遭遇表由 `npm run audit:round-34` 对照 `data/base/quests/round-07-quests.json`、`data/base/battles/round-05-encounters.json` 与 `data/schema/quest-set.schema.json` 核验：任务名、发布人、前置、目标 kind、失败遭遇与奖励任一漂移都会使审计非零退出。
 
 ## 总表
 

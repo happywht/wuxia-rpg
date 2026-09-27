@@ -16,6 +16,8 @@
 
 设计基调：**小屏时代"高密度选择"的江湖体验，在现代浏览器中以数据驱动方式重构**——世界不大，但每一次相遇、每一句话都可能留下痕迹。
 
+> 当前已落地世界的背景、区域地理、五派格局、药道会盟与叙事边界，以基础 JSON 为证据源整理于 [`docs/WORLD-SETTING.md`](WORLD-SETTING.md)；地图、对白与任务资料协议分别见 [`docs/MAP-ATLAS.md`](MAP-ATLAS.md)、[`docs/DIALOGUE-GUIDE.md`](DIALOGUE-GUIDE.md) 与 [`docs/QUESTS.md`](QUESTS.md)。
+
 ## 2. 目标平台与视觉方向
 
 | 项 | 决策 |
@@ -29,6 +31,7 @@
 > Round 09–26 状态：保留既有网格探索与成长闭环，新增主菜单、角色创建、版本化本地存档、世界地图、区域事件、知识图谱百科、师门规则、伙伴、擂台、门派战、玩家自创武学、经脉内修、装备锻造、炼丹，以及按 NPC 区分的社交记忆。Round 12 为地图、人物标记和 UI 增加程序生成像素层次、统一焦点反馈及 H 键操作帮助；Round 13 接入数据驱动的入门门槛、师父、授艺、退门门规和 J 键门派档案；Round 14–15 接入资料驱动的历法、昼夜、季节和逐日天气；Round 16 让 NPC 按历法时段在所属地图切换地点；Round 19 让玩家通过关系门槛招募伙伴、跨区同行并取得数据驱动的战斗援护；Round 20–21 加入擂台记录与门派战贡献/声望/见闻后果；Round 22 加入组件配方、自创武学、战斗使用与存档；Round 23 加入可替换经脉网络、升级修为点、材料消耗、角色加成和兼容存档；Round 24 加入资料驱动装备强化；Round 25 加入需先发现的药方、地图药炉、药材/银两原子投入和悟性品质结果；Round 26 让玩家分享个人见闻、NPC 以独立记忆触发后续对白，并通过图谱关系边按系数传播态度。详情见 `docs/SAVES.md`、`docs/KNOWLEDGE-GRAPH.md`、`docs/ENDINGS.md`、`docs/CLIMATE.md`、`docs/NPC-SCHEDULES.md`、`docs/COMPANIONS.md`、`docs/FACTION_WAR_DESIGN.md`、`docs/MARTIAL_ART_FORGE.md`、`docs/MERIDIANS.md`、`docs/EQUIPMENT-FORGING.md`、`docs/ALCHEMY.md` 与 `docs/DATA-GUIDE.md`。
 > Round 27 状态：可选结局集以独立 Schema/MOD 资源声明终章地点、结局文本和任务/善恶/声望/人物关系/门派/知识条件。渡口照心石显示锁定提示和可达结局，玩家选择后读完终章返回主菜单；详细规则见 `docs/ENDINGS.md`。
 > Round 28–29 状态：成就由独立资料定义条件进度和一次性奖励；江湖图鉴则从知识图谱派生八类收集统计。玩家在遇见人物、抵达地点、持有图谱物品或学会图谱武学后自动记录发现，L 键查看收录比例，K 键继续查已知见闻与关系。
+> Round 34 状态：原创世界设定汇编为一份以数据为证的总览（背景、区域地理、五派格局、药道会盟与叙事边界，见 `docs/WORLD-SETTING.md`）；地图图册、对白指南与任务志校准到当前资料和 Schema，`npm run audit:round-34` 只读核验文档与 JSON/Schema 的一致性。
 > Round 28 状态（已实现并通过专项/回归验证）：可选成就集以独立 Schema/MOD 资源声明 14 类 AND 条件、进度提示和一次性经验/银两奖励，覆盖成长、任务、见闻、社会、门派、战斗、擂台、经脉、自创武学、锻造与炼丹。G 键面板展示锁定条件、逐项进度与奖励；解锁状态和活动计数随 v1 存档保存；详细规则与验证命令见 `docs/ACHIEVEMENTS.md`。
 
 ## 3. 核心循环
