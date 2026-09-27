@@ -513,8 +513,7 @@ function captureRun(run: LiveRun): SaveSnapshotV1 {
   if (!parsed.ok) throw new Error(parsed.errors.join('\n'));
   const plan = planSnapshotRestore(parsed.snapshot, createSaveReferences(run));
   if (!plan.ok) throw new Error(plan.errors.join('\n'));
-  expect(plan.warnings).toHaveLength(1);
-  expect(plan.warnings[0]).toContain('quest.r42-seal-rubbing');
+  expect(plan.warnings).toEqual([]);
   expect(plan.snapshot.quests.trackedQuestId).toBeNull();
   return plan.snapshot;
 }

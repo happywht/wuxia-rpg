@@ -4,6 +4,19 @@
 
 ## [Unreleased]
 
+### Fixed (Round 50)
+
+- **任务完成后的跟踪状态**：任务由对话、战斗信号或收集物数量自动完成时立即清除相同的跟踪 ID，避免旧存档在读档时提示“跟踪中的任务不是进行中任务”。
+
+### Added (Round 50)
+
+- **1.0 最终交付审计**：新增独立 `npm run audit:final`，核对 Round 00–50 计划标题、子任务小节（至少两项）及最低 10 分钟工时估算、逐轮提交、关键内容数量（同 Schema 多资源聚合）、Schema 家族、同名 MOD 覆盖样例、引擎资料字面量边界与 24 份交付文档；正反向夹具覆盖通过与诊断路径。此命令依赖完整 Git 历史，不进入 `npm run check` 或浅克隆 CI。
+- **最终验收矩阵与浏览器闭环**：新增 `docs/FINAL-ACCEPTANCE.md`；本地浏览器走查完成新游戏、巷战、NPC 对话、接取并完成收集差事、购入物品、自创武学、两个空槽存档及页面刷新读档。
+
+### Verification (Round 50)
+
+- 最终 `npm run check`、`npm run smoke:round-35`、`npm run package:release` 和提交后的 `npm run audit:final` 结果见 `DEVLOG.md` Round 50；浏览器步骤和验证边界见 `docs/FINAL-ACCEPTANCE.md`。
+
 ### Fixed (Round 49)
 
 - **锻造配方资料告警**：修正“琥珀嵌扣”升级结果丢失基础装备的定力与内力加成、导致配方被装配器禁用的问题；现保留原加成并实际提升至少一项，开局不再出现默认可选资料告警。

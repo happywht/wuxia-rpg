@@ -6,6 +6,7 @@ Round 38 起本项目拥有可重复运行的 Vitest 自动化测试基线；Rou
 
 ```bash
 npm run check       # 统一质量门槛：validate:data → inspect:mods → typecheck → test → audit:round-34 → audit:round-48-docs
+npm run audit:final # 完整 checkout 上核对 R00–R50 计划/提交、内容数、文档与解耦证据（独立于 check/浅克隆 CI）
 npm test            # vitest run，单次运行全部测试（CI 语义；不包含性能基准）
 npm run benchmark:round-40 # 性能/内存基准（R40 起；与 npm test 双向隔离，见下文）
 npm run smoke:round-46 # 真实资料驱动的开局→故事分支→多结局纵向集成回归
@@ -31,7 +32,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 
 - 测试框架：Vitest 5.0.2。官方指南要求 Vite >=6.4.0、Node >=22.12.0；本仓库使用 Vite 8.3.1 与 Node 22.18.0，符合要求（详见 [`docs/REFERENCES.md`](REFERENCES.md) #12；基准 API 见同文件 #16）。
 - 运行环境：Node（无 DOM、无浏览器、无网络、无真实时钟依赖）。
-- 覆盖统计：16 个测试文件、143 个用例（R38 建立四组 53 个，R40 新增渲染器结构回归 10 个，R41 新增设置与输入 42 个，R42 新增主线集成 3 个，R43 新增漫游事件 6 个与门派支线集成 3 个，R44 新增日程漫游/奖励协议/双路线集成 6 个，R45 新增战斗成长基线与擂台奖品边界 4 个，R46 新增真实资料纵向切片 2 个，R47 新增版本清单/路径白名单测试 4 个，R48 新增文档审计 9 个，R49 新增真实默认世界装配/内容数量/零可选告警回归 1 个；详见 `CHANGELOG.md` 对应条目）。
+- 覆盖统计：17 个测试文件、148 个用例（R38 建立四组 53 个，R40 新增渲染器结构回归 10 个，R41 新增设置与输入 42 个，R42 新增主线集成 3 个，R43 新增漫游事件 6 个与门派支线集成 3 个，R44 新增日程漫游/奖励协议/双路线集成 6 个，R45 新增战斗成长基线与擂台奖品边界 4 个，R46 新增真实资料纵向切片 2 个，R47 新增版本清单/路径白名单测试 4 个，R48 新增文档审计 9 个，R49 新增真实默认世界装配/内容数量/零可选告警回归 1 个，R50 新增最终验收审计 5 个；详见 `CHANGELOG.md` 对应条目）。
 
 ## 配置：为什么有独立的 `vitest.config.ts`
 
@@ -69,6 +70,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 | `tests/round45-balance.test.ts` | `arena-challenge.ts`、`turn-based-combat.ts`、角色成长和基础战斗/擂台资料 | R45 平衡回归：首夺一次性银两/物品、失败和重赛奖品为零、旧 `championships` 记录兼容、擂台每场战斗经验保留；无装备/无伙伴/起始散手开场实战 5 招胜出并验证升级补血 |
 | `tests/round46-vertical-slice.test.ts` | 真实基础角色、地图、任务、对白、物品、战斗、武学、存档、图谱与结局资料及对应 Phaser-free 引擎 API | R46 纵向验收：开局和地图阻挡、真实 NPC 对白接任务、巷战经验/奖励、拜师学艺、快照往返与恢复、R42 两条互斥路线各自抵达一个结局；不会模拟浏览器 UI |
 | `tests/release-package.test.ts` | `scripts/lib/release-package.mjs` | R47 发布协议：稳定排序的 SHA-256 清单、版本/提交约束、强制静态运行文件、拒绝路径穿越/隐藏目录/重复与递归清单，并要求归档精确符合 staging allowlist |
+| `tests/round50-final-acceptance.test.ts` | `scripts/lib/final-acceptance.mjs` 与缺资料运行时入口 | R50 正反向临时 fixture：核验 51 份计划字段/子任务、轮次 commit、实际内容计数、24 份交付文档、Schema 家族、同名 MOD 路径与引擎资料字面量；验证缺计划/提交/数量、未登记 MOD 和世界 manifest 404 的可读错误 |
 
 测试只调用**公共导出函数**并断言行为，不做源码文本匹配；引擎模块均为 Phaser-free 设计，无需启动任何场景。
 
@@ -103,6 +105,7 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 | `npm run smoke:round-44` | Round 44 NPC 日程附近条件、任务声望/见闻奖励与渡口互斥分支回归 |
 | `npm run smoke:round-46` | Round 46 真实资料驱动的开局、任务/战斗/成长、存档恢复和两条结局路线纵向回归 |
 | `npm run smoke:round-47` | Round 47 npm 版本归档解包/哈希核验及部署前非根路径 HTML/JS/CSS/MOD/26 项资料加载验证（先运行 `npm run package:release`） |
+| `npm run audit:final` | 完整 Git checkout 专用的 R00–R50 最终结构审计；核对 51 份计划标题、子任务小节（至少两项）和至少 10 分钟计划工时估算、逐轮 round commit、同 Schema 多资源合并计数、Schema 家族、同名 MOD 样例、资料解耦/错误回退证据文件与必需交付文档 |
 | `npm run smoke:round-20` | 擂台首夺货币/物品彩头、逐场经验、连战与旧/新 v1 存档回归（R45 扩展） |
 | `npm run typecheck` | 严格类型检查（check 的第 3 步） |
 | `npm run benchmark:round-40` | 性能/内存基准（R40 起）：渲染对象数与耗时双口径、26 资源加载、50 轮长跑堆观察；与 `npm test` 双向隔离、不进门槛（读数与局限见 `docs/PERFORMANCE.md`） |
@@ -111,6 +114,7 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 
 ## 变更记录
 
+- 2026-09-28（Round 50）：新增 `tests/round50-final-acceptance.test.ts` 5 用例，含通过夹具及轮次/计划/内容/MOD/引擎边界反向 fixture，并验证多资源汇总、子任务小节/最低工时判断和缺 manifest 时的玩家可读错误；补充 quest completion 清理旧跟踪 ID 的状态回归。完整覆盖统计更新为 17 文件/148 用例。`npm run audit:final` 依赖 Git 完整历史，单独执行而不进入浅克隆 CI `check`。
 - 2026-09-28（Round 49）：新增真实 `data/` 世界装配回归，检查清单内资源全部加载、核心内容数量达标且默认可选系统没有装配告警；修复沼琥珀锻造配方产物降低原装备 resolve/qi 的错误；文档审计改为从路线图识别最新已完成轮次。浏览器另走查新游戏、移动/墙体与 NPC 阻挡、对白/任务接取、擂台入口和暂停设置/空存档槽导航；详情见 `docs/PLAYTEST-FEEDBACK.md`。完整覆盖统计更新为 16 文件/143 用例。
 - 2026-09-28（Round 48）：新增 `tests/docs-audit-round-48.test.ts` 9 用例覆盖玩家/MOD 指南、README/包索引、实际命令、manifest/Schema/内容计数、轮次/绝对路径和许可边界正反向审计；测试统计更新为 15 文件/142 用例。`npm run check` 新增末尾步骤 `audit:round-48-docs`。
 - 2026-09-28（Round 43）：新增 `tests/world-map.test.ts` 6 用例与 `tests/round43-faction-routes.test.ts` 3 用例，覆盖可选随机事件协议及五派任务资格、真实状态机/对白发现；覆盖统计更新为 10 文件 117 用例，新增 `npm run smoke:round-43`。

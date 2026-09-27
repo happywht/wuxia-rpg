@@ -520,6 +520,7 @@ function completeQuest(
 ): QuestRewardGrant {
   const state = journal.states.get(quest.id);
   if (state !== undefined) state.status = 'completed';
+  if (journal.trackedQuestId === quest.id) journal.trackedQuestId = null;
   return {
     questId: quest.id,
     experience: quest.rewards.experience,

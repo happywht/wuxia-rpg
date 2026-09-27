@@ -272,6 +272,7 @@ describe('quest lifecycle', () => {
       { questId: 'quest-errand', experience: 30, currency: 10 },
     ]);
     expect(journal.states.get('quest-errand')!.status).toBe('completed');
+    expect(journal.trackedQuestId).toBeNull();
     expect(journal.states.get('quest-gather')!.status).toBe('offered');
 
     // A further signal no longer touches the completed quest.
@@ -299,6 +300,7 @@ describe('quest lifecycle', () => {
     ]);
     expect(state.objectiveCounts.get('obj-collect')).toBe(2);
     expect(state.status).toBe('completed');
+    expect(journal.trackedQuestId).toBeNull();
   });
 
   it('accepting a collect quest snapshots already-owned items and may complete at once', () => {
@@ -314,6 +316,7 @@ describe('quest lifecycle', () => {
       { questId: 'quest-gather', experience: 20, currency: 15 },
     ]);
     expect(journal.states.get('quest-gather')!.status).toBe('completed');
+    expect(journal.trackedQuestId).toBeNull();
   });
 
   it('a defeat on a failing encounter fails the active quest and clears tracking', () => {
