@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：Round 03–26 已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台、门派战、自创武学、经脉、装备锻造、炼丹、存档、区域旅行、知识图谱、NPC 私有记忆、昼夜气候、日程、条件奇遇与多层社会声望；详情分别见 `docs/SAVES.md`、`docs/KNOWLEDGE-GRAPH.md`、`docs/COMPANIONS.md`、`docs/FACTION_WAR_DESIGN.md`、`docs/MARTIAL_ART_FORGE.md`、`docs/EQUIPMENT-FORGING.md` 与 `docs/ALCHEMY.md`。
+- 状态：Round 03–27 已落地地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台、门派战、自创武学、经脉、装备锻造、炼丹、存档、区域旅行、知识图谱、NPC 私有记忆、昼夜气候、日程、条件奇遇、多层社会声望与数据驱动多结局；详情分别见 `docs/SAVES.md`、`docs/KNOWLEDGE-GRAPH.md`、`docs/ENDINGS.md`、`docs/COMPANIONS.md`、`docs/FACTION_WAR_DESIGN.md`、`docs/MARTIAL_ART_FORGE.md`、`docs/EQUIPMENT-FORGING.md` 与 `docs/ALCHEMY.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -31,7 +31,7 @@ data/
 │   ├── factions/            # 门派：立场、声望规则、成员关系
 │   ├── battles/             # 战斗：遭遇触发点、敌人、奖励与提示文本
 │   └── endings/             # 结局：触发条件与结局文本
-├── schema/                  # JSON Schema（含 manifest、grid-map、world-map、game-calendar、knowledge-nodes、knowledge-edges、npc-set、companion-set、faction-war-set、martial-art-components、meridian-set、equipment-forge-set、alchemy-set、dialogue-set、character-profiles、faction-set、martial-arts-set、battle-encounters、arena-set、items-set、shops-set、quest-set）
+├── schema/                  # JSON Schema（含 manifest、grid-map、world-map、game-calendar、knowledge-nodes、knowledge-edges、ending-set、npc-set、companion-set、faction-war-set、martial-art-components、meridian-set、equipment-forge-set、alchemy-set、dialogue-set、character-profiles、faction-set、martial-arts-set、battle-encounters、arena-set、items-set、shops-set、quest-set）
 mods/                        # mod 覆盖层：mods/<modId>/ 镜像 data/base/ 相对路径
 ```
 
@@ -62,6 +62,8 @@ Round 24 新增可选 `equipment-forge-set`，配方和地图工位定义放在 
 Round 25 新增可选 `alchemy-set`，药炉和药方定义放在 `alchemy/`，通过 manifest 同名路径 MOD 覆盖。药方引用一个需要先发现的知识节点、杂项药材、正银两成本和按悟性阈值递增的 2–5 档普通消耗品结果。Schema 检查字段边界；装配器校验地图占位、物品/知识跨引用、门槛排序及恢复效果单调性。投入和结果定义见 `data/schema/alchemy-set.schema.json`，内容流程见 [`ALCHEMY.md`](ALCHEMY.md)。
 
 Round 26 以 `social.npcKnowledge` 保存动态 NPC 见闻；旧 v1 缺字段时仍按空动态记忆恢复，并从当前有效 `knows` 边重建静态认知。`attitudeSpread` 人物关系边使态度按声明系数单跳传播。`npcKnows` 与 `shareKnowledgeNode` 仅影响 NPC 私有记忆，不把玩家百科状态混入 NPC 认知。规则及 MOD/存档行为见 [`KNOWLEDGE-GRAPH.md`](KNOWLEDGE-GRAPH.md)、[`SAVES.md`](SAVES.md) 和 [`DIALOGUE-GUIDE.md`](DIALOGUE-GUIDE.md)。
+
+Round 27 新增可选 `ending-set` 资源，使用 `ending-set.schema.json`，可由同路径 MOD 覆盖。资源为终章声明一个地图入口、多个结局文本和 AND 条件；条件可读取任务状态、善恶、江湖/门派声望、NPC 关系、门派身份及已知图谱节点。加载时逐结局校验引用与地图占格，坏入口使该资源不可用，坏结局只隔离该结局；NPC 日程不会进入终章格。结局评估为纯函数，界面显示未满足条件并在确认时重算。当前原型在读完结局后回主菜单，尚不记录结局选择到存档。资料字段、路线及限制见 [`ENDINGS.md`](ENDINGS.md)。
 
 Round 20 新增擂台资料族：manifest 中的可选 arena-set 资源按地图入口、角色模板、赛程武学、彩头物品逐项校验；坏入口只禁用对应擂台。赛事文件可由 MOD 使用同路径覆盖，资料字段和玩法边界见 docs/ARENA_DESIGN.md。
 

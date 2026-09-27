@@ -4,6 +4,16 @@
 
 ## [Unreleased]
 
+### Added (Round 27)
+
+- 新增可选 ending-set 资料族与 schema；地图终章入口、结局叙事和任务/善恶/声望/关系/门派/见闻条件均由 JSON/MOD 声明。
+- 新增五条可达结局与图谱节点关系，渡口终章面板展示锁定提示、可选归宿及终章文本。
+- 新增 Round27 世界装配、几何/引用校验与专项烟测。
+
+### Verification (Round 27)
+
+- 资料校验、完整世界装配、Round27 smoke、R26–R24 回归、类型检查、生产构建均通过；生产主 bundle 仍高于 Vite 默认分包建议线。
+
 ### Added (Round 26)
 
 - 新增 NPC 私有见闻状态：由图谱 `knows` 边初始化，玩家可在对白中分享已知节点，后续对白用 `npcKnows` 区分 NPC 实际知情与玩家百科状态。

@@ -26,6 +26,7 @@ import {
   parseKnowledgeEdgeSet,
   parseKnowledgeNodeSet,
   type KnowledgeGraph,
+  type KnowledgeNodeData,
   type KnowledgeNodeSetData,
   type KnowledgeEdgeSetData,
 } from '../engine/knowledge-graph';
@@ -98,6 +99,12 @@ import {
   type AssembledAlchemyStation,
 } from '../engine/alchemy-system';
 import {
+  assembleEndingSet,
+  parseEndingSet,
+  type AssembledEndingSet,
+  type EndingSetData,
+} from '../engine/ending-system';
+import {
   assembleBattleEncounters,
   type BattleEncounterSetData,
   parseBattleEncounterSet,
@@ -135,6 +142,7 @@ const MARTIAL_ART_COMPONENT_RESOURCE_ID = 'martial-art-components.round-22-set';
 const MERIDIAN_RESOURCE_ID = 'meridian.round-23-set';
 const EQUIPMENT_FORGE_RESOURCE_ID = 'equipment-forge.round-24-set';
 const ALCHEMY_RESOURCE_ID = 'alchemy.round-25-set';
+const ENDING_RESOURCE_ID = 'ending.round-27-set';
 const ITEM_RESOURCE_ID = 'item.round-06-set';
 const SHOP_RESOURCE_ID = 'shop.round-06-set';
 const QUEST_RESOURCE_ID = 'quest.round-07-set';
@@ -156,6 +164,7 @@ const OPTIONAL_RESOURCE_IDS = new Set([
   MERIDIAN_RESOURCE_ID,
   EQUIPMENT_FORGE_RESOURCE_ID,
   ALCHEMY_RESOURCE_ID,
+  ENDING_RESOURCE_ID,
   ITEM_RESOURCE_ID,
   SHOP_RESOURCE_ID,
   QUEST_RESOURCE_ID,
@@ -178,6 +187,7 @@ const OPTIONAL_SCHEMA_ORIGINS = new Set([
   'schema:meridian-set',
   'schema:equipment-forge-set',
   'schema:alchemy-set',
+  'schema:ending-set',
   'schema:items-set',
   'schema:shops-set',
   'schema:quest-set',
@@ -230,6 +240,8 @@ export interface WorldAssembly {
   equipmentForges: readonly AssembledEquipmentForgeStation[];
   /** Optional data-authored medicine stations and discovered recipes. */
   alchemyStations: readonly AssembledAlchemyStation[];
+  /** Optional data-authored ending conditions and their map gate. */
+  endings: AssembledEndingSet | null;
   items: ReadonlyMap<string, ItemRecordData>;
   shops: ReadonlyMap<string, AssembledShop>;
   quests: ReadonlyMap<string, QuestData>;
@@ -341,6 +353,10 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
         },
         'alchemy-set': (value) => {
           const parsed = parseAlchemySet(value);
+          return parsed.ok ? [] : parsed.errors;
+        },
+        'ending-set': (value) => {
+          const parsed = parseEndingSet(value);
           return parsed.ok ? [] : parsed.errors;
         },
         'items-set': (value) => {
@@ -473,6 +489,7 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
       worldMap.transitions,
       worldMap.events,
       new Set(knowledgeResult.graph.nodes.keys()),
+      knowledgeResult.graph.nodes,
       calendarPeriodIds,
       parsedCalendar.calendar.periods,
     );
@@ -620,6 +637,7 @@ function assembleOptionalContent(
   regionTransitions: readonly RegionTransitionData[],
   regionEvents: readonly RegionEventData[],
   knowledgeNodeIds: ReadonlySet<string>,
+  knowledgeNodes: ReadonlyMap<string, KnowledgeNodeData>,
   timeOfDayPeriodIds: ReadonlySet<string>,
   calendarPeriods: GameCalendarData['periods'],
 ): WorldAssembly {
@@ -1075,6 +1093,42 @@ function assembleOptionalContent(
     details: [],
   });
 
+  let endingSetData: EndingSetData | null = null;
+  const endingResource = resources.get(ENDING_RESOURCE_ID);
+  if (endingResource !== undefined) {
+    const parsed = parseEndingSet(endingResource.value);
+    if (!parsed.ok) {
+      warnings.push({
+        resource: ENDING_RESOURCE_ID,
+        origin: 'ending-assembly',
+        severity: 'warning',
+        message: '结局资料结构无效，已关闭结局入口',
+        details: parsed.errors,
+      });
+    } else {
+      endingSetData = parsed.set;
+      for (const message of parsed.warnings) warnings.push({
+        resource: ENDING_RESOURCE_ID,
+        origin: 'ending-assembly',
+        severity: 'warning',
+        message,
+        details: [],
+      });
+    }
+  }
+  // This snapshot excludes the gate itself and is used for its collision
+  // check. Adding the gate to NPC schedule blockers prevents a later
+  // time-based NPC from occupying the ending interaction point.
+  const occupiedWorldCells = new Map<string, Set<string>>();
+  for (const [mapId, cells] of alchemyBlockedCells) {
+    occupiedWorldCells.set(mapId, new Set(cells));
+  }
+  for (const station of alchemyAssembly.stations) {
+    const cells = occupiedWorldCells.get(station.record.mapResourceId) ?? new Set<string>();
+    cells.add(station.record.position.col + ',' + station.record.position.row);
+    occupiedWorldCells.set(station.record.mapResourceId, cells);
+  }
+
   // Compile one safe NPC layout per declared calendar period. The base
   // placements remain the stable cast registry for quests/factions; runtime
   // scenes choose the current period's layout from the clock.
@@ -1106,6 +1160,12 @@ function assembleOptionalContent(
     const blocked = encounterBlocksByMap.get(station.record.mapResourceId) ?? new Set<string>();
     blocked.add(`${station.record.position.col},${station.record.position.row}`);
     encounterBlocksByMap.set(station.record.mapResourceId, blocked);
+  }
+  if (endingSetData !== null) {
+    const gate = endingSetData.gate;
+    const blocked = encounterBlocksByMap.get(gate.mapResourceId) ?? new Set<string>();
+    blocked.add(gate.position.col + ',' + gate.position.row);
+    encounterBlocksByMap.set(gate.mapResourceId, blocked);
   }
   const npcSchedules = compileNpcSchedules({
     npcs: allNpcs,
@@ -1239,6 +1299,23 @@ function assembleOptionalContent(
     });
   }
 
+  const endingAssembly = assembleEndingSet({
+    set: endingSetData,
+    maps,
+    blockedCells: occupiedWorldCells,
+    knowledgeNodes,
+    questIds: new Set(questAssembly.quests.keys()),
+    npcIds: placedNpcIds,
+    factionIds: new Set(progression.factions.keys()),
+  });
+  for (const message of endingAssembly.warnings) warnings.push({
+    resource: ENDING_RESOURCE_ID,
+    origin: 'ending-assembly',
+    severity: 'warning',
+    message,
+    details: [],
+  });
+
   return {
     npcs: allNpcs,
     npcsByPeriod: npcSchedules.placementsByPeriod,
@@ -1251,6 +1328,7 @@ function assembleOptionalContent(
     meridianSet,
     equipmentForges: equipmentForgeAssembly.stations,
     alchemyStations: alchemyAssembly.stations,
+    endings: endingAssembly.endingSet,
     items: itemAssembly.items,
     shops: shopAssembly.shops,
     quests: questAssembly.quests,

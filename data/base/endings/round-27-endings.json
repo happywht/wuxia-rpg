@@ -1,0 +1,78 @@
+{
+  "id": "ending.set.round-27",
+  "gate": {
+    "id": "ending.gate.mirror-stone",
+    "name": "照心石",
+    "mapResourceId": "map.round-10-mist-ferry",
+    "position": { "col": 8, "row": 2 },
+    "approachText": "碑面映出雨夜旧路。按 E 静观此行，看看江湖为你留下哪些归处。"
+  },
+  "endings": [
+    {
+      "id": "ending.river-lantern",
+      "knowledgeNodeId": "ending.river-lantern",
+      "title": "河灯归处",
+      "epilogue": "你将药送到了伤者手中，也把雨夜里未解的脚印告诉愿意倾听的人。后来渡口每逢灯节，乡邻都会多放一盏河灯；有人说那盏灯照的是旧船道，有人说照的是肯为陌路人停步的心。",
+      "priority": 50,
+      "conditions": [
+        { "kind": "questStatus", "questId": "quest.round-07-medicine-run", "status": "completed", "hint": "完成「巷口送药」差事" },
+        { "kind": "morality", "minValue": 5, "hint": "善恶值达到 5" },
+        { "kind": "npcRelationship", "npcId": "char.lu-zhenniang", "minValue": 10, "hint": "与茶棚主人结下足够信任" },
+        { "kind": "knowledgeKnown", "nodeId": "event.old-footprints", "hint": "查明雨后脚印的线索" }
+      ]
+    },
+    {
+      "id": "ending.tingyu-oath",
+      "knowledgeNodeId": "ending.tingyu-oath",
+      "title": "听雨守约",
+      "epilogue": "巷口风波平息后，你仍记得剑阁教习所说的“先听雨，后出剑”。多年之后，你受托守在江南药道的旧约边，不凭门墙压人，也不让约定沦为空纸。剑阁弟子行经此处，常会向石碑留下一礼。",
+      "priority": 40,
+      "conditions": [
+        { "kind": "questStatus", "questId": "quest.round-07-clear-alley", "status": "completed", "hint": "完成「巷口除患」差事" },
+        { "kind": "factionMembership", "factionId": "faction.tingyu-jiange", "isMember": true, "hint": "拜入听雨剑阁" },
+        { "kind": "factionRenown", "factionId": "faction.tingyu-jiange", "minValue": 10, "hint": "听雨剑阁声望达到 10" },
+        { "kind": "npcRelationship", "npcId": "char.ye-tingzhou", "minValue": 5, "hint": "与叶庭舟保持足够信任" },
+        { "kind": "renown", "minValue": 5, "hint": "江湖声望达到 5" }
+      ]
+    },
+    {
+      "id": "ending.tiezhang-foundation",
+      "knowledgeNodeId": "ending.tiezhang-foundation",
+      "title": "铁嶂砺心",
+      "epilogue": "你没有绕开最难的一段巷路。铁嶂派把那次守街的经历刻进桩功谱，新弟子练至气息不乱时，便要下山走一趟渡口。你不再以强弱论人，只把每一根扎稳的脚跟留给后来者。",
+      "priority": 35,
+      "conditions": [
+        { "kind": "questStatus", "questId": "quest.round-07-clear-alley", "status": "completed", "hint": "完成「巷口除患」差事" },
+        { "kind": "factionMembership", "factionId": "faction.tiezhang-pai", "isMember": true, "hint": "拜入铁嶂派" },
+        { "kind": "factionRenown", "factionId": "faction.tiezhang-pai", "minValue": 10, "hint": "铁嶂派声望达到 10" },
+        { "kind": "npcRelationship", "npcId": "char.shi-bei", "minValue": 0, "hint": "与石北保持中立，不因失信而交恶" },
+        { "kind": "renown", "minValue": 5, "hint": "江湖声望达到 5" }
+      ]
+    },
+    {
+      "id": "ending.yunyin-healer",
+      "knowledgeNodeId": "ending.yunyin-healer",
+      "title": "云隐护生",
+      "epilogue": "药道与山庄并未因你而归于一人之手。你带着医理往来村镇，闻素心把护身之法教给愿意守夜的人。后来人记住的不是你赢过多少场，而是每当风雨压低屋檐，总有人知道该如何把灯重新点亮。",
+      "priority": 35,
+      "conditions": [
+        { "kind": "questStatus", "questId": "quest.round-07-medicine-run", "status": "completed", "hint": "完成「巷口送药」差事" },
+        { "kind": "factionMembership", "factionId": "faction.yunyin-shanzhuang", "isMember": true, "hint": "加入云隐山庄" },
+        { "kind": "factionRenown", "factionId": "faction.yunyin-shanzhuang", "minValue": 10, "hint": "云隐山庄声望达到 10" },
+        { "kind": "npcRelationship", "npcId": "char.wen-suxin", "minValue": 0, "hint": "与闻素心保持中立，不因失信而交恶" },
+        { "kind": "morality", "minValue": 5, "hint": "善恶值达到 5" }
+      ]
+    },
+    {
+      "id": "ending.open-water",
+      "knowledgeNodeId": "ending.open-water",
+      "title": "行舟万里",
+      "epilogue": "你没有把名字留在任何一块门墙下。认清脚印指向何方后，你向渡船借了一叶轻舟，沿着尚未写进舆图的水路继续走。江湖没有替你选定终点；此后遇到的每个人，仍会把新的答案交到你手里。",
+      "priority": 10,
+      "conditions": [
+        { "kind": "knowledgeKnown", "nodeId": "event.old-footprints", "hint": "至少走出旧渡口，查见雨后的脚印" },
+        { "kind": "factionMembership", "isMember": false, "hint": "保持无门无派，或先行离门" }
+      ]
+    }
+  ]
+}

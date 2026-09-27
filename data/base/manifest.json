@@ -76,6 +76,11 @@
       "schema": "alchemy-set"
     },
     {
+      "id": "ending.round-27-set",
+      "path": "endings/round-27-endings.json",
+      "schema": "ending-set"
+    },
+    {
       "id": "encounter.round-05-set",
       "path": "battles/round-05-encounters.json",
       "schema": "battle-encounters"

@@ -26,6 +26,7 @@ import {
   getVisibleOptions,
 } from '../engine/dialogue-runtime';
 import { GameClock } from '../engine/game-calendar';
+import { selectAdjacentEndingGate, type EndingEvaluationContext } from '../engine/ending-system';
 import { resolveNpcPlacementsForPlayer } from '../engine/npc-schedule';
 import {
   ClimateRuntime,
@@ -131,6 +132,7 @@ import { FactionWarPanel } from './faction-war-ui';
 import { MartialArtForgePanel } from './martial-art-forge-ui';
 import { EquipmentForgePanel } from './equipment-forge-ui';
 import { AlchemyPanel } from './alchemy-ui';
+import { EndingPanel } from './ending-ui';
 import { MeridianPanel } from './meridian-ui';
 import { type GameSettings, applyGameSettings, loadGameSettings, uiFontSize } from './settings';
 import { createPixelPerson, UI_FONT_FAMILY } from './ui-theme';
@@ -341,6 +343,7 @@ export class GridScene extends Phaser.Scene {
   private martialArtForgePanel: MartialArtForgePanel | null = null;
   private equipmentForgePanel: EquipmentForgePanel | null = null;
   private alchemyPanel: AlchemyPanel | null = null;
+  private endingPanel: EndingPanel | null = null;
   private meridianPanel: MeridianPanel | null = null;
   private activeSession: CombatSession | null = null;
   private activeEncounter: PlacedEncounter | null = null;
@@ -636,6 +639,7 @@ export class GridScene extends Phaser.Scene {
     this.renderFactionWarMarkers(activeMap);
     this.renderEquipmentForgeMarkers(activeMap);
     this.renderAlchemyMarkers(activeMap);
+    this.renderEndingGateMarker(activeMap);
     this.ensureDaylightLayer();
     this.buildHud(activeMap, world.optionalWarnings, world.modWarnings);
     this.updateCoordsHud();
@@ -677,6 +681,7 @@ export class GridScene extends Phaser.Scene {
     this.martialArtForgePanel = new MartialArtForgePanel(this, () => this.noteOverlayClosed());
     this.equipmentForgePanel = new EquipmentForgePanel(this, () => this.noteOverlayClosed());
     this.alchemyPanel = new AlchemyPanel(this, () => this.noteOverlayClosed());
+    this.endingPanel = new EndingPanel(this, () => this.noteOverlayClosed());
     this.meridianPanel = new MeridianPanel(this, () => this.noteOverlayClosed());
     this.worldMapPanel = new WorldMapPanel(this, () => this.noteOverlayClosed());
     this.encyclopediaPanel = new EncyclopediaPanel(this, { onClose: () => this.noteOverlayClosed() });
@@ -1054,6 +1059,23 @@ export class GridScene extends Phaser.Scene {
       }).setOrigin(0.5).setDepth(5), 12);
       this.encounterLayer?.add([badge, label]);
     }
+  }
+
+  /** A gold mirror badge marks the data-authored location where the journey can conclude. */
+  private renderEndingGateMarker(map: GridMap): void {
+    const gate = this.world?.assembly.endings?.gate;
+    if (gate === undefined || gate.mapResourceId !== this.currentMapResourceId) return;
+    const center = cellCenterOffset(map, gate.position.col, gate.position.row);
+    const x = this.mapOrigin.x + center.x;
+    const y = this.mapOrigin.y + center.y;
+    const badge = this.add.rectangle(x, y, Math.max(22, map.tileSize * 0.52), Math.max(22, map.tileSize * 0.52), 0x55472b)
+      .setStrokeStyle(2, 0xe8cb7c).setDepth(4);
+    const label = this.registerScaledText(this.add.text(x, y, '终', {
+      fontFamily: UI.fontFamily,
+      fontSize: uiFontSize(12),
+      color: '#fff4c9',
+    }).setOrigin(0.5).setDepth(5), 12);
+    this.encounterLayer?.add([badge, label]);
   }
 
   /**
@@ -1953,6 +1975,15 @@ export class GridScene extends Phaser.Scene {
       this.interactText.setText(`按 E 通过「${gate.name}」前往另一处地界`);
       return;
     }
+    const endingGate = this.world === null ? null : selectAdjacentEndingGate(
+      this.world.assembly.endings,
+      this.currentMapResourceId,
+      { col: this.playerCol, row: this.playerRow },
+    );
+    if (endingGate !== null) {
+      this.interactText.setText(endingGate.gate.approachText);
+      return;
+    }
     if (this.placedNpcs.length === 0 && this.activeEncounters().length === 0) {
       this.interactText.setText(this.companionState.activeCompanionId === null
         ? '暂无可交互人物'
@@ -1980,6 +2011,7 @@ export class GridScene extends Phaser.Scene {
       (this.martialArtForgePanel !== null && this.martialArtForgePanel.isOpen) ||
       (this.equipmentForgePanel !== null && this.equipmentForgePanel.isOpen) ||
       (this.alchemyPanel !== null && this.alchemyPanel.isOpen) ||
+      (this.endingPanel !== null && this.endingPanel.isOpen) ||
       (this.meridianPanel !== null && this.meridianPanel.isOpen) ||
       (this.controlsPanel !== null && this.controlsPanel.isOpen)
     );
@@ -2410,6 +2442,8 @@ export class GridScene extends Phaser.Scene {
       this.equipmentForgePanel = null;
       this.alchemyPanel?.destroy();
       this.alchemyPanel = null;
+      this.endingPanel?.destroy();
+      this.endingPanel = null;
       this.meridianPanel?.destroy();
       this.meridianPanel = null;
       this.controlsPanel?.destroy();
@@ -2548,7 +2582,40 @@ export class GridScene extends Phaser.Scene {
           col: this.playerCol,
           row: this.playerRow,
         });
-    if (gate !== null) this.switchRegion(gate);
+    if (gate !== null) {
+      this.switchRegion(gate);
+      return;
+    }
+    const endingGate = this.world === null ? null : selectAdjacentEndingGate(
+      this.world.assembly.endings,
+      this.currentMapResourceId,
+      { col: this.playerCol, row: this.playerRow },
+    );
+    if (endingGate !== null) this.openEndingGate();
+  }
+
+  /** Opens the conclusion panel with a read-only snapshot of current journey state. */
+  private openEndingGate(): void {
+    const world = this.world;
+    const panel = this.endingPanel;
+    const endingSet = world?.assembly.endings;
+    if (world === null || panel === null || endingSet === null || endingSet === undefined) return;
+    const context: EndingEvaluationContext = {
+      questStatuses: new Map(
+        [...this.questJournal.states].map(([questId, state]) => [questId, state.status]),
+      ),
+      social: this.social,
+      factionMembership: this.factionState.membership,
+      knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
+    };
+    panel.open({
+      endingSet,
+      context,
+      onFinish: () => {
+        this.returnToMenu();
+      },
+    });
+    this.updateInteractHint();
   }
 
   /**
@@ -2803,6 +2870,7 @@ export class GridScene extends Phaser.Scene {
     this.renderFactionWarMarkers(destinationMap);
     this.renderEquipmentForgeMarkers(destinationMap);
     this.renderAlchemyMarkers(destinationMap);
+    this.renderEndingGateMarker(destinationMap);
     this.ensureDaylightLayer(); // The rebuilt world layers must sit below the wash again.
     this.mapNameText?.setText(destinationMap.data.name);
     this.updateCoordsHud();
