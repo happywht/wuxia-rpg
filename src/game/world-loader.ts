@@ -358,7 +358,12 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
       }
       maps.set(resource.id, parsedMap.map);
     }
-    const worldMapResult = assembleWorldMap(parsedWorldMap.data, maps);
+    const knowledgeResult = assembleKnowledgeGraphContent(result.resources);
+    const worldMapResult = assembleWorldMap(parsedWorldMap.data, maps, {
+      knowledgeNodeIds: new Set(knowledgeResult.graph.nodes.keys()),
+      periodIds: new Set(parsedCalendar.calendar.periods.map((period) => period.id)),
+      weatherIds: new Set(parsedClimate.climate.weathers.map((weather) => weather.id)),
+    });
     if ('ok' in worldMapResult && !worldMapResult.ok) {
       return { ok: false, title: '世界地图引用无效', lines: worldMapResult.errors };
     }
@@ -369,7 +374,6 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
       return { ok: false, title: '起始地图不可用', lines: [`地图资源 "${startingMapResourceId}" 未能加载。`] };
     }
 
-    const knowledgeResult = assembleKnowledgeGraphContent(result.resources);
     const calendarPeriodIds = new Set(parsedCalendar.calendar.periods.map((period) => period.id));
     const assembly = assembleOptionalContent(
       result.resources,

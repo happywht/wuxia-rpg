@@ -36,7 +36,8 @@
       "col": 1,
       "row": 4,
       "text": "渡口边留着一行新鲜脚印，雨水还没有将它们冲散。",
-      "once": true
+      "once": true,
+      "discoverKnowledgeNodeId": "event.old-footprints"
     },
     {
       "id": "event.trial-cloudbreak",
@@ -45,6 +46,20 @@
       "row": 7,
       "text": "云隙投下一束日光，石面上的旧刻痕清晰起来。",
       "once": true
+    },
+    {
+      "id": "event.reedbank-traces",
+      "mapResourceId": "map.round-10-mist-ferry",
+      "col": 5,
+      "row": 4,
+      "text": "沿着脚印走到芦苇边，泥面下露出一截被水草缠住的旧桩。渡船人认得那是废船道留下的系缆桩。",
+      "once": true,
+      "conditions": {
+        "knowledgeNodeIds": ["event.old-footprints"],
+        "periodIds": ["period.dusk", "period.night"],
+        "weatherIds": ["weather.drizzle", "weather.rain", "weather.storm"]
+      },
+      "discoverKnowledgeNodeId": "place.reedbank"
     }
   ]
 }

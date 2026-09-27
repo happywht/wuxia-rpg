@@ -33,6 +33,29 @@ export interface RegionEventData extends CellPosition {
   mapResourceId: string;
   text: string;
   once: boolean;
+  conditions?: RegionEventConditionsData;
+  discoverKnowledgeNodeId?: string;
+}
+
+/** All declared condition groups must pass; ids inside each group are alternatives. */
+export interface RegionEventConditionsData {
+  knowledgeNodeIds?: string[];
+  periodIds?: string[];
+  weatherIds?: string[];
+}
+
+/** Live player/world state read by the pure region-event evaluator. */
+export interface RegionEventContext {
+  knownKnowledgeNodeIds: ReadonlySet<string>;
+  periodId: string | null;
+  weatherId: string | null;
+}
+
+/** Cross-resource ids used to disable only events with dangling references. */
+export interface RegionEventReferenceIds {
+  knowledgeNodeIds: ReadonlySet<string>;
+  periodIds: ReadonlySet<string>;
+  weatherIds: ReadonlySet<string>;
 }
 
 export interface WorldMapAssembly {
@@ -57,6 +80,42 @@ function nonEmpty(value: unknown): value is string {
 
 function integer(value: unknown): value is number {
   return typeof value === 'number' && Number.isInteger(value);
+}
+
+function parseUniqueStringArray(value: unknown, label: string, errors: string[]): string[] | null {
+  if (!Array.isArray(value) || value.length === 0 || !value.every(nonEmpty)) {
+    errors.push(`${label}：应为至少含一个非空字符串的数组`);
+    return null;
+  }
+  if (new Set(value).size !== value.length) {
+    errors.push(`${label}：不应包含重复 id`);
+    return null;
+  }
+  return [...value];
+}
+
+function parseRegionEventConditions(value: unknown, label: string, errors: string[]): RegionEventConditionsData | null {
+  if (!isObject(value)) {
+    errors.push(`${label}：应为对象`);
+    return null;
+  }
+  const allowedKeys = new Set(['knowledgeNodeIds', 'periodIds', 'weatherIds']);
+  for (const key of Object.keys(value)) {
+    if (!allowedKeys.has(key)) errors.push(`${label}.${key}：不是受支持的条件`);
+  }
+  const conditions: RegionEventConditionsData = {};
+  for (const key of allowedKeys) {
+    if (value[key] === undefined) continue;
+    const ids = parseUniqueStringArray(value[key], `${label}.${key}`, errors);
+    if (ids === null) continue;
+    if (key === 'knowledgeNodeIds') conditions.knowledgeNodeIds = ids;
+    else if (key === 'periodIds') conditions.periodIds = ids;
+    else conditions.weatherIds = ids;
+  }
+  if (Object.keys(conditions).length === 0) {
+    errors.push(`${label}：至少需要一种线索、时段或天气条件`);
+  }
+  return conditions;
 }
 
 function parseCell(value: unknown, label: string, errors: string[]): CellPosition | null {
@@ -126,12 +185,25 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
     const text = nonEmpty(entry.text) ? entry.text : null;
     const cell = parseCell(entry, label, errors);
     const once = typeof entry.once === 'boolean' ? entry.once : null;
+    const conditions = entry.conditions === undefined
+      ? undefined
+      : parseRegionEventConditions(entry.conditions, `${label}.conditions`, errors);
+    const discoverKnowledgeNodeId = entry.discoverKnowledgeNodeId === undefined
+      ? undefined
+      : nonEmpty(entry.discoverKnowledgeNodeId) ? entry.discoverKnowledgeNodeId : null;
     if (id === null) errors.push(`${label}.id：应为非空字符串`);
     if (mapResourceId === null) errors.push(`${label}.mapResourceId：应为非空字符串`);
     if (text === null) errors.push(`${label}.text：应为非空字符串`);
     if (once === null) errors.push(`${label}.once：应为布尔值`);
-    if (id !== null && mapResourceId !== null && text !== null && once !== null && cell !== null)
-      events.push({ id, mapResourceId, ...cell, text, once });
+    if (discoverKnowledgeNodeId === null) errors.push(`${label}.discoverKnowledgeNodeId：应为非空字符串`);
+    if (id !== null && mapResourceId !== null && text !== null && once !== null && cell !== null &&
+      conditions !== null && discoverKnowledgeNodeId !== null) {
+      events.push({
+        id, mapResourceId, ...cell, text, once,
+        ...(conditions === undefined ? {} : { conditions }),
+        ...(discoverKnowledgeNodeId === undefined ? {} : { discoverKnowledgeNodeId }),
+      });
+    }
   });
   return errors.length > 0
     ? { ok: false, errors }
@@ -139,7 +211,11 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
 }
 
 /** Resolves map references and isolates bad region links/events to their row. */
-export function assembleWorldMap(data: WorldMapData, maps: ReadonlyMap<string, GridMap>): WorldMapAssembly | { ok: false; errors: string[] } {
+export function assembleWorldMap(
+  data: WorldMapData,
+  maps: ReadonlyMap<string, GridMap>,
+  eventReferences?: RegionEventReferenceIds,
+): WorldMapAssembly | { ok: false; errors: string[] } {
   const warnings: string[] = [];
   const regions: WorldRegionData[] = [];
   const seenRegions = new Set<string>();
@@ -183,11 +259,69 @@ export function assembleWorldMap(data: WorldMapData, maps: ReadonlyMap<string, G
     if (seenEvents.has(event.id)) problems.push('id 重复');
     if (!regions.some((region) => region.mapResourceId === event.mapResourceId)) problems.push('地图不在世界图区域中');
     if (map === undefined || !map.canEnter(event.col, event.row)) problems.push('触发坐标不可通行');
+    if (eventReferences !== undefined) {
+      if (event.discoverKnowledgeNodeId !== undefined &&
+        !eventReferences.knowledgeNodeIds.has(event.discoverKnowledgeNodeId)) {
+        problems.push(`发现节点未登记：${event.discoverKnowledgeNodeId}`);
+      }
+      for (const nodeId of event.conditions?.knowledgeNodeIds ?? []) {
+        if (!eventReferences.knowledgeNodeIds.has(nodeId)) problems.push(`条件节点未登记：${nodeId}`);
+      }
+      for (const periodId of event.conditions?.periodIds ?? []) {
+        if (!eventReferences.periodIds.has(periodId)) problems.push(`引用无效时段：${periodId}`);
+      }
+      for (const weatherId of event.conditions?.weatherIds ?? []) {
+        if (!eventReferences.weatherIds.has(weatherId)) problems.push(`引用无效天气：${weatherId}`);
+      }
+    }
     seenEvents.add(event.id);
     if (problems.length > 0) warnings.push(`区域事件 "${event.id}" 已禁用：${problems.join('；')}`);
     else events.push(event);
   }
   return { data, regions, transitions, events, warnings };
+}
+
+/** True when every condition group on this event is satisfied by live state. */
+export function regionEventConditionsMet(event: RegionEventData, context: RegionEventContext): boolean {
+  const conditions = event.conditions;
+  if (conditions === undefined) return true;
+  if (conditions.knowledgeNodeIds?.some((id) => !context.knownKnowledgeNodeIds.has(id))) return false;
+  if (conditions.periodIds !== undefined &&
+    (context.periodId === null || !conditions.periodIds.includes(context.periodId))) return false;
+  if (conditions.weatherIds !== undefined &&
+    (context.weatherId === null || !conditions.weatherIds.includes(context.weatherId))) return false;
+  return true;
+}
+
+/** Selects ready events at an exact cell without mutating completion or knowledge state. */
+export function selectTriggeredRegionEvents(
+  events: readonly RegionEventData[],
+  location: { mapResourceId: string } & CellPosition,
+  completedEventIds: ReadonlySet<string>,
+  context: RegionEventContext,
+): RegionEventData[] {
+  return events.filter((event) =>
+    event.mapResourceId === location.mapResourceId &&
+    event.col === location.col && event.row === location.row &&
+    (!event.once || !completedEventIds.has(event.id)) &&
+    regionEventConditionsMet(event, context),
+  );
+}
+
+/** Returns first-time node discoveries for a ready batch without mutating the save state. */
+export function selectNewRegionEventKnowledgeIds(
+  events: readonly RegionEventData[],
+  knownKnowledgeNodeIds: ReadonlySet<string>,
+): string[] {
+  const seen = new Set(knownKnowledgeNodeIds);
+  const discoveries: string[] = [];
+  for (const event of events) {
+    const nodeId = event.discoverKnowledgeNodeId;
+    if (nodeId === undefined || seen.has(nodeId)) continue;
+    seen.add(nodeId);
+    discoveries.push(nodeId);
+  }
+  return discoveries;
 }
 
 export function selectAdjacentTransition(

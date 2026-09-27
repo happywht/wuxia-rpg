@@ -134,8 +134,7 @@
               "text": "那背刀的往哪儿去了？",
               "nextNodeId": "where",
               "effects": [
-                { "kind": "discoverKnowledgeNode", "nodeId": "event.old-footprints" },
-                { "kind": "discoverKnowledgeNode", "nodeId": "place.reedbank" }
+                { "kind": "discoverKnowledgeNode", "nodeId": "event.old-footprints" }
               ]
             }
           ]

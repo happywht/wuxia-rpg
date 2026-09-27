@@ -3,7 +3,12 @@ import Phaser from 'phaser';
 import type { Diagnostic } from '../engine/data-loader';
 import { GridMap } from '../engine/grid-map';
 import { cellCenterOffset, renderGridMap } from '../engine/grid-map-renderer';
-import { selectAdjacentTransition, type RegionTransitionData } from '../engine/world-map';
+import {
+  selectAdjacentTransition,
+  selectNewRegionEventKnowledgeIds,
+  selectTriggeredRegionEvents,
+  type RegionTransitionData,
+} from '../engine/world-map';
 import { createKnowledgeState } from '../engine/knowledge-graph';
 import { createFactionMembershipState, type FactionMembershipState } from '../engine/faction-system';
 import {
@@ -1148,7 +1153,7 @@ export class GridScene extends Phaser.Scene {
     const minutes = clock.calendar.actionCosts.waitMinutes;
     this.advanceTime(minutes);
     const period = clock.currentPeriod();
-    this.showRegionNotice(`静候片刻（${minutes} 分钟），此刻已是「${period.name}」。`);
+    this.triggerRegionEvents(`静候片刻（${minutes} 分钟），此刻已是「${period.name}」。`);
   }
 
   /** Refreshes the calendar HUD line from the clock's derived snapshot. */
@@ -1981,18 +1986,37 @@ export class GridScene extends Phaser.Scene {
     this.triggerRegionEvents();
   }
 
-  /** Fires events authored for the exact cell just entered. */
-  private triggerRegionEvents(): void {
-    const events = this.world?.worldMap.events.filter((event) =>
-      event.mapResourceId === this.currentMapResourceId &&
-      event.col === this.playerCol && event.row === this.playerRow &&
-      (!event.once || !this.completedRegionalEvents.has(event.id)),
-    ) ?? [];
-    if (events.length === 0) return;
+  /** Fires ready events authored for the exact current cell. */
+  private triggerRegionEvents(prefix = ''): void {
+    const world = this.world;
+    if (world === null) {
+      if (prefix.length > 0) this.showRegionNotice(prefix);
+      return;
+    }
+    const events = selectTriggeredRegionEvents(
+      world.worldMap.events,
+      { mapResourceId: this.currentMapResourceId, col: this.playerCol, row: this.playerRow },
+      this.completedRegionalEvents,
+      {
+        knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
+        periodId: this.clock?.currentPeriod().id ?? null,
+        weatherId: this.currentClimate()?.weather.id ?? null,
+      },
+    );
+    const notices = prefix.length > 0 ? [prefix] : [];
     for (const event of events) {
       if (event.once) this.completedRegionalEvents.add(event.id);
+      notices.push(event.text);
     }
-    this.showRegionNotice(events.map((event) => event.text).join(' '));
+    const newlyDiscoveredTitles = new Set<string>();
+    for (const nodeId of selectNewRegionEventKnowledgeIds(events, this.knownKnowledgeNodeIds)) {
+      const node = world.knowledgeGraph.nodes.get(nodeId);
+      if (node === undefined) continue;
+      this.knownKnowledgeNodeIds.add(nodeId);
+      newlyDiscoveredTitles.add(node.title);
+    }
+    for (const title of newlyDiscoveredTitles) notices.push(`新见闻「${title}」已记入江湖百闻。`);
+    if (notices.length > 0) this.showRegionNotice(notices.join(' '));
   }
 
   private showRegionNotice(text: string): void {

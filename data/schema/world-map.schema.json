@@ -45,7 +45,9 @@
           "col": { "type": "integer", "minimum": 0, "maximum": 255 },
           "row": { "type": "integer", "minimum": 0, "maximum": 255 },
           "text": { "type": "string", "minLength": 1 },
-          "once": { "type": "boolean" }
+          "once": { "type": "boolean" },
+          "conditions": { "$ref": "#/definitions/regionEventConditions" },
+          "discoverKnowledgeNodeId": { "type": "string", "minLength": 1 }
         }
       }
     }
@@ -75,6 +77,18 @@
         "x": { "type": "integer", "minimum": 0, "maximum": 100 },
         "y": { "type": "integer", "minimum": 0, "maximum": 100 }
       }
+    },
+    "regionEventConditions": {
+      "type": "object", "additionalProperties": false, "minProperties": 1,
+      "properties": {
+        "knowledgeNodeIds": { "$ref": "#/definitions/nonEmptyIdList" },
+        "periodIds": { "$ref": "#/definitions/nonEmptyIdList" },
+        "weatherIds": { "$ref": "#/definitions/nonEmptyIdList" }
+      }
+    },
+    "nonEmptyIdList": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
     }
   }
 }
