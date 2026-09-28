@@ -3,9 +3,19 @@ import Phaser from 'phaser';
 import { type CellPosition, type GridMap } from '../engine/grid-map';
 import { findGridPath, findGridPathToAdjacentCell, summarizePathRuns } from '../engine/grid-path';
 import { clampMapViewport, createMapViewport, panMapViewport, zoomMapViewport, type MapViewportBounds, type MapViewportState } from '../engine/map-viewport';
-import { gridMapArtTextureKey } from '../engine/grid-map-renderer';
+import { ensureGridMapArtTexture, ensureGridMapLayerTexture } from '../engine/grid-map-renderer';
 import { QUEST_NAVIGATION_ID_PREFIX, type QuestNavigationTarget } from '../engine/quest-navigation';
 import { type WorldMapAssembly } from '../engine/world-map';
+import {
+  buildWorldAtlasOverlays,
+  projectWorldCell,
+  worldAtlasArtTextureKey,
+  type WorldAtlasConnection,
+  type WorldAtlasLandmarkMarker,
+  type WorldAtlasPoint,
+  type WorldAtlasRegionMarker,
+  type WorldAtlasOverlays,
+} from '../engine/world-atlas-view';
 import { buildWorldMapWaypoints, cycleWorldWaypointIndex, normalizeWorldMapPointer, type WorldMapWaypoint } from '../engine/world-navigation';
 import { uiFontSize } from './settings';
 import { addPixelPanelChrome, UI_FONT_FAMILY } from './ui-theme';
@@ -24,12 +34,24 @@ const COLORS = {
   crossing: 0xf09a68,
   route: 0xe8b04b,
   other: 0xc3a0f5,
+  region: 0xffe3a0,
 } as const;
 
 type Binding = { key: Phaser.Input.Keyboard.Key; handler: () => void };
 
 interface MapPin {
   waypointId: string;
+  pin: Phaser.GameObjects.Arc;
+}
+
+interface AtlasRegionPin {
+  marker: WorldAtlasRegionMarker;
+  pin: Phaser.GameObjects.Arc;
+  label: Phaser.GameObjects.Text;
+}
+
+interface AtlasLandmarkPin {
+  marker: WorldAtlasLandmarkMarker;
   pin: Phaser.GameObjects.Arc;
 }
 
@@ -55,7 +77,17 @@ export class WorldMapPanel {
   private routeDirectionsText: Phaser.GameObjects.Text | null = null;
   private routeDestinationText: Phaser.GameObjects.Text | null = null;
   private activeMap: GridMap | null = null;
+  private worldMap: WorldMapAssembly | null = null;
+  private allMaps: ReadonlyMap<string, GridMap> = new Map();
   private waypoints: WorldMapWaypoint[] = [];
+  private atlasOverlays: WorldAtlasOverlays | null = null;
+  private readonly atlasRegionPins: AtlasRegionPin[] = [];
+  private readonly atlasLandmarkPins: AtlasLandmarkPin[] = [];
+  private atlasConnections: WorldAtlasConnection[] = [];
+  private atlasConnectionGraphics: Phaser.GameObjects.Graphics | null = null;
+  private atlasPlayerPin: Phaser.GameObjects.Arc | null = null;
+  private viewMode: 'world' | 'local' = 'world';
+  private knownKnowledgeNodeIds: ReadonlySet<string> = new Set();
   private routeCells: CellPosition[] | null = null;
   private selectedWaypointId: string | null = null;
   private focusedWaypointIndex = -1;
@@ -118,6 +150,10 @@ export class WorldMapPanel {
     const clicked = !this.dragMoved;
     this.draggingPointerId = null;
     if (!clicked || !this.isPointerInsideMap(point.x, point.y)) return;
+    if (this.viewMode === 'world') {
+      this.selectOverviewPoint(point.x, point.y);
+      return;
+    }
     const waypoint = this.waypoints
       .map((candidate) => ({ waypoint: candidate, point: this.waypointScreenPosition(candidate.position) }))
       .map((candidate) => ({ ...candidate, distance: Math.hypot(candidate.point.x - point.x, candidate.point.y - point.y) }))
@@ -158,6 +194,7 @@ export class WorldMapPanel {
     worldMap: WorldMapAssembly,
     currentMapResourceId: string,
     map: GridMap,
+    maps: ReadonlyMap<string, GridMap>,
     playerCol: number,
     playerRow: number,
     knownKnowledgeNodeIds: ReadonlySet<string> = new Set(),
@@ -169,6 +206,10 @@ export class WorldMapPanel {
     this.container.setVisible(true);
     this.playerCol = playerCol;
     this.playerRow = playerRow;
+    this.worldMap = worldMap;
+    this.allMaps = maps;
+    this.knownKnowledgeNodeIds = knownKnowledgeNodeIds;
+    this.viewMode = worldMap.data.atlasArt === undefined ? 'local' : 'world';
     this.bindKeys();
     this.scene.input.on('pointerdown', this.pointerDown);
     this.scene.input.on('pointermove', this.pointerMove);
@@ -210,11 +251,19 @@ export class WorldMapPanel {
     this.mapPins.length = 0;
     this.waypointRows.length = 0;
     this.routeGraphics = null;
+    this.atlasConnectionGraphics = null;
+    this.atlasRegionPins.length = 0;
+    this.atlasLandmarkPins.length = 0;
+    this.atlasConnections = [];
+    this.atlasOverlays = null;
+    this.atlasPlayerPin = null;
     this.selectedNameText = null;
     this.routeDistanceText = null;
     this.routeDirectionsText = null;
     this.routeDestinationText = null;
     this.activeMap = null;
+    this.worldMap = null;
+    this.allMaps = new Map();
     this.waypoints = [];
     this.routeCells = null;
     this.selectedWaypointId = null;
@@ -266,6 +315,10 @@ export class WorldMapPanel {
     };
     confirm.on('down', confirmHandler);
     this.bindings.push({ key: confirm, handler: confirmHandler });
+    const toggle = keyboard.addKey(codes.G);
+    const toggleHandler = (): void => this.toggleView();
+    toggle.on('down', toggleHandler);
+    this.bindings.push({ key: toggle, handler: toggleHandler });
   }
 
   private unbindKeys(): void {
@@ -276,54 +329,103 @@ export class WorldMapPanel {
   private render(worldMap: WorldMapAssembly, currentMapResourceId: string, map: GridMap): void {
     addPixelPanelChrome(this.scene, this.container, { x: 90, y: 45, width: 780, height: 450 }, 0.9);
     this.addText(WIDTH / 2, 62, '江湖舆图', 20, COLORS.text, 0.5);
-    this.addText(WIDTH / 2, 91, '拖动平移 · 滚轮缩放 · 方向键微调 · W/S 选点 · Enter 规划 · M/Esc 收起', 12, COLORS.muted, 0.5);
+    this.addText(WIDTH / 2, 99, '拖动平移 · 滚轮缩放 · 方向键微调 · W/S 选点 · Enter 规划 · G 切换视图 · M/Esc 收起', 12, COLORS.muted, 0.5, 720);
+    if (worldMap.data.atlasArt !== undefined) {
+      this.addText(778, 63, this.viewMode === 'world' ? 'G · 本区细图' : 'G · 全域总览', 11, COLORS.accent, 0.5)
+        .setInteractive({ useHandCursor: true })
+        .on('pointerdown', () => this.toggleView());
+    }
 
-    const art = map.data.art;
-    const textureKey = art === undefined ? null : gridMapArtTextureKey(map);
-    if (art !== undefined && textureKey !== null && this.scene.textures.exists(textureKey)) {
-      this.mapWidth = map.columns * art.tileSize;
-      this.mapHeight = map.rows * art.tileSize;
-      this.artTileSize = art.tileSize;
+    const background = this.scene.add.rectangle(
+      this.mapBounds.x + this.mapBounds.width / 2,
+      this.mapBounds.y + this.mapBounds.height / 2,
+      this.mapBounds.width,
+      this.mapBounds.height,
+      COLORS.viewport,
+    ).setStrokeStyle(1, COLORS.stroke);
+    this.container.add(background);
+    this.inputZone = this.scene.add.zone(
+      this.mapBounds.x + this.mapBounds.width / 2,
+      this.mapBounds.y + this.mapBounds.height / 2,
+      this.mapBounds.width,
+      this.mapBounds.height,
+    ).setInteractive();
+    this.container.add(this.inputZone);
+
+    const atlasArt = this.viewMode === 'world' ? worldMap.data.atlasArt : undefined;
+    const atlasKey = this.viewMode === 'world' ? worldAtlasArtTextureKey(worldMap) : null;
+    const atlasTexture = atlasArt === undefined || atlasKey === null
+      ? null
+      : ensureGridMapLayerTexture(this.scene, atlasArt, atlasArt.columns, atlasArt.rows, atlasKey);
+    const localArt = this.viewMode === 'local' ? map.data.art : undefined;
+    const localKey = localArt === undefined ? null : ensureGridMapArtTexture(this.scene, map);
+    const textureKey = atlasTexture ?? localKey;
+    if (textureKey !== null) {
+      const usingOverview = atlasTexture !== null;
+      this.mapWidth = usingOverview
+        ? atlasArt!.columns * atlasArt!.tileSize
+        : map.columns * localArt!.tileSize;
+      this.mapHeight = usingOverview
+        ? atlasArt!.rows * atlasArt!.tileSize
+        : map.rows * localArt!.tileSize;
+      this.artTileSize = usingOverview ? atlasArt!.tileSize : localArt!.tileSize;
       this.baseScale = Math.min(this.mapBounds.width / this.mapWidth, this.mapBounds.height / this.mapHeight);
       this.viewportState = createMapViewport(this.mapBounds, this.mapWidth, this.mapHeight);
       this.mapContent = this.scene.add.container(0, 0).setScrollFactor(0).setDepth(1200);
-      const background = this.scene.add.rectangle(
-        this.mapBounds.x + this.mapBounds.width / 2,
-        this.mapBounds.y + this.mapBounds.height / 2,
-        this.mapBounds.width,
-        this.mapBounds.height,
-        COLORS.viewport,
-      ).setStrokeStyle(1, COLORS.stroke);
-      this.container.add(background);
       this.mapImage = this.scene.add.image(
         this.viewportState.x - this.mapBounds.x,
         this.viewportState.y - this.mapBounds.y,
         textureKey,
       ).setScale(this.viewportState.scale);
       this.mapContent.add(this.mapImage);
-      this.routeGraphics = this.scene.add.graphics();
-      this.mapContent.add(this.routeGraphics);
-      for (const waypoint of this.waypoints) {
-        // Remote objectives share their map marker with the first gate. Keep
-        // the local gate pin unambiguous; the remote destination remains a
-        // separate selectable row in the sidebar.
-        if (waypoint.kind === 'remote-region' || waypoint.kind === 'remote-landmark') continue;
-        const pin = this.scene.add.circle(0, 0, waypoint.kind === 'transition' ? 6 : 4.5, COLORS[waypoint.category])
-          .setStrokeStyle(2, 0x16202a);
-        pin.setInteractive(new Phaser.Geom.Circle(0, 0, 14), Phaser.Geom.Circle.Contains);
-        pin.on('pointerdown', () => this.selectWaypoint(waypoint.id));
-        this.mapPins.push({ waypointId: waypoint.id, pin });
-        this.mapContent.add(pin);
+      if (usingOverview) {
+        this.atlasOverlays = buildWorldAtlasOverlays(
+          worldMap,
+          this.allMaps,
+          currentMapResourceId,
+          { col: this.playerCol, row: this.playerRow },
+          this.knownKnowledgeNodeIds,
+        );
+        this.atlasConnections = this.atlasOverlays.connections;
+        this.atlasConnectionGraphics = this.scene.add.graphics();
+        this.mapContent.add(this.atlasConnectionGraphics);
+        this.routeGraphics = this.scene.add.graphics();
+        this.mapContent.add(this.routeGraphics);
+        for (const marker of this.atlasOverlays.regions) {
+          const pin = this.scene.add.circle(0, 0, 7, COLORS.region).setStrokeStyle(2, 0x271e13);
+          const label = this.scene.add.text(0, 0, marker.name, {
+            fontFamily: UI_FONT_FAMILY, fontSize: uiFontSize(11), color: '#fff1cb',
+            backgroundColor: '#10141d', padding: { x: 3, y: 1 },
+          }).setOrigin(0.5, 1).setScrollFactor(0);
+          this.atlasRegionPins.push({ marker, pin, label });
+          this.mapContent.add([pin, label]);
+        }
+        for (const marker of this.atlasOverlays.landmarks) {
+          const pin = this.scene.add.circle(0, 0, 4.5, COLORS[marker.category]).setStrokeStyle(1, 0x16202a);
+          this.atlasLandmarkPins.push({ marker, pin });
+          this.mapContent.add(pin);
+        }
+        if (this.atlasOverlays.player !== null) {
+          this.atlasPlayerPin = this.scene.add.circle(0, 0, 6, COLORS.player).setStrokeStyle(2, 0x241b0b);
+          this.mapContent.add(this.atlasPlayerPin);
+        }
+      } else {
+        this.routeGraphics = this.scene.add.graphics();
+        this.mapContent.add(this.routeGraphics);
+        for (const waypoint of this.waypoints) {
+          // Remote objectives share their map marker with the first gate. Keep
+          // the local gate pin unambiguous; the remote destination stays in the sidebar.
+          if (waypoint.kind === 'remote-region' || waypoint.kind === 'remote-landmark') continue;
+          const pin = this.scene.add.circle(0, 0, waypoint.kind === 'transition' ? 6 : 4.5, COLORS[waypoint.category])
+            .setStrokeStyle(2, 0x16202a);
+          pin.setInteractive(new Phaser.Geom.Circle(0, 0, 14), Phaser.Geom.Circle.Contains);
+          pin.on('pointerdown', () => this.selectWaypoint(waypoint.id));
+          this.mapPins.push({ waypointId: waypoint.id, pin });
+          this.mapContent.add(pin);
+        }
+        this.playerPin = this.scene.add.circle(0, 0, 6, COLORS.player).setStrokeStyle(2, 0x241b0b);
+        this.mapContent.add(this.playerPin);
       }
-      this.playerPin = this.scene.add.circle(0, 0, 6, COLORS.player).setStrokeStyle(2, 0x241b0b);
-      this.mapContent.add(this.playerPin);
-      this.inputZone = this.scene.add.zone(
-        this.mapBounds.x + this.mapBounds.width / 2,
-        this.mapBounds.y + this.mapBounds.height / 2,
-        this.mapBounds.width,
-        this.mapBounds.height,
-      ).setInteractive();
-      this.container.add(this.inputZone);
       this.updateMapPosition();
     } else {
       const fallback = this.scene.add.rectangle(
@@ -334,7 +436,9 @@ export class WorldMapPanel {
         COLORS.panelFill,
       ).setStrokeStyle(1, COLORS.stroke);
       this.container.add(fallback);
-      this.addText(this.mapBounds.x + 20, this.mapBounds.y + 32, '此地图未声明像素图层。', 13, COLORS.muted, 0);
+      this.addText(this.mapBounds.x + 20, this.mapBounds.y + 32, atlasArt === undefined && this.viewMode === 'world'
+        ? '此世界资料未声明全域底图；可按 G 查看本区地图。'
+        : '此地图未声明像素图层。', 13, COLORS.muted, 0);
     }
 
     const current = worldMap.regions.find((region) => region.mapResourceId === currentMapResourceId);
@@ -362,8 +466,41 @@ export class WorldMapPanel {
     this.routeDistanceText = this.addText(672, 415, '', 11, COLORS.text, 0);
     this.routeDirectionsText = this.addText(672, 437, '', 10, COLORS.muted, 0);
     this.routeDestinationText = this.addText(672, 465, '', 10, COLORS.muted, 0);
-    this.addText(122, 443, `${map.data.name} · 格坐标 (${this.playerCol}, ${this.playerRow})`, 11, COLORS.muted, 0);
+    this.addText(122, 443, this.viewMode === 'world'
+      ? `全域总图 · ${worldMap.regions.length} 个区域 · ${worldMap.data.atlasArt?.columns ?? 0}×${worldMap.data.atlasArt?.rows ?? 0} 格`
+      : `${map.data.name} · 格坐标 (${this.playerCol}, ${this.playerRow})`, 11, COLORS.muted, 0);
     if (this.mapContent !== null) this.createAtlasCamera();
+  }
+
+  private toggleView(): void {
+    const worldMap = this.worldMap;
+    const map = this.activeMap;
+    if (worldMap?.data.atlasArt === undefined || map === null) return;
+    const selectedId = this.selectedWaypointId;
+    this.viewMode = this.viewMode === 'world' ? 'local' : 'world';
+    if (this.mapCamera !== null) this.scene.cameras.remove(this.mapCamera);
+    this.mapCamera = null;
+    this.mapContent?.destroy();
+    this.mapContent = null;
+    this.container.removeAll(true);
+    this.mapImage = null;
+    this.playerPin = null;
+    this.atlasPlayerPin = null;
+    this.atlasConnectionGraphics = null;
+    this.atlasConnections = [];
+    this.atlasRegionPins.length = 0;
+    this.atlasLandmarkPins.length = 0;
+    this.atlasOverlays = null;
+    this.mapPins.length = 0;
+    this.waypointRows.length = 0;
+    this.selectedNameText = null;
+    this.routeDistanceText = null;
+    this.routeDirectionsText = null;
+    this.routeDestinationText = null;
+    this.routeGraphics = null;
+    this.inputZone = null;
+    this.render(worldMap, map.data.id, map);
+    if (selectedId !== null) this.selectWaypoint(selectedId);
   }
 
   /** A viewport camera gives the movable atlas a real rectangular clip region. */
@@ -407,15 +544,98 @@ export class WorldMapPanel {
       this.viewportState.x - this.mapBounds.x,
       this.viewportState.y - this.mapBounds.y,
     ).setScale(this.viewportState.scale);
-    this.playerPin?.setPosition(
-      this.viewportState.x - this.mapBounds.x - this.mapWidth * this.viewportState.scale / 2 + (this.playerCol + 0.5) * this.artTileSize * this.viewportState.scale,
-      this.viewportState.y - this.mapBounds.y - this.mapHeight * this.viewportState.scale / 2 + (this.playerRow + 0.5) * this.artTileSize * this.viewportState.scale,
-    );
-    for (const { waypointId, pin } of this.mapPins) {
-      const waypoint = this.waypoints.find((candidate) => candidate.id === waypointId);
-      if (waypoint !== undefined) pin.setPosition(...this.waypointMapContentPosition(waypoint.position));
+    if (this.viewMode === 'world' && this.atlasOverlays !== null) {
+      for (const entry of this.atlasRegionPins) {
+        const [x, y] = this.mapWorldContentPosition(entry.marker.position);
+        entry.pin.setPosition(x, y);
+        entry.label.setPosition(x, y - 10);
+      }
+      for (const entry of this.atlasLandmarkPins) {
+        const [x, y] = this.mapWorldContentPosition(entry.marker.position);
+        entry.pin.setPosition(x, y);
+      }
+      if (this.atlasOverlays.player !== null) {
+        this.atlasPlayerPin?.setPosition(...this.mapWorldContentPosition(this.atlasOverlays.player));
+      }
+      this.drawAtlasConnections();
+    } else {
+      this.playerPin?.setPosition(
+        this.viewportState.x - this.mapBounds.x - this.mapWidth * this.viewportState.scale / 2 + (this.playerCol + 0.5) * this.artTileSize * this.viewportState.scale,
+        this.viewportState.y - this.mapBounds.y - this.mapHeight * this.viewportState.scale / 2 + (this.playerRow + 0.5) * this.artTileSize * this.viewportState.scale,
+      );
+      for (const { waypointId, pin } of this.mapPins) {
+        const waypoint = this.waypoints.find((candidate) => candidate.id === waypointId);
+        if (waypoint !== undefined) pin.setPosition(...this.waypointMapContentPosition(waypoint.position));
+      }
     }
     this.drawRoute();
+  }
+
+  private drawAtlasConnections(): void {
+    const graphics = this.atlasConnectionGraphics;
+    if (graphics === null) return;
+    graphics.clear();
+    graphics.lineStyle(3, 0x384c61, 0.95);
+    for (const connection of this.atlasConnections) {
+      const from = this.mapWorldContentPosition(connection.from);
+      const to = this.mapWorldContentPosition(connection.to);
+      graphics.beginPath();
+      graphics.moveTo(from[0], from[1]);
+      graphics.lineTo(to[0], to[1]);
+      graphics.strokePath();
+    }
+  }
+
+  private selectOverviewPoint(screenX: number, screenY: number): boolean {
+    const overlays = this.atlasOverlays;
+    const worldMap = this.worldMap;
+    if (overlays === null || worldMap === null) return false;
+    const screenPosition = (point: WorldAtlasPoint): { x: number; y: number } => {
+      const [x, y] = this.mapWorldContentPosition(point);
+      return { x: x + this.mapBounds.x, y: y + this.mapBounds.y };
+    };
+    const landmark = this.atlasLandmarkPins
+      .map((entry) => ({ entry, point: screenPosition(entry.marker.position) }))
+      .map((candidate) => ({ ...candidate, distance: Math.hypot(candidate.point.x - screenX, candidate.point.y - screenY) }))
+      .filter((candidate) => candidate.distance <= 14)
+      .sort((left, right) => left.distance - right.distance)[0]?.entry.marker;
+    if (landmark !== undefined) {
+      const waypoint = this.waypoints.find((candidate) => candidate.destinationLandmarkId === landmark.id);
+      if (waypoint !== undefined) this.selectWaypoint(waypoint.id);
+      return true;
+    }
+    const region = this.atlasRegionPins
+      .map((entry) => ({ entry, point: screenPosition(entry.marker.position) }))
+      .map((candidate) => ({ ...candidate, distance: Math.hypot(candidate.point.x - screenX, candidate.point.y - screenY) }))
+      .filter((candidate) => candidate.distance <= 18)
+      .sort((left, right) => left.distance - right.distance)[0]?.entry.marker;
+    if (region !== undefined) {
+      const waypoint = this.waypoints.find((candidate) => candidate.id === `region:${region.mapResourceId}`);
+      if (waypoint !== undefined) {
+        this.selectWaypoint(waypoint.id);
+      } else {
+        this.selectedNameText?.setText(region.name);
+        this.routeDistanceText?.setText(region.mapResourceId === this.activeMap?.data.id ? '你正在此区域。' : '此区域当前没有已装配的步行关口。');
+        this.routeDirectionsText?.setText('');
+        this.routeDestinationText?.setText('');
+      }
+      return true;
+    }
+    const endpoint = this.atlasConnections
+      .flatMap((connection) => [
+        { connection, position: connection.from },
+        { connection, position: connection.to },
+      ])
+      .map((candidate) => ({ ...candidate, point: screenPosition(candidate.position) }))
+      .map((candidate) => ({ ...candidate, distance: Math.hypot(candidate.point.x - screenX, candidate.point.y - screenY) }))
+      .filter((candidate) => candidate.distance <= 14)
+      .sort((left, right) => left.distance - right.distance)[0]?.connection;
+    if (endpoint !== undefined) {
+      const waypoint = this.waypoints.find((candidate) => candidate.id === `transition:${endpoint.id}`);
+      if (waypoint !== undefined) this.selectWaypoint(waypoint.id);
+      return true;
+    }
+    return false;
   }
 
   private focusWaypoint(index: number): void {
@@ -469,6 +689,10 @@ export class WorldMapPanel {
     const selectedIndex = this.waypoints.findIndex((candidate) => candidate.id === id);
     if (selectedIndex >= 0) this.focusWaypoint(selectedIndex);
     for (const { waypointId, pin } of this.mapPins) pin.setScale(waypointId === id ? 1.4 : 1);
+    for (const { marker, pin } of this.atlasRegionPins) pin.setScale(id === `region:${marker.mapResourceId}` ? 1.5 : 1);
+    for (const { marker, pin } of this.atlasLandmarkPins) {
+      pin.setScale(waypoint.destinationLandmarkId === marker.id ? 1.5 : 1);
+    }
     this.drawRoute();
   }
 
@@ -480,13 +704,33 @@ export class WorldMapPanel {
     if (path === null || path.length < 2) return;
     graphics.lineStyle(3, COLORS.route, 0.9);
     graphics.beginPath();
-    const first = this.waypointMapContentPosition(path[0]!);
+    const first = this.routeMapContentPosition(path[0]!);
     graphics.moveTo(first[0], first[1]);
     for (const cell of path.slice(1)) {
-      const point = this.waypointMapContentPosition(cell);
+      const point = this.routeMapContentPosition(cell);
       graphics.lineTo(point[0], point[1]);
     }
     graphics.strokePath();
+  }
+
+  private routeMapContentPosition(position: CellPosition): [number, number] {
+    const worldMap = this.worldMap;
+    const map = this.activeMap;
+    if (this.viewMode === 'world' && worldMap?.data.atlasArt !== undefined && map !== null) {
+      const region = worldMap.regions.find(({ mapResourceId }) => mapResourceId === map.data.id);
+      if (region !== undefined) {
+        const point = projectWorldCell(position, map, region.atlasPosition, worldMap.data.atlasArt);
+        return this.mapWorldContentPosition(point);
+      }
+    }
+    return this.waypointMapContentPosition(position);
+  }
+
+  private mapWorldContentPosition(position: WorldAtlasPoint): [number, number] {
+    return [
+      this.viewportState.x - this.mapBounds.x - this.mapWidth * this.viewportState.scale / 2 + position.x * this.viewportState.scale,
+      this.viewportState.y - this.mapBounds.y - this.mapHeight * this.viewportState.scale / 2 + position.y * this.viewportState.scale,
+    ];
   }
 
   private waypointMapContentPosition(position: CellPosition): [number, number] {
@@ -517,12 +761,12 @@ export class WorldMapPanel {
     this.container.add(swatch);
   }
 
-  private addText(x: number, y: number, text: string, size: number, color: string, originX: number): Phaser.GameObjects.Text {
+  private addText(x: number, y: number, text: string, size: number, color: string, originX: number, wrapWidth = 175): Phaser.GameObjects.Text {
     const object = this.scene.add.text(x, y, text, {
       fontFamily: UI_FONT_FAMILY,
       fontSize: uiFontSize(size),
       color,
-      wordWrap: { width: 175 },
+      wordWrap: { width: wrapWidth, useAdvancedWrap: true },
     }).setOrigin(originX, 0.5).setScrollFactor(0);
     this.container.add(object);
     return object;

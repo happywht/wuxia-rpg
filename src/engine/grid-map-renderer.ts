@@ -2,7 +2,7 @@ import type Phaser from 'phaser';
 
 const PIXEL_FILTER_MODE = 1;
 
-import { GridMap, parseHexColor, type GridMapTilesetData } from './grid-map';
+import { GridMap, parseHexColor, type GridMapImageArtData, type GridMapTilesetData } from './grid-map';
 
 /**
  * Renders a validated {@link GridMap} as flat colored rectangles.
@@ -189,8 +189,13 @@ export function gridMapArtTextureKey(map: GridMap): string {
 }
 
 /** Loads the distinct source images required by a validated set of maps. */
-export function loadGridMapArtAssets(scene: Phaser.Scene, maps: Iterable<GridMap>): Promise<void> {
+export function loadGridMapArtAssets(
+  scene: Phaser.Scene,
+  maps: Iterable<GridMap>,
+  additionalTilesets: Iterable<GridMapTilesetData> = [],
+): Promise<void> {
   const tilesets = new Map<string, GridMapTilesetData>();
+  for (const tileset of additionalTilesets) tilesets.set(tileset.id, tileset);
   for (const map of maps) {
     for (const tileset of map.data.art?.tilesets ?? []) tilesets.set(tileset.id, tileset);
   }
@@ -231,19 +236,30 @@ export function ensureGridMapArtTexture(scene: Phaser.Scene, map: GridMap): stri
   const art = map.data.art;
   if (art === undefined) return null;
   const key = gridMapArtTextureKey(map);
+  return ensureGridMapLayerTexture(scene, art, map.columns, map.rows, key);
+}
+
+/** Bakes any validated layered tile image; dimensions are explicit so other data sets can reuse it. */
+export function ensureGridMapLayerTexture(
+  scene: Phaser.Scene,
+  art: GridMapImageArtData,
+  columns: number,
+  rows: number,
+  key: string,
+): string | null {
   if (scene.textures.exists(key)) return key;
-  const width = map.columns * art.tileSize;
-  const height = map.rows * art.tileSize;
+  const width = columns * art.tileSize;
+  const height = rows * art.tileSize;
   const texture = scene.textures.createCanvas(key, width, height);
-  if (texture === null) throw new Error(`无法创建地图贴图缓存：${map.data.id}（${width}×${height}）`);
+  if (texture === null) return null;
   const context = texture.context;
   const tilesets = new Map(art.tilesets.map((tileset) => [tileset.id, tileset]));
   for (const layer of art.layers) {
     const tileset = tilesets.get(layer.tilesetId);
     if (tileset === undefined) throw new Error(`地图图层“${layer.id}”引用了缺失图集“${layer.tilesetId}”。`);
     const source = scene.textures.get(gridMapTilesetTextureKey(tileset.id)).getSourceImage();
-    for (let row = 0; row < map.rows; row++) {
-      for (let col = 0; col < map.columns; col++) {
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < columns; col++) {
         const rawGid = layer.cells[row]?.[col] ?? 0;
         const frame = rawGid & 0x0fffffff;
         if (frame === 0) continue;

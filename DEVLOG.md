@@ -4,6 +4,34 @@
 
 ---
 
+## Round 66 — 全域可移动舆图（2026-09-29，已完成）
+
+### 计划与实现
+
+- 按 `iterations/round-66/plan.md` 执行。本轮面向用户提出的“超大世界地图且页面可移动”：让 M 先打开独立的宽幅全域地理总览，同时保留每张 100×100 实际可玩地图的细图、碰撞和既有导航。
+- **资料/Schema**：`world-map.json` 新增可选 `atlasArt`，当前声明 128×80、16px/格、五个 Tiled GID 图层；Schema 和 Phaser-free 解析器对图集引用、尺寸、图层网格与瓦片范围双重校验。旧资料和不提供 `atlasArt` 的 MOD 仍能装配并回退到本区细图。底图用仓库已有的 Kenney Roguelike CC0 图集，没有新增授权未明素材。
+- **确定性生成**：新增 `scripts/generate-round66-atlas.mjs` / `npm run generate:round-66-atlas`，由已声明的 `regions[].atlasPosition`、当前区域地图和实际 `transitions` 端点生成海面、陆地、海岸、山脊/林带与道路图层；海图种子稳定，不依赖运行时随机值。浏览器目检发现首版地表变化呈碎点；调整为连续主地表、较稀疏的地面变体和更大的树林/山脊簇，再次目检后保留。
+- **跨区投影**：新增 Phaser-free `src/engine/world-atlas-view.ts`：统一将 0–100 舆图坐标、各区域格坐标、玩家、关口两端、已知地标投影到全图像素空间。地标继续经 `discoveryNodeId` 过滤，不在总览或清单暴露未发现名称；关口连线只表示路线连接，不提供瞬移。
+- **界面**：`WorldMapPanel` 默认以 M 打开总览，支持视窗相机裁切、拖动、鼠标滚轮缩放和方向键平移；G 或按钮切换到本区细图。复用已选 waypoint、路线/首关口指引、NPC/遭遇占位寻路与手动过关规则。保留当前玩家位置与选择状态。视觉检查修正标题和操作行碰撞；汇总标题指引拓宽到单行显示。
+- **数据接线**：GridScene 为全图素材加载 tileset 并传入已装配全部区域地图；全图 texture 按图层内容哈希缓存，热替换图像数据会生成新键。新底图仅呈现外观；碰撞仍只由各地图 `grid` 决定。
+- **文档**：更新 `docs/MAP-ATLAS.md`、`docs/PLAYER-GUIDE.md`、`docs/ARCHITECTURE.md`、`docs/TESTING.md`、`CHANGELOG.md`、`ROADMAP.md`。
+
+### 验证
+
+- `npm run generate:round-66-atlas` 连续运行两次，第一次生成前/后与第二次生成后的文件 SHA-256 均为 `4B268FFBDE9AFF63B5ED4F8405D7B1BEFA9FB65CB4A076BF2C414205FD98FFD6`，证明确定性输出。
+- `npm run validate:data`：manifest Schema 与 28 个基础资源 Schema 全部通过。
+- `npm run typecheck`：`tsc --noEmit` 通过。
+- `npx vitest run tests/round66-world-atlas.test.ts tests/world-navigation.test.ts tests/world-map.test.ts tests/round52-map-landmarks.test.ts`：4 个文件/28 个用例通过。
+- 浏览器独立端口 `http://127.0.0.1:5183/`：从新游戏开始，M 打开全域地图；滚轮缩放、缩放后鼠标拖动改变视窗、方向键平移；G 切换本区细图；W/S + Enter 选择远区并得到「首段步行 65 格至石阶渡口旁」路线；Esc 回到原地图。未操作用户的 `127.0.0.1:5178` 页面。
+- `npm run package:release`：全通——28 项基础 Schema、28 项 MOD 零问题、`tsc --noEmit`、37 个测试文件/280 项用例、Round 34/48 文档审计、Vite 139 模块生产构建、发行归档和 R47 子路径 smoke。发行包 819,563 bytes，SHA-256 `d5cbeddb268c2b9541524a2e1de3781155f7948154937e30ceb112ab653aa785`，74 个归档文件/73 个内容文件；smoke 确认解包哈希及 `/preview/wuxia-rpg/` 页面、MOD/全部基础资料与 Schema、三张 Kenney PNG 图集及原始 CC0 License 均可加载。Vite 对 1,944.45 kB 主 JS 的分包建议为非阻断警告。
+
+### 边界
+
+- 全域总图目前用一张独立 128×80 CC0 地理底图汇总三块实际 100×100 区域；并非把三张实际百格细图缩成地图贴片。本区细节仍通过 G 切换查看，区域坐标可在世界资料里调整。
+- 本轮沿用上一轮已核验的 Kenney 素材授权；来源、CC0 许可和用途仍见 `docs/REFERENCES.md` 第六节。本轮未改玩家原有的 5178 端口标签页或其存档。
+
+---
+
 ## Round 65 — 世界地图美术与角色精灵升级（2026-09-29，已完成）
 
 ### 计划与实现

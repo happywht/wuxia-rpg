@@ -509,7 +509,11 @@ export class GridScene extends Phaser.Scene {
       return;
     }
     try {
-      await loadGridMapArtAssets(this, outcome.world.maps.values());
+      await loadGridMapArtAssets(
+        this,
+        outcome.world.maps.values(),
+        outcome.world.worldMap.data.atlasArt?.tilesets,
+      );
     } catch (error) {
       this.showErrorState('地图像素素材无法加载', [error instanceof Error ? error.message : String(error)], true);
       return;
@@ -1164,7 +1168,11 @@ export class GridScene extends Phaser.Scene {
       return;
     }
     try {
-      await loadGridMapArtAssets(this, outcome.world.maps.values());
+      await loadGridMapArtAssets(
+        this,
+        outcome.world.maps.values(),
+        outcome.world.worldMap.data.atlasArt?.tilesets,
+      );
     } catch (error) {
       this.reportDataReloadFailure('地图像素素材无法加载', [error instanceof Error ? error.message : String(error)]);
       return;
@@ -2834,6 +2842,7 @@ export class GridScene extends Phaser.Scene {
       world.worldMap,
       this.currentMapResourceId,
       this.map,
+      world.maps,
       this.playerCol,
       this.playerRow,
       this.knownKnowledgeNodeIds,

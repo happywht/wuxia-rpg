@@ -1,10 +1,12 @@
-import type { CellPosition, GridMap } from './grid-map';
+import type { CellPosition, GridMap, GridMapArtLayerData, GridMapTilesetData } from './grid-map';
 
 /** Data-only world atlas protocol. Coordinates in the atlas are presentation hints. */
 export interface WorldMapData {
   id: string;
   startingMapResourceId: string;
   regions: WorldRegionData[];
+  /** Optional CC0 pixel-art overview; absent in legacy atlases and MODs. */
+  atlasArt?: WorldAtlasArtData;
   /** Optional map-local presentation pins; absent in older world maps. */
   landmarks: WorldLandmarkData[];
   transitions: RegionTransitionData[];
@@ -30,6 +32,15 @@ export interface WorldRegionData {
   name: string;
   description: string;
   atlasPosition: { x: number; y: number };
+}
+
+/** Layered presentation-only map art. It never defines collision or movement. */
+export interface WorldAtlasArtData {
+  columns: number;
+  rows: number;
+  tileSize: number;
+  tilesets: GridMapTilesetData[];
+  layers: GridMapArtLayerData[];
 }
 
 export interface RegionEndpoint extends CellPosition {
@@ -166,6 +177,126 @@ function parseCell(value: unknown, label: string, errors: string[]): CellPositio
   return { col: value.col, row: value.row };
 }
 
+function parseAtlasArt(value: unknown, errors: string[]): WorldAtlasArtData | null {
+  const label = 'atlasArt';
+  if (!isObject(value)) {
+    errors.push(`${label}：应为对象`);
+    return null;
+  }
+  const allowed = new Set(['columns', 'rows', 'tileSize', 'tilesets', 'layers']);
+  for (const key of Object.keys(value)) if (!allowed.has(key)) errors.push(`${label}.${key}：不是受支持的字段`);
+  const dimension = (field: 'columns' | 'rows'): number | null => {
+    const candidate = value[field];
+    if (!integer(candidate) || candidate < 1 || candidate > 256) {
+      errors.push(`${label}.${field}：应为 1–256 之间的整数`);
+      return null;
+    }
+    return candidate;
+  };
+  const columns = dimension('columns');
+  const rows = dimension('rows');
+  const tileSize = integer(value.tileSize) && value.tileSize >= 1 && value.tileSize <= 256
+    ? value.tileSize
+    : null;
+  if (tileSize === null) errors.push(`${label}.tileSize：应为 1–256 之间的整数`);
+
+  const tilesets: GridMapTilesetData[] = [];
+  const tilesetIds = new Set<string>();
+  const rawTilesets = Array.isArray(value.tilesets) ? value.tilesets : [];
+  if (rawTilesets.length === 0) {
+    errors.push(`${label}.tilesets：应为非空图集数组`);
+  } else rawTilesets.forEach((entry, index) => {
+    const path = `${label}.tilesets[${index}]`;
+    if (!isObject(entry)) { errors.push(`${path}：应为对象`); return; }
+    const { id, image, tileSize: sourceSize, columns: sourceColumns, rows: sourceRows, spacing, tileCount } = entry;
+    if (!nonEmpty(id)) errors.push(`${path}.id：应为非空字符串`);
+    if (nonEmpty(id) && tilesetIds.has(id)) errors.push(`${path}.id：图集 id 重复`);
+    if (nonEmpty(id)) tilesetIds.add(id);
+    if (typeof image !== 'string' || image.trim().length === 0 || image.startsWith('/') ||
+      image.split('/').some((part) => part === '..')) errors.push(`${path}.image：应为不含绝对路径或 .. 的相对路径`);
+    const integerField = (name: string, candidate: unknown, min: number, max: number): candidate is number => {
+      if (!integer(candidate) || candidate < min || candidate > max) {
+        errors.push(`${path}.${name}：应为 ${min}–${max} 之间的整数`);
+        return false;
+      }
+      return true;
+    };
+    const validSourceSize = integerField('tileSize', sourceSize, 1, 256);
+    const validSourceColumns = integerField('columns', sourceColumns, 1, 1024);
+    const validSourceRows = integerField('rows', sourceRows, 1, 1024);
+    const validSpacing = integerField('spacing', spacing, 0, 32);
+    const validCount = integerField('tileCount', tileCount, 1, 1_048_576);
+    if (validSourceColumns && validSourceRows && validCount && tileCount > sourceColumns * sourceRows) {
+      errors.push(`${path}.tileCount：超过图集容量`);
+    }
+    if (nonEmpty(id) && typeof image === 'string' && validSourceSize && validSourceColumns && validSourceRows &&
+      validSpacing && validCount) {
+      tilesets.push({
+        id, image, tileSize: sourceSize, columns: sourceColumns, rows: sourceRows,
+        spacing, tileCount,
+      });
+    }
+  });
+
+  const layers: GridMapArtLayerData[] = [];
+  const layerIds = new Set<string>();
+  const rawLayers = Array.isArray(value.layers) ? value.layers : [];
+  if (rawLayers.length === 0) {
+    errors.push(`${label}.layers：应为非空图层数组`);
+  } else rawLayers.forEach((entry, layerIndex) => {
+    const path = `${label}.layers[${layerIndex}]`;
+    if (!isObject(entry)) { errors.push(`${path}：应为对象`); return; }
+    const { id, tilesetId, cells } = entry;
+    if (!nonEmpty(id)) errors.push(`${path}.id：应为非空字符串`);
+    if (nonEmpty(id) && layerIds.has(id)) errors.push(`${path}.id：图层 id 重复`);
+    if (nonEmpty(id)) layerIds.add(id);
+    if (!nonEmpty(tilesetId) || !tilesetIds.has(tilesetId)) {
+      errors.push(`${path}.tilesetId：未引用已声明图集`);
+    }
+    if (!Array.isArray(cells)) {
+      errors.push(`${path}.cells：应为二维数组`);
+      return;
+    }
+    if (rows !== null && cells.length !== rows) errors.push(`${path}.cells：应有 ${rows} 行，实际 ${cells.length} 行`);
+    let valid = true;
+    const parsedRows: number[][] = [];
+    cells.forEach((row, rowIndex) => {
+      if (!Array.isArray(row)) {
+        errors.push(`${path}.cells[${rowIndex}]：应为数组`);
+        valid = false;
+        return;
+      }
+      if (columns !== null && row.length !== columns) {
+        errors.push(`${path}.cells[${rowIndex}]：应有 ${columns} 格，实际 ${row.length} 格`);
+        valid = false;
+      }
+      const parsedRow: number[] = [];
+      row.forEach((gid, colIndex) => {
+        if (!integer(gid) || gid < 0 || gid > 0xffffffff) {
+          errors.push(`${path}.cells[${rowIndex}][${colIndex}]：应为无符号整数 GID`);
+          valid = false;
+          return;
+        }
+        const frame = gid & 0x0fffffff;
+        const tileset = tilesets.find((candidate) => candidate.id === tilesetId);
+        if (frame !== 0 && (tileset === undefined || frame > tileset.tileCount)) {
+          errors.push(`${path}.cells[${rowIndex}][${colIndex}]：帧 ${frame} 超出图集`);
+          valid = false;
+        }
+        parsedRow.push(gid);
+      });
+      parsedRows.push(parsedRow);
+    });
+    if (nonEmpty(id) && nonEmpty(tilesetId) && tilesetIds.has(tilesetId) && valid) {
+      layers.push({ id, tilesetId, cells: parsedRows });
+    }
+  });
+
+  if (columns === null || rows === null || tileSize === null || layers.length !== rawLayers.length ||
+    tilesets.length !== rawTilesets.length) return null;
+  return { columns, rows, tileSize, tilesets, layers };
+}
+
 function parseEndpoint(value: unknown, label: string, errors: string[]): RegionEndpoint | null {
   const cell = parseCell(value, label, errors);
   if (!isObject(value) || cell === null || !nonEmpty(value.mapResourceId)) {
@@ -183,6 +314,7 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
   const errors: string[] = [];
   if (!nonEmpty(raw.id)) errors.push('id：应为非空字符串');
   if (!nonEmpty(raw.startingMapResourceId)) errors.push('startingMapResourceId：应为非空字符串');
+  const atlasArt = raw.atlasArt === undefined ? undefined : parseAtlasArt(raw.atlasArt, errors) ?? undefined;
   const regions: WorldRegionData[] = [];
   if (!Array.isArray(raw.regions) || raw.regions.length === 0) {
     errors.push('regions：应为非空区域数组');
@@ -313,6 +445,7 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
       id: raw.id as string,
       startingMapResourceId: raw.startingMapResourceId as string,
       regions,
+      ...(atlasArt === undefined ? {} : { atlasArt }),
       landmarks,
       transitions,
       events,

@@ -35,11 +35,15 @@ export interface GridMapArtLayerData {
   cells: number[][];
 }
 
-/** Optional presentation data. Collision and movement remain in `grid`. */
-export interface GridMapArtData {
+/** Layered pixels-only art reusable by gameplay maps and the world atlas. */
+export interface GridMapImageArtData {
   tileSize: number;
   tilesets: GridMapTilesetData[];
   layers: GridMapArtLayerData[];
+}
+
+/** Optional presentation data. Collision and movement remain in `grid`. */
+export interface GridMapArtData extends GridMapImageArtData {
   actors: {
     tilesetId: string;
     playerFrame: number;

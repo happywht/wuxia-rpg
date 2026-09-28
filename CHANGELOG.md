@@ -4,6 +4,25 @@
 
 ## [Unreleased]
 
+### Added (Round 66)
+
+- **全域可移动舆图**：`world-map.json` 可选 `atlasArt`，基于已有 Kenney Roguelike CC0 图集生成 128×80 格五层宽幅地理底图；M 默认打开总览，G/按钮切换本区细图。区域、位置、关口端点与发现地标由世界资料投影，不改碰撞图或跨区步行规则。
+- **全域投影引擎模块**：新增 Phaser-free `world-atlas-view.ts` 统一映射区域格点、当前位置、关口和已知地标；新增可重复的 `generate:round-66-atlas` 脚本与 `tests/round66-world-atlas.test.ts` 专项回归。
+
+### Changed (Round 66)
+
+- 地图 Schema 与运行时解析器校验全域图尺寸、图集、图层/GID；旧 `world-map` 与 MOD 可继续省略全域美术并回退本区细图。
+- `world-map-ui.ts` 增加全域/本区切换，继续使用原 waypoint 选择、碰撞寻路、目的地和过关提示；全域连接线只提供方向信息。面板支持裁切后的拖动平移、滚轮缩放及方向键平移。
+- 调整全域底图草地变化密度与林地/山脊群落尺度；操作说明改用宽幅单行，消除标题区与多行指引重叠。
+- 同步 `docs/MAP-ATLAS.md`、`docs/PLAYER-GUIDE.md`、`docs/ARCHITECTURE.md`、`docs/TESTING.md` 与路线图/开发日志。
+
+### Verification (Round 66)
+
+- `npm run generate:round-66-atlas` 连续生成两次，SHA-256 均为 `4B268FFBDE9AFF63B5ED4F8405D7B1BEFA9FB65CB4A076BF2C414205FD98FFD6`。
+- `npm run typecheck`、`npm run validate:data` 通过；专项命令 `npx vitest run tests/round66-world-atlas.test.ts tests/world-navigation.test.ts tests/world-map.test.ts tests/round52-map-landmarks.test.ts` 为 4 个文件/28 个用例通过。
+- 浏览器隔离端口 `http://127.0.0.1:5183/`：新游戏后按 M 打开全域图，滚轮缩放、放大后拖动与方向键平移有效；G 切换本区细图并保留选点，W/S + Enter 选择远方铁嶂目标显示首段 65 格至石阶渡口旁的路线，Esc 返回原地图。用户的 5178 页面未触碰。
+- `npm run package:release`：全通——28 项基础 Schema/28 项 MOD 零问题、`tsc --noEmit`、37 个测试文件/280 项用例、Round 34/48 文档审计、139 模块生产构建、74 个归档文件/73 个内容文件与 R47 子路径 smoke。发行包 819,563 bytes，SHA-256 `d5cbeddb268c2b9541524a2e1de3781155f7948154937e30ceb112ab653aa785`；完整详情见 `DEVLOG.md` Round 66。
+
 ### Added (Round 65)
 
 - **官方城镇图集接入**：新增 `data/assets/kenney/rpg-urban-pack/`（官方 Kenney RPG Urban Pack 打包图集 432×288 + 原始 CC0 `License.txt`），逐像素核验为 27×18 格、16px、0 间距（包内 `tilemap.txt` 声称 Spacing: 1px 与 PNG 实际尺寸矛盾，以实测为准并记录于 `docs/REFERENCES.md` 第六节）。发布白名单与 R47 归档 smoke 同步纳入第三张图集及许可。
