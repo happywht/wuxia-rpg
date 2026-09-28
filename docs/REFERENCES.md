@@ -73,7 +73,7 @@
 
 | 素材来源 | 官方页面 / 许可依据 | 本项目实际使用内容 | 授权与发行处理 |
 |---|---|---|---|
-| Kenney Roguelike/RPG Pack | [素材页](https://kenney.nl/assets/roguelike-rpg-pack)；[Kenney 许可说明](https://kenney.nl/support) | `data/assets/kenney/roguelike-rpg/roguelikeSheet_transparent.png` 用于地表、道路、树木、岸线、建筑与聚落；素材包所附 `Map/sample_map.tmx` 作为 100×100 五层世界底稿，项目本地副本为 `scripts/sources/kenney-roguelike-sample-map.tmx` | 素材包页面与作者说明采用 CC0/公有领域许可；保留原始 `License.txt`。地图扩建只复用该图集瓦片，不引入未授权外部素材；源码 TMX 不进入版本包 |
+| Kenney Roguelike/RPG Pack | [素材页](https://kenney.nl/assets/roguelike-rpg-pack)；[Kenney 许可说明](https://kenney.nl/support) | `data/assets/kenney/roguelike-rpg/roguelikeSheet_transparent.png` 用于地表、道路、树木、岸线、建筑与聚落；素材包所附 `Map/sample_map.tmx` 作为 100×100 五层世界底稿，项目本地副本为 `scripts/sources/kenney-roguelike-sample-map.tmx`；Round 62 铁嶂北道八层地貌复用同一图集 | 素材包页面与作者说明采用 CC0/公有领域许可；保留原始 `License.txt`。地图扩建只复用该图集瓦片，不引入未授权外部素材；源码 TMX 不进入版本包 |
 | Kenney Tiny Dungeon | [素材页](https://kenney.nl/assets/tiny-dungeon)；[Kenney 许可说明](https://kenney.nl/support) | `data/assets/kenney/tiny-dungeon/tilemap_packed.png` 中的帧用于玩家、NPC 与伙伴像素人物 | CC0/公有领域许可；保留原始 `License.txt`，人物帧号由地图/NPC JSON 数据指定 |
 
 Kenney 的许可 FAQ 明确说明 Kenney.nl 提供的素材可在 CC0 条款下用于个人、教育及商业项目，署名并非强制。为保留来源并方便后续核验，本项目仍链接官方素材页并随素材包保存原许可文件。仅加入运行实际需要的两张图集及各自许可文件；未使用同轮下载时检查过的 Tiny Town、Puny Characters 等其他资源。该素材来源独立于原作研究资料，不含《白金英雄坛说》的美术资源。

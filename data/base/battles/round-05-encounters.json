@@ -168,6 +168,54 @@
         "defeat": "你被假护队头目逼得退回池塘外，挑夫们也不敢再走这条路。",
         "flee": "你退到坡边，假护队仍守着东野小道不肯离开。"
       }
+    },
+    {
+      "id": "encounter.r62-ridge-roadblock",
+      "name": "碎岭拦路客",
+      "mapResourceId": "map.round-62-iron-ridge",
+      "position": { "col": 71, "row": 63 },
+      "profileId": "char.scribe-apprentice",
+      "enemy": {
+        "name": "拦路头目",
+        "attributes": { "body": 9, "force": 9, "agility": 7, "insight": 6, "resolve": 6 },
+        "health": 62,
+        "qi": 16,
+        "martialArtIds": ["skill.tiezhang-zhuanggong", "skill.jianghu-sanshou"]
+      },
+      "victoryExperience": 48,
+      "defeatRecovery": { "healthRatio": 0.6, "qiRatio": 0.6 },
+      "repeatable": true,
+      "texts": {
+        "approach": "碎岭路上有人截停过山客，按 E 应战",
+        "intro": "头目把铁钎横在路心：「界石归谁，路就归谁。留下行囊再过去。」",
+        "victory": "铁钎落在路旁，几名拦路客退到石坡后，驿路暂时通畅。",
+        "defeat": "你被拦路头目逼退到山弯，驿道上的行旅只得绕回关墙外。",
+        "flee": "你退到松影下，拦路客仍守着碎岭弯道。"
+      }
+    },
+    {
+      "id": "encounter.r62-beacon-looters",
+      "name": "烽台盗石人",
+      "mapResourceId": "map.round-62-iron-ridge",
+      "position": { "col": 87, "row": 80 },
+      "profileId": "char.scribe-apprentice",
+      "enemy": {
+        "name": "盗石领头人",
+        "attributes": { "body": 8, "force": 10, "agility": 7, "insight": 5, "resolve": 6 },
+        "health": 60,
+        "qi": 16,
+        "martialArtIds": ["skill.jianghu-sanshou", "skill.tiezhang-zhuanggong"]
+      },
+      "victoryExperience": 46,
+      "defeatRecovery": { "healthRatio": 0.6, "qiRatio": 0.6 },
+      "repeatable": true,
+      "texts": {
+        "approach": "旧烽台下有人拆取石件，按 E 阻止他们",
+        "intro": "领头人抛起一块刻着更次的石片：「废台上的东西，谁先拿到便是谁的。」",
+        "victory": "盗石人弃下工具逃散，烽台石片被放回原位。",
+        "defeat": "你被盗石领头人逼离烽台，只能等伤势平复后再来。",
+        "flee": "你退到山坡另一侧，盗石人继续敲凿残墙。"
+      }
     }
   ]
 }

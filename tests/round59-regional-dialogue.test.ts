@@ -267,9 +267,9 @@ function visibleStartTargets(conversation: DialogueData, context: DialogueRuntim
 describe('Round 59 regional dialogue echoes', () => {
   it('parses real base data and assembles quests and dialogue references without warnings', () => {
     expect(graph.warnings).toEqual([]);
-    expect(graph.nodes.size).toBe(181);
+    expect(graph.nodes.size).toBe(195);
     expect(questAssembly.warnings).toEqual([]);
-    expect(questAssembly.quests.size).toBe(40);
+    expect(questAssembly.quests.size).toBe(43);
     expect(dialogueAssembly.warnings).toEqual([]);
 
     // Both conversation files parse without disabled conversations.

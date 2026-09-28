@@ -143,6 +143,32 @@
       "schedule": [
         { "periodId": "period.dusk", "position": { "col": 3, "row": 4 } }
       ]
+    },
+    {
+      "id": "char.shao-changgeng",
+      "name": "邵长庚",
+      "mapResourceId": "map.round-62-iron-ridge",
+      "position": { "col": 48, "row": 49 },
+      "dialogueId": "dlg.shao-changgeng-iron-ridge",
+      "questGiver": true,
+      "spriteFrame": 98,
+      "schedule": [
+        { "periodId": "period.morning", "position": { "col": 49, "row": 48 } },
+        { "periodId": "period.night", "position": { "col": 48, "row": 50 } }
+      ]
+    },
+    {
+      "id": "char.qin-suyan",
+      "name": "秦素砚",
+      "mapResourceId": "map.round-62-iron-ridge",
+      "position": { "col": 57, "row": 49 },
+      "dialogueId": "dlg.qin-suyan-iron-ridge",
+      "questGiver": true,
+      "spriteFrame": 99,
+      "schedule": [
+        { "periodId": "period.midday", "position": { "col": 57, "row": 50 } },
+        { "periodId": "period.night", "position": { "col": 56, "row": 50 } }
+      ]
     }
   ]
 }

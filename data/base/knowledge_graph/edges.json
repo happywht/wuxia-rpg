@@ -287,6 +287,23 @@
     {"id":"kg.edge.r58-supply-requires-survey","fromId":"quest.r58-south-hamlet-supply","toId":"quest.r58-south-hamlet-survey","relation":"requires","summary":"先查明南麓聚落和旧路，才能安排送药。"},
     {"id":"kg.edge.r58-supply-requires-root","fromId":"quest.r58-south-hamlet-supply","toId":"item.cangya-gen","relation":"requires","summary":"南麓药队需要苍崖根配散。"},
     {"id":"kg.edge.r58-gu-offers-bandit","fromId":"char.gu-yechen","toId":"quest.r58-pond-bandit-camp","relation":"participatesIn","summary":"顾夜尘请玩家查清东野池塘冒牌护药队并打通旧路。"},
-    {"id":"kg.edge.r58-bandit-requires-supply","fromId":"quest.r58-pond-bandit-camp","toId":"quest.r58-south-hamlet-supply","relation":"requires","summary":"南麓药材交由货担捎送后，才进一步查办冒牌护队。"}
+    {"id":"kg.edge.r58-bandit-requires-supply","fromId":"quest.r58-pond-bandit-camp","toId":"quest.r58-south-hamlet-supply","relation":"requires","summary":"南麓药材交由货担捎送后，才进一步查办冒牌护队。"},
+    {"id":"kg.edge.r62-region-arrival-event","fromId":"event.r62-ridge-arrival","toId":"map.round-62-iron-ridge","relation":"locatedAt","summary":"雾岬北口初行标出铁嶂北道的区域入口。"},
+    {"id":"kg.edge.r62-region-north-gate","fromId":"place.iron-ridge-north-gate","toId":"map.round-62-iron-ridge","relation":"locatedAt","summary":"铁嶂南隘是北道地图的渡口入口。"},
+    {"id":"kg.edge.r62-north-gate-arrival","fromId":"event.r62-ridge-arrival","toId":"place.iron-ridge-north-gate","relation":"triggers","summary":"穿过雾岬北口时首次认识铁嶂南隘。"},
+    {"id":"kg.edge.r62-pass-event-place","fromId":"event.r62-pass-marks","toId":"place.iron-ridge-pass","relation":"triggers","summary":"检查碎岭凿痕后确认旧道仍可通行。"},
+    {"id":"kg.edge.r62-post-event-place","fromId":"event.r62-post-ledger","toId":"place.iron-ridge-post","relation":"triggers","summary":"比对更簿与水尺印记后认出岩关驿镇。"},
+    {"id":"kg.edge.r62-beacon-event-place","fromId":"event.r62-beacon-code","toId":"place.iron-ridge-beacon","relation":"triggers","summary":"烽台残页揭出北脊旧烽台的巡山暗号。"},
+    {"id":"kg.edge.r62-shao-located","fromId":"char.shao-changgeng","toId":"map.round-62-iron-ridge","relation":"locatedAt","summary":"邵长庚在铁嶂北道岩关驿镇值事。"},
+    {"id":"kg.edge.r62-qin-located","fromId":"char.qin-suyan","toId":"place.iron-ridge-post","relation":"locatedAt","summary":"秦素砚在岩关驿镇整理北道更簿。"},
+    {"id":"kg.edge.r62-shao-tiezhang","fromId":"char.shao-changgeng","toId":"faction.tiezhang-pai","relation":"belongsTo","summary":"邵长庚出身铁嶂派，兼管北道驿务。"},
+    {"id":"kg.edge.r62-shao-offers-pass","fromId":"char.shao-changgeng","toId":"quest.r62-north-pass-marks","relation":"participatesIn","summary":"邵长庚请玩家核对碎岭旧道界石。"},
+    {"id":"kg.edge.r62-pass-requires-gauge","fromId":"quest.r62-north-pass-marks","toId":"place.mist-north-cap","relation":"requires","summary":"北隘校标须以雾岬北岸水尺作为线索。"},
+    {"id":"kg.edge.r62-pass-triggers-marks","fromId":"quest.r62-north-pass-marks","toId":"event.r62-pass-marks","relation":"triggers","summary":"北隘校标把玩家引到碎岭界石核验凿痕。"},
+    {"id":"kg.edge.r62-shao-offers-ledger","fromId":"char.shao-changgeng","toId":"quest.r62-post-ledger","relation":"participatesIn","summary":"邵长庚请玩家与秦素砚核对巡山更次。"},
+    {"id":"kg.edge.r62-qin-ledger","fromId":"char.qin-suyan","toId":"quest.r62-post-ledger","relation":"participatesIn","summary":"秦素砚按驿镇旧簿校出烽台换班暗号。"},
+    {"id":"kg.edge.r62-ledger-requires-pass","fromId":"quest.r62-post-ledger","toId":"quest.r62-north-pass-marks","relation":"requires","summary":"先校准碎岭界石，再核对北道更次。"},
+    {"id":"kg.edge.r62-shao-offers-clear-road","fromId":"char.shao-changgeng","toId":"quest.r62-clear-ridge-road","relation":"participatesIn","summary":"邵长庚请玩家驱散占据碎岭路的拦路客。"},
+    {"id":"kg.edge.r62-clear-road-requires-ledger","fromId":"quest.r62-clear-ridge-road","toId":"quest.r62-post-ledger","relation":"requires","summary":"巡山更次核实后再清理碎岭拦路客。"}
   ]
 }

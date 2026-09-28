@@ -169,14 +169,18 @@ try {
     }
     const data = await loadGameData({ baseUrl: siteBase });
     assert.equal(data.diagnostics.length, 0, JSON.stringify(data.diagnostics, null, 2));
-    assert.equal(data.resources.size, 26, '非根路径下基础 manifest 的 26 项资源和 Schema 全部加载');
+    const publishedManifestResponse = await fetch(`${siteBase}base/manifest.json`);
+    assert.equal(publishedManifestResponse.status, 200, '非根路径下发布的基础 manifest 可读取');
+    const publishedManifest = await publishedManifestResponse.json();
+    assert.equal(data.resources.size, publishedManifest.resources.length,
+      `非根路径下 manifest 的 ${publishedManifest.resources.length} 项资源和 Schema 全部加载`);
     assert.equal(data.enabledMods.length, 0, '基础资料未启用示例覆盖层');
   } finally {
     await vite.close();
     await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
   }
 
-  console.log(`通过：${archiveName} 可解包，${manifest.files.length} 个文件的大小/哈希与清单一致；静态包可挂载到 ${mountPath} 并加载 HTML/JS/CSS、示例 MOD、全部 26 项基础资料/Schema，以及两张 Kenney PNG 图集与原始 CC0 License。`);
+  console.log(`通过：${archiveName} 可解包，${manifest.files.length} 个文件的大小/哈希与清单一致；静态包可挂载到 ${mountPath} 并加载 HTML/JS/CSS、示例 MOD、manifest 中全部基础资料/Schema，以及两张 Kenney PNG 图集与原始 CC0 License。`);
 } finally {
   await rm(tempRoot, { recursive: true, force: true });
 }

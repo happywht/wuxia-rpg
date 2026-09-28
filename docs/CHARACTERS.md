@@ -1,6 +1,6 @@
 # 人物志（CHARACTERS）
 
-- 状态：Round 30 起基础世界共有 **12 名可交互 NPC**（江南道·七镇行旅 7 名、雾雨渡口 5 名），全部为原创人物；Round 51 将江南道地图扩为 100×100 并重排七名 NPC 到开局聚落周围，NPC 均有独立像素精灵帧。Round 59 为七位与芦桥集/南麓任务链相关的人物（陆贞娘、顾夜尘、姜百味、马尚义、石北、祝九弦、白鹭洲）补入按 `questStatus` 显隐的活动中/完成后区域回应，不接任务、不发效果。身份数据在 `data/base/characters/round-03-npcs.json`，对话分布于 `dialogues/round-03-conversations.json` 与 `dialogues/round-30-conversations.json`，图谱词条在 `data/base/knowledge_graph/nodes.json`。
+- 状态：Round 62 起基础世界共有 **14 名可交互 NPC**（江南道·七镇行旅 7 名、雾雨渡口 5 名、铁嶂北道 2 名），全部为原创人物；Round 51 将江南道地图扩为 100×100 并重排七名 NPC 到开局聚落周围，NPC 均有独立像素精灵帧。Round 59 为七位与芦桥集/南麓任务链相关的人物（陆贞娘、顾夜尘、姜百味、马尚义、石北、祝九弦、白鹭洲）补入按 `questStatus` 显隐的活动中/完成后区域回应，不接任务、不发效果。Round 62 增加铁嶂北道驿镇人物邵长庚、秦素砚，分别担任区域差事发布人和巡山旧簿谈话目标。身份数据在 `data/base/characters/round-03-npcs.json`，对话分布于 `dialogues/round-03-conversations.json`、`dialogues/round-30-conversations.json` 与 `dialogues/round-62-conversations.json`，图谱词条在 `data/base/knowledge_graph/nodes.json`。
 - 关联：`docs/NPC-SCHEDULES.md`（时段日程）、`docs/FACTIONS.md`（门派与师承）、`docs/KNOWLEDGE-GRAPH.md`（人物词条与关系边）、`docs/DIALOGUE-GUIDE.md`（对话写法）。
 
 ## 总表
@@ -19,6 +19,8 @@
 | 容素青 | 雾雨渡口 | (12,2) | `dlg.rong-su-qing-herbalist` | 药师；三张药方传授 |
 | **祝九弦** | 雾雨渡口 | (11,3) | `dlg.zhu-jiuxian-mentor` | **盘舷刀场教头（导师，R30）；集口拦贩发布人（R58）** |
 | **白鹭洲** | 雾雨渡口 | (4,4) | `dlg.bai-luzhou-ferry-master` | **渡董；渡籍与轮值章程（R30）；集期赶办发布人（R58）** |
+| 邵长庚 | 铁嶂北道·岩关驿镇 | (48,49) | `dlg.shao-changgeng-iron-ridge` | 驿镇更牌核验人；北隘校标、驿镇更次、碎岭清道发布人（R62） |
+| 秦素砚 | 铁嶂北道·岩关驿镇 | (57,49) | `dlg.qin-suyan-iron-ridge` | 抄录巡山旧簿；驿镇更次谈话目标（R62） |
 
 加粗为 Round 30 新增。所有位置为 `npc-set` 中的基础 `position`；带 `schedule` 的人物会按历法时段在图内移动（见总表之外的 `NPC-SCHEDULES.md`）。放置校验要求基础位与全部日程位可走、不压玩家出生点、不与其他 NPC 或任何固定互动格（遭遇/擂台/工位/药炉/门派战入口/终章入口/关口/区域事件）重叠。
 
@@ -35,6 +37,16 @@
 ### 白鹭洲（char.bai-luzhou）
 
 雾雨渡口的渡董，掌渡籍正本，立约、记事、算账都出自他手。袖中永远揣着那册翻旧的船票簿，算盘拨得比谁都稳。药道轮值章程由他立约、寒山书院誊抄、盘舷刀场照章排班——他是这套秩序的枢纽。场景职责：**传递地方知识与跨门派议事**。玩家向他请教通行章程（发现见闻「渡籍·轮值章程」）、听他讲解渡口五派格局、把雾渡药道会盟的三种结果**报备入渡籍**（`shareKnowledgeNode`，让他留下 NPC 私有记忆），入任何门派后也到他这里登记。黄昏在 (3,4) 收桥费。
+
+## Round 62 铁嶂北道人物
+
+### 邵长庚（char.shao-changgeng）
+
+铁嶂北道岩关驿镇的门楼值守，按水尺拓片和旧驿簿校验山道界石。他在基础位 `(48,49)` 整理散开的更牌，晨光移到 `(49,48)`，入夜移到 `(48,50)`。玩家发现雾岬北岸水尺后，可从他处接「北隘校标」；后续两段差事仍由他发布。对话仅按图谱见闻与任务状态显示分支，不在引擎中写入剧情。
+
+### 秦素砚（char.qin-suyan）
+
+在岩关驿镇窗边核抄巡山更簿的记录人，桌角压着一块北脊旧烽台石片。她的基础位在 `(57,49)`，日中去 `(57,50)`，入夜回到 `(56,50)`。玩家完成界石核验后需要与她交谈，校对烽台更次并推进「驿镇更次」。
 
 ## 关系速览（图谱边）
 

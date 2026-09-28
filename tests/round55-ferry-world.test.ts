@@ -15,9 +15,10 @@ function parseMap(path: string) {
   return parsed.map;
 }
 
-describe('Round 55 second large walkable region', () => {
+describe('large walkable regions and the Round 62 atlas extension', () => {
   const ferry = parseMap('../data/base/maps/round-10-mist-ferry.json');
   const jiangnan = parseMap('../data/base/maps/round-01-grid.json');
+  const ironRidge = parseMap('../data/base/maps/round-62-iron-ridge.json');
   const worldData = readJson('../data/base/world/world-map.json') as {
     transitions: Array<{ id: string; from: { mapResourceId: string; col: number; row: number }; to: { mapResourceId: string; col: number; row: number } }>;
     landmarks: Array<{ id: string; mapResourceId: string; col: number; row: number }>;
@@ -60,11 +61,18 @@ describe('Round 55 second large walkable region', () => {
     }
     for (const encounter of encounterSet.encounters) points.push({ id: encounter.id, mapResourceId: encounter.mapResourceId, ...encounter.position });
 
-    const ferryAnchors = points.filter((point) => point.mapResourceId === ferry.data.id);
-    for (const anchor of ferryAnchors) {
-      expect(ferry.canEnter(anchor.col, anchor.row), `${anchor.id} must be open`).toBe(true);
-      expect(findGridPath(ferry, ferry.playerStart, anchor), `${anchor.id} must be reachable from the ferry spawn`)
-        .not.toBeNull();
+    for (const map of [jiangnan, ferry, ironRidge]) {
+      const mapAnchors = points.filter((point) =>
+        point.mapResourceId === map.data.id &&
+        (!point.id.startsWith('landmark.') || map.data.id === ironRidge.data.id),
+      );
+      for (const anchor of mapAnchors) {
+        if (!anchor.id.startsWith('landmark.')) {
+          expect(map.canEnter(anchor.col, anchor.row), `${anchor.id} must be open`).toBe(true);
+        }
+        expect(findGridPath(map, map.playerStart, anchor), `${anchor.id} must be reachable from ${map.data.id}`)
+          .not.toBeNull();
+      }
     }
 
     const toFerry = worldData.transitions.find(({ id }) => id === 'gate.trial-to-ferry');
@@ -76,12 +84,22 @@ describe('Round 55 second large walkable region', () => {
     expect(findGridPath(jiangnan, jiangnan.playerStart, toFerry!.from)).not.toBeNull();
     expect(findGridPath(ferry, toFerry!.to, toJiangnan!.from)).not.toBeNull();
 
+    const toIronRidge = worldData.transitions.find(({ id }) => id === 'gate.ferry-north-to-iron-ridge');
+    const backToFerry = worldData.transitions.find(({ id }) => id === 'gate.iron-ridge-to-ferry-north');
+    expect(toIronRidge?.from).toEqual({ mapResourceId: ferry.data.id, col: 89, row: 15 });
+    expect(toIronRidge?.to).toEqual({ mapResourceId: ironRidge.data.id, col: 4, row: 7 });
+    expect(backToFerry?.from).toEqual({ mapResourceId: ironRidge.data.id, col: 3, row: 7 });
+    expect(backToFerry?.to).toEqual({ mapResourceId: ferry.data.id, col: 89, row: 16 });
+    expect(findGridPath(ferry, ferry.playerStart, toIronRidge!.from)).not.toBeNull();
+    expect(findGridPath(ironRidge, toIronRidge!.to, backToFerry!.from)).not.toBeNull();
+    expect(findGridPath(ferry, backToFerry!.to, toJiangnan!.from)).not.toBeNull();
+
     const newSluice = worldData.events.find(({ id }) => id === 'event.r55-sluice-inscription');
     expect(newSluice?.discoverKnowledgeNodeId).toBe('place.mist-sluice');
     expect(worldData.landmarks.find(({ id }) => id === 'landmark.mist-old-sluice')?.id).toBe('landmark.mist-old-sluice');
   });
 
-  it('assembles the two maps and preserves data-driven landmark and knowledge references', () => {
+  it('assembles all three maps and preserves data-driven landmark and knowledge references', () => {
     const parsed = parseWorldMap(readJson('../data/base/world/world-map.json'));
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
@@ -92,6 +110,7 @@ describe('Round 55 second large walkable region', () => {
     const assembled = assembleWorldMap(parsed.data, new Map([
       [jiangnan.data.id, jiangnan],
       [ferry.data.id, ferry],
+      [ironRidge.data.id, ironRidge],
     ]), {
       knowledgeNodeIds: new Set(nodes.nodes.map(({ id }) => id)),
       periodIds: new Set(calendar.periods.map(({ id }) => id)),
@@ -101,10 +120,13 @@ describe('Round 55 second large walkable region', () => {
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
     expect(assembled.warnings).toEqual([]);
-    expect(assembled.transitions).toHaveLength(2);
+    expect(assembled.regions).toHaveLength(3);
+    expect(assembled.transitions).toHaveLength(4);
     expect(assembled.landmarks.some(({ id }) => id === 'landmark.mist-willow-market')).toBe(true);
     expect(assembled.landmarks.some(({ id }) => id === 'landmark.mist-old-sluice' && id !== undefined)).toBe(true);
     expect(assembled.events.some(({ id }) => id === 'event.r55-sluice-inscription')).toBe(true);
+    expect(assembled.landmarks.filter(({ mapResourceId }) => mapResourceId === ironRidge.data.id)).toHaveLength(4);
+    expect(assembled.events.filter(({ mapResourceId }) => mapResourceId === ironRidge.data.id)).toHaveLength(4);
     expect(nodes.nodes.some(({ id }) => id === 'event.r55-sluice-inscription')).toBe(true);
     expect(nodes.nodes.some(({ id }) => id === 'place.mist-sluice')).toBe(true);
   });

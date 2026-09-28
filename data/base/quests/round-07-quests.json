@@ -791,6 +791,61 @@
       ],
       "failOnEncounterIds": ["encounter.r58-pond-fake-escort"],
       "rewards": { "experience": 38, "currency": 30 }
+    },
+    {
+      "id": "quest.r62-north-pass-marks",
+      "name": "北隘校标",
+      "description": "邵长庚看过雾岬水尺拓片后，请你沿北道核对碎岭旧路的界石。石面上的凿痕可能说明驿路并未塌断，而是被人挪了路标。",
+      "giverNpcId": "char.shao-changgeng",
+      "requiredKnowledgeNodeId": "place.mist-north-cap",
+      "objectives": [
+        {
+          "id": "objective.r62-pass-marks",
+          "kind": "discoverKnowledge",
+          "targetId": "place.iron-ridge-pass",
+          "requiredCount": 1,
+          "text": "到碎岭旧道核对界石凿痕"
+        }
+      ],
+      "rewards": { "experience": 22, "currency": 18 }
+    },
+    {
+      "id": "quest.r62-post-ledger",
+      "name": "驿镇更次",
+      "description": "界石凿痕与驿路旧制相合。邵长庚请你把消息带给秦素砚，核对旧烽台的巡山更次，免得夜间再有人借错牌拦路。",
+      "giverNpcId": "char.shao-changgeng",
+      "prerequisiteQuestIds": ["quest.r62-north-pass-marks"],
+      "objectives": [
+        {
+          "id": "objective.r62-suyan-ledger",
+          "kind": "talkToNpc",
+          "targetId": "char.qin-suyan",
+          "requiredCount": 1,
+          "text": "找秦素砚核对旧烽台巡山更次"
+        }
+      ],
+      "rewards": { "experience": 26, "currency": 20 }
+    },
+    {
+      "id": "quest.r62-clear-ridge-road",
+      "name": "碎岭清道",
+      "description": "巡山更次已经校妥，碎岭拦路客却仍扣着界石。邵长庚托你清出通路，让铁嶂北道重新按驿簿往来。",
+      "giverNpcId": "char.shao-changgeng",
+      "prerequisiteQuestIds": ["quest.r62-post-ledger"],
+      "objectives": [
+        {
+          "id": "objective.r62-roadblock",
+          "kind": "defeatEncounter",
+          "targetId": "encounter.r62-ridge-roadblock",
+          "requiredCount": 1,
+          "text": "击退碎岭路上的拦路客"
+        }
+      ],
+      "rewards": {
+        "experience": 42,
+        "currency": 32,
+        "factionRenown": [{ "factionId": "faction.tiezhang-pai", "delta": 5 }]
+      }
     }
   ]
 }

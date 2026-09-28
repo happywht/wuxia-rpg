@@ -13,6 +13,12 @@
       "name": "雾雨渡口",
       "description": "山雨与江雾相接，渡船歇在芦苇深处。",
       "atlasPosition": { "x": 85, "y": 80 }
+    },
+    {
+      "mapResourceId": "map.round-62-iron-ridge",
+      "name": "铁嶂北道·岩关驿镇",
+      "description": "雾岬水尺指向北面的岩关驿路，石堡、松岭与旧烽台散落在山脊之间。",
+      "atlasPosition": { "x": 83, "y": 20 }
     }
   ],
   "landmarks": [
@@ -25,7 +31,11 @@
     { "id": "landmark.mist-north-cap", "mapResourceId": "map.round-10-mist-ferry", "col": 86, "row": 15, "name": "雾岬林地", "category": "other", "discoveryNodeId": "place.mist-north-cap" },
     { "id": "landmark.mist-willow-market", "mapResourceId": "map.round-10-mist-ferry", "col": 59, "row": 65, "name": "芦桥集", "category": "settlement", "discoveryNodeId": "place.mist-willow-market" },
     { "id": "landmark.mist-old-sluice", "mapResourceId": "map.round-10-mist-ferry", "col": 46, "row": 53, "name": "旧渠石闸", "category": "crossing", "discoveryNodeId": "place.mist-sluice" },
-    { "id": "landmark.mist-south-pool", "mapResourceId": "map.round-10-mist-ferry", "col": 81, "row": 87, "name": "南湾苇池", "category": "water", "discoveryNodeId": "place.mist-south-pool" }
+    { "id": "landmark.mist-south-pool", "mapResourceId": "map.round-10-mist-ferry", "col": 81, "row": 87, "name": "南湾苇池", "category": "water", "discoveryNodeId": "place.mist-south-pool" },
+    { "id": "landmark.iron-ridge-north-gate", "mapResourceId": "map.round-62-iron-ridge", "col": 4, "row": 7, "name": "铁嶂南隘", "category": "crossing" },
+    { "id": "landmark.iron-ridge-pass", "mapResourceId": "map.round-62-iron-ridge", "col": 30, "row": 29, "name": "碎岭旧道", "category": "route", "discoveryNodeId": "place.iron-ridge-pass" },
+    { "id": "landmark.iron-ridge-post", "mapResourceId": "map.round-62-iron-ridge", "col": 51, "row": 49, "name": "岩关驿镇", "category": "settlement", "discoveryNodeId": "place.iron-ridge-post" },
+    { "id": "landmark.iron-ridge-beacon", "mapResourceId": "map.round-62-iron-ridge", "col": 84, "row": 83, "name": "北脊旧烽台", "category": "other", "discoveryNodeId": "place.iron-ridge-beacon" }
   ],
   "transitions": [
     {
@@ -39,6 +49,18 @@
       "name": "回望石阶",
       "from": { "mapResourceId": "map.round-10-mist-ferry", "col": 2, "row": 4 },
       "to": { "mapResourceId": "map.round-01-grid", "col": 89, "row": 50 }
+    },
+    {
+      "id": "gate.ferry-north-to-iron-ridge",
+      "name": "雾岬北口",
+      "from": { "mapResourceId": "map.round-10-mist-ferry", "col": 89, "row": 15 },
+      "to": { "mapResourceId": "map.round-62-iron-ridge", "col": 4, "row": 7 }
+    },
+    {
+      "id": "gate.iron-ridge-to-ferry-north",
+      "name": "铁嶂南隘",
+      "from": { "mapResourceId": "map.round-62-iron-ridge", "col": 3, "row": 7 },
+      "to": { "mapResourceId": "map.round-10-mist-ferry", "col": 89, "row": 16 }
     }
   ],
   "events": [
@@ -117,6 +139,42 @@
       "text": "山脚一排排竹匾正晾着新采的茶叶，村口石阶沿旧驿道向南折去。马尚义托人问过的南麓聚落，就在这片坡地尽头。",
       "once": true,
       "discoverKnowledgeNodeId": "place.south-hamlet"
+    },
+    {
+      "id": "event.r62-ridge-arrival",
+      "mapResourceId": "map.round-62-iron-ridge",
+      "col": 4,
+      "row": 7,
+      "text": "越过雾岬北口，山风从黑石关门间穿过。驿路旧牌已裂，却还指向铁嶂北面的岩关驿镇。",
+      "once": true,
+      "discoverKnowledgeNodeId": "map.round-62-iron-ridge"
+    },
+    {
+      "id": "event.r62-pass-marks",
+      "mapResourceId": "map.round-62-iron-ridge",
+      "col": 30,
+      "row": 29,
+      "text": "碎岭路旁的石面留着几道新旧交错的凿痕。旧道并非塌毁，只是有人把驿路界石挪进了坡下。",
+      "once": true,
+      "discoverKnowledgeNodeId": "place.iron-ridge-pass"
+    },
+    {
+      "id": "event.r62-post-ledger",
+      "mapResourceId": "map.round-62-iron-ridge",
+      "col": 51,
+      "row": 49,
+      "text": "驿镇墙上的旧簿写着各家换班时辰，落款与雾岬水尺拓片上的铁嶂印记相合。",
+      "once": true,
+      "discoverKnowledgeNodeId": "place.iron-ridge-post"
+    },
+    {
+      "id": "event.r62-beacon-code",
+      "mapResourceId": "map.round-62-iron-ridge",
+      "col": 84,
+      "row": 83,
+      "text": "烽台石缝里压着一页未烧尽的更次簿，记下的三短一长，正是驿镇旧例的巡山暗号。",
+      "once": true,
+      "discoverKnowledgeNodeId": "place.iron-ridge-beacon"
     }
   ],
   "randomEvents": [

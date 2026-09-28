@@ -4,6 +4,28 @@
 
 ---
 
+## Round 62 — 铁嶂北道第三块百格区域（2026-09-29，已完成）
+
+### 计划与实现
+
+- 开工前写入 `iterations/round-62/plan.md`，列明第三个 100×100 地图、双向步行关口、区域发现/人物/遭遇/三段任务、地图路线回归、文档与发行检查等验收项；预计人类工程工时约 90–150 分钟，并拆为四个可验证子任务。原候选“多轮时钟推进路线模拟”顺延到 R63，优先响应用户长期提出的超大可移动世界需求。
+- 新增 `scripts/generate-round62-iron-ridge.mjs` 与 `npm run generate:round-62-iron-ridge`：确定性生成“铁嶂北道·岩关驿镇”100×100 地图，复用仓库已留存 License 的 Kenney Roguelike/RPG CC0 图集构造八层地表/山脊/林带/聚落/道路贴图，独立碰撞网格含 7,818 个可行格；保护并 BFS 检查出生点、关口、地标、事件、NPC 日程位和遭遇共 87 个锚点。
+- `data/base/world/world-map.json` 加入北行双向关口（渡口 (89,15) → 北道 (4,7)，北道 (3,7) → 渡口 (89,16)）与四个地标/四项见闻事件。新增邵长庚、秦素砚、两个可重战遭遇和「北隘校标 → 驿镇更次 → 碎岭清道」三段任务；图谱新增 14 节点/17 关系，manifest 增至 28 项资料。
+- 新增 `tests/round62-iron-ridge.test.ts` 四项专项验证；扩展渡口测试覆盖三地图装配，并更新 R58/R59 的实时资料数量断言（43 项任务、195 节点/305 关系）。路线专项把新增区域三项空间任务目标和发布人按实际 NPC/遭遇占格，在日历七时段逐个求路。
+- 同步架构、数据、地图、玩家手册、人物志、任务志、世界设定、知识图谱、测试说明、授权用途、README、路线图和变更日志。`smoke:round-47` 删除过期固定资源数断言，改为使用发行 manifest 的资源清单。
+
+### 验证
+
+- `npm run generate:round-62-iron-ridge`：通过，生成 7,818 个可行格、96 株 CC0 松木和 1,459 格岩脊，并核验 87 个受保护锚点。运行前后地图 SHA-256 均为 `DCC60968F991294ABDE6945387D1729E11DC09F9EC42EBB7557BB782122E8868`，逐字节重建稳定。
+- `npx vitest run tests/round55-ferry-world.test.ts tests/round62-iron-ridge.test.ts tests/round58-region-quests.test.ts tests/round59-regional-dialogue.test.ts`：4 个文件、25 项通过。
+- `npx vitest run tests/round52-map-landmarks.test.ts tests/world-map.test.ts`：16 项通过。全量第一次复核发现这两组旧测试的装配夹具仍只提供 R00/R10 地图，造成新增第三地图相关诊断进入断言；为夹具补入真实第三地图、知识引用和新地标数量后复跑通过，生产数据/引擎逻辑无需绕过校验。
+- `npm run validate:data`：通过，manifest 与 28 项基础资源 Schema 全部通过。
+- `npm run typecheck`：通过（`tsc --noEmit`）。
+- `npm run package:release`：通过。MOD 检查 28 项资源/0 问题；全量 Vitest 32 文件/247 项；`audit:round-34` 核对三张地图、三个区域、四道关口、12 个定点事件、两项漫游事件、43 项任务与五派资料；`audit:round-48-docs` 通过；Vite 138 模块构建、发行包归档/哈希和 `/preview/wuxia-rpg/` 子路径 smoke 均通过。归档 787,244 bytes，72 个归档文件/71 个内容文件，SHA-256 `80e02bc11d43ece3ad2786081156873b7e52533f3126e51537c6b5b0dd21c158`。主 JS 1,931.59 kB、gzip 510.45 kB，保留既有非阻断的 500 kB chunk 提示。
+- 浏览器试玩：为避免写入用户原有存档，在 `node_modules/.cache/round62-preview-dist/` 建临时发行副本，只将副本的起始地图改为 R62 地图，并以独立 `127.0.0.1:5181` origin 开新游戏。截图确认 100×100 岩脊/林地/碎石路图层和 Kenney 人物贴图正确渲染；WASD 向东从 `(4,7)` 走到 `(5,7)` 再到 `(17,7)`，游戏时间同步由 08:00 推进至 08:13，镜头随行而地图内容滚动。临时测试标签页与服务随后关闭，未保存该试玩进度。
+
+---
+
 ## Round 61 — 差事导航抵达提示与动态寻路审计（2026-09-29，已完成）
 
 ### 计划与实现

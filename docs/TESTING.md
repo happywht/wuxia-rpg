@@ -32,7 +32,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 
 - 测试框架：Vitest 5.0.2。官方指南要求 Vite >=6.4.0、Node >=22.12.0；本仓库使用 Vite 8.3.1 与 Node 22.18.0，符合要求（详见 [`docs/REFERENCES.md`](REFERENCES.md) #12；基准 API 见同文件 #16）。
 - 运行环境：Node（无 DOM、无浏览器、无网络、无真实时钟依赖）。
-- 覆盖统计：27 个测试文件、208 个用例（R57 后静态基线；最终全量复跑结果以 `DEVLOG.md` Round 57 为准）。构成：R38 建立四组 53 个，R40 新增渲染器结构回归 10 个，R41 新增设置与输入 42 个，R42 新增主线集成 3 个，R43 新增漫游事件 6 个与门派支线集成 3 个，R44 新增日程漫游/奖励协议/双路线集成 6 个，R45 新增战斗成长基线与擂台奖品边界 4 个，R46 新增真实资料纵向切片 2 个，R47 新增版本清单/路径白名单测试 4 个，R48 新增文档审计 9 个，R49 新增真实默认世界装配/内容数量/零可选告警回归 1 个，R50 新增最终验收审计 5 个，R51 新增 100×100 地图/素材检查及舆图视口导航 7 个，R52 新增相机坐标和地标协议/坏引用回归 5 个，R53 新增网格路径回归 11 个及见闻投影回归 5 个，R54 新增跨区行程与 waypoint 组合 14 个（当轮完整验证为 24 文件/190 用例，见 `DEVLOG.md` Round 54），R55 新增第二张百格区域回归 3 个，R56 新增发现见闻目标与渡口巡标回归 9 个（新文件 `tests/round56-discovery-quests.test.ts` 及 `tests/quest-system.test.ts` 与世界地图/图谱/读档兼容既有测试的扩展），R57 新增跨区行路接续/隐藏地标门控回归 4 个及关口交互格寻路回归 2 个。
+- 覆盖统计：32 个测试文件、247 个用例（Round 62 全量验证基线）。Round 51–62 增量覆盖地图/CC0 素材、舆图视口与相机坐标、地标和跨区寻路、三次地图扩区、见闻任务、任务导航以及动态占位路线；Round 62 专项另有 4 项测试，覆盖三地图装配、第三地图八层贴图/图集范围、全部新增锚点 BFS 和三段任务在七个时段中的 NPC/目标路线。每轮细节与最终命令见 `DEVLOG.md`。
 
 ## 配置：为什么有独立的 `vitest.config.ts`
 
@@ -79,7 +79,8 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 | `tests/world-travel.test.ts` | `src/engine/world-travel.ts` | R54 有向区域 BFS：稳定最短关口链、同长按关口 id 决胜、起点等于终点/未知地图/孤立区域边界 |
 | `tests/world-navigation.test.ts` | `src/engine/world-navigation.ts` | R54 waypoint 组合：本区地标与关口投影、直接相邻区域可见、远区见闻门控不泄漏、远区目的地复用当前首关口坐标 |
 | `tests/world-navigation-guidance.test.ts` | `src/engine/world-navigation-guidance.ts` + 两张基础地图与世界图 | R57 验证远区稳定地标在首关口与切区后续接本地区段、处于 E 交互格时的到关口状态、本区地标抵达、隐藏地标不泄漏及断开有向路线诊断 |
-| `tests/round55-ferry-world.test.ts` | 基础地图/世界图/NPC/遭遇资料与 `grid-path.ts` | R55 第二张百格区域回归：100×100/十层尺寸与 CC0 License 存在、可行格下限、全部关口/事件/日程 NPC/遇怪/地标锚点从出生点 BFS 可达、两向关口端点精确值、碑记事件发现 `place.mist-sluice` |
+| `tests/round55-ferry-world.test.ts` | 基础地图/世界图/NPC/遭遇资料与 `grid-path.ts` | R55 雾雨渡口百格区域回归：100×100/十层尺寸、CC0 License、可行格下限、渡口关口/事件/NPC 日程/遭遇从出生点可达、双向端点精确值和碑记发现 `place.mist-sluice`；兼顾第三图后的世界图装配与历史地图阻挡地标停靠规则 |
+| `tests/round62-iron-ridge.test.ts` | 三张基础地图、世界图/NPC/遭遇/任务/日历与寻路装配 | R62 铁嶂北道：100×100/八层图集范围、7,818 个可行格、三图/四关口装配、新增锚点 BFS，以及三段差事发布人和目标在七个时段的动态占位路线 |
 | `tests/round56-discovery-quests.test.ts`（及 R56 扩展的任务/世界地图/图谱既有测试） | quest-set/知识图谱/世界图资料与 `quest-system.ts` | R56 发现见闻回归：`discoverKnowledge` 目标与两段渡口巡标差事的解析/装配引用校验、首次发现信号只推进匹配目标一次、接取时已知见闻回填、旧档恢复重算、奖励见闻级联推进与发现门控地标/事件引用；专项命令 `npx vitest run tests/quest-system.test.ts tests/round56-discovery-quests.test.ts` 为 2 文件/29 用例 |
 
 测试只调用**公共导出函数**并断言行为，不做源码文本匹配；引擎模块均为 Phaser-free 设计，无需启动任何场景。
@@ -114,7 +115,7 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 | `npm run smoke:round-43` | Round 43 漫游事件协议及五派支线资格/对白/见闻集成回归 |
 | `npm run smoke:round-44` | Round 44 NPC 日程附近条件、任务声望/见闻奖励与渡口互斥分支回归 |
 | `npm run smoke:round-46` | Round 46 真实资料驱动的开局、任务/战斗/成长、存档恢复和两条结局路线纵向回归 |
-| `npm run smoke:round-47` | Round 47 npm 版本归档解包/哈希核验及部署前非根路径 HTML/JS/CSS/MOD/26 项资料和全部 Round 51 CC0 图集/许可加载验证（先运行 `npm run package:release`） |
+| `npm run smoke:round-47` | Round 47 npm 版本归档解包/哈希核验及非根路径 HTML/JS/CSS/MOD/当前 manifest 资源与 Schema、全部 CC0 图集/许可加载验证（先运行 `npm run package:release`） |
 | `npm run audit:final` | 完整 Git checkout 专用的 R00–R50 最终结构审计；核对 51 份计划标题、子任务小节（至少两项）和至少 10 分钟计划工时估算、逐轮 round commit、同 Schema 多资源合并计数、Schema 家族、同名 MOD 样例、资料解耦/错误回退证据文件与必需交付文档 |
 | `npm run smoke:round-20` | 擂台首夺货币/物品彩头、逐场经验、连战与旧/新 v1 存档回归（R45 扩展） |
 | `npm run typecheck` | 严格类型检查（check 的第 3 步） |

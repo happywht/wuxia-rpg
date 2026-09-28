@@ -462,6 +462,104 @@
       "title": "南麓茶匾",
       "summary": "山脚晾茶竹匾引到南麓聚落的旧驿道入口。",
       "knownByDefault": false
+    },
+    {
+      "id": "map.round-62-iron-ridge",
+      "kind": "place",
+      "title": "铁嶂北道·岩关驿镇",
+      "summary": "由雾岬北口进入的高地驿路，散布着碎岭旧道、岩关驿镇与北脊烽台。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.iron-ridge-north-gate",
+      "kind": "place",
+      "title": "铁嶂南隘",
+      "summary": "雾岬北行后进入铁嶂北道的石关，旧驿牌仍挂在门楼间。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.iron-ridge-pass",
+      "kind": "place",
+      "title": "碎岭旧道",
+      "summary": "石面刻痕显示驿路界石曾被移动，山道本身仍然连通。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.iron-ridge-post",
+      "kind": "place",
+      "title": "岩关驿镇",
+      "summary": "邵长庚与秦素砚整理铁嶂北道更牌和旧簿的山中驿站。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.iron-ridge-beacon",
+      "kind": "place",
+      "title": "北脊旧烽台",
+      "summary": "巡山更次刻在台壁夹缝的石片上，三短一长是驿镇沿用的暗号。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r62-ridge-arrival",
+      "kind": "event",
+      "title": "雾岬北口初行",
+      "summary": "渡口北岸的水尺把行旅引入铁嶂南隘。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r62-pass-marks",
+      "kind": "event",
+      "title": "碎岭凿痕",
+      "summary": "碎岭界石的凿痕证明驿道没有塌断，只是路标被人移动。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r62-post-ledger",
+      "kind": "event",
+      "title": "岩关换班旧簿",
+      "summary": "驿镇旧簿把巡山更次与雾岬水尺所见的铁嶂印记相合。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r62-beacon-code",
+      "kind": "event",
+      "title": "烽台更次残页",
+      "summary": "旧烽台石缝残页记着驿镇巡山暗号。",
+      "knownByDefault": false
+    },
+    {
+      "id": "char.shao-changgeng",
+      "kind": "character",
+      "title": "邵长庚",
+      "summary": "岩关驿镇值事，负责整理北道更牌并校验山路界石。",
+      "knownByDefault": false
+    },
+    {
+      "id": "char.qin-suyan",
+      "kind": "character",
+      "title": "秦素砚",
+      "summary": "岩关驿镇簿吏，熟记旧烽台巡山更次。",
+      "knownByDefault": false
+    },
+    {
+      "id": "quest.r62-north-pass-marks",
+      "kind": "quest",
+      "title": "北隘校标",
+      "summary": "持雾岬水尺线索到碎岭旧道核对界石凿痕。",
+      "knownByDefault": true
+    },
+    {
+      "id": "quest.r62-post-ledger",
+      "kind": "quest",
+      "title": "驿镇更次",
+      "summary": "请秦素砚核对旧烽台巡山更次。",
+      "knownByDefault": true
+    },
+    {
+      "id": "quest.r62-clear-ridge-road",
+      "kind": "quest",
+      "title": "碎岭清道",
+      "summary": "击退碎岭拦路客，让铁嶂北道恢复通行。",
+      "knownByDefault": true
     }
   ]
 }

@@ -1,0 +1,77 @@
+{
+  "conversations": [
+    {
+      "id": "dlg.shao-changgeng-iron-ridge",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "邵长庚在驿镇门楼下收拢散开的更牌，见你上来，先问了一句：「雾岬北岸的水尺，近来可有人去看？」",
+          "options": [
+            {
+              "text": "我见过北岸水尺，想核对它指的旧道。",
+              "nextNodeId": "north-mark",
+              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "place.mist-north-cap" }]
+            },
+            {
+              "text": "碎岭旧道的界石已有线索。",
+              "nextNodeId": "pass-active",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r62-north-pass-marks", "status": "active" }
+              ]
+            },
+            {
+              "text": "北道已经清出来了。",
+              "nextNodeId": "road-clear",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r62-clear-ridge-road", "status": "completed" }
+              ]
+            },
+            { "text": "我再看看驿路。", "nextNodeId": "farewell" }
+          ]
+        },
+        {
+          "id": "north-mark",
+          "text": "邵长庚将水尺拓片压在门楼图上：「北道还认得这几道刻线。去碎岭核过界石，再把更次交给秦素砚；她管旧簿，比我记得细。」"
+        },
+        {
+          "id": "pass-active",
+          "text": "「先看凿痕，再别碰移过的界石。」邵长庚将一枚旧铜扣交给你辨认，「驿簿的记号总能对上。」"
+        },
+        {
+          "id": "road-clear",
+          "text": "邵长庚把更牌挂回门边：「石路能走了，才算驿道重新活过来。铁嶂的人记你这一程。」"
+        },
+        { "id": "farewell", "text": "「若还要查北道，等风小些再上坡。」邵长庚低头重新整理更牌。" }
+      ]
+    },
+    {
+      "id": "dlg.qin-suyan-iron-ridge",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "秦素砚在驿镇窗边逐页核更簿，桌角压着一块旧烽台石片。她抬眼问道：「你是来对路标，还是对更次？」",
+          "options": [
+            {
+              "text": "邵长庚托我来核对巡山更次。",
+              "nextNodeId": "ledger-checked",
+              "conditions": [{ "kind": "questStatus", "questId": "quest.r62-post-ledger", "status": "active" }]
+            },
+            { "text": "我想看看这本旧簿。", "nextNodeId": "ledger" },
+            { "text": "先不打扰你。", "nextNodeId": "farewell" }
+          ]
+        },
+        {
+          "id": "ledger-checked",
+          "text": "秦素砚用指节敲了敲石片：「三短一长，子夜换人。把这一页交回邵长庚，旧烽台就不会再被错牌占住。」"
+        },
+        {
+          "id": "ledger",
+          "text": "她翻开旧簿：「北道的更次不是按钟声记，而是照烽台回声。雾岬水尺一动，山上的石刻便能校时。」"
+        },
+        { "id": "farewell", "text": "秦素砚合上簿册，把桌角的石片压稳。" }
+      ]
+    }
+  ]
+}
