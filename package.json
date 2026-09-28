@@ -14,6 +14,7 @@
     "test": "vitest run",
     "benchmark:round-40": "node scripts/benchmark-round-40.mjs",
     "import:round-51-world": "node scripts/import-round51-kenney-world.mjs",
+    "import:round-65-urban-town": "node scripts/import-round65-urban-town.mjs",
     "generate:round-55-ferry": "node scripts/generate-round55-ferry-world.mjs",
     "generate:round-62-iron-ridge": "node scripts/generate-round62-iron-ridge.mjs",
     "validate:data": "node scripts/validate-data.mjs",

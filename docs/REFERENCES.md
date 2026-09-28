@@ -1,6 +1,6 @@
 # 参考来源与使用边界（REFERENCES）
 
-核验日期：2026-09-28。历史/回忆类来源统一编号 **#1–#5**，官方技术来源统一编号 **#6–#20**；软件包元数据在独立表格中按精确包版本记录，不参与原作对照编号。来源授权状态只在核验到明确许可时标为已知；没有核验页面许可时，仅作事实性查阅，不复制内容。
+核验日期：2026-09-29。历史/回忆类来源统一编号 **#1–#5**，官方技术来源统一编号 **#6–#20**；软件包元数据在独立表格中按精确包版本记录，不参与原作对照编号。来源授权状态只在核验到明确许可时标为已知；没有核验页面许可时，仅作事实性查阅，不复制内容。
 
 ---
 
@@ -69,11 +69,12 @@
 - 任何原作系列的具名细节（人名、地名、剧情点）不得进入 `src/`、`data/`；研究性讨论只出现在 `docs/`，且必须携带来源与置信度。
 - 若未来需要引用带授权的资料，必须先在本文件登记来源、许可证与使用范围，再进入仓库。
 
-## 六、Round 51 网页像素素材与再分发许可
+## 六、Round 51+ 网页像素素材与再分发许可
 
 | 素材来源 | 官方页面 / 许可依据 | 本项目实际使用内容 | 授权与发行处理 |
 |---|---|---|---|
 | Kenney Roguelike/RPG Pack | [素材页](https://kenney.nl/assets/roguelike-rpg-pack)；[Kenney 许可说明](https://kenney.nl/support) | `data/assets/kenney/roguelike-rpg/roguelikeSheet_transparent.png` 用于地表、道路、树木、岸线、建筑与聚落；素材包所附 `Map/sample_map.tmx` 作为 100×100 五层世界底稿，项目本地副本为 `scripts/sources/kenney-roguelike-sample-map.tmx`；Round 62 铁嶂北道八层地貌复用同一图集 | 素材包页面与作者说明采用 CC0/公有领域许可；保留原始 `License.txt`。地图扩建只复用该图集瓦片，不引入未授权外部素材；源码 TMX 不进入版本包 |
-| Kenney Tiny Dungeon | [素材页](https://kenney.nl/assets/tiny-dungeon)；[Kenney 许可说明](https://kenney.nl/support) | `data/assets/kenney/tiny-dungeon/tilemap_packed.png` 中的帧用于玩家、NPC 与伙伴像素人物 | CC0/公有领域许可；保留原始 `License.txt`，人物帧号由地图/NPC JSON 数据指定 |
+| Kenney Tiny Dungeon | [素材页](https://kenney.nl/assets/tiny-dungeon)；[Kenney 许可说明](https://kenney.nl/support) | `data/assets/kenney/tiny-dungeon/tilemap_packed.png`；Round 65 前用于玩家、NPC 与伙伴像素人物，Round 65 起保留图集声明供旧资料/MOD 兼容引用 | CC0/公有领域许可；保留原始 `License.txt`，人物帧号由地图/NPC JSON 数据指定 |
+| Kenney RPG Urban Pack | [素材页](https://kenney.nl/assets/rpg-urban-pack)（官方下载 `https://kenney.nl/media/pages/assets/rpg-urban-pack/0a097d1dc7-1677578575/kenney_rpg-urban-pack.zip`）；[Kenney 许可说明](https://kenney.nl/support) | `data/assets/kenney/rpg-urban-pack/tilemap_packed.png`（432×288、27×18 格、16px、0 间距）：Round 65 起始地图 `urban-street-ground`/`urban-street-details` 两层使用经目检核验的路面/井盖族 432–445；三张百格地图的人物精灵使用图集列 23–26 的 4 格人物组 23–26/131–134/239–242/347–350/455–458，各组为同一外观的 4 个静态朝向格 | 包内 `License.txt` 声明 Creative Commons Zero (CC0) 1.0（包版本 RPG Urban Pack 1.0，创作日期 2019-01-05）；保留原始许可文件随素材分发。包内 `Tilemap/tilemap.txt` 声称 Spacing: 1px 与实际 PNG 尺寸矛盾（27×17−1=458≠432），以逐像素核验的 16px 无间距网格为准。只导入打包图集与原始许可两个文件，不携带未使用的散片瓦片或整包 |
 
-Kenney 的许可 FAQ 明确说明 Kenney.nl 提供的素材可在 CC0 条款下用于个人、教育及商业项目，署名并非强制。为保留来源并方便后续核验，本项目仍链接官方素材页并随素材包保存原许可文件。仅加入运行实际需要的两张图集及各自许可文件；未使用同轮下载时检查过的 Tiny Town、Puny Characters 等其他资源。该素材来源独立于原作研究资料，不含《白金英雄坛说》的美术资源。
+Kenney 的许可 FAQ 明确说明 Kenney.nl 提供的素材可在 CC0 条款下用于个人、教育及商业项目，署名并非强制。为保留来源并方便后续核验，本项目仍链接官方素材页并随素材包保存原许可文件。仅加入运行实际需要的图集及各自许可文件；未使用下载检查时看过的其他资源（Tiny Town、Puny Characters 等）。该素材来源独立于原作研究资料，不含《白金英雄坛说》的美术资源。

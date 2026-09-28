@@ -1,6 +1,11 @@
 # 玩家手册
 
-这份手册对应当前仓库 Round 64 的可运行原型。菜单、键位与玩法以游戏内 H「操作手册」和现行资料为准；浏览器存档仅保存在当前浏览器的本地存储中。R00–R64 均有独立计划和提交；R50 最终验收边界见 [`FINAL-ACCEPTANCE.md`](FINAL-ACCEPTANCE.md)，三块百格地图、区域内容与静态日程路线证据见 [`MAP-ATLAS.md`](MAP-ATLAS.md)、[`ROUND-61-ROUTE-AUDIT.md`](ROUND-61-ROUTE-AUDIT.md)、[`ROUND-63-TIMED-ROUTE-AUDIT.md`](ROUND-63-TIMED-ROUTE-AUDIT.md) 和 [`ROUND-64-ROUTE-AUDIT.md`](ROUND-64-ROUTE-AUDIT.md)。
+这份手册对应当前仓库 Round 65 的可运行原型。菜单、键位与玩法以游戏内 H「操作手册」和现行资料为准；浏览器存档仅保存在当前浏览器的本地存储中。R00–R65 均有独立计划和提交；R50 最终验收边界见 [`FINAL-ACCEPTANCE.md`](FINAL-ACCEPTANCE.md)，三块百格地图、区域内容与静态日程路线证据见 [`MAP-ATLAS.md`](MAP-ATLAS.md)、[`ROUND-61-ROUTE-AUDIT.md`](ROUND-61-ROUTE-AUDIT.md)、[`ROUND-63-TIMED-ROUTE-AUDIT.md`](ROUND-63-TIMED-ROUTE-AUDIT.md) 和 [`ROUND-64-ROUTE-AUDIT.md`](ROUND-64-ROUTE-AUDIT.md)。
+
+## 世界外观（Round 65 起）
+
+- 起始区域加入一处小型街面素材样板：在原装饰留白的可走格铺上 Kenney RPG Urban Pack（CC0）道路/铺装瓦片，并在其中两格加井盖细节；原地图近出生点的阻挡区实际是墓园，所以没有用城镇墙件覆盖墓碑，也没有改动地图碰撞。街面范围目前有限，后续会沿可走路线扩展，不代表已经建成完整城镇。
+- 玩家与全部 NPC 换上了更清晰的正式像素人物：人物来自图集的 5 组基础外观（深色便装、浅色长袍、红褐上衣、橄榄工装、蓝色制服），每组 4 格为同一人物的静态朝向/姿态变体。玩家为深色便装正面站姿，同屏 NPC 尽量取自不同外观组以便区分；相邻地图的同组 NPC 则是同一外观的不同朝向，并非人人一套独立服装。人物帧由资料数据指定，与地图美术可分别替换。
 
 ## 开始游戏
 

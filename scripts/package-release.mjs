@@ -53,6 +53,8 @@ async function ensureBuildIsPresent() {
     'assets/kenney/roguelike-rpg/License.txt',
     'assets/kenney/tiny-dungeon/tilemap_packed.png',
     'assets/kenney/tiny-dungeon/License.txt',
+    'assets/kenney/rpg-urban-pack/tilemap_packed.png',
+    'assets/kenney/rpg-urban-pack/License.txt',
   ];
   for (const relative of required) {
     try {

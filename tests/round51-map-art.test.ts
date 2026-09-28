@@ -11,19 +11,21 @@ function loadMap(path: string) {
 }
 
 describe('Round 51 world art data', () => {
-  it('uses a collision-independent 100×100 five-layer pixel map and the licensed actor atlas', () => {
+  it('uses a collision-independent 100×100 layered pixel map and the licensed actor atlas', () => {
     const map = loadMap('../data/base/maps/round-01-grid.json');
     const art = map.data.art;
     expect(map.columns).toBe(100);
     expect(map.rows).toBe(100);
     expect(map.playerStart).toEqual({ col: 43, row: 37 });
     expect(art?.tileSize).toBe(16);
-    expect(art?.layers).toHaveLength(5);
+    // Five Tiled layers (Round 51) plus the two Round 65 urban street layers.
+    expect(art?.layers).toHaveLength(7);
     expect(art?.tilesets.map((tileset) => tileset.id)).toEqual([
       'kenney.roguelike-rpg',
       'kenney.tiny-dungeon',
+      'kenney.rpg-urban-pack',
     ]);
-    expect(art?.actors.playerFrame).toBe(85);
+    expect(art?.actors.playerFrame).toBe(24);
     expect(art?.layers.every((layer) => layer.cells.length === map.rows && layer.cells.every((row) => row.length === map.columns))).toBe(true);
     expect(map.data.grid.join('').length).toBe(10_000);
     expect([...map.data.grid.join('')].filter((cell) => cell === '.').length).toBeGreaterThan(7_000);
@@ -37,6 +39,8 @@ describe('Round 51 world art data', () => {
       '../data/assets/kenney/roguelike-rpg/License.txt',
       '../data/assets/kenney/tiny-dungeon/tilemap_packed.png',
       '../data/assets/kenney/tiny-dungeon/License.txt',
+      '../data/assets/kenney/rpg-urban-pack/tilemap_packed.png',
+      '../data/assets/kenney/rpg-urban-pack/License.txt',
     ]) {
       expect(existsSync(new URL(path, import.meta.url))).toBe(true);
     }

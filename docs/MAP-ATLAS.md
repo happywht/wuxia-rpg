@@ -1,6 +1,6 @@
 # 世界舆图与区域旅行
 
-Round 10 将单张网格地图扩展为由资料驱动的区域集合；Round 51 将起始区域扩展为 100×100 格的连续大地图，并换成公开 CC0 像素图集；Round 52 校正视觉地图坐标并加入资料地标图例及独立视口相机裁切；Round 55 将雾雨渡口扩建为第二张 100×100 十层 CC0 大地图并新增四个渡口地标；Round 57 让已选地标目的地在区域间接续；Round 62 新增第三块 100×100 铁嶂北道山地大区，含石关、松岭、驿镇、往返关口与区域任务链。地图尺寸、碰撞、分层贴图、区域命名、地标、关口端点和区域事件仍由 `data/` 声明；引擎只执行通用协议。
+Round 10 将单张网格地图扩展为由资料驱动的区域集合；Round 51 将起始区域扩展为 100×100 格的连续大地图，并换成公开 CC0 像素图集；Round 52 校正视觉地图坐标并加入资料地标图例及独立视口相机裁切；Round 55 将雾雨渡口扩建为第二张 100×100 十层 CC0 大地图并新增四个渡口地标；Round 57 让已选地标目的地在区域间接续；Round 62 新增第三块 100×100 铁嶂北道山地大区，含石关、松岭、驿镇、往返关口与区域任务链；Round 65 以官方 RPG Urban Pack 图集为起始区域增绘城镇街市两层，并把三图人物精灵升级为多帧正式像素人物。地图尺寸、碰撞、分层贴图、区域命名、地标、关口端点和区域事件仍由 `data/` 声明；引擎只执行通用协议。
 
 ## 当前地图资源总表
 
@@ -13,7 +13,7 @@ Round 10 将单张网格地图扩展为由资料驱动的区域集合；Round 51
 | `map.round-62-iron-ridge` | 铁嶂北道·岩关驿镇 | (83, 20) | 100×100 | (4, 7) | `.`、`,` 可走；`#` 岩壁/松林阻挡 |
 
 - 世界图 `world.atlas` 的 `startingMapResourceId` 为 `map.round-01-grid`；每张地图的 `id` 与 manifest 资源 id 一致，地图格尺寸均为 48 世界像素。
-- 三张百格大地图均将 16×16 素材格最近邻放大至 48×48 世界像素；独立画面层从 Tiled GID 绘制（起始图五层、渡口图十层、铁嶂北道八层），移动碰撞始终只看 `grid`，不会根据美术像素推断阻挡。
+- 三张百格大地图均将 16×16 素材格最近邻放大至 48×48 世界像素；独立画面层从 Tiled GID 绘制（起始图七层——五层 Tiled 底稿加 Round 65 城镇街市两层、渡口图十层、铁嶂北道八层），移动碰撞始终只看 `grid`，不会根据美术像素推断阻挡。
 - 玩家行走在三张百格大地图时镜头均跟随并限制在地图范围内；地图视觉对象显式采用世界滚动系数，不继承场景为 HUD 设定的固定坐标。HUD、面板与天气覆盖层固定在画面上。
 - 芦苇河滩（`place.reedbank`）仍是知识图谱地点词条而非地图资源：第三张 `grid-map` 是铁嶂北道，河滩不可旅行，详见 [`WORLD-SETTING.md`](WORLD-SETTING.md) §2。
 
@@ -122,11 +122,15 @@ M 舆图的侧栏可点选已知地点或关口，直接点选地图内的色点
 
 石北发布的「雾岬水尺巡查」要求先发现旧渠石闸，再实际走到北岸水尺；完成后解锁「南湾水路测绘」，继续发现南湾苇池。任务使用通用 `discoverKnowledge` 目标：匹配的新发现信号一次推进，接取时按已知见闻回填；旧兼容存档恢复后也会依据玩家已知节点重算活动任务，不改变 v1 存档字段。任务发布人、先后关系、区域事件和事件所在地点都在图谱中相连。专项覆盖见 [`tests/round56-discovery-quests.test.ts`](../tests/round56-discovery-quests.test.ts) 与 [`iterations/round-56/plan.md`](../iterations/round-56/plan.md)。
 
+## Round 65 城镇街市美术与人物精灵
+
+回应试玩反馈的起始区域美术升级：起始大地图在既有五层 Tiled 美术之上新增 `urban-street-ground`（铺装街面）与 `urban-street-details`（路面细节）两个图层，素材来自官方 Kenney RPG Urban Pack（CC0）。生成器 `scripts/import-round65-urban-town.mjs` 只在原装饰层 2–5 均为空的可走格绘制小型街面、车道和市集铺地，共 42 格铺装；另在新街面上叠加 2 个井盖细节。近出生点阻挡格原本绘有墓园石碑、围墙与墓道，故本轮没有把它们误判为商铺或空白建筑位，没有放置门面/街灯/消防栓/行道树，也不覆盖现有土路。碰撞网格 `grid` 一格未动；数据测试逐格确认铺装可走且不压旧装饰，井盖一定有新路面底层，出生点、NPC、任务与跨区关口仍可达。三张百格地图的人物图集同轮切换到该图集：人物格只存在于图集列 23–26 的 4 格组（23–26 深色便装、131–134 浅色长袍、239–242 红褐上衣、347–350 橄榄工装、455–458 蓝色制服，每组为同一人物的 4 个静态朝向/姿态格），玩家用 24，14 名 NPC 的 `spriteFrame` 分配其中 14 个互异格，帧号仍完全由地图/NPC JSON 数据驱动，引擎无任何人物硬编码；专项测试同时守卫"角色列帧禁入环境图层"与"角色帧必须落在角色列"。专项审计见 [`tests/round65-urban-art.test.ts`](../tests/round65-urban-art.test.ts)。
+
 ## Round 51 地图美术资源
 
-- 起始大地图使用 `data/assets/kenney/roguelike-rpg/roguelikeSheet_transparent.png` 的 16×16 地表、道路、林木、岸线、聚落与屋顶瓦片，以及该 CC0 素材包附带的 `scripts/sources/kenney-roguelike-sample-map.tmx` 五层 100×100 地图作为底稿。`scripts/import-round51-kenney-world.mjs` 可从底稿重建**起始大地图**的 JSON 图层和独立碰撞网格（Round 55 起不再改写雾雨渡口地图，见上文「Round 55」一节）；扩展的林带、池塘、道路与第二聚落也都使用这张 CC0 图集。
-- 玩家、NPC 和伙伴使用 `data/assets/kenney/tiny-dungeon/tilemap_packed.png` 中配置的人物帧。帧索引、图集尺寸和画面图层都随地图数据声明，NPC 可选 `spriteFrame` 覆盖默认人物帧。
-- 两套图集的原始 `License.txt` 随游戏素材一起打包；许可来源、素材用途和发布边界见 [`REFERENCES.md`](REFERENCES.md) 与 [`PLAYER-GUIDE.md`](PLAYER-GUIDE.md)。美术素材可替换而不改变地图移动碰撞协议。
+- 起始大地图使用 `data/assets/kenney/roguelike-rpg/roguelikeSheet_transparent.png` 的 16×16 地表、道路、林木、岸线、聚落与屋顶瓦片，以及该 CC0 素材包附带的 `scripts/sources/kenney-roguelike-sample-map.tmx` 五层 100×100 地图作为底稿。`scripts/import-round51-kenney-world.mjs` 可从底稿重建**起始大地图**的 JSON 图层和独立碰撞网格（Round 55 起不再改写雾雨渡口地图，见上文「Round 55」一节）；扩展的林带、池塘、道路与第二聚落也都使用这张 CC0 图集。Round 65 起起始地图另有叠加其上的城镇街市两层（见上节）。
+- 玩家、NPC 和伙伴的人物帧：Round 51–64 使用 `data/assets/kenney/tiny-dungeon/tilemap_packed.png`；Round 65 起三张百格地图的 `art.actors` 与全部 NPC 帧改用 `data/assets/kenney/rpg-urban-pack/tilemap_packed.png`（432×288、27×18、16px、0 间距）。帧索引、图集尺寸和画面图层都随地图数据声明，NPC 可选 `spriteFrame` 覆盖默认人物帧。
+- 三套图集的原始 `License.txt` 随游戏素材一起打包；许可来源、素材用途和发布边界见 [`REFERENCES.md`](REFERENCES.md) 第六节与 [`PLAYER-GUIDE.md`](PLAYER-GUIDE.md)。美术素材可替换而不改变地图移动碰撞协议。
 
 ## 资料协议
 
