@@ -290,6 +290,20 @@
               "nextNodeId": "r42-protect-result",
               "conditions": [{ "kind": "questStatus", "questId": "quest.r42-protect-witness", "status": "completed" }],
               "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.r42-protected-witness-vow" }]
+            },
+            {
+              "text": "祝师父，集口那个旧例管事，我这就去劝。",
+              "nextNodeId": "r58-toll-squabble-active",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r58-market-toll-squabble", "status": "active" }
+              ]
+            },
+            {
+              "text": "祝师父，集口的索钱人已经散了。",
+              "nextNodeId": "r58-toll-squabble-done",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r58-market-toll-squabble", "status": "completed" }
+              ]
             }
           ]
         },
@@ -335,6 +349,14 @@
         {
           "id": "r43-accepted-panzhou-return-tide",
           "text": "祝九弦收拢缆绳：「三道痕先问清是哪条船留下的。刀场护路，不替没对上的账先出刀。」"
+        },
+        {
+          "id": "r58-toll-squabble-active",
+          "text": "祝九弦把缆绳往桩上一套：「那人的刀我认得——收腕快、落步虚，是把护船的路数改成了行骗的路数。他若肯讲旧例便罢，不肯讲，你就替旧例把脸面赢回来。只是记着：赶人散场，别伤人根本。」"
+        },
+        {
+          "id": "r58-toll-squabble-done",
+          "text": "祝九弦头也不抬地打了个绳结：「散了就好。摊棚刚立起来，经不起第二回堵门。往后集期他再来，渡籍和旧账都在公所摆着，白纸黑字，轮不到他收什么过集钱。」"
         }
       ]
     },
@@ -441,6 +463,20 @@
                 { "kind": "questStatus", "questId": "quest.r44-ledger-first", "status": "offered" }
               ],
               "effects": [{ "kind": "acceptQuest", "questId": "quest.r44-ledger-first" }]
+            },
+            {
+              "text": "渡董，集期赶办的摊棚，我来领章程。",
+              "nextNodeId": "r58-stall-pact-charter",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r58-market-stall-pact", "status": "active" }
+              ]
+            },
+            {
+              "text": "渡董，摊棚绳带补齐，通路也报明了。",
+              "nextNodeId": "r58-stall-pact-logged",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r58-market-stall-pact", "status": "completed" }
+              ]
             }
           ]
         },
@@ -524,6 +560,14 @@
         {
           "id": "r44-ledger-first-accepted",
           "text": "白鹭洲按住渡簿一角：「先核账，先把船次和潮时摆清。你去请柳听澜对副页，若记录相合，我再约石北按潮痕修桩。」"
+        },
+        {
+          "id": "r58-stall-pact-charter",
+          "text": "白鹭洲翻开船票簿的空页：「三条韧皮料补绳带，摊位去向石北报明——这两样他点了头，我便把摊棚记进集册。旧集重开是渡镇的事，账要从第一笔记清。」"
+        },
+        {
+          "id": "r58-stall-pact-logged",
+          "text": "白鹭洲在集册上落下摊棚一行：「绳带补齐，通路划清，集册今日起复用。药担与行船各留一条路——这条旧例，比哪条新章程都值钱。」"
         }
       ]
     }

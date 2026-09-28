@@ -4,6 +4,34 @@
 
 ---
 
+## Round 59 — 区域差事对话回声与世界设定校正（2026-09-29，已完成）
+
+### 计划与实现
+
+- 开工前计划写入 `iterations/round-59/plan.md`：把 R58 两条区域任务链接入七位既有人物的条件对白、同步滞后的世界设定/人物志等文档、增加有意义的专项回归；记录用户故事、验收标准、三个子任务、文件范围、风险与不少于 30 分钟人类工程师工时。
+- 对话数据：`round-03-conversations.json`（陆贞娘、顾夜尘、姜百味、马尚义、石北）与 `round-30-conversations.json`（祝九弦、白鹭洲）的既有 greet 节点尾部追加 16 个仅按 `questStatus` 显隐的回应选项与 16 个新节点（石北覆盖芦桥寻集/集期赶办两条任务，其余各一条）。新增节点 id 以 `r58-` 前缀全局唯一（白鹭洲的集期赶办节点用 `r58-stall-pact-charter`/`-logged` 避免与石北重名）。全部新选项无 effects，不重发接取、奖励、物品、关系或声望；既有选项与节点零改动。
+- 文本事实核对：回应只引用数据中已存在的地点/人物/事件——河湾旧幌、韧皮料、摊棚与药担通路、旧例索钱人的刀路、茶匾旧驿道、苍崖根配散、东野冒牌护队等；石北与姜百味的活动态回应写成"还缺什么"，完成态写成"刚办妥什么"，与谈话即完成的真实次序吻合。
+- 文档同步：修正《世界设定》三处滞后内容——「芦桥集暂无任务内容」旧句、「南麓聚落等只是图册描述点非交互入口」的过时范围、图谱节点数 171 → 181 与 R58 增补说明；状态行升至 Round 59。更新人物志（总表职责列补 R58 区域差事身份、新增 R59 回声一节）、任务志第八章（补 R59 对白回声说明）、对白指南（新增 3.2「任务状态回声」写法与谈话目标次序提醒），并同步 README/ARCHITECTURE/DATA-GUIDE/PLAYER-GUIDE/ROADMAP/CHANGELOG 的当前轮次与 R59 摘要。
+- 专项回归 `tests/round59-regional-dialogue.test.ts`：以真实基础 quest/dialogue/物品/门派/武学/图谱/历法/伙伴数据完成解析与 `assembleQuests`/`assembleDialogueReferences` 跨资源装配（零警告断言）；七组对白（含石北两条任务共 8 组规格）在 locked/offered/active/completed/failed 五态下的可见性互斥验证；16 个新节点跨文件唯一、每对恰好 active+completed 两选项且条件仅 `questStatus` 无 effects；七个 greet 节点选项总数锚定与签名选项存活断言；按 `GridScene.openDialogueWith` 的真实次序（`grid-scene.ts` 先发 `npc-talk` 信号、后以同一 journal 求首节点可见选项）验证石北（韧皮料齐备谈话）与姜百味（苍崖根齐备谈话）当次对话即切换到完成态回应，并以马尚义（非谈话目标）作对照组；陆贞娘跨对话联动完成态可见。
+- 边界约束遵守：未创建 git commit；未改引擎规则（`src/` 零改动）与存档协议；未修改/删除 `.serena/`；未在浏览器玩家存档上移动、接取或战斗（本轮无浏览器操作，全部以纯逻辑运行时回归代替）。
+
+### 阶段验证
+
+- `npx vitest run tests/round59-regional-dialogue.test.ts`：14 项用例全部通过（首轮 4 项失败为测试自身问题——`parseQuestSet` 成功结果无 warnings 字段、全局节点唯一性误把各对话复用的 `greet` 计入、两个 greet 选项基线数字数错；修正断言范围与基线后通过，未放宽任何运行时校验）。
+- `npm run typecheck`：通过（`tsc --noEmit`，`src/` 零改动）。
+- `npm run validate:data`：通过（manifest 与 26 个基础资源 Schema）。
+- `npm run audit:round-34`：通过（文档一致性审计，对白条件/效果、40 项任务、5 门派名与数据一致）。
+- `npm run audit:round-48-docs`：首轮报「ROADMAP.md 缺少 Round 59/Round 60 当前及后续条目」——审计要求 ROADMAP 含 `**R60**` 粗体条目；把后续建议首条改为 `- **R60** — …` 格式后复跑通过。
+- `npm test`：全量通过——29 个测试文件 / 226 项用例（R58 基线 28 文件/212 用例，新增本轮 1 文件/14 用例）。
+
+### 最终验证
+
+- 主代理执行 `npm run package:release` 全通：manifest/26 项基础资源 Schema、26 项 MOD 资源零问题、`tsc --noEmit`、29 个测试文件/226 项用例、Round 34 与 Round 48 文档审计、Vite 137 modules 生产构建、静态归档与 Round 47 子路径 smoke。
+- 发行包 `release/wuxia-rpg-web-0.0.1.tgz`：765,530 bytes，70 个归档文件/69 个内容文件，SHA-256 `b08e3daa7aa4d44c02b9c51974a29d4e1a5511d74ce46208e6d68db77ac354fb`。smoke 核验全部 69 个内容文件大小/哈希、`/preview/wuxia-rpg/` 挂载和全套 26 项基础资料/Schema、示例 MOD、Kenney 图集及 CC0 License。
+- 本轮未对既有玩家存档做浏览器操作；任务状态对白显隐与 `npc-talk` 先行、首节点后算的实时顺序由真实基础资料驱动的专项引擎回归验证。Vite 主 JS chunk 1,924.52 kB（gzip 508.47 kB）超过 500 kB 建议线；构建和 smoke 均成功，代码分块留待后续性能轮次。
+
+---
+
 ## Round 58 — 芦桥集与南麓聚落区域任务链（2026-09-29，已完成）
 
 ### 计划与实现

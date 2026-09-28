@@ -1,6 +1,6 @@
 # 人物志（CHARACTERS）
 
-- 状态：Round 30 起基础世界共有 **12 名可交互 NPC**（江南道·七镇行旅 7 名、雾雨渡口 5 名），全部为原创人物；Round 51 将江南道地图扩为 100×100 并重排七名 NPC 到开局聚落周围，NPC 均有独立像素精灵帧。身份数据在 `data/base/characters/round-03-npcs.json`，对话分布于 `dialogues/round-03-conversations.json` 与 `dialogues/round-30-conversations.json`，图谱词条在 `data/base/knowledge_graph/nodes.json`。
+- 状态：Round 30 起基础世界共有 **12 名可交互 NPC**（江南道·七镇行旅 7 名、雾雨渡口 5 名），全部为原创人物；Round 51 将江南道地图扩为 100×100 并重排七名 NPC 到开局聚落周围，NPC 均有独立像素精灵帧。Round 59 为七位与芦桥集/南麓任务链相关的人物（陆贞娘、顾夜尘、姜百味、马尚义、石北、祝九弦、白鹭洲）补入按 `questStatus` 显隐的活动中/完成后区域回应，不接任务、不发效果。身份数据在 `data/base/characters/round-03-npcs.json`，对话分布于 `dialogues/round-03-conversations.json` 与 `dialogues/round-30-conversations.json`，图谱词条在 `data/base/knowledge_graph/nodes.json`。
 - 关联：`docs/NPC-SCHEDULES.md`（时段日程）、`docs/FACTIONS.md`（门派与师承）、`docs/KNOWLEDGE-GRAPH.md`（人物词条与关系边）、`docs/DIALOGUE-GUIDE.md`（对话写法）。
 
 ## 总表
@@ -8,17 +8,17 @@
 | 人物 | 所在地图 | 基础位 | 对话 | 职责 |
 |---|---|---|---|---|
 | 沈墨涵 | 江南道·七镇行旅 | (45,37) | `dlg.shen-mohan-bookshop` | 书铺掌柜；洗髓残篇线 |
-| 陆贞娘 | 江南道·七镇行旅 | (43,38) | `dlg.lu-zhenniang-teastall` | 茶棚主人；传闻与脚印线索 |
-| 顾夜尘 | 江南道·七镇行旅 | (51,40) | `dlg.gu-yechen-roadside` | 拦路刀客；可招募伙伴 |
-| 姜百味 | 江南道·七镇行旅 | (45,39) | `dlg.jiang-baiwei-peddler` | 货郎；商店与杂货 |
-| 马尚义 | 江南道·七镇行旅 | (42,41) | `dlg.ma-shangyi-notice-board` | 差事发布人；巷口两桩差事 |
+| 陆贞娘 | 江南道·七镇行旅 | (43,38) | `dlg.lu-zhenniang-teastall` | 茶棚主人；传闻与脚印线索；南麓捎药发布人（R58） |
+| 顾夜尘 | 江南道·七镇行旅 | (51,40) | `dlg.gu-yechen-roadside` | 拦路刀客；可招募伙伴；塘匪断道发布人（R58） |
+| 姜百味 | 江南道·七镇行旅 | (45,39) | `dlg.jiang-baiwei-peddler` | 货郎；商店与杂货；南麓捎药谈话目标（R58） |
+| 马尚义 | 江南道·七镇行旅 | (42,41) | `dlg.ma-shangyi-notice-board` | 差事发布人；巷口两桩差事；南麓寻村发布人（R58） |
 | 叶庭舟 | 江南道·七镇行旅 | (39,37) | `dlg.ye-tingzhou-mentor` | 听雨剑阁教习（导师） |
 | **柳听澜** | 江南道·七镇行旅 | (48,43) | `dlg.liu-tinglan-mentor` | **寒山书院教习（导师，R30）** |
-| 石北 | 雾雨渡口 | (3,1) | `dlg.shi-bei-mentor` | 铁嶂派教习（导师） |
+| 石北 | 雾雨渡口 | (3,1) | `dlg.shi-bei-mentor` | 铁嶂派教习（导师）；芦桥寻集发布人与集期赶办谈话目标（R58） |
 | 闻素心 | 雾雨渡口 | (12,7) | `dlg.wen-suxin-mentor` | 云隐山庄庄主（导师） |
 | 容素青 | 雾雨渡口 | (12,2) | `dlg.rong-su-qing-herbalist` | 药师；三张药方传授 |
-| **祝九弦** | 雾雨渡口 | (11,3) | `dlg.zhu-jiuxian-mentor` | **盘舷刀场教头（导师，R30）** |
-| **白鹭洲** | 雾雨渡口 | (4,4) | `dlg.bai-luzhou-ferry-master` | **渡董；渡籍与轮值章程（R30）** |
+| **祝九弦** | 雾雨渡口 | (11,3) | `dlg.zhu-jiuxian-mentor` | **盘舷刀场教头（导师，R30）；集口拦贩发布人（R58）** |
+| **白鹭洲** | 雾雨渡口 | (4,4) | `dlg.bai-luzhou-ferry-master` | **渡董；渡籍与轮值章程（R30）；集期赶办发布人（R58）** |
 
 加粗为 Round 30 新增。所有位置为 `npc-set` 中的基础 `position`；带 `schedule` 的人物会按历法时段在图内移动（见总表之外的 `NPC-SCHEDULES.md`）。放置校验要求基础位与全部日程位可走、不压玩家出生点、不与其他 NPC 或任何固定互动格（遭遇/擂台/工位/药炉/门派战入口/终章入口/关口/区域事件）重叠。
 
@@ -39,6 +39,10 @@
 ## 关系速览（图谱边）
 
 人物间的主要 `knows` 边（含态度传播系数）与 `belongsTo` 归属见 `data/base/knowledge_graph/edges.json`；Round 30 新增：白鹭洲↔祝九弦（0.4 / 0.5）、白鹭洲→闻素心（0.3）、柳听澜→叶庭舟（0.5），以及三位新人物到门派/地图/渡籍的 `belongsTo` / `locatedAt` / `knows` 边。关系调整会沿带系数的人物边一跳传播（Round 26 规则）。
+
+## Round 59 区域任务回声（Round 59）
+
+七位与 R58 区域任务链相关的人物在既有对话的 greet 节点各加入互斥的活动中/完成后回应：石北（芦桥寻集 + 集期赶办）、白鹭洲（集期赶办）、祝九弦（集口拦贩）、马尚义（南麓寻村）、陆贞娘（南麓捎药）、姜百味（南麓捎药）、顾夜尘（塘匪断道）。回应选项只用 `questStatus` 条件、不带任何 effects——不接任务、不发奖励、不改关系，接取仍走名录/日志。石北与姜百味本身是谈话目标：场景按真实次序先发 `npc-talk` 信号再求首节点可见选项，因此带齐材料去谈话的玩家会直接看到完成态回应（`tests/round59-regional-dialogue.test.ts` 覆盖该次序）。
 
 ## 新增人物须知
 

@@ -157,6 +157,20 @@
               "text": "你还记得我说过的雨后脚印么？",
               "nextNodeId": "remembered-footprints",
               "conditions": [{ "kind": "npcKnows", "nodeId": "event.old-footprints" }]
+            },
+            {
+              "text": "贞娘，南麓捎药的差事，药队还缺什么？",
+              "nextNodeId": "r58-supply-active",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r58-south-hamlet-supply", "status": "active" }
+              ]
+            },
+            {
+              "text": "贞娘，苍崖根交割了，捎药的事办妥了。",
+              "nextNodeId": "r58-supply-done",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r58-south-hamlet-supply", "status": "completed" }
+              ]
             }
           ]
         },
@@ -205,6 +219,14 @@
         {
           "id": "thanks",
           "text": "哎，慢走。碗搁在这儿就好，回头我来收。"
+        },
+        {
+          "id": "r58-supply-active",
+          "text": "陆贞娘往灶上添了勺水：「还差两份苍崖根——村里沿水路做工的人，胳膊腿被芦苇划开是常事，药队配散就指望这味。料齐了便去寻姜百味，让他按新查明的旧路捎，别再叫药停在镇口。」"
+        },
+        {
+          "id": "r58-supply-done",
+          "text": "陆贞娘把茶碗往前推了推：「料收齐了，姜百味那头也应下了。等药散配出来，南麓的人便能少受些罪——这份跑腿的心，茶棚里替你记一笔。」"
         }
       ]
     },
@@ -256,6 +278,20 @@
                   "kind": "discoverKnowledgeNode",
                   "nodeId": "event.r43-tiezhang-stone-post"
                 }
+              ]
+            },
+            {
+              "text": "顾兄，东野池塘那伙冒牌护队，我正要去查。",
+              "nextNodeId": "r58-pond-active",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r58-pond-bandit-camp", "status": "active" }
+              ]
+            },
+            {
+              "text": "顾兄，冒牌护队已经击退，特来告知。",
+              "nextNodeId": "r58-pond-done",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r58-pond-bandit-camp", "status": "completed" }
               ]
             }
           ]
@@ -356,6 +392,14 @@
         {
           "id": "r43-resolved-tiezhang-stone-post",
           "text": "顾夜尘沿着桩脚比了比潮线：「底下有一道空槽，涨潮时水气灌进去才响。拿铁楔压住就行，没人藏在桩里。」"
+        },
+        {
+          "id": "r58-pond-active",
+          "text": "顾夜尘拇指在刀镡上蹭了蹭：「先看凭据，再动手。真护队认的是货单与口令，冒牌的只认落单的挑夫。你既摸清了南麓旧路，从东野边路过去正顺——赶散他们就行，别伤人根本。」"
+        },
+        {
+          "id": "r58-pond-done",
+          "text": "顾夜尘抱刀点了点头：「凭据对不上，人散了，这条路便算清了。挑夫夜里敢走东野，比什么谢礼都实在。」"
         }
       ]
     },
@@ -368,7 +412,21 @@
           "text": "（货郎把担子往肩上一颠）客官别急着走！姜百味走南闯北三十年，担子里伤药丸散、笔墨兵刃样样有，价钱公道——只是方才过桥颠散了架，货物一时半会儿翻不出来，且容我慢慢归置。",
           "options": [
             { "text": "不急，你先忙你的。", "nextNodeId": "wait" },
-            { "text": "你这担子里最值钱的是什么？", "nextNodeId": "prized" }
+            { "text": "你这担子里最值钱的是什么？", "nextNodeId": "prized" },
+            {
+              "text": "姜老板，往南麓捎药的货，你这边可备得下？",
+              "nextNodeId": "r58-peddler-supply-active",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r58-south-hamlet-supply", "status": "active" }
+              ]
+            },
+            {
+              "text": "姜老板，苍崖根带来了，捎药的事托付你了。",
+              "nextNodeId": "r58-peddler-supply-done",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r58-south-hamlet-supply", "status": "completed" }
+              ]
+            }
           ]
         },
         {
@@ -400,6 +458,14 @@
         {
           "id": "farewell",
           "text": "去去去，改日担子归置好了，管挑管换，亏待不了你！"
+        },
+        {
+          "id": "r58-peddler-supply-active",
+          "text": "（货郎拍拍肩上的扁担）捎药？担子越轻我越欢喜——只等贞娘那两份苍崖根一到，我立时按新查明的旧路挑去南麓。这条路我惦记半辈子了，早想走上一遭！"
+        },
+        {
+          "id": "r58-peddler-supply-done",
+          "text": "（货郎把两份苍崖根仔细捆进担头，绳子勒了三道）料收讫，路也记下了！这担药明日一早按旧路挑去南麓——你只管去贞娘那儿讨碗热茶，等我的信儿！"
         }
       ]
     },
@@ -418,6 +484,20 @@
               "nextNodeId": "friendly",
               "conditions": [
                 { "kind": "npcRelationship", "npcId": "char.ma-shangyi", "minValue": 10 }
+              ]
+            },
+            {
+              "text": "马叔，去南麓认路的差事，我正走着。",
+              "nextNodeId": "r58-hamlet-survey-active",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r58-south-hamlet-survey", "status": "active" }
+              ]
+            },
+            {
+              "text": "马叔，南麓村口的旧路记清了。",
+              "nextNodeId": "r58-hamlet-survey-done",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r58-south-hamlet-survey", "status": "completed" }
               ]
             }
           ]
@@ -500,6 +580,14 @@
         {
           "id": "friendly",
           "text": "托你的福，巷口清净多了，孩子们又敢出门追跑了。你这样的年轻人，镇上多几个就好。"
+        },
+        {
+          "id": "r58-hamlet-survey-active",
+          "text": "马尚义把告示压平了些：「沿山脚那排晒茶的竹匾走，匾到头便是旧驿道的石阶。村里几户还没收到药讯，路认清了，药担往后就少绕一段——不急，天黑前回来就行。」"
+        },
+        {
+          "id": "r58-hamlet-survey-done",
+          "text": "马尚义在旧账上勾了一笔：「路认清就好。贞娘已说要给药队配散，你把村口的情形也告诉姜百味一声——差事一环扣一环，往后南边的药就不用我挨家捎话了。」"
         },
         { "id": "leave", "text": "不妨事，路上留神便好。" }
       ]
@@ -697,6 +785,34 @@
               "nextNodeId": "r44-post-reinforced",
               "conditions": [{ "kind": "questStatus", "questId": "quest.r44-post-first", "status": "completed" }]
             },
+            {
+              "text": "师父，渠碑上那半个「芦」字船号，我循着去找旧集。",
+              "nextNodeId": "r58-market-discovery-active",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r58-market-discovery", "status": "active" }
+              ]
+            },
+            {
+              "text": "师父，芦桥集找到了，旧幌还挂着。",
+              "nextNodeId": "r58-market-discovery-done",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r58-market-discovery", "status": "completed" }
+              ]
+            },
+            {
+              "text": "师父，集期赶办的摊位，我来报明。",
+              "nextNodeId": "r58-stall-pact-active",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r58-market-stall-pact", "status": "active" }
+              ]
+            },
+            {
+              "text": "师父，摊棚与药担的通路已经划定。",
+              "nextNodeId": "r58-stall-pact-done",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r58-market-stall-pact", "status": "completed" }
+              ]
+            },
             { "text": "这便去磨练筋骨。", "nextNodeId": "farewell" }
           ]
         },
@@ -734,6 +850,22 @@
         {
           "id": "r44-post-reinforced",
           "text": "石北用靴跟踢了踢桩脚：「铁楔吃进木芯，潮起时便不再晃。白鹭洲的簿上有了潮时，我这边也有了桩痕——往后谁查，都能对得上。」"
+        },
+        {
+          "id": "r58-market-discovery-active",
+          "text": "石北双掌往石桩上一按：「循船号走北岸河湾，苇丛里那段浅槽枯水时露头。集子若还开着，药担便不必都挤在栈桥——路是死的，腿是活的，去。」"
+        },
+        {
+          "id": "r58-market-discovery-done",
+          "text": "石北听完，往北岸河湾的方向抬了抬下巴：「旧幌还挂着，市期就没断根。渡镇的药担有了落脚处，这趟跑得值。」"
+        },
+        {
+          "id": "r58-stall-pact-active",
+          "text": "石北朝滩地比划了一道：「韧皮料备齐了么？绳带不补，摊棚立不住。摊子沿河湾一侧摆，中间给药担留一条道——摆摊的路和运药的路，一条也不能堵。」"
+        },
+        {
+          "id": "r58-stall-pact-done",
+          "text": "石北用靴尖在地上划出两条线：「摊棚靠外，药担走里——就这么定了。往后来往的人多了，都按这两条线走，谁也不挤谁。」"
         }
       ]
     },
