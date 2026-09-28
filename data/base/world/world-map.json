@@ -99,6 +99,24 @@
       "text": "苇根间埋着一块斜立的旧水标。刮去泥皮后，刻线与石闸潮尺首尾相接，标出通往南湾的浅槽。",
       "once": true,
       "discoverKnowledgeNodeId": "place.mist-south-pool"
+    },
+    {
+      "id": "event.r58-market-first-visit",
+      "mapResourceId": "map.round-10-mist-ferry",
+      "col": 59,
+      "row": 65,
+      "text": "河湾旧棚下挂着半幅褪色的芦字幌子，边上还留着船号刻痕。比过旧渠碑上的残字后，渡口人认出这里便是早年歇脚开市的芦桥集。",
+      "once": true,
+      "discoverKnowledgeNodeId": "place.mist-willow-market"
+    },
+    {
+      "id": "event.r58-south-hamlet-arrival",
+      "mapResourceId": "map.round-01-grid",
+      "col": 70,
+      "row": 75,
+      "text": "山脚一排排竹匾正晾着新采的茶叶，村口石阶沿旧驿道向南折去。马尚义托人问过的南麓聚落，就在这片坡地尽头。",
+      "once": true,
+      "discoverKnowledgeNodeId": "place.south-hamlet"
     }
   ],
   "randomEvents": [

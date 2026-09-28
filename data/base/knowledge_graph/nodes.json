@@ -392,6 +392,76 @@
       "title": "南湾苇池",
       "summary": "苇池旧水标对应石闸窄槽的南端，浅水时仍可循槽返渡。",
       "knownByDefault": false
+    },
+    {
+      "id": "quest.r58-market-discovery",
+      "kind": "quest",
+      "title": "芦桥寻集",
+      "summary": "凭南湾浅槽与旧渠碑上的残缺船号，循线找到河湾边的芦桥集。",
+      "knownByDefault": true
+    },
+    {
+      "id": "quest.r58-market-stall-pact",
+      "kind": "quest",
+      "title": "集期赶办",
+      "summary": "备齐摊棚绳带并与石北商定药担通路，让芦桥集重新开市。",
+      "knownByDefault": true
+    },
+    {
+      "id": "quest.r58-market-toll-squabble",
+      "kind": "quest",
+      "title": "集口拦贩",
+      "summary": "击退芦桥集口索取不明过集钱的旧例管事。",
+      "knownByDefault": true
+    },
+    {
+      "id": "quest.r58-south-hamlet-survey",
+      "kind": "quest",
+      "title": "南麓寻村",
+      "summary": "循山脚茶匾走到南麓聚落，认清村口旧驿道。",
+      "knownByDefault": true
+    },
+    {
+      "id": "quest.r58-south-hamlet-supply",
+      "kind": "quest",
+      "title": "南麓捎药",
+      "summary": "备下苍崖根并请货担按旧路向南麓送药。",
+      "knownByDefault": true
+    },
+    {
+      "id": "quest.r58-pond-bandit-camp",
+      "kind": "quest",
+      "title": "塘匪断道",
+      "summary": "东野池塘有人冒充护队拦取药队钱粮，需查清并赶走。",
+      "knownByDefault": true
+    },
+    {
+      "id": "place.mist-willow-market",
+      "kind": "place",
+      "title": "芦桥集",
+      "summary": "旧渠北岸的河湾市集，沿浅槽而来的药担与河船可在此歇脚开市。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.south-hamlet",
+      "kind": "place",
+      "title": "南麓聚落",
+      "summary": "江南道南侧山麓村落，旧驿道沿茶匾间的石阶通向村口。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r58-market-first-visit",
+      "kind": "event",
+      "title": "芦桥旧幌",
+      "summary": "褪色的芦字幌子与旧渠碑上的半个船号相合，显出芦桥集旧址。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r58-south-hamlet-arrival",
+      "kind": "event",
+      "title": "南麓茶匾",
+      "summary": "山脚晾茶竹匾引到南麓聚落的旧驿道入口。",
+      "knownByDefault": false
     }
   ]
 }

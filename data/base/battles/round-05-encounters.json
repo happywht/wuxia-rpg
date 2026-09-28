@@ -120,6 +120,54 @@
         "defeat": "你被扁担扫下桥滩，索银人得意地在新桥板上又刻了一道记号。",
         "flee": "你退出桥心，索银人在身后把「过桥钱」三个字喊得更响。"
       }
+    },
+    {
+      "id": "encounter.r58-market-toll-claimer",
+      "name": "芦桥旧例索钱人",
+      "mapResourceId": "map.round-10-mist-ferry",
+      "position": { "col": 60, "row": 67 },
+      "profileId": "char.scribe-apprentice",
+      "enemy": {
+        "name": "旧例管事",
+        "attributes": { "body": 8, "force": 8, "agility": 6, "insight": 5, "resolve": 5 },
+        "health": 56,
+        "qi": 12,
+        "martialArtIds": ["skill.lanmen-daofa", "skill.jianghu-sanshou"]
+      },
+      "victoryExperience": 44,
+      "defeatRecovery": { "healthRatio": 0.6, "qiRatio": 0.6 },
+      "repeatable": true,
+      "texts": {
+        "approach": "芦桥集口有人堵路，旧例管事按 E 盘问",
+        "intro": "那人把刀横在摊棚边：「芦桥集的老规矩，先交过集钱，再谈开市。」",
+        "victory": "旧例管事捂腕退开，挑担的商贩趁势把摊棚重新撑起。",
+        "defeat": "你被旧例管事逼退到河堤外，只得缓一缓再回集口。",
+        "flee": "你暂避到芦苇边，集口又响起几声不耐烦的催钱声。"
+      }
+    },
+    {
+      "id": "encounter.r58-pond-fake-escort",
+      "name": "冒牌护药队",
+      "mapResourceId": "map.round-01-grid",
+      "position": { "col": 80, "row": 20 },
+      "profileId": "char.scribe-apprentice",
+      "enemy": {
+        "name": "假护队头目",
+        "attributes": { "body": 8, "force": 8, "agility": 6, "insight": 5, "resolve": 5 },
+        "health": 58,
+        "qi": 12,
+        "martialArtIds": ["skill.jianghu-sanshou", "skill.tiezhang-zhuanggong"]
+      },
+      "victoryExperience": 44,
+      "defeatRecovery": { "healthRatio": 0.6, "qiRatio": 0.6 },
+      "repeatable": true,
+      "texts": {
+        "approach": "东野的路边有人拦药担，冒牌护药队按 E 迎战",
+        "intro": "为首的人亮出一块磨旧的木牌：「药队过路，留下护送钱，沿途都由我们看着。」",
+        "victory": "木牌被打落在地，几名冒牌护队四散逃开，南麓旧路暂时清静。",
+        "defeat": "你被假护队头目逼得退回池塘外，挑夫们也不敢再走这条路。",
+        "flee": "你退到坡边，假护队仍守着东野小道不肯离开。"
+      }
     }
   ]
 }

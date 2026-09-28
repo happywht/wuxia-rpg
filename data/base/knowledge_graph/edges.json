@@ -266,6 +266,27 @@
     {"id":"kg.edge.r56-shibei-offers-south-survey","fromId":"char.shi-bei","toId":"quest.r56-south-waterway-survey","relation":"participatesIn","summary":"石北在北岸潮尺确认后，续托南湾水路测绘。"},
     {"id":"kg.edge.r56-south-survey-requires-north-cap","fromId":"quest.r56-south-waterway-survey","toId":"place.mist-north-cap","relation":"requires","summary":"南湾测绘以前一程查明的北岸水尺为起点。"},
     {"id":"kg.edge.r56-south-survey-triggers-mark","fromId":"quest.r56-south-waterway-survey","toId":"event.r56-south-waterway-mark","relation":"triggers","summary":"测绘路线延伸至南湾浅槽的旧水标。"},
-    {"id":"kg.edge.r56-south-mark-located","fromId":"event.r56-south-waterway-mark","toId":"place.mist-south-pool","relation":"locatedAt","summary":"苇根下的水标标记南湾苇池旧航道。"}
+    {"id":"kg.edge.r56-south-mark-located","fromId":"event.r56-south-waterway-mark","toId":"place.mist-south-pool","relation":"locatedAt","summary":"苇根下的水标标记南湾苇池旧航道。"},
+    {"id":"kg.edge.r58-shibei-offers-market","fromId":"char.shi-bei","toId":"quest.r58-market-discovery","relation":"participatesIn","summary":"石北请玩家沿南湾浅槽与旧船号找到芦桥集。"},
+    {"id":"kg.edge.r58-market-requires-south-pool","fromId":"quest.r58-market-discovery","toId":"place.mist-south-pool","relation":"requires","summary":"芦桥寻集以前一轮查明的南湾浅槽与旧水标为线索。"},
+    {"id":"kg.edge.r58-market-requires-survey","fromId":"quest.r58-market-discovery","toId":"quest.r56-south-waterway-survey","relation":"requires","summary":"芦桥寻集接续南湾水路测绘。"},
+    {"id":"kg.edge.r58-market-triggers-old-sign","fromId":"quest.r58-market-discovery","toId":"event.r58-market-first-visit","relation":"triggers","summary":"循线抵达河湾后认出芦桥集旧幌与船号。"},
+    {"id":"kg.edge.r58-market-event-located","fromId":"event.r58-market-first-visit","toId":"place.mist-willow-market","relation":"locatedAt","summary":"河湾旧幌与旧渠碑船号相合，确认芦桥集旧址。"},
+    {"id":"kg.edge.r58-bai-offers-stall","fromId":"char.bai-luzhou","toId":"quest.r58-market-stall-pact","relation":"participatesIn","summary":"白鹭洲托玩家备好绳带并与石北商定芦桥集通路。"},
+    {"id":"kg.edge.r58-shi-participates-stall","fromId":"char.shi-bei","toId":"quest.r58-market-stall-pact","relation":"participatesIn","summary":"石北与玩家约定集市摊棚和药担的行路位置。"},
+    {"id":"kg.edge.r58-stall-requires-market","fromId":"quest.r58-market-stall-pact","toId":"quest.r58-market-discovery","relation":"requires","summary":"集期赶办在寻得芦桥集之后解锁。"},
+    {"id":"kg.edge.r58-stall-requires-leather","fromId":"quest.r58-market-stall-pact","toId":"item.tough-leather","relation":"requires","summary":"复开摊棚需要韧皮料补回绳带。"},
+    {"id":"kg.edge.r58-zhu-offers-toll-squabble","fromId":"char.zhu-jiuxian","toId":"quest.r58-market-toll-squabble","relation":"participatesIn","summary":"祝九弦托玩家赶走向商贩索取过集钱的旧例管事。"},
+    {"id":"kg.edge.r58-toll-squabble-requires-stall","fromId":"quest.r58-market-toll-squabble","toId":"quest.r58-market-stall-pact","relation":"requires","summary":"集口拦贩在集市通路与摊棚安排落实后解锁。"},
+    {"id":"kg.edge.r58-ma-offers-hamlet","fromId":"char.ma-shangyi","toId":"quest.r58-south-hamlet-survey","relation":"participatesIn","summary":"马尚义请玩家向南送药讯并查明南麓旧路。"},
+    {"id":"kg.edge.r58-hamlet-requires-medicine","fromId":"quest.r58-south-hamlet-survey","toId":"quest.round-07-medicine-run","relation":"requires","summary":"巷口伤者安置妥当后才有余力向南麓村落送讯。"},
+    {"id":"kg.edge.r58-hamlet-triggers-arrival","fromId":"quest.r58-south-hamlet-survey","toId":"event.r58-south-hamlet-arrival","relation":"triggers","summary":"沿山脚茶匾走到南麓聚落并认出村口旧路。"},
+    {"id":"kg.edge.r58-hamlet-event-located","fromId":"event.r58-south-hamlet-arrival","toId":"place.south-hamlet","relation":"locatedAt","summary":"山脚茶匾旁的旧石阶标出南麓聚落位置。"},
+    {"id":"kg.edge.r58-lu-offers-supply","fromId":"char.lu-zhenniang","toId":"quest.r58-south-hamlet-supply","relation":"participatesIn","summary":"陆贞娘请玩家备苍崖根并托货担沿旧路送药。"},
+    {"id":"kg.edge.r58-jiang-participates-supply","fromId":"char.jiang-baiwei","toId":"quest.r58-south-hamlet-supply","relation":"participatesIn","summary":"姜百味按旧驿道向南麓村落捎送药材。"},
+    {"id":"kg.edge.r58-supply-requires-survey","fromId":"quest.r58-south-hamlet-supply","toId":"quest.r58-south-hamlet-survey","relation":"requires","summary":"先查明南麓聚落和旧路，才能安排送药。"},
+    {"id":"kg.edge.r58-supply-requires-root","fromId":"quest.r58-south-hamlet-supply","toId":"item.cangya-gen","relation":"requires","summary":"南麓药队需要苍崖根配散。"},
+    {"id":"kg.edge.r58-gu-offers-bandit","fromId":"char.gu-yechen","toId":"quest.r58-pond-bandit-camp","relation":"participatesIn","summary":"顾夜尘请玩家查清东野池塘冒牌护药队并打通旧路。"},
+    {"id":"kg.edge.r58-bandit-requires-supply","fromId":"quest.r58-pond-bandit-camp","toId":"quest.r58-south-hamlet-supply","relation":"requires","summary":"南麓药材交由货担捎送后，才进一步查办冒牌护队。"}
   ]
 }

@@ -671,6 +671,126 @@
         }
       ],
       "rewards": { "experience": 32, "currency": 24 }
+    },
+    {
+      "id": "quest.r58-market-discovery",
+      "name": "芦桥寻集",
+      "description": "旧渠碑上残着半个「芦」字船号，南湾浅槽既已测明，石北请你循船号往北岸河湾找找旧集。渡镇的市期若还开着，药队的货便不必都挤在栈桥边。",
+      "giverNpcId": "char.shi-bei",
+      "prerequisiteQuestIds": ["quest.r56-south-waterway-survey"],
+      "requiredKnowledgeNodeId": "place.mist-south-pool",
+      "objectives": [
+        {
+          "id": "objective.r58-market-discovery",
+          "kind": "discoverKnowledge",
+          "targetId": "place.mist-willow-market",
+          "requiredCount": 1,
+          "text": "循旧船号找到芦桥集"
+        }
+      ],
+      "rewards": { "experience": 28, "currency": 20 }
+    },
+    {
+      "id": "quest.r58-market-stall-pact",
+      "name": "集期赶办",
+      "description": "芦桥集的摊棚久未开张，绳带先坏了一半。白鹭洲要你备好三条韧皮料，再向石北报明摆摊的位置，好让药担与行船各留一条路。",
+      "giverNpcId": "char.bai-luzhou",
+      "prerequisiteQuestIds": ["quest.r58-market-discovery"],
+      "requiredKnowledgeNodeId": "place.mist-willow-market",
+      "objectives": [
+        {
+          "id": "objective.r58-market-stall-leather",
+          "kind": "collectItem",
+          "targetId": "item.tough-leather",
+          "requiredCount": 3,
+          "text": "备好三条韧皮料补摊棚绳带"
+        },
+        {
+          "id": "objective.r58-market-stall-layout",
+          "kind": "talkToNpc",
+          "targetId": "char.shi-bei",
+          "requiredCount": 1,
+          "text": "与石北商定摊棚和药担的通路"
+        }
+      ],
+      "rewards": { "experience": 34, "currency": 26 }
+    },
+    {
+      "id": "quest.r58-market-toll-squabble",
+      "name": "集口拦贩",
+      "description": "集市刚要复开，就有个旧例管事堵在入口，向每个挑担人收一笔来路不明的过集钱。祝九弦认得他的刀路，让你先把人劝退；此人若赢了，摊棚只怕又要散。",
+      "giverNpcId": "char.zhu-jiuxian",
+      "prerequisiteQuestIds": ["quest.r58-market-stall-pact"],
+      "objectives": [
+        {
+          "id": "objective.r58-market-toll-claimer",
+          "kind": "defeatEncounter",
+          "targetId": "encounter.r58-market-toll-claimer",
+          "requiredCount": 1,
+          "text": "赶走芦桥集口的旧例索钱人"
+        }
+      ],
+      "failOnEncounterIds": ["encounter.r58-market-toll-claimer"],
+      "rewards": { "experience": 46, "currency": 44 }
+    },
+    {
+      "id": "quest.r58-south-hamlet-survey",
+      "name": "南麓寻村",
+      "description": "巷口伤者渐能起身，马尚义说南边聚落还有几户没收到药讯。循山脚晒开的茶匾往南走一趟，把村口的旧路记清，往后的药担便能少绕一段。",
+      "giverNpcId": "char.ma-shangyi",
+      "prerequisiteQuestIds": ["quest.round-07-medicine-run"],
+      "objectives": [
+        {
+          "id": "objective.r58-south-hamlet-arrival",
+          "kind": "discoverKnowledge",
+          "targetId": "place.south-hamlet",
+          "requiredCount": 1,
+          "text": "走到南麓聚落并认清村口旧路"
+        }
+      ],
+      "rewards": { "experience": 20, "currency": 16 }
+    },
+    {
+      "id": "quest.r58-south-hamlet-supply",
+      "name": "南麓捎药",
+      "description": "村里沿水路劳作的人常被芦苇划伤，陆贞娘请你备两份苍崖根给药队配散，再告诉姜百味捎往南麓。货担要按新查明的旧路走，不能再把药留在镇口。",
+      "giverNpcId": "char.lu-zhenniang",
+      "prerequisiteQuestIds": ["quest.r58-south-hamlet-survey"],
+      "objectives": [
+        {
+          "id": "objective.r58-south-hamlet-roots",
+          "kind": "collectItem",
+          "targetId": "item.cangya-gen",
+          "requiredCount": 2,
+          "text": "备好两份苍崖根交药队配散"
+        },
+        {
+          "id": "objective.r58-south-hamlet-peddler",
+          "kind": "talkToNpc",
+          "targetId": "char.jiang-baiwei",
+          "requiredCount": 1,
+          "text": "请姜百味按旧路捎药到南麓"
+        }
+      ],
+      "rewards": { "experience": 24, "currency": 20 }
+    },
+    {
+      "id": "quest.r58-pond-bandit-camp",
+      "name": "塘匪断道",
+      "description": "药担按旧路备妥后，顾夜尘又听说东野池塘附近有人冒充护队，专拦落单的挑夫。你既已摸清南麓一线，便去查查那伙人是否真有护送凭据。",
+      "giverNpcId": "char.gu-yechen",
+      "prerequisiteQuestIds": ["quest.r58-south-hamlet-supply"],
+      "objectives": [
+        {
+          "id": "objective.r58-pond-fake-escort",
+          "kind": "defeatEncounter",
+          "targetId": "encounter.r58-pond-fake-escort",
+          "requiredCount": 1,
+          "text": "击退东野池塘附近的冒牌护药队"
+        }
+      ],
+      "failOnEncounterIds": ["encounter.r58-pond-fake-escort"],
+      "rewards": { "experience": 38, "currency": 30 }
     }
   ]
 }

@@ -56,7 +56,7 @@ describe('world map roaming events', () => {
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
     const mapStub = (id: string): GridMap => ({
-      data: { id, name: id, columns: 16, rows: 9, playerStart: { col: 7, row: 7 } },
+      data: { id, name: id, columns: 100, rows: 100, playerStart: { col: 7, row: 7 } },
       playerStart: { col: 7, row: 7 },
       canEnter: () => true,
     }) as unknown as GridMap;
@@ -67,6 +67,7 @@ describe('world map roaming events', () => {
       knowledgeNodeIds: new Set([
         'event.old-footprints', 'event.r43-wayfarer-letter', 'place.reedbank', 'event.r44-dock-claim',
         'place.mist-sluice', 'place.mist-north-cap', 'place.mist-south-pool',
+        'place.mist-willow-market', 'place.south-hamlet',
       ]),
       periodIds: new Set(['period.dusk', 'period.night']),
       weatherIds: new Set(['weather.drizzle', 'weather.rain', 'weather.storm']),
@@ -167,7 +168,7 @@ describe('world map roaming events', () => {
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
     const mapStub = (id: string): GridMap => ({
-      data: { id, name: id, columns: 16, rows: 9, playerStart: { col: 7, row: 7 } },
+      data: { id, name: id, columns: 100, rows: 100, playerStart: { col: 7, row: 7 } },
       playerStart: { col: 7, row: 7 },
       canEnter: () => true,
     }) as unknown as GridMap;
@@ -178,6 +179,7 @@ describe('world map roaming events', () => {
       knowledgeNodeIds: new Set([
         'event.old-footprints', 'event.r43-wayfarer-letter', 'place.reedbank', 'event.r44-dock-claim',
         'place.mist-north-cap', 'place.mist-south-pool',
+        'place.mist-willow-market', 'place.south-hamlet',
       ]),
       periodIds: new Set(['period.dusk', 'period.night']),
       weatherIds: new Set(['weather.drizzle', 'weather.rain', 'weather.storm']),

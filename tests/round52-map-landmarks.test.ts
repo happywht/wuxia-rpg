@@ -100,6 +100,8 @@ describe('Round 53 landmark discovery gating', () => {
       'place.mist-sluice',
       'place.mist-north-cap',
       'place.mist-south-pool',
+      'place.mist-willow-market',
+      'place.south-hamlet',
     ]),
     periodIds: new Set(['period.dusk', 'period.night']),
     weatherIds: new Set(['weather.drizzle', 'weather.rain', 'weather.storm']),
