@@ -13,6 +13,7 @@
 
 import type { PlacedNpc } from './npc-placement';
 import type { QuestData, QuestJournal } from './quest-system';
+import type { NavigationArrivalAction } from './world-navigation-guidance';
 import type { PlacedEncounter } from './turn-based-combat';
 import type { WorldMapAssembly } from './world-map';
 
@@ -38,6 +39,8 @@ export interface QuestNavigationTarget {
   row: number;
   /** Exact for discovery events; adjacent for NPCs/encounters. */
   approachRadius: number;
+  /** Content-free control hint the HUD shows once the target is reached. */
+  arrivalAction: NavigationArrivalAction;
   /** Stable landmark id when a discovery target coincides with a world landmark. */
   landmarkId?: string;
 }
@@ -74,6 +77,13 @@ export interface QuestNavigationInput {
 /** Builds the runtime-only selector stable across objective progression. */
 export function questNavigationTargetId(questId: string): string {
   return `${QUEST_NAVIGATION_ID_PREFIX}${questId}`;
+}
+
+/** Maps one spatial objective kind onto the generic arrival control hint. */
+export function questObjectiveArrivalAction(kind: SpatialQuestObjectiveKind): NavigationArrivalAction {
+  if (kind === 'talkToNpc') return 'talk';
+  if (kind === 'defeatEncounter') return 'battle';
+  return 'discover';
 }
 
 interface NpcPosition {
@@ -196,6 +206,7 @@ export function resolveQuestNavigationTarget(input: QuestNavigationInput): Quest
         col: npc.col,
         row: npc.row,
         approachRadius: 1,
+        arrivalAction: questObjectiveArrivalAction(objective.kind),
       },
     };
   }
@@ -217,6 +228,7 @@ export function resolveQuestNavigationTarget(input: QuestNavigationInput): Quest
         col: encounter.record.position.col,
         row: encounter.record.position.row,
         approachRadius: 1,
+        arrivalAction: questObjectiveArrivalAction(objective.kind),
       },
     };
   }
@@ -235,6 +247,7 @@ export function resolveQuestNavigationTarget(input: QuestNavigationInput): Quest
       col: knowledge.col,
       row: knowledge.row,
       approachRadius: 0,
+      arrivalAction: questObjectiveArrivalAction(objective.kind),
       ...(knowledge.landmarkId === undefined ? {} : { landmarkId: knowledge.landmarkId }),
     },
   };

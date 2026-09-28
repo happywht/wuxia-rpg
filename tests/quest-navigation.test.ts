@@ -6,6 +6,7 @@ import type { CharacterProfileData } from '../src/engine/character-progression';
 import type { PlacedNpc } from '../src/engine/npc-placement';
 import {
   QUEST_NAVIGATION_ID_PREFIX,
+  questObjectiveArrivalAction,
   resolveQuestNavigationTarget,
   type QuestNavigationInput,
 } from '../src/engine/quest-navigation';
@@ -335,6 +336,40 @@ describe('Round 60 quest objective navigation', () => {
     expect(first.target.id).toBe(`${QUEST_NAVIGATION_ID_PREFIX}quest.a`);
     expect(second.target.id).toBe(first.target.id);
     expect(QUEST_NAVIGATION_ID_PREFIX).toBe('quest:');
+  });
+
+  it('maps each spatial objective kind onto its arrival control hint', () => {
+    expect(questObjectiveArrivalAction('talkToNpc')).toBe('talk');
+    expect(questObjectiveArrivalAction('defeatEncounter')).toBe('battle');
+    expect(questObjectiveArrivalAction('discoverKnowledge')).toBe('discover');
+
+    // The resolver carries the same mapping through every target branch.
+    const quest = makeQuest([
+      { id: 'obj-talk', kind: 'talkToNpc', targetId: 'char.test-ferryman' },
+      { id: 'obj-fight', kind: 'defeatEncounter', targetId: 'encounter.test-bandit' },
+      { id: 'obj-market', kind: 'discoverKnowledge', targetId: 'place.mist-willow-market' },
+    ], 'quest.arrival-actions');
+    const input = makeInput({
+      quests: new Map([[quest.id, quest]]),
+      journal: makeJournal([quest]),
+      questId: quest.id,
+      baseNpcs: [makeNpc('char.test-ferryman', '测试船夫', FERRY_MAP, 10, 10)],
+      encounters: [makeEncounter('encounter.test-bandit', '测试匪人', FERRY_MAP, 12, 12)],
+    });
+    const expectedActions: Record<string, 'talk' | 'battle' | 'discover'> = {
+      'obj-talk': 'talk',
+      'obj-fight': 'battle',
+      'obj-market': 'discover',
+    };
+    for (const [objectiveId, expected] of Object.entries(expectedActions)) {
+      const result = resolveQuestNavigationTarget(input);
+      expect(result.status).toBe('target');
+      if (result.status !== 'target') throw new Error('expected a target');
+      expect(result.target.objectiveId).toBe(objectiveId);
+      expect(result.target.arrivalAction).toBe(expected);
+      // Advance this objective so the next loop pass resolves the next kind.
+      input.journal.states.get(quest.id)!.objectiveCounts.set(objectiveId, 1);
+    }
   });
 });
 

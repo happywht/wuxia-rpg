@@ -22,15 +22,15 @@
       "questGiver": true,
       "spriteFrame": 88,
       "schedule": [
-        { "periodId": "period.dusk", "position": { "col": 41, "row": 38 } },
-        { "periodId": "period.night", "position": { "col": 43, "row": 38 } }
+        { "periodId": "period.dusk", "position": { "col": 44, "row": 37 } },
+        { "periodId": "period.night", "position": { "col": 44, "row": 38 } }
       ]
     },
     {
       "id": "char.gu-yechen",
       "name": "顾夜尘",
       "mapResourceId": "map.round-01-grid",
-      "position": { "col": 51, "row": 40 },
+      "position": { "col": 51, "row": 42 },
       "dialogueId": "dlg.gu-yechen-roadside",
       "questGiver": true,
       "spriteFrame": 87

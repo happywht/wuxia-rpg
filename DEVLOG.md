@@ -4,6 +4,33 @@
 
 ---
 
+## Round 61 — 差事导航抵达提示与动态寻路审计（2026-09-29，已完成）
+
+### 计划与实现
+
+- 开工前写入 `iterations/round-61/plan.md`，列明抵达操作提示、动态 NPC/遭遇避让与暂堵恢复、R58 六项任务七时段路线审计、数据修复、文档/测试/提交标准及约 60–90 分钟人类工程工时；发现当前路径只查静态地形后，将动态阻挡与暂时封路恢复纳入本轮目标。
+- 差事目标在 `quest-navigation.ts` 传递内容无关的 `talk`/`battle`/`discover` 抵达动作；`world-navigation-guidance.ts` 负责泛型动作枚举与提示映射，`GridScene` 只在 `arrived` HUD 写入对应按键。人物说明 F 直接交谈；遭遇说明 E 的邻近人物优先级；见闻说明先满足区域事件条件、V 推进时段等待。普通地标沿用旧抵达文案；引擎协议没有人物名、地点名或剧情文本。
+- 导航计算接收仅在场景运行期构造的当前人物/活动遭遇占位集合，用其余可走格重新做当前区域 BFS，人物与遭遇终点仍取四向相邻停靠格。若有占位时无路、但忽略动态占位存在地形路线，则返回 `route-blocked` 并保留当前选择，在 HUD 提示通路状态变化后自动重算；若地形本身无路则沿用既有失效提示/清除。占位不改写地图数据或存档。
+- 新增 `tests/round61-route-audit.test.ts`：加载真实 100×100 地图、world-map、任务、NPC、战斗、日历，逐一按七个 `periodId` 编译人物位置；从江南道出生格或雾雨渡口关口落点出发，按 NPC/遭遇实际占位计算到 R58 六个发布人及其空间目标的四向最短步数。collect 目标无空间坐标，按 R60 目标解析规则跳过；每项各时段可达性及六组 min/max 距离都断言锁定，共 42 个路线场景。
+- 路线审计查明三处内容放置问题并修正 `data/base/characters/round-03-npcs.json`：顾夜尘原 `(51,40)` 的所有邻格都不接入江南道起点可达区，改为 `(51,42)`；陆贞娘入夜位置从 `(43,38)` 改为 `(44,38)`，释放被人物占位封住的出生区出口；黄昏位置从 `(41,38)`（发布人路线 92 格）调到 `(44,37)`，让「南麓捎药」在七时段下落至 3–4 格总路程。
+- 距离范围与限制见新文档 `docs/ROUND-61-ROUTE-AUDIT.md`；更新 `docs/PLAYER-GUIDE.md`、`docs/ARCHITECTURE.md`、`docs/DATA-GUIDE.md`、README、ROADMAP 和 CHANGELOG。
+
+### 验证
+
+- `npx vitest run tests/round61-route-audit.test.ts tests/world-navigation-guidance.test.ts tests/quest-navigation.test.ts`：3 个文件 / 21 项用例通过，包含真实资料 42 路线、三类动作映射/透传、动态占位绕行与暂时封路状态。
+- `npm run typecheck`：`tsc --noEmit` 通过。
+- `git diff --check`：通过。
+- 第一次 `npm run package:release`：资料 Schema（26 项）、MOD 检查（26 项零问题）与类型检查通过；全量 Vitest 为 31 个文件、242/243 项通过，唯一失败为 `tests/docs-audit-round-48.test.ts` 检出 README/ROADMAP/CHANGELOG/DEVLOG/DATA-GUIDE 的当前轮次尚未同步到 R61。随后已补齐文档标记和 R62 路线。
+- 复跑 `npm run package:release`：通过——26 项基础资源 Schema、26 项 MOD 零问题、`tsc --noEmit`、31 个测试文件 / 243 项用例、Round 34/48 文档审计、Vite 138 模块生产构建、发行归档及 Round 47 子路径 smoke 全通过；归档 768,107 bytes，SHA-256 `880932add1451c20ff7c0bd1fe3f95f2778adea486c32e9035139abbb7ccc9d2`，含 70 个归档文件 / 69 个内容文件。主 JS chunk 1,931.59 kB（gzip 510.45 kB）仍高于 Vite 500 kB 建议线，但不影响构建及 smoke。
+
+### 边界与未做
+
+- 没有非维护者试玩记录；路线表是可复现步数审计，不伪称主观体感结论或平衡性评估。
+- 没有浏览器手动走完任务链；未接触玩家存档，未改存档格式。
+- `.serena/` 保持原样，不纳入本轮提交。
+
+---
+
 ## Round 60 — 差事目标导航与跑图提示（2026-09-29，已完成）
 
 ### 计划与实现

@@ -3,7 +3,11 @@ import { describe, expect, it } from 'vitest';
 
 import { parseGridMap } from '../src/engine/grid-map';
 import { assembleWorldMap, parseWorldMap } from '../src/engine/world-map';
-import { resolveWorldNavigationGuide } from '../src/engine/world-navigation-guidance';
+import {
+  arrivalActionHint,
+  resolveCellNavigationGuide,
+  resolveWorldNavigationGuide,
+} from '../src/engine/world-navigation-guidance';
 
 function readJson(path: string): unknown {
   return JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8')) as unknown;
@@ -155,6 +159,131 @@ describe('cross-region landmark guidance', () => {
       start,
     );
     expect(guide.status).toBe('arrived');
+    if (guide.status !== 'arrived') throw new Error('expected an arrived landmark stop');
     expect(guide).toMatchObject({ destinationName: '南湾苇池', nextTransitionName: null });
+    // Plain landmark stops carry no quest arrival action.
+    expect(guide.arrivalAction).toBeUndefined();
+  });
+});
+
+describe('quest arrival actions', () => {
+  it('names the existing control for each arrival action without claiming it happened', () => {
+    // F talks directly; E serves an adjacent NPC (shop or quest board)
+    // before its encounter; discovery fires on arrival but may wait on
+    // the period or weather, so V waits in place. Copy changes must be
+    // deliberate — this locks the shipped wording.
+    expect(arrivalActionHint('talk')).toBe('按 F 直接交谈（E 键优先处理商铺或差事名录）');
+    expect(arrivalActionHint('battle')).toBe('按 E 交手（身旁另有人物时 E 会先应对他们）');
+    expect(arrivalActionHint('discover')).toBe('见闻须满足事件条件；可按 V 推进时段等待');
+  });
+
+  it('carries a quest arrival action through every segment status', () => {
+    const world = makeWorld();
+    const ferryMap = world.maps.get('map.round-10-mist-ferry')!;
+    const destination = {
+      mapResourceId: 'map.round-10-mist-ferry',
+      col: 3,
+      row: 1,
+      name: '测试船夫',
+      approachRadius: 1,
+      arrivalAction: 'talk' as const,
+    };
+
+    const enRoute = resolveCellNavigationGuide(
+      world.worldMap,
+      'map.round-10-mist-ferry',
+      destination,
+      ferryMap,
+      ferryMap.playerStart,
+    );
+    expect(enRoute.status).toBe('en-route');
+    if (enRoute.status !== 'en-route') throw new Error('expected an en-route guide');
+    expect(enRoute.arrivalAction).toBe('talk');
+
+    // Standing on the computed stop collapses the path to one cell: arrived.
+    const arrived = resolveCellNavigationGuide(
+      world.worldMap,
+      'map.round-10-mist-ferry',
+      destination,
+      ferryMap,
+      enRoute.path.at(-1)!,
+    );
+    expect(arrived.status).toBe('arrived');
+    if (arrived.status !== 'arrived') throw new Error('expected an arrived guide');
+    expect(arrived.arrivalAction).toBe('talk');
+  });
+
+  it('routes around live NPC and encounter cells without mutating the map', () => {
+    const world = makeWorld();
+    const map = world.maps.get('map.round-10-mist-ferry')!;
+    const destination = {
+      mapResourceId: 'map.round-10-mist-ferry',
+      col: 59,
+      row: 65,
+      name: '测试目的地',
+      approachRadius: 2,
+    };
+    const direct = resolveCellNavigationGuide(
+      world.worldMap,
+      'map.round-10-mist-ferry',
+      destination,
+      map,
+      map.playerStart,
+    );
+    expect(direct.status).toBe('en-route');
+    if (direct.status !== 'en-route') throw new Error('expected an en-route guide');
+    const occupied = direct.path[1];
+    if (occupied === undefined) throw new Error('the route should take at least one step');
+
+    const detour = resolveCellNavigationGuide(
+      world.worldMap,
+      'map.round-10-mist-ferry',
+      destination,
+      map,
+      map.playerStart,
+      new Set([`${occupied.col},${occupied.row}`]),
+    );
+    expect(detour.status).toBe('en-route');
+    if (detour.status !== 'en-route') throw new Error('expected a detour guide');
+    expect(detour.path).not.toContainEqual(occupied);
+    expect(map.canEnter(occupied.col, occupied.row)).toBe(true);
+  });
+
+  it('keeps temporary live-occupancy blockage distinct from a broken terrain route', () => {
+    const world = makeWorld();
+    const map = world.maps.get('map.round-10-mist-ferry')!;
+    const destination = {
+      mapResourceId: 'map.round-10-mist-ferry',
+      col: 59,
+      row: 65,
+      name: '测试目的地',
+      approachRadius: 2,
+    };
+    const ring = new Set<string>();
+    for (let row = destination.row - 2; row <= destination.row + 2; row += 1) {
+      for (let col = destination.col - 2; col <= destination.col + 2; col += 1) {
+        if (Math.abs(col - destination.col) + Math.abs(row - destination.row) <= 2) {
+          ring.add(`${col},${row}`);
+        }
+      }
+    }
+    const blocked = resolveCellNavigationGuide(
+      world.worldMap,
+      'map.round-10-mist-ferry',
+      destination,
+      map,
+      map.playerStart,
+      ring,
+    );
+    expect(blocked).toEqual({ status: 'route-blocked', destinationName: destination.name });
+
+    const noOccupancy = resolveCellNavigationGuide(
+      world.worldMap,
+      'map.round-10-mist-ferry',
+      destination,
+      map,
+      map.playerStart,
+    );
+    expect(noOccupancy.status).toBe('en-route');
   });
 });

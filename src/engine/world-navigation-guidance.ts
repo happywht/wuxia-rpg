@@ -1,12 +1,21 @@
 import type { CellPosition, GridMap } from './grid-map';
-import { findGridPath, findGridPathToAdjacentCell } from './grid-path';
+import { findGridPath, findGridPathToAdjacentCell, type GridPathSurface } from './grid-path';
 import { selectVisibleWorldLandmarks, type WorldMapAssembly } from './world-map';
 import { findWorldTravelRoute } from './world-travel';
+
+/**
+ * Generic, content-free control hint for a reached quest destination. The
+ * engine knows only which existing control applies — never the character,
+ * place or story behind the objective (see docs/ARCHITECTURE.md).
+ */
+export type NavigationArrivalAction = 'talk' | 'battle' | 'discover';
 
 export interface WorldNavigationGuideSegment {
   status: 'en-route' | 'at-gate' | 'arrived';
   /** Stable lore id; carried only when the destination is a world landmark. */
   destinationLandmarkId?: string;
+  /** Control hint carried from quest targets; landmarks leave this unset. */
+  arrivalAction?: NavigationArrivalAction;
   destinationName: string;
   destinationRegionName: string;
   /** Current map's cell path, ending at a landmark or beside its next gate. */
@@ -18,6 +27,7 @@ export interface WorldNavigationGuideSegment {
 
 export type WorldNavigationGuide = WorldNavigationGuideSegment
   | { status: 'target-lost' }
+  | { status: 'route-blocked'; destinationName: string }
   | { status: 'route-broken'; destinationName: string };
 
 /** Any addressable destination cell: a landmark, or a projected quest target. */
@@ -28,6 +38,22 @@ export interface NavigationDestinationCell {
   name: string;
   /** Number of cells from the destination considered reachable; defaults to 2 for landmarks. */
   approachRadius?: number;
+  /** Control hint surfaced by the HUD once the guide reports 'arrived'. */
+  arrivalAction?: NavigationArrivalAction;
+}
+
+/** Applies live occupants without mutating the authored map or persisted data. */
+function withNavigationBlockers(
+  map: GridMap,
+  blockedCells: ReadonlySet<string> | undefined,
+): GridPathSurface {
+  if (blockedCells === undefined || blockedCells.size === 0) return map;
+  return {
+    columns: map.columns,
+    rows: map.rows,
+    inBounds: (col, row) => map.inBounds(col, row),
+    canEnter: (col, row) => map.canEnter(col, row) && !blockedCells.has(`${col},${row}`),
+  };
 }
 
 /**
@@ -42,6 +68,7 @@ export function resolveCellNavigationGuide(
   destination: NavigationDestinationCell,
   map: GridMap,
   playerPosition: CellPosition,
+  blockedCells?: ReadonlySet<string>,
 ): WorldNavigationGuide {
   const route = findWorldTravelRoute(world, currentMapResourceId, destination.mapResourceId);
   if (route === null) return { status: 'route-broken', destinationName: destination.name };
@@ -53,19 +80,28 @@ export function resolveCellNavigationGuide(
   }
 
   const nextLeg = route.legs[0];
-  const path = nextLeg === undefined
+  const navigationMap = withNavigationBlockers(map, blockedCells);
+  const findPath = (surface: GridPathSurface) => nextLeg === undefined
     ? destination.approachRadius === 1
       // NPC and encounter cells are occupied at runtime but remain walkable
       // in static map data, so route to a real adjacent cell explicitly.
-      ? findGridPathToAdjacentCell(map, playerPosition, destination)
+      ? findGridPathToAdjacentCell(surface, playerPosition, destination)
       : findGridPath(
-        map,
+        surface,
         playerPosition,
         { col: destination.col, row: destination.row },
         { approachRadius: destination.approachRadius ?? 2 },
       )
-    : findGridPathToAdjacentCell(map, playerPosition, nextLeg.transition.from);
-  if (path === null) return { status: 'route-broken', destinationName: destination.name };
+    : findGridPathToAdjacentCell(surface, playerPosition, nextLeg.transition.from);
+  const path = findPath(navigationMap);
+  if (path === null) {
+    // Distinguish a blocked corridor that may open on the next NPC schedule
+    // or encounter update from a destination disconnected by the map itself.
+    if (blockedCells !== undefined && blockedCells.size > 0 && findPath(map) !== null) {
+      return { status: 'route-blocked', destinationName: destination.name };
+    }
+    return { status: 'route-broken', destinationName: destination.name };
+  }
 
   const status = nextLeg === undefined
     ? (path.length === 1 ? 'arrived' : 'en-route')
@@ -77,6 +113,9 @@ export function resolveCellNavigationGuide(
     path,
     regionRouteNames: route.regionNames,
     nextTransitionName: nextLeg?.transition.name ?? null,
+    ...(destination.arrivalAction === undefined
+      ? {}
+      : { arrivalAction: destination.arrivalAction }),
   };
 }
 
@@ -92,6 +131,7 @@ export function resolveWorldNavigationGuide(
   knownKnowledgeNodeIds: ReadonlySet<string>,
   map: GridMap,
   playerPosition: CellPosition,
+  blockedCells?: ReadonlySet<string>,
 ): WorldNavigationGuide {
   const landmark = selectVisibleWorldLandmarks(world.landmarks, knownKnowledgeNodeIds)
     .find((candidate) => candidate.id === destinationLandmarkId);
@@ -109,7 +149,28 @@ export function resolveWorldNavigationGuide(
     },
     map,
     playerPosition,
+    blockedCells,
   );
-  if (guide.status === 'target-lost' || guide.status === 'route-broken') return guide;
+  if (guide.status === 'target-lost' || guide.status === 'route-broken' || guide.status === 'route-blocked') {
+    return guide;
+  }
   return { ...guide, destinationLandmarkId: landmark.id };
+}
+
+/**
+ * HUD copy naming the existing control that acts on a reached quest target.
+ * Mirrors the scene's input precedence — F talks directly, E serves an
+ * adjacent NPC before an encounter, discovery fires on arrival but can be
+ * gated by period or weather — so the copy never claims the interaction or
+ * discovery has already happened, only that the player is next to it.
+ */
+export function arrivalActionHint(action: NavigationArrivalAction): string {
+  switch (action) {
+    case 'talk':
+      return '按 F 直接交谈（E 键优先处理商铺或差事名录）';
+    case 'battle':
+      return '按 E 交手（身旁另有人物时 E 会先应对他们）';
+    case 'discover':
+      return '见闻须满足事件条件；可按 V 推进时段等待';
+  }
 }

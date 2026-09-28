@@ -186,6 +186,7 @@ import {
 } from '../engine/quest-navigation';
 import { LANDMARK_DESTINATION_PREFIX } from '../engine/world-navigation';
 import {
+  arrivalActionHint,
   resolveCellNavigationGuide,
   resolveWorldNavigationGuide,
   type WorldNavigationGuide,
@@ -2148,6 +2149,12 @@ export class GridScene extends Phaser.Scene {
       text.setText('行路目标已失效；可在 M 舆图重新选择。');
       return;
     }
+    if (guide.status === 'route-blocked') {
+      // Keep the selector: NPC schedules and battle outcomes can reopen this
+      // route, and the next world refresh will rebuild its local path.
+      text.setText(`行路「${guide.destinationName}」暂被人物或遭遇堵住，通路变化后将自动重算。`);
+      return;
+    }
     if (guide.status === 'route-broken') {
       this.navigationDestinationId = null;
       text.setText(`行路「${guide.destinationName}」当前无可行路线；可在 M 舆图重新规划。`);
@@ -2162,7 +2169,13 @@ export class GridScene extends Phaser.Scene {
     if (guide.status === 'at-gate') {
       text.setText(`行路「${guide.destinationName}」· 已到「${guide.nextTransitionName ?? '关口'}」旁，按 E 通过。`);
     } else if (guide.status === 'arrived') {
-      text.setText(`行路「${guide.destinationName}」· 已抵达附近。`);
+      // Quest targets name the existing control that acts on arrival; plain
+      // landmark stops keep their original copy. Arrival is only proximity,
+      // so the hint stays a suggestion and never reports an interaction.
+      const action = guide.arrivalAction === undefined
+        ? ''
+        : `，${arrivalActionHint(guide.arrivalAction)}`;
+      text.setText(`行路「${guide.destinationName}」· 已抵达附近${action}。`);
       // A landmark is complete when reached; an NPC/encounter still needs its
       // interaction, so keep that quest pin selected until the objective moves.
       if (this.navigationDestinationId?.startsWith(QUEST_NAVIGATION_ID_PREFIX) !== true) {
@@ -2186,6 +2199,7 @@ export class GridScene extends Phaser.Scene {
     const map = this.map;
     const text = this.navigationHintText;
     if (world === null || map === null || text === null) return null;
+    const blockedCells = this.navigationBlockedCells();
 
     if (destinationId.startsWith(LANDMARK_DESTINATION_PREFIX)) {
       return resolveWorldNavigationGuide(
@@ -2195,6 +2209,7 @@ export class GridScene extends Phaser.Scene {
         this.knownKnowledgeNodeIds,
         map,
         { col: this.playerCol, row: this.playerRow },
+        blockedCells,
       );
     }
     if (!destinationId.startsWith(QUEST_NAVIGATION_ID_PREFIX)) return { status: 'target-lost' };
@@ -2215,7 +2230,16 @@ export class GridScene extends Phaser.Scene {
       resolution.target,
       map,
       { col: this.playerCol, row: this.playerRow },
+      blockedCells,
     );
+  }
+
+  /** Current live NPC and encounter cells; rebuilt with every guide refresh. */
+  private navigationBlockedCells(): ReadonlySet<string> {
+    return new Set([
+      ...this.placedNpcs.map((npc) => `${npc.col},${npc.row}`),
+      ...this.activeEncounters().map((encounter) => `${encounter.col},${encounter.row}`),
+    ]);
   }
 
   /**
