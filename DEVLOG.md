@@ -4,6 +4,36 @@
 
 ---
 
+## Round 63 — 跨时段实时行路模拟与玩家引导复核（2026-09-29，已完成）
+
+### 计划与实现
+
+- 开工前先读取用户指定的 `goal-objective.md`，确认仍按逐轮计划/实现/验证/文档/独立提交推进；该文件定义的是至少 Round 00–50 的长期开发目标，不把历史 Round 50 结构验收当作整个产品完成。工作区保留 `.serena/` 与 Round 62 三张未跟踪地图调色板图。
+- 开工前写入 `iterations/round-63/plan.md`：模拟三张大地图上的游戏时间逐格推进、日程目标跟随、NPC/遭遇避让与抵达提示；列明用户故事、验收、四个子任务、风险、涉及文件与约 60–90 分钟人类工程师工时。
+- 新增 `tests/round63-live-clock-navigation.test.ts`：装配真实地图、区域关系、任务、NPC、遭遇、历法与气候；以 `GameClock`、`ClimateRuntime`、NPC 日程编译/实时玩家安全落位、差事目标解析和正式导航引擎复演实际单格步行。测试为三条路线各自寻找开局春季天气表中最高步耗时的确定性雨天 seed（基础 1 + 雨天额外 2 = 3 分钟/成功走格），每一格都断言路径首格/可行/无人物或遭遇占位、推进时钟且换时段后重算目标及寻路。
+- 江南道出生点 `(43,37)` 到南麓聚落 `(70,75)`：雨天 71 格 / 213 分钟，09:30 到 13:03，跨晨光→日中，见闻停在事件格。
+- 雾雨渡口关口落点 `(1,4)` 到芦桥集 `(59,65)`：119 格 / 357 分钟，14:00 到 19:57，跨午后→黄昏→入夜，抵达见闻触发格。
+- 铁嶂北道入口 `(4,7)` 追踪「驿镇更次」中的秦素砚：94 格 / 282 分钟，18:00 到 22:42，跨黄昏→入夜；目的地真实从 `(57,49)` 更新到夜班 `(56,50)`，最终停在 `(56,49)` 的相邻格，HUD 按键提示为 F。
+- 三条独立路线共 284 格 / 852 游戏分钟；均无封路、断路、NPC/遭遇占格或坏目的地。复现数字、方法和审计边界记入 `docs/ROUND-63-TIMED-ROUTE-AUDIT.md`。
+- 对照 `GridScene` 每次成功移动的 `stepMinutes + currentClimate().weather.stepMinutes` 与时段变化时 NPC/导航刷新次序，检查 `arrivalActionHint` 三类映射和 `docs/PLAYER-GUIDE.md`。未发现路线或抵达 HUD 运行逻辑缺陷；玩家手册原来没有明说天气会为每步加时及路线每格重算，现已写明“显示指引、仍由玩家手动走格”和天气加时 HUD 说明。
+- 更新 README 当前轮次、CHANGELOG、DEVLOG、ROADMAP；下轮路线调整为 R64 关键 NPC 通路/收集与师门玩法引导，整个项目目标继续 active。
+
+### 验证
+
+- `$env:ROUND63_REPORT='1'; npx vitest run tests/round63-live-clock-navigation.test.ts --silent=false`：3 项专项全部通过；逐项输出 71 / 119 / 94 格与 213 / 357 / 282 分钟、雨天加时 2 分/格及各跨段时段。
+- `npx vitest run tests/round63-live-clock-navigation.test.ts tests/round61-route-audit.test.ts tests/world-navigation-guidance.test.ts`：3 个文件、12 项通过。
+- `npm run typecheck`：`tsc --noEmit` 通过。
+- 首轮 `npm run package:release` 的全量测试为 249/250：Round 48 文档审计发现 `docs/ARCHITECTURE.md` 与 `docs/DATA-GUIDE.md` 当前状态仍为 Round 62；已补上 R63 实时路线审计摘要后复跑。
+- `npm run package:release`：最终完整通过——28 项基础 Schema、28 项 MOD 检查/0 问题、`tsc --noEmit`、33 个测试文件/250 项用例、Round 34/48 文档审计、Vite 138 模块生产构建、发行归档与 Round 47 子路径 smoke。包 787,419 bytes、72 个归档文件/71 个内容文件，SHA-256 `65aa13d03d475c85a302b78b1ab92780d165fdf87badac1f665b56593cdb402c`；smoke 校验解包哈希及 `/preview/wuxia-rpg/` 页面、MOD/资料/Schema/图集资源加载通过。
+- `git diff --check`：通过。生产主 JS 为 1,931.59 kB（gzip 510.45 kB），Vite 仍提示高于 500 kB 建议阈值；构建和 smoke 成功。
+- 浏览器：未进行人工 UI 试玩或声称采集到玩家反馈；R63 属于真实资料驱动的自动逐格模拟。没有改动存档格式、生产运行时规则、玩家原有存档或用户浏览器状态。
+
+### 边界
+
+- 测试按三种地区路线分别建立游戏内时间快照，行程合计 14 小时 12 分，不是一个角色连续跑完的单次一天行程。
+- 模拟验证目标抵达和提示，不模拟事件奖励、任务结算、遭遇战、渲染和 Phaser Tween；相关完整游戏流程仍需后续浏览器试玩。
+- `.serena/` 和 Round 62 预览图片保持未跟踪、未纳入本轮提交。
+
 ## Round 62 — 铁嶂北道第三块百格区域（2026-09-29，已完成）
 
 ### 计划与实现
