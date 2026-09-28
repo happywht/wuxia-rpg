@@ -15,6 +15,7 @@ import {
   assembleQuests,
   createQuestJournal,
   parseQuestSet,
+  reconcileKnownKnowledgeObjectives,
 } from '../src/engine/quest-system';
 import { applyQuestRewardConsequences } from '../src/engine/quest-consequences';
 import { createSocialState, getFactionRenown } from '../src/engine/social-state';
@@ -47,6 +48,19 @@ const gatherQuest: QuestData = {
   ],
   failOnEncounterIds: [],
   rewards: { experience: 20, currency: 15 },
+};
+
+const discoveryQuest: QuestData = {
+  id: 'quest-discovery',
+  name: '查访旧地',
+  description: '沿路查明旧标所在。',
+  giverNpcId: 'npc-elder',
+  prerequisiteQuestIds: [],
+  objectives: [
+    { id: 'obj-discover', kind: 'discoverKnowledge', targetId: 'place-old-marker', requiredCount: 1, text: '发现旧标' },
+  ],
+  failOnEncounterIds: [],
+  rewards: { experience: 12, currency: 6 },
 };
 
 const branchA: QuestData = {
@@ -83,6 +97,7 @@ interface World {
   npcIds: ReadonlySet<string>;
   itemIds: ReadonlySet<string>;
   encounterIds: ReadonlySet<string>;
+  knowledgeNodeIds?: ReadonlySet<string>;
 }
 
 function assembleWorld(quests: QuestData[], overrides: Partial<World> = {}) {
@@ -166,6 +181,20 @@ describe('parseQuestSet', () => {
     } }] }).ok).toBe(false);
   });
 
+  it('parses one-time discoverKnowledge objectives and rejects impossible multi-discovery counts', () => {
+    const objective = {
+      id: 'discover', kind: 'discoverKnowledge', targetId: 'place-old-marker', requiredCount: 1, text: '发现旧标',
+    };
+    expect(parseQuestSet({ quests: [{
+      id: 'q', name: '名', description: '说明', giverNpcId: 'npc-elder',
+      objectives: [objective], rewards: { experience: 1, currency: 2 },
+    }] }).ok).toBe(true);
+    expect(parseQuestSet({ quests: [{
+      id: 'q', name: '名', description: '说明', giverNpcId: 'npc-elder',
+      objectives: [{ ...objective, requiredCount: 2 }], rewards: { experience: 1, currency: 2 },
+    }] }).ok).toBe(false);
+  });
+
   it('rejects a non-array envelope', () => {
     expect(parseQuestSet({ quests: 'nope' }).ok).toBe(false);
     expect(parseQuestSet(null).ok).toBe(false);
@@ -191,6 +220,13 @@ describe('assembleQuests', () => {
     expect(warnings).toHaveLength(1);
     expect(warnings[0]).toContain('quest-broken');
     expect(warnings[0]).toContain('npc-ghost');
+  });
+
+  it('disables a discovery objective that references an unregistered knowledge node', () => {
+    const { quests, warnings } = assembleWorld([discoveryQuest], { knowledgeNodeIds: new Set() });
+    expect(quests.has(discoveryQuest.id)).toBe(false);
+    expect(warnings.join('\n')).toContain('place-old-marker');
+    expect(warnings.join('\n')).toContain('知识节点');
   });
 
   it('disables quests locked in a prerequisite cycle', () => {
@@ -317,6 +353,38 @@ describe('quest lifecycle', () => {
     ]);
     expect(journal.states.get('quest-gather')!.status).toBe('completed');
     expect(journal.trackedQuestId).toBeNull();
+  });
+
+  it('completes one-time discovery objectives only for a matching first-discovery signal', () => {
+    const { quests } = assembleWorld([discoveryQuest], { knowledgeNodeIds: new Set(['place-old-marker']) });
+    const journal = createQuestJournal(quests);
+    acceptQuest(quests, journal, discoveryQuest.id);
+
+    const update = applyQuestSignal(quests, journal, { type: 'knowledge-discovery', nodeId: 'place-old-marker' });
+    expect(update.completed).toEqual([{ questId: discoveryQuest.id, experience: 12, currency: 6 }]);
+    expect(journal.states.get(discoveryQuest.id)?.objectiveCounts.get('obj-discover')).toBe(1);
+    expect(applyQuestSignal(quests, journal, { type: 'knowledge-discovery', nodeId: 'place-old-marker' }).changed).toBe(false);
+    expect(journal.states.get(discoveryQuest.id)?.status).toBe('completed');
+  });
+
+  it('backfills already-known discoveries on acceptance and reconciles active legacy saves', () => {
+    const { quests } = assembleWorld([discoveryQuest], { knowledgeNodeIds: new Set(['place-old-marker']) });
+    const journal = createQuestJournal(quests);
+    const accepted = acceptQuest(quests, journal, discoveryQuest.id, new Map(), {
+      knownKnowledgeNodeIds: new Set(['place-old-marker']),
+    });
+    expect(accepted.ok).toBe(true);
+    expect(accepted.update.completed).toHaveLength(1);
+
+    const restoredJournal = createQuestJournal(quests);
+    const state = restoredJournal.states.get(discoveryQuest.id)!;
+    state.status = 'active'; // A compatible old save has no new discovery count.
+    restoredJournal.trackedQuestId = discoveryQuest.id;
+    const restored = reconcileKnownKnowledgeObjectives(quests, restoredJournal, new Set(['place-old-marker']));
+    expect(restored.completed).toHaveLength(1);
+    expect(restoredJournal.states.get(discoveryQuest.id)?.status).toBe('completed');
+    expect(restoredJournal.trackedQuestId).toBeNull();
+    expect(reconcileKnownKnowledgeObjectives(quests, restoredJournal, new Set(['place-old-marker'])).changed).toBe(false);
   });
 
   it('a defeat on a failing encounter fails the active quest and clears tracking', () => {

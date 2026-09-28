@@ -636,6 +636,41 @@
         "factionRenown": [{ "factionId": "faction.hanshan-shuyuan", "delta": 6 }],
         "discoverKnowledgeNodeIds": ["event.r44-ledger-verified"]
       }
+    },
+    {
+      "id": "quest.r56-north-water-gauge",
+      "name": "雾岬水尺巡查",
+      "description": "旧渠石闸的潮痕指向北岸。石北托你沿河湾走到雾岬水尺，核清这条水路还能否辨出旧刻。",
+      "giverNpcId": "char.shi-bei",
+      "requiredKnowledgeNodeId": "place.mist-sluice",
+      "objectives": [
+        {
+          "id": "objective.r56-north-water-gauge",
+          "kind": "discoverKnowledge",
+          "targetId": "place.mist-north-cap",
+          "requiredCount": 1,
+          "text": "查明雾岬北岸水尺所在"
+        }
+      ],
+      "rewards": { "experience": 24, "currency": 18 }
+    },
+    {
+      "id": "quest.r56-south-waterway-survey",
+      "name": "南湾水路测绘",
+      "description": "北岸水尺已明，下一步须沿浅水折向南湾。石北请你找到苇池旧标，确认石闸下的窄槽确实能与南湾相通。",
+      "giverNpcId": "char.shi-bei",
+      "prerequisiteQuestIds": ["quest.r56-north-water-gauge"],
+      "requiredKnowledgeNodeId": "place.mist-north-cap",
+      "objectives": [
+        {
+          "id": "objective.r56-south-waterway-mark",
+          "kind": "discoverKnowledge",
+          "targetId": "place.mist-south-pool",
+          "requiredCount": 1,
+          "text": "查明南湾苇池旧水标"
+        }
+      ],
+      "rewards": { "experience": 32, "currency": 24 }
     }
   ]
 }

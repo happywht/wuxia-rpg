@@ -4,6 +4,17 @@
 
 ## [Unreleased]
 
+### Added (Round 56)
+
+- **发现见闻任务目标 `discoverKnowledge`**：quest-set 目标 kind 新增 `discoverKnowledge`（`requiredCount` 固定为 1），Schema/防御解析器/跨资源装配三层校验知识图谱节点引用；图谱首次新增节点发出一次性任务信号，只推进匹配目标一次；接取任务时按玩家已有见闻回填进度，读档时把存档已知节点重算到活跃发现目标——复用既有 v1 目标 id/计数快照，不新增存档字段；任务奖励解锁的见闻沿同一信号链级联推进其他活动任务。
+- **两段雾雨渡口见闻巡标差事**：石北在玩家发现旧渠石闸碑记（`place.mist-sluice`）后发布「北岬水尺巡查」，至雾岬林地 (86,15) 触发发现事件解锁 `place.mist-north-cap` 完成；完成前段后接取「南湾水路测绘」，至南湾苇池 (81,87) 发现 `place.mist-south-pool` 完成。两项差事不互斥、顺次可完成。
+- **图谱与舆图同步**：世界图为雾岬林地、南湾苇池两处地点设置发现门控地标与一次性发现事件；知识图谱新增 6 节点/8 条关系，总量扩至 171 节点/267 条关系；基础差事总量扩至 34 项（奖励合计 1,108 经验/812 文，含互斥取舍的单周目上界为 979 经验/724 文）。
+
+### Verification (Round 56)
+
+- `npm test`：26 个测试文件/202 个用例全部通过；`npx vitest run tests/quest-system.test.ts tests/round56-discovery-quests.test.ts`：2 个文件/29 个用例通过。
+- `npm run package:release`：资料/MOD/类型/全量测试/两项文档审计/生产构建及 Round 47 解包与子路径 smoke 全部通过。发行归档 756,726 bytes，70 个归档文件/69 个内容清单文件，SHA-256 `e5e474dd3d7d268beb0c6ff41f391a85a8d310efde7f2450273ce86347b60a61`；Vite 1,921.01 kB chunk 建议为非阻断信息。
+
 ### Added (Round 55)
 
 - **第二张百格可步行区域**：`map.round-10-mist-ferry` 由 16×9 过场小图扩为 100×100 十层 Kenney CC0 像素河湾地貌——草地/岸线/繁花/林木四层河流走廊、五层芦桥集渡镇聚落与一层步径层；独立碰撞网格给出 7,340 个可行格（`,` 芦苇滩草地与 `.` 地面可走，`~` 江水与 `#` 岩岸阻挡），林木层 388 处 CC0 树木。地图由确定性生成脚本 `scripts/generate-round55-ferry-world.mjs`（`npm run generate:round-55-ferry`）以种子哈希与河道路径距离场重建，可重复再生；素材仅复用已授权的 Kenney Roguelike/RPG 与 Tiny Dungeon 图集（见 `docs/REFERENCES.md` 第六节），未新增外部资产。

@@ -389,6 +389,10 @@ for (const quest of quests) {
       const target = encounterById.get(objective.targetId);
       if (target === undefined) fail('QUESTS.md', `任务 "${quest.name}" 的战斗目标 "${objective.targetId}" 未登记（数据侧错误）`);
       else objectiveNames.push(target.name);
+    } else if (objective.kind === 'discoverKnowledge') {
+      const target = knowledgeNodeById.get(objective.targetId);
+      if (target === undefined) fail('QUESTS.md', `任务 "${quest.name}" 的见闻目标 "${objective.targetId}" 未登记（数据侧错误）`);
+      else objectiveNames.push(target.title);
     }
   }
   const eligibilityNames = [];

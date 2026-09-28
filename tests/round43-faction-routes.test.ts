@@ -122,7 +122,7 @@ describe('Round 43 faction routes', () => {
   it('assembles five data-driven routes gated by the matching faction and discovered letter', () => {
     const world = loadWorld();
     expect(world.warnings).toEqual([]);
-    expect(world.parsed.quests).toHaveLength(32);
+    expect(world.parsed.quests).toHaveLength(34);
     expect(routes.map((route) => world.quests.get(route.questId)?.requiredFactionId))
       .toEqual(routes.map((route) => route.factionId));
 

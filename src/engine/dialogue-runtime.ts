@@ -786,6 +786,12 @@ export function applyDialogueEffects(
           const alreadyKnown = staged.knownKnowledgeNodeIds.has(node.id);
           staged.knownKnowledgeNodeIds.add(node.id);
           lines.push(alreadyKnown ? `已记下「${node.title}」` : `新增见闻「${node.title}」`);
+          if (!alreadyKnown) {
+            mergeQuestUpdate(questUpdate, applyQuestSignal(staged.quests, staged.journal, {
+              type: 'knowledge-discovery',
+              nodeId: node.id,
+            }));
+          }
         }
         break;
       }

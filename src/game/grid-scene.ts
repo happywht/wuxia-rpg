@@ -120,6 +120,7 @@ import {
   type QuestUpdateResult,
   applyQuestSignal,
   createQuestJournal,
+  reconcileKnownKnowledgeObjectives,
 } from '../engine/quest-system';
 import {
   type SaveSlotId,
@@ -686,7 +687,6 @@ export class GridScene extends Phaser.Scene {
       this.playerRow = map.playerStart.row;
     }
     this.social.npcKnowledge = mergeNpcKnowledge(world.knowledgeGraph, this.social.npcKnowledge);
-    this.syncKnowledgeFromRunFacts();
     if (this.playerProfile !== null && this.playerState !== null) {
       applyMeridianEffects(
         this.playerProfile,
@@ -791,6 +791,14 @@ export class GridScene extends Phaser.Scene {
     this.encyclopediaPanel = new EncyclopediaPanel(this, { onClose: () => this.noteOverlayClosed() });
     this.modStatusPanel = new ModStatusPanel(this, { onClose: () => this.noteOverlayClosed() });
     this.collectionPanel = new CollectionPanel(this, { onClose: () => this.noteOverlayClosed() });
+    this.syncKnowledgeFromRunFacts();
+    if (restoredRun !== null) {
+      this.applyQuestUpdate(reconcileKnownKnowledgeObjectives(
+        this.quests,
+        this.questJournal,
+        this.knownKnowledgeNodeIds,
+      ));
+    }
     this.updateQuestTrackerHud();
     this.updateInteractHint();
     this.triggerRegionEvents();
@@ -1668,9 +1676,8 @@ export class GridScene extends Phaser.Scene {
     applySocialChange(this.social, { kind: 'factionRenown', factionId: run.alliedFactionId, delta: outcome.alliedFactionRenownDelta });
     applySocialChange(this.social, { kind: 'factionRenown', factionId: run.opposingFactionId, delta: outcome.opposingFactionRenownDelta });
     const node = this.world?.knowledgeGraph.nodes.get(outcome.knowledgeNodeId);
-    const discovery = node !== undefined && !this.knownKnowledgeNodeIds.has(node.id)
-      ? (this.knownKnowledgeNodeIds.add(node.id), `新见闻「${node.title}」已记入江湖百闻。`)
-      : '';
+    const newlyDiscovered = node !== undefined && this.markKnowledgeDiscovered(node.id);
+    const discovery = newlyDiscovered ? `新见闻「${node!.title}」已记入江湖百闻。` : '';
     this.showRegionNotice(outcome.text + (discovery.length > 0 ? ' ' + discovery : ''));
     console.info('[faction-war] 会盟「%s」结束：贡献 %d/%d，结果 %s',
       run.war.record.id, run.contribution, run.war.record.contributionThreshold, outcomeId);
@@ -2652,7 +2659,26 @@ export class GridScene extends Phaser.Scene {
   private recordKnowledgeObservations(observations: KnowledgeObservations): void {
     const graph = this.world?.knowledgeGraph;
     if (graph === undefined) return;
-    discoverObservedKnowledge(graph, this.knownKnowledgeNodeIds, observations);
+    const newlyDiscovered = discoverObservedKnowledge(graph, this.knownKnowledgeNodeIds, observations);
+    this.progressKnowledgeDiscoveries(newlyDiscovered.map((node) => node.id));
+  }
+
+  /** Advances matching one-time quest objectives for actual first discoveries. */
+  private progressKnowledgeDiscoveries(nodeIds: readonly string[]): void {
+    for (const nodeId of nodeIds) {
+      this.applyQuestUpdate(applyQuestSignal(this.quests, this.questJournal, {
+        type: 'knowledge-discovery',
+        nodeId,
+      }));
+    }
+  }
+
+  /** Records one registered knowledge node and advances quests only once. */
+  private markKnowledgeDiscovered(nodeId: string): boolean {
+    if (!this.world?.knowledgeGraph.nodes.has(nodeId) || this.knownKnowledgeNodeIds.has(nodeId)) return false;
+    this.knownKnowledgeNodeIds.add(nodeId);
+    this.progressKnowledgeDiscoveries([nodeId]);
+    return true;
   }
 
   /** Items, learned arts and the current map are observed at stable run boundaries. */
@@ -2765,12 +2791,15 @@ export class GridScene extends Phaser.Scene {
 
   /** Applies one state transition's rewards and refreshes the visible tracker. */
   private applyQuestUpdate(update: QuestUpdateResult): void {
-    if (update.completed.length > 0 || update.failedQuestIds.length > 0) {
+    const completed = [...update.completed];
+    if (completed.length > 0 || update.failedQuestIds.length > 0) {
       this.questNoticeTimer?.remove(false);
       this.questNoticeTimer = null;
     }
     if (this.playerProfile !== null && this.playerState !== null && this.inventory !== null) {
-      for (const reward of update.completed) {
+      const completionNotices: string[] = [];
+      for (let index = 0; index < completed.length; index += 1) {
+        const reward = completed[index]!;
         const quest = this.quests.get(reward.questId);
         const experience = grantExperience(this.playerProfile, this.playerState, reward.experience);
         const cultivation = this.meridianSet === null
@@ -2792,13 +2821,22 @@ export class GridScene extends Phaser.Scene {
           const node = this.world?.knowledgeGraph.nodes.get(nodeId);
           return node === undefined ? [] : [`新见闻「${node.title}」`];
         });
+        for (const nodeId of consequences.discoveredKnowledgeNodeIds) {
+          const chained = applyQuestSignal(this.quests, this.questJournal, {
+            type: 'knowledge-discovery',
+            nodeId,
+          });
+          completed.push(...chained.completed);
+        }
         const consequenceText = [...factionText, ...knowledgeText].join(' · ');
         const rewardText = consequenceText.length > 0 ? ` · ${consequenceText}` : '';
-        this.questNotice = quest === undefined
+        const notice = quest === undefined
           ? `差事完成：经验 +${paidExperience} · 银两 +${reward.currency}${cultivationText}${rewardText}`
           : `完成「${quest.name}」：经验 +${paidExperience} · 银两 +${reward.currency}${cultivationText}${rewardText}`;
+        completionNotices.push(notice);
         console.info('[quest] 任务 "%s" 完成：经验 +%d，银两 +%d%s', reward.questId, paidExperience, reward.currency, rewardText);
       }
+      if (completionNotices.length > 0) this.questNotice = completionNotices.join('；');
     }
     if (update.failedQuestIds.length > 0) {
       const failed = this.quests.get(update.failedQuestIds[update.failedQuestIds.length - 1] ?? '');
@@ -3166,7 +3204,7 @@ export class GridScene extends Phaser.Scene {
           if (!outcome.ok) return { ok: false, message: outcome.reason };
           this.achievementState = recordAchievementCounter(this.achievementState, 'alchemyCrafts');
           this.refreshQuestCollectObjectives();
-          if (this.world?.knowledgeGraph.nodes.has(outcome.result.id)) this.knownKnowledgeNodeIds.add(outcome.result.id);
+          this.markKnowledgeDiscovered(outcome.result.id);
           return { ok: true, message: `已炼成「${outcome.result.name}」，剩余银两 ${outcome.remainingCurrency}。` };
         },
       });
@@ -3551,7 +3589,7 @@ export class GridScene extends Phaser.Scene {
     for (const nodeId of selectNewRegionEventKnowledgeIds(allEvents, this.knownKnowledgeNodeIds)) {
       const node = world.knowledgeGraph.nodes.get(nodeId);
       if (node === undefined) continue;
-      this.knownKnowledgeNodeIds.add(nodeId);
+      if (!this.markKnowledgeDiscovered(nodeId)) continue;
       newlyDiscoveredTitles.add(node.title);
     }
     for (const title of newlyDiscoveredTitles) notices.push(`新见闻「${title}」已记入江湖百闻。`);

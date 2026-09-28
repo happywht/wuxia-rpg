@@ -22,10 +22,10 @@
     { "id": "landmark.south-hamlet", "mapResourceId": "map.round-01-grid", "col": 70, "row": 75, "name": "南麓聚落", "category": "settlement" },
     { "id": "landmark.stone-stairs-ferry", "mapResourceId": "map.round-01-grid", "col": 90, "row": 50, "name": "石阶渡口", "category": "crossing" },
     { "id": "landmark.reedbank-landing", "mapResourceId": "map.round-10-mist-ferry", "col": 1, "row": 4, "name": "芦岸登船点", "category": "crossing", "discoveryNodeId": "place.reedbank" },
-    { "id": "landmark.mist-north-cap", "mapResourceId": "map.round-10-mist-ferry", "col": 86, "row": 15, "name": "雾岬林地", "category": "other" },
+    { "id": "landmark.mist-north-cap", "mapResourceId": "map.round-10-mist-ferry", "col": 86, "row": 15, "name": "雾岬林地", "category": "other", "discoveryNodeId": "place.mist-north-cap" },
     { "id": "landmark.mist-willow-market", "mapResourceId": "map.round-10-mist-ferry", "col": 59, "row": 65, "name": "芦桥集", "category": "settlement" },
     { "id": "landmark.mist-old-sluice", "mapResourceId": "map.round-10-mist-ferry", "col": 46, "row": 53, "name": "旧渠石闸", "category": "crossing", "discoveryNodeId": "place.mist-sluice" },
-    { "id": "landmark.mist-south-pool", "mapResourceId": "map.round-10-mist-ferry", "col": 81, "row": 87, "name": "南湾苇池", "category": "water" }
+    { "id": "landmark.mist-south-pool", "mapResourceId": "map.round-10-mist-ferry", "col": 81, "row": 87, "name": "南湾苇池", "category": "water", "discoveryNodeId": "place.mist-south-pool" }
   ],
   "transitions": [
     {
@@ -81,6 +81,24 @@
       "text": "石闸背水的一面刻着数道潮尺。最深的一痕旁，还留着旧船号的半个‘芦’字；枯水时，窄槽能把南湾的浅舟引回渡镇。",
       "once": true,
       "discoverKnowledgeNodeId": "place.mist-sluice"
+    },
+    {
+      "id": "event.r56-north-water-gauge",
+      "mapResourceId": "map.round-10-mist-ferry",
+      "col": 86,
+      "row": 15,
+      "text": "雾气散开时，北岸石桩露出半截潮尺。石北留下的旧拓片与刻痕相合，水尺尽头正是雾岬林地。",
+      "once": true,
+      "discoverKnowledgeNodeId": "place.mist-north-cap"
+    },
+    {
+      "id": "event.r56-south-waterway-mark",
+      "mapResourceId": "map.round-10-mist-ferry",
+      "col": 81,
+      "row": 87,
+      "text": "苇根间埋着一块斜立的旧水标。刮去泥皮后，刻线与石闸潮尺首尾相接，标出通往南湾的浅槽。",
+      "once": true,
+      "discoverKnowledgeNodeId": "place.mist-south-pool"
     }
   ],
   "randomEvents": [

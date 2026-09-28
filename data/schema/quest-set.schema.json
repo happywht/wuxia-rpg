@@ -45,7 +45,8 @@
             "oneOf": [
               { "$ref": "#/definitions/collect-objective" },
               { "$ref": "#/definitions/defeat-objective" },
-              { "$ref": "#/definitions/talk-objective" }
+              { "$ref": "#/definitions/talk-objective" },
+              { "$ref": "#/definitions/discover-knowledge-objective" }
             ]
           }
         },
@@ -90,6 +91,18 @@
         "kind": { "const": "talkToNpc" },
         "targetId": { "$ref": "#/definitions/id" },
         "requiredCount": { "type": "integer", "minimum": 1, "maximum": 99 },
+        "text": { "type": "string", "minLength": 1, "maxLength": 160 }
+      }
+    },
+    "discover-knowledge-objective": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "targetId", "requiredCount", "text"],
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "kind": { "const": "discoverKnowledge" },
+        "targetId": { "$ref": "#/definitions/id" },
+        "requiredCount": { "const": 1 },
         "text": { "type": "string", "minLength": 1, "maxLength": 160 }
       }
     },

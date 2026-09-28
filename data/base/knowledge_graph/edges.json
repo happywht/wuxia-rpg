@@ -258,6 +258,14 @@
     {"id":"kg.edge.r44-liu-participates-ledger","fromId":"char.liu-tinglan","toId":"quest.r44-ledger-first","relation":"participatesIn","summary":"柳听澜以书院抄本复核渡簿上的潮时。"},
     {"id":"kg.edge.r44-post-triggers-outcome","fromId":"quest.r44-post-first","toId":"event.r44-pier-reinforced","relation":"triggers","summary":"铁嶂派按潮痕补入铁楔并记录固桩结果。"},
     {"id":"kg.edge.r44-ledger-triggers-outcome","fromId":"quest.r44-ledger-first","toId":"event.r44-ledger-verified","relation":"triggers","summary":"寒山书院用抄本核验潮时并记录渡簿结果。"},
-    {"id":"kg.edge.r55-sluice-located","fromId":"event.r55-sluice-inscription","toId":"place.mist-sluice","relation":"locatedAt","summary":"河湾石闸的潮尺与旧船号指向南湾古渠。"}
+    {"id":"kg.edge.r55-sluice-located","fromId":"event.r55-sluice-inscription","toId":"place.mist-sluice","relation":"locatedAt","summary":"河湾石闸的潮尺与旧船号指向南湾古渠。"},
+    {"id":"kg.edge.r56-shibei-offers-north-watch","fromId":"char.shi-bei","toId":"quest.r56-north-water-gauge","relation":"participatesIn","summary":"石北托玩家前往雾岬北岸核验潮尺。"},
+    {"id":"kg.edge.r56-north-watch-requires-sluice","fromId":"quest.r56-north-water-gauge","toId":"place.mist-sluice","relation":"requires","summary":"雾岬巡标从旧渠石闸的潮刻线索开始。"},
+    {"id":"kg.edge.r56-north-watch-triggers-gauge","fromId":"quest.r56-north-water-gauge","toId":"event.r56-north-water-gauge","relation":"triggers","summary":"巡查将玩家带到北岸潮尺位置。"},
+    {"id":"kg.edge.r56-north-gauge-located","fromId":"event.r56-north-water-gauge","toId":"place.mist-north-cap","relation":"locatedAt","summary":"雾岬林地北岸石桩即为潮尺所在。"},
+    {"id":"kg.edge.r56-shibei-offers-south-survey","fromId":"char.shi-bei","toId":"quest.r56-south-waterway-survey","relation":"participatesIn","summary":"石北在北岸潮尺确认后，续托南湾水路测绘。"},
+    {"id":"kg.edge.r56-south-survey-requires-north-cap","fromId":"quest.r56-south-waterway-survey","toId":"place.mist-north-cap","relation":"requires","summary":"南湾测绘以前一程查明的北岸水尺为起点。"},
+    {"id":"kg.edge.r56-south-survey-triggers-mark","fromId":"quest.r56-south-waterway-survey","toId":"event.r56-south-waterway-mark","relation":"triggers","summary":"测绘路线延伸至南湾浅槽的旧水标。"},
+    {"id":"kg.edge.r56-south-mark-located","fromId":"event.r56-south-waterway-mark","toId":"place.mist-south-pool","relation":"locatedAt","summary":"苇根下的水标标记南湾苇池旧航道。"}
   ]
 }

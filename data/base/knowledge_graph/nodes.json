@@ -350,6 +350,48 @@
       "title": "旧渠石闸",
       "summary": "渡镇南侧的石闸刻有旧潮尺与残损船号。枯水时，闸下窄槽仍能连通南湾苇池与古渡支渠。",
       "knownByDefault": false
+    },
+    {
+      "id": "quest.r56-north-water-gauge",
+      "kind": "quest",
+      "title": "雾岬水尺巡查",
+      "summary": "依旧渠石闸的潮痕前往雾岬北岸，查明水尺与旧拓片所指的方位。",
+      "knownByDefault": true
+    },
+    {
+      "id": "quest.r56-south-waterway-survey",
+      "kind": "quest",
+      "title": "南湾水路测绘",
+      "summary": "沿北岸水尺继续南行，找到南湾苇池旧标并核实浅槽水路。",
+      "knownByDefault": true
+    },
+    {
+      "id": "event.r56-north-water-gauge",
+      "kind": "event",
+      "title": "雾岬水尺显露",
+      "summary": "雾气散开，北岸潮尺与石北留下的拓片相合，指明雾岬林地方位。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.mist-north-cap",
+      "kind": "place",
+      "title": "雾岬北岸水尺",
+      "summary": "雾岬林地下临北岸，石桩上的潮尺能与旧渠石闸的刻痕相互印证。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r56-south-waterway-mark",
+      "kind": "event",
+      "title": "南湾旧水标",
+      "summary": "苇根下的旧水标刻线与石闸潮尺首尾相接，证实浅槽通往南湾。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.mist-south-pool",
+      "kind": "place",
+      "title": "南湾苇池",
+      "summary": "苇池旧水标对应石闸窄槽的南端，浅水时仍可循槽返渡。",
+      "knownByDefault": false
     }
   ]
 }

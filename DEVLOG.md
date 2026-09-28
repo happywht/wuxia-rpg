@@ -4,6 +4,37 @@
 
 ---
 
+## Round 56 — 区域见闻差事与 discoverKnowledge 任务目标（2026-09-29，已完成）
+
+### 计划与实现
+
+- 开工前计划写入 `iterations/round-56/plan.md`：为雾雨渡口增补区域专属见闻差事，并把「发现知识节点」做成通用任务目标，含目标、用户故事、验收标准、可验证子任务、风险与人类工时估算。
+- 任务协议新增通用 `discoverKnowledge` 目标：quest-set Schema、防御解析器与跨资源装配三层校验知识节点引用；`requiredCount` 固定为 1。知识图谱首次新增节点时发出任务信号，匹配的目标只被推进一次；接取任务时按玩家已知见闻回填进度；读档时把存档已知节点重算到活跃发现目标——复用既有 v1 目标 id/计数快照，不新增存档字段；任务奖励解锁的见闻沿同一信号链级联推进其他活动任务。
+- 新增两段石北发布的雾雨渡口见闻巡标差事：玩家先经 R55 碑记事件发现旧渠石闸（`place.mist-sluice`），随后可接取「北岬水尺巡查」——至雾岬林地 (86,15) 触发发现事件解锁 `place.mist-north-cap` 完成；完成前段后接取「南湾水路测绘」——至南湾苇池 (81,87) 发现 `place.mist-south-pool` 完成。两项不互斥且顺次可完成。
+- `world-map.json` 为雾岬林地、南湾苇池两处地点设置 `discoveryNodeId` 发现门控地标与一次性发现事件；知识图谱新增 6 个节点、8 条关系，总量扩至 171 节点/267 条关系；基础差事总量扩至 34 项，任务奖励合计 1,108 经验/812 文（含互斥取舍的单周目上界 979 经验/724 文，本轮新增 56 经验/42 文直接计入，见 `docs/COMBAT-BALANCE.md`）。
+- 新增/更新自动测试：新增 `tests/round56-discovery-quests.test.ts`，并扩展 `tests/quest-system.test.ts` 及世界地图、知识图谱、读档兼容与文档一致性相关既有测试，合计净增 9 个用例；静态测试基线更新为 26 个测试文件/202 个用例。
+
+### 自动验证（阶段记录）
+
+- `npx vitest run tests/quest-system.test.ts tests/round56-discovery-quests.test.ts`：通过，2 个文件/29 个用例。
+- `npm run typecheck`：通过（`tsc --noEmit`）。
+- `npm run validate:data`：通过（manifest 与 26 个基础资源 Schema）。
+- `npm run audit:round-34`：通过。
+
+### 最终验证
+
+- 完整 `npm test`：26 个测试文件、202 个用例全部通过。
+- `npm run package:release`：完整质量门槛通过——manifest 与 26 项基础资源 Schema、26 项 MOD 资源零问题、严格类型检查、26/202 全量测试、Round 34 与 Round 48 文档审计、Vite 生产构建（136 modules）及 Round 47 解包/子路径 smoke。
+- 发行包 `release/wuxia-rpg-web-0.0.1.tgz`：756,726 bytes；70 个归档文件、69 个内容清单文件；SHA-256 `e5e474dd3d7d268beb0c6ff41f391a85a8d310efde7f2450273ce86347b60a61`。Round 47 smoke 确认 69 个文件的大小/哈希清单相符，可挂载于 `/preview/wuxia-rpg/` 并加载 26 项基础资料/Schema、两张 Kenney PNG 图集及原始 CC0 License。
+- `npm run smoke:round-31`：通过，34 项差事、四类任务目标及既有互斥分支/旧档行为烟测；`npm run smoke:round-43`：通过，2 个测试文件/11 个用例。
+- Vite 对 1,921.01 kB 主 JS chunk（gzip 507.42 kB）的 >500 kB 建议为非阻断提示。
+
+### 边界
+
+- 巡标差事与发现事件仅覆盖雾岬林地、南湾苇池两处地点；芦桥集与旧渠石闸本体尚无任务内容。远端发布、物理手柄与外部公测仍无证据；本轮未做浏览器手动走查，任务链与发现门控由专项自动测试覆盖。
+
+---
+
 ## Round 55 — 扩建第二块百格区域与跨区步行闭环（2026-09-28，已完成）
 
 ### 计划与实现

@@ -6,7 +6,7 @@
  * validation, objective progress and one-time reward transitions.
  */
 
-export type QuestObjectiveKind = 'collectItem' | 'defeatEncounter' | 'talkToNpc';
+export type QuestObjectiveKind = 'collectItem' | 'defeatEncounter' | 'talkToNpc' | 'discoverKnowledge';
 
 export interface QuestObjectiveData {
   id: string;
@@ -121,7 +121,8 @@ export type QuestSignal =
   | { type: 'item-count'; itemId: string; quantity: number }
   | { type: 'encounter-victory'; encounterId: string }
   | { type: 'encounter-defeat'; encounterId: string }
-  | { type: 'npc-talk'; npcId: string };
+  | { type: 'npc-talk'; npcId: string }
+  | { type: 'knowledge-discovery'; nodeId: string };
 
 export type QuestActionResult =
   | { ok: true; update: QuestUpdateResult }
@@ -196,7 +197,9 @@ function parseFactionRenownRewards(
   return rewards;
 }
 
-const OBJECTIVE_KINDS: readonly QuestObjectiveKind[] = ['collectItem', 'defeatEncounter', 'talkToNpc'];
+const OBJECTIVE_KINDS: readonly QuestObjectiveKind[] = [
+  'collectItem', 'defeatEncounter', 'talkToNpc', 'discoverKnowledge',
+];
 
 function parseObjective(raw: unknown, label: string, errors: string[]): QuestObjectiveData | null {
   if (!isPlainObject(raw)) {
@@ -208,7 +211,7 @@ function parseObjective(raw: unknown, label: string, errors: string[]): QuestObj
   const targetId = string(raw.targetId);
   const requiredCount = safeNonNegativeInteger(raw.requiredCount);
   const text = string(raw.text);
-  const maximumCount = kind === 'collectItem' ? 999 : 99;
+  const maximumCount = kind === 'collectItem' ? 999 : kind === 'discoverKnowledge' ? 1 : 99;
   const problems: string[] = [];
   if (id === null) problems.push('id 应为非空字符串');
   if (!OBJECTIVE_KINDS.includes(kind as QuestObjectiveKind)) {
@@ -390,6 +393,10 @@ export function assembleQuests(input: QuestAssemblyInput): QuestAssemblyResult {
       }
       if (objective.kind === 'talkToNpc' && !input.npcIds.has(objective.targetId)) {
         problems.push(`谈话目标引用无效人物 "${objective.targetId}"`);
+      }
+      if (objective.kind === 'discoverKnowledge' && input.knowledgeNodeIds !== undefined &&
+          !input.knowledgeNodeIds.has(objective.targetId)) {
+        problems.push(`见闻目标引用无效知识节点 "${objective.targetId}"`);
       }
     }
     for (const prerequisiteId of quest.prerequisiteQuestIds) {
@@ -589,6 +596,8 @@ export function acceptQuest(
     if (objective.kind === 'collectItem') {
       const quantity = Math.max(0, itemCounts.get(objective.targetId) ?? 0);
       state.objectiveCounts.set(objective.id, Math.min(quantity, objective.requiredCount));
+    } else if (objective.kind === 'discoverKnowledge' && access.knownKnowledgeNodeIds?.has(objective.targetId)) {
+      state.objectiveCounts.set(objective.id, objective.requiredCount);
     }
   }
   if (quest.objectives.every(
@@ -667,6 +676,11 @@ export function applyQuestSignal(
         objective.targetId === signal.npcId
       ) {
         next = Math.min(objective.requiredCount, current + 1);
+      } else if (
+        objective.kind === 'discoverKnowledge' && signal.type === 'knowledge-discovery' &&
+        objective.targetId === signal.nodeId
+      ) {
+        next = objective.requiredCount;
       }
       if (next !== current) {
         state.objectiveCounts.set(objective.id, next);
@@ -682,6 +696,36 @@ export function applyQuestSignal(
   }
   if (refreshUnlocked(quests, journal)) changed = true;
   return { changed, completed, failedQuestIds };
+}
+
+/** Reconciles active knowledge objectives after loading an older compatible save. */
+export function reconcileKnownKnowledgeObjectives(
+  quests: ReadonlyMap<string, QuestData>,
+  journal: QuestJournal,
+  knownKnowledgeNodeIds: ReadonlySet<string>,
+): QuestUpdateResult {
+  const aggregate: { changed: boolean; completed: QuestRewardGrant[]; failedQuestIds: string[] } = {
+    changed: false,
+    completed: [],
+    failedQuestIds: [],
+  };
+  // Repeat after a completion unlocks a follow-up whose target was already
+  // seen earlier in this pass. Every pass either settles a quest or stops.
+  let passChanged = true;
+  let passes = 0;
+  while (passChanged && passes <= quests.size) {
+    passChanged = false;
+    passes += 1;
+    for (const nodeId of knownKnowledgeNodeIds) {
+      const update = applyQuestSignal(quests, journal, { type: 'knowledge-discovery', nodeId });
+      if (!update.changed) continue;
+      passChanged = true;
+      aggregate.changed = true;
+      aggregate.completed.push(...update.completed);
+      aggregate.failedQuestIds.push(...update.failedQuestIds);
+    }
+  }
+  return aggregate;
 }
 
 export function getQuestObjectiveProgress(

@@ -13,7 +13,7 @@ Round 11 建立可替换的图谱资料和玩家见闻状态。当前实现用�
 
 每条关系使用 `id`、`fromId`、`toId`、`relation` 和 `summary`。关系枚举为 `mentorOf`、`parentOf`、`hostileTo`、`belongsTo`、`locatedAt`、`holds`、`triggers`、`requires`、`rewards`、`knows`、`participatesIn`、`influences`。两个端点必须都声明在节点集内。
 
-当前基础资料包含 **165 个节点和 259 条关系**，其中 7 个结局节点。边可选声明 `attitudeSpread`（非零 -1…1）：其 `fromId` 人物的关系变化按该有符号系数传递给 `toId` 人物。该字段只适用于两端都是人物的边；结构越界的边由 parser 隔离，端点类别不符时只移除传播系数并警告。没有系数的旧边不改变关系值。结局节点只保存百科摘要；可达性、锁定原因和终章文本来自独立 `ending-set` 资料，具体条件见 [`ENDINGS.md`](ENDINGS.md)。
+当前基础资料包含 **171 个节点和 267 条关系**，其中 7 个结局节点。边可选声明 `attitudeSpread`（非零 -1…1）：其 `fromId` 人物的关系变化按该有符号系数传递给 `toId` 人物。该字段只适用于两端都是人物的边；结构越界的边由 parser 隔离，端点类别不符时只移除传播系数并警告。没有系数的旧边不改变关系值。结局节点只保存百科摘要；可达性、锁定原因和终章文本来自独立 `ending-set` 资料，具体条件见 [`ENDINGS.md`](ENDINGS.md)。
 
 示例：
 
@@ -59,7 +59,7 @@ Round 29 增加 L 键“江湖图鉴”，不另建重复词条集或存档字�
 - **武学归属**：所有声明 `factionIds` 的门派武学（听雨剑阁 6、铁嶂派 6、云隐山庄 6、寒山书院 5、盘舷刀场 4，共 27 种）都有指向所属门派的 `belongsTo` 边。
 - **商贩库存**：姜百味按 `shops-set` 声明的 31 个货架条目逐项建立 `holds` 边，说明常备/限量性质。
 - **锻造投入**：9 条装备配方的每个结果物品都以 `requires` 连到全部投入材料（共 24 条），升级链可在百科中沿边追溯。
-- **任务链路**：32 项任务都有发布 NPC 指向任务的 `participatesIn` 边；Round 42 五项主线与 Round 43 五项门派差事均记录任务链和目标/见闻引用。Round 44 新增的两项任务共享「雨夜旧桩之争」前置，各自连接所选 NPC、声望派别及完成见闻。五项门派任务同时要求门派资格与「风雨传函」见闻，并由对应交付对白解锁各自结果事件。原有任务引用继续以 `requires` / `participatesIn` 落边；`defeatEncounter` 目标引用的遭遇是战斗业务实体，不在图谱中伪造节点（巷口刀客词条除外，它由遭遇的 `knowledgeNodeId` 人物引用使用）。
+- **任务链路**：34 项任务都有发布 NPC 指向任务的 `participatesIn` 边；Round 42 五项主线与 Round 43 五项门派差事均记录任务链和目标/见闻引用。Round 44 新增的两项任务共享「雨夜旧桩之争」前置，各自连接所选 NPC、声望派别及完成见闻。五项门派任务同时要求门派资格与「风雨传函」见闻，并由对应交付对白解锁各自结果事件。Round 56 两项巡标差事把旧渠石闸、北岸水尺、南湾水标与 `discoverKnowledge` 目标连成跨区探索链。原有任务引用继续以 `requires` / `participatesIn` 落边；`defeatEncounter` 目标引用的遭遇是战斗业务实体，不在图谱中伪造节点（巷口刀客词条除外，它由遭遇的 `knowledgeNodeId` 人物引用使用）。
 - **结局条件**：每条结局中引用图谱节点的可判定条件（任务状态、已知见闻、门派在籍、NPC 关系）都有从条件来源指向结局节点的 `influences` 边，可在百科中追溯「为什么这条结局会亮」；善恶、声望等纯数值条件不设图谱来源，不造无意义边。
 
 Round 42 为新增两条主线结局分别建立 `quest.r42-open-register` / `event.r42-public-record-vow` 与 `quest.r42-protect-witness` / `event.r42-protected-witness-vow` 到各自 ending 节点的 `influences` 边；两个任务分支共享同一前置且由同一互斥组约束。物品节点 `item.r42-ferry-seal-rubbing` 默认未知，在对白获得后由背包观察式发现自动解锁。
@@ -69,6 +69,8 @@ Round 43 增加 `event.r43-wayfarer-letter` 漫游见闻，作为五项门派任
 Round 44 增加「雨夜旧桩之争」及两条互斥调停差事。事件 `event.r44-dock-claim` 由风雨传函触发，并声明石北与白鹭洲必须在黄昏按 NPC 日程落位且同时邻近玩家；两任务共享该事件见闻前置，分别由 NPC 参与边连向石北/柳听澜，完成后触发「铁楔固桩」或「潮时复核」。声望与发现见闻随任务完成一次性结算，9 条关系完整表达事件来源、任务条件、人物参与及任务结果。
 
 Round 55 为扩建后的雾雨渡口新增两节点一边：固定格事件 `event.r55-sluice-inscription`（「石闸潮尺铭文」，渡口 (46,53)，默认未知）在触发时发现地点节点 `place.mist-sluice`（旧渠石闸）；一条 `locatedAt` 边把碑记事件连到该地点。此节点同时作为世界图旧渠石闸地标的 `discoveryNodeId`，未发现时该地标不进入舆图展示（门控规则见 [`MAP-ATLAS.md`](MAP-ATLAS.md) Round 53/55）。
+
+Round 56 新增六个节点、八条关系：石北发布雾岬水尺巡查与南湾水路测绘两项差事；两项任务分别要求旧渠石闸、北岸水尺见闻，并以 `triggers` 连到雾岬潮尺事件和南湾旧水标事件。两条事件再用 `locatedAt` 连接地点节点。每次新图谱发现都能推进匹配的 `discoverKnowledge` 目标；接取回填、读档重算与任务奖励发现也走同一一次性进度规则，数据仍复用原有 `knownKnowledgeNodeIds` 和 v1 目标计数字段。
 
 MOD 删除某个目录条目时，既有逐条引用隔离规则不变：悬空端点的关系边在装配期被逐条忽略并警告，不会禁用其余图谱内容。`npm run smoke:round-33` 以真实 JSON 对照断言上述全部规则。
 
