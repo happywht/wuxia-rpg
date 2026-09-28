@@ -1,0 +1,111 @@
+import { existsSync, readFileSync } from 'node:fs';
+import { describe, expect, it } from 'vitest';
+
+import { findGridPath } from '../src/engine/grid-path';
+import { parseGridMap } from '../src/engine/grid-map';
+import { assembleWorldMap, parseWorldMap } from '../src/engine/world-map';
+
+function readJson(path: string): unknown {
+  return JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8')) as unknown;
+}
+
+function parseMap(path: string) {
+  const parsed = parseGridMap(readJson(path));
+  if (!parsed.ok) throw new Error(parsed.errors.join('\n'));
+  return parsed.map;
+}
+
+describe('Round 55 second large walkable region', () => {
+  const ferry = parseMap('../data/base/maps/round-10-mist-ferry.json');
+  const jiangnan = parseMap('../data/base/maps/round-01-grid.json');
+  const worldData = readJson('../data/base/world/world-map.json') as {
+    transitions: Array<{ id: string; from: { mapResourceId: string; col: number; row: number }; to: { mapResourceId: string; col: number; row: number } }>;
+    landmarks: Array<{ id: string; mapResourceId: string; col: number; row: number }>;
+    events: Array<{ id: string; mapResourceId: string; col: number; row: number; discoverKnowledgeNodeId?: string }>;
+  };
+  const npcSet = readJson('../data/base/characters/round-03-npcs.json') as {
+    npcs: Array<{ id: string; mapResourceId: string; position: { col: number; row: number }; schedule?: Array<{ position: { col: number; row: number } }> }>;
+  };
+  const encounterSet = readJson('../data/base/battles/round-05-encounters.json') as {
+    encounters: Array<{ id: string; mapResourceId: string; position: { col: number; row: number } }>;
+  };
+
+  it('expands to 100×100 CC0 layered terrain without reducing collision to a tiny scene', () => {
+    expect(ferry.columns).toBe(100);
+    expect(ferry.rows).toBe(100);
+    expect(ferry.data.art?.layers).toHaveLength(10);
+    expect(ferry.data.art?.layers.every((layer) =>
+      layer.cells.length === 100 && layer.cells.every((row) => row.length === 100),
+    )).toBe(true);
+    const walkable = ferry.data.grid.flatMap((row) => [...row]).filter((tile) => tile !== '#' && tile !== '~');
+    expect(walkable.length).toBeGreaterThanOrEqual(6500);
+    expect(ferry.data.art?.layers.some((layer) => layer.cells.some((row) => row.some((gid) => (gid & 0x80000000) !== 0))))
+      .toBe(true);
+    expect(existsSync(new URL('../data/assets/kenney/roguelike-rpg/License.txt', import.meta.url))).toBe(true);
+  });
+
+  it('keeps all legacy gates, events, scheduled NPCs, encounters and new atlas destinations reachable', () => {
+    const points: Array<{ id: string; mapResourceId: string; col: number; row: number }> = [];
+    for (const transition of worldData.transitions) {
+      points.push({ id: `${transition.id}:from`, ...transition.from });
+      points.push({ id: `${transition.id}:to`, ...transition.to });
+    }
+    for (const landmark of worldData.landmarks) points.push(landmark);
+    for (const event of worldData.events) points.push(event);
+    for (const npc of npcSet.npcs) {
+      points.push({ id: `${npc.id}:base`, mapResourceId: npc.mapResourceId, ...npc.position });
+      for (const [index, schedule] of (npc.schedule ?? []).entries()) {
+        points.push({ id: `${npc.id}:schedule:${index}`, mapResourceId: npc.mapResourceId, ...schedule.position });
+      }
+    }
+    for (const encounter of encounterSet.encounters) points.push({ id: encounter.id, mapResourceId: encounter.mapResourceId, ...encounter.position });
+
+    const ferryAnchors = points.filter((point) => point.mapResourceId === ferry.data.id);
+    for (const anchor of ferryAnchors) {
+      expect(ferry.canEnter(anchor.col, anchor.row), `${anchor.id} must be open`).toBe(true);
+      expect(findGridPath(ferry, ferry.playerStart, anchor), `${anchor.id} must be reachable from the ferry spawn`)
+        .not.toBeNull();
+    }
+
+    const toFerry = worldData.transitions.find(({ id }) => id === 'gate.trial-to-ferry');
+    const toJiangnan = worldData.transitions.find(({ id }) => id === 'gate.ferry-to-trial');
+    expect(toFerry?.from).toEqual({ mapResourceId: jiangnan.data.id, col: 90, row: 50 });
+    expect(toFerry?.to).toEqual({ mapResourceId: ferry.data.id, col: 1, row: 4 });
+    expect(toJiangnan?.from).toEqual({ mapResourceId: ferry.data.id, col: 2, row: 4 });
+    expect(toJiangnan?.to).toEqual({ mapResourceId: jiangnan.data.id, col: 89, row: 50 });
+    expect(findGridPath(jiangnan, jiangnan.playerStart, toFerry!.from)).not.toBeNull();
+    expect(findGridPath(ferry, toFerry!.to, toJiangnan!.from)).not.toBeNull();
+
+    const newSluice = worldData.events.find(({ id }) => id === 'event.r55-sluice-inscription');
+    expect(newSluice?.discoverKnowledgeNodeId).toBe('place.mist-sluice');
+    expect(worldData.landmarks.find(({ id }) => id === 'landmark.mist-old-sluice')?.id).toBe('landmark.mist-old-sluice');
+  });
+
+  it('assembles the two maps and preserves data-driven landmark and knowledge references', () => {
+    const parsed = parseWorldMap(readJson('../data/base/world/world-map.json'));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+
+    const nodes = readJson('../data/base/knowledge_graph/nodes.json') as { nodes: Array<{ id: string }> };
+    const calendar = readJson('../data/base/worldview/calendar.json') as { periods: Array<{ id: string }> };
+    const climate = readJson('../data/base/worldview/climate.json') as { weathers: Array<{ id: string }> };
+    const assembled = assembleWorldMap(parsed.data, new Map([
+      [jiangnan.data.id, jiangnan],
+      [ferry.data.id, ferry],
+    ]), {
+      knowledgeNodeIds: new Set(nodes.nodes.map(({ id }) => id)),
+      periodIds: new Set(calendar.periods.map(({ id }) => id)),
+      weatherIds: new Set(climate.weathers.map(({ id }) => id)),
+      npcIds: new Set(npcSet.npcs.map(({ id }) => id)),
+    });
+    expect('ok' in assembled).toBe(false);
+    if ('ok' in assembled) return;
+    expect(assembled.warnings).toEqual([]);
+    expect(assembled.transitions).toHaveLength(2);
+    expect(assembled.landmarks.some(({ id }) => id === 'landmark.mist-willow-market')).toBe(true);
+    expect(assembled.landmarks.some(({ id }) => id === 'landmark.mist-old-sluice' && id !== undefined)).toBe(true);
+    expect(assembled.events.some(({ id }) => id === 'event.r55-sluice-inscription')).toBe(true);
+    expect(nodes.nodes.some(({ id }) => id === 'event.r55-sluice-inscription')).toBe(true);
+    expect(nodes.nodes.some(({ id }) => id === 'place.mist-sluice')).toBe(true);
+  });
+});

@@ -32,6 +32,10 @@ describe('Round 52 data-driven map landmarks', () => {
       'landmark.south-hamlet',
       'landmark.stone-stairs-ferry',
       'landmark.reedbank-landing',
+      'landmark.mist-north-cap',
+      'landmark.mist-willow-market',
+      'landmark.mist-old-sluice',
+      'landmark.mist-south-pool',
     ]);
     // Legacy direct callers pass no reference ids, so the discovery gate on
     // the reedbank landing must not be validated (and not hide the landmark).
@@ -49,7 +53,7 @@ describe('Round 52 data-driven map landmarks', () => {
     raw.landmarks = [
       { id: 'valid', mapResourceId: 'map.round-01-grid', col: 43, row: 37, name: '路口', category: 'route' },
       { id: 'bad-map', mapResourceId: 'map.deleted-by-mod', col: 3, row: 3, name: '失效标记', category: 'other' },
-      { id: 'bad-cell', mapResourceId: 'map.round-10-mist-ferry', col: 30, row: 3, name: '越界标记', category: 'other' },
+      { id: 'bad-cell', mapResourceId: 'map.round-10-mist-ferry', col: 100, row: 100, name: '越界标记', category: 'other' },
     ];
     const modified = parseWorldMap(raw);
     expect(modified.ok).toBe(true);
@@ -91,7 +95,7 @@ describe('Round 53 landmark discovery gating', () => {
 
   /** Reference ids covering every event/landmark gate in the shipped atlas. */
   const fullReferences = (knowledgeNodeIds: string[]) => ({
-    knowledgeNodeIds: new Set(knowledgeNodeIds),
+    knowledgeNodeIds: new Set([...knowledgeNodeIds, 'place.mist-sluice']),
     periodIds: new Set(['period.dusk', 'period.night']),
     weatherIds: new Set(['weather.drizzle', 'weather.rain', 'weather.storm']),
     npcIds: new Set(['char.shi-bei', 'char.bai-luzhou']),
@@ -123,7 +127,7 @@ describe('Round 53 landmark discovery gating', () => {
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
     expect(assembled.landmarks.map(({ id }) => id)).not.toContain('landmark.reedbank-landing');
-    expect(assembled.landmarks).toHaveLength(5);
+    expect(assembled.landmarks).toHaveLength(9);
     expect(assembled.events.map(({ id }) => id)).not.toContain('event.reedbank-traces');
     const joined = assembled.warnings.join('\n');
     expect(joined).toContain('landmark.reedbank-landing');
@@ -157,13 +161,14 @@ describe('Round 53 landmark discovery gating', () => {
 
     const undiscovered = selectVisibleWorldLandmarks(assembled.landmarks, new Set());
     const undiscoveredJson = JSON.stringify(undiscovered);
-    expect(undiscovered).toHaveLength(5);
+    expect(undiscovered).toHaveLength(8);
     expect(undiscoveredJson).not.toContain('芦岸登船点');
     expect(undiscoveredJson).not.toContain('landmark.reedbank-landing');
     expect(undiscoveredJson).not.toContain('place.reedbank');
+    expect(undiscoveredJson).not.toContain('旧渠石闸');
 
     const discovered = selectVisibleWorldLandmarks(assembled.landmarks, new Set(['place.reedbank']));
-    expect(discovered).toHaveLength(6);
+    expect(discovered).toHaveLength(9);
     expect(discovered.find(({ id }) => id === 'landmark.reedbank-landing')?.name).toBe('芦岸登船点');
   });
 });

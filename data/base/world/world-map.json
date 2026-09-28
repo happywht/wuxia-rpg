@@ -21,7 +21,11 @@
     { "id": "landmark.eastern-pond", "mapResourceId": "map.round-01-grid", "col": 80, "row": 25, "name": "东野池塘", "category": "water" },
     { "id": "landmark.south-hamlet", "mapResourceId": "map.round-01-grid", "col": 70, "row": 75, "name": "南麓聚落", "category": "settlement" },
     { "id": "landmark.stone-stairs-ferry", "mapResourceId": "map.round-01-grid", "col": 90, "row": 50, "name": "石阶渡口", "category": "crossing" },
-    { "id": "landmark.reedbank-landing", "mapResourceId": "map.round-10-mist-ferry", "col": 1, "row": 4, "name": "芦岸登船点", "category": "crossing", "discoveryNodeId": "place.reedbank" }
+    { "id": "landmark.reedbank-landing", "mapResourceId": "map.round-10-mist-ferry", "col": 1, "row": 4, "name": "芦岸登船点", "category": "crossing", "discoveryNodeId": "place.reedbank" },
+    { "id": "landmark.mist-north-cap", "mapResourceId": "map.round-10-mist-ferry", "col": 86, "row": 15, "name": "雾岬林地", "category": "other" },
+    { "id": "landmark.mist-willow-market", "mapResourceId": "map.round-10-mist-ferry", "col": 59, "row": 65, "name": "芦桥集", "category": "settlement" },
+    { "id": "landmark.mist-old-sluice", "mapResourceId": "map.round-10-mist-ferry", "col": 46, "row": 53, "name": "旧渠石闸", "category": "crossing", "discoveryNodeId": "place.mist-sluice" },
+    { "id": "landmark.mist-south-pool", "mapResourceId": "map.round-10-mist-ferry", "col": 81, "row": 87, "name": "南湾苇池", "category": "water" }
   ],
   "transitions": [
     {
@@ -68,6 +72,15 @@
         "weatherIds": ["weather.drizzle", "weather.rain", "weather.storm"]
       },
       "discoverKnowledgeNodeId": "place.reedbank"
+    },
+    {
+      "id": "event.r55-sluice-inscription",
+      "mapResourceId": "map.round-10-mist-ferry",
+      "col": 46,
+      "row": 53,
+      "text": "石闸背水的一面刻着数道潮尺。最深的一痕旁，还留着旧船号的半个‘芦’字；枯水时，窄槽能把南湾的浅舟引回渡镇。",
+      "once": true,
+      "discoverKnowledgeNodeId": "place.mist-sluice"
     }
   ],
   "randomEvents": [

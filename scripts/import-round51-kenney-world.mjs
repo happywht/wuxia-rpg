@@ -213,26 +213,3 @@ await writeFile(outputPath, `${JSON.stringify(output, null, 2)}\n`);
 const openCells = solidGrid.flat().filter((solid) => !solid).length;
 console.log(`Imported ${columns}×${rows} Tiled world (${layers.length} visual layers, ${openCells} walkable cells).`);
 console.log(`Spawn: (${playerStart.col}, ${playerStart.row}); collision derived from open-water GIDs and ${blockingLayers.map((layer) => layer.name).join(', ')}.`);
-
-const ferryPath = resolve(repoRoot, 'data/base/maps/round-10-mist-ferry.json');
-const ferry = JSON.parse(await readFile(ferryPath, 'utf8'));
-const ferrySurface = ferry.grid.map((line) => [...line].map((character) => {
-  if (character === '~') return 1; // open water
-  if (character === '#') return 9; // impassable stone edge
-  if (character === '.') return 579; // walkable earth path
-  return 63; // grass around the landing
-}));
-const ferryPlants = ferry.grid.map((line, row) => [...line].map((character, col) =>
-  character === ',' && (row + col) % 3 === 0 ? 543 : 0,
-));
-ferry.art = {
-  tileSize: 16,
-  tilesets: output.art.tilesets,
-  layers: [
-    { id: 'ferry-ground', tilesetId: 'kenney.roguelike-rpg', cells: ferrySurface },
-    { id: 'ferry-reedflowers', tilesetId: 'kenney.roguelike-rpg', cells: ferryPlants },
-  ],
-  actors: output.art.actors,
-};
-await writeFile(ferryPath, `${JSON.stringify(ferry, null, 2)}\n`);
-console.log(`Converted the ferry landing to ${ferry.columns}×${ferry.rows} tiles from the same outdoor atlas.`);

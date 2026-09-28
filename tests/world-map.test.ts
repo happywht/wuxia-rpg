@@ -64,7 +64,10 @@ describe('world map roaming events', () => {
       ['map.round-01-grid', mapStub('map.round-01-grid')],
       ['map.round-10-mist-ferry', mapStub('map.round-10-mist-ferry')],
     ]), {
-      knowledgeNodeIds: new Set(['event.old-footprints', 'event.r43-wayfarer-letter', 'place.reedbank', 'event.r44-dock-claim']),
+      knowledgeNodeIds: new Set([
+        'event.old-footprints', 'event.r43-wayfarer-letter', 'place.reedbank', 'event.r44-dock-claim',
+        'place.mist-sluice',
+      ]),
       periodIds: new Set(['period.dusk', 'period.night']),
       weatherIds: new Set(['weather.drizzle', 'weather.rain', 'weather.storm']),
       npcIds: new Set(['char.shi-bei', 'char.bai-luzhou']),

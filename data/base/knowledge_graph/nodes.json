@@ -336,6 +336,20 @@
       "title": "潮时复核",
       "summary": "书院抄本与渡簿的潮时互相印证，争执暂以记录可查的船期收束。",
       "knownByDefault": false
+    },
+    {
+      "id": "event.r55-sluice-inscription",
+      "kind": "event",
+      "title": "石闸潮尺铭文",
+      "summary": "在旧渠石闸背水侧发现潮尺与残损船号，证明枯水窄槽仍连通南湾浅舟航路。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.mist-sluice",
+      "kind": "place",
+      "title": "旧渠石闸",
+      "summary": "渡镇南侧的石闸刻有旧潮尺与残损船号。枯水时，闸下窄槽仍能连通南湾苇池与古渡支渠。",
+      "knownByDefault": false
     }
   ]
 }

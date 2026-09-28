@@ -257,6 +257,7 @@
     {"id":"kg.edge.r44-shi-participates-post","fromId":"char.shi-bei","toId":"quest.r44-post-first","relation":"participatesIn","summary":"石北确认旧系缆桩的加固办法。"},
     {"id":"kg.edge.r44-liu-participates-ledger","fromId":"char.liu-tinglan","toId":"quest.r44-ledger-first","relation":"participatesIn","summary":"柳听澜以书院抄本复核渡簿上的潮时。"},
     {"id":"kg.edge.r44-post-triggers-outcome","fromId":"quest.r44-post-first","toId":"event.r44-pier-reinforced","relation":"triggers","summary":"铁嶂派按潮痕补入铁楔并记录固桩结果。"},
-    {"id":"kg.edge.r44-ledger-triggers-outcome","fromId":"quest.r44-ledger-first","toId":"event.r44-ledger-verified","relation":"triggers","summary":"寒山书院用抄本核验潮时并记录渡簿结果。"}
+    {"id":"kg.edge.r44-ledger-triggers-outcome","fromId":"quest.r44-ledger-first","toId":"event.r44-ledger-verified","relation":"triggers","summary":"寒山书院用抄本核验潮时并记录渡簿结果。"},
+    {"id":"kg.edge.r55-sluice-located","fromId":"event.r55-sluice-inscription","toId":"place.mist-sluice","relation":"locatedAt","summary":"河湾石闸的潮尺与旧船号指向南湾古渠。"}
   ]
 }

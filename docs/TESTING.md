@@ -32,7 +32,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 
 - 测试框架：Vitest 5.0.2。官方指南要求 Vite >=6.4.0、Node >=22.12.0；本仓库使用 Vite 8.3.1 与 Node 22.18.0，符合要求（详见 [`docs/REFERENCES.md`](REFERENCES.md) #12；基准 API 见同文件 #16）。
 - 运行环境：Node（无 DOM、无浏览器、无网络、无真实时钟依赖）。
-- 覆盖统计：22 个测试文件、176 个用例（R38 建立四组 53 个，R40 新增渲染器结构回归 10 个，R41 新增设置与输入 42 个，R42 新增主线集成 3 个，R43 新增漫游事件 6 个与门派支线集成 3 个，R44 新增日程漫游/奖励协议/双路线集成 6 个，R45 新增战斗成长基线与擂台奖品边界 4 个，R46 新增真实资料纵向切片 2 个，R47 新增版本清单/路径白名单测试 4 个，R48 新增文档审计 9 个，R49 新增真实默认世界装配/内容数量/零可选告警回归 1 个，R50 新增最终验收审计 5 个，R51 新增 100×100 地图/素材检查及舆图视口导航 7 个，R52 新增相机坐标和地标协议/坏引用回归 5 个，R53 新增网格路径回归 11 个及见闻投影回归 5 个；详见 `CHANGELOG.md` 对应条目）。
+- 覆盖统计：25 个测试文件、193 个用例。构成：R38 建立四组 53 个，R40 新增渲染器结构回归 10 个，R41 新增设置与输入 42 个，R42 新增主线集成 3 个，R43 新增漫游事件 6 个与门派支线集成 3 个，R44 新增日程漫游/奖励协议/双路线集成 6 个，R45 新增战斗成长基线与擂台奖品边界 4 个，R46 新增真实资料纵向切片 2 个，R47 新增版本清单/路径白名单测试 4 个，R48 新增文档审计 9 个，R49 新增真实默认世界装配/内容数量/零可选告警回归 1 个，R50 新增最终验收审计 5 个，R51 新增 100×100 地图/素材检查及舆图视口导航 7 个，R52 新增相机坐标和地标协议/坏引用回归 5 个，R53 新增网格路径回归 11 个及见闻投影回归 5 个，R54 新增跨区行程与 waypoint 组合 14 个（当轮完整验证为 24 文件/190 用例，见 `DEVLOG.md` Round 54），R55 新增第二张百格区域回归 3 个；全量结果见 `DEVLOG.md` Round 55。
 
 ## 配置：为什么有独立的 `vitest.config.ts`
 
@@ -71,11 +71,14 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 | `tests/round46-vertical-slice.test.ts` | 真实基础角色、地图、任务、对白、物品、战斗、武学、存档、图谱与结局资料及对应 Phaser-free 引擎 API | R46 纵向验收：开局和地图阻挡、真实 NPC 对白接任务、巷战经验/奖励、拜师学艺、快照往返与恢复、R42 两条互斥路线各自抵达一个结局；不会模拟浏览器 UI |
 | `tests/release-package.test.ts` | `scripts/lib/release-package.mjs` | R47 发布协议：稳定排序的 SHA-256 清单、版本/提交约束、强制静态运行文件、拒绝路径穿越/隐藏目录/重复与递归清单，并要求归档精确符合 staging allowlist |
 | `tests/round50-final-acceptance.test.ts` | `scripts/lib/final-acceptance.mjs` 与缺资料运行时入口 | R50 正反向临时 fixture：核验 51 份计划字段/子任务、轮次 commit、实际内容计数、24 份交付文档、Schema 家族、同名 MOD 路径与引擎资料字面量；验证缺计划/提交/数量、未登记 MOD 和世界 manifest 404 的可读错误 |
-| `tests/round51-map-art.test.ts` | 基础地图/NPC 数据、地图 Schema 与官方静态素材 | R51 核对 100×100 / 5 层资料尺寸、角色图集帧声明、碰撞容量、真实 CC0 图集与 License 文件及渡口旧碰撞兼容 |
+| `tests/round51-map-art.test.ts` | 基础地图/NPC 数据、地图 Schema 与官方静态素材 | R51 核对起始图 100×100 / 5 层资料尺寸、角色图集帧声明、碰撞容量、真实 CC0 图集与 License 文件；R55 回归渡口现为 100×100 / 10 层、关口与聚落可行格及边界碰撞 |
 | `tests/round51-map-viewport.test.ts` | `src/engine/map-viewport.ts` | R51 核对全图适配、视窗边界钳制、以指针为中心的缩放、较小地图居中；Phaser UI 的滚轮与拖动另行做浏览器手测 |
 | `tests/round52-map-camera.test.ts` | `src/engine/grid-map-renderer.ts` + 当前 100×100 地图资料 | R52 模拟 Phaser 场景新增对象默认固定在 HUD 平面的情况，验证真实地图 Image 与世界容器显式设回滚动坐标 |
 | `tests/round52-map-landmarks.test.ts` | `src/engine/world-map.ts` + 两张基础地图 | R52 验证旧 world-map 缺省兼容、六个真实地标装配、无效地图/越界坐标逐条隔离和未知类别拒绝；R53 验证发现引用门控、坏节点隔离和未发现地点不进入可见资料投影 |
 | `tests/grid-path.test.ts` | `src/engine/grid-path.ts` | R53 四向确定性最短路：绕障、solid 地标停靠点、并列路线稳定、越界/封闭区域拒绝、默认/自定义/非法半径、真实渡口数据路线与方向分段 |
+| `tests/world-travel.test.ts` | `src/engine/world-travel.ts` | R54 有向区域 BFS：稳定最短关口链、同长按关口 id 决胜、起点等于终点/未知地图/孤立区域边界 |
+| `tests/world-navigation.test.ts` | `src/engine/world-navigation.ts` | R54 waypoint 组合：本区地标与关口投影、直接相邻区域可见、远区见闻门控不泄漏、远区目的地复用当前首关口坐标 |
+| `tests/round55-ferry-world.test.ts` | 基础地图/世界图/NPC/遭遇资料与 `grid-path.ts` | R55 第二张百格区域回归：100×100/十层尺寸与 CC0 License 存在、可行格下限、全部关口/事件/日程 NPC/遇怪/地标锚点从出生点 BFS 可达、两向关口端点精确值、碑记事件发现 `place.mist-sluice` |
 
 测试只调用**公共导出函数**并断言行为，不做源码文本匹配；引擎模块均为 Phaser-free 设计，无需启动任何场景。
 
@@ -119,6 +122,8 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 
 ## 变更记录
 
+- 2026-09-28（Round 55）：新增 `tests/round55-ferry-world.test.ts` 3 个用例，锁定雾雨渡口 100×100/十层 CC0 地图尺寸、可行格下限、全部玩法锚点 BFS 可达、两向关口端点精确值与碑记事件发现引用；更新旧测试的地图尺寸和地标基线。`npm run package:release` 全通，25 个测试文件/193 个用例通过，完整输出见 `DEVLOG.md` Round 55。
+- 2026-09-28（Round 54，补记）：新增 `tests/world-travel.test.ts` 与 `tests/world-navigation.test.ts` 共 14 个用例（有向区域最短关口链、waypoint 组合与远区见闻门控）；当轮完整验证为 24 文件/190 用例（证据见 `DEVLOG.md` Round 54，本表此前未随 R54 更新，现补齐）。
 - 2026-09-28（Round 51）：新增 2 个测试文件/7 个用例，覆盖 100×100 Kenney 五层地图/人物素材及舆图适配、钳制、指针缩放、地图居中；浏览器手测新游戏、跟随镜头、滚轮放大后拖动地图。Round 51 当时统计为 19 个文件/155 个用例。
 - 2026-09-28（Round 52）：新增 2 个测试文件/5 个用例，覆盖地图贴图退出 HUD 固定默认值、旧 world-map 兼容、真实六标记装配、坏地图/越界点逐项隔离和未知类别拒绝；更新 performance bench 的真实地图夹具以适配 100×100 网格。`npm run check` 全通，完整覆盖 21 个测试文件/160 个用例。
 - 2026-09-28（Round 53）：新增 `tests/grid-path.test.ts` 11 用例，验证确定性四向最短路、阻挡地标停靠、封闭/越界端点、半径配置、方向压缩和真实雾雨渡口路线；扩展 `tests/round52-map-landmarks.test.ts` 5 用例，验证发现门槛引用隔离及未知地标从展示投影中完全移除。最终全量命令/用例数与浏览器操作记录于 Round 53 开发日志。

@@ -42,12 +42,13 @@ describe('Round 51 world art data', () => {
     }
   });
 
-  it('keeps the small ferry area on the same source atlas and legacy collision grid', () => {
+  it('keeps the expanded ferry district on the licensed source atlas with its own collision grid', () => {
     const map = loadMap('../data/base/maps/round-10-mist-ferry.json');
-    expect(map.columns).toBe(16);
-    expect(map.rows).toBe(9);
-    expect(map.data.art?.layers).toHaveLength(2);
+    expect(map.columns).toBe(100);
+    expect(map.rows).toBe(100);
+    expect(map.data.art?.layers).toHaveLength(10);
     expect(map.canEnter(1, 4)).toBe(true);
-    expect(map.isSolid(0, 0)).toBe(true);
+    expect(map.canEnter(59, 65)).toBe(true);
+    expect(map.isSolid(99, 99)).toBe(true);
   });
 });

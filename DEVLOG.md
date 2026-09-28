@@ -4,6 +4,38 @@
 
 ---
 
+## Round 55 — 扩建第二块百格区域与跨区步行闭环（2026-09-28，已完成）
+
+### 计划与实现
+
+- 开工前计划写入 `iterations/round-55/plan.md`：把雾雨渡口从 16×9 过场小图扩建为独立 100×100 可步行区域，含用户故事、6 项验收标准、4 项可验证子任务、风险、预计文件及至少 2 小时人类工时。
+- 新增确定性生成脚本 `scripts/generate-round55-ferry-world.mjs` 与 `npm run generate:round-55-ferry` 命令：以格坐标种子哈希与折线河道路径的距离场铺地貌，从已授权 Kenney CC0 图集（Roguelike/RPG 地表 + Tiny Dungeon 人物，许可见 `docs/REFERENCES.md` 第六节）生成 100×100 十层视觉图（mist-river-grass/-shores/-blooms/-woods 四层河流走廊、mist-willow-market-1~5 五层渡镇聚落、mist-river-trails 步径层）与独立碰撞网格。当前产出 7,340 个可行格（`,` 与 `.` 可走，`~` 江水与 `#` 岩岸阻挡）、林木层 388 处 CC0 树木；脚本对全部关口端点、事件格、NPC 基础/日程位、遇怪格、出生点设保护落点，重建不迁移既有坐标。
+- 保留事实核验：出生点 (7,7)；关口 `gate.trial-to-ferry` (90,50)→(1,4)、`gate.ferry-to-trial` (2,4)→(89,50)；事件 `event.ferry-first-arrival` (1,4)、`event.reedbank-traces` (5,4)；石北/闻素心/容素青/祝九弦/白鹭洲五名 NPC 的基础位与日程位；三处任务遇怪格 (5,6)/(6,6)/(10,6) 均未移动。
+- `world-map.json` 新增四个雾雨渡口地标：雾岬林地 (86,15)、芦桥集 (59,65)、旧渠石闸 (46,53)、南湾苇池 (81,87)；旧渠石闸带 `discoveryNodeId: place.mist-sluice` 见闻门控。新增固定格事件「石闸潮尺铭文」`event.r55-sluice-inscription` (46,53)，成功触发发现 `place.mist-sluice`。
+- 知识图谱新增 2 个节点（`event.r55-sluice-inscription`、`place.mist-sluice`，均默认未知）与 1 条 `locatedAt` 关系边，总量由 163 节点/258 边扩至 165/259。
+- `scripts/import-round51-kenney-world.mjs` 收窄为只重建起始大地图，不再改写 `map.round-10-mist-ferry`；渡口图层唯一由 Round 55 生成脚本产出，防止旧导入器覆盖第二区域。
+- 新增专项回归 `tests/round55-ferry-world.test.ts`（3 个用例）：锁定 100×100/十层尺寸与 License 文件、可行格下限、全部关口/事件/日程 NPC/遇怪/地标锚点从出生点 BFS 可达、两向关口端点坐标精确值，以及碑记事件的 `place.mist-sluice` 发现引用。
+
+### 浏览器手动验证
+
+- 本机开发服务器从江南道实际走至石阶渡口关卡 (90,50) 按 E，落入雾雨渡口码头 (1,4)；跟随镜头在新区域步进，河湾、林地、渡镇与步径多层像素地貌随玩家滚动，碰撞与视觉一致。
+- 探索至东南侧芦桥集 (59,65)，继续抵达旧渠石闸 (46,53)：踩入碑记事件格触发「石闸潮尺铭文」见闻，`place.mist-sluice` 词条解锁并进入舆图地标展示。
+- 从 (59,65) 返回关口附近，走到回望石阶渡口侧触发格 (2,4) 的相邻格 (2,5) 后按 E，返回江南道 (89,50)，跨区往返闭环走通；进入渡口即落在初到脚印事件格 (1,4)，一次性事件照常触发。
+
+### 自动验证（最终结果）
+
+- `npm run generate:round-55-ferry` 连续重建前后产物 SHA-256 相同：`0557f1467560099a7864c997b888434209af5c2eb54c6ed6b6afd4b49b8a5b51`，证实生成确定性。
+- `npm run package:release` 通过：`validate:data`（manifest 与 26 个基础资源 Schema）、`inspect:mods`（26 项资源、0 问题）、`typecheck`、`npm test`（25 文件/193 用例）、`audit:round-34`、`audit:round-48-docs`、Vite 生产构建、版本归档与 `smoke:round-47`。
+- 发布 smoke 解包核对 69 个内容文件的大小/哈希，确认静态包可挂载 `/preview/wuxia-rpg/`，并可加载 HTML/JS/CSS、示例 MOD、26 项基础资料与 Schema、两张 Kenney 图集及原始 CC0 License。最终归档 `release/wuxia-rpg-web-0.0.1.tgz`：754,075 字节，SHA-256 `0c0611524064e21a2490d1c1c3c72367db39f539a34be1aad3b078314533eae9`。
+- `npm run build` 报告主 JS chunk 为 1,919.61 kB（gzip 507.07 kB），超过 500 kB 提示阈值；构建和发行包仍通过。本轮没有实施代码分块，列入后续性能跟踪。
+
+### 边界
+
+- 远端发布、物理手柄与外部公测仍无证据；本轮浏览器验证覆盖跨区往返主路径，未逐一走完两图全部 100×100 边缘格。
+- 地图视觉为确定性脚本产物：修改生成参数后需重跑 `npm run generate:round-55-ferry` 并同步检查锚点保护；手改 JSON 图层会被下次生成覆盖。
+
+---
+
 ## Round 54 — 跨区域舆图路线与 waypoint 操作（2026-09-28，已完成）
 
 ### 计划与实现

@@ -13,7 +13,7 @@ Round 11 建立可替换的图谱资料和玩家见闻状态。当前实现用�
 
 每条关系使用 `id`、`fromId`、`toId`、`relation` 和 `summary`。关系枚举为 `mentorOf`、`parentOf`、`hostileTo`、`belongsTo`、`locatedAt`、`holds`、`triggers`、`requires`、`rewards`、`knows`、`participatesIn`、`influences`。两个端点必须都声明在节点集内。
 
-当前基础资料包含 **163 个节点和 258 条关系**，其中 7 个结局节点。边可选声明 `attitudeSpread`（非零 -1…1）：其 `fromId` 人物的关系变化按该有符号系数传递给 `toId` 人物。该字段只适用于两端都是人物的边；结构越界的边由 parser 隔离，端点类别不符时只移除传播系数并警告。没有系数的旧边不改变关系值。结局节点只保存百科摘要；可达性、锁定原因和终章文本来自独立 `ending-set` 资料，具体条件见 [`ENDINGS.md`](ENDINGS.md)。
+当前基础资料包含 **165 个节点和 259 条关系**，其中 7 个结局节点。边可选声明 `attitudeSpread`（非零 -1…1）：其 `fromId` 人物的关系变化按该有符号系数传递给 `toId` 人物。该字段只适用于两端都是人物的边；结构越界的边由 parser 隔离，端点类别不符时只移除传播系数并警告。没有系数的旧边不改变关系值。结局节点只保存百科摘要；可达性、锁定原因和终章文本来自独立 `ending-set` 资料，具体条件见 [`ENDINGS.md`](ENDINGS.md)。
 
 示例：
 
@@ -67,6 +67,8 @@ Round 42 为新增两条主线结局分别建立 `quest.r42-open-register` / `ev
 Round 43 增加 `event.r43-wayfarer-letter` 漫游见闻，作为五项门派任务共同的知识前置；每项任务以 `requires` 连到传函事件、以 `participatesIn` 连到发布导师，完成后由对白发现对应结果事件。区域事件只在成功移动后按概率尝试，地图、时辰、天气和旧脚印条件都来自事件资料；一次性状态复用现有区域事件完成 id，因此没有新增存档字段。
 
 Round 44 增加「雨夜旧桩之争」及两条互斥调停差事。事件 `event.r44-dock-claim` 由风雨传函触发，并声明石北与白鹭洲必须在黄昏按 NPC 日程落位且同时邻近玩家；两任务共享该事件见闻前置，分别由 NPC 参与边连向石北/柳听澜，完成后触发「铁楔固桩」或「潮时复核」。声望与发现见闻随任务完成一次性结算，9 条关系完整表达事件来源、任务条件、人物参与及任务结果。
+
+Round 55 为扩建后的雾雨渡口新增两节点一边：固定格事件 `event.r55-sluice-inscription`（「石闸潮尺铭文」，渡口 (46,53)，默认未知）在触发时发现地点节点 `place.mist-sluice`（旧渠石闸）；一条 `locatedAt` 边把碑记事件连到该地点。此节点同时作为世界图旧渠石闸地标的 `discoveryNodeId`，未发现时该地标不进入舆图展示（门控规则见 [`MAP-ATLAS.md`](MAP-ATLAS.md) Round 53/55）。
 
 MOD 删除某个目录条目时，既有逐条引用隔离规则不变：悬空端点的关系边在装配期被逐条忽略并警告，不会禁用其余图谱内容。`npm run smoke:round-33` 以真实 JSON 对照断言上述全部规则。
 

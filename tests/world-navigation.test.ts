@@ -42,7 +42,7 @@ describe('data-driven world map waypoints', () => {
     expect(normalizeWorldMapPointer({ x: 12, y: 0 }, 540, 0)).toEqual({ x: 12, y: 0 });
   });
 
-  it('does not reveal or project a gated remote landmark before discovery', () => {
+  it('shows public remote landmarks but keeps discovery-gated landmarks hidden', () => {
     const destinations = buildWorldMapWaypoints(makeWorld(), 'map.round-01-grid', new Set());
     const visibleJson = JSON.stringify(destinations);
     expect(destinations).toContainEqual(expect.objectContaining({
@@ -51,10 +51,14 @@ describe('data-driven world map waypoints', () => {
       name: '雾雨渡口',
       nextTransitionName: '石阶渡口',
     }));
-    expect(destinations.some(({ kind }) => kind === 'remote-landmark')).toBe(false);
+    expect(destinations.some(({ id }) => id === 'remote:landmark.mist-willow-market')).toBe(true);
+    expect(destinations.some(({ id }) => id === 'remote:landmark.reedbank-landing')).toBe(false);
+    expect(destinations.some(({ id }) => id === 'remote:landmark.mist-old-sluice')).toBe(false);
     expect(visibleJson).not.toContain('芦岸登船点');
     expect(visibleJson).not.toContain('landmark.reedbank-landing');
     expect(visibleJson).not.toContain('place.reedbank');
+    expect(visibleJson).not.toContain('landmark.mist-old-sluice');
+    expect(visibleJson).not.toContain('place.mist-sluice');
   });
 
   it('does not project undisclosed regions beyond the directly known crossing', () => {
