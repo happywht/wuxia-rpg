@@ -4,29 +4,29 @@
   "regions": [
     {
       "mapResourceId": "map.round-01-grid",
-      "name": "方格试炼场",
-      "description": "石阶环抱的旧试场，几条小径通向渡口。",
-      "atlasPosition": { "x": 27, "y": 52 }
+      "name": "江南道·七镇行旅",
+      "description": "道路穿过林泽、渡口与两处聚落，行旅可在百格山河间自由往来。",
+      "atlasPosition": { "x": 42, "y": 50 }
     },
     {
       "mapResourceId": "map.round-10-mist-ferry",
       "name": "雾雨渡口",
       "description": "山雨与江雾相接，渡船歇在芦苇深处。",
-      "atlasPosition": { "x": 72, "y": 52 }
+      "atlasPosition": { "x": 85, "y": 80 }
     }
   ],
   "transitions": [
     {
       "id": "gate.trial-to-ferry",
       "name": "石阶渡口",
-      "from": { "mapResourceId": "map.round-01-grid", "col": 14, "row": 7 },
+      "from": { "mapResourceId": "map.round-01-grid", "col": 90, "row": 50 },
       "to": { "mapResourceId": "map.round-10-mist-ferry", "col": 1, "row": 4 }
     },
     {
       "id": "gate.ferry-to-trial",
       "name": "回望石阶",
       "from": { "mapResourceId": "map.round-10-mist-ferry", "col": 2, "row": 4 },
-      "to": { "mapResourceId": "map.round-01-grid", "col": 13, "row": 7 }
+      "to": { "mapResourceId": "map.round-01-grid", "col": 89, "row": 50 }
     }
   ],
   "events": [
@@ -42,8 +42,8 @@
     {
       "id": "event.trial-cloudbreak",
       "mapResourceId": "map.round-01-grid",
-      "col": 8,
-      "row": 7,
+      "col": 43,
+      "row": 36,
       "text": "云隙投下一束日光，石面上的旧刻痕清晰起来。",
       "once": true
     },

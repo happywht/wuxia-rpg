@@ -29,6 +29,8 @@ export interface NpcRecordData {
   shopId: string | null;
   /** Whether this NPC publishes quests (Round 07); missing means false. */
   questGiver: boolean;
+  /** Optional zero-based tile frame in the map's validated character atlas. */
+  spriteFrame?: number;
   /** Optional time-of-day destinations (Round 16), normalized to an empty array. */
   schedule: NpcScheduleEntryData[];
 }
@@ -90,6 +92,7 @@ export function parseNpcSet(raw: unknown): NpcSetParseResult {
     // treated as "no shop" rather than a per-NPC failure.
     const shopId = requireNonEmptyString(entry.shopId);
     const questGiver = entry.questGiver === undefined ? false : entry.questGiver === true;
+    const spriteFrame = entry.spriteFrame === undefined ? undefined : requireInteger(entry.spriteFrame);
     const position = isPlainObject(entry.position) ? entry.position : null;
     const col = position === null ? null : requireInteger(position.col);
     const row = position === null ? null : requireInteger(position.row);
@@ -132,6 +135,9 @@ export function parseNpcSet(raw: unknown): NpcSetParseResult {
     if (entry.questGiver !== undefined && typeof entry.questGiver !== 'boolean') {
       problems.push(`${label}.questGiver：应为布尔值`);
     }
+    if (entry.spriteFrame !== undefined && (spriteFrame === null || spriteFrame === undefined || spriteFrame < 0)) {
+      problems.push(`${label}.spriteFrame：应为非负整数`);
+    }
     if (position === null || col === null || row === null) {
       problems.push(`${label}.position：应含整数 col 与 row`);
     }
@@ -160,6 +166,7 @@ export function parseNpcSet(raw: unknown): NpcSetParseResult {
       questGiver,
       schedule,
       position: { col, row },
+      ...(typeof spriteFrame !== 'number' ? {} : { spriteFrame }),
     });
   });
 
@@ -261,6 +268,16 @@ export function assembleNpcPlacements(input: NpcAssemblyInput): NpcAssemblyResul
         if (clashId !== undefined) {
           problems.push(`坐标 (${col}, ${row}) 与 NPC "${clashId}" 占用同一格`);
         }
+      }
+    }
+
+    if (record.mapResourceId === input.currentMapResourceId && record.spriteFrame !== undefined && npcMap !== undefined) {
+      const art = npcMap.data.art;
+      const actorTileset = art === undefined
+        ? undefined
+        : art.tilesets.find((tileset) => tileset.id === art.actors.tilesetId);
+      if (actorTileset === undefined || record.spriteFrame >= actorTileset.tileCount) {
+        problems.push(`人物精灵帧 ${record.spriteFrame} 超出地图声明的人物图集`);
       }
     }
 

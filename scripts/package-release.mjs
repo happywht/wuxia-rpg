@@ -49,6 +49,10 @@ async function ensureBuildIsPresent() {
     'base/manifest.json',
     'schema/manifest.schema.json',
     'mods/example/maps/round-01-grid.json',
+    'assets/kenney/roguelike-rpg/roguelikeSheet_transparent.png',
+    'assets/kenney/roguelike-rpg/License.txt',
+    'assets/kenney/tiny-dungeon/tilemap_packed.png',
+    'assets/kenney/tiny-dungeon/License.txt',
   ];
   for (const relative of required) {
     try {

@@ -2,7 +2,12 @@ import Phaser from 'phaser';
 
 import type { Diagnostic } from '../engine/data-loader';
 import { GridMap } from '../engine/grid-map';
-import { cellCenterOffset, renderGridMap } from '../engine/grid-map-renderer';
+import {
+  cellCenterOffset,
+  createGridMapActor,
+  loadGridMapArtAssets,
+  renderGridMap,
+} from '../engine/grid-map-renderer';
 import {
   selectAdjacentTransition,
   selectNewRegionEventKnowledgeIds,
@@ -169,7 +174,7 @@ import {
   sampleStandardPad,
 } from './input-settings';
 import { ModStatusPanel } from './mod-status-ui';
-import { createPixelPerson, UI_FONT_FAMILY } from './ui-theme';
+import { UI_FONT_FAMILY } from './ui-theme';
 import { type GridStartupData } from './menu-scene';
 import { subscribeDataChanges, type DataChangeBatch, type UnsubscribeDataChanges } from './data-hot-reload';
 import {
@@ -225,9 +230,6 @@ const HUD_HEIGHT = 72;
 
 const MOVE_DURATION_MS = 110;
 
-/** Presentation-only NPC palette, cycled by placement order (content stays in data). */
-const NPC_PALETTE = [0x7ec8a9, 0xc89fd4, 0x8fb7e8, 0xe89f8f] as const;
-
 /** Presentation-only enemy-marker styling (content stays in data). */
 const ENCOUNTER_FILL = 0xc96a5a;
 const ENCOUNTER_BORDER = 0x30120e;
@@ -245,6 +247,8 @@ const WEATHER_PARTICLE_DEPTH = 52;
 const HUD_TEXT_DEPTH = 60;
 /** Duration of the alpha cross-fade when the day period changes. */
 const DAYLIGHT_FADE_MS = 600;
+
+type WorldActorMarker = Phaser.GameObjects.Image | Phaser.GameObjects.Arc;
 
 const UI = {
   background: '#0b0e14',
@@ -264,7 +268,7 @@ export class GridScene extends Phaser.Scene {
   private mapLayer: Phaser.GameObjects.Container | null = null;
   private npcLayer: Phaser.GameObjects.Container | null = null;
   private encounterLayer: Phaser.GameObjects.Container | null = null;
-  private marker: Phaser.GameObjects.Container | null = null;
+  private marker: WorldActorMarker | null = null;
   private playerCol = 0;
   private playerRow = 0;
 
@@ -283,7 +287,7 @@ export class GridScene extends Phaser.Scene {
   /** Calendar period used by the current NPC placement and visual layer. */
   private lastNpcSchedulePeriodId: string | null = null;
   private readonly npcVisuals = new Map<string, {
-    marker: Phaser.GameObjects.Container;
+    marker: WorldActorMarker;
     label: Phaser.GameObjects.Text;
   }>();
   private dialogues: ReadonlyMap<string, DialogueData> = new Map();
@@ -300,7 +304,7 @@ export class GridScene extends Phaser.Scene {
     alliedFactionId: string;
     opposingFactionId: string;
   } | null = null;
-  private companionFollower: { marker: Phaser.GameObjects.Container; label: Phaser.GameObjects.Text } | null = null;
+  private companionFollower: { marker: WorldActorMarker; label: Phaser.GameObjects.Text } | null = null;
 
   /** Validated progression datasets (assembled by the shared world loader). */
   private progression: ProgressionAssembly = {
@@ -451,6 +455,14 @@ export class GridScene extends Phaser.Scene {
   }
 
   create(): void {
+    const pinScreenObject = (gameObject: Phaser.GameObjects.GameObject): void => {
+      (gameObject as Phaser.GameObjects.GameObject & { setScrollFactor(x: number, y?: number): unknown })
+        .setScrollFactor(0);
+    };
+    this.events.on(Phaser.Scenes.Events.ADDED_TO_SCENE, pinScreenObject);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.events.off(Phaser.Scenes.Events.ADDED_TO_SCENE, pinScreenObject);
+    });
     this.storage = createBrowserSaveStorage();
     this.settings = loadGameSettings(this.storage ?? unavailableStorage());
     applyGameSettings(this.game, this.settings);
@@ -471,6 +483,12 @@ export class GridScene extends Phaser.Scene {
     const outcome = await loadWorldData();
     if (!outcome.ok) {
       this.showErrorState(outcome.title, outcome.lines, true);
+      return;
+    }
+    try {
+      await loadGridMapArtAssets(this, outcome.world.maps.values());
+    } catch (error) {
+      this.showErrorState('地图像素素材无法加载', [error instanceof Error ? error.message : String(error)], true);
       return;
     }
     this.setupWorld(outcome.world);
@@ -696,21 +714,23 @@ export class GridScene extends Phaser.Scene {
       this.quests.size,
     );
 
-    this.mapOrigin.set(
-      (VIEW_WIDTH - map.pixelWidth) / 2,
-      HUD_HEIGHT + (VIEW_HEIGHT - HUD_HEIGHT - map.pixelHeight) / 2,
-    );
+    this.setMapOrigin(activeMap);
     this.mapLayer = renderGridMap(this, activeMap, this.mapOrigin.x, this.mapOrigin.y);
+    this.mapLayer.setScrollFactor(1);
 
     const startOffset = cellCenterOffset(activeMap, this.playerCol, this.playerRow);
-    this.marker = createPixelPerson(
-      this,
-      this.mapOrigin.x + startOffset.x,
-      this.mapOrigin.y + startOffset.y,
-      map.tileSize,
-      0xe8b04b,
-      0x3a2c12,
-    );
+    this.marker = createGridMapActor(
+      this, activeMap, this.mapOrigin.x + startOffset.x, this.mapOrigin.y + startOffset.y,
+      activeMap.data.art?.actors.playerFrame,
+    ) ?? this.add.circle(
+      this.mapOrigin.x + startOffset.x, this.mapOrigin.y + startOffset.y,
+      map.tileSize * 0.28, 0xe8b04b,
+    ).setScrollFactor(1).setDepth(10);
+    if (this.marker === null) {
+      this.showErrorState('地图缺少玩家像素精灵', ['当前地图 art.actors 未提供可用人物图集。'], true);
+      return;
+    }
+    this.configureMapCamera(activeMap, this.marker);
 
     this.renderNpcs(activeMap);
     this.renderEncounterMarkers(activeMap);
@@ -1103,6 +1123,12 @@ export class GridScene extends Phaser.Scene {
       this.reportDataReloadFailure(outcome.title, outcome.lines);
       return;
     }
+    try {
+      await loadGridMapArtAssets(this, outcome.world.maps.values());
+    } catch (error) {
+      this.reportDataReloadFailure('地图像素素材无法加载', [error instanceof Error ? error.message : String(error)]);
+      return;
+    }
     let restoreSnapshot: SaveSnapshotV1 | null = null;
     if (snapshot !== null) {
       const plan = planSnapshotRestore(
@@ -1272,8 +1298,20 @@ export class GridScene extends Phaser.Scene {
   }
 
   /** Draws each still-active encounter marker and its data-driven name. */
+  private addWorldObjects(
+    layer: Phaser.GameObjects.Container | null,
+    objects: Phaser.GameObjects.GameObject[],
+  ): void {
+    if (layer === null) return;
+    for (const object of objects) {
+      (object as Phaser.GameObjects.GameObject & { setScrollFactor(x: number, y?: number): unknown })
+        .setScrollFactor(1);
+    }
+    layer.add(objects);
+  }
+
   private renderEncounterMarkers(map: GridMap): void {
-    this.encounterLayer = this.add.container();
+    this.encounterLayer = this.add.container().setScrollFactor(1);
     for (const encounter of this.activeEncounters()) {
       const center = cellCenterOffset(map, encounter.col, encounter.row);
       const size = map.tileSize * ENCOUNTER_SIZE_RATIO;
@@ -1300,7 +1338,7 @@ export class GridScene extends Phaser.Scene {
         )
         .setOrigin(0.5, 1), 10);
 
-      this.encounterLayer.add([body, label]);
+      this.addWorldObjects(this.encounterLayer, [body, label]);
       this.encounterMarkers.set(encounter.record.id, [body, label]);
     }
   }
@@ -1321,7 +1359,7 @@ export class GridScene extends Phaser.Scene {
         fontSize: uiFontSize(12),
         color: '#fff1c4',
       }).setOrigin(0.5).setDepth(5), 12);
-      this.encounterLayer?.add([badge, label]);
+      this.addWorldObjects(this.encounterLayer, [badge, label]);
     }
   }
 
@@ -1341,7 +1379,7 @@ export class GridScene extends Phaser.Scene {
         fontSize: uiFontSize(12),
         color: '#d8f4d6',
       }).setOrigin(0.5).setDepth(5), 12);
-      this.encounterLayer?.add([badge, label]);
+      this.addWorldObjects(this.encounterLayer, [badge, label]);
     }
   }
 
@@ -1361,7 +1399,7 @@ export class GridScene extends Phaser.Scene {
         fontSize: uiFontSize(12),
         color: '#fff0c8',
       }).setOrigin(0.5).setDepth(5), 12);
-      this.encounterLayer?.add([badge, label]);
+      this.addWorldObjects(this.encounterLayer, [badge, label]);
     }
   }
 
@@ -1381,7 +1419,7 @@ export class GridScene extends Phaser.Scene {
         fontSize: uiFontSize(12),
         color: '#e3fff1',
       }).setOrigin(0.5).setDepth(5), 12);
-      this.encounterLayer?.add([badge, label]);
+      this.addWorldObjects(this.encounterLayer, [badge, label]);
     }
   }
 
@@ -1399,7 +1437,7 @@ export class GridScene extends Phaser.Scene {
       fontSize: uiFontSize(12),
       color: '#fff4c9',
     }).setOrigin(0.5).setDepth(5), 12);
-    this.encounterLayer?.add([badge, label]);
+    this.addWorldObjects(this.encounterLayer, [badge, label]);
   }
 
   /**
@@ -1731,7 +1769,7 @@ export class GridScene extends Phaser.Scene {
 
   /** Draws every placed NPC and its data-driven name label. */
   private renderNpcs(map: GridMap): void {
-    this.npcLayer = this.add.container();
+    this.npcLayer = this.add.container().setScrollFactor(1);
     this.npcVisuals.clear();
     (this.world?.assembly.npcs ?? [])
       .filter((npc) => npc.record.mapResourceId === this.currentMapResourceId)
@@ -1740,27 +1778,44 @@ export class GridScene extends Phaser.Scene {
     this.refreshCompanionFollower(null);
   }
 
+  private setMapOrigin(map: GridMap): void {
+    if (map.pixelWidth > VIEW_WIDTH || map.pixelHeight > VIEW_HEIGHT) {
+      this.mapOrigin.set(0, 0);
+      return;
+    }
+    this.mapOrigin.set(
+      (VIEW_WIDTH - map.pixelWidth) / 2,
+      HUD_HEIGHT + (VIEW_HEIGHT - HUD_HEIGHT - map.pixelHeight) / 2,
+    );
+  }
+
+  private configureMapCamera(map: GridMap, target: Phaser.GameObjects.GameObject | null): void {
+    const camera = this.cameras.main;
+    camera.stopFollow();
+    camera.setRoundPixels(true);
+    if (map.pixelWidth > VIEW_WIDTH || map.pixelHeight > VIEW_HEIGHT) {
+      camera.setBounds(0, 0, map.pixelWidth, map.pixelHeight);
+      if (target !== null) camera.startFollow(target, true, 1, 1);
+      return;
+    }
+    camera.setBounds(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
+    camera.setScroll(0, 0);
+  }
+
   private createNpcVisual(npc: PlacedNpc, map: GridMap): void {
     const center = cellCenterOffset(map, npc.col, npc.row);
-    const colorIndex = Math.max(
-      0,
-      this.world?.assembly.npcs.findIndex((candidate) => candidate.record.id === npc.record.id) ?? 0,
-    );
-    const marker = createPixelPerson(
-      this,
-      this.mapOrigin.x + center.x,
-      this.mapOrigin.y + center.y,
-      map.tileSize,
-      NPC_PALETTE[colorIndex % NPC_PALETTE.length] ?? NPC_PALETTE[0],
-    );
+    const x = this.mapOrigin.x + center.x;
+    const y = this.mapOrigin.y + center.y;
+    const marker = createGridMapActor(this, map, x, y, npc.record.spriteFrame) ??
+      this.add.circle(x, y, map.tileSize * 0.25, 0x7ec8a9).setDepth(10);
     const label = this.registerScaledText(this.add
-      .text(this.mapOrigin.x + center.x, this.mapOrigin.y + center.y - map.tileSize * 0.42 - 4, npc.record.name, {
+      .text(x, y - map.tileSize * 0.42 - 4, npc.record.name, {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(10),
         color: UI.textPrimary,
       })
       .setOrigin(0.5, 1), 10);
-    this.npcLayer?.add([marker, label]);
+    this.addWorldObjects(this.npcLayer, [marker, label]);
     this.npcVisuals.set(npc.record.id, { marker, label });
   }
 
@@ -1862,14 +1917,16 @@ export class GridScene extends Phaser.Scene {
     }
     if (this.companionFollower === null) {
       const center = cellCenterOffset(map, this.playerCol, this.playerRow);
-      const marker = createPixelPerson(this, this.mapOrigin.x + center.x, this.mapOrigin.y + center.y, map.tileSize, 0x48c8a3, 0x173a32);
+      const marker = createGridMapActor(
+        this, map, this.mapOrigin.x + center.x, this.mapOrigin.y + center.y, npc.record.spriteFrame,
+      ) ?? this.add.circle(this.mapOrigin.x + center.x, this.mapOrigin.y + center.y, map.tileSize * 0.25, 0x48c8a3);
       const label = this.registerScaledText(this.add.text(
         this.mapOrigin.x + center.x,
         this.mapOrigin.y + center.y - map.tileSize * 0.42 - 4,
         npc.record.name,
         { fontFamily: UI_FONT_FAMILY, fontSize: uiFontSize(10), color: UI.textPrimary },
       ).setOrigin(0.5, 1), 10);
-      this.npcLayer?.add([marker, label]);
+      this.addWorldObjects(this.npcLayer, [marker, label]);
       this.companionFollower = { marker, label };
     }
     const blocked = new Set([
@@ -2539,7 +2596,8 @@ export class GridScene extends Phaser.Scene {
       return;
     }
     if (this.anyOverlayOpen()) return;
-    panel.open(world.worldMap, this.currentMapResourceId);
+    if (this.map === null) return;
+    panel.open(world.worldMap, this.currentMapResourceId, this.map, this.playerCol, this.playerRow);
     this.updateInteractHint();
   }
 
@@ -3429,13 +3487,12 @@ export class GridScene extends Phaser.Scene {
     this.lastNpcSchedulePeriodId = arrivalPeriodId;
     this.placedNpcs = this.resolveNpcPlacements(arrivalPeriodId);
     this.occupancy = new NpcOccupancyIndex(this.placedNpcs);
-    this.mapOrigin.set(
-      (VIEW_WIDTH - destinationMap.pixelWidth) / 2,
-      HUD_HEIGHT + (VIEW_HEIGHT - HUD_HEIGHT - destinationMap.pixelHeight) / 2,
-    );
+    this.setMapOrigin(destinationMap);
     this.mapLayer = renderGridMap(this, destinationMap, this.mapOrigin.x, this.mapOrigin.y);
+    this.mapLayer.setScrollFactor(1);
     const center = cellCenterOffset(destinationMap, this.playerCol, this.playerRow);
     this.marker?.setPosition(this.mapOrigin.x + center.x, this.mapOrigin.y + center.y);
+    this.configureMapCamera(destinationMap, this.marker);
     this.renderNpcs(destinationMap);
     this.renderEncounterMarkers(destinationMap);
     this.renderArenaMarkers(destinationMap);

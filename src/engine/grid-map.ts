@@ -17,6 +17,36 @@ export interface TileTypeDefinition {
   solid: boolean;
 }
 
+/** Static sprite-sheet metadata supplied by a map data pack. */
+export interface GridMapTilesetData {
+  id: string;
+  image: string;
+  tileSize: number;
+  columns: number;
+  rows: number;
+  spacing: number;
+  tileCount: number;
+}
+
+/** A data-authored Tiled-style image layer. GIDs are 1-based; zero is empty. */
+export interface GridMapArtLayerData {
+  id: string;
+  tilesetId: string;
+  cells: number[][];
+}
+
+/** Optional presentation data. Collision and movement remain in `grid`. */
+export interface GridMapArtData {
+  tileSize: number;
+  tilesets: GridMapTilesetData[];
+  layers: GridMapArtLayerData[];
+  actors: {
+    tilesetId: string;
+    playerFrame: number;
+    defaultNpcFrame: number;
+  };
+}
+
 /** Grid-cell coordinates; (0, 0) is the top-left cell. */
 export interface CellPosition {
   col: number;
@@ -34,6 +64,8 @@ export interface GridMapData {
   /** One string per row; each character indexes into `tileTypes`. */
   grid: string[];
   playerStart: CellPosition;
+  /** Optional licensed pixel-art atlases and orthogonal sprite layers. */
+  art?: GridMapArtData;
 }
 
 /** Result of validating and parsing raw JSON into a {@link GridMap}. */
@@ -101,11 +133,114 @@ export function parseGridMap(raw: unknown): GridMapParseResult {
   validateTileTypes(raw.tileTypes, errors);
   validateGrid(raw.grid, raw.tileTypes, raw.columns, raw.rows, errors);
   validatePlayerStart(raw.playerStart, raw.tileTypes, raw.grid, raw.columns, raw.rows, errors);
+  if (raw.art !== undefined) validateGridMapArt(raw.art, raw.columns, raw.rows, errors);
 
   if (errors.length > 0) {
     return { ok: false, errors };
   }
   return { ok: true, map: new GridMap(raw as unknown as GridMapData) };
+}
+
+function validateGridMapArt(art: unknown, columns: unknown, rows: unknown, errors: string[]): void {
+  if (!isPlainObject(art)) {
+    errors.push('art: expected an object');
+    return;
+  }
+  checkIntegerInRange(art.tileSize, 1, 256, 'art.tileSize', errors);
+  if (!Array.isArray(art.tilesets) || art.tilesets.length === 0) {
+    errors.push('art.tilesets: expected at least one sprite sheet');
+    return;
+  }
+
+  const tilesets = new Map<string, GridMapTilesetData>();
+  art.tilesets.forEach((candidate, index) => {
+    const path = `art.tilesets[${index}]`;
+    if (!isPlainObject(candidate)) {
+      errors.push(`${path}: expected an object`);
+      return;
+    }
+    const id = candidate.id;
+    const image = candidate.image;
+    if (typeof id !== 'string' || id.trim().length === 0) errors.push(`${path}.id: expected a non-empty string`);
+    if (
+      typeof image !== 'string' || image.trim().length === 0 ||
+      image.startsWith('/') || image.split('/').some((part) => part === '..')
+    ) errors.push(`${path}.image: expected a non-empty relative asset path without parent traversal`);
+    checkIntegerInRange(candidate.tileSize, 1, 256, `${path}.tileSize`, errors);
+    checkIntegerInRange(candidate.columns, 1, 1024, `${path}.columns`, errors);
+    checkIntegerInRange(candidate.rows, 1, 1024, `${path}.rows`, errors);
+    checkIntegerInRange(candidate.spacing, 0, 32, `${path}.spacing`, errors);
+    checkIntegerInRange(candidate.tileCount, 1, 1_048_576, `${path}.tileCount`, errors);
+    if (
+      typeof id === 'string' && id.trim().length > 0 &&
+      Number.isInteger(candidate.tileSize) && Number.isInteger(candidate.columns) &&
+      Number.isInteger(candidate.rows) && Number.isInteger(candidate.spacing) &&
+      Number.isInteger(candidate.tileCount)
+    ) {
+      if ((candidate.tileCount as number) > (candidate.columns as number) * (candidate.rows as number)) {
+        errors.push(`${path}.tileCount: exceeds atlas capacity`);
+      }
+      if (tilesets.has(id)) errors.push(`${path}.id: duplicate sprite sheet id "${id}"`);
+      else tilesets.set(id, candidate as unknown as GridMapTilesetData);
+    }
+  });
+
+  if (!Array.isArray(art.layers) || art.layers.length === 0) {
+    errors.push('art.layers: expected at least one image layer');
+  } else {
+    art.layers.forEach((candidate, layerIndex) => {
+      const path = `art.layers[${layerIndex}]`;
+      if (!isPlainObject(candidate)) {
+        errors.push(`${path}: expected an object`);
+        return;
+      }
+      if (typeof candidate.id !== 'string' || candidate.id.trim().length === 0) errors.push(`${path}.id: expected a non-empty string`);
+      if (typeof candidate.tilesetId !== 'string' || !tilesets.has(candidate.tilesetId)) {
+        errors.push(`${path}.tilesetId: does not name a declared sprite sheet`);
+      }
+      const cells = candidate.cells;
+      if (!Array.isArray(cells)) {
+        errors.push(`${path}.cells: expected an array of rows`);
+        return;
+      }
+      if (typeof rows === 'number' && cells.length !== rows) errors.push(`${path}.cells: expected ${rows} rows, got ${cells.length}`);
+      cells.forEach((row, rowIndex) => {
+        if (!Array.isArray(row)) {
+          errors.push(`${path}.cells[${rowIndex}]: expected an array`);
+          return;
+        }
+        if (typeof columns === 'number' && row.length !== columns) {
+          errors.push(`${path}.cells[${rowIndex}]: expected ${columns} cells, got ${row.length}`);
+        }
+        row.forEach((gid, colIndex) => {
+          if (typeof gid !== 'number' || !Number.isInteger(gid) || gid < 0 || gid > 0xffffffff) {
+            errors.push(`${path}.cells[${rowIndex}][${colIndex}]: expected an unsigned Tiled GID`);
+            return;
+          }
+          const frameId = gid & 0x0fffffff;
+          const tileset = typeof candidate.tilesetId === 'string' ? tilesets.get(candidate.tilesetId) : undefined;
+          if (frameId !== 0 && tileset !== undefined && frameId > tileset.tileCount) {
+            errors.push(`${path}.cells[${rowIndex}][${colIndex}]: GID ${frameId} exceeds sprite sheet "${tileset.id}"`);
+          }
+        });
+      });
+    });
+  }
+
+  if (!isPlainObject(art.actors)) {
+    errors.push('art.actors: expected an object');
+    return;
+  }
+  const actorTilesetId = art.actors.tilesetId;
+  const actorTileset = typeof actorTilesetId === 'string' ? tilesets.get(actorTilesetId) : undefined;
+  if (actorTileset === undefined) errors.push('art.actors.tilesetId: does not name a declared sprite sheet');
+  for (const field of ['playerFrame', 'defaultNpcFrame'] as const) {
+    const value = art.actors[field];
+    checkIntegerInRange(value, 0, 1_048_575, `art.actors.${field}`, errors);
+    if (actorTileset !== undefined && typeof value === 'number' && value >= actorTileset.tileCount) {
+      errors.push(`art.actors.${field}: frame ${value} exceeds sprite sheet "${actorTileset.id}"`);
+    }
+  }
 }
 
 function validateTileTypes(value: unknown, errors: string[]): void {

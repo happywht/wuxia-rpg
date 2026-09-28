@@ -25,6 +25,8 @@ const contentTypes = new Map([
   ['.html', 'text/html; charset=utf-8'],
   ['.js', 'text/javascript; charset=utf-8'],
   ['.json', 'application/json; charset=utf-8'],
+  ['.png', 'image/png'],
+  ['.txt', 'text/plain; charset=utf-8'],
 ]);
 
 async function listFiles(directory, parent = '') {
@@ -149,6 +151,22 @@ try {
     assert.equal(modResponse.status, 200, '示例 MOD JSON 与站点一同被发布');
     const noticeResponse = await fetch(`${siteBase}THIRD-PARTY-NOTICES.md`);
     assert.equal(noticeResponse.status, 200, '第三方运行时依赖许可随静态站点发布');
+    for (const assetPath of [
+      'assets/kenney/roguelike-rpg/roguelikeSheet_transparent.png',
+      'assets/kenney/tiny-dungeon/tilemap_packed.png',
+    ]) {
+      const response = await fetch(`${siteBase}${assetPath}`);
+      assert.equal(response.status, 200, `Kenney 图集在非根部署路径可访问：${assetPath}`);
+      assert.match(response.headers.get('content-type') ?? '', /^image\/png/u, `PNG MIME 正确：${assetPath}`);
+    }
+    for (const licensePath of [
+      'assets/kenney/roguelike-rpg/License.txt',
+      'assets/kenney/tiny-dungeon/License.txt',
+    ]) {
+      const response = await fetch(`${siteBase}${licensePath}`);
+      assert.equal(response.status, 200, `原始 CC0 License 随包并可读取：${licensePath}`);
+      assert.match(await response.text(), /CC0/iu, `许可文件包含 CC0 授权：${licensePath}`);
+    }
     const data = await loadGameData({ baseUrl: siteBase });
     assert.equal(data.diagnostics.length, 0, JSON.stringify(data.diagnostics, null, 2));
     assert.equal(data.resources.size, 26, '非根路径下基础 manifest 的 26 项资源和 Schema 全部加载');
@@ -158,7 +176,7 @@ try {
     await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
   }
 
-  console.log(`通过：${archiveName} 可解包，${manifest.files.length} 个文件的大小/哈希与清单一致；静态包可挂载到 ${mountPath} 并加载 HTML/JS/CSS/示例 MOD 及全部 26 项基础资料/Schema。`);
+  console.log(`通过：${archiveName} 可解包，${manifest.files.length} 个文件的大小/哈希与清单一致；静态包可挂载到 ${mountPath} 并加载 HTML/JS/CSS、示例 MOD、全部 26 项基础资料/Schema，以及两张 Kenney PNG 图集与原始 CC0 License。`);
 } finally {
   await rm(tempRoot, { recursive: true, force: true });
 }

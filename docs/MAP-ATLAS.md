@@ -1,6 +1,6 @@
 # 世界舆图与区域旅行
 
-Round 10 将单张网格地图扩展为由资料驱动的区域集合。舆图、区域命名、地图文件、关口端点和区域事件都放在 `data/`，引擎只执行通用协议。Round 17 为区域事件增加线索/时段/天气门槛和百科发现效果。
+Round 10 将单张网格地图扩展为由资料驱动的区域集合；Round 51 将起始区域扩展为 100×100 格的连续大地图，并换成公开 CC0 像素图集。地图尺寸、碰撞、分层贴图、区域命名、关口端点和区域事件仍由 `data/` 声明；引擎只执行通用协议。
 
 ## 当前地图资源总表
 
@@ -8,11 +8,12 @@ Round 10 将单张网格地图扩展为由资料驱动的区域集合。舆图�
 
 | 地图资源 id | 区域名 | 舆图坐标 | 尺寸（列×行） | 玩家起点 | 瓦片通行性 |
 |---|---|---:|---|---|---|
-| `map.round-01-grid` | 方格试炼场 | (27, 52) | 16×9 | (7, 7) | `.`、`~` 可走；`#` 阻挡 |
-| `map.round-10-mist-ferry` | 雾雨渡口 | (72, 52) | 16×9 | (7, 7) | `.`、`,` 可走；`~`、`#` 阻挡 |
+| `map.round-01-grid` | 江南道·七镇行旅 | (42, 50) | 100×100 | (43, 37) | `.` 可走；`#` 水域/树木/屋顶阻挡 |
+| `map.round-10-mist-ferry` | 雾雨渡口 | (85, 80) | 16×9 | (7, 7) | `.`、`,` 可走；`~`、`#` 阻挡 |
 
-- 世界图 `world.atlas` 的 `startingMapResourceId` 为 `map.round-01-grid`；每张地图的 `id` 与 manifest 资源 id 一致，`tileSize` 均为 48。
-- 方格试炼场的 `~` 是**可走**浅水（试炼场中庭水洼），雾雨渡口的 `~` 是**阻挡**江水——同名瓦片键在两张图内的 `solid` 声明不同，通行性以各自 `tileTypes` 为准。
+- 世界图 `world.atlas` 的 `startingMapResourceId` 为 `map.round-01-grid`；每张地图的 `id` 与 manifest 资源 id 一致，地图格尺寸均为 48 世界像素。
+- 起始大地图将 16×16 素材格最近邻放大至 48×48 世界像素；五个独立画面层从 Tiled GID 绘制，移动碰撞始终只看 `grid`，不会根据美术像素推断阻挡。
+- 玩家行走在起始地图时镜头跟随并限制在地图范围内，HUD、面板与天气覆盖层固定在画面上；短渡口地图仍居中显示，不强行滚动。
 - 芦苇河滩（`place.reedbank`）是知识图谱地点词条而非地图资源：当前世界没有第三张 `grid-map`，详见 [`WORLD-SETTING.md`](WORLD-SETTING.md) §2。
 
 ## 关口端点
@@ -21,8 +22,8 @@ Round 10 将单张网格地图扩展为由资料驱动的区域集合。舆图�
 
 | 关口 id | 名称 | from（地图 · 格） | to（地图 · 格） |
 |---|---|---|---|
-| `gate.trial-to-ferry` | 石阶渡口 | `map.round-01-grid` · (14, 7) | `map.round-10-mist-ferry` · (1, 4) |
-| `gate.ferry-to-trial` | 回望石阶 | `map.round-10-mist-ferry` · (2, 4) | `map.round-01-grid` · (13, 7) |
+| `gate.trial-to-ferry` | 石阶渡口 | `map.round-01-grid` · (90, 50) | `map.round-10-mist-ferry` · (1, 4) |
+| `gate.ferry-to-trial` | 回望石阶 | `map.round-10-mist-ferry` · (2, 4) | `map.round-01-grid` · (89, 50) |
 
 引擎装配规则（`src/engine/world-map.ts` 的 `assembleWorldMap`）：`from` 端点必须可走**且不得位于该图玩家出生格**；`to` 落点必须可走；两端地图必须都已登记进 `regions`。任一不满足即整条关口禁用并给出警告，不影响其他关口。协议不自动推断双向旅行——往返必须像上表一样显式声明两条记录。
 
@@ -32,7 +33,7 @@ Round 10 将单张网格地图扩展为由资料驱动的区域集合。舆图�
 
 | 事件 id | 地图 · 格 | 一次性 | 条件 | 成功发现 |
 |---|---|---|---|---|
-| `event.trial-cloudbreak` | `map.round-01-grid` · (8, 7) | 是 | 无 | — |
+| `event.trial-cloudbreak` | `map.round-01-grid` · (43, 36) | 是 | 无 | — |
 | `event.ferry-first-arrival` | `map.round-10-mist-ferry` · (1, 4) | 是 | 无 | `event.old-footprints`（雨后的脚印） |
 | `event.reedbank-traces` | `map.round-10-mist-ferry` · (5, 4) | 是 | 已知 `event.old-footprints`；时段 黄昏/入夜；天气 细雨/降雨/骤雨 | `place.reedbank`（芦苇河滩） |
 
@@ -45,7 +46,13 @@ Round 10 将单张网格地图扩展为由资料驱动的区域集合。舆图�
 | `event.r43-wayfarer-letter` | 雾雨渡口 (`map.round-10-mist-ferry`) · 成功走格时 | 12% | 是 | 已知 `event.old-footprints`；黄昏/入夜；细雨/降雨/骤雨 | `event.r43-wayfarer-letter`（风雨传函） |
 | `event.r44-dock-claim` | 雾雨渡口 (`map.round-10-mist-ferry`) · 成功走格时 | 35% | 是 | 已知 `event.r43-wayfarer-letter`；黄昏；细雨/降雨/骤雨；邻近石北 (`char.shi-bei`) 与白鹭洲 (`char.bai-luzhou`) | `event.r44-dock-claim`（雨夜旧桩之争） |
 
-玩家按 **M** 打开舆图，当前区域高亮；图册开启时探索输入锁定。相邻关口按 **E** 旅行。该键的冲突优先级固定为 NPC、战斗遭遇、关口，避免旅行抢占既有交互。
+玩家按 **M** 打开舆图，当前大地图底图和金色玩家位置标记随地图资料绘制。鼠标/触屏拖动可平移，滚轮可缩放，方向键小幅平移；缩放后地图边缘受视窗约束，不会漏出边框。按 **M** 或 **Esc** 收起，打开时探索输入锁定。相邻关口按 **E** 旅行。
+
+## Round 51 地图美术资源
+
+- 起始大地图使用 `data/assets/kenney/roguelike-rpg/roguelikeSheet_transparent.png` 的 16×16 地表、道路、林木、岸线、聚落与屋顶瓦片，以及该 CC0 素材包附带的 `scripts/sources/kenney-roguelike-sample-map.tmx` 五层 100×100 地图作为底稿。`scripts/import-round51-kenney-world.mjs` 可从底稿重建 JSON 图层和独立碰撞网格；扩展的林带、池塘、道路与第二聚落也都使用这张 CC0 图集。
+- 玩家、NPC 和伙伴使用 `data/assets/kenney/tiny-dungeon/tilemap_packed.png` 中配置的人物帧。帧索引、图集尺寸和画面图层都随地图数据声明，NPC 可选 `spriteFrame` 覆盖默认人物帧。
+- 两套图集的原始 `License.txt` 随游戏素材一起打包；许可来源、素材用途和发布边界见 [`REFERENCES.md`](REFERENCES.md) 与 [`PLAYER-GUIDE.md`](PLAYER-GUIDE.md)。美术素材可替换而不改变地图移动碰撞协议。
 
 ## 资料协议
 

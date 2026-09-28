@@ -1,19 +1,19 @@
 # 人物志（CHARACTERS）
 
-- 状态：Round 30 起基础世界共有 **12 名可交互 NPC**（方格试炼场 7 名、雾雨渡口 5 名），全部为原创人物；身份数据在 `data/base/characters/round-03-npcs.json`，对话分布于 `dialogues/round-03-conversations.json` 与 `dialogues/round-30-conversations.json`，图谱词条在 `data/base/knowledge_graph/nodes.json`。
+- 状态：Round 30 起基础世界共有 **12 名可交互 NPC**（江南道·七镇行旅 7 名、雾雨渡口 5 名），全部为原创人物；Round 51 将江南道地图扩为 100×100 并重排七名 NPC 到开局聚落周围，NPC 均有独立像素精灵帧。身份数据在 `data/base/characters/round-03-npcs.json`，对话分布于 `dialogues/round-03-conversations.json` 与 `dialogues/round-30-conversations.json`，图谱词条在 `data/base/knowledge_graph/nodes.json`。
 - 关联：`docs/NPC-SCHEDULES.md`（时段日程）、`docs/FACTIONS.md`（门派与师承）、`docs/KNOWLEDGE-GRAPH.md`（人物词条与关系边）、`docs/DIALOGUE-GUIDE.md`（对话写法）。
 
 ## 总表
 
 | 人物 | 所在地图 | 基础位 | 对话 | 职责 |
 |---|---|---|---|---|
-| 沈墨涵 | 方格试炼场 | (4,1) | `dlg.shen-mohan-bookshop` | 书铺掌柜；洗髓残篇线 |
-| 陆贞娘 | 方格试炼场 | (5,5) | `dlg.lu-zhenniang-teastall` | 茶棚主人；传闻与脚印线索 |
-| 顾夜尘 | 方格试炼场 | (12,3) | `dlg.gu-yechen-roadside` | 拦路刀客；可招募伙伴 |
-| 姜百味 | 方格试炼场 | (9,1) | `dlg.jiang-baiwei-peddler` | 货郎；商店与杂货 |
-| 马尚义 | 方格试炼场 | (12,1) | `dlg.ma-shangyi-notice-board` | 差事发布人；巷口两桩差事 |
-| 叶庭舟 | 方格试炼场 | (2,1) | `dlg.ye-tingzhou-mentor` | 听雨剑阁教习（导师） |
-| **柳听澜** | 方格试炼场 | (5,3) | `dlg.liu-tinglan-mentor` | **寒山书院教习（导师，R30）** |
+| 沈墨涵 | 江南道·七镇行旅 | (45,37) | `dlg.shen-mohan-bookshop` | 书铺掌柜；洗髓残篇线 |
+| 陆贞娘 | 江南道·七镇行旅 | (43,38) | `dlg.lu-zhenniang-teastall` | 茶棚主人；传闻与脚印线索 |
+| 顾夜尘 | 江南道·七镇行旅 | (51,40) | `dlg.gu-yechen-roadside` | 拦路刀客；可招募伙伴 |
+| 姜百味 | 江南道·七镇行旅 | (45,39) | `dlg.jiang-baiwei-peddler` | 货郎；商店与杂货 |
+| 马尚义 | 江南道·七镇行旅 | (42,41) | `dlg.ma-shangyi-notice-board` | 差事发布人；巷口两桩差事 |
+| 叶庭舟 | 江南道·七镇行旅 | (39,37) | `dlg.ye-tingzhou-mentor` | 听雨剑阁教习（导师） |
+| **柳听澜** | 江南道·七镇行旅 | (48,43) | `dlg.liu-tinglan-mentor` | **寒山书院教习（导师，R30）** |
 | 石北 | 雾雨渡口 | (3,1) | `dlg.shi-bei-mentor` | 铁嶂派教习（导师） |
 | 闻素心 | 雾雨渡口 | (12,7) | `dlg.wen-suxin-mentor` | 云隐山庄庄主（导师） |
 | 容素青 | 雾雨渡口 | (12,2) | `dlg.rong-su-qing-herbalist` | 药师；三张药方传授 |
@@ -26,7 +26,7 @@
 
 ### 柳听澜（char.liu-tinglan）
 
-寒山书院派驻方格试炼场的教习，在石阶小径旁设案誊录江湖文书。年约四十，长衫洗得发白，一手小楷端正得近乎刻板；他是渡籍轮值章程誊抄副本的执笔人，与剑阁教习叶庭舟以诗文相往来。他收徒先看心正不正（善名至少 5），再看笔稳不稳（悟性至少 8），最后才轮到与他的交情（关系至少 5）——「请教文章」一次即可叩开这扇门。场景职责：**门派招收**。基础位在 (5,3)，日中移至 (6,3) 讲学，黄昏回案；所有时段都在初始区域可接近的位置。
+寒山书院派驻江南道·七镇行旅的教习，在聚落书案旁誊录江湖文书。年约四十，长衫洗得发白，一手小楷端正得近乎刻板；他是渡籍轮值章程誊抄副本的执笔人，与剑阁教习叶庭舟以诗文相往来。他收徒先看心正不正（善名至少 5），再看笔稳不稳（悟性至少 8），最后才轮到与他的交情（关系至少 5）——「请教文章」一次即可叩开这扇门。场景职责：**门派招收**。基础位在 (48,43)，日中移至 (49,43) 讲学，黄昏回案；所有时段都在初始区域可接近的位置。
 
 ### 祝九弦（char.zhu-jiuxian）
 

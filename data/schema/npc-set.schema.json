@@ -60,6 +60,12 @@
             "description": "可选：该 NPC 可发布任务（Round 07）。玩家与其相邻按 E 打开任务名录；缺省为 false。",
             "type": "boolean"
           },
+          "spriteFrame": {
+            "description": "可选：map art actor 图集中的零起始人物帧；缺省使用地图配置的默认 NPC 帧。",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1048575
+          },
           "schedule": {
             "description": "可选：按历法时段声明地图内位置（Round 16）；未声明当前时段时回到基础 position。",
             "type": "array",

@@ -704,7 +704,11 @@ describe('Round 46 real-data vertical slice', () => {
     expect(world.conversations.size).toBeGreaterThan(10);
     expect(world.map.canEnter(start.col, start.row)).toBe(true);
     expect(world.map.canEnter(start.col + 1, start.row)).toBe(true);
-    expect(world.map.canEnter(start.col, start.row + 1)).toBe(false);
+    const solid = Array.from({ length: world.map.rows }, (_, row) =>
+      Array.from({ length: world.map.columns }, (_, col) => ({ col, row })),
+    ).flat().find(({ col, row }) => world.map.isSolid(col, row));
+    expect(solid).toBeDefined();
+    expect(world.map.canEnter(solid!.col, solid!.row)).toBe(false);
     expect(world.map.canEnter(-1, start.row)).toBe(false);
   });
 
@@ -714,7 +718,9 @@ describe('Round 46 real-data vertical slice', () => {
     const start = world.map.playerStart;
     expect(world.map.canEnter(start.col, start.row)).toBe(true);
     const openStep = { col: start.col + 1, row: start.row };
-    const blockedStep = { col: start.col, row: start.row + 1 };
+    const blockedStep = Array.from({ length: world.map.rows }, (_, row) =>
+      Array.from({ length: world.map.columns }, (_, col) => ({ col, row })),
+    ).flat().find(({ col, row }) => world.map.isSolid(col, row))!;
     expect(world.map.canEnter(openStep.col, openStep.row)).toBe(true);
     expect(world.map.canEnter(blockedStep.col, blockedStep.row)).toBe(false);
     run.position = openStep;

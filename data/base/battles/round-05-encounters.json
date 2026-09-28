@@ -4,7 +4,7 @@
       "id": "encounter.alley-blade-bully",
       "name": "巷口拦路刀客",
       "mapResourceId": "map.round-01-grid",
-      "position": { "col": 1, "row": 7 },
+      "position": { "col": 55, "row": 44 },
       "profileId": "char.scribe-apprentice",
       "knowledgeNodeId": "char.alley-blade",
       "enemy": {

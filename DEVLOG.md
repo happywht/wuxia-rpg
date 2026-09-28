@@ -4,6 +4,39 @@
 
 ---
 
+## Round 51 — 超大可移动世界与网页像素素材（2026-09-28，已完成）
+
+### 计划与实现
+
+- 开发前计划写入 `iterations/round-51/plan.md`，细分官方素材核验、100×100 地图与跟随相机、角色精灵/舆图、整合验证四个可验子任务；计划工时约 2 小时以上。
+- 采用 [Kenney Roguelike/RPG Pack](https://kenney.nl/assets/roguelike-rpg-pack) 的户外图集与 100×100 五层示例地图、[Kenney Tiny Dungeon](https://kenney.nl/assets/tiny-dungeon) 人物图集，素材页及 [Kenney 许可说明](https://kenney.nl/support) 标注 CC0；仅保留运行所用的两张 PNG 及各自原始 `License.txt`。官方样例 TMX 归档在 `scripts/sources/`，不进入发布静态根。来源、用途与许可说明见 `docs/REFERENCES.md`。
+- 新增 `scripts/import-round51-kenney-world.mjs` 和 `npm run import:round-51-world`：从公开 Tiled TMX 解压五个视觉层，扩展林带、池塘、道路与第二聚落，导出 100×100 地图和独立碰撞网格；当前有 7997 个可走格，起点 `(43,37)`。渡口也改用同源图集，保留其 16×9 碰撞语义。
+- 扩展地图/NPC Schema 和数据协议，在资料中声明图集、Tiled 图层与 spriteFrame；引擎以最近邻采样将图层缓存为地表纹理。玩家、NPC 与伙伴使用 Tiny Dungeon 像素帧；大地图相机跟随玩家、受世界边界限制，HUD 与面板固定在屏幕上。
+- M 舆图使用实际五层地图图像，含玩家位置点、地图拖动、滚轮缩放、方向键微调。浏览器验证滚轮时发现原来的 GameObject `wheel` 绑定没有接到 Phaser 的场景级输入；现改为 `scene.input` 监听，并在舆图关闭时清理。新增 4 个纯视口数学用例及 3 个地图/素材数据用例。
+- 修正 `docs/QUESTS.md`、`docs/WORLD-SETTING.md`、人物志、门派志、日程志等过期的小地图名/坐标；更新 GDD 当前设计状态、架构/数据说明及 README/路线图，让 100×100 开局地图在全项目文档中一致。
+- 发行打包清单校验将两套素材 PNG 与原始许可列为必需文件；扩展 Round 47 非根路径 smoke，实际请求图集 PNG 并核验两份 CC0 License 可读，避免只验证本地开发路径。
+
+### 手动浏览器验证
+
+- 本地 `http://127.0.0.1:5178/`：新游戏完成角色模板选择并进入江南道，素材资源正常显示，无浏览器 console error/warning。
+- 按方向键移动两格后，NPC/地貌相对屏幕移动，玩家维持在相机中心区域，HUD 坐标同步变化；此地图为 100×100 格，而非当前屏幕尺寸。
+- 按 M 打开实景舆图；在缩放前尝试拖动时全图完全处于视窗内，因此位置按设计保持居中；用滚轮放大后可拖动地图平移，当前位置点随底图移动；M/Esc 关闭返回探索。地图控件通过浏览器实际鼠标滚轮与拖拽输入验证。
+
+### 自动验证
+
+- `npm run import:round-51-world`：成功，100×100，5 个视觉层，7997 个可行格，起点 `(43,37)`。
+- `npm run validate:data`：通过，manifest/schema 与 26 个基础资源。
+- `npm run typecheck`：通过。
+- 首次 `npm test -- --run` 有 154/155 通过；唯一失败为文档审计发现 README/路线图仍列 Round 50。随后同步当前轮次和区域名，浏览器正式试玩后完整 `npm run check` 通过，Vitest 为 19 个文件、155/155 通过，Round 34 和 Round 48 两项文档审计通过。
+- 完整 check 首次在 Round 34 审计处发现 16 条任务/世界设定表仍写旧区域名；按新 `world-map.json` 更新名称和位置后，两个文档审计及最终 check 通过。新加的静态资源 smoke 首次发现测试服务器未配置 PNG MIME，补充 `image/png` 后 smoke 通过。
+- `npm run package:release`：包含完整 check 和 133 modules 生产构建；版本归档 734038 bytes、69 个内容文件，SHA-256 `6e3c8cf08da1e3d81d0d7024e097ecc120da73fbe195fc17332a5dbea3be9abe`。Round 47 smoke 成功解包并校验全包哈希，在 `/preview/wuxia-rpg/` 非根路径加载 26 项基础资料/Schema、两张 Kenney PNG 图集及两个 CC0 License。
+- `dist/assets/kenney/` 和 `.tgz` 归档均实际含两套 PNG 图集与 License.txt；地图源 TMX 只留在开发脚本目录，不进入版本包。
+- `npm run audit:final`（Round 51 提交后）通过：历史 Round 00–50 的 51/51 份计划、51/51 个轮次提交和所有最终交付审计项均通过；R51 是后续缺口收敛迭代，并未把 R50 最终验收报告改写为全项目完成。
+
+### 边界
+
+- 本机手测覆盖镜头跟随、地图缩放/拖动和资源读取；未声称外部玩家试玩、远端托管发布或物理手柄实测。大地图区域辨识度及周边指引继续列入 R52 试玩反馈范围。
+
 ## Round 50 — 最终交付审计、纵向试玩与复盘（2026-09-28，已提交并通过最终审计）
 
 ### 计划与实现

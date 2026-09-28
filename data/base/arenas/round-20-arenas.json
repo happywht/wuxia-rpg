@@ -5,7 +5,7 @@
       "name": "南市武擂",
       "description": "茶棚东侧临时搭起一座木台，规矩是连胜两场便可夺魁。每场胜利后气力不作恢复，若要报名，先备好背包空位领取彩头。",
       "mapResourceId": "map.round-01-grid",
-      "position": { "col": 8, "row": 7 },
+      "position": { "col": 49, "row": 42 },
       "profileId": "char.scribe-apprentice",
       "opponents": [
         {

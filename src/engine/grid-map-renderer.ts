@@ -1,6 +1,8 @@
 import type Phaser from 'phaser';
 
-import { GridMap, parseHexColor } from './grid-map';
+const PIXEL_FILTER_MODE = 1;
+
+import { GridMap, parseHexColor, type GridMapTilesetData } from './grid-map';
 
 /**
  * Renders a validated {@link GridMap} as flat colored rectangles.
@@ -131,6 +133,14 @@ export function renderGridMap(
   originY: number,
 ): Phaser.GameObjects.Container {
   const container = scene.add.container(originX, originY);
+  if (map.data.art !== undefined) {
+    const artTextureKey = ensureGridMapArtTexture(scene, map);
+    if (artTextureKey === null) throw new Error(`无法生成地图贴图：${map.data.id}`);
+    const image = scene.add.image(0, 0, artTextureKey).setOrigin(0, 0)
+      .setDisplaySize(map.pixelWidth, map.pixelHeight);
+    container.add(image);
+    return container;
+  }
   const layer = scene.add.graphics();
   // Repeated style calls with identical arguments are skipped; fill and line
   // styles are independent Graphics state, so alternating ops stays correct.
@@ -153,6 +163,153 @@ export function renderGridMap(
   }
   container.add(layer);
   return container;
+}
+
+/** Stable Phaser texture key for a source atlas declared by the content pack. */
+export function gridMapTilesetTextureKey(tilesetId: string): string {
+  let hash = 2166136261;
+  for (const char of tilesetId) hash = Math.imul(hash ^ char.charCodeAt(0), 16777619);
+  return `wuxia-atlas-${(hash >>> 0).toString(16)}`;
+}
+
+/** Stable cached ground-texture key, including a hash so live data edits rebuild it. */
+export function gridMapArtTextureKey(map: GridMap): string {
+  const art = map.data.art;
+  if (art === undefined) return '';
+  let hash = 2166136261;
+  const mix = (value: number): void => { hash = Math.imul(hash ^ value, 16777619); };
+  for (const layer of art.layers) {
+    for (let index = 0; index < layer.id.length; index++) mix(layer.id.charCodeAt(index));
+    for (const row of layer.cells) for (const gid of row) mix(gid >>> 0);
+  }
+  return `wuxia-map-art-${(hash >>> 0).toString(16)}`;
+}
+
+/** Loads the distinct source images required by a validated set of maps. */
+export function loadGridMapArtAssets(scene: Phaser.Scene, maps: Iterable<GridMap>): Promise<void> {
+  const tilesets = new Map<string, GridMapTilesetData>();
+  for (const map of maps) {
+    for (const tileset of map.data.art?.tilesets ?? []) tilesets.set(tileset.id, tileset);
+  }
+  const pending = [...tilesets.values()].filter((tileset) =>
+    !scene.textures.exists(gridMapTilesetTextureKey(tileset.id)),
+  );
+  if (pending.length === 0) return Promise.resolve();
+
+  const loader = scene.load;
+  return new Promise((resolve, reject) => {
+    let firstFailure: string | null = null;
+    const onFileError = (file: Phaser.Loader.File): void => {
+      const tileset = pending.find((entry) => gridMapTilesetTextureKey(entry.id) === file.key);
+      if (tileset !== undefined) firstFailure ??= `${tileset.image}（${file.src}）`;
+    };
+    loader.on('loaderror', onFileError);
+    loader.once('complete', () => {
+      loader.off('loaderror', onFileError);
+      const missing = pending.filter((tileset) => !scene.textures.exists(gridMapTilesetTextureKey(tileset.id)));
+      if (firstFailure !== null || missing.length > 0) {
+        reject(new Error(`地图像素素材加载失败：${firstFailure ?? missing.map((entry) => entry.image).join('、')}`));
+        return;
+      }
+      for (const tileset of tilesets.values()) {
+        scene.textures.get(gridMapTilesetTextureKey(tileset.id)).setFilter(PIXEL_FILTER_MODE);
+      }
+      resolve();
+    });
+    for (const tileset of pending) {
+      loader.image(gridMapTilesetTextureKey(tileset.id), `${import.meta.env.BASE_URL}${tileset.image}`);
+    }
+    loader.start();
+  });
+}
+
+/** Bakes layered 16px sprite art into one compact, nearest-neighbour map texture. */
+export function ensureGridMapArtTexture(scene: Phaser.Scene, map: GridMap): string | null {
+  const art = map.data.art;
+  if (art === undefined) return null;
+  const key = gridMapArtTextureKey(map);
+  if (scene.textures.exists(key)) return key;
+  const width = map.columns * art.tileSize;
+  const height = map.rows * art.tileSize;
+  const texture = scene.textures.createCanvas(key, width, height);
+  if (texture === null) throw new Error(`无法创建地图贴图缓存：${map.data.id}（${width}×${height}）`);
+  const context = texture.context;
+  const tilesets = new Map(art.tilesets.map((tileset) => [tileset.id, tileset]));
+  for (const layer of art.layers) {
+    const tileset = tilesets.get(layer.tilesetId);
+    if (tileset === undefined) throw new Error(`地图图层“${layer.id}”引用了缺失图集“${layer.tilesetId}”。`);
+    const source = scene.textures.get(gridMapTilesetTextureKey(tileset.id)).getSourceImage();
+    for (let row = 0; row < map.rows; row++) {
+      for (let col = 0; col < map.columns; col++) {
+        const rawGid = layer.cells[row]?.[col] ?? 0;
+        const frame = rawGid & 0x0fffffff;
+        if (frame === 0) continue;
+        const sourceCol = (frame - 1) % tileset.columns;
+        const sourceRow = Math.floor((frame - 1) / tileset.columns);
+        const sourceX = sourceCol * (tileset.tileSize + tileset.spacing);
+        const sourceY = sourceRow * (tileset.tileSize + tileset.spacing);
+        const destinationX = col * art.tileSize;
+        const destinationY = row * art.tileSize;
+        drawTiledFrame(context, source, sourceX, sourceY, tileset.tileSize, destinationX, destinationY, art.tileSize, rawGid);
+      }
+    }
+  }
+  texture.refresh();
+  texture.setFilter(PIXEL_FILTER_MODE);
+  return key;
+}
+
+/** Extracts one sprite frame from a declared atlas and scales it to one world cell. */
+export function createGridMapActor(
+  scene: Phaser.Scene,
+  map: GridMap,
+  x: number,
+  y: number,
+  frameIndex?: number,
+): Phaser.GameObjects.Image | null {
+  const art = map.data.art;
+  if (art === undefined) return null;
+  const tileset = art.tilesets.find((entry) => entry.id === art.actors.tilesetId);
+  if (tileset === undefined) return null;
+  const frame = frameIndex ?? art.actors.defaultNpcFrame;
+  const key = gridMapTilesetTextureKey(tileset.id);
+  const frameKey = `actor-${tileset.id}-${frame}`;
+  const texture = scene.textures.get(key);
+  if (!texture.has(frameKey)) {
+    const sourceX = (frame % tileset.columns) * (tileset.tileSize + tileset.spacing);
+    const sourceY = Math.floor(frame / tileset.columns) * (tileset.tileSize + tileset.spacing);
+    if (texture.add(frameKey, 0, sourceX, sourceY, tileset.tileSize, tileset.tileSize) === null) {
+      throw new Error(`无法读取人物精灵帧 ${frame}（图集“${tileset.id}”）。`);
+    }
+  }
+  return scene.add.image(x, y, key, frameKey).setScrollFactor(1)
+    .setDisplaySize(map.tileSize, map.tileSize).setDepth(10);
+}
+
+function drawTiledFrame(
+  context: CanvasRenderingContext2D,
+  source: HTMLImageElement | HTMLCanvasElement | Phaser.GameObjects.RenderTexture,
+  sourceX: number,
+  sourceY: number,
+  sourceSize: number,
+  destinationX: number,
+  destinationY: number,
+  destinationSize: number,
+  rawGid: number,
+): void {
+  const flipH = (rawGid & 0x80000000) !== 0;
+  const flipV = (rawGid & 0x40000000) !== 0;
+  const flipD = (rawGid & 0x20000000) !== 0;
+  if (!flipH && !flipV && !flipD) {
+    context.drawImage(source as CanvasImageSource, sourceX, sourceY, sourceSize, sourceSize, destinationX, destinationY, destinationSize, destinationSize);
+    return;
+  }
+  context.save();
+  context.translate(destinationX + destinationSize / 2, destinationY + destinationSize / 2);
+  if (flipD) context.rotate(Math.PI / 2);
+  context.scale(flipH ? -1 : 1, flipV ? -1 : 1);
+  context.drawImage(source as CanvasImageSource, sourceX, sourceY, sourceSize, sourceSize, -destinationSize / 2, -destinationSize / 2, destinationSize, destinationSize);
+  context.restore();
 }
 
 /** Pixel center of a cell relative to the map origin — for marker positioning. */
