@@ -4,6 +4,22 @@
 
 ---
 
+## Round 57 — 跨区舆图目的地接续（2026-09-29，已完成）
+
+### 计划与实现
+
+- 开工前计划写入 `iterations/round-57/plan.md`：记录持续地标目标、手动切区后接续路线、HUD 指引、门控/抵达清理的用户故事、验收标准、文件范围、风险和不少于两小时的工程工时估算。
+- `world-navigation.ts` 为本区/远区地标 waypoint 填入同一稳定地标 id；新增 Phaser-free `world-navigation-guidance.ts`，每次按当前地图、知识门控和坐标解析有向剩余区域路由与本图路径。
+- `grid-path.ts` 新增到四向可行交互格的确定性最短路。M 舆图选点回调向 GridScene 传递稳定目标；重新打开时恢复投影并重画当前段。GridScene 在走格/成功切区后更新方向、格数和下一关口 HUD 提示；只保留运行时地标 id，不改 v1 存档；已知地标抵达/目标失效/路线断开时清理提示状态。
+- 专项 `npm run typecheck` 与三文件 Vitest 回归首轮通过。首轮完整 `npm run package:release` 的 208 项用例中 207 项通过；Round 48 文档审计发现缺 Round 57 DEVLOG 条目及 DATA-GUIDE 状态摘要过期，已补齐并准备复跑全量门槛。
+
+### 最终验证
+
+- 自动：`npx vitest run tests/grid-path.test.ts tests/world-navigation.test.ts tests/world-navigation-guidance.test.ts` 为 3 文件/24 用例通过；`npm run package:release` 复跑全通——26 项基础资源 Schema、启用 MOD 0 问题、`tsc --noEmit`、27 个测试文件/208 个用例、Round 34 与 Round 48 文档审计、Vite 137 模块生产构建及 Round 47 静态归档/子路径 smoke 均成功。
+- 发行包：`release/wuxia-rpg-web-0.0.1.tgz` 758,471 bytes，70 个归档文件/69 个内容文件；SHA-256 `92db34165b52ee60d120501ff697c99b4a77597255b62e7e28d4e9f2549743b7`。smoke 校验逐文件大小/哈希、`/preview/wuxia-rpg/` 路径、26 项资料/Schema、两张 Kenney PNG 图集与 CC0 License。
+- 浏览器：现有 `http://127.0.0.1:5178/` 页面中新建临时角色，M 舆图选择远区「芦桥集」，收起后画面左上出现本区行路方向/关口提示，重开舆图仍高亮原地标并显示路线。未把临时角色存档；完整步行过关没有进行浏览器人工长途走格，本轮以真实双图资料的引擎回归覆盖过关后接续路线。
+- 构建器仅报告既有主 JS chunk 1,924.52 kB（gzip 508.47 kB）高于 500 kB 建议线；构建及 smoke 成功。首轮文档审计失败原因和补齐过程如上，最终审计通过。
+
 ## Round 56 — 区域见闻差事与 discoverKnowledge 任务目标（2026-09-29，已完成）
 
 ### 计划与实现

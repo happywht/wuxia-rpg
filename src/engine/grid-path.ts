@@ -102,6 +102,33 @@ export function findGridPath(
 }
 
 /**
+ * Routes to the closest reachable, walkable cell orthogonally beside a target.
+ * This is useful for interactions whose target occupies its own cell: the
+ * player must stop beside it to press the interaction key. Candidate order is
+ * north/east/south/west, then shortest path, keeping ties deterministic.
+ */
+export function findGridPathToAdjacentCell(
+  map: GridPathSurface,
+  start: CellPosition,
+  target: CellPosition,
+): CellPosition[] | null {
+  if (!map.inBounds(target.col, target.row)) return null;
+  const candidates = [
+    { col: target.col, row: target.row - 1 },
+    { col: target.col + 1, row: target.row },
+    { col: target.col, row: target.row + 1 },
+    { col: target.col - 1, row: target.row },
+  ];
+  let best: CellPosition[] | null = null;
+  for (const candidate of candidates) {
+    if (!map.canEnter(candidate.col, candidate.row)) continue;
+    const path = findGridPath(map, start, candidate, { approachRadius: 0 });
+    if (path !== null && (best === null || path.length < best.length)) best = path;
+  }
+  return best;
+}
+
+/**
  * Collapses a cell path into straight per-direction runs, e.g. "east 2,
  * south 3". A single-cell path summarizes to an empty list.
  */

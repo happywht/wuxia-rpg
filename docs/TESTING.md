@@ -32,7 +32,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 
 - 测试框架：Vitest 5.0.2。官方指南要求 Vite >=6.4.0、Node >=22.12.0；本仓库使用 Vite 8.3.1 与 Node 22.18.0，符合要求（详见 [`docs/REFERENCES.md`](REFERENCES.md) #12；基准 API 见同文件 #16）。
 - 运行环境：Node（无 DOM、无浏览器、无网络、无真实时钟依赖）。
-- 覆盖统计：26 个测试文件、202 个用例（R56 后静态基线；最终全量复跑结果以 `DEVLOG.md` Round 56 为准）。构成：R38 建立四组 53 个，R40 新增渲染器结构回归 10 个，R41 新增设置与输入 42 个，R42 新增主线集成 3 个，R43 新增漫游事件 6 个与门派支线集成 3 个，R44 新增日程漫游/奖励协议/双路线集成 6 个，R45 新增战斗成长基线与擂台奖品边界 4 个，R46 新增真实资料纵向切片 2 个，R47 新增版本清单/路径白名单测试 4 个，R48 新增文档审计 9 个，R49 新增真实默认世界装配/内容数量/零可选告警回归 1 个，R50 新增最终验收审计 5 个，R51 新增 100×100 地图/素材检查及舆图视口导航 7 个，R52 新增相机坐标和地标协议/坏引用回归 5 个，R53 新增网格路径回归 11 个及见闻投影回归 5 个，R54 新增跨区行程与 waypoint 组合 14 个（当轮完整验证为 24 文件/190 用例，见 `DEVLOG.md` Round 54），R55 新增第二张百格区域回归 3 个，R56 新增发现见闻目标与渡口巡标回归 9 个（新文件 `tests/round56-discovery-quests.test.ts` 及 `tests/quest-system.test.ts` 与世界地图/图谱/读档兼容既有测试的扩展）。
+- 覆盖统计：27 个测试文件、208 个用例（R57 后静态基线；最终全量复跑结果以 `DEVLOG.md` Round 57 为准）。构成：R38 建立四组 53 个，R40 新增渲染器结构回归 10 个，R41 新增设置与输入 42 个，R42 新增主线集成 3 个，R43 新增漫游事件 6 个与门派支线集成 3 个，R44 新增日程漫游/奖励协议/双路线集成 6 个，R45 新增战斗成长基线与擂台奖品边界 4 个，R46 新增真实资料纵向切片 2 个，R47 新增版本清单/路径白名单测试 4 个，R48 新增文档审计 9 个，R49 新增真实默认世界装配/内容数量/零可选告警回归 1 个，R50 新增最终验收审计 5 个，R51 新增 100×100 地图/素材检查及舆图视口导航 7 个，R52 新增相机坐标和地标协议/坏引用回归 5 个，R53 新增网格路径回归 11 个及见闻投影回归 5 个，R54 新增跨区行程与 waypoint 组合 14 个（当轮完整验证为 24 文件/190 用例，见 `DEVLOG.md` Round 54），R55 新增第二张百格区域回归 3 个，R56 新增发现见闻目标与渡口巡标回归 9 个（新文件 `tests/round56-discovery-quests.test.ts` 及 `tests/quest-system.test.ts` 与世界地图/图谱/读档兼容既有测试的扩展），R57 新增跨区行路接续/隐藏地标门控回归 4 个及关口交互格寻路回归 2 个。
 
 ## 配置：为什么有独立的 `vitest.config.ts`
 
@@ -75,9 +75,10 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 | `tests/round51-map-viewport.test.ts` | `src/engine/map-viewport.ts` | R51 核对全图适配、视窗边界钳制、以指针为中心的缩放、较小地图居中；Phaser UI 的滚轮与拖动另行做浏览器手测 |
 | `tests/round52-map-camera.test.ts` | `src/engine/grid-map-renderer.ts` + 当前 100×100 地图资料 | R52 模拟 Phaser 场景新增对象默认固定在 HUD 平面的情况，验证真实地图 Image 与世界容器显式设回滚动坐标 |
 | `tests/round52-map-landmarks.test.ts` | `src/engine/world-map.ts` + 两张基础地图 | R52 验证旧 world-map 缺省兼容、六个真实地标装配、无效地图/越界坐标逐条隔离和未知类别拒绝；R53 验证发现引用门控、坏节点隔离和未发现地点不进入可见资料投影 |
-| `tests/grid-path.test.ts` | `src/engine/grid-path.ts` | R53 四向确定性最短路：绕障、solid 地标停靠点、并列路线稳定、越界/封闭区域拒绝、默认/自定义/非法半径、真实渡口数据路线与方向分段 |
+| `tests/grid-path.test.ts` | `src/engine/grid-path.ts` | R53 四向确定性最短路：绕障、solid 地标停靠点、并列路线稳定、越界/封闭区域拒绝、默认/自定义/非法半径、真实渡口数据路线与方向分段；R57 覆盖最短可行关口交互格、已经邻接和无可行停靠点 |
 | `tests/world-travel.test.ts` | `src/engine/world-travel.ts` | R54 有向区域 BFS：稳定最短关口链、同长按关口 id 决胜、起点等于终点/未知地图/孤立区域边界 |
 | `tests/world-navigation.test.ts` | `src/engine/world-navigation.ts` | R54 waypoint 组合：本区地标与关口投影、直接相邻区域可见、远区见闻门控不泄漏、远区目的地复用当前首关口坐标 |
+| `tests/world-navigation-guidance.test.ts` | `src/engine/world-navigation-guidance.ts` + 两张基础地图与世界图 | R57 验证远区稳定地标在首关口与切区后续接本地区段、处于 E 交互格时的到关口状态、本区地标抵达、隐藏地标不泄漏及断开有向路线诊断 |
 | `tests/round55-ferry-world.test.ts` | 基础地图/世界图/NPC/遭遇资料与 `grid-path.ts` | R55 第二张百格区域回归：100×100/十层尺寸与 CC0 License 存在、可行格下限、全部关口/事件/日程 NPC/遇怪/地标锚点从出生点 BFS 可达、两向关口端点精确值、碑记事件发现 `place.mist-sluice` |
 | `tests/round56-discovery-quests.test.ts`（及 R56 扩展的任务/世界地图/图谱既有测试） | quest-set/知识图谱/世界图资料与 `quest-system.ts` | R56 发现见闻回归：`discoverKnowledge` 目标与两段渡口巡标差事的解析/装配引用校验、首次发现信号只推进匹配目标一次、接取时已知见闻回填、旧档恢复重算、奖励见闻级联推进与发现门控地标/事件引用；专项命令 `npx vitest run tests/quest-system.test.ts tests/round56-discovery-quests.test.ts` 为 2 文件/29 用例 |
 
@@ -124,6 +125,7 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 ## 变更记录
 
 - 2026-09-29（Round 56）：新增 `tests/round56-discovery-quests.test.ts`，扩展 `tests/quest-system.test.ts` 及地图/知识图谱/旧档相关回归，净增 9 个用例；基线 26 文件/202 用例。专项 2 文件/29 用例及 `npm test` 的 26/202 全量通过；`npm run package:release` 全门槛通过并生成 756,726 bytes 发行包（69 个内容文件，SHA-256 `e5e474dd3d7d268beb0c6ff41f391a85a8d310efde7f2450273ce86347b60a61`）；详情见 `DEVLOG.md` Round 56。
+- 2026-09-29（Round 57）：新增 `tests/world-navigation-guidance.test.ts` 4 个用例，扩展 `tests/grid-path.test.ts` 2 个用例并加强稳定地标 id 断言；专项 `typecheck` + 3 文件/24 用例通过。完整门槛首次运行发现文档审计遗漏，补齐 Round 57 DEVLOG 与 DATA-GUIDE 状态后复跑全部 27 文件/208 用例、Schema/MOD/类型/双文档审计、生产构建和归档 smoke 均通过，详情见 `DEVLOG.md` Round 57。
 - 2026-09-28（Round 55）：新增 `tests/round55-ferry-world.test.ts` 3 个用例，锁定雾雨渡口 100×100/十层 CC0 地图尺寸、可行格下限、全部玩法锚点 BFS 可达、两向关口端点精确值与碑记事件发现引用；更新旧测试的地图尺寸和地标基线。`npm run package:release` 全通，25 个测试文件/193 个用例通过，完整输出见 `DEVLOG.md` Round 55。
 - 2026-09-28（Round 54，补记）：新增 `tests/world-travel.test.ts` 与 `tests/world-navigation.test.ts` 共 14 个用例（有向区域最短关口链、waypoint 组合与远区见闻门控）；当轮完整验证为 24 文件/190 用例（证据见 `DEVLOG.md` Round 54，本表此前未随 R54 更新，现补齐）。
 - 2026-09-28（Round 51）：新增 2 个测试文件/7 个用例，覆盖 100×100 Kenney 五层地图/人物素材及舆图适配、钳制、指针缩放、地图居中；浏览器手测新游戏、跟随镜头、滚轮放大后拖动地图。Round 51 当时统计为 19 个文件/155 个用例。

@@ -91,6 +91,7 @@ describe('data-driven world map waypoints', () => {
     expect(remote).toMatchObject({
       name: '芦岸登船点',
       kind: 'remote-landmark',
+      destinationLandmarkId: 'landmark.reedbank-landing',
       position: { col: 90, row: 50 },
       destinationRegionName: '雾雨渡口',
       regionRouteNames: ['江南道·七镇行旅', '雾雨渡口'],
@@ -106,8 +107,11 @@ describe('data-driven world map waypoints', () => {
       new Set(['place.reedbank']),
     );
     const remote = destinations.find(({ id }) => id === 'remote:landmark.northwest-settlement');
-    expect(destinations.find(({ id }) => id === 'landmark:landmark.reedbank-landing')?.position)
-      .toEqual({ col: 1, row: 4 });
+    expect(destinations.find(({ id }) => id === 'landmark:landmark.reedbank-landing'))
+      .toMatchObject({
+        position: { col: 1, row: 4 },
+        destinationLandmarkId: 'landmark.reedbank-landing',
+      });
     expect(remote).toMatchObject({
       position: { col: 2, row: 4 },
       destinationRegionName: '江南道·七镇行旅',

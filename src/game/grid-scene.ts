@@ -176,6 +176,8 @@ import {
 } from './input-settings';
 import { ModStatusPanel } from './mod-status-ui';
 import { UI_FONT_FAMILY } from './ui-theme';
+import { summarizePathRuns } from '../engine/grid-path';
+import { resolveWorldNavigationGuide } from '../engine/world-navigation-guidance';
 import { type GridStartupData } from './menu-scene';
 import { subscribeDataChanges, type DataChangeBatch, type UnsubscribeDataChanges } from './data-hot-reload';
 import {
@@ -265,6 +267,8 @@ export class GridScene extends Phaser.Scene {
   private map: GridMap | null = null;
   private world: LoadedWorld | null = null;
   private currentMapResourceId = '';
+  /** Stable selected landmark for this live run; guidance paths are recomputed. */
+  private navigationDestinationLandmarkId: string | null = null;
   private mapOrigin = new Phaser.Math.Vector2(0, 0);
   private mapLayer: Phaser.GameObjects.Container | null = null;
   private npcLayer: Phaser.GameObjects.Container | null = null;
@@ -414,6 +418,7 @@ export class GridScene extends Phaser.Scene {
   private climateText: Phaser.GameObjects.Text | null = null;
   private interactText: Phaser.GameObjects.Text | null = null;
   private questTrackerText: Phaser.GameObjects.Text | null = null;
+  private navigationHintText: Phaser.GameObjects.Text | null = null;
   private questNotice: string | null = null;
   private questNoticeTimer: Phaser.Time.TimerEvent | null = null;
   private regionNotice: string | null = null;
@@ -545,6 +550,7 @@ export class GridScene extends Phaser.Scene {
     this.children.removeAll(true); // Drop the transient loading hint.
     this.scaledTextTargets.length = 0;
     this.world = world;
+    this.navigationDestinationLandmarkId = null;
     this.achievementState = restoredRun?.achievementState ?? createAchievementRunState();
     this.arenaRecords.clear();
     for (const record of restoredRun?.arenaRecords ?? []) {
@@ -787,7 +793,14 @@ export class GridScene extends Phaser.Scene {
     this.endingPanel = new EndingPanel(this, () => this.noteOverlayClosed());
     this.achievementPanel = new AchievementPanel(this, () => this.noteOverlayClosed());
     this.meridianPanel = new MeridianPanel(this, () => this.noteOverlayClosed());
-    this.worldMapPanel = new WorldMapPanel(this, () => this.noteOverlayClosed());
+    this.worldMapPanel = new WorldMapPanel(
+      this,
+      () => this.noteOverlayClosed(),
+      (destinationLandmarkId) => {
+        this.navigationDestinationLandmarkId = destinationLandmarkId;
+        this.refreshNavigationGuide();
+      },
+    );
     this.encyclopediaPanel = new EncyclopediaPanel(this, { onClose: () => this.noteOverlayClosed() });
     this.modStatusPanel = new ModStatusPanel(this, { onClose: () => this.noteOverlayClosed() });
     this.collectionPanel = new CollectionPanel(this, { onClose: () => this.noteOverlayClosed() });
@@ -800,6 +813,7 @@ export class GridScene extends Phaser.Scene {
       ));
     }
     this.updateQuestTrackerHud();
+    this.refreshNavigationGuide();
     this.updateInteractHint();
     this.triggerRegionEvents();
   }
@@ -1990,6 +2004,16 @@ export class GridScene extends Phaser.Scene {
       .setOrigin(0, 0)
       .setDepth(HUD_TEXT_DEPTH), 11);
 
+    this.navigationHintText = this.registerScaledText(this.add
+      .text(16, 65, '', {
+        fontFamily: UI.fontFamily,
+        fontSize: uiFontSize(10),
+        color: UI.textWarn,
+        wordWrap: { width: VIEW_WIDTH - 32 },
+      })
+      .setOrigin(0, 0)
+      .setDepth(HUD_TEXT_DEPTH), 10);
+
     this.mapNameText = this.registerScaledText(this.add
       .text(VIEW_WIDTH / 2, 14, map.data.name, {
         fontFamily: UI.fontFamily,
@@ -2084,6 +2108,60 @@ export class GridScene extends Phaser.Scene {
   private updateCoordsHud(): void {
     const name = this.playerDisplayName.length > 0 ? `${this.playerDisplayName} · ` : '';
     this.coordsText?.setText(`${name}位置 (${this.playerCol}, ${this.playerRow})`);
+  }
+
+  /** Rebuilds the selected landmark's local route and compact HUD instruction. */
+  private refreshNavigationGuide(): void {
+    const destinationLandmarkId = this.navigationDestinationLandmarkId;
+    const map = this.map;
+    const world = this.world;
+    const text = this.navigationHintText;
+    if (text === null) return;
+    if (destinationLandmarkId === null || map === null || world === null) {
+      text.setText('');
+      return;
+    }
+
+    const guide = resolveWorldNavigationGuide(
+      world.worldMap,
+      this.currentMapResourceId,
+      destinationLandmarkId,
+      this.knownKnowledgeNodeIds,
+      map,
+      { col: this.playerCol, row: this.playerRow },
+    );
+    if (guide.status === 'target-lost') {
+      this.navigationDestinationLandmarkId = null;
+      text.setText('行路目标已失效；可在 M 舆图重新选择。');
+      return;
+    }
+    if (guide.status === 'route-broken') {
+      this.navigationDestinationLandmarkId = null;
+      text.setText(`行路「${guide.destinationName}」当前无可行路线；可在 M 舆图重新规划。`);
+      return;
+    }
+
+    const directionNames = { north: '北', east: '东', south: '南', west: '西' } as const;
+    const runs = summarizePathRuns(guide.path).slice(0, 3)
+      .map((run) => `${directionNames[run.direction]}${run.steps}`);
+    const direction = runs.length > 0 ? `${runs.join('→')} · ` : '';
+    const steps = Math.max(0, guide.path.length - 1);
+    if (guide.status === 'at-gate') {
+      text.setText(`行路「${guide.destinationName}」· 已到「${guide.nextTransitionName ?? '关口'}」旁，按 E 通过。`);
+    } else if (guide.status === 'arrived') {
+      text.setText(`行路「${guide.destinationName}」· 已抵达附近。`);
+      this.navigationDestinationLandmarkId = null;
+    } else if (guide.nextTransitionName !== null) {
+      text.setText(`行路「${guide.destinationName}」· ${direction}${steps}格至「${guide.nextTransitionName}」旁。`);
+    } else {
+      text.setText(`行路「${guide.destinationName}」· ${direction}${steps}格。`);
+    }
+  }
+
+  /** Keeps route guidance below the variable-height tracked-quest line. */
+  private positionNavigationHint(): void {
+    if (this.questTrackerText === null || this.navigationHintText === null) return;
+    this.navigationHintText.setY(Math.max(65, this.questTrackerText.y + this.questTrackerText.height + 2));
   }
 
   // -------------------------------------------------------------------------
@@ -2604,7 +2682,16 @@ export class GridScene extends Phaser.Scene {
     }
     if (this.anyOverlayOpen()) return;
     if (this.map === null) return;
-    panel.open(world.worldMap, this.currentMapResourceId, this.map, this.playerCol, this.playerRow, this.knownKnowledgeNodeIds);
+    this.refreshNavigationGuide();
+    panel.open(
+      world.worldMap,
+      this.currentMapResourceId,
+      this.map,
+      this.playerCol,
+      this.playerRow,
+      this.knownKnowledgeNodeIds,
+      this.navigationDestinationLandmarkId,
+    );
     this.updateInteractHint();
   }
 
@@ -2859,6 +2946,7 @@ export class GridScene extends Phaser.Scene {
           this.updateQuestTrackerHud();
         });
       }
+      this.positionNavigationHint();
       return;
     }
     const trackedId = this.questJournal.trackedQuestId;
@@ -2866,12 +2954,14 @@ export class GridScene extends Phaser.Scene {
     const state = trackedId === null ? undefined : this.questJournal.states.get(trackedId);
     if (quest === undefined || state?.status !== 'active') {
       text.setText('');
+      this.positionNavigationHint();
       return;
     }
     const progress = quest.objectives.map((objective) =>
       `${objective.text} ${state.objectiveCounts.get(objective.id) ?? 0}/${objective.requiredCount}`,
     ).join(' · ');
     text.setText(`跟踪：${quest.name}　${progress}`).setColor(UI.textMuted);
+    this.positionNavigationHint();
   }
 
   /** B key: open the backpack while free, close it while it is open. */
@@ -3435,6 +3525,7 @@ export class GridScene extends Phaser.Scene {
     this.playerCol = targetCol;
     this.playerRow = targetRow;
     this.updateCoordsHud();
+    this.refreshNavigationGuide();
     this.updateInteractHint();
     const baseStepMinutes = this.clock?.calendar.actionCosts.stepMinutes ?? 0;
     const weatherStepMinutes = this.currentClimate()?.weather.stepMinutes ?? 0;
@@ -3543,6 +3634,7 @@ export class GridScene extends Phaser.Scene {
     this.updateCoordsHud();
     this.advanceTime(travelMinutes);
     this.refreshCompanionFollower(null);
+    this.refreshNavigationGuide();
     this.showRegionNotice(`已抵达「${destinationMap.data.name}」。`);
     this.triggerRegionEvents();
   }

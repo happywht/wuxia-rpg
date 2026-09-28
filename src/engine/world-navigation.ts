@@ -20,6 +20,8 @@ export interface WorldMapWaypoint {
   position: CellPosition;
   kind: WorldMapWaypointKind;
   approachRadius: number;
+  /** Stable lore id shared by this landmark's local and remote projections. */
+  destinationLandmarkId?: string;
   destinationRegionName?: string;
   regionRouteNames?: string[];
   nextTransitionName?: string;
@@ -67,6 +69,7 @@ export function buildWorldMapWaypoints(
       position: { col: landmark.col, row: landmark.row },
       kind: 'landmark',
       approachRadius: 2,
+      destinationLandmarkId: landmark.id,
     }));
   const crossings = world.transitions
     .filter((transition) => transition.from.mapResourceId === currentMapResourceId)
@@ -111,6 +114,7 @@ export function buildWorldMapWaypoints(
       position: { col: currentPosition.col, row: currentPosition.row },
       kind: 'remote-landmark',
       approachRadius: 0,
+      destinationLandmarkId: landmark.id,
       destinationRegionName: route.regionNames.at(-1),
       regionRouteNames: route.regionNames,
       nextTransitionName: firstLeg.transition.name,

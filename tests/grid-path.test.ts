@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import { type CellPosition, GridMap, parseGridMap } from '../src/engine/grid-map';
-import { findGridPath, summarizePathRuns } from '../src/engine/grid-path';
+import { findGridPath, findGridPathToAdjacentCell, summarizePathRuns } from '../src/engine/grid-path';
 
 const TILE_TYPES = {
   '.': { color: '#000000', solid: false },
@@ -161,6 +161,34 @@ describe('deterministic four-way grid pathfinding', () => {
   it('returns the start alone when already at the goal', () => {
     const map = makeMap(['...', '...']);
     expect(findGridPath(map, { col: 1, row: 1 }, { col: 1, row: 1 })).toEqual([{ col: 1, row: 1 }]);
+  });
+
+  it('routes to a reachable interaction cell beside a target and stops there', () => {
+    const map = makeMap([
+      '.....',
+      '.....',
+      '.....',
+    ]);
+    const target = { col: 2, row: 1 };
+    const path = findGridPathToAdjacentCell(map, { col: 0, row: 1 }, target);
+    expect(path).toEqual([
+      { col: 0, row: 1 },
+      { col: 1, row: 1 },
+    ]);
+    expect(path!.at(-1)).not.toEqual(target);
+    expect(Math.abs(path!.at(-1)!.col - target.col) + Math.abs(path!.at(-1)!.row - target.row)).toBe(1);
+  });
+
+  it('treats an adjacent start as ready and rejects a target with no open approach cell', () => {
+    const adjacentMap = makeMap(['...', '...']);
+    expect(findGridPathToAdjacentCell(adjacentMap, { col: 1, row: 0 }, { col: 1, row: 1 }))
+      .toEqual([{ col: 1, row: 0 }]);
+    const blocked = makeMap([
+      '###',
+      '#.#',
+      '###',
+    ]);
+    expect(findGridPathToAdjacentCell(blocked, { col: 1, row: 1 }, { col: 1, row: 1 })).toBeNull();
   });
 
   it('routes across the real mist-ferry map from spawn to the reedbank landing cell', () => {

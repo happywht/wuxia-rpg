@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 
 import { type CellPosition, type GridMap } from '../engine/grid-map';
-import { findGridPath, summarizePathRuns } from '../engine/grid-path';
+import { findGridPath, findGridPathToAdjacentCell, summarizePathRuns } from '../engine/grid-path';
 import { clampMapViewport, createMapViewport, panMapViewport, zoomMapViewport, type MapViewportBounds, type MapViewportState } from '../engine/map-viewport';
 import { gridMapArtTextureKey } from '../engine/grid-map-renderer';
 import { type WorldMapAssembly } from '../engine/world-map';
@@ -38,6 +38,7 @@ export class WorldMapPanel {
   private readonly container: Phaser.GameObjects.Container;
   private readonly bindings: Binding[] = [];
   private readonly onClose?: () => void;
+  private readonly onDestinationPicked?: (destinationLandmarkId: string | null) => void;
   private readonly mapBounds: MapViewportBounds = { x: 122, y: 128, width: 520, height: 298 };
   private openState = false;
   private mapImage: Phaser.GameObjects.Image | null = null;
@@ -139,9 +140,14 @@ export class WorldMapPanel {
     this.zoom(point.x, point.y, deltaY > 0 ? 0.88 : 1.12);
   };
 
-  constructor(scene: Phaser.Scene, onClose?: () => void) {
+  constructor(
+    scene: Phaser.Scene,
+    onClose?: () => void,
+    onDestinationPicked?: (destinationLandmarkId: string | null) => void,
+  ) {
     this.scene = scene;
     this.onClose = onClose;
+    this.onDestinationPicked = onDestinationPicked;
     this.container = scene.add.container(0, 0).setVisible(false).setDepth(1100).setScrollFactor(0);
   }
 
@@ -154,6 +160,7 @@ export class WorldMapPanel {
     playerCol: number,
     playerRow: number,
     knownKnowledgeNodeIds: ReadonlySet<string> = new Set(),
+    selectedDestinationLandmarkId: string | null = null,
   ): void {
     if (this.openState) return;
     this.openState = true;
@@ -170,6 +177,10 @@ export class WorldMapPanel {
     this.selectedWaypointId = null;
     this.focusedWaypointIndex = -1;
     this.render(worldMap, currentMapResourceId, map);
+    const selectedProjection = selectedDestinationLandmarkId === null
+      ? undefined
+      : this.waypoints.find((waypoint) => waypoint.destinationLandmarkId === selectedDestinationLandmarkId);
+    if (selectedProjection !== undefined) this.selectWaypoint(selectedProjection.id);
   }
 
   close(): void {
@@ -418,13 +429,14 @@ export class WorldMapPanel {
     const waypoint = this.waypoints.find((candidate) => candidate.id === id);
     const map = this.activeMap;
     if (waypoint === undefined || map === null) return;
-    this.routeCells = findGridPath(
-      map,
-      { col: this.playerCol, row: this.playerRow },
-      waypoint.position,
-      { approachRadius: waypoint.approachRadius },
-    );
+    const start = { col: this.playerCol, row: this.playerRow };
+    const approachToGate = waypoint.kind === 'transition' ||
+      waypoint.kind === 'remote-region' || waypoint.kind === 'remote-landmark';
+    this.routeCells = approachToGate
+      ? findGridPathToAdjacentCell(map, start, waypoint.position)
+      : findGridPath(map, start, waypoint.position, { approachRadius: waypoint.approachRadius });
     this.selectedWaypointId = id;
+    this.onDestinationPicked?.(waypoint.destinationLandmarkId ?? null);
     const kindLabel = waypointLabel(waypoint);
     this.selectedNameText?.setText(`${kindLabel}：${waypoint.name}`);
     if (this.routeCells === null) {
@@ -432,11 +444,11 @@ export class WorldMapPanel {
       this.routeDirectionsText?.setText('请从别处重新规划。');
     } else {
       const steps = Math.max(0, this.routeCells.length - 1);
-      const arrivedAtTarget = this.routeCells.at(-1)?.col === waypoint.position.col &&
-        this.routeCells.at(-1)?.row === waypoint.position.row;
       this.routeDistanceText?.setText(waypoint.kind === 'remote-landmark' || waypoint.kind === 'remote-region'
-        ? `首段步行 ${steps} 格至「${waypoint.nextTransitionName ?? '下一关口'}」`
-        : `步行 ${steps} 格${arrivedAtTarget ? '' : ' · 至最近可行停靠点'}`);
+        ? `首段步行 ${steps} 格至「${waypoint.nextTransitionName ?? '下一关口'}」旁`
+        : waypoint.kind === 'transition'
+          ? `步行 ${steps} 格到关口旁，按 E 通过`
+          : `步行 ${steps} 格 · 至地标或最近可行停靠点`);
       this.routeDirectionsText?.setText(formatRouteDirections(this.routeCells));
     }
     if (waypoint.kind === 'remote-landmark' || waypoint.kind === 'remote-region') {
