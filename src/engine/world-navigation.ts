@@ -1,4 +1,5 @@
 import type { CellPosition } from './grid-map';
+import type { QuestNavigationTarget } from './quest-navigation';
 import {
   selectVisibleWorldLandmarks,
   type WorldLandmarkCategory,
@@ -7,6 +8,9 @@ import {
 import { findWorldTravelRoute } from './world-travel';
 
 export type WorldMapWaypointKind = 'landmark' | 'transition' | 'remote-region' | 'remote-landmark';
+
+/** Prefix of every stable landmark destination selector. */
+export const LANDMARK_DESTINATION_PREFIX = 'landmark:';
 
 /**
  * A map panel destination. `position` is always in the current map's local
@@ -22,6 +26,14 @@ export interface WorldMapWaypoint {
   approachRadius: number;
   /** Stable lore id shared by this landmark's local and remote projections. */
   destinationLandmarkId?: string;
+  /**
+   * Unified runtime destination selector: `landmark:<id>` for stable atlas
+   * pins or `quest:<questId>` for projected active-quest targets. The quest
+   * selector stays stable while its active objective advances. Absent on pure
+   * route stops (crossings/regions), which clear the
+   * current destination when picked. Never persisted to saves.
+   */
+  destinationId?: string;
   destinationRegionName?: string;
   regionRouteNames?: string[];
   nextTransitionName?: string;
@@ -47,17 +59,60 @@ export function cycleWorldWaypointIndex(currentIndex: number, count: number, ste
 }
 
 /**
+ * Projects one resolved active-quest objective target into a map waypoint.
+ * Same-map targets pin their own cell; remote targets pin the first gate of
+ * the routed itinerary, mirroring remote-landmark semantics. Returns null
+ * when no directed route reaches the target's map.
+ */
+export function buildQuestObjectiveWaypoint(
+  world: WorldMapAssembly,
+  currentMapResourceId: string,
+  target: QuestNavigationTarget,
+): WorldMapWaypoint | null {
+  const route = findWorldTravelRoute(world, currentMapResourceId, target.mapResourceId);
+  if (route === null) return null;
+  const firstLeg = route.legs[0];
+  if (firstLeg === undefined) {
+    return {
+      id: target.id,
+      name: target.name,
+      category: 'route',
+      position: { col: target.col, row: target.row },
+      kind: 'landmark',
+      approachRadius: target.approachRadius,
+      destinationId: target.id,
+    };
+  }
+  return {
+    id: target.id,
+    name: target.name,
+    category: 'route',
+    position: { col: firstLeg.transition.from.col, row: firstLeg.transition.from.row },
+    kind: 'remote-landmark',
+    approachRadius: 0,
+    destinationId: target.id,
+    destinationRegionName: route.regionNames.at(-1),
+    regionRouteNames: route.regionNames,
+    nextTransitionName: firstLeg.transition.name,
+  };
+}
+
+/**
  * Projects current-region landmarks/crossings and reachable, discovered
  * remote landmarks into destinations that can be reached from the current
  * grid. Knowledge filtering occurs before remote region names are inspected
  * or copied into the projection. Remote region names are projected only when
  * they are the direct destination of a visible outgoing crossing; deeper
  * route regions are left for an explicitly discovered landmark itinerary.
+ * Supplemental quest targets append after the atlas pins: they are runtime
+ * projections of already-accepted quests and intentionally bypass the
+ * knowledge gate without ever revealing locked or unaccepted content.
  */
 export function buildWorldMapWaypoints(
   world: WorldMapAssembly,
   currentMapResourceId: string,
   knownKnowledgeNodeIds: ReadonlySet<string>,
+  supplementalQuestTargets: readonly QuestNavigationTarget[] = [],
 ): WorldMapWaypoint[] {
   const visibleLandmarks = selectVisibleWorldLandmarks(world.landmarks, knownKnowledgeNodeIds);
   const currentLandmarks = visibleLandmarks
@@ -70,6 +125,7 @@ export function buildWorldMapWaypoints(
       kind: 'landmark',
       approachRadius: 2,
       destinationLandmarkId: landmark.id,
+      destinationId: `${LANDMARK_DESTINATION_PREFIX}${landmark.id}`,
     }));
   const crossings = world.transitions
     .filter((transition) => transition.from.mapResourceId === currentMapResourceId)
@@ -115,10 +171,14 @@ export function buildWorldMapWaypoints(
       kind: 'remote-landmark',
       approachRadius: 0,
       destinationLandmarkId: landmark.id,
+      destinationId: `${LANDMARK_DESTINATION_PREFIX}${landmark.id}`,
       destinationRegionName: route.regionNames.at(-1),
       regionRouteNames: route.regionNames,
       nextTransitionName: firstLeg.transition.name,
     });
   }
-  return [...currentLandmarks, ...crossings, ...remoteRegions, ...remoteLandmarks];
+  const questWaypoints = supplementalQuestTargets
+    .map((target) => buildQuestObjectiveWaypoint(world, currentMapResourceId, target))
+    .filter((waypoint): waypoint is WorldMapWaypoint => waypoint !== null);
+  return [...currentLandmarks, ...crossings, ...remoteRegions, ...remoteLandmarks, ...questWaypoints];
 }

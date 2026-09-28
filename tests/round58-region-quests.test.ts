@@ -120,7 +120,9 @@ describe('Round 58 regional quest chains', () => {
         point.mapResourceId === event.mapResourceId && point.col === event.col && point.row === event.row,
       );
       expect(landmark).toBeDefined();
-      expect(landmark?.discoveryNodeId).toBeUndefined();
+      // Round 60 gates both landing landmarks behind the same knowledge node
+      // their first-visit event teaches; accepted quests project the pin.
+      expect(landmark?.discoveryNodeId).toBe(event.discoverKnowledgeNodeId);
       expect(map.canEnter(event.col, event.row)).toBe(true);
       expect(findGridPath(map, map.playerStart, event)).not.toBeNull();
     }

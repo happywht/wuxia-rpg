@@ -58,8 +58,9 @@ const LABELS = {
   accept: 'Enter 接取',
   track: 'Enter 跟踪此差事',
   untrack: 'Enter 取消跟踪',
+  navigate: 'N 导航至目标',
   abandon: 'A 放弃任务',
-  hint: '↑/↓ 选择 · Enter 接取/跟踪 · A 放弃 · Esc 关闭',
+  hint: '↑/↓ 选择 · Enter 接取/跟踪 · N 导航 · A 放弃 · Esc 关闭',
   noSelection: '选择一项差事查看详情。',
 } as const;
 
@@ -80,6 +81,13 @@ export interface QuestPanelModel {
 export interface QuestPanelOptions {
   onClose?: () => void;
   onUpdate?: (update: QuestUpdateResult) => void;
+  /**
+   * Round 60 N-key navigation: resolves one active quest's next unfinished
+   * spatial objective. The scene answers whether navigation started (the
+   * journal panel then closes in favour of the world map) or returns a
+   * readable reason to keep showing here.
+   */
+  onNavigateQuest?: (questId: string) => { ok: boolean; message: string };
 }
 
 type PanelKeyBinding = { key: Phaser.Input.Keyboard.Key; handler: () => void };
@@ -111,6 +119,7 @@ export class QuestPanel {
   private readonly bindings: PanelKeyBinding[] = [];
   private readonly onClose?: () => void;
   private readonly onUpdate?: (update: QuestUpdateResult) => void;
+  private readonly onNavigateQuest?: (questId: string) => { ok: boolean; message: string };
   private model: QuestPanelModel | null = null;
   private selection = 0;
   private status: string | null = null;
@@ -120,6 +129,7 @@ export class QuestPanel {
     this.scene = scene;
     this.onClose = options.onClose;
     this.onUpdate = options.onUpdate;
+    this.onNavigateQuest = options.onNavigateQuest;
     this.container = scene.add.container(0, 0).setVisible(false).setDepth(1200);
   }
 
@@ -163,6 +173,7 @@ export class QuestPanel {
       [KeyCodes.DOWN, () => this.moveSelection(1)],
       [KeyCodes.S, () => this.moveSelection(1)],
       [KeyCodes.ENTER, () => this.confirm()],
+      [KeyCodes.N, () => this.navigateSelected()],
       [KeyCodes.A, () => this.abandonSelected()],
       [KeyCodes.ESC, () => this.close()],
     ];
@@ -230,6 +241,21 @@ export class QuestPanel {
       this.status = state?.status === 'completed' ? '这项差事已完成' : '这项差事已结束';
     }
     this.render();
+  }
+
+  /**
+   * N key: hand the selected active quest to the scene's objective resolver.
+   * A successful answer closes this panel (the world map takes over); a
+   * failure keeps the panel open with the scene's readable reason.
+   */
+  private navigateSelected(): void {
+    const quest = this.selectedQuest();
+    if (quest === undefined || this.onNavigateQuest === undefined) return;
+    const outcome = this.onNavigateQuest(quest.id);
+    if (!outcome.ok) {
+      this.status = outcome.message;
+      this.render();
+    }
   }
 
   private abandonSelected(): void {
@@ -348,6 +374,7 @@ export class QuestPanel {
           10,
           UI.muted,
         );
+        this.addText(LABELS.navigate, left + PADDING + 150, actionY, 10, UI.muted);
       }
     }
 

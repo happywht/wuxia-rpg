@@ -168,23 +168,26 @@ describe('Round 53 landmark discovery gating', () => {
 
     const undiscovered = selectVisibleWorldLandmarks(assembled.landmarks, new Set());
     const undiscoveredJson = JSON.stringify(undiscovered);
-    expect(undiscovered).toHaveLength(6);
+    expect(undiscovered).toHaveLength(4);
     expect(undiscoveredJson).not.toContain('芦岸登船点');
     expect(undiscoveredJson).not.toContain('landmark.reedbank-landing');
     expect(undiscoveredJson).not.toContain('place.reedbank');
     expect(undiscoveredJson).not.toContain('旧渠石闸');
     expect(undiscoveredJson).not.toContain('北岬水尺');
     expect(undiscoveredJson).not.toContain('南湾回水池');
+    // Round 60 gates the two R58 landing landmarks behind their first-visit nodes.
+    expect(undiscoveredJson).not.toContain('芦桥集');
+    expect(undiscoveredJson).not.toContain('南麓聚落');
 
     const discovered = selectVisibleWorldLandmarks(assembled.landmarks, new Set(['place.reedbank']));
-    expect(discovered).toHaveLength(7);
+    expect(discovered).toHaveLength(5);
     expect(discovered.find(({ id }) => id === 'landmark.reedbank-landing')?.name).toBe('芦岸登船点');
 
     const bothNewSurveySites = selectVisibleWorldLandmarks(
       assembled.landmarks,
       new Set(['place.reedbank', 'place.mist-north-cap', 'place.mist-south-pool']),
     );
-    expect(bothNewSurveySites).toHaveLength(9);
+    expect(bothNewSurveySites).toHaveLength(7);
     expect(bothNewSurveySites.map(({ id }) => id)).toContain('landmark.mist-north-cap');
     expect(bothNewSurveySites.map(({ id }) => id)).toContain('landmark.mist-south-pool');
   });

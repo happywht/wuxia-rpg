@@ -4,6 +4,7 @@ import { type CellPosition, type GridMap } from '../engine/grid-map';
 import { findGridPath, findGridPathToAdjacentCell, summarizePathRuns } from '../engine/grid-path';
 import { clampMapViewport, createMapViewport, panMapViewport, zoomMapViewport, type MapViewportBounds, type MapViewportState } from '../engine/map-viewport';
 import { gridMapArtTextureKey } from '../engine/grid-map-renderer';
+import { QUEST_NAVIGATION_ID_PREFIX, type QuestNavigationTarget } from '../engine/quest-navigation';
 import { type WorldMapAssembly } from '../engine/world-map';
 import { buildWorldMapWaypoints, cycleWorldWaypointIndex, normalizeWorldMapPointer, type WorldMapWaypoint } from '../engine/world-navigation';
 import { uiFontSize } from './settings';
@@ -38,7 +39,7 @@ export class WorldMapPanel {
   private readonly container: Phaser.GameObjects.Container;
   private readonly bindings: Binding[] = [];
   private readonly onClose?: () => void;
-  private readonly onDestinationPicked?: (destinationLandmarkId: string | null) => void;
+  private readonly onDestinationPicked?: (destinationId: string | null) => void;
   private readonly mapBounds: MapViewportBounds = { x: 122, y: 128, width: 520, height: 298 };
   private openState = false;
   private mapImage: Phaser.GameObjects.Image | null = null;
@@ -143,7 +144,7 @@ export class WorldMapPanel {
   constructor(
     scene: Phaser.Scene,
     onClose?: () => void,
-    onDestinationPicked?: (destinationLandmarkId: string | null) => void,
+    onDestinationPicked?: (destinationId: string | null) => void,
   ) {
     this.scene = scene;
     this.onClose = onClose;
@@ -160,7 +161,8 @@ export class WorldMapPanel {
     playerCol: number,
     playerRow: number,
     knownKnowledgeNodeIds: ReadonlySet<string> = new Set(),
-    selectedDestinationLandmarkId: string | null = null,
+    selectedDestinationId: string | null = null,
+    supplementalQuestTargets: readonly QuestNavigationTarget[] = [],
   ): void {
     if (this.openState) return;
     this.openState = true;
@@ -173,13 +175,18 @@ export class WorldMapPanel {
     this.scene.input.on('pointerup', this.pointerUp);
     this.scene.input.on('wheel', this.pointerWheel);
     this.activeMap = map;
-    this.waypoints = buildWorldMapWaypoints(worldMap, currentMapResourceId, knownKnowledgeNodeIds);
+    this.waypoints = buildWorldMapWaypoints(
+      worldMap,
+      currentMapResourceId,
+      knownKnowledgeNodeIds,
+      supplementalQuestTargets,
+    );
     this.selectedWaypointId = null;
     this.focusedWaypointIndex = -1;
     this.render(worldMap, currentMapResourceId, map);
-    const selectedProjection = selectedDestinationLandmarkId === null
+    const selectedProjection = selectedDestinationId === null
       ? undefined
-      : this.waypoints.find((waypoint) => waypoint.destinationLandmarkId === selectedDestinationLandmarkId);
+      : this.waypoints.find((waypoint) => waypoint.destinationId === selectedDestinationId);
     if (selectedProjection !== undefined) this.selectWaypoint(selectedProjection.id);
   }
 
@@ -434,9 +441,11 @@ export class WorldMapPanel {
       waypoint.kind === 'remote-region' || waypoint.kind === 'remote-landmark';
     this.routeCells = approachToGate
       ? findGridPathToAdjacentCell(map, start, waypoint.position)
-      : findGridPath(map, start, waypoint.position, { approachRadius: waypoint.approachRadius });
+      : waypoint.approachRadius === 1
+        ? findGridPathToAdjacentCell(map, start, waypoint.position)
+        : findGridPath(map, start, waypoint.position, { approachRadius: waypoint.approachRadius });
     this.selectedWaypointId = id;
-    this.onDestinationPicked?.(waypoint.destinationLandmarkId ?? null);
+    this.onDestinationPicked?.(waypoint.destinationId ?? null);
     const kindLabel = waypointLabel(waypoint);
     this.selectedNameText?.setText(`${kindLabel}：${waypoint.name}`);
     if (this.routeCells === null) {
@@ -521,6 +530,7 @@ export class WorldMapPanel {
 }
 
 function waypointLabel(waypoint: WorldMapWaypoint): string {
+  if (waypoint.destinationId?.startsWith(QUEST_NAVIGATION_ID_PREFIX)) return '差事';
   if (waypoint.kind === 'transition') return '关口';
   if (waypoint.kind === 'remote-region') return '区域';
   if (waypoint.kind === 'remote-landmark') return '远方';

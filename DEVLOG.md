@@ -4,6 +4,38 @@
 
 ---
 
+## Round 60 — 差事目标导航与跑图提示（2026-09-29，已完成）
+
+### 计划与实现
+
+- 开工前计划写入 `iterations/round-60/plan.md`：让玩家从 Q 差事日志把进行中差事的下一项未完成空间目标设为舆图行路目标，记录用户故事、验收标准、三个子任务、文件范围、风险与约 60–90 分钟人类工程师工时。
+- 新增 Phaser-free 解析器 `src/engine/quest-navigation.ts`：按声明顺序取活动差事第一个未完成的空间目标（`talkToNpc`/`defeatEncounter`/`discoverKnowledge`），跳过非空间的 `collectItem` 且不伪造坐标；人物目标按「当前地图运行时布置 → 当前时段编译布置 → 基础布置」三级优先解析，遭遇目标取装配布置位置，见闻目标先匹配世界图事件（触发点优先于同节点地标，同位时附带地标 id）再匹配发现门槛地标；目标缺失时返回 `unknown-quest`/`not-active`/`no-spatial-objective`/`unresolved-target` 四种可读原因。引擎不写任何具体人物、地点或剧情。
+- 导航层扩展：`world-navigation-guidance.ts` 提取通用 `resolveCellNavigationGuide`（地标版成为其薄封装，跨区首关口/碰撞寻路/区域名逻辑共用）；`world-navigation.ts` 为航点新增统一目的地选择器 `destinationId`（`landmark:<id>` 稳定命名空间 / `quest:<questId>` 运行期命名空间；同一差事跨阶段保持选择稳定）并新增 `buildQuestObjectiveWaypoint` 投影（同图目标钉自身格，跨图目标钉首道关口，不可达不投影）。
+- UI/场景接线：`quest-ui.ts` 活动差事绑定 N 导航（Q 面板打开期间主层 N 仍由 `anyOverlayOpen` 防护互不干扰）并把场景答复的原因显示在面板状态行；`world-map-ui.ts` 选择回调改传 `destinationId`、重开时按其恢复选中，差事航点在侧栏显示「差事」金色标签；`grid-scene.ts` 以 `navigationDestinationId` 取代地标专用字段，`resolveNavigationGuide` 按前缀分发到地标/差事两路解析（差事路每次刷新用当前时段与实际布置重算），`navigateQuestObjective` 完成跟踪→投影→关 Q→开 M 的整链，M 舆图打开时附带当前活动差事导航目标的补充标点；`applyQuestUpdate` 与 `syncNpcSchedule` 末尾新增行路重算（目标完成/差事结束/时段切换即时生效），移动与跨区既有刷新点不变。
+- 数据门槛：`data/base/world/world-map.json` 为 `landmark.mist-willow-market` 与 `landmark.south-hamlet` 补挂与其首访事件相同的知识节点（`place.mist-willow-market`/`place.south-hamlet`），未获知前不再常显；已接取差事的目标由运行期投影引导，锁定/未接取差事不投影。
+- 测试：新增 `tests/quest-navigation.test.ts`（11 项，全部加载真实世界图与两张百格地图）：活动状态过滤、声明顺序与进度跳过、采集目标跳过与 collect-only 无目标、NPC 三级位置优先、遭遇/见闻匹配（含事件优先于地标、同位附带地标 id、跨图遭遇）、数据缺失 unresolved、id 命名空间、知识门槛旁路的差事 pin 投影（不夹带其他隐藏内容）、同图/跨图/无路三种航点投影、本地碰撞寻路 guide 与跨区首关口 guide 集成。既有 `world-navigation.test.ts`、`world-navigation-guidance.test.ts`、`round52-map-landmarks.test.ts`、`round58-region-quests.test.ts` 共 6 处断言按新门槛收紧更新（例如芦桥集空知识集下不可见、可见地标计数 6→4、R58 断言升级为「地标门槛与首访事件节点一致」），未放宽任何运行时校验。
+- 文档：更新 `docs/PLAYER-GUIDE.md`（Q 面板 N 导航说明、M 舆图差事标点、常见问题新增「按 N 没有导航」条目、状态行升至 Round 60）与 `CHANGELOG.md`、`ROADMAP.md`、本日志。
+
+### 阶段验证
+
+- `npm run typecheck`：通过（`tsc --noEmit`；首轮报 5 处类型错误——夹具笔误 `PlacedNpcs`、find 谓词不缩窄 collectItem、guide 联合类型 spread、场景字段改名残留、未用 import，逐一修复后通过）。
+- `npx vitest run tests/quest-navigation.test.ts`：11 项用例通过（首轮 3 处失败为测试自身问题——`makeJournal` 参数缺默认值、一处 filter 条件写反、跨区起点选在关口邻格导致 at-gate；修正后通过）。
+- `npm test`：30 个测试文件 / 237 项用例全通过（R59 基线 29 文件/226 用例；补门槛后首轮 4 文件 6 项既有断言失败，全部按新可见性收紧更新）。
+- `npm run validate:data`：通过（manifest 与 26 个基础资源 Schema）。
+- `npm run inspect:mods`：通过（26 项资源基础层零问题）。
+- 独立代码复核修正了三项边界：NPC/遭遇格虽在静态地形上可行，但运行时被占用，所以舆图和 HUD 都改为走到真实相邻格；见闻目标必须走到实际触发格；任务选择器在同一差事推进到下一阶段时保持稳定，M 重开仍能选中新目标。抵达人物/遭遇后保留标点，直到交互真正推进目标。专项回归 `npx vitest run tests/quest-navigation.test.ts tests/world-navigation.test.ts tests/world-navigation-guidance.test.ts tests/round52-map-landmarks.test.ts tests/round58-region-quests.test.ts`：5 个文件 / 34 项全通过。
+- 独立 `npm run package:release` 期间，类型检查分别发现并修复了新测试里已失用的导入，以及到达状态分支中目的地可能为空的窄化问题；最终整条命令通过：Schema/MOD 检查、`tsc --noEmit`、30 个测试文件 / 237 项、两项文档审计、Vite 生产构建、发行包解包及 69 个文件哈希烟测均通过；最终包 SHA-256 为 `403b26a02617852a426ed657b93105bb47ead10429f7348a5b36b92d17772c67`。主 bundle 1,930.37 kB（gzip 509.96 kB）仍触发 Vite 既有的 500 kB 提示，构建与烟测通过。
+- 最终 `git diff --check`：通过（见提交前复核）。
+
+### 边界与未做
+
+- 未改动 `.serena/`（轮前既有的未跟踪目录）。
+- 未改动存档格式：差事目的地选择器只存于运行期字段，`SaveSnapshotV1` 零变化。
+- 未做浏览器人工试玩（本轮全部以真实资料的 Phaser-free 回归验证解析、投影与导引；按 N 的面板联动逻辑与既有 Q/M 面板键位路径一致）。
+- 见闻导航指向触发事件的格子，事件自身的时段/天气条件不在导航层判断（玩家到达后按既有事件规则触发，手册已说明）。
+
+---
+
 ## Round 59 — 区域差事对话回声与世界设定校正（2026-09-29，已完成）
 
 ### 计划与实现

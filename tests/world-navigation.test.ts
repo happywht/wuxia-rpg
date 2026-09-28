@@ -51,7 +51,9 @@ describe('data-driven world map waypoints', () => {
       name: '雾雨渡口',
       nextTransitionName: '石阶渡口',
     }));
-    expect(destinations.some(({ id }) => id === 'remote:landmark.mist-willow-market')).toBe(true);
+    // Round 60 gates the market behind its first-visit knowledge node.
+    expect(destinations.some(({ id }) => id === 'remote:landmark.mist-willow-market')).toBe(false);
+    expect(visibleJson).not.toContain('芦桥集');
     expect(destinations.some(({ id }) => id === 'remote:landmark.reedbank-landing')).toBe(false);
     expect(destinations.some(({ id }) => id === 'remote:landmark.mist-old-sluice')).toBe(false);
     expect(visibleJson).not.toContain('芦岸登船点');
@@ -59,6 +61,19 @@ describe('data-driven world map waypoints', () => {
     expect(visibleJson).not.toContain('place.reedbank');
     expect(visibleJson).not.toContain('landmark.mist-old-sluice');
     expect(visibleJson).not.toContain('place.mist-sluice');
+
+    const marketKnown = buildWorldMapWaypoints(
+      makeWorld(),
+      'map.round-01-grid',
+      new Set(['place.mist-willow-market']),
+    );
+    const remoteMarket = marketKnown.find(({ id }) => id === 'remote:landmark.mist-willow-market');
+    expect(remoteMarket).toMatchObject({
+      kind: 'remote-landmark',
+      name: '芦桥集',
+      destinationLandmarkId: 'landmark.mist-willow-market',
+      destinationId: 'landmark:landmark.mist-willow-market',
+    });
   });
 
   it('does not project undisclosed regions beyond the directly known crossing', () => {

@@ -4,7 +4,7 @@
 
 - 设计文档：`docs/GDD.md`
 - 逐轮路线图（R00–R59）：`ROADMAP.md`
-- 当前进度：**Round 59 已完成；下一轮 Round 60**
+- 当前进度：**Round 60 已完成；下一轮 Round 61**
 
 ## 范围
 

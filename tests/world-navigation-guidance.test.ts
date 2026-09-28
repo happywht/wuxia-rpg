@@ -37,7 +37,7 @@ describe('cross-region landmark guidance', () => {
       world.worldMap,
       'map.round-01-grid',
       'landmark.mist-willow-market',
-      new Set(),
+      new Set(['place.mist-willow-market']),
       startingMap,
       startingMap.playerStart,
     );
@@ -57,7 +57,7 @@ describe('cross-region landmark guidance', () => {
       world.worldMap,
       'map.round-10-mist-ferry',
       'landmark.mist-willow-market',
-      new Set(),
+      new Set(['place.mist-willow-market']),
       ferryMap,
       { col: 1, row: 4 },
     );
@@ -84,7 +84,7 @@ describe('cross-region landmark guidance', () => {
       world.worldMap,
       'map.round-01-grid',
       'landmark.mist-willow-market',
-      new Set(),
+      new Set(['place.mist-willow-market']),
       map,
       start,
     );
@@ -108,13 +108,23 @@ describe('cross-region landmark guidance', () => {
     expect(hidden).toEqual({ status: 'target-lost' });
     expect(JSON.stringify(hidden)).not.toContain('南湾苇池');
 
+    const marketGated = resolveWorldNavigationGuide(
+      world.worldMap,
+      'map.round-01-grid',
+      'landmark.mist-willow-market',
+      new Set(),
+      map,
+      map.playerStart,
+    );
+    expect(marketGated).toEqual({ status: 'target-lost' });
+
     world.worldMap.transitions = world.worldMap.transitions
       .filter((transition) => transition.id !== 'gate.trial-to-ferry');
     const broken = resolveWorldNavigationGuide(
       world.worldMap,
       'map.round-01-grid',
       'landmark.mist-willow-market',
-      new Set(),
+      new Set(['place.mist-willow-market']),
       map,
       map.playerStart,
     );

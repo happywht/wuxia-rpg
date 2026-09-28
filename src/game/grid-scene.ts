@@ -177,7 +177,19 @@ import {
 import { ModStatusPanel } from './mod-status-ui';
 import { UI_FONT_FAMILY } from './ui-theme';
 import { summarizePathRuns } from '../engine/grid-path';
-import { resolveWorldNavigationGuide } from '../engine/world-navigation-guidance';
+import {
+  QUEST_NAVIGATION_ID_PREFIX,
+  type QuestNavigationNoTargetReason,
+  type QuestNavigationResult,
+  type QuestNavigationTarget,
+  resolveQuestNavigationTarget,
+} from '../engine/quest-navigation';
+import { LANDMARK_DESTINATION_PREFIX } from '../engine/world-navigation';
+import {
+  resolveCellNavigationGuide,
+  resolveWorldNavigationGuide,
+  type WorldNavigationGuide,
+} from '../engine/world-navigation-guidance';
 import { type GridStartupData } from './menu-scene';
 import { subscribeDataChanges, type DataChangeBatch, type UnsubscribeDataChanges } from './data-hot-reload';
 import {
@@ -267,8 +279,12 @@ export class GridScene extends Phaser.Scene {
   private map: GridMap | null = null;
   private world: LoadedWorld | null = null;
   private currentMapResourceId = '';
-  /** Stable selected landmark for this live run; guidance paths are recomputed. */
-  private navigationDestinationLandmarkId: string | null = null;
+  /**
+   * Stable destination selector for this live run (`landmark:<id>` or a
+   * runtime `quest:<questId>` projection); guidance paths are
+   * recomputed and never persisted to saves.
+   */
+  private navigationDestinationId: string | null = null;
   private mapOrigin = new Phaser.Math.Vector2(0, 0);
   private mapLayer: Phaser.GameObjects.Container | null = null;
   private npcLayer: Phaser.GameObjects.Container | null = null;
@@ -550,7 +566,7 @@ export class GridScene extends Phaser.Scene {
     this.children.removeAll(true); // Drop the transient loading hint.
     this.scaledTextTargets.length = 0;
     this.world = world;
-    this.navigationDestinationLandmarkId = null;
+    this.navigationDestinationId = null;
     this.achievementState = restoredRun?.achievementState ?? createAchievementRunState();
     this.arenaRecords.clear();
     for (const record of restoredRun?.arenaRecords ?? []) {
@@ -768,6 +784,7 @@ export class GridScene extends Phaser.Scene {
     this.questPanel = new QuestPanel(this, {
       onClose: () => this.noteOverlayClosed(),
       onUpdate: (update) => this.applyQuestUpdate(update),
+      onNavigateQuest: (questId) => this.navigateQuestObjective(questId),
     });
     this.pauseMenu = new PauseMenuPanel(this, {
       storage: this.storage,
@@ -796,8 +813,8 @@ export class GridScene extends Phaser.Scene {
     this.worldMapPanel = new WorldMapPanel(
       this,
       () => this.noteOverlayClosed(),
-      (destinationLandmarkId) => {
-        this.navigationDestinationLandmarkId = destinationLandmarkId;
+      (destinationId) => {
+        this.navigationDestinationId = destinationId;
         this.refreshNavigationGuide();
       },
     );
@@ -1875,6 +1892,8 @@ export class GridScene extends Phaser.Scene {
     this.syncNpcVisuals(animate);
     this.refreshCompanionFollower(null);
     this.updateInteractHint();
+    // A period change may have moved a navigation target NPC: re-resolve.
+    this.refreshNavigationGuide();
   }
 
   /** Reapplies the current schedule after a partner joins or leaves. */
@@ -2110,33 +2129,27 @@ export class GridScene extends Phaser.Scene {
     this.coordsText?.setText(`${name}位置 (${this.playerCol}, ${this.playerRow})`);
   }
 
-  /** Rebuilds the selected landmark's local route and compact HUD instruction. */
+  /** Rebuilds the selected destination's local route and compact HUD instruction. */
   private refreshNavigationGuide(): void {
-    const destinationLandmarkId = this.navigationDestinationLandmarkId;
+    const destinationId = this.navigationDestinationId;
     const map = this.map;
     const world = this.world;
     const text = this.navigationHintText;
     if (text === null) return;
-    if (destinationLandmarkId === null || map === null || world === null) {
+    if (destinationId === null || map === null || world === null) {
       text.setText('');
       return;
     }
 
-    const guide = resolveWorldNavigationGuide(
-      world.worldMap,
-      this.currentMapResourceId,
-      destinationLandmarkId,
-      this.knownKnowledgeNodeIds,
-      map,
-      { col: this.playerCol, row: this.playerRow },
-    );
+    const guide = this.resolveNavigationGuide(destinationId);
+    if (guide === null) return; // A readable status was already shown.
     if (guide.status === 'target-lost') {
-      this.navigationDestinationLandmarkId = null;
+      this.navigationDestinationId = null;
       text.setText('行路目标已失效；可在 M 舆图重新选择。');
       return;
     }
     if (guide.status === 'route-broken') {
-      this.navigationDestinationLandmarkId = null;
+      this.navigationDestinationId = null;
       text.setText(`行路「${guide.destinationName}」当前无可行路线；可在 M 舆图重新规划。`);
       return;
     }
@@ -2150,12 +2163,112 @@ export class GridScene extends Phaser.Scene {
       text.setText(`行路「${guide.destinationName}」· 已到「${guide.nextTransitionName ?? '关口'}」旁，按 E 通过。`);
     } else if (guide.status === 'arrived') {
       text.setText(`行路「${guide.destinationName}」· 已抵达附近。`);
-      this.navigationDestinationLandmarkId = null;
+      // A landmark is complete when reached; an NPC/encounter still needs its
+      // interaction, so keep that quest pin selected until the objective moves.
+      if (this.navigationDestinationId?.startsWith(QUEST_NAVIGATION_ID_PREFIX) !== true) {
+        this.navigationDestinationId = null;
+      }
     } else if (guide.nextTransitionName !== null) {
       text.setText(`行路「${guide.destinationName}」· ${direction}${steps}格至「${guide.nextTransitionName}」旁。`);
     } else {
       text.setText(`行路「${guide.destinationName}」· ${direction}${steps}格。`);
     }
+  }
+
+  /**
+   * Dispatches one destination selector to the matching guide resolver: a
+   * stable `landmark:` id keeps the discovery gate, while a runtime `quest:`
+   * projection re-resolves the objective against the current clock period,
+   * live NPC placements and quest progress on every refresh.
+   */
+  private resolveNavigationGuide(destinationId: string): WorldNavigationGuide | null {
+    const world = this.world;
+    const map = this.map;
+    const text = this.navigationHintText;
+    if (world === null || map === null || text === null) return null;
+
+    if (destinationId.startsWith(LANDMARK_DESTINATION_PREFIX)) {
+      return resolveWorldNavigationGuide(
+        world.worldMap,
+        this.currentMapResourceId,
+        destinationId.slice(LANDMARK_DESTINATION_PREFIX.length),
+        this.knownKnowledgeNodeIds,
+        map,
+        { col: this.playerCol, row: this.playerRow },
+      );
+    }
+    if (!destinationId.startsWith(QUEST_NAVIGATION_ID_PREFIX)) return { status: 'target-lost' };
+
+    const questId = destinationId.slice(QUEST_NAVIGATION_ID_PREFIX.length);
+    const resolution = this.resolveQuestNavigation(questId);
+    if (resolution.status === 'no-target') {
+      this.navigationDestinationId = null;
+      text.setText('差事目标已变化，行路提示到此为止；可在 Q 日志重新导航。');
+      return null;
+    }
+    // One stable quest selector can follow a multi-stage objective chain and
+    // stays selected when the journal is reopened after the next target moves.
+    this.navigationDestinationId = resolution.target.id;
+    return resolveCellNavigationGuide(
+      world.worldMap,
+      this.currentMapResourceId,
+      resolution.target,
+      map,
+      { col: this.playerCol, row: this.playerRow },
+    );
+  }
+
+  /**
+   * Resolves one quest's next unfinished spatial objective from live state:
+   * current-map runtime NPC placements win, then the compiled period set,
+   * then the stable base records.
+   */
+  private resolveQuestNavigation(questId: string): QuestNavigationResult {
+    const world = this.world;
+    if (world === null) return { status: 'no-target', reason: 'unknown-quest' };
+    const periodId = this.clock?.currentPeriod().id;
+    return resolveQuestNavigationTarget({
+      quests: this.quests,
+      journal: this.questJournal,
+      questId,
+      worldMap: world.worldMap,
+      baseNpcs: world.assembly.npcs,
+      periodNpcs: periodId === undefined
+        ? world.assembly.npcs
+        : world.assembly.npcsByPeriod.get(periodId) ?? world.assembly.npcs,
+      currentMapNpcs: this.placedNpcs,
+      encounters: world.assembly.encounters,
+      knowledgeNodeTitles: new Map([...world.knowledgeGraph.nodes]
+        .map(([id, node]) => [id, node.title])),
+    });
+  }
+
+  /**
+   * Round 60 Q-journal N key: tracks the quest, projects its next unfinished
+   * spatial objective as the run's destination, closes the journal and opens
+   * the world map with that pin selected. Answers a readable message either
+   * way; collect-only or data-missing quests never fabricate coordinates.
+   */
+  private navigateQuestObjective(questId: string): { ok: boolean; message: string } {
+    const resolution = this.resolveQuestNavigation(questId);
+    if (resolution.status === 'no-target') {
+      const messages: Record<QuestNavigationNoTargetReason, string> = {
+        'unknown-quest': '这项差事当前无法导航。',
+        'not-active': '只有进行中的差事可以导航。',
+        'no-spatial-objective': '这项差事接下来的目标没有地图标点（如采集类目标），无法导航。',
+        'unresolved-target': '地图资料暂时无法解析这项目标的位置，暂时无法导航。',
+      };
+      return { ok: false, message: messages[resolution.reason] };
+    }
+
+    const target = resolution.target;
+    this.questJournal.trackedQuestId = questId;
+    this.navigationDestinationId = target.id;
+    this.updateQuestTrackerHud();
+    this.refreshNavigationGuide();
+    this.questPanel?.close();
+    this.toggleWorldMap();
+    return { ok: true, message: `正在导航至「${target.name}」。` };
   }
 
   /** Keeps route guidance below the variable-height tracked-quest line. */
@@ -2683,6 +2796,7 @@ export class GridScene extends Phaser.Scene {
     if (this.anyOverlayOpen()) return;
     if (this.map === null) return;
     this.refreshNavigationGuide();
+    const questTarget = this.navigationQuestTarget();
     panel.open(
       world.worldMap,
       this.currentMapResourceId,
@@ -2690,9 +2804,24 @@ export class GridScene extends Phaser.Scene {
       this.playerCol,
       this.playerRow,
       this.knownKnowledgeNodeIds,
-      this.navigationDestinationLandmarkId,
+      this.navigationDestinationId,
+      questTarget === null ? [] : [questTarget],
     );
     this.updateInteractHint();
+  }
+
+  /**
+   * Projects the current active quest route as a supplemental map pin.
+   * Already-accepted quests may reveal their target before the underlying
+   * landmark is discovered; locked or unaccepted quests are never projected.
+   */
+  private navigationQuestTarget(): QuestNavigationTarget | null {
+    const destinationId = this.navigationDestinationId;
+    if (destinationId === null || !destinationId.startsWith(QUEST_NAVIGATION_ID_PREFIX)) return null;
+    const questId = destinationId.slice(QUEST_NAVIGATION_ID_PREFIX.length);
+    const resolution = this.resolveQuestNavigation(questId);
+    if (resolution.status === 'no-target') return null;
+    return resolution.target;
   }
 
   /** K key: browse known graph entries without exposing undiscovered details. */
@@ -2932,6 +3061,8 @@ export class GridScene extends Phaser.Scene {
     }
     this.updateQuestTrackerHud();
     this.updateInteractHint();
+    // Objective progress may have completed the navigated target: re-resolve.
+    this.refreshNavigationGuide();
   }
 
   private updateQuestTrackerHud(): void {
