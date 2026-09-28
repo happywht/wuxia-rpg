@@ -32,7 +32,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 
 - 测试框架：Vitest 5.0.2。官方指南要求 Vite >=6.4.0、Node >=22.12.0；本仓库使用 Vite 8.3.1 与 Node 22.18.0，符合要求（详见 [`docs/REFERENCES.md`](REFERENCES.md) #12；基准 API 见同文件 #16）。
 - 运行环境：Node（无 DOM、无浏览器、无网络、无真实时钟依赖）。
-- 覆盖统计：19 个测试文件、155 个用例（R38 建立四组 53 个，R40 新增渲染器结构回归 10 个，R41 新增设置与输入 42 个，R42 新增主线集成 3 个，R43 新增漫游事件 6 个与门派支线集成 3 个，R44 新增日程漫游/奖励协议/双路线集成 6 个，R45 新增战斗成长基线与擂台奖品边界 4 个，R46 新增真实资料纵向切片 2 个，R47 新增版本清单/路径白名单测试 4 个，R48 新增文档审计 9 个，R49 新增真实默认世界装配/内容数量/零可选告警回归 1 个，R50 新增最终验收审计 5 个，R51 新增 100×100 地图/素材检查及舆图视口导航 7 个；详见 `CHANGELOG.md` 对应条目）。
+- 覆盖统计：21 个测试文件、160 个用例（R38 建立四组 53 个，R40 新增渲染器结构回归 10 个，R41 新增设置与输入 42 个，R42 新增主线集成 3 个，R43 新增漫游事件 6 个与门派支线集成 3 个，R44 新增日程漫游/奖励协议/双路线集成 6 个，R45 新增战斗成长基线与擂台奖品边界 4 个，R46 新增真实资料纵向切片 2 个，R47 新增版本清单/路径白名单测试 4 个，R48 新增文档审计 9 个，R49 新增真实默认世界装配/内容数量/零可选告警回归 1 个，R50 新增最终验收审计 5 个，R51 新增 100×100 地图/素材检查及舆图视口导航 7 个，R52 新增相机坐标和地标协议/坏引用回归 5 个；详见 `CHANGELOG.md` 对应条目）。
 
 ## 配置：为什么有独立的 `vitest.config.ts`
 
@@ -60,7 +60,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 | `tests/dialogue.test.ts` | `src/engine/dialogue-graph.ts`、`dialogue-runtime.ts` | `parseDialogueSet` 正反向（信封破损整份拒绝、单段坏对话仅隔离自身）；`validateConversation` 图语义（重复节点 id、缺失起始节点、悬空选项目标）；运行时条件可见性 `isConditionMet`/`getVisibleOptions`（questStatus/itemCount/道德边界含端点/timeOfDay/npcKnows/knowledgeKnown；多条件全满足才可见、空结果即结束节点、索引指向原始数组）；`DialogueSession` 播放与敌意输入忽略 |
 | `tests/quest-system.test.ts` | `src/engine/quest-system.ts`、`quest-consequences.ts` | `parseQuestSet` 防御解析；`assembleQuests` 跨资源装配（坏发布人/奖励引用剔除、前置循环禁用、互斥组整组校验）；接受/推进/完成/失败生命周期及互斥分支连带失败；声望/见闻奖励随首次完成发放、声望边界钳制与重复信号不重发 |
 | `tests/data-validation.test.ts` | `scripts/lib/data-validation.mjs`、`scripts/validate-data.mjs` | **真实仓库**正向校验（manifest + 全部基础资源计数一致）；临时 fixture 反向校验（资源违反 Schema、manifest 违反 Schema、资源文件缺失、无效 Schema、JSON `null`）；另以临时 CLI 副本启动真实 Node 子进程，锁定可读错误输出与非零退出码 |
-| `tests/grid-map-renderer.test.ts` | `src/engine/grid-map-renderer.ts` | R40 渲染器结构回归：场景对象数随面积增长恒为 2（O(1) 契约）；逐格命令顺序（底色→边线→亮边→暗边）与几何/颜色/alpha 精确锁定；绘制范围与地图像素尺寸一致；Graphics 挂在返回容器内（地图切换 `destroy()` 级联语义）；样式去重；`cellCenterOffset` 普通坐标返回 |
+| `tests/grid-map-renderer.test.ts` | `src/engine/grid-map-renderer.ts` | R40 渲染器结构回归：场景对象数随面积增长恒为 2（O(1) 契约）；逐格命令顺序（底色→边线→亮边→暗边）与几何/颜色/alpha 精确锁定；绘制范围与地图像素尺寸一致；Graphics 挂在返回容器内（地图切换 `destroy()` 级联语义）；样式去重；`cellCenterOffset` 普通坐标返回；R52 验证容器及回退 Graphics 脱离 HUD 固定滚动默认值 |
 | `tests/settings.test.ts` | `src/game/settings.ts` | R41 设置回归：Round 09 旧载荷 `{volume,textScaleIndex}` 迁移（新字段补默认、旧存储字节不动）；完整六字段往返；新字段"存在但无效"整载荷拒绝且不动存储；音量/字号越界与 JSON 损坏回退默认；写入拒绝（会话内仍生效）；`applyGameSettings` 声音总线音量与画布高对比度滤镜（mock game 结构替身，无浏览器依赖）；五档字号单调与 `uiFontSize`；`settingsRows`/`adjustGameSetting` 共享行数、循环与钳制语义 |
 | `tests/input-settings.test.ts` | `src/game/input-settings.ts` | R41 输入回归：三档移动键位解析与键集（arrows 恰 4 键 / wasd 恰 4 键 / both 8 键）、逐键启用判定与帮助文本；摇杆死区（默认 0.5 与自定义）、主导轴、对角水平优先、非有限值；D-pad 基数优先于摇杆与对向键消解；标准映射采样（D-pad/左摇杆/A→confirm、B→back）；`GamepadEdgeTracker` 按住只发一次、换向即新边沿、释放重触发、confirm/back 边沿与 `reset()` |
 | `tests/round42-story.test.ts` | `src/engine/quest-system.ts`、`dialogue-graph.ts`、`ending-system.ts` 与基础故事资料 | R42 主线集成：完整载入并装配任务和四张目标对白图；校验 R31 渡籍补录到三段主线、共享前置互斥分支、对话任务/物品/图谱引用；实际驱动任务状态机完成两条路线，验证兄弟失败和各自唯一新结局可达 |
@@ -73,6 +73,8 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 | `tests/round50-final-acceptance.test.ts` | `scripts/lib/final-acceptance.mjs` 与缺资料运行时入口 | R50 正反向临时 fixture：核验 51 份计划字段/子任务、轮次 commit、实际内容计数、24 份交付文档、Schema 家族、同名 MOD 路径与引擎资料字面量；验证缺计划/提交/数量、未登记 MOD 和世界 manifest 404 的可读错误 |
 | `tests/round51-map-art.test.ts` | 基础地图/NPC 数据、地图 Schema 与官方静态素材 | R51 核对 100×100 / 5 层资料尺寸、角色图集帧声明、碰撞容量、真实 CC0 图集与 License 文件及渡口旧碰撞兼容 |
 | `tests/round51-map-viewport.test.ts` | `src/engine/map-viewport.ts` | R51 核对全图适配、视窗边界钳制、以指针为中心的缩放、较小地图居中；Phaser UI 的滚轮与拖动另行做浏览器手测 |
+| `tests/round52-map-camera.test.ts` | `src/engine/grid-map-renderer.ts` + 当前 100×100 地图资料 | R52 模拟 Phaser 场景新增对象默认固定在 HUD 平面的情况，验证真实地图 Image 与世界容器显式设回滚动坐标 |
+| `tests/round52-map-landmarks.test.ts` | `src/engine/world-map.ts` + 两张基础地图 | R52 验证旧 world-map 缺省兼容、六个真实地标装配、无效地图/越界坐标逐条隔离和未知类别拒绝 |
 
 测试只调用**公共导出函数**并断言行为，不做源码文本匹配；引擎模块均为 Phaser-free 设计，无需启动任何场景。
 
@@ -116,7 +118,8 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 
 ## 变更记录
 
-- 2026-09-28（Round 51）：新增 2 个测试文件/7 个用例，覆盖 100×100 Kenney 五层地图/人物素材及舆图适配、钳制、指针缩放、地图居中；浏览器手测新游戏、跟随镜头、滚轮放大后拖动地图。当前统计为 19 个文件/155 个用例。
+- 2026-09-28（Round 51）：新增 2 个测试文件/7 个用例，覆盖 100×100 Kenney 五层地图/人物素材及舆图适配、钳制、指针缩放、地图居中；浏览器手测新游戏、跟随镜头、滚轮放大后拖动地图。Round 51 当时统计为 19 个文件/155 个用例。
+- 2026-09-28（Round 52）：新增 2 个测试文件/5 个用例，覆盖地图贴图退出 HUD 固定默认值、旧 world-map 兼容、真实六标记装配、坏地图/越界点逐项隔离和未知类别拒绝；更新 performance bench 的真实地图夹具以适配 100×100 网格。`npm run check` 全通，完整覆盖 21 个测试文件/160 个用例。
 - 2026-09-28（Round 50）：新增 `tests/round50-final-acceptance.test.ts` 5 用例，含通过夹具及轮次/计划/内容/MOD/引擎边界反向 fixture，并验证多资源汇总、子任务小节/最低工时判断和缺 manifest 时的玩家可读错误；补充 quest completion 清理旧跟踪 ID 的状态回归。完整覆盖统计更新为 17 文件/148 用例。`npm run audit:final` 依赖 Git 完整历史，单独执行而不进入浅克隆 CI `check`。
 - 2026-09-28（Round 49）：新增真实 `data/` 世界装配回归，检查清单内资源全部加载、核心内容数量达标且默认可选系统没有装配告警；修复沼琥珀锻造配方产物降低原装备 resolve/qi 的错误；文档审计改为从路线图识别最新已完成轮次。浏览器另走查新游戏、移动/墙体与 NPC 阻挡、对白/任务接取、擂台入口和暂停设置/空存档槽导航；详情见 `docs/PLAYTEST-FEEDBACK.md`。完整覆盖统计更新为 16 文件/143 用例。
 - 2026-09-28（Round 48）：新增 `tests/docs-audit-round-48.test.ts` 9 用例覆盖玩家/MOD 指南、README/包索引、实际命令、manifest/Schema/内容计数、轮次/绝对路径和许可边界正反向审计；测试统计更新为 15 文件/142 用例。`npm run check` 新增末尾步骤 `audit:round-48-docs`。

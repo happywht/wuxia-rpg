@@ -15,6 +15,14 @@
       "atlasPosition": { "x": 85, "y": 80 }
     }
   ],
+  "landmarks": [
+    { "id": "landmark.northwest-settlement", "mapResourceId": "map.round-01-grid", "col": 23, "row": 27, "name": "西北聚落", "category": "settlement" },
+    { "id": "landmark.village-lake", "mapResourceId": "map.round-01-grid", "col": 38, "row": 27, "name": "村北湖泊", "category": "water" },
+    { "id": "landmark.eastern-pond", "mapResourceId": "map.round-01-grid", "col": 80, "row": 25, "name": "东野池塘", "category": "water" },
+    { "id": "landmark.south-hamlet", "mapResourceId": "map.round-01-grid", "col": 70, "row": 75, "name": "南麓聚落", "category": "settlement" },
+    { "id": "landmark.stone-stairs-ferry", "mapResourceId": "map.round-01-grid", "col": 90, "row": 50, "name": "石阶渡口", "category": "crossing" },
+    { "id": "landmark.reedbank-landing", "mapResourceId": "map.round-10-mist-ferry", "col": 1, "row": 4, "name": "芦岸登船点", "category": "crossing" }
+  ],
   "transitions": [
     {
       "id": "gate.trial-to-ferry",

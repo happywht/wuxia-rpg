@@ -47,7 +47,7 @@ console.log(`  cpu: ${cpus()[0]?.model?.trim() ?? 'unknown'} (${cpus().length} c
 console.log(`  gc: ${typeof gc === 'function' ? 'exposed (--expose-gc)' : 'NOT exposed — heap deltas observed without forced GC'}`);
 
 // ---------------------------------------------------------------------------
-// Fixture maps: the real 16x9 map plus deterministic synthetic sizes
+// Fixture maps: the current real collision grid (art omitted) plus deterministic synthetic sizes
 // ---------------------------------------------------------------------------
 
 function parseOrThrow(raw: unknown, label: string): GridMap {
@@ -58,10 +58,9 @@ function parseOrThrow(raw: unknown, label: string): GridMap {
   return parsed.map;
 }
 
-const realMap = parseOrThrow(
-  JSON.parse(readFileSync(path.join(repoRoot, 'data', 'base', 'maps', 'round-01-grid.json'), 'utf8')),
-  'real fixture map',
-);
+const realMapData = JSON.parse(readFileSync(path.join(repoRoot, 'data', 'base', 'maps', 'round-01-grid.json'), 'utf8')) as Record<string, unknown>;
+delete realMapData.art; // keep this benchmark focused on the fallback command renderer, not atlas texture baking
+const realMap = parseOrThrow(realMapData, '100x100 real grid fixture');
 
 /** Deterministic layout — same map every run, no Math.random noise. */
 function syntheticMap(columns: number, rows: number): GridMap {
@@ -126,6 +125,9 @@ function createRecordingScene(): RecordingScene {
         return {
           x,
           y,
+          setScrollFactor() {
+            return this;
+          },
           children: [] as unknown[],
           // Phaser's Container.add accepts a single child or an array.
           add(child: unknown | unknown[]) {
@@ -146,6 +148,9 @@ function createRecordingScene(): RecordingScene {
       graphics: () => {
         counters.graphics += 1;
         return {
+          setScrollFactor() {
+            return this;
+          },
           fillStyle() {
             counters.drawCalls += 1;
             return this;
@@ -171,7 +176,7 @@ function createRecordingScene(): RecordingScene {
 
 console.log('[round-40] scene objects per single render (structure, not timing):');
 for (const [label, map] of [
-  ['16x9 real fixture', realMap],
+  ['100x100 real grid (art omitted)', realMap],
   ['32x24 synthetic', map32x24],
   ['64x48 synthetic', map64x48],
   ['128x96 synthetic', map128x96],
@@ -223,7 +228,7 @@ test('grid-map render assembly across map sizes', async (testContext) => {
   };
 
   console.log('[round-40] render benchmark (draw-command generation + scene-object assembly):');
-  await runAndReport(testContext, 'render 16x9 real fixture', () => renderOnce(realMap));
+  await runAndReport(testContext, 'render 100x100 real grid (art omitted)', () => renderOnce(realMap));
   await runAndReport(testContext, 'render 32x24 synthetic', () => renderOnce(map32x24));
   await runAndReport(testContext, 'render 64x48 synthetic', () => renderOnce(map64x48));
   await runAndReport(testContext, 'render 128x96 synthetic', () => renderOnce(map128x96));

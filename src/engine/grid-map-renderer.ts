@@ -132,16 +132,19 @@ export function renderGridMap(
   originX: number,
   originY: number,
 ): Phaser.GameObjects.Container {
-  const container = scene.add.container(originX, originY);
+  // GridScene pins ordinary new objects to the HUD coordinate plane in its
+  // ADDED_TO_SCENE handler. This renderer is a world layer, so explicitly
+  // opt both the container and its children back into camera scrolling.
+  const container = scene.add.container(originX, originY).setScrollFactor(1);
   if (map.data.art !== undefined) {
     const artTextureKey = ensureGridMapArtTexture(scene, map);
     if (artTextureKey === null) throw new Error(`无法生成地图贴图：${map.data.id}`);
     const image = scene.add.image(0, 0, artTextureKey).setOrigin(0, 0)
-      .setDisplaySize(map.pixelWidth, map.pixelHeight);
+      .setDisplaySize(map.pixelWidth, map.pixelHeight).setScrollFactor(1);
     container.add(image);
     return container;
   }
-  const layer = scene.add.graphics();
+  const layer = scene.add.graphics().setScrollFactor(1);
   // Repeated style calls with identical arguments are skipped; fill and line
   // styles are independent Graphics state, so alternating ops stays correct.
   let lastFill: { color: number; alpha: number } | null = null;

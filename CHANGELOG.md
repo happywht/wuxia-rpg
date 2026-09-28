@@ -4,6 +4,22 @@
 
 ## [Unreleased]
 
+### Fixed (Round 52)
+
+- **起始地图视觉层跟随**：地图贴图与旧式 Graphics 地层明确采用世界坐标滚动，不再继承场景统一施加的 HUD 固定滚动系数；开局实景现与玩家坐标一致。
+- **舆图放大裁切**：移除无法在当前 WebGL 渲染路径可靠裁切的几何遮罩，改用地图专属相机视口；高倍率拖图限制在地图框内，标题和侧栏保持可见，关闭地图时销毁临时相机。
+
+### Added (Round 52)
+
+- **资料驱动地图地标**：世界地图资料新增可选 `landmarks` 数组、Schema 类别校验与坐标/地图引用逐项隔离；M 舆图为当前地图显示地标色点、格坐标图例和玩家位置。
+- **地图审计回归**：新增地图子层相机默认值和地标兼容性/坏引用测试，并更新 R40 记录场景基准以测量现有 100×100 碰撞格（不把贴图烘焙混入其测量范围）。
+
+### Verification (Round 52)
+
+- `npm run validate:data`、`npm run typecheck`、`npm run audit:round-34`、`npm run audit:round-48-docs` 均通过；`npm test` 与 `npm run check` 均为 21 个文件/160 个用例通过。
+- `npm run benchmark:round-40` 独立通过；纯 100×100 网格 recording renderer 为 2 场景对象，裸 Node 约 2.02 ms/render（单机描述数据）。
+- `npm run package:release` 通过 133 modules 构建与 R47 解包/子路径/资产许可 smoke；归档 70 entries、69 个内容文件，735,045 bytes，SHA-256 `2c1c29afe2b9f17d0857fd02692e5052575321fe7444984971982c75759a3a14`。更完整的浏览器步骤和历史审计见 `DEVLOG.md`。
+
 ### Fixed (Round 51)
 
 - **舆图滚轮缩放**：将缩放输入接到 Phaser 场景级 `wheel` 事件，并按地图视窗范围过滤；之前挂在 GameObject 上的 `wheel` 监听不会收到场景滚轮输入。面板关闭时同步解除监听。

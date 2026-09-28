@@ -5,10 +5,22 @@ export interface WorldMapData {
   id: string;
   startingMapResourceId: string;
   regions: WorldRegionData[];
+  /** Optional map-local presentation pins; absent in older world maps. */
+  landmarks: WorldLandmarkData[];
   transitions: RegionTransitionData[];
   events: RegionEventData[];
   /** Optional one-shot/random-step encounters; absent in older world maps. */
   randomEvents: RandomRegionEventData[];
+}
+
+export const WORLD_LANDMARK_CATEGORIES = ['settlement', 'water', 'crossing', 'route', 'other'] as const;
+export type WorldLandmarkCategory = typeof WORLD_LANDMARK_CATEGORIES[number];
+
+/** One data-authored point of interest, positioned in grid-cell coordinates. */
+export interface WorldLandmarkData extends RegionEndpoint {
+  id: string;
+  name: string;
+  category: WorldLandmarkCategory;
 }
 
 export interface WorldRegionData {
@@ -80,6 +92,7 @@ export interface RegionEventReferenceIds {
 export interface WorldMapAssembly {
   data: WorldMapData;
   regions: WorldRegionData[];
+  landmarks: WorldLandmarkData[];
   transitions: RegionTransitionData[];
   events: RegionEventData[];
   randomEvents: RandomRegionEventData[];
@@ -183,6 +196,27 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
     if (mapResourceId !== null && name !== null && description !== null && atlasPosition !== null)
       regions.push({ mapResourceId, name, description, atlasPosition });
   });
+  const landmarks: WorldLandmarkData[] = [];
+  const rawLandmarks = raw.landmarks === undefined ? [] : raw.landmarks;
+  if (!Array.isArray(rawLandmarks)) errors.push('landmarks：应为数组');
+  else rawLandmarks.forEach((entry, index) => {
+    const label = `landmarks[${index}]`;
+    if (!isObject(entry)) { errors.push(`${label}：应为对象`); return; }
+    const id = nonEmpty(entry.id) ? entry.id : null;
+    const name = nonEmpty(entry.name) ? entry.name : null;
+    const mapResourceId = nonEmpty(entry.mapResourceId) ? entry.mapResourceId : null;
+    const cell = parseCell(entry, label, errors);
+    const category = typeof entry.category === 'string' &&
+      (WORLD_LANDMARK_CATEGORIES as readonly string[]).includes(entry.category)
+      ? entry.category as WorldLandmarkCategory : null;
+    if (id === null) errors.push(`${label}.id：应为非空字符串`);
+    if (name === null) errors.push(`${label}.name：应为非空字符串`);
+    if (mapResourceId === null) errors.push(`${label}.mapResourceId：应为非空字符串`);
+    if (category === null) errors.push(`${label}.category：应为受支持的地标类型`);
+    if (id !== null && name !== null && mapResourceId !== null && cell !== null && category !== null) {
+      landmarks.push({ id, name, mapResourceId, ...cell, category });
+    }
+  });
   const transitions: RegionTransitionData[] = [];
   if (!Array.isArray(raw.transitions)) errors.push('transitions：应为数组');
   else raw.transitions.forEach((entry, index) => {
@@ -265,6 +299,7 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
       id: raw.id as string,
       startingMapResourceId: raw.startingMapResourceId as string,
       regions,
+      landmarks,
       transitions,
       events,
       randomEvents,
@@ -311,6 +346,18 @@ export function assembleWorldMap(
     seenTransitionIds.add(transition.id);
     if (problems.length > 0) warnings.push(`关口 "${transition.id}" 已禁用：${problems.join('；')}`);
     else transitions.push(transition);
+  }
+  const landmarks: WorldLandmarkData[] = [];
+  const seenLandmarkIds = new Set<string>();
+  for (const landmark of data.landmarks) {
+    const map = maps.get(landmark.mapResourceId);
+    const problems: string[] = [];
+    if (seenLandmarkIds.has(landmark.id)) problems.push('id 重复');
+    if (!regions.some((region) => region.mapResourceId === landmark.mapResourceId)) problems.push('地图不在世界图区域中');
+    if (map === undefined || landmark.col >= map.columns || landmark.row >= map.rows) problems.push('坐标超出地图范围');
+    seenLandmarkIds.add(landmark.id);
+    if (problems.length > 0) warnings.push(`地标 "${landmark.id}" 已忽略：${problems.join('；')}`);
+    else landmarks.push(landmark);
   }
   const events: RegionEventData[] = [];
   const randomEvents: RandomRegionEventData[] = [];
@@ -375,7 +422,7 @@ export function assembleWorldMap(
     if (problems.length > 0) warnings.push(`漫游奇遇「${event.id}」已禁用：${problems.join('；')}`);
     else randomEvents.push(event);
   }
-  return { data, regions, transitions, events, randomEvents, warnings };
+  return { data, regions, landmarks, transitions, events, randomEvents, warnings };
 }
 
 /** True when every condition group on this event is satisfied by live state. */

@@ -62,10 +62,12 @@ function createRecordingScene(): {
   counts: { containers: number; rectangles: number; graphics: number };
   draws: { op: string; args: number[] }[];
   containerChildren: unknown[][];
+  scrollFactorCalls: number[];
 } {
   const counts = { containers: 0, rectangles: 0, graphics: 0 };
   const draws: { op: string; args: number[] }[] = [];
   const containerChildren: unknown[][] = [];
+  const scrollFactorCalls: number[] = [];
   const scene = {
     add: {
       container: (x: number, y: number) => {
@@ -75,6 +77,10 @@ function createRecordingScene(): {
         return {
           x,
           y,
+          setScrollFactor(value: number) {
+            scrollFactorCalls.push(value);
+            return this;
+          },
           add(child: unknown) {
             children.push(child);
             return this;
@@ -91,6 +97,10 @@ function createRecordingScene(): {
       graphics: () => {
         counts.graphics += 1;
         return {
+          setScrollFactor(value: number) {
+            scrollFactorCalls.push(value);
+            return this;
+          },
           fillStyle(color: number, alpha: number) {
             draws.push({ op: 'fillStyle', args: [color, alpha] });
             return this;
@@ -111,7 +121,7 @@ function createRecordingScene(): {
       },
     },
   };
-  return { scene, counts, draws, containerChildren };
+  return { scene, counts, draws, containerChildren, scrollFactorCalls };
 }
 
 describe('buildGridMapDrawCommands', () => {
@@ -186,6 +196,12 @@ describe('renderGridMap scene-object allocation (Round 40 O(1) contract)', () =>
     const { scene, counts } = createRecordingScene();
     renderGridMap(scene as never, makeMap(16, 9), 0, 0);
     expect(counts).toEqual({ containers: 1, rectangles: 0, graphics: 1 });
+  });
+
+  it('opts the world container and fallback graphics out of the HUD fixed-scroll default', () => {
+    const { scene, scrollFactorCalls } = createRecordingScene();
+    renderGridMap(scene as never, makeMap(2, 2), 0, 0);
+    expect(scrollFactorCalls).toEqual([1, 1]);
   });
 
   it('keeps the scene-object count constant as grid area grows 16×', () => {

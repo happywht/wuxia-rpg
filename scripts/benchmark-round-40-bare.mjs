@@ -32,6 +32,7 @@ import { parseGridMap } from './src/engine/grid-map';
 import { renderGridMap } from './src/engine/grid-map-renderer';
 
 const raw = JSON.parse(readFileSync('data/base/maps/round-01-grid.json', 'utf8'));
+delete raw.art; // measure fallback draw-command generation against the current real collision grid
 const realParsed = parseGridMap(raw);
 if (!realParsed.ok) throw new Error(realParsed.errors.join('; '));
 const realMap = realParsed.map;
@@ -63,14 +64,14 @@ function synthetic(columns, rows) {
 const counters = { containers: 0, rectangles: 0, graphics: 0 };
 const scene = {
   add: {
-    container: (x, y) => { counters.containers += 1; return { x, y, add() { return this; }, destroy() {} }; },
+    container: (x, y) => { counters.containers += 1; return { x, y, setScrollFactor() { return this; }, add() { return this; }, destroy() {} }; },
     rectangle: () => { counters.rectangles += 1; return { setStrokeStyle() { return this; } }; },
-    graphics: () => { counters.graphics += 1; return { fillStyle() { return this; }, fillRect() { return this; }, lineStyle() { return this; }, strokeRect() { return this; } }; },
+    graphics: () => { counters.graphics += 1; return { setScrollFactor() { return this; }, fillStyle() { return this; }, fillRect() { return this; }, lineStyle() { return this; }, strokeRect() { return this; } }; },
   },
 };
 
 console.log('[round-40] bare-Node render benchmark (vite-bundled source, recording scene, no GPU):');
-for (const [label, map] of [['16x9 real fixture', realMap], ['32x24 synthetic', synthetic(32, 24)], ['64x48 synthetic', synthetic(64, 48)], ['128x96 synthetic', synthetic(128, 96)]]) {
+for (const [label, map] of [['100x100 real grid (art omitted)', realMap], ['32x24 synthetic', synthetic(32, 24)], ['64x48 synthetic', synthetic(64, 48)], ['128x96 synthetic', synthetic(128, 96)]]) {
   renderGridMap(scene, map, 0, 0); // warmup
   counters.containers = 0; counters.rectangles = 0; counters.graphics = 0;
   const iterations = 200;
