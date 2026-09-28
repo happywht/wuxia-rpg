@@ -21,6 +21,8 @@ export interface WorldLandmarkData extends RegionEndpoint {
   id: string;
   name: string;
   category: WorldLandmarkCategory;
+  /** Knowledge node required before the landmark may be revealed to the player. */
+  discoveryNodeId?: string;
 }
 
 export interface WorldRegionData {
@@ -80,7 +82,11 @@ export interface RegionEventContext {
   nearbyNpcIds?: ReadonlySet<string>;
 }
 
-/** Cross-resource ids used to disable only events with dangling references. */
+/**
+ * Cross-resource ids used to disable only events and discovery-gated
+ * landmarks with dangling references. Omitted by legacy direct callers,
+ * whose references are then not validated.
+ */
 export interface RegionEventReferenceIds {
   knowledgeNodeIds: ReadonlySet<string>;
   periodIds: ReadonlySet<string>;
@@ -209,12 +215,20 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
     const category = typeof entry.category === 'string' &&
       (WORLD_LANDMARK_CATEGORIES as readonly string[]).includes(entry.category)
       ? entry.category as WorldLandmarkCategory : null;
+    const discoveryNodeId = entry.discoveryNodeId === undefined
+      ? undefined
+      : nonEmpty(entry.discoveryNodeId) ? entry.discoveryNodeId : null;
     if (id === null) errors.push(`${label}.id：应为非空字符串`);
     if (name === null) errors.push(`${label}.name：应为非空字符串`);
     if (mapResourceId === null) errors.push(`${label}.mapResourceId：应为非空字符串`);
     if (category === null) errors.push(`${label}.category：应为受支持的地标类型`);
-    if (id !== null && name !== null && mapResourceId !== null && cell !== null && category !== null) {
-      landmarks.push({ id, name, mapResourceId, ...cell, category });
+    if (discoveryNodeId === null) errors.push(`${label}.discoveryNodeId：应为非空字符串`);
+    if (id !== null && name !== null && mapResourceId !== null && cell !== null && category !== null &&
+      discoveryNodeId !== null) {
+      landmarks.push({
+        id, name, mapResourceId, ...cell, category,
+        ...(discoveryNodeId === undefined ? {} : { discoveryNodeId }),
+      });
     }
   });
   const transitions: RegionTransitionData[] = [];
@@ -355,6 +369,10 @@ export function assembleWorldMap(
     if (seenLandmarkIds.has(landmark.id)) problems.push('id 重复');
     if (!regions.some((region) => region.mapResourceId === landmark.mapResourceId)) problems.push('地图不在世界图区域中');
     if (map === undefined || landmark.col >= map.columns || landmark.row >= map.rows) problems.push('坐标超出地图范围');
+    if (eventReferences !== undefined && landmark.discoveryNodeId !== undefined &&
+      !eventReferences.knowledgeNodeIds.has(landmark.discoveryNodeId)) {
+      problems.push(`发现节点未登记：${landmark.discoveryNodeId}`);
+    }
     seenLandmarkIds.add(landmark.id);
     if (problems.length > 0) warnings.push(`地标 "${landmark.id}" 已忽略：${problems.join('；')}`);
     else landmarks.push(landmark);
@@ -423,6 +441,16 @@ export function assembleWorldMap(
     else randomEvents.push(event);
   }
   return { data, regions, landmarks, transitions, events, randomEvents, warnings };
+}
+
+/** Returns only map pins that are currently public to the player's knowledge state. */
+export function selectVisibleWorldLandmarks(
+  landmarks: readonly WorldLandmarkData[],
+  knownKnowledgeNodeIds: ReadonlySet<string>,
+): WorldLandmarkData[] {
+  return landmarks.filter((landmark) =>
+    landmark.discoveryNodeId === undefined || knownKnowledgeNodeIds.has(landmark.discoveryNodeId),
+  );
 }
 
 /** True when every condition group on this event is satisfied by live state. */

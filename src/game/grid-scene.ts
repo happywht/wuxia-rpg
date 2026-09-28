@@ -2597,7 +2597,7 @@ export class GridScene extends Phaser.Scene {
     }
     if (this.anyOverlayOpen()) return;
     if (this.map === null) return;
-    panel.open(world.worldMap, this.currentMapResourceId, this.map, this.playerCol, this.playerRow);
+    panel.open(world.worldMap, this.currentMapResourceId, this.map, this.playerCol, this.playerRow, this.knownKnowledgeNodeIds);
     this.updateInteractHint();
   }
 

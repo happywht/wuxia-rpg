@@ -4,6 +4,30 @@
 
 ---
 
+## Round 53 — 地标寻路与区域探索反馈（2026-09-28，已完成）
+
+### 计划与实现
+
+- 开发前计划已写入 `iterations/round-53/plan.md`，拆为四向寻路、地标见闻引用门控、舆图 waypoint 交互和整合回归四个可验证子任务，列明风险、涉及文件并估算至少 2 小时人类工程师工时。
+- 新增 Phaser-free `src/engine/grid-path.ts` 确定性 BFS：只走四向可通行格，等长路线依 N/E/S/W 稳定择路；障碍上的地点会以曼哈顿半径内可行停靠格为目标；目标越界/被隔断返回 `null`，路线还能折叠为方向段。
+- `world-map.landmarks[].discoveryNodeId` 扩展到 schema、parser 和跨资源装配；坏/未登记见闻引用只隔离该地标并告警。默认芦岸登船点关联 `place.reedbank`，`selectVisibleWorldLandmarks` 在已知见闻投影前直接过滤整条记录，避免名称、类别、位置和 id 从地图展示模型泄露。
+- M 舆图把当前地图内已知地标和出入口投影为可选 waypoint，绘制寻路线并展示步行格数、方向分段和跨区去向；舆图不自动移动角色或传送。修正 `docs/REFERENCES.md` 曾把“无原作素材”写成“仓库没有任何图像”，与已纳入的 Kenney CC0 图集清单矛盾的问题。
+- 浏览器从本地站点进入新游戏并打开舆图，确认百格地图窗口、当前区域和六个可见地点/关口列表均有绘制。尝试点侧栏地点时，当前 CUA 操作把面板收起；重新打开后可见该面板，但无法从这组浏览器操作可靠确认选点后的路线面板状态。故不把这次尝试写成“路线 UI 浏览器验收通过”；路径长度、阻挡和方向由纯逻辑测试覆盖，真实 UI 点选仍需后续复核。
+
+### 自动验证
+
+- `npm run typecheck`：通过（`tsc --noEmit`）。
+- 定向路径/地图测试 `npx vitest run tests/grid-path.test.ts tests/round52-map-landmarks.test.ts tests/world-map.test.ts`：通过，3 个文件/27 个测试。
+- 首次 `npm run package:release` 暴露 Round 48 文档审计器只读到 Round 52：R53 路线图完成标签使用了审计器不接受的括号/冒号标点。按其可识别格式调整后，`npm run audit:round-48-docs` 通过，Round 48 审计回归 9/9 通过；路线图下一项也改成了带完整编号的 R54。
+- `npm run package:release`：最终通过；`npm run check` 子步骤包含基础 manifest/schema 校验（26 项）、MOD 检查（0 问题）、TypeScript 类型检查、22 文件/176 用例、R34 与 R48 文档审计；随后 Vite 8.3.1 构建 134 modules，归档 70 项（69 个内容文件）/737,497 bytes，SHA-256 `acb834326599255fcbf4a32375a1b210791435f901242b07000f1127acd503ff`，Round 47 子路径 smoke 解包及素材/许可文件校验通过。
+- 独立定向命令 `npm run typecheck` 通过；`npx vitest run tests/grid-path.test.ts tests/round52-map-landmarks.test.ts tests/world-map.test.ts` 通过（3 文件/27 项）。
+
+### 边界
+
+- 自动路线基于静态地图碰撞格，不把 NPC 临时占位作为障碍；这是舆图步行提示，不是自动寻路行走。浏览器实测确认新游戏与舆图地点/关口列表可显示，但 CUA 鼠标点侧栏的操作会使面板收起，故仍需 R54 在可观测条件下复核真实选点后的距离/路线展示与发现前后闭环。远端发布和外部试玩也不在本轮证据内。
+
+---
+
 ## Round 52 — 起始大地图视觉校准与舆图地标（2026-09-28，已完成）
 
 ### 计划与实现

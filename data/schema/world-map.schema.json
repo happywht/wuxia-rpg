@@ -32,7 +32,8 @@
           "col": { "type": "integer", "minimum": 0, "maximum": 255 },
           "row": { "type": "integer", "minimum": 0, "maximum": 255 },
           "name": { "type": "string", "minLength": 1 },
-          "category": { "enum": ["settlement", "water", "crossing", "route", "other"] }
+          "category": { "enum": ["settlement", "water", "crossing", "route", "other"] },
+          "discoveryNodeId": { "type": "string", "minLength": 1 }
         }
       }
     },

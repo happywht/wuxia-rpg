@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import { parseGridMap } from '../src/engine/grid-map';
-import { assembleWorldMap, parseWorldMap } from '../src/engine/world-map';
+import { assembleWorldMap, parseWorldMap, selectVisibleWorldLandmarks } from '../src/engine/world-map';
 
 function readJson(path: string): unknown {
   return JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8')) as unknown;
@@ -33,6 +33,8 @@ describe('Round 52 data-driven map landmarks', () => {
       'landmark.stone-stairs-ferry',
       'landmark.reedbank-landing',
     ]);
+    // Legacy direct callers pass no reference ids, so the discovery gate on
+    // the reedbank landing must not be validated (and not hide the landmark).
     expect(assembled.warnings).toEqual([]);
   });
 
@@ -70,5 +72,98 @@ describe('Round 52 data-driven map landmarks', () => {
     const parsed = parseWorldMap(raw);
     expect(parsed.ok).toBe(false);
     if (!parsed.ok) expect(parsed.errors.join('\n')).toContain('landmarks[0].category');
+  });
+
+  it('rejects non-string discovery gates at the parser boundary', () => {
+    const raw = readJson('../data/base/world/world-map.json') as { landmarks: Record<string, unknown>[] };
+    raw.landmarks[0] = { ...raw.landmarks[0], discoveryNodeId: 42 };
+    const parsed = parseWorldMap(raw);
+    expect(parsed.ok).toBe(false);
+    if (!parsed.ok) expect(parsed.errors.join('\n')).toContain('landmarks[0].discoveryNodeId');
+  });
+});
+
+describe('Round 53 landmark discovery gating', () => {
+  const loadMaps = () => new Map([
+    ['map.round-01-grid', loadMap('../data/base/maps/round-01-grid.json')],
+    ['map.round-10-mist-ferry', loadMap('../data/base/maps/round-10-mist-ferry.json')],
+  ]);
+
+  /** Reference ids covering every event/landmark gate in the shipped atlas. */
+  const fullReferences = (knowledgeNodeIds: string[]) => ({
+    knowledgeNodeIds: new Set(knowledgeNodeIds),
+    periodIds: new Set(['period.dusk', 'period.night']),
+    weatherIds: new Set(['weather.drizzle', 'weather.rain', 'weather.storm']),
+    npcIds: new Set(['char.shi-bei', 'char.bai-luzhou']),
+  });
+
+  const parseAssembled = () => {
+    const parsed = parseWorldMap(readJson('../data/base/world/world-map.json'));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) throw new Error(parsed.errors.join('\n'));
+    return parsed.data;
+  };
+
+  it('keeps the discovery-gated reedbank landing when its knowledge node is registered', () => {
+    const assembled = assembleWorldMap(parseAssembled(), loadMaps(), fullReferences([
+      'event.old-footprints', 'place.reedbank', 'event.r43-wayfarer-letter', 'event.r44-dock-claim',
+    ]));
+    expect('ok' in assembled).toBe(false);
+    if ('ok' in assembled) return;
+    expect(assembled.landmarks.map(({ id }) => id)).toContain('landmark.reedbank-landing');
+    expect(assembled.landmarks.find(({ id }) => id === 'landmark.reedbank-landing')?.discoveryNodeId)
+      .toBe('place.reedbank');
+    expect(assembled.warnings).toEqual([]);
+  });
+
+  it('isolates only the landmark (and event) whose discovery node is unregistered', () => {
+    const assembled = assembleWorldMap(parseAssembled(), loadMaps(), fullReferences([
+      'event.old-footprints', 'event.r43-wayfarer-letter', 'event.r44-dock-claim',
+    ]));
+    expect('ok' in assembled).toBe(false);
+    if ('ok' in assembled) return;
+    expect(assembled.landmarks.map(({ id }) => id)).not.toContain('landmark.reedbank-landing');
+    expect(assembled.landmarks).toHaveLength(5);
+    expect(assembled.events.map(({ id }) => id)).not.toContain('event.reedbank-traces');
+    const joined = assembled.warnings.join('\n');
+    expect(joined).toContain('landmark.reedbank-landing');
+    expect(joined).toContain('发现节点未登记：place.reedbank');
+    expect(joined).toContain('event.reedbank-traces');
+  });
+
+  it('registers the shipped reedbank gate against the real knowledge node set', () => {
+    const nodes = readJson('../data/base/knowledge_graph/nodes.json') as { nodes: { id: string }[] };
+    const assembled = assembleWorldMap(
+      parseAssembled(),
+      loadMaps(),
+      fullReferences(nodes.nodes.map(({ id }) => id)),
+    );
+    expect('ok' in assembled).toBe(false);
+    if ('ok' in assembled) return;
+    expect(assembled.landmarks.map(({ id }) => id)).toContain('landmark.reedbank-landing');
+    expect(assembled.warnings.join('\n')).not.toContain('发现节点未登记');
+  });
+
+  it('projects no gated landmark fields until the linked knowledge node is known', () => {
+    const nodes = readJson('../data/base/knowledge_graph/nodes.json') as { nodes: { id: string }[] };
+    const parsed = parseAssembled();
+    const assembled = assembleWorldMap(
+      parsed,
+      loadMaps(),
+      fullReferences(nodes.nodes.map(({ id }) => id)),
+    );
+    expect('ok' in assembled).toBe(false);
+    if ('ok' in assembled) return;
+
+    const undiscovered = selectVisibleWorldLandmarks(assembled.landmarks, new Set());
+    const undiscoveredJson = JSON.stringify(undiscovered);
+    expect(undiscovered).toHaveLength(5);
+    expect(undiscoveredJson).not.toContain('芦岸登船点');
+    expect(undiscoveredJson).not.toContain('landmark.reedbank-landing');
+    expect(undiscoveredJson).not.toContain('place.reedbank');
+
+    const discovered = selectVisibleWorldLandmarks(assembled.landmarks, new Set(['place.reedbank']));
+    expect(discovered).toHaveLength(6);
+    expect(discovered.find(({ id }) => id === 'landmark.reedbank-landing')?.name).toBe('芦岸登船点');
   });
 });
