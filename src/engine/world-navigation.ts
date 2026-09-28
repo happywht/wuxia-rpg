@@ -1,9 +1,11 @@
 import type { CellPosition } from './grid-map';
+import type { PlacedNpc } from './npc-placement';
 import type { QuestNavigationTarget } from './quest-navigation';
 import {
   selectVisibleWorldLandmarks,
   type WorldLandmarkCategory,
   type WorldMapAssembly,
+  type WorldRegionData,
 } from './world-map';
 import { findWorldTravelRoute } from './world-travel';
 
@@ -56,6 +58,26 @@ export function cycleWorldWaypointIndex(currentIndex: number, count: number, ste
     return step < 0 ? count - 1 : 0;
   }
   return (currentIndex + step + count) % count;
+}
+
+/**
+ * Derives every assembled NPC's region name from the world atlas. The NPC's
+ * map stays fixed across schedule moves (schedules only change the cell), so
+ * the base record's `mapResourceId` is the whole truth. NPCs whose map has no
+ * registered region are simply absent from the map; callers fall back to a
+ * generic "whereabouts unknown" label for them (Round 64 faction dossier).
+ */
+export function deriveNpcRegionNames(
+  npcs: readonly PlacedNpc[],
+  regions: readonly WorldRegionData[],
+): ReadonlyMap<string, string> {
+  const regionNameByMap = new Map(regions.map((region) => [region.mapResourceId, region.name]));
+  const names = new Map<string, string>();
+  for (const npc of npcs) {
+    const regionName = regionNameByMap.get(npc.record.mapResourceId);
+    if (regionName !== undefined) names.set(npc.record.id, regionName);
+  }
+  return names;
 }
 
 /**

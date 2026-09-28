@@ -184,7 +184,7 @@ import {
   type QuestNavigationTarget,
   resolveQuestNavigationTarget,
 } from '../engine/quest-navigation';
-import { LANDMARK_DESTINATION_PREFIX } from '../engine/world-navigation';
+import { deriveNpcRegionNames, LANDMARK_DESTINATION_PREFIX } from '../engine/world-navigation';
 import {
   arrivalActionHint,
   resolveCellNavigationGuide,
@@ -2264,6 +2264,9 @@ export class GridScene extends Phaser.Scene {
       encounters: world.assembly.encounters,
       knowledgeNodeTitles: new Map([...world.knowledgeGraph.nodes]
         .map(([id, node]) => [id, node.title])),
+      shops: world.assembly.shops,
+      shopStocks: this.shopStocks,
+      currentMapResourceId: this.currentMapResourceId,
     });
   }
 
@@ -2279,8 +2282,10 @@ export class GridScene extends Phaser.Scene {
       const messages: Record<QuestNavigationNoTargetReason, string> = {
         'unknown-quest': '这项差事当前无法导航。',
         'not-active': '只有进行中的差事可以导航。',
-        'no-spatial-objective': '这项差事接下来的目标没有地图标点（如采集类目标），无法导航。',
+        'no-spatial-objective': '这项差事接下来的目标没有地图标点，无法导航。',
         'unresolved-target': '地图资料暂时无法解析这项目标的位置，暂时无法导航。',
+        'collect-item-not-stocked': '尚无在营商铺上架这项目标所需的物品，无法导航到卖家。',
+        'collect-stock-insufficient': '在营商铺的现存数量不够补齐这项目标，暂时无法导航到卖家。',
       };
       return { ok: false, message: messages[resolution.reason] };
     }
@@ -2654,11 +2659,15 @@ export class GridScene extends Phaser.Scene {
       return;
     }
     if (this.anyOverlayOpen()) return;
+    const world = this.world;
     panel.open({
       factions: this.progression.factions,
       membership: this.factionState.membership,
       social: this.social,
-      npcNames: new Map((this.world?.assembly.npcs ?? []).map((npc) => [npc.record.id, npc.record.name])),
+      npcNames: new Map((world?.assembly.npcs ?? []).map((npc) => [npc.record.id, npc.record.name])),
+      npcRegionNames: world === null
+        ? undefined
+        : deriveNpcRegionNames(world.assembly.npcs, world.worldMap.regions),
       quests: this.quests,
     });
     this.updateInteractHint();

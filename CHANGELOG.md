@@ -4,6 +4,21 @@
 
 ## [Unreleased]
 
+### Added (Round 64)
+
+- **采集目标商铺导航**：进行中差事的 `collectItem` 目标可导航到真实装配的 NPC 商铺——解析器按装配货架与逐店运行时库存判定可用量（`-1` 无限、正数有限、`0`/未上架不可用），优先当前地图卖家、否则按装配顺序确定选取；目标投射到店主当前时段位置（随时段日程重算），抵达提示新增内容无关的 `shop` 动作（按 E 直接交易、F 交谈，购买后差事计数自动核对）。无任何商店上架、全部上架店铺库存不足或店主无法定位时分别返回精确 no-target 原因，不编造坐标；已完成的采集目标照旧让位给后续谈话/交手/见闻目标。
+- **师门页导师地域名**：J 师门页为每位登记师父显示由装配 NPC/地图/世界区域资料派生的区域名（新增 `deriveNpcRegionNames` 纯函数），未解析导师回退通用「行踪未详」占位；引擎与 UI 均不硬编码门派/人物/地点。
+- **三图七时段交互目标路线审计**：新增可复现审计 `tests/round64-route-audit.test.ts`，覆盖三张地图、七个历日时段、全部 5 位门派师父、43 项差事给予者与谈话目标（去重 14 人）及全部出图关口，从各区域入口按静态几何与动态 NPC/遭遇占位两层核验相邻交互格可达性，共 462 项检查零静态断连、零动态阻挡；记录见 `docs/ROUND-64-ROUTE-AUDIT.md`。
+
+### Changed (Round 64)
+
+- `resolveQuestNavigationTarget` 输入新增可选 `shops`/`shopStocks`/`currentMapResourceId`，场景把装配商店、运行时库存与当前地图 id 线程化传入；`NavigationArrivalAction` 扩展 `shop` 枚举。`tests/quest-navigation.test.ts` 两项被新语义取代的断言改为采集完成态与精确缺货原因；`tests/round61-route-audit.test.ts` 补装配真实商店后，摊棚差事首目标从跳过采集改为跨区导购路线（3–5 格 → 62–64 格）。
+
+### Verification (Round 64)
+
+- 专项：`npx vitest run tests/quest-navigation.test.ts tests/round64-collect-shop-navigation.test.ts tests/round64-route-audit.test.ts`——3 个文件 26 项通过；路线审计输出 maps=3 periods=7 targets=14 entries=5 checks=462 static-disconnected=0 dynamic-blocked=0。
+- `npm run typecheck`、`npm run validate:data`、`npm run audit:round-34`、`npm run audit:round-48-docs`、`npm test`（35 个测试文件 264 项）与最终 `npm run package:release`（138 模块构建、发行包 788,135 bytes、SHA-256 `f93769c4058a8a72ab60a86198c2e5af49553c513fd90cb70f2dbf1c19b4ddc2`、72 个归档文件/71 个内容文件）全部通过；发行验证明细见 `DEVLOG.md` Round 64。
+
 ### Added (Round 63)
 
 - **跨时段真实步行审计**：新增三图长途模拟，以真实日历、春季雨天最高步耗时、NPC 日程/实时玩家安全放置、活动遭遇和差事导航逐格行走，覆盖 284 格、852 分钟；验证晨间/午后/黄昏/入夜换段及秦素砚夜班目标迁移后仍可抵达。

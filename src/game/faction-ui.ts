@@ -12,6 +12,8 @@ export interface FactionPanelModel {
   membership: FactionMembership | null;
   social: Readonly<SocialState>;
   npcNames: ReadonlyMap<string, string>;
+  /** Data-derived region name per assembled NPC id (Round 64 dossier). */
+  npcRegionNames?: ReadonlyMap<string, string>;
   quests: ReadonlyMap<string, QuestData>;
 }
 
@@ -121,7 +123,13 @@ export class FactionPanel {
     }
     for (const faction of factions) {
       const isCurrent = membership?.factionId === faction.id;
-      const mentors = faction.mentorNpcIds.map((id) => model.npcNames.get(id) ?? id);
+      const mentors = faction.mentorNpcIds.map((id) => {
+        const name = model.npcNames.get(id) ?? id;
+        const region = model.npcRegionNames?.get(id);
+        // An unresolvable mentor keeps its name with a generic whereabouts
+        // label — the dossier never hard-codes any place (Round 64).
+        return region === undefined ? `${name}（行踪未详）` : `${name}（${region}）`;
+      });
       const admission = this.admissionSummary(faction, model);
       const factionRenown = getFactionRenown(model.social, faction.id);
       const departure = faction.departure.allowed

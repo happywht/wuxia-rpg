@@ -11,6 +11,7 @@
  * id is a runtime-only, namespaced key that must never be persisted.
  */
 
+import { UNLIMITED_STOCK, type AssembledShop, type ShopStockRuntime } from './item-system';
 import type { PlacedNpc } from './npc-placement';
 import type { QuestData, QuestJournal } from './quest-system';
 import type { NavigationArrivalAction } from './world-navigation-guidance';
@@ -21,7 +22,11 @@ import type { WorldMapAssembly } from './world-map';
 export const QUEST_NAVIGATION_ID_PREFIX = 'quest:';
 
 /** Objective kinds whose target resolves to a position on some map. */
-export type SpatialQuestObjectiveKind = 'talkToNpc' | 'defeatEncounter' | 'discoverKnowledge';
+export type SpatialQuestObjectiveKind =
+  | 'talkToNpc'
+  | 'defeatEncounter'
+  | 'discoverKnowledge'
+  | 'collectItem';
 
 /** One resolved, navigable quest objective target. */
 export interface QuestNavigationTarget {
@@ -48,10 +53,14 @@ export interface QuestNavigationTarget {
 export type QuestNavigationNoTargetReason =
   | 'unknown-quest'
   | 'not-active'
-  /** Every unfinished objective is non-spatial (e.g. collect-only quests). */
+  /** Every unfinished objective is non-spatial (e.g. non-map state goals). */
   | 'no-spatial-objective'
   /** A spatial objective exists but its referenced data is currently missing. */
-  | 'unresolved-target';
+  | 'unresolved-target'
+  /** No assembled shop stocks the item a collect objective still needs. */
+  | 'collect-item-not-stocked'
+  /** Shops stock the item, but no available quantity covers the remaining need. */
+  | 'collect-stock-insufficient';
 
 export type QuestNavigationResult =
   | { status: 'target'; target: QuestNavigationTarget }
@@ -72,6 +81,12 @@ export interface QuestNavigationInput {
   encounters: readonly PlacedEncounter[];
   /** Knowledge node titles for readable discovery-target names. */
   knowledgeNodeTitles?: ReadonlyMap<string, string>;
+  /** Assembled shops by id; collect objectives route to a stocked seller. */
+  shops?: ReadonlyMap<string, AssembledShop>;
+  /** Live per-shop stock; a shop without a runtime entry uses its shelf data. */
+  shopStocks?: ReadonlyMap<string, ShopStockRuntime>;
+  /** Map the player currently walks; same-map sellers win seller selection. */
+  currentMapResourceId?: string;
 }
 
 /** Builds the runtime-only selector stable across objective progression. */
@@ -83,6 +98,7 @@ export function questNavigationTargetId(questId: string): string {
 export function questObjectiveArrivalAction(kind: SpatialQuestObjectiveKind): NavigationArrivalAction {
   if (kind === 'talkToNpc') return 'talk';
   if (kind === 'defeatEncounter') return 'battle';
+  if (kind === 'collectItem') return 'shop';
   return 'discover';
 }
 
@@ -163,12 +179,80 @@ function resolveKnowledgePosition(
   };
 }
 
+/** One stocked seller for a collect objective, resolved against live state. */
+interface CollectSeller {
+  shop: AssembledShop;
+  npc: NpcPosition;
+}
+
+/**
+ * Available units of `itemId` at one assembled shop: the live runtime stock
+ * wins when the scene tracks purchases, otherwise the assembled shelf entry
+ * stands in. `UNLIMITED_STOCK` (-1) passes every finite requirement; zero or
+ * a missing shelf entry means the shop cannot serve the objective at all.
+ */
+function availableShopStock(
+  input: QuestNavigationInput,
+  shop: AssembledShop,
+  itemId: string,
+): number | null {
+  const live = input.shopStocks?.get(shop.record.id)?.get(itemId);
+  if (live !== undefined) return live;
+  const shelf = shop.stock.find((entry) => entry.itemId === itemId);
+  return shelf === undefined ? null : shelf.quantity;
+}
+
+/**
+ * Resolves a collect objective's seller against the assembled shops. Among
+ * shops that stock the item with enough available quantity, a seller on the
+ * player's current map wins (declaration order breaks ties); otherwise the
+ * first eligible shop in loaded world order is selected deterministically.
+ * Precise reasons come back instead of a target whenever no seller qualifies,
+ * so a coordinate is never fabricated for an item nobody can sell.
+ */
+function resolveCollectSeller(
+  input: QuestNavigationInput,
+  itemId: string,
+  remaining: number,
+): CollectSeller | 'collect-item-not-stocked' | 'collect-stock-insufficient' | 'unresolved-target' {
+  const shops = input.shops;
+  if (shops === undefined || shops.size === 0) return 'collect-item-not-stocked';
+
+  let stockedAny = false;
+  let enoughStockAny = false;
+  let eligible: CollectSeller | null = null;
+  let eligibleOtherMap: CollectSeller | null = null;
+  for (const shop of shops.values()) {
+    const available = availableShopStock(input, shop, itemId);
+    if (available === null || available === 0) continue;
+    stockedAny = true;
+    if (available !== UNLIMITED_STOCK && available < remaining) continue;
+    enoughStockAny = true;
+
+    const npc = resolveNpcPosition(input, shop.record.npcId);
+    if (npc === null) continue; // Unplaceable keeper: skip, other shops may serve.
+    const seller = { shop, npc };
+    if (input.currentMapResourceId === undefined ||
+        npc.mapResourceId === input.currentMapResourceId) {
+      // First declaration wins within each preference tier.
+      if (eligible === null) eligible = seller;
+    } else if (eligibleOtherMap === null) {
+      eligibleOtherMap = seller;
+    }
+  }
+
+  const selected = eligible ?? eligibleOtherMap;
+  if (selected !== null) return selected;
+  if (enoughStockAny) return 'unresolved-target';
+  return stockedAny ? 'collect-stock-insufficient' : 'collect-item-not-stocked';
+}
+
 /**
  * Resolves the next unfinished spatial objective of an active quest in
- * declaration order. Non-spatial collect objectives are skipped without
- * fabricating coordinates; a quest whose remaining goals are all collect-only
- * (or whose spatial target is missing from the assembled data) reports a
- * readable no-target reason instead of guessing.
+ * declaration order. Collect objectives resolve to a real stocked seller's
+ * keeper position (same-map shops preferred); a quest whose remaining goals
+ * cannot be mapped to assembled data reports a readable, precise no-target
+ * reason instead of guessing.
  */
 export function resolveQuestNavigationTarget(input: QuestNavigationInput): QuestNavigationResult {
   const quest = input.quests.get(input.questId);
@@ -181,15 +265,37 @@ export function resolveQuestNavigationTarget(input: QuestNavigationInput): Quest
   }
 
   const objective = quest.objectives.find((candidate) => {
-    if (candidate.kind === 'collectItem') return false;
     const current = state.objectiveCounts.get(candidate.id) ?? 0;
     return current < candidate.requiredCount;
   });
-  if (objective === undefined || objective.kind === 'collectItem') {
+  if (objective === undefined) {
     return { status: 'no-target', reason: 'no-spatial-objective' };
   }
 
   const id = questNavigationTargetId(quest.id);
+  if (objective.kind === 'collectItem') {
+    const current = state.objectiveCounts.get(objective.id) ?? 0;
+    const seller = resolveCollectSeller(input, objective.targetId, objective.requiredCount - current);
+    if (typeof seller === 'string') {
+      return { status: 'no-target', reason: seller };
+    }
+    return {
+      status: 'target',
+      target: {
+        id,
+        questId: quest.id,
+        objectiveId: objective.id,
+        kind: objective.kind,
+        name: seller.shop.record.name,
+        objectiveText: objective.text,
+        mapResourceId: seller.npc.mapResourceId,
+        col: seller.npc.col,
+        row: seller.npc.row,
+        approachRadius: 1,
+        arrivalAction: questObjectiveArrivalAction(objective.kind),
+      },
+    };
+  }
   if (objective.kind === 'talkToNpc') {
     const npc = resolveNpcPosition(input, objective.targetId);
     if (npc === null) return { status: 'no-target', reason: 'unresolved-target' };

@@ -5,6 +5,7 @@ import { compileNpcSchedules } from '../src/engine/npc-schedule';
 import { parseGameCalendar } from '../src/engine/game-calendar';
 import { parseGridMap, type GridMap } from '../src/engine/grid-map';
 import { findGridPath, findGridPathToAdjacentCell, type GridPathSurface } from '../src/engine/grid-path';
+import { assembleShops, indexItems, parseItemSet, parseShopSet } from '../src/engine/item-system';
 import { parseNpcSet } from '../src/engine/npc-placement';
 import { resolveQuestNavigationTarget } from '../src/engine/quest-navigation';
 import { parseQuestSet } from '../src/engine/quest-system';
@@ -129,6 +130,18 @@ describe('Round 61 route audit against authored R58 routes', () => {
       col: record.position.col,
       row: record.position.row,
     }));
+    // Round 64: collect objectives now resolve to a stocked seller, so the
+    // audit assembles the real shops the same way the world loader does.
+    const itemParsed = parseItemSet(readJson('../data/base/items/round-06-items.json'));
+    if (!itemParsed.ok) throw new Error(itemParsed.errors.join('\n'));
+    const shopParsed = parseShopSet(readJson('../data/base/shops/round-06-shops.json'));
+    if (!shopParsed.ok) throw new Error(shopParsed.errors.join('\n'));
+    const shopAssembly = assembleShops({
+      shopSet: shopParsed.set,
+      placedNpcIds: new Set(baseNpcs.map((npc) => npc.record.id)),
+      items: indexItems(itemParsed.set).byId,
+    });
+    expect(shopAssembly.warnings).toEqual([]);
     const mapsById = new Map(maps);
     const encounterCellsByMap = new Map<string, ReadonlySet<string>>();
     for (const mapId of maps.keys()) {
@@ -197,6 +210,7 @@ describe('Round 61 route audit against authored R58 routes', () => {
           baseNpcs,
           periodNpcs,
           encounters,
+          shops: shopAssembly.shops,
         });
         expect(resolution.status, `${questId} should resolve a spatial goal in ${period.id}`).toBe('target');
         if (resolution.status !== 'target') continue;
@@ -253,7 +267,9 @@ describe('Round 61 route audit against authored R58 routes', () => {
     });
     expect(ranges).toEqual([
       ['quest.r58-market-discovery', 121, 123],
-      ['quest.r58-market-stall-pact', 3, 5],
+      // Round 64: the stall-pact leather goal now routes to the assembled
+      // peddler shop on Jiangnan instead of skipping to the later talk goal.
+      ['quest.r58-market-stall-pact', 62, 64],
       ['quest.r58-market-toll-squabble', 123, 123],
       ['quest.r58-south-hamlet-survey', 69, 73],
       ['quest.r58-south-hamlet-supply', 3, 4],

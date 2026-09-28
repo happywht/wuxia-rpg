@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { parseGridMap, type GridMap } from '../src/engine/grid-map';
 import type { CharacterProfileData } from '../src/engine/character-progression';
+import type { AssembledShop } from '../src/engine/item-system';
 import type { PlacedNpc } from '../src/engine/npc-placement';
 import {
   QUEST_NAVIGATION_ID_PREFIX,
@@ -182,7 +183,7 @@ describe('Round 60 quest objective navigation', () => {
     const input = makeInput({
       quests: new Map([[quest.id, quest]]),
       journal: makeJournal([quest], {}, {
-        [quest.id]: { 'obj-collect': 1, 'obj-talk': 1 },
+        [quest.id]: { 'obj-collect': 3, 'obj-talk': 1 },
       }),
       baseNpcs: [makeNpc('char.test-ferryman', '测试船夫', FERRY_MAP, 10, 10)],
       encounters: [makeEncounter('encounter.test-bandit', '测试匪人', FERRY_MAP, 12, 12)],
@@ -199,7 +200,7 @@ describe('Round 60 quest objective navigation', () => {
     expect(result.target.approachRadius).toBe(1);
   });
 
-  it('reports collect-only quests as having no spatial target instead of inventing coordinates', () => {
+  it('reports collect-only quests without any shop data as not stocked instead of inventing coordinates', () => {
     const quest = makeQuest([
       { id: 'obj-herbs', kind: 'collectItem', targetId: 'item.test-herb', requiredCount: 2 },
     ]);
@@ -207,7 +208,7 @@ describe('Round 60 quest objective navigation', () => {
       quests: new Map([[quest.id, quest]]),
       journal: makeJournal([quest], {}, { [quest.id]: { 'obj-herbs': 1 } }),
     }));
-    expect(result).toEqual({ status: 'no-target', reason: 'no-spatial-objective' });
+    expect(result).toEqual({ status: 'no-target', reason: 'collect-item-not-stocked' });
   });
 
   it('prefers live current-map placements, then compiled period placements, then base records', () => {
@@ -370,6 +371,193 @@ describe('Round 60 quest objective navigation', () => {
       // Advance this objective so the next loop pass resolves the next kind.
       input.journal.states.get(quest.id)!.objectiveCounts.set(objectiveId, 1);
     }
+  });
+});
+
+describe('Round 64 collect objective shop navigation', () => {
+  function makeShop(
+    id: string,
+    name: string,
+    npcId: string,
+    stock: readonly { itemId: string; quantity: number }[],
+  ): AssembledShop {
+    return { record: { id, name, npcId, greeting: '', sellRate: 1, stock: [...stock] }, stock: [...stock] };
+  }
+
+  const herbQuest = makeQuest([
+    { id: 'obj-herbs', kind: 'collectItem', targetId: 'item.test-herb', requiredCount: 3 },
+  ]);
+  const keeper = makeNpc('char.test-keeper', '测试店主', STARTING_MAP, 20, 20);
+
+  it('routes a collect objective to the stocked shop keeper with the shop arrival action', () => {
+    const shops = new Map([
+      ['shop.test-cart', makeShop('shop.test-cart', '测试百宝担', 'char.test-keeper', [
+        { itemId: 'item.test-herb', quantity: -1 },
+      ])],
+    ]);
+    const result = resolveQuestNavigationTarget(makeInput({
+      quests: new Map([[herbQuest.id, herbQuest]]),
+      journal: makeJournal([herbQuest], {}, { [herbQuest.id]: { 'obj-herbs': 1 } }),
+      baseNpcs: [keeper],
+      shops,
+      currentMapResourceId: FERRY_MAP,
+    }));
+    expect(result.status).toBe('target');
+    if (result.status !== 'target') throw new Error('expected a target');
+    expect(result.target).toMatchObject({
+      objectiveId: 'obj-herbs',
+      kind: 'collectItem',
+      name: '测试百宝担',
+      mapResourceId: STARTING_MAP,
+      col: 20,
+      row: 20,
+      approachRadius: 1,
+      arrivalAction: 'shop',
+    });
+    expect(result.target.id).toBe(`${QUEST_NAVIGATION_ID_PREFIX}${herbQuest.id}`);
+    expect(questObjectiveArrivalAction('collectItem')).toBe('shop');
+  });
+
+  it('counts only the remaining quantity against finite shelf stock', () => {
+    const shops = new Map([
+      ['shop.test-cart', makeShop('shop.test-cart', '测试百宝担', 'char.test-keeper', [
+        { itemId: 'item.test-herb', quantity: 2 },
+      ])],
+    ]);
+    // Remaining need is 3 - 1 = 2: the shelf of exactly 2 satisfies it.
+    const enough = resolveQuestNavigationTarget(makeInput({
+      quests: new Map([[herbQuest.id, herbQuest]]),
+      journal: makeJournal([herbQuest], {}, { [herbQuest.id]: { 'obj-herbs': 1 } }),
+      baseNpcs: [keeper],
+      shops,
+    }));
+    expect(enough.status).toBe('target');
+
+    const short = resolveQuestNavigationTarget(makeInput({
+      quests: new Map([[herbQuest.id, herbQuest]]),
+      journal: makeJournal([herbQuest], {}, { [herbQuest.id]: { 'obj-herbs': 0 } }),
+      baseNpcs: [keeper],
+      shops,
+    }));
+    expect(short).toEqual({ status: 'no-target', reason: 'collect-stock-insufficient' });
+  });
+
+  it('treats zero shelf quantity as unavailable and distinguishes it from not stocked', () => {
+    const zeroed = makeShop('shop.test-cart', '测试百宝担', 'char.test-keeper', [
+      { itemId: 'item.test-herb', quantity: 0 },
+    ]);
+    expect(resolveQuestNavigationTarget(makeInput({
+      quests: new Map([[herbQuest.id, herbQuest]]),
+      journal: makeJournal([herbQuest]),
+      baseNpcs: [keeper],
+      shops: new Map([['shop.test-cart', zeroed]]),
+    }))).toEqual({ status: 'no-target', reason: 'collect-item-not-stocked' });
+
+    const unstocked = makeShop('shop.test-cart', '测试百宝担', 'char.test-keeper', [
+      { itemId: 'item.other', quantity: 9 },
+    ]);
+    expect(resolveQuestNavigationTarget(makeInput({
+      quests: new Map([[herbQuest.id, herbQuest]]),
+      journal: makeJournal([herbQuest]),
+      baseNpcs: [keeper],
+      shops: new Map([['shop.test-cart', unstocked]]),
+    }))).toEqual({ status: 'no-target', reason: 'collect-item-not-stocked' });
+  });
+
+  it('lets live runtime stock override the assembled shelf quantity both ways', () => {
+    const shops = new Map([
+      ['shop.test-cart', makeShop('shop.test-cart', '测试百宝担', 'char.test-keeper', [
+        { itemId: 'item.test-herb', quantity: 5 },
+      ])],
+    ]);
+    // Shelf says 5, but the run has bought the shelf down to 1.
+    const depleted = new Map([['shop.test-cart', new Map([['item.test-herb', 1]])]]);
+    expect(resolveQuestNavigationTarget(makeInput({
+      quests: new Map([[herbQuest.id, herbQuest]]),
+      journal: makeJournal([herbQuest]),
+      baseNpcs: [keeper],
+      shops,
+      shopStocks: depleted,
+    }))).toEqual({ status: 'no-target', reason: 'collect-stock-insufficient' });
+
+    // A finite shelf whose runtime entry is unlimited keeps serving.
+    const unlimited = new Map([['shop.test-cart', new Map([['item.test-herb', -1]])]]);
+    expect(resolveQuestNavigationTarget(makeInput({
+      quests: new Map([[herbQuest.id, herbQuest]]),
+      journal: makeJournal([herbQuest]),
+      baseNpcs: [keeper],
+      shops,
+      shopStocks: unlimited,
+    })).status).toBe('target');
+  });
+
+  it('prefers a seller on the current map, then loaded world order', () => {
+    const nearShop = makeShop('shop.test-near', '近处店铺', 'char.test-near-keeper', [
+      { itemId: 'item.test-herb', quantity: -1 },
+    ]);
+    const farShop = makeShop('shop.test-far', '远处店铺', 'char.test-far-keeper', [
+      { itemId: 'item.test-herb', quantity: -1 },
+    ]);
+    const nearKeeper = makeNpc('char.test-near-keeper', '近处店主', FERRY_MAP, 30, 30);
+    const farKeeper = makeNpc('char.test-far-keeper', '远处店主', STARTING_MAP, 40, 40);
+
+    const common = {
+      quests: new Map([[herbQuest.id, herbQuest]]),
+      journal: makeJournal([herbQuest]),
+      baseNpcs: [farKeeper, nearKeeper],
+    };
+    // Declaration order puts the far shop first; the current map still wins.
+    const shops = new Map([
+      ['shop.test-far', farShop],
+      ['shop.test-near', nearShop],
+    ]);
+    const sameMap = resolveQuestNavigationTarget(makeInput({
+      ...common, shops, currentMapResourceId: FERRY_MAP,
+    }));
+    expect(sameMap).toMatchObject({ status: 'target', target: { name: '近处店铺' } });
+
+    // Without a current map, the first eligible shop in loaded order wins.
+    const byOrder = resolveQuestNavigationTarget(makeInput({ ...common, shops }));
+    expect(byOrder).toMatchObject({ status: 'target', target: { name: '远处店铺' } });
+
+    // A remote seller is still selectable when no same-map shop qualifies.
+    const onlyFar = resolveQuestNavigationTarget(makeInput({
+      ...common,
+      shops: new Map([['shop.test-far', farShop]]),
+      currentMapResourceId: FERRY_MAP,
+    }));
+    expect(onlyFar).toMatchObject({ status: 'target', target: { name: '远处店铺' } });
+  });
+
+  it('reports unresolved-target when stocked keepers cannot be placed', () => {
+    const shops = new Map([
+      ['shop.test-cart', makeShop('shop.test-cart', '测试百宝担', 'char.ghost-keeper', [
+        { itemId: 'item.test-herb', quantity: -1 },
+      ])],
+    ]);
+    expect(resolveQuestNavigationTarget(makeInput({
+      quests: new Map([[herbQuest.id, herbQuest]]),
+      journal: makeJournal([herbQuest]),
+      baseNpcs: [keeper],
+      shops,
+    }))).toEqual({ status: 'no-target', reason: 'unresolved-target' });
+  });
+
+  it('keeps navigation following the seller across schedule periods', () => {
+    const shops = new Map([
+      ['shop.test-cart', makeShop('shop.test-cart', '测试百宝担', 'char.test-keeper', [
+        { itemId: 'item.test-herb', quantity: -1 },
+      ])],
+    ]);
+    const moved = [{ ...keeper, col: 22, row: 21 }];
+    const result = resolveQuestNavigationTarget(makeInput({
+      quests: new Map([[herbQuest.id, herbQuest]]),
+      journal: makeJournal([herbQuest]),
+      baseNpcs: [keeper],
+      periodNpcs: moved,
+      shops,
+    }));
+    expect(result).toMatchObject({ status: 'target', target: { col: 22, row: 21 } });
   });
 });
 

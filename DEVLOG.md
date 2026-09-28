@@ -4,6 +4,33 @@
 
 ---
 
+## Round 64 — 采集目标商铺导航、师门地域展示与全量路线审计（2026-09-29，已完成）
+
+### 计划与实现
+
+- 接到按 `iterations/round-64/plan.md` 实现的任务，但该文件当时并不存在（仓库只有 R00–R63 的计划书）；按用户指令中的四项范围补写了 `iterations/round-64/plan.md`（含用户故事、验收、子任务、风险与约 75–105 分钟预计人类工程师工时），未改动 `.serena/` 与 Round 62 的三张未跟踪调色板图。
+- 核对 `grid-scene.ts` 的 E 键优先级（相邻 NPC：商铺 → 差事名录 → 对话；F 直接交谈）后，为 `NavigationArrivalAction` 新增 `shop` 抵达动作，HUD 文案为「按 E 直接交易 · F 交谈（购买后差事计数自动核对）」，与 `updateInteractHint` 对店主的「按 E 交易 · F 交谈」提示和 ShopPanel `onChange → refreshQuestCollectObjectives` 的实际链路一致。
+- `src/engine/quest-navigation.ts`：`SpatialQuestObjectiveKind` 纳入 `collectItem`；输入新增可选 `shops`（装配商店表）、`shopStocks`（逐店运行时库存）、`currentMapResourceId`；新增 `resolveCollectSeller` 在「运行时库存优先、货架 `-1` 无限、正数有限、`0`/未上架不可用」规则下筛选能补齐剩余份数（`requiredCount - 当前计数`）的卖家——同图优先、组内按装配声明顺序取首，无同图合格卖家时按装配顺序取首个异地卖家；返回新增精确原因 `collect-item-not-stocked`（无任何商店上架）与 `collect-stock-insufficient`（有上架但可用量全部不足），店主无法定位沿用 `unresolved-target`。目标名取商店名、位置取店主当前时段布置（同图活位 > 编译时段位 > 基础位）、`approachRadius: 1`；目标 id 沿用 `quest:` 运行时命名空间不进存档。引擎仅 import `item-system` 的类型与 `UNLIMITED_STOCK` 协议常量，无内容常量。
+- `GridScene.resolveQuestNavigation` 传入 `world.assembly.shops`、`this.shopStocks` 与 `this.currentMapResourceId`；Q→N 的 no-target 文案补两种缺货原因。
+- Scope 2：`src/engine/world-navigation.ts` 新增 `deriveNpcRegionNames` 纯函数（装配 NPC 的固定 `mapResourceId` → 世界区域名；NPC 日程只改格不改图）；`faction-ui.ts` 的 J 页师父名旁显示 `名字（区域名）`，未解析导师显示「行踪未详」通用占位；`grid-scene.ts` 打开面板时以装配数据派生。
+- 新增 `tests/round64-collect-shop-navigation.test.ts`：以真实物品/商店/NPC/任务/历法资料装配，验证无限库存采集目标解析到姜百味商铺、`quest.r42-seal-rubbing` 的拓本未上架返回 `collect-item-not-stocked`、清心丸静态货架 5/运行时买空至 1 时按剩余需求精确拒绝、姜百味七个时段位置（午后 `(43,39)`、入夜 `(44,39)`、其余基础 `(45,39)`）逐段跟随，以及导师地域名派生与未登记地图的省略行为。
+- 新增 `tests/round64-route-audit.test.ts`：按世界加载器同款逐图 `assembleNpcPlacements` 合并 14 名 NPC、`compileNpcSchedules` 编译七时段并装入全部野外遭遇；审计目标为全部登记门派师父、差事给予者与 `talkToNpc` 对象（去重 14 人，全部通过装配存在性检查），入口为起始图出生点与每条有向关口落点（去重后 5 个不同格位：江南道 2、雾雨渡口 2、铁嶂北道 1）。可达性判定与 `findGridPathToAdjacentCell` 契约一致（入口 BFS 可达集 ∩ 目标四向可走邻格），分静态（纯几何）与动态（当期 NPC+遭遇占位、豁免入口格以对齐 `resolveNpcPlacementsForPlayer` 的让位保证）两层，并审计每个入口到本图全部交互目标及出图关口 `from` 格。结果 462 项检查零静态断连、零动态阻挡，本轮未发现需要修复的交互关键阻挡，未改动任何地图/日程数据；口径与数字记入新增 `docs/ROUND-64-ROUTE-AUDIT.md`。
+- 更新 `tests/quest-navigation.test.ts` 两项被 Round 64 语义取代的断言（采集完成态让位后续目标；无商店资料时返回 `collect-item-not-stocked` 而非编造坐标）并新增 7 项商铺导航用例；`tests/round61-route-audit.test.ts` 补装配真实商店（`assembleShops`，零警告）后，`quest.r58-market-stall-pact` 首个未完成目标从后续谈话改为跨区导购（距离 3–5 格 → 62–64 格），其余五条 R58 路线距离不变。
+- 文档：`docs/PLAYER-GUIDE.md` 更新采集目标导航、J 师门行与「按 N 没有导航」疑难说明；`docs/ARCHITECTURE.md` 状态行、导航模块段与变更表补 Round 64；新增 `docs/ROUND-64-ROUTE-AUDIT.md`；`CHANGELOG.md`/`DEVLOG.md`/`ROADMAP.md`/`README.md`/`docs/DATA-GUIDE.md` 按轮次联动更新。
+- 限制与边界：当前基础资料仅一家在营商铺，「无卖家」与「库存不足」原因各有真实数据用例（拓本未上架、清心丸有限货架）；师门页地域名依赖装配 NPC 与世界区域资料齐全；本轮审计覆盖入口→同图交互格可达性，跨时区长途步行与天气耗时沿用 R63 模拟口径。主流程复核后补做隔离浏览器新档试玩（独立 `127.0.0.1:5182`：接取「巷口送药」→ Q/N 导航到姜百味百宝担 → M 查看三格路线 → 按步行指引绕过阻挡 → 抵达提示按 E 交易 → 购买一份回春膏后差事显示 3/3 已完成；J 页同时核验五位师父均显示区域名），没有写入或覆盖用户的 `127.0.0.1:5178` 页面/存档。
+
+### 验证
+
+- `npx vitest run tests/quest-navigation.test.ts tests/round64-collect-shop-navigation.test.ts tests/round64-route-audit.test.ts`：3 个文件 26 项通过；主流程独立复跑 `npx vitest run tests/quest-navigation.test.ts tests/round61-route-audit.test.ts tests/round64-collect-shop-navigation.test.ts tests/round64-route-audit.test.ts`：4 个文件 27 项通过；审计行输出 `maps=3 periods=7 targets=14 entries=5 checks=462 static-disconnected=0 dynamic-blocked=0`。
+- `npm run typecheck`：`tsc --noEmit` 通过（含两处测试类型修正：runtime 商铺 id 非空检查、历法时段显式类型，以及删除审计测试一个未使用的 `WorldMapAssembly` 导入）。
+- `npm test`：首轮 264 项中 1 项失败——R61 审计未传商店输入导致采集首目标返回 no-target；补装配后 35 个测试文件 264 项全部通过。
+- `npm run validate:data`：28 项基础资源 Schema 通过；`npm run audit:round-34`：文档一致性审计通过；`npm run audit:round-48-docs`：全部六份联动文档（README/ROADMAP/CHANGELOG/DEVLOG/ARCHITECTURE/DATA-GUIDE/PLAYER-GUIDE）更新到 Round 64 后通过。
+- 最终 `npm run package:release`：通过——28 项资源 Schema、28 项 MOD 检查零问题、严格类型检查、35 个测试文件/264 项用例、Round 34/48 文档审计、Vite 138 模块生产构建、发行归档与 Round 47 子路径 smoke；发行包 788,135 bytes、72 个归档文件/71 个内容文件，SHA-256 `f93769c4058a8a72ab60a86198c2e5af49553c513fd90cb70f2dbf1c19b4ddc2`，主 JS 1,933.34 kB（gzip 511.00 kB）的 Vite 体积提示仍为非阻断。
+- 环境备注：本轮在 Git Bash 下执行，PATH 首位的 GNU tar 1.35 会把 `D:\` 盘符路径误当远程主机导致 `smoke:round-47` 失败；以仅含 Windows bsdtar 3.8.8 的临时 shim 目录前置 PATH 后 smoke 完整通过（仓库脚本未为此改动；R63 及更早记录在 bsdtar 环境下验证）。
+- `.serena/`、`iterations/round-62/*.png` 与任何生成资产保持未改动、未纳入本轮。
+
+---
+
 ## Round 63 — 跨时段实时行路模拟与玩家引导复核（2026-09-29，已完成）
 
 ### 计划与实现
@@ -257,7 +284,7 @@
 - 开工前计划写入 `iterations/round-54/plan.md`：目标是从区域图显示可步行的跨区行程首段，含用户故事、6 项验收标准、4 项可验证子任务、风险、预计文件及至少 2 小时人类工时；计划开发前创建，未把等待时间计作工时。
 - 新增 Phaser-free `src/engine/world-travel.ts`，对已装配地图区域与有向关口执行 BFS；同长路径按 transition id 稳定决胜，不自动补返程边，端点不存在或无路时返回 `null`。
 - 新增 Phaser-free `src/engine/world-navigation.ts`，组合当前区地点/关口、直接相邻的区域 waypoint 与已发现的远区地标。远区目的地只投影到本区首个关口格；通过知识节点过滤后才读取/复制地标信息。区域候选仅列直接可见关口去向，避免可达性查询泄露玩家尚未知晓的多跳区域。
-- 输入诊断发现当前窄视口 `Phaser.Scale.FIT` 下 pointer 的 x 已换成逻辑画布坐标，但 y 仍是 CSS 像素；例如侧栏首行点击回报 `x≈704,y≈155`，而面板首行位于逻辑 `y=224`，导致先前点击不命中。新增纯逻辑 `normalizeWorldMapPointer` 以 canvas backing height/clientHeight 归一纵轴，舆图列表、pin 路径、拖动与滚轮共用该转换，并以单元测试覆盖高 DPI/零高度。
+- 输入诊断发现当前窄视口 `Phaser.Scale.FIT` 下 pointer 的 x 已换成逻辑画布坐标，但 y 仍是 CSS 像素；例如侧栏首行点击回报 `x≈704,y≈155`，而面板首行位于逻辑 `y=462`，导致先前点击不命中。新增纯逻辑 `normalizeWorldMapPointer` 以 canvas backing height/clientHeight 归一纵轴，舆图列表、pin 路径、拖动与滚轮共用该转换，并以单元测试覆盖高 DPI/零高度。
 - 舆图现在支持 W/S 循环焦点、Enter 确认；侧栏各行使用独立命中区，地图 pin 有扩大后的 pointer 命中区。远区“区域/远方”目标不绘制覆盖本地关口的重复 pin，路线详情同时显示本区首段、下一道关口和区域行程。面板 M/Esc 关闭时移除监听并清空选择。
 - 同步更新 `docs/MAP-ATLAS.md`、玩家指南、架构/资料指南、README、路线图与变更记录；Round 55 路线转为扩展第二块可步行大型区域并核对关口落点。
 

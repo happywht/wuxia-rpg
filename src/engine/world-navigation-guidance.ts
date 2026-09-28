@@ -8,7 +8,7 @@ import { findWorldTravelRoute } from './world-travel';
  * engine knows only which existing control applies — never the character,
  * place or story behind the objective (see docs/ARCHITECTURE.md).
  */
-export type NavigationArrivalAction = 'talk' | 'battle' | 'discover';
+export type NavigationArrivalAction = 'talk' | 'battle' | 'discover' | 'shop';
 
 export interface WorldNavigationGuideSegment {
   status: 'en-route' | 'at-gate' | 'arrived';
@@ -160,9 +160,10 @@ export function resolveWorldNavigationGuide(
 /**
  * HUD copy naming the existing control that acts on a reached quest target.
  * Mirrors the scene's input precedence — F talks directly, E serves an
- * adjacent NPC before an encounter, discovery fires on arrival but can be
- * gated by period or weather — so the copy never claims the interaction or
- * discovery has already happened, only that the player is next to it.
+ * adjacent NPC before an encounter (opening that keeper's shop first),
+ * discovery fires on arrival but can be gated by period or weather — so the
+ * copy never claims the interaction or discovery has already happened, only
+ * that the player is next to it.
  */
 export function arrivalActionHint(action: NavigationArrivalAction): string {
   switch (action) {
@@ -172,5 +173,7 @@ export function arrivalActionHint(action: NavigationArrivalAction): string {
       return '按 E 交手（身旁另有人物时 E 会先应对他们）';
     case 'discover':
       return '见闻须满足事件条件；可按 V 推进时段等待';
+    case 'shop':
+      return '按 E 直接交易 · F 交谈（购买后差事计数自动核对）';
   }
 }
