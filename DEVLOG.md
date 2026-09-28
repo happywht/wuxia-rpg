@@ -4,6 +4,43 @@
 
 ---
 
+## Round 54 — 跨区域舆图路线与 waypoint 操作（2026-09-28，已完成）
+
+### 计划与实现
+
+- 开工前计划写入 `iterations/round-54/plan.md`：目标是从区域图显示可步行的跨区行程首段，含用户故事、6 项验收标准、4 项可验证子任务、风险、预计文件及至少 2 小时人类工时；计划开发前创建，未把等待时间计作工时。
+- 新增 Phaser-free `src/engine/world-travel.ts`，对已装配地图区域与有向关口执行 BFS；同长路径按 transition id 稳定决胜，不自动补返程边，端点不存在或无路时返回 `null`。
+- 新增 Phaser-free `src/engine/world-navigation.ts`，组合当前区地点/关口、直接相邻的区域 waypoint 与已发现的远区地标。远区目的地只投影到本区首个关口格；通过知识节点过滤后才读取/复制地标信息。区域候选仅列直接可见关口去向，避免可达性查询泄露玩家尚未知晓的多跳区域。
+- 输入诊断发现当前窄视口 `Phaser.Scale.FIT` 下 pointer 的 x 已换成逻辑画布坐标，但 y 仍是 CSS 像素；例如侧栏首行点击回报 `x≈704,y≈155`，而面板首行位于逻辑 `y=224`，导致先前点击不命中。新增纯逻辑 `normalizeWorldMapPointer` 以 canvas backing height/clientHeight 归一纵轴，舆图列表、pin 路径、拖动与滚轮共用该转换，并以单元测试覆盖高 DPI/零高度。
+- 舆图现在支持 W/S 循环焦点、Enter 确认；侧栏各行使用独立命中区，地图 pin 有扩大后的 pointer 命中区。远区“区域/远方”目标不绘制覆盖本地关口的重复 pin，路线详情同时显示本区首段、下一道关口和区域行程。面板 M/Esc 关闭时移除监听并清空选择。
+- 同步更新 `docs/MAP-ATLAS.md`、玩家指南、架构/资料指南、README、路线图与变更记录；Round 55 路线转为扩展第二块可步行大型区域并核对关口落点。
+
+### 浏览器手动验证
+
+- 在本机 `http://127.0.0.1:5178/` 新建默认角色，按 M 打开起始 100×100 地图；面板仍显示实景舆图和 7 个可见目的地，未发现的芦岸登船点不出现在候选列表。
+- 首次浏览器点击诊断捕获列表命中时 Phaser `pointer.y≈155`，由此确认 FIT 画布的 CSS/逻辑纵轴偏差；修复后再点侧栏首行、点击湖泊 pin、点选直接相邻区域行，面板均保持打开并更新高亮/路线。选择区域目的地显示当前本地图关口与区域行程；W/S 后 Enter 可循环切换并确认。
+- 按 M 关闭再打开，选中路线与键盘焦点均已清除，舆图回到待选状态。浏览器人工检查覆盖当前浏览器视口；两跳未公开区域与发现后的远区地标继续由自动回归覆盖。
+
+### 自动验证（阶段记录）
+
+- `npx vitest run tests/world-travel.test.ts tests/world-navigation.test.ts tests/grid-path.test.ts tests/round52-map-landmarks.test.ts`：通过，4 个文件/32 个测试。
+- `npm run typecheck`：通过（`tsc --noEmit`）。
+- 最终自动验证结果见下方“最终质量门槛”小节。
+
+### 最终质量门槛
+
+- `npx vitest run tests/world-travel.test.ts tests/world-navigation.test.ts tests/grid-path.test.ts tests/round52-map-landmarks.test.ts`：通过，4 个文件/33 个测试。
+- `npm run typecheck`：通过（`tsc --noEmit`）。
+- `npm run package:release`：通过；`npm run check` 内含 26 项基础资料/schema 校验、MOD 0 问题、类型检查、24 个测试文件/190 项、Round 34 与 Round 48 文档审计；随后 Vite 8.3.1 构建 136 modules，完成 tarball 清单/哈希验证和 R47 `/preview/wuxia-rpg/` 子路径 smoke。版本包 `release/wuxia-rpg-web-0.0.1.tgz` 为 739,006 bytes，SHA-256 `0320c6fadebd162071a089265d9c8f00716a0e69c6f46bd8109b2e710984350b`，70 项归档含 69 个内容文件。Vite 的单 JS chunk 提示为 1,919.61 kB（gzip 507.07 kB），仅为非阻塞体积建议。
+- 首次质量门槛在补写本轮 DEVLOG 标题前由 Round 48 审计按预期拒绝（其余 188 项测试通过）；补上本节后重跑完整发行命令，全部门槛通过。
+
+### 边界
+
+- 当前世界仍只有 100×100 起始大地图和 16×9 渡口图；已知远区的路线计算按有向区域图规划，具体格路径只覆盖当前地图至首关口。
+- 自动路径只看静态碰撞网格，不考虑 NPC 瞬时占位，也不会自动让角色行走或代替 E 键切区。远区见闻的获取条件和实际跨区连续试玩没有在本轮浏览器操作中走完。
+
+---
+
 ## Round 53 — 地标寻路与区域探索反馈（2026-09-28，已完成）
 
 ### 计划与实现

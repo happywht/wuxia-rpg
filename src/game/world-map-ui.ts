@@ -4,7 +4,8 @@ import { type CellPosition, type GridMap } from '../engine/grid-map';
 import { findGridPath, summarizePathRuns } from '../engine/grid-path';
 import { clampMapViewport, createMapViewport, panMapViewport, zoomMapViewport, type MapViewportBounds, type MapViewportState } from '../engine/map-viewport';
 import { gridMapArtTextureKey } from '../engine/grid-map-renderer';
-import { selectVisibleWorldLandmarks, type WorldLandmarkCategory, type WorldMapAssembly } from '../engine/world-map';
+import { type WorldMapAssembly } from '../engine/world-map';
+import { buildWorldMapWaypoints, cycleWorldWaypointIndex, normalizeWorldMapPointer, type WorldMapWaypoint } from '../engine/world-navigation';
 import { uiFontSize } from './settings';
 import { addPixelPanelChrome, UI_FONT_FAMILY } from './ui-theme';
 
@@ -25,16 +26,6 @@ const COLORS = {
 } as const;
 
 type Binding = { key: Phaser.Input.Keyboard.Key; handler: () => void };
-
-interface MapWaypoint {
-  id: string;
-  name: string;
-  category: WorldLandmarkCategory;
-  position: CellPosition;
-  kind: 'landmark' | 'transition';
-  approachRadius: number;
-  destinationRegionName?: string;
-}
 
 interface MapPin {
   waypointId: string;
@@ -62,8 +53,10 @@ export class WorldMapPanel {
   private routeDirectionsText: Phaser.GameObjects.Text | null = null;
   private routeDestinationText: Phaser.GameObjects.Text | null = null;
   private activeMap: GridMap | null = null;
-  private waypoints: MapWaypoint[] = [];
+  private waypoints: WorldMapWaypoint[] = [];
   private routeCells: CellPosition[] | null = null;
+  private selectedWaypointId: string | null = null;
+  private focusedWaypointIndex = -1;
   private viewportState: MapViewportState = { x: 0, y: 0, scale: 1 };
   private mapWidth = 0;
   private mapHeight = 0;
@@ -78,26 +71,54 @@ export class WorldMapPanel {
   private lastPointerX = 0;
   private lastPointerY = 0;
 
+  private readonly pointerDown = (pointer: Phaser.Input.Pointer): void => {
+    if (!this.openState) return;
+    const point = this.panelPointer(pointer);
+    if (point.x >= 672 && point.x <= 860) {
+      const index = Math.round((point.y - 224) / 19);
+      const rowY = 224 + index * 19;
+      if (index >= 0 && index < Math.min(8, this.waypoints.length) && Math.abs(point.y - rowY) <= 9) {
+        this.draggingPointerId = null;
+        this.focusWaypoint(index);
+        const waypoint = this.waypoints[index];
+        if (waypoint !== undefined) this.selectWaypoint(waypoint.id);
+        return;
+      }
+    }
+    if (!this.isPointerInsideMap(point.x, point.y)) {
+      this.draggingPointerId = null;
+      return;
+    }
+    this.draggingPointerId = pointer.id;
+    this.dragStartX = point.x;
+    this.dragStartY = point.y;
+    this.dragMoved = false;
+    this.lastPointerX = point.x;
+    this.lastPointerY = point.y;
+  };
+
   private readonly pointerMove = (pointer: Phaser.Input.Pointer): void => {
     if (this.draggingPointerId === null || pointer.id !== this.draggingPointerId) return;
-    if (Math.hypot(pointer.x - this.dragStartX, pointer.y - this.dragStartY) > 4) this.dragMoved = true;
+    const point = this.panelPointer(pointer);
+    if (Math.hypot(point.x - this.dragStartX, point.y - this.dragStartY) > 4) this.dragMoved = true;
     this.viewportState = panMapViewport(
       this.mapBounds, this.mapWidth, this.mapHeight, this.viewportState,
-      pointer.x - this.lastPointerX, pointer.y - this.lastPointerY,
+      point.x - this.lastPointerX, point.y - this.lastPointerY,
     );
-    this.lastPointerX = pointer.x;
-    this.lastPointerY = pointer.y;
+    this.lastPointerX = point.x;
+    this.lastPointerY = point.y;
     this.updateMapPosition();
   };
 
   private readonly pointerUp = (pointer: Phaser.Input.Pointer): void => {
     if (pointer.id !== this.draggingPointerId) return;
+    const point = this.panelPointer(pointer);
     const clicked = !this.dragMoved;
     this.draggingPointerId = null;
-    if (!clicked || !this.isPointerInsideMap(pointer.x, pointer.y)) return;
+    if (!clicked || !this.isPointerInsideMap(point.x, point.y)) return;
     const waypoint = this.waypoints
       .map((candidate) => ({ waypoint: candidate, point: this.waypointScreenPosition(candidate.position) }))
-      .map((candidate) => ({ ...candidate, distance: Math.hypot(candidate.point.x - pointer.x, candidate.point.y - pointer.y) }))
+      .map((candidate) => ({ ...candidate, distance: Math.hypot(candidate.point.x - point.x, candidate.point.y - point.y) }))
       .filter((candidate) => candidate.distance <= 13)
       .sort((a, b) => a.distance - b.distance)[0]?.waypoint;
     if (waypoint !== undefined) this.selectWaypoint(waypoint.id);
@@ -110,11 +131,12 @@ export class WorldMapPanel {
     deltaY: number,
   ): void => {
     if (!this.openState || this.mapImage === null) return;
+    const point = this.panelPointer(pointer);
     if (
-      pointer.x < this.mapBounds.x || pointer.x > this.mapBounds.x + this.mapBounds.width ||
-      pointer.y < this.mapBounds.y || pointer.y > this.mapBounds.y + this.mapBounds.height
+      point.x < this.mapBounds.x || point.x > this.mapBounds.x + this.mapBounds.width ||
+      point.y < this.mapBounds.y || point.y > this.mapBounds.y + this.mapBounds.height
     ) return;
-    this.zoom(pointer.x, pointer.y, deltaY > 0 ? 0.88 : 1.12);
+    this.zoom(point.x, point.y, deltaY > 0 ? 0.88 : 1.12);
   };
 
   constructor(scene: Phaser.Scene, onClose?: () => void) {
@@ -139,11 +161,14 @@ export class WorldMapPanel {
     this.playerCol = playerCol;
     this.playerRow = playerRow;
     this.bindKeys();
+    this.scene.input.on('pointerdown', this.pointerDown);
     this.scene.input.on('pointermove', this.pointerMove);
     this.scene.input.on('pointerup', this.pointerUp);
     this.scene.input.on('wheel', this.pointerWheel);
     this.activeMap = map;
-    this.waypoints = this.buildWaypoints(worldMap, currentMapResourceId, knownKnowledgeNodeIds);
+    this.waypoints = buildWorldMapWaypoints(worldMap, currentMapResourceId, knownKnowledgeNodeIds);
+    this.selectedWaypointId = null;
+    this.focusedWaypointIndex = -1;
     this.render(worldMap, currentMapResourceId, map);
   }
 
@@ -151,6 +176,7 @@ export class WorldMapPanel {
     if (!this.openState) return;
     this.openState = false;
     this.unbindKeys();
+    this.scene.input.off('pointerdown', this.pointerDown);
     this.scene.input.off('pointermove', this.pointerMove);
     this.scene.input.off('pointerup', this.pointerUp);
     this.scene.input.off('wheel', this.pointerWheel);
@@ -173,6 +199,8 @@ export class WorldMapPanel {
     this.activeMap = null;
     this.waypoints = [];
     this.routeCells = null;
+    this.selectedWaypointId = null;
+    this.focusedWaypointIndex = -1;
     this.inputZone = null;
     this.onClose?.();
   }
@@ -200,6 +228,26 @@ export class WorldMapPanel {
       key.on('down', handler);
       this.bindings.push({ key, handler });
     }
+    const previous = keyboard.addKey(codes.W);
+    const previousHandler = (): void => this.focusWaypoint(
+      cycleWorldWaypointIndex(this.focusedWaypointIndex, this.waypoints.length, -1),
+    );
+    previous.on('down', previousHandler);
+    this.bindings.push({ key: previous, handler: previousHandler });
+    const next = keyboard.addKey(codes.S);
+    const nextHandler = (): void => this.focusWaypoint(
+      cycleWorldWaypointIndex(this.focusedWaypointIndex, this.waypoints.length, 1),
+    );
+    next.on('down', nextHandler);
+    this.bindings.push({ key: next, handler: nextHandler });
+    const confirm = keyboard.addKey(codes.ENTER);
+    const confirmHandler = (): void => {
+      if (this.focusedWaypointIndex < 0) return;
+      const waypoint = this.waypoints[this.focusedWaypointIndex];
+      if (waypoint !== undefined) this.selectWaypoint(waypoint.id);
+    };
+    confirm.on('down', confirmHandler);
+    this.bindings.push({ key: confirm, handler: confirmHandler });
   }
 
   private unbindKeys(): void {
@@ -210,7 +258,7 @@ export class WorldMapPanel {
   private render(worldMap: WorldMapAssembly, currentMapResourceId: string, map: GridMap): void {
     addPixelPanelChrome(this.scene, this.container, { x: 90, y: 45, width: 780, height: 450 }, 0.9);
     this.addText(WIDTH / 2, 62, '江湖舆图', 20, COLORS.text, 0.5);
-    this.addText(WIDTH / 2, 91, '拖动平移 · 滚轮缩放 · 方向键微调 · 按 M 或 Esc 收起', 12, COLORS.muted, 0.5);
+    this.addText(WIDTH / 2, 91, '拖动平移 · 滚轮缩放 · 方向键微调 · W/S 选点 · Enter 规划 · M/Esc 收起', 12, COLORS.muted, 0.5);
 
     const art = map.data.art;
     const textureKey = art === undefined ? null : gridMapArtTextureKey(map);
@@ -238,8 +286,14 @@ export class WorldMapPanel {
       this.routeGraphics = this.scene.add.graphics();
       this.mapContent.add(this.routeGraphics);
       for (const waypoint of this.waypoints) {
+        // Remote objectives share their map marker with the first gate. Keep
+        // the local gate pin unambiguous; the remote destination remains a
+        // separate selectable row in the sidebar.
+        if (waypoint.kind === 'remote-region' || waypoint.kind === 'remote-landmark') continue;
         const pin = this.scene.add.circle(0, 0, waypoint.kind === 'transition' ? 6 : 4.5, COLORS[waypoint.category])
           .setStrokeStyle(2, 0x16202a);
+        pin.setInteractive(new Phaser.Geom.Circle(0, 0, 14), Phaser.Geom.Circle.Contains);
+        pin.on('pointerdown', () => this.selectWaypoint(waypoint.id));
         this.mapPins.push({ waypointId: waypoint.id, pin });
         this.mapContent.add(pin);
       }
@@ -251,14 +305,6 @@ export class WorldMapPanel {
         this.mapBounds.width,
         this.mapBounds.height,
       ).setInteractive();
-      this.inputZone.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-        this.draggingPointerId = pointer.id;
-        this.dragStartX = pointer.x;
-        this.dragStartY = pointer.y;
-        this.dragMoved = false;
-        this.lastPointerX = pointer.x;
-        this.lastPointerY = pointer.y;
-      });
       this.container.add(this.inputZone);
       this.updateMapPosition();
     } else {
@@ -277,21 +323,27 @@ export class WorldMapPanel {
     this.addText(672, 137, current?.name ?? currentMapResourceId, 15, COLORS.accent, 0);
     this.addText(672, 166, current?.description ?? '当前区域', 12, COLORS.muted, 0);
     this.addText(672, 203, `已知地点与关口 ${this.waypoints.length} 处`, 12, COLORS.text, 0);
-    this.waypoints.slice(0, 6).forEach((waypoint, index) => {
+    this.waypoints.slice(0, 8).forEach((waypoint, index) => {
       const y = 224 + index * 19;
       this.addLegendSwatch(678, y, COLORS[waypoint.category]);
-      const row = this.addText(690, y, `${waypoint.kind === 'transition' ? '关口' : '地点'} · ${waypoint.name}`, 11,
-        COLORS.text, 0).setInteractive({ useHandCursor: true });
-      row.on('pointerdown', () => this.selectWaypoint(waypoint.id));
+      const row = this.addText(690, y, `${waypointLabel(waypoint)} · ${waypoint.name}`, 11, COLORS.text, 0);
+      const hitZone = this.scene.add.zone(777, y, 174, 18)
+        .setScrollFactor(0)
+        .setInteractive({ useHandCursor: true })
+        .on('pointerdown', () => {
+          this.focusWaypoint(index);
+          this.selectWaypoint(waypoint.id);
+        });
+      this.container.add(hitZone);
       this.waypointRows.push({ id: waypoint.id, text: row });
     });
-    if (this.waypoints.length > 6) {
-      this.addText(690, 337, `其余 ${this.waypoints.length - 6} 处可点选地图标记`, 10, COLORS.muted, 0);
+    if (this.waypoints.length > 8) {
+      this.addText(690, 373, `其余 ${this.waypoints.length - 8} 处可用 W/S 切换`, 10, COLORS.muted, 0);
     }
-    this.selectedNameText = this.addText(672, 355, '选择地点规划步行路线', 11, COLORS.accent, 0);
-    this.routeDistanceText = this.addText(672, 377, '', 11, COLORS.text, 0);
-    this.routeDirectionsText = this.addText(672, 399, '', 10, COLORS.muted, 0);
-    this.routeDestinationText = this.addText(672, 448, '', 10, COLORS.muted, 0);
+    this.selectedNameText = this.addText(672, 393, '选择地点规划步行路线', 11, COLORS.accent, 0);
+    this.routeDistanceText = this.addText(672, 415, '', 11, COLORS.text, 0);
+    this.routeDirectionsText = this.addText(672, 437, '', 10, COLORS.muted, 0);
+    this.routeDestinationText = this.addText(672, 465, '', 10, COLORS.muted, 0);
     this.addText(122, 443, `${map.data.name} · 格坐标 (${this.playerCol}, ${this.playerRow})`, 11, COLORS.muted, 0);
     if (this.mapContent !== null) this.createAtlasCamera();
   }
@@ -348,33 +400,18 @@ export class WorldMapPanel {
     this.drawRoute();
   }
 
-  private buildWaypoints(
-    worldMap: WorldMapAssembly,
-    currentMapResourceId: string,
-    knownKnowledgeNodeIds: ReadonlySet<string>,
-  ): MapWaypoint[] {
-    const landmarks = selectVisibleWorldLandmarks(worldMap.landmarks, knownKnowledgeNodeIds)
-      .filter((landmark) => landmark.mapResourceId === currentMapResourceId)
-      .map((landmark): MapWaypoint => ({
-        id: `landmark:${landmark.id}`,
-        name: landmark.name,
-        category: landmark.category,
-        position: { col: landmark.col, row: landmark.row },
-        kind: 'landmark',
-        approachRadius: 2,
-      }));
-    const transitions = worldMap.transitions
-      .filter((transition) => transition.from.mapResourceId === currentMapResourceId)
-      .map((transition): MapWaypoint => ({
-        id: `transition:${transition.id}`,
-        name: transition.name,
-        category: 'crossing',
-        position: { col: transition.from.col, row: transition.from.row },
-        kind: 'transition',
-        approachRadius: 0,
-        destinationRegionName: worldMap.regions.find((region) => region.mapResourceId === transition.to.mapResourceId)?.name ?? transition.to.mapResourceId,
-      }));
-    return [...landmarks, ...transitions];
+  private focusWaypoint(index: number): void {
+    if (this.waypoints.length === 0) return;
+    this.focusedWaypointIndex = ((index % this.waypoints.length) + this.waypoints.length) % this.waypoints.length;
+    const focusedId = this.waypoints[this.focusedWaypointIndex]?.id;
+    for (const row of this.waypointRows) {
+      const waypoint = this.waypoints.find((candidate) => candidate.id === row.id);
+      if (waypoint === undefined) continue;
+      const focused = row.id === focusedId;
+      const selected = row.id === this.selectedWaypointId;
+      row.text.setColor(focused ? COLORS.accent : COLORS.text);
+      row.text.setText(`${focused ? '›' : selected ? '✓' : '·'} ${waypointLabel(waypoint)} · ${waypoint.name}`);
+    }
   }
 
   private selectWaypoint(id: string): void {
@@ -387,7 +424,9 @@ export class WorldMapPanel {
       waypoint.position,
       { approachRadius: waypoint.approachRadius },
     );
-    this.selectedNameText?.setText(`${waypoint.kind === 'transition' ? '关口' : '地点'}：${waypoint.name}`);
+    this.selectedWaypointId = id;
+    const kindLabel = waypointLabel(waypoint);
+    this.selectedNameText?.setText(`${kindLabel}：${waypoint.name}`);
     if (this.routeCells === null) {
       this.routeDistanceText?.setText('当前地形没有可行路线');
       this.routeDirectionsText?.setText('请从别处重新规划。');
@@ -395,17 +434,19 @@ export class WorldMapPanel {
       const steps = Math.max(0, this.routeCells.length - 1);
       const arrivedAtTarget = this.routeCells.at(-1)?.col === waypoint.position.col &&
         this.routeCells.at(-1)?.row === waypoint.position.row;
-      this.routeDistanceText?.setText(`步行 ${steps} 格${arrivedAtTarget ? '' : ' · 至最近可行停靠点'}`);
+      this.routeDistanceText?.setText(waypoint.kind === 'remote-landmark' || waypoint.kind === 'remote-region'
+        ? `首段步行 ${steps} 格至「${waypoint.nextTransitionName ?? '下一关口'}」`
+        : `步行 ${steps} 格${arrivedAtTarget ? '' : ' · 至最近可行停靠点'}`);
       this.routeDirectionsText?.setText(formatRouteDirections(this.routeCells));
     }
-    this.routeDestinationText?.setText(waypoint.destinationRegionName === undefined
-      ? '' : `抵达后通往：${waypoint.destinationRegionName}`);
-    for (const row of this.waypointRows) {
-      const selected = row.id === id;
-      row.text.setColor(selected ? COLORS.accent : COLORS.text);
-      const entry = this.waypoints.find((candidate) => candidate.id === row.id);
-      if (entry !== undefined) row.text.setText(`${selected ? '›' : '·'} ${entry.kind === 'transition' ? '关口' : '地点'} · ${entry.name}`);
+    if (waypoint.kind === 'remote-landmark' || waypoint.kind === 'remote-region') {
+      this.routeDestinationText?.setText(`行程：${waypoint.regionRouteNames?.join(' → ') ?? waypoint.destinationRegionName ?? ''}`);
+    } else {
+      this.routeDestinationText?.setText(waypoint.destinationRegionName === undefined
+        ? '' : `抵达后通往：${waypoint.destinationRegionName}`);
     }
+    const selectedIndex = this.waypoints.findIndex((candidate) => candidate.id === id);
+    if (selectedIndex >= 0) this.focusWaypoint(selectedIndex);
     for (const { waypointId, pin } of this.mapPins) pin.setScale(waypointId === id ? 1.4 : 1);
     this.drawRoute();
   }
@@ -444,6 +485,12 @@ export class WorldMapPanel {
       y >= this.mapBounds.y && y <= this.mapBounds.y + this.mapBounds.height;
   }
 
+  /** Phaser scales Pointer.x with the FIT canvas but leaves Pointer.y in CSS pixels here. */
+  private panelPointer(pointer: Phaser.Input.Pointer): { x: number; y: number } {
+    const canvas = this.scene.game.canvas;
+    return normalizeWorldMapPointer(pointer, canvas.height, canvas.clientHeight);
+  }
+
   private addLegendSwatch(x: number, y: number, color: number): void {
     const swatch = this.scene.add.circle(x, y, 4, color).setStrokeStyle(1, 0x16202a).setScrollFactor(0);
     this.container.add(swatch);
@@ -459,6 +506,13 @@ export class WorldMapPanel {
     this.container.add(object);
     return object;
   }
+}
+
+function waypointLabel(waypoint: WorldMapWaypoint): string {
+  if (waypoint.kind === 'transition') return '关口';
+  if (waypoint.kind === 'remote-region') return '区域';
+  if (waypoint.kind === 'remote-landmark') return '远方';
+  return '地点';
 }
 
 function formatRouteDirections(path: readonly CellPosition[]): string {
