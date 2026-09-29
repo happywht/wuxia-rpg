@@ -1,6 +1,6 @@
 /** Round 68: one real-data journey across all four regions, a remote save, and an ending. */
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import { ClimateRuntime, parseClimate } from '../src/engine/climate-system';
@@ -175,7 +175,45 @@ interface JourneyRun {
   walkedSteps: number;
   waitedMinutes: number;
   eventDiscoveryIds: string[];
+  browserTrace: BrowserTraceAction[];
 }
+
+type BrowserTraceAction =
+  | {
+    kind: 'walk';
+    stage: string;
+    mapResourceId: string;
+    start: CellPosition;
+    end: CellPosition;
+    targetName: string;
+    stop: 'gate' | 'arrived';
+    directions: string;
+  }
+  | {
+    kind: 'gate';
+    key: 'E';
+    gateId: string;
+    fromMapResourceId: string;
+    toMapResourceId: string;
+    landing: CellPosition;
+  }
+  | {
+    kind: 'wait';
+    key: 'V';
+    mapResourceId: string;
+    minutes: number;
+    reason: 'route-blocked' | 'gate-landing-blocked';
+  }
+  | {
+    kind: 'checkpoint';
+    id: 'save-and-refresh-in-salt-road' | 'salt-quest-completed' | 'ending-gate';
+    mapResourceId: string;
+    position: CellPosition;
+    saveKeys?: string[];
+    continueKeys?: string[];
+    endingKey?: 'E';
+    endingId?: string;
+  };
 
 function loadJourneyWorld(): JourneyWorld {
   const maps = new Map<string, GridMap>();
@@ -368,6 +406,7 @@ function createJourney(world: JourneyWorld): JourneyRun {
     walkedSteps: 0,
     waitedMinutes: 0,
     eventDiscoveryIds: [],
+    browserTrace: [],
   };
 }
 
@@ -431,10 +470,24 @@ function walkTo(
   run: JourneyRun,
   targetForPeriod: TargetResolver,
   atlasLandmarkId?: string,
+  traceStage = 'journey',
 ): JourneyReport {
   const periodsAtStart = new Set(run.periodIdsSeen);
   const transitionCountAtStart = run.transitionIds.length;
   const stepsAtStart = run.walkedSteps;
+  let traceMapResourceId = run.mapResourceId;
+  let traceStart: CellPosition = { ...run.position };
+  let traceDirections = '';
+  let traceTargetName = '';
+  const flushTraceWalk = (stop: 'gate' | 'arrived'): void => {
+    if (traceDirections.length === 0) return;
+    run.browserTrace.push({
+      kind: 'walk', stage: traceStage, mapResourceId: traceMapResourceId,
+      start: traceStart, end: { ...run.position }, targetName: traceTargetName, stop,
+      directions: traceDirections,
+    });
+    traceDirections = '';
+  };
   for (let tick = 0; tick < 5000; tick += 1) {
     const map = world.maps.get(run.mapResourceId)!;
     const period = run.clock.currentPeriod();
@@ -442,6 +495,7 @@ function walkTo(
     const npcs = liveNpcs(world, run);
     const target = targetForPeriod(npcs);
     if (target === null) throw new Error(`旅程目标暂时无法从真实资料解析（${run.mapResourceId} / ${period.id}）`);
+    traceTargetName = target.name;
     const occupied = new Set<string>([
       ...npcs.map(({ col, row }) => `${col},${row}`),
       ...(world.encounterCellsByMap.get(run.mapResourceId) ?? []),
@@ -463,9 +517,14 @@ function walkTo(
     }
     if (guide.status === 'route-blocked') {
       const beforePeriod = period.id;
-      const advanced = run.clock.advance(world.calendar.actionCosts.waitMinutes);
+      const waitMinutes = world.calendar.actionCosts.waitMinutes;
+      run.browserTrace.push({
+        kind: 'wait', key: 'V', mapResourceId: run.mapResourceId,
+        minutes: waitMinutes, reason: 'route-blocked',
+      });
+      const advanced = run.clock.advance(waitMinutes);
       expect(advanced, 'V 等候需要推进游戏时间').toBe(true);
-      run.waitedMinutes += world.calendar.actionCosts.waitMinutes;
+      run.waitedMinutes += waitMinutes;
       run.periodIdsSeen.add(run.clock.currentPeriod().id);
       if (run.clock.currentPeriod().id === beforePeriod && run.waitedMinutes > 2880) {
         throw new Error(`动态障碍等待两日后仍不消退：${target.name}`);
@@ -473,6 +532,7 @@ function walkTo(
       continue;
     }
     if (guide.status === 'arrived') {
+      flushTraceWalk('arrived');
       return {
         endMapResourceId: run.mapResourceId,
         steps: run.walkedSteps - stepsAtStart,
@@ -502,11 +562,29 @@ function walkTo(
       );
       if (blockedAtLanding) {
         // A refused E interaction is free; V advances to the next NPC schedule before retrying.
-        expect(run.clock.advance(world.calendar.actionCosts.waitMinutes)).toBe(true);
-        run.waitedMinutes += world.calendar.actionCosts.waitMinutes;
+        run.browserTrace.push({
+          kind: 'gate', key: 'E', gateId: transition.id,
+          fromMapResourceId: transition.from.mapResourceId,
+          toMapResourceId: transition.to.mapResourceId,
+          landing: { col: transition.to.col, row: transition.to.row },
+        });
+        const waitMinutes = world.calendar.actionCosts.waitMinutes;
+        run.browserTrace.push({
+          kind: 'wait', key: 'V', mapResourceId: run.mapResourceId,
+          minutes: waitMinutes, reason: 'gate-landing-blocked',
+        });
+        expect(run.clock.advance(waitMinutes)).toBe(true);
+        run.waitedMinutes += waitMinutes;
         run.periodIdsSeen.add(run.clock.currentPeriod().id);
         continue;
       }
+      flushTraceWalk('gate');
+      run.browserTrace.push({
+        kind: 'gate', key: 'E', gateId: transition.id,
+        fromMapResourceId: transition.from.mapResourceId,
+        toMapResourceId: transition.to.mapResourceId,
+        landing: { col: transition.to.col, row: transition.to.row },
+      });
       expect(run.clock.advance(world.calendar.actionCosts.travelMinutes), `${transition.name} 花费 45 分钟`).toBe(true);
       run.regionSegments.push({
         from: run.mapResourceId,
@@ -520,6 +598,8 @@ function walkTo(
       run.directionsSinceGate = [];
       run.mapResourceId = transition.to.mapResourceId;
       run.position = { col: transition.to.col, row: transition.to.row };
+      traceMapResourceId = run.mapResourceId;
+      traceStart = { ...run.position };
       run.mapIdsVisited.add(run.mapResourceId);
       run.transitionIds.push(transition.id);
       run.periodIdsSeen.add(run.clock.currentPeriod().id);
@@ -537,9 +617,11 @@ function walkTo(
     expect(occupied.has(cellKey(next)), '导航绕开当前 NPC/遭遇占位').toBe(false);
     const weather = world.climate.weatherForDay(world.weatherSeed, run.clock.snapshot());
     const stepCost = world.calendar.actionCosts.stepMinutes + weather.stepMinutes;
-    run.directionsSinceGate.push(next.col > run.position.col ? 'R'
+    const direction = next.col > run.position.col ? 'R'
       : next.col < run.position.col ? 'L'
-        : next.row > run.position.row ? 'D' : 'U');
+        : next.row > run.position.row ? 'D' : 'U';
+    run.directionsSinceGate.push(direction);
+    traceDirections += direction;
     run.position = { ...next };
     run.walkedSteps += 1;
     expect(run.clock.advance(stepCost), '成功步行推进真实时钟').toBe(true);
@@ -613,7 +695,7 @@ describe('Round 68 四区长线旅程、跨时段存档与结局闭环', () => {
       row: post.row,
       name: post.name,
       approachRadius: 2,
-    }), SALT_POST_ID);
+    }), SALT_POST_ID, 'outbound');
     expect(outbound.endMapResourceId).toBe(SALT_ROAD_ID);
     expect(outbound.transitions).toEqual([
       'gate.trial-to-ferry',
@@ -635,7 +717,7 @@ describe('Round 68 四区长线旅程、跨时段存档与结局闭环', () => {
         approachRadius: 1,
         arrivalAction: 'talk',
       };
-    });
+    }, undefined, 'find-luo-jinzi');
     expect(npcGuide.endMapResourceId).toBe(SALT_ROAD_ID);
     const speaker = selectInteractionTarget(liveNpcs(world, run), run.position);
     expect(speaker?.record.id, '抵达日程中的驿站 NPC 后才可交谈').toBe(LUO_ID);
@@ -657,6 +739,12 @@ describe('Round 68 四区长线旅程、跨时段存档与结局闭环', () => {
     if (!accepted.ok) throw new Error(accepted.reason);
     settleQuestRewards(world, run, accepted.summary.questUpdate);
     expect(run.journal.states.get(SALT_QUEST_ID)?.status).toBe('active');
+    run.browserTrace.push({
+      kind: 'checkpoint', id: 'save-and-refresh-in-salt-road',
+      mapResourceId: run.mapResourceId, position: { ...run.position },
+      saveKeys: ['Escape', 'ArrowDown', 'Enter', 'Enter'],
+      continueKeys: ['ArrowDown', 'Enter', 'Enter'],
+    });
 
 
     const savedPosition = { ...run.position };
@@ -738,13 +826,17 @@ describe('Round 68 四区长线旅程、跨时段存档与结局闭环', () => {
       // onto its tile; retain that final target for the next arrival check.
       return run.journal.states.get(SALT_QUEST_ID)?.status === 'completed' ? lastWellTarget : null;
     };
-    const wellTrip = walkTo(world, run, wellTarget);
+    const wellTrip = walkTo(world, run, wellTarget, undefined, 'complete-salt-quest');
     expect(wellTrip.endMapResourceId).toBe(SALT_ROAD_ID);
     expect(run.position).toEqual({ col: 26, row: 28 });
     expect(run.knownKnowledgeNodeIds.has(WELL_NODE_ID)).toBe(true);
     expect(run.completedRegionalEvents.has('event.r67-well-reading')).toBe(true);
     expect(run.journal.states.get(SALT_QUEST_ID)?.status).toBe('completed');
     expect(run.inventory.currency).toBeGreaterThan(120);
+    run.browserTrace.push({
+      kind: 'checkpoint', id: 'salt-quest-completed',
+      mapResourceId: run.mapResourceId, position: { ...run.position },
+    });
 
     const endingGate = world.endingSet.gate;
     const returnTrip = walkTo(world, run, () => ({
@@ -753,7 +845,7 @@ describe('Round 68 四区长线旅程、跨时段存档与结局闭环', () => {
       row: endingGate.position.row,
       name: endingGate.name,
       approachRadius: 1,
-    }));
+    }), undefined, 'return-to-ending');
     expect(returnTrip.endMapResourceId).toBe(FERRY_ID);
     expect(returnTrip.transitions).toEqual([
       'gate.salt-road-to-iron-ridge',
@@ -761,6 +853,11 @@ describe('Round 68 四区长线旅程、跨时段存档与结局闭环', () => {
     ]);
     expect(selectAdjacentEndingGate(world.endingSet, run.mapResourceId, run.position)?.gate.id)
       .toBe(endingGate.id);
+    run.browserTrace.push({
+      kind: 'checkpoint', id: 'ending-gate',
+      mapResourceId: run.mapResourceId, position: { ...run.position },
+      endingKey: 'E', endingId: 'ending.open-water',
+    });
 
     const context = endingContext(run);
     const endings = evaluateEndings(world.endingSet, context);
@@ -799,6 +896,28 @@ describe('Round 68 四区长线旅程、跨时段存档与结局闭环', () => {
         quest: run.journal.states.get(SALT_QUEST_ID)?.status,
         ending: selected.ending.id,
       }, null, 2)}\n`);
+    }
+    if (process.env.ROUND71_TRACE_FILE !== undefined && process.env.ROUND71_TRACE_FILE.length > 0) {
+      const trace = {
+        schemaVersion: 1,
+        sourceTest: 'tests/round68-long-journey.test.ts',
+        start: {
+          mapResourceId: JIANGNAN_ID,
+          position: world.maps.get(JIANGNAN_ID)!.data.playerStart,
+          firstDay: new GameClock(world.calendar).snapshot(),
+        },
+        actions: run.browserTrace,
+        expected: {
+          regions: [...run.mapIdsVisited],
+          transitionIds: run.transitionIds,
+          steps: run.walkedSteps,
+          elapsedGameMinutes: run.clock.elapsedMinutes,
+          periodsSeen: [...run.periodIdsSeen],
+          completedQuestId: SALT_QUEST_ID,
+          endingId: selected.ending.id,
+        },
+      };
+      writeFileSync(process.env.ROUND71_TRACE_FILE, `${JSON.stringify(trace, null, 2)}\n`, 'utf8');
     }
   }, 30_000);
 });

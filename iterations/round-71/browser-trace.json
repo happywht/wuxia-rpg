@@ -1,0 +1,285 @@
+{
+  "schemaVersion": 1,
+  "sourceTest": "tests/round68-long-journey.test.ts",
+  "start": {
+    "mapResourceId": "map.round-01-grid",
+    "position": {
+      "col": 43,
+      "row": 37
+    },
+    "firstDay": {
+      "year": 1,
+      "monthIndex": 0,
+      "day": 1,
+      "minuteOfDay": 480
+    }
+  },
+  "actions": [
+    {
+      "kind": "walk",
+      "stage": "outbound",
+      "mapResourceId": "map.round-01-grid",
+      "start": {
+        "col": 43,
+        "row": 37
+      },
+      "end": {
+        "col": 90,
+        "row": 51
+      },
+      "targetName": "青岩驿",
+      "stop": "gate",
+      "directions": "RDDLDDRRDDDRRRRRRDRRRRRRRDRRRDDRRRDRRDRDDDRRRRRRRRRRRRRRRURRRRRURRR"
+    },
+    {
+      "kind": "gate",
+      "key": "E",
+      "gateId": "gate.trial-to-ferry",
+      "fromMapResourceId": "map.round-01-grid",
+      "toMapResourceId": "map.round-10-mist-ferry",
+      "landing": {
+        "col": 1,
+        "row": 4
+      }
+    },
+    {
+      "kind": "walk",
+      "stage": "outbound",
+      "mapResourceId": "map.round-10-mist-ferry",
+      "start": {
+        "col": 1,
+        "row": 4
+      },
+      "end": {
+        "col": 88,
+        "row": 15
+      },
+      "targetName": "青岩驿",
+      "stop": "gate",
+      "directions": "RRDRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRDDDDDDDDRRDRRRRDRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"
+    },
+    {
+      "kind": "gate",
+      "key": "E",
+      "gateId": "gate.ferry-north-to-iron-ridge",
+      "fromMapResourceId": "map.round-10-mist-ferry",
+      "toMapResourceId": "map.round-62-iron-ridge",
+      "landing": {
+        "col": 4,
+        "row": 7
+      }
+    },
+    {
+      "kind": "walk",
+      "stage": "outbound",
+      "mapResourceId": "map.round-62-iron-ridge",
+      "start": {
+        "col": 4,
+        "row": 7
+      },
+      "end": {
+        "col": 52,
+        "row": 89
+      },
+      "targetName": "青岩驿",
+      "stop": "gate",
+      "directions": "RRRRRRRRRRRRRRRRRRRRRRRRRRDDDDDDDDDDRRDRRRRDDDRRDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDRRRDDDRDDDRRRRRRRRRRDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+    },
+    {
+      "kind": "gate",
+      "key": "E",
+      "gateId": "gate.iron-ridge-to-salt-road",
+      "fromMapResourceId": "map.round-62-iron-ridge",
+      "toMapResourceId": "map.round-67-salt-road",
+      "landing": {
+        "col": 95,
+        "row": 74
+      }
+    },
+    {
+      "kind": "walk",
+      "stage": "outbound",
+      "mapResourceId": "map.round-67-salt-road",
+      "start": {
+        "col": 95,
+        "row": 74
+      },
+      "end": {
+        "col": 50,
+        "row": 49
+      },
+      "targetName": "青岩驿",
+      "stop": "arrived",
+      "directions": "UUUUUUUUUUUUUUUUUUUULLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLULLULLULLLLLULUL"
+    },
+    {
+      "kind": "walk",
+      "stage": "find-luo-jinzi",
+      "mapResourceId": "map.round-67-salt-road",
+      "start": {
+        "col": 50,
+        "row": 49
+      },
+      "end": {
+        "col": 49,
+        "row": 49
+      },
+      "targetName": "罗金子",
+      "stop": "arrived",
+      "directions": "L"
+    },
+    {
+      "kind": "checkpoint",
+      "id": "save-and-refresh-in-salt-road",
+      "mapResourceId": "map.round-67-salt-road",
+      "position": {
+        "col": 49,
+        "row": 49
+      },
+      "saveKeys": [
+        "Escape",
+        "ArrowDown",
+        "Enter",
+        "Enter"
+      ],
+      "continueKeys": [
+        "ArrowDown",
+        "Enter",
+        "Enter"
+      ]
+    },
+    {
+      "kind": "walk",
+      "stage": "complete-salt-quest",
+      "mapResourceId": "map.round-67-salt-road",
+      "start": {
+        "col": 49,
+        "row": 49
+      },
+      "end": {
+        "col": 26,
+        "row": 28
+      },
+      "targetName": "回声苦井",
+      "stop": "arrived",
+      "directions": "UUUUUUULUULUUUUUUUUUUUULLLLLLLLLLLLLLLLLLLLL"
+    },
+    {
+      "kind": "checkpoint",
+      "id": "salt-quest-completed",
+      "mapResourceId": "map.round-67-salt-road",
+      "position": {
+        "col": 26,
+        "row": 28
+      }
+    },
+    {
+      "kind": "walk",
+      "stage": "return-to-ending",
+      "mapResourceId": "map.round-67-salt-road",
+      "start": {
+        "col": 26,
+        "row": 28
+      },
+      "end": {
+        "col": 94,
+        "row": 73
+      },
+      "targetName": "照心石",
+      "stop": "gate",
+      "directions": "RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRDDDDRDDDDDRDDRDDRDRDRRRDRRRRRRRRDDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+    },
+    {
+      "kind": "gate",
+      "key": "E",
+      "gateId": "gate.salt-road-to-iron-ridge",
+      "fromMapResourceId": "map.round-67-salt-road",
+      "toMapResourceId": "map.round-62-iron-ridge",
+      "landing": {
+        "col": 53,
+        "row": 90
+      }
+    },
+    {
+      "kind": "walk",
+      "stage": "return-to-ending",
+      "mapResourceId": "map.round-62-iron-ridge",
+      "start": {
+        "col": 53,
+        "row": 90
+      },
+      "end": {
+        "col": 4,
+        "row": 7
+      },
+      "targetName": "照心石",
+      "stop": "gate",
+      "directions": "UUUUUUUUUUUUUUUUUUUUUUUUUUUUULLLLLLLLLLLUUULUUULLLUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUULLUUULLLLULLUUUUUUUUUULLLLLLLLLLLLLLLLLLLLLLLLLL"
+    },
+    {
+      "kind": "gate",
+      "key": "E",
+      "gateId": "gate.iron-ridge-to-ferry-north",
+      "fromMapResourceId": "map.round-62-iron-ridge",
+      "toMapResourceId": "map.round-10-mist-ferry",
+      "landing": {
+        "col": 89,
+        "row": 16
+      }
+    },
+    {
+      "kind": "walk",
+      "stage": "return-to-ending",
+      "mapResourceId": "map.round-10-mist-ferry",
+      "start": {
+        "col": 89,
+        "row": 16
+      },
+      "end": {
+        "col": 9,
+        "row": 2
+      },
+      "targetName": "照心石",
+      "stop": "arrived",
+      "directions": "ULLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLULLLLULLUUUUUUUUULLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLUUL"
+    },
+    {
+      "kind": "checkpoint",
+      "id": "ending-gate",
+      "mapResourceId": "map.round-10-mist-ferry",
+      "position": {
+        "col": 9,
+        "row": 2
+      },
+      "endingKey": "E",
+      "endingId": "ending.open-water"
+    }
+  ],
+  "expected": {
+    "regions": [
+      "map.round-01-grid",
+      "map.round-10-mist-ferry",
+      "map.round-62-iron-ridge",
+      "map.round-67-salt-road"
+    ],
+    "transitionIds": [
+      "gate.trial-to-ferry",
+      "gate.ferry-north-to-iron-ridge",
+      "gate.iron-ridge-to-salt-road",
+      "gate.salt-road-to-iron-ridge",
+      "gate.iron-ridge-to-ferry-north"
+    ],
+    "steps": 749,
+    "elapsedGameMinutes": 974,
+    "periodsSeen": [
+      "period.morning",
+      "period.midday",
+      "period.afternoon",
+      "period.dusk",
+      "period.night",
+      "period.midnight"
+    ],
+    "completedQuestId": "quest.r67-well-waterline",
+    "endingId": "ending.open-water"
+  }
+}

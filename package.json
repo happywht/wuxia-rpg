@@ -15,8 +15,9 @@
     "benchmark:round-40": "node scripts/benchmark-round-40.mjs",
     "import:round-51-world": "node scripts/import-round51-kenney-world.mjs",
     "import:round-65-urban-town": "node scripts/import-round65-urban-town.mjs",
-  "generate:round-66-atlas": "node scripts/generate-round66-atlas.mjs",
-  "generate:round-70-atlas": "node scripts/generate-round70-atlas.mjs",
+    "generate:round-66-atlas": "node scripts/generate-round66-atlas.mjs",
+    "generate:round-70-atlas": "node scripts/generate-round70-atlas.mjs",
+    "generate:round-71-browser-trace": "node scripts/generate-round71-browser-trace.mjs",
     "generate:round-67-salt-road": "node scripts/generate-round67-salt-road.mjs",
     "generate:round-55-ferry": "node scripts/generate-round55-ferry-world.mjs",
     "generate:round-62-iron-ridge": "node scripts/generate-round62-iron-ridge.mjs",
@@ -50,8 +51,8 @@
     "smoke:round-46": "vitest run tests/round46-vertical-slice.test.ts",
     "smoke:round-47": "node scripts/smoke-round-47.mjs",
     "smoke:round-68": "vitest run tests/round68-long-journey.test.ts",
-  "smoke:round-69": "vitest run tests/round69-martial-paths.test.ts tests/round69-guard-combat.test.ts",
-  "smoke:round-70": "vitest run tests/round66-world-atlas.test.ts tests/round70-world-atlas.test.ts"
+    "smoke:round-69": "vitest run tests/round69-martial-paths.test.ts tests/round69-guard-combat.test.ts",
+    "smoke:round-70": "vitest run tests/round66-world-atlas.test.ts tests/round70-world-atlas.test.ts"
   },
   "dependencies": {
     "ajv": "^8.20.0",
