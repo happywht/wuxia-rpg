@@ -64,12 +64,15 @@ describe('world map roaming events', () => {
       ['map.round-01-grid', mapStub('map.round-01-grid')],
       ['map.round-10-mist-ferry', mapStub('map.round-10-mist-ferry')],
       ['map.round-62-iron-ridge', mapStub('map.round-62-iron-ridge')],
+      ['map.round-67-salt-road', mapStub('map.round-67-salt-road')],
     ]), {
       knowledgeNodeIds: new Set([
         'event.old-footprints', 'event.r43-wayfarer-letter', 'place.reedbank', 'event.r44-dock-claim',
         'place.mist-sluice', 'place.mist-north-cap', 'place.mist-south-pool',
         'place.mist-willow-market', 'place.south-hamlet',
         'map.round-62-iron-ridge', 'place.iron-ridge-pass', 'place.iron-ridge-post', 'place.iron-ridge-beacon',
+        'map.round-67-salt-road', 'place.r67-brine-well',
+        'event.r67-salt-road-arrival', 'event.r67-well-reading',
       ]),
       periodIds: new Set(['period.dusk', 'period.night']),
       weatherIds: new Set(['weather.drizzle', 'weather.rain', 'weather.storm']),

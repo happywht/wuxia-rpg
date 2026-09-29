@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const worldPath = resolve(repoRoot, 'data/base/world/world-map.json');
 const manifestPath = resolve(repoRoot, 'data/base/manifest.json');
-const overview = { columns: 128, rows: 80, tileSize: 16 };
+const overview = { columns: 176, rows: 112, tileSize: 16 };
 
 async function readJson(path) {
   return JSON.parse(await readFile(path, 'utf8'));

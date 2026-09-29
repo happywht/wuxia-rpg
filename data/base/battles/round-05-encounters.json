@@ -216,6 +216,30 @@
         "defeat": "你被盗石领头人逼离烽台，只能等伤势平复后再来。",
         "flee": "你退到山坡另一侧，盗石人继续敲凿残墙。"
       }
+    },
+    {
+      "id": "encounter.r67-salt-road-robbers",
+      "name": "盐路截担客",
+      "mapResourceId": "map.round-67-salt-road",
+      "position": { "col": 72, "row": 59 },
+      "profileId": "char.scribe-apprentice",
+      "enemy": {
+        "name": "截担头目",
+        "attributes": { "body": 8, "force": 9, "agility": 8, "insight": 5, "resolve": 6 },
+        "health": 58,
+        "qi": 14,
+        "martialArtIds": ["skill.jianghu-sanshou", "skill.tiezhang-zhuanggong"]
+      },
+      "victoryExperience": 40,
+      "defeatRecovery": { "healthRatio": 0.6, "qiRatio": 0.6 },
+      "repeatable": true,
+      "texts": {
+        "approach": "盐路转弯处有人拦住驼担，按 E 应战",
+        "intro": "为首者拿短棍指着脚下的盐袋：「过路要留两袋，青岩驿的人从前都懂规矩。」",
+        "victory": "短棍滚进路沟，几名截担客散入石坡，商旅暂时能沿正路通行。",
+        "defeat": "你被截担头目逼回盐坪外，驼铃渐渐远去。",
+        "flee": "你退到石坡边，截担客仍守着那段路。"
+      }
     }
   ]
 }

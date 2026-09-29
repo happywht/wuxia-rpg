@@ -105,6 +105,7 @@ const questAssembly = assembleQuests({
 const dialogueSources = [
   readJson('../data/base/dialogues/round-03-conversations.json'),
   readJson('../data/base/dialogues/round-30-conversations.json'),
+  readJson('../data/base/dialogues/round-67-conversations.json'),
 ];
 const rawConversations = new Map<string, DialogueData>();
 for (const source of dialogueSources) {
@@ -267,9 +268,9 @@ function visibleStartTargets(conversation: DialogueData, context: DialogueRuntim
 describe('Round 59 regional dialogue echoes', () => {
   it('parses real base data and assembles quests and dialogue references without warnings', () => {
     expect(graph.warnings).toEqual([]);
-    expect(graph.nodes.size).toBe(195);
+    expect(graph.nodes.size).toBe(201);
     expect(questAssembly.warnings).toEqual([]);
-    expect(questAssembly.quests.size).toBe(43);
+    expect(questAssembly.quests.size).toBe(44);
     expect(dialogueAssembly.warnings).toEqual([]);
 
     // Both conversation files parse without disabled conversations.

@@ -16,6 +16,11 @@
       "schema": "grid-map"
     },
     {
+      "id": "map.round-67-salt-road",
+      "path": "maps/round-67-salt-road.json",
+      "schema": "grid-map"
+    },
+    {
       "id": "world.atlas",
       "path": "world/world-map.json",
       "schema": "world-map"
@@ -53,6 +58,11 @@
     {
       "id": "dialogue.round-62-set",
       "path": "dialogues/round-62-conversations.json",
+      "schema": "dialogue-set"
+    },
+    {
+      "id": "dialogue.round-67-set",
+      "path": "dialogues/round-67-conversations.json",
       "schema": "dialogue-set"
     },
     {

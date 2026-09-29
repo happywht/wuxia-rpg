@@ -82,12 +82,12 @@ describe('Round 58 regional quest chains', () => {
   });
 
   it('keeps six new tasks, both event discoveries, and the graph closed in existing schemas', () => {
-    expect(questParse.set.quests).toHaveLength(43);
+    expect(questParse.set.quests).toHaveLength(44);
     expect(assembly.warnings).toEqual([]);
-    expect(assembly.quests.size).toBe(43);
+    expect(assembly.quests.size).toBe(44);
     expect(graph.warnings).toEqual([]);
-    expect(nodeParse.data.nodes).toHaveLength(195);
-    expect(edgeParse.data.edges).toHaveLength(305);
+    expect(nodeParse.data.nodes).toHaveLength(201);
+    expect(edgeParse.data.edges).toHaveLength(311);
 
     const newQuestIds = [
       'quest.r58-market-discovery',

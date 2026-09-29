@@ -32,7 +32,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 
 - 测试框架：Vitest 5.0.2。官方指南要求 Vite >=6.4.0、Node >=22.12.0；本仓库使用 Vite 8.3.1 与 Node 22.18.0，符合要求（详见 [`docs/REFERENCES.md`](REFERENCES.md) #12；基准 API 见同文件 #16）。
 - 运行环境：Node（无 DOM、无浏览器、无网络、无真实时钟依赖）。
-- 覆盖统计：37 个测试文件、280 个用例（Round 66 全量验证后）。Round 51–62 增量覆盖地图/CC0 素材、舆图视口与相机坐标、地标和跨区寻路、三次地图扩区、见闻任务、任务导航以及动态占位路线；Round 63–64 覆盖跨时段步行模拟与三图七时段全部交互目标路线/商铺导航审计；Round 65 专项 `tests/round65-urban-art.test.ts` 11 用例以内置 PNG 调色板解码器审计城镇图集许可/网格/486 格非空、三图与 14 名 NPC 的角色帧（必须落在图集角色列）、起始图城镇两图层的帧引用、角色列帧禁入城镇图层与环境帧白名单双守卫、碰撞一致性及出生点/NPC/关口可达；Round 66 专项新增 5 项全域图层/GID、旧资料回退、运行时输入、区域/关口/当前位置投影、发现地标隐私测试。每轮细节与最终命令见 `DEVLOG.md`。
+- 覆盖统计：Round 66 全量验证基线为 37 个测试文件/280 个用例；Round 67 新增 `tests/round67-salt-road.test.ts` 4 项回归，覆盖盐道 100×100 十层 CC0 生成、176×112 四区总图投影与真实关口、58 个锚点可达、NPC 日程/遭遇/见闻差事闭环，并更新 landmark 门控测试的基础可见数量。Round 51–62 增量覆盖地图/CC0 素材、舆图视口与相机坐标、地标和跨区寻路、地图扩区、见闻任务、任务导航以及动态占位路线；Round 63–64 覆盖跨时段步行模拟与多图七时段全部交互目标路线/商铺导航审计；Round 65 专项 `tests/round65-urban-art.test.ts` 11 用例以内置 PNG 调色板解码器审计城镇图集许可/网格/486 格非空、地图与 NPC 的角色帧（必须落在图集角色列）、起始图城镇两图层的帧引用、角色列帧禁入城镇图层与环境帧白名单双守卫、碰撞一致性及出生点/NPC/关口可达；Round 66 专项新增 5 项全域图层/GID、旧资料回退、运行时输入、区域/关口/当前位置投影、发现地标隐私测试。全量统计以 Round 67 验证的 DEVLOG 记录为准。
 
 ## 配置：为什么有独立的 `vitest.config.ts`
 
@@ -81,6 +81,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 | `tests/world-navigation-guidance.test.ts` | `src/engine/world-navigation-guidance.ts` + 两张基础地图与世界图 | R57 验证远区稳定地标在首关口与切区后续接本地区段、处于 E 交互格时的到关口状态、本区地标抵达、隐藏地标不泄漏及断开有向路线诊断 |
 | `tests/round55-ferry-world.test.ts` | 基础地图/世界图/NPC/遭遇资料与 `grid-path.ts` | R55 雾雨渡口百格区域回归：100×100/十层尺寸、CC0 License、可行格下限、渡口关口/事件/NPC 日程/遭遇从出生点可达、双向端点精确值和碑记发现 `place.mist-sluice`；兼顾第三图后的世界图装配与历史地图阻挡地标停靠规则 |
 | `tests/round62-iron-ridge.test.ts` | 三张基础地图、世界图/NPC/遭遇/任务/日历与寻路装配 | R62 铁嶂北道：100×100/八层图集范围、7,818 个可行格、三图/四关口装配、新增锚点 BFS，以及三段差事发布人和目标在七个时段的动态占位路线 |
+| `tests/round67-salt-road.test.ts` | 第四区域地图/全域舆图/图谱/对白/任务装配资料 | R67 盐道 100×100/十层、入口 BFS 可达格、四图六关口装配、事件与地标可达、罗金子日程与差事完成闭环 |
 | `tests/round56-discovery-quests.test.ts`（及 R56 扩展的任务/世界地图/图谱既有测试） | quest-set/知识图谱/世界图资料与 `quest-system.ts` | R56 发现见闻回归：`discoverKnowledge` 目标与两段渡口巡标差事的解析/装配引用校验、首次发现信号只推进匹配目标一次、接取时已知见闻回填、旧档恢复重算、奖励见闻级联推进与发现门控地标/事件引用；专项命令 `npx vitest run tests/quest-system.test.ts tests/round56-discovery-quests.test.ts` 为 2 文件/29 用例 |
 
 测试只调用**公共导出函数**并断言行为，不做源码文本匹配；引擎模块均为 Phaser-free 设计，无需启动任何场景。
@@ -127,6 +128,7 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 
 - 2026-09-29（Round 65）：新增 `tests/round65-urban-art.test.ts`（内置纯 Node PNG 调色板解码器，审计 RPG Urban Pack CC0 许可文本、432×288/27×18 网格与 486 格非空、三图角色图集与帧落在角色列、14 名 NPC 帧非空/互异/不与玩家共用、起始图两种新路面层的帧引用、角色列帧禁入环境层、铺装只落于原装饰空白的可走格、井盖具有路面底层、出生点/NPC/关口 BFS 可达）；`tests/round51-map-art.test.ts` 图层数/图集清单/玩家帧断言随协议演进更新。同日两次视觉纠偏：先以联络表排除把门窗误作人物/路面的错误帧；再发现原阻挡区属于墓园后，取消门面覆盖，限制地面仅落于可走且原装饰为空的格子。专项 2 文件 14 用例与关联回归 5 文件 16 用例通过；全量与发行数字见 `DEVLOG.md` Round 65 验证段。
 - 2026-09-29（Round 66）：新增 `tests/round66-world-atlas.test.ts` 5 项全域舆图回归，检查 128×80 五层 Kenney CC0 图层的尺寸/GID、主地表连续性、旧世界无 `atlasArt` 兼容、坏尺寸/帧拒绝、所有区域/关口/玩家投影及未发现地标隔离。浏览器在隔离端口实测 M 打开、滚轮缩放、缩放后拖动、G 切换本区细图、键盘选择远区与首段关口路线；无人工语料/商用素材新增。完整质量门槛与浏览器验证见 `DEVLOG.md` Round 66。
+- 2026-09-29（Round 67）：新增 `tests/round67-salt-road.test.ts` 4 项回归，检查 100×100 盐道图、十层 Kenney CC0 画面、8,280 个入口连通可行格、58 个受保护锚点、四区 176×112 舆图投影、六个有向关口端点、罗金子基础位/晨光与夜间日程、敌对遭遇和苦井发现任务。`tests/round52-map-landmarks.test.ts` 增加盐道三处普通地标与回声苦井发现门控断言。浏览器试玩及完整验证情况见 `DEVLOG.md` Round 67。
 - 2026-09-29（Round 56）：新增 `tests/round56-discovery-quests.test.ts`，扩展 `tests/quest-system.test.ts` 及地图/知识图谱/旧档相关回归，净增 9 个用例；基线 26 文件/202 用例。专项 2 文件/29 用例及 `npm test` 的 26/202 全量通过；`npm run package:release` 全门槛通过并生成 756,726 bytes 发行包（69 个内容文件，SHA-256 `e5e474dd3d7d268beb0c6ff41f391a85a8d310efde7f2450273ce86347b60a61`）；详情见 `DEVLOG.md` Round 56。
 - 2026-09-29（Round 57）：新增 `tests/world-navigation-guidance.test.ts` 4 个用例，扩展 `tests/grid-path.test.ts` 2 个用例并加强稳定地标 id 断言；专项 `typecheck` + 3 文件/24 用例通过。完整门槛首次运行发现文档审计遗漏，补齐 Round 57 DEVLOG 与 DATA-GUIDE 状态后复跑全部 27 文件/208 用例、Schema/MOD/类型/双文档审计、生产构建和归档 smoke 均通过，详情见 `DEVLOG.md` Round 57。
 - 2026-09-28（Round 55）：新增 `tests/round55-ferry-world.test.ts` 3 个用例，锁定雾雨渡口 100×100/十层 CC0 地图尺寸、可行格下限、全部玩法锚点 BFS 可达、两向关口端点精确值与碑记事件发现引用；更新旧测试的地图尺寸和地标基线。`npm run package:release` 全通，25 个测试文件/193 个用例通过，完整输出见 `DEVLOG.md` Round 55。

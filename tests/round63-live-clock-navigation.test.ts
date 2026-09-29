@@ -93,6 +93,7 @@ describe('Round 63 live-clock navigation', () => {
     [JIANGNAN_ID, loadMap('../data/base/maps/round-01-grid.json')],
     [FERRY_ID, loadMap('../data/base/maps/round-10-mist-ferry.json')],
     [IRON_RIDGE_ID, loadMap('../data/base/maps/round-62-iron-ridge.json')],
+    ['map.round-67-salt-road', loadMap('../data/base/maps/round-67-salt-road.json')],
   ]);
   const worldParsed = parseWorldMap(readJson('../data/base/world/world-map.json'));
   const questParsed = parseQuestSet(readJson('../data/base/quests/round-07-quests.json'));

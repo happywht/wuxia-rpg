@@ -560,6 +560,48 @@
       "title": "碎岭清道",
       "summary": "击退碎岭拦路客，让铁嶂北道恢复通行。",
       "knownByDefault": true
+    },
+    {
+      "id": "map.round-67-salt-road",
+      "kind": "place",
+      "title": "西陲盐道·青岩驿",
+      "summary": "铁嶂北道以西的百格盐路，青岩驿、回声苦井与白石晒盐坪沿旧商道分布。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.r67-brine-well",
+      "kind": "place",
+      "title": "回声苦井",
+      "summary": "青岩驿西北方的旧井，井壁水线与井沿秤刻记录了驿路汲水的旧规。",
+      "knownByDefault": false
+    },
+    {
+      "id": "char.luo-jinzi",
+      "kind": "character",
+      "title": "罗金子",
+      "summary": "青岩驿管秤人，熟悉货担水份、旧盐坪和沿途井水。",
+      "knownByDefault": false
+    },
+    {
+      "id": "quest.r67-well-waterline",
+      "kind": "quest",
+      "title": "苦井辨线",
+      "summary": "替罗金子到回声苦井核对水线和井壁刻痕。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r67-salt-road-arrival",
+      "kind": "event",
+      "title": "初抵青岩东关",
+      "summary": "初行石脊西道，认出青岩驿与西陲旧盐路。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r67-well-reading",
+      "kind": "event",
+      "title": "回声井水线",
+      "summary": "从回声苦井的刻痕读出驿站汲水水线已经下降。",
+      "knownByDefault": false
     }
   ]
 }

@@ -1,6 +1,6 @@
 # 架构说明（ARCHITECTURE）
 
-- 状态：截至 Round 66，核心玩法与资料/引擎解耦继续扩展；基础内容为 14 名 NPC、5 个门派、43 项差事、51 件物品、30 种武学、195 个图谱节点/305 条关系和 3 张互通百格地图。基础 manifest 有 28 项资源，覆盖 24 个资源 Schema 家族；仓库含 26 份 draft-07 JSON Schema。R51–62 已完成 CC0 图集接入、大地图镜头/舆图、寻路与跨区导航、三块区域内容和静态七时段路线审核；R63 新增真实时钟/天气步耗时的三图逐格路线审计、换班目标跟随验证，并补充玩家操作说明；R64 将采集目标导航接到在营商铺、为师门页派生导师地域名，并完成三图七时段全部交互目标的路线审计；R65 以官方 RPG Urban Pack（CC0）图集叠加街面并升级三图人物精灵；R66 增加由已登记 Kenney Roguelike CC0 图集生成的宽幅全域总图和 M/G 总览/本区细图切换，位置/关口/地标投影保持资料驱动。整个产品目标仍在推进。
+- 状态：截至 Round 67，核心玩法与资料/引擎解耦继续扩展；基础内容为 15 名 NPC、5 个门派、44 项差事、51 件物品、30 种武学、201 个图谱节点/311 条关系和 4 张互通百格地图。基础 manifest 有 30 项资源，覆盖 24 个资源 Schema 家族；仓库含 26 份 draft-07 JSON Schema。R51–62 已完成 CC0 图集接入、大地图镜头/舆图、寻路与跨区导航及三块区域内容；R63–64 增加时天气路线审计、商铺采集导航与三图七时段交互路线检查；R65 以官方 RPG Urban Pack（CC0）图集叠加街面并升级人物精灵；R66–67 增加资料驱动的可移动全域总图、切换细图以及通过双向关口连接的第四张西陲盐道地图。全图投影、地图内容和任务继续由数据声明。整个产品目标仍在推进。
 - 关联：`docs/ADR.md`（技术选型依据）、`docs/DATA-GUIDE.md`（数据面细节）
 
 ---
@@ -31,7 +31,7 @@
 
 ## 2. 启动流程与缺失数据的降级策略
 
-Round 01 的切片式地图加载已由后续统一加载器取代。当前 Vite 将 `data/` 与 `mods/` 作为受限静态资料目录，生产构建复制资料并以相对基址 `./` 加载 `base/manifest.json`、`schema/`、`base/<resource.path>` 与已启用 MOD 覆盖；相对 URL 支持域名根路径和仓库子路径。缺失/HTTP 错误、JSON 无法解析、Schema 或语义检查失败时，场景显示结构化可读诊断。实际版本包只包含允许列表中的构建资源和说明，不带开发代码或依赖。Round 47 烟测当时从解包版本包子路径加载 26 项基础资源；Round 62 的 smoke 已按 manifest 动态核对当前 28 项资源及 26 份 Schema。详细证据见 `DEVLOG.md`。
+Round 01 的切片式地图加载已由后续统一加载器取代。当前 Vite 将 `data/` 与 `mods/` 作为受限静态资料目录，生产构建复制资料并以相对基址 `./` 加载 `base/manifest.json`、`schema/`、`base/<resource.path>` 与已启用 MOD 覆盖；相对 URL 支持域名根路径和仓库子路径。缺失/HTTP 错误、JSON 无法解析、Schema 或语义检查失败时，场景显示结构化可读诊断。实际版本包只包含允许列表中的构建资源和说明，不带开发代码或依赖。Round 47 烟测当时从解包版本包子路径加载 26 项基础资源；Round 62 烟测按当时 manifest 核验 28 项资源及 26 份 Schema，当前 R67 manifest 有 30 项资源。详细证据见 `DEVLOG.md`。
 
 Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id、相对路径、schema id 和按顺序启用的 MOD。加载顺序为：Ajv 校验 manifest → 加载并编译被引用的 schema → 加载并校验基础资源 → 按启用顺序读取同路径 MOD 覆盖并重复校验 → 通过事件总线广播结果 → 场景消费资源。Round 03 起 manifest 注册地图/NPC/对话，Round 04 登记角色/门派/武学，Round 05 登记战斗遭遇，Round 06 登记物品/商店，Round 07 登记任务；Round 10 根据 `grid-map` schema 家族收集全部地图，并要求 `world-map` 资源解析出有效起始地图；Round 11 将知识节点与关系作为两个可选、独立 schema 资源登记，缺失任一者时以空集合继续，坏引用只隔离相关关系或对话选项；Round 14 登记**必需**的 `game-calendar` 历法资源，未登记或语义无效时提供可读错误并拒绝加载；Round 15 登记**必需**的 `climate` 资源，必须与历法月份完整分区且权重引用有效；Round 16 的 NPC 日程是 NPC 资源的可选扩展，逐项引用历法时段并按地图校验占位；Round 21 的 `faction-war-set` 为可选资源，跨资源检查入口格、两派、双方对手武学及结局知识节点。地图、区域、图谱、历法、气候、日程和门派战协议均由 Phaser 无关模块执行。运行状态仍独立保存到浏览器本地存储，不混入世界资料。
 
@@ -73,7 +73,7 @@ Round 22 在上述流程中可选登记武学创制组件资源；它按 JSON Sc
 
 ## 3. JSON Schema 校验（Ajv，Round 02 已接入）
 
-- 当前 `data/schema/` 有 26 份 draft-07 JSON Schema：`manifest`、`grid-map`、`world-map`、`game-calendar`、`climate`、`knowledge-nodes`、`knowledge-edges`、`npc-set`、`dialogue-set`、`character-profiles`、`faction-set`、`martial-arts-set`、`battle-encounters`、`items-set`、`shops-set`、`quest-set`、`companion-set`、`arena-set`、`faction-war-set`、`martial-art-components`、`meridian-set`、`equipment-forge-set`、`alchemy-set`、`ending-set`、`achievement-set` 与 `content-package`。当前基础 manifest 登记 28 项资源、覆盖 24 个资源 Schema 家族；`manifest` 与 `content-package` 是独立契约，不计入这 24 个世界资源家族。
+- 当前 `data/schema/` 有 26 份 draft-07 JSON Schema：`manifest`、`grid-map`、`world-map`、`game-calendar`、`climate`、`knowledge-nodes`、`knowledge-edges`、`npc-set`、`dialogue-set`、`character-profiles`、`faction-set`、`martial-arts-set`、`battle-encounters`、`items-set`、`shops-set`、`quest-set`、`companion-set`、`arena-set`、`faction-war-set`、`martial-art-components`、`meridian-set`、`equipment-forge-set`、`alchemy-set`、`ending-set`、`achievement-set` 与 `content-package`。当前基础 manifest 登记 30 项资源、覆盖 24 个资源 Schema 家族；`manifest` 与 `content-package` 是独立契约，不计入这 24 个世界资源家族。
 - Ajv 8.x 在加载期校验 manifest、基础资源和每份 MOD 覆盖（开发/生产相同），不在游戏循环内反复校验。
 - 跨字段规则分层完成：地图尺寸/出生点、世界图地图/区域/关口/事件引用、关口坐标和可走性、历法 id/时段起点唯一性与零点时段存在性、气候季节对历法月份的完整分区及天气权重引用等由语义解析补足；世界图跨地图装配后还会排除与 NPC/战斗遭遇重叠的关口或区域事件。角色成长、武学、物品/商店、任务与对话引用仍按原有模块逐项校验；对话范围顺序由防御解析器隔离。失败时只禁用受影响的最小条目，世界图起始地图、历法与气候等关键资料无效则提供可读启动错误。
 - 错误输出为结构化诊断（来源、资源、消息和字段路径），可被事件总线订阅并显示在场景。
@@ -123,7 +123,7 @@ Round 22 在上述流程中可选登记武学创制组件资源；它按 JSON Sc
 - Round 12 的 `ui-theme.ts` 与 `controls-ui.ts` 属于内容无关的游戏胶水：前者提供像素面板框、选中底条、通用色板与程序人物标记，后者显示不含世界设定的键位说明。Phaser 入口启用 `pixelArt`/`roundPixels`，网格 renderer 从资料颜色推导亮/暗边缘。各覆盖层保留自身业务布局与输入，只调用共享视觉原语；GridScene 的字号目标表负责刷新已创建的 HUD/NPC/遭遇文字，暂停设置关闭时同步游戏设置快照。战斗 UI 按选中招式分页显示，任务 UI 按实际文字高度排布说明与目标。
 - Round 54 的 `world-travel.ts` 与 `world-navigation.ts` 继续保持 Phaser-free：前者在已装配区域/关口图上按有向边运行稳定 BFS，后者将可见直接去向或已知远区地标投影到当前地图首关口。`world-map-ui.ts` 负责把本图碰撞格路线、行程区域列表、pin 和侧栏点击/W-S/Enter 组合为呈现；pointer 输入按 FIT canvas 的 client/backing 尺寸统一坐标。跨图段不会拿外地图坐标寻路，也不会从有向边推造回程。
 - Round 57 增加 `world-navigation-guidance.ts`，以可见地标 id 解析当前区域路线段；地图格路线每次走格/切区后重算，不缓存跨区坐标。`grid-path.ts` 的邻格寻路将关口停靠在可行的四向交互格，`world-map-ui.ts` 通过选点回调通知场景并在重开时恢复 projection，GridScene 持有仅本次运行有效的 landmark id 并将新路线写入 HUD。路线提示不自动移动；目标 id 不进入 v1 存档。纯函数返回到达/目标失效/路线失效状态，画面文案与按键提示仍由 `src/game/` 负责。
-- Round 66 扩展 `WorldMapData` 的可选 `atlasArt` 呈现字段，但不扩展碰撞/旅行规则；Schema 与 `parseWorldMap` 校验独立全域底图的栅格、图集和帧，缺字段的旧 MOD/存档继续使用。`world-atlas-view.ts` 在 Phaser-free 层由区域坐标、区域细图格点、有效关口端点和已知知识节点计算标记；确定性生成器将 Kenney CC0 瓦片生成为 128×80 格五层全域底图。`world-map-ui.ts` 默认开启可裁切的全域视图，G/按钮切到本区细图，既有本区寻路仍在原碰撞图上执行，跨区提示依旧需手动走到关口。
+- Round 66 扩展 `WorldMapData` 的可选 `atlasArt` 呈现字段，但不扩展碰撞/旅行规则；Schema 与 `parseWorldMap` 校验独立全域底图的栅格、图集和帧，缺字段的旧 MOD/存档继续使用。`world-atlas-view.ts` 在 Phaser-free 层由区域坐标、区域细图格点、有效关口端点和已知知识节点计算标记；确定性生成器把 Kenney CC0 瓦片生成为 176×112 格五层全域底图。Round 67 仅扩展底图尺寸、区域资料坐标与生成器内容，并通过数据增加西陲盐道地图；不新增引擎专属地区分支。`world-map-ui.ts` 默认开启可裁切的全域视图，G/按钮切到本区细图，既有本区寻路仍在原碰撞图上执行，跨区提示依旧需手动走到关口。
 - Round 61 扩展 `world-navigation-guidance.ts` 的可选占位集合：`GridScene` 每次重算时传入当期 NPC 和活动遭遇格，纯逻辑寻路把这些动态格视作阻挡，同时仍将人物/遭遇目标停在真实的四向交互格。若只因动态占位暂时封路则保留当前目的地并在后续状态刷新时重算；地形自身断路仍使用既有失效处理。目标导航协议另传内容无关的 `talk`/`battle`/`discover` 提示枚举，抵达 HUD 由场景映射为 F/E/V 操作文案；地标仍不带任务动作，运行状态不进入存档。`tests/round61-route-audit.test.ts` 以真实地图、任务、NPC、遭遇与七时段日历审核两区内的 42 条路线并锁定距离范围；人物坐标、日程等实际资料留在 `data/`。
 - Round 64 让 `quest-navigation.ts` 把 `collectItem` 目标也解析为空间目标：解析器接收装配商店表、可选逐店运行时库存与当前地图 id，在"货架数量 `-1` 视为无限、正数为有限、`0`/未上架视为不可用"的规则下筛选能补齐剩余份数的卖家，优先当前地图、否则按装配顺序确定选取，目标投射到店主当前时段位置并携带内容无关的 `shop` 抵达提示（E 对相邻 NPC 先开商铺、F 直接交谈）；无任何商店上架、全部上架店铺库存不足或店主无法定位分别返回新增的精确 no-target 原因，不编造坐标。`world-navigation.ts` 另提供 `deriveNpcRegionNames` 纯函数，J 师门页据此在师父名旁显示装配数据派生的区域名，未解析导师回退通用占位。`tests/round64-route-audit.test.ts` 以三张真实地图、七时段日程与全部师父/给予者/谈话目标审计 462 项入口可达性（静态断连与动态阻挡均为零，见 `docs/ROUND-64-ROUTE-AUDIT.md`）。
 

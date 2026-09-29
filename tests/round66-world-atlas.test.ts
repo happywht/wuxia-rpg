@@ -32,7 +32,7 @@ describe('Round 66 global world atlas art and projection', () => {
     const art = parsed.atlasArt;
     expect(art).toBeDefined();
     if (art === undefined) return;
-    expect({ columns: art.columns, rows: art.rows, tileSize: art.tileSize }).toEqual({ columns: 128, rows: 80, tileSize: 16 });
+    expect({ columns: art.columns, rows: art.rows, tileSize: art.tileSize }).toEqual({ columns: 176, rows: 112, tileSize: 16 });
     expect(art.layers.map(({ id }) => id)).toEqual([
       'world-ocean', 'world-land', 'world-coast', 'world-relief', 'world-roads',
     ]);
@@ -105,7 +105,7 @@ describe('Round 66 global world atlas art and projection', () => {
   it('uses edge-safe atlas coordinates and does not reveal undiscovered landmark names', () => {
     const { world, maps, parsed } = loadWorld();
     const art = parsed.atlasArt!;
-    expect(projectAtlasPosition({ x: 0, y: 100 }, art)).toEqual({ x: 8, y: 1272 });
+    expect(projectAtlasPosition({ x: 0, y: 100 }, art)).toEqual({ x: 8, y: 1784 });
     const undiscovered = buildWorldAtlasOverlays(world, maps, parsed.startingMapResourceId, { col: 43, row: 37 }, new Set());
     const undiscoveredJson = JSON.stringify(undiscovered);
     expect(undiscoveredJson).not.toContain('landmark.reedbank-landing');

@@ -13,6 +13,7 @@ const MAP_PATHS = [
   '../data/base/maps/round-01-grid.json',
   '../data/base/maps/round-10-mist-ferry.json',
   '../data/base/maps/round-62-iron-ridge.json',
+  '../data/base/maps/round-67-salt-road.json',
 ] as const;
 
 function readJson(path: string): unknown {

@@ -15,10 +15,11 @@ function parseMap(path: string) {
   return parsed.map;
 }
 
-describe('large walkable regions and the Round 62 atlas extension', () => {
+describe('large walkable regions and later atlas extensions', () => {
   const ferry = parseMap('../data/base/maps/round-10-mist-ferry.json');
   const jiangnan = parseMap('../data/base/maps/round-01-grid.json');
   const ironRidge = parseMap('../data/base/maps/round-62-iron-ridge.json');
+  const saltRoad = parseMap('../data/base/maps/round-67-salt-road.json');
   const worldData = readJson('../data/base/world/world-map.json') as {
     transitions: Array<{ id: string; from: { mapResourceId: string; col: number; row: number }; to: { mapResourceId: string; col: number; row: number } }>;
     landmarks: Array<{ id: string; mapResourceId: string; col: number; row: number }>;
@@ -61,7 +62,7 @@ describe('large walkable regions and the Round 62 atlas extension', () => {
     }
     for (const encounter of encounterSet.encounters) points.push({ id: encounter.id, mapResourceId: encounter.mapResourceId, ...encounter.position });
 
-    for (const map of [jiangnan, ferry, ironRidge]) {
+    for (const map of [jiangnan, ferry, ironRidge, saltRoad]) {
       const mapAnchors = points.filter((point) =>
         point.mapResourceId === map.data.id &&
         (!point.id.startsWith('landmark.') || map.data.id === ironRidge.data.id),
@@ -99,7 +100,7 @@ describe('large walkable regions and the Round 62 atlas extension', () => {
     expect(worldData.landmarks.find(({ id }) => id === 'landmark.mist-old-sluice')?.id).toBe('landmark.mist-old-sluice');
   });
 
-  it('assembles all three maps and preserves data-driven landmark and knowledge references', () => {
+  it('assembles all four maps and preserves data-driven landmark and knowledge references', () => {
     const parsed = parseWorldMap(readJson('../data/base/world/world-map.json'));
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
@@ -111,6 +112,7 @@ describe('large walkable regions and the Round 62 atlas extension', () => {
       [jiangnan.data.id, jiangnan],
       [ferry.data.id, ferry],
       [ironRidge.data.id, ironRidge],
+      [saltRoad.data.id, saltRoad],
     ]), {
       knowledgeNodeIds: new Set(nodes.nodes.map(({ id }) => id)),
       periodIds: new Set(calendar.periods.map(({ id }) => id)),
@@ -120,13 +122,15 @@ describe('large walkable regions and the Round 62 atlas extension', () => {
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
     expect(assembled.warnings).toEqual([]);
-    expect(assembled.regions).toHaveLength(3);
-    expect(assembled.transitions).toHaveLength(4);
+    expect(assembled.regions).toHaveLength(4);
+    expect(assembled.transitions).toHaveLength(6);
     expect(assembled.landmarks.some(({ id }) => id === 'landmark.mist-willow-market')).toBe(true);
     expect(assembled.landmarks.some(({ id }) => id === 'landmark.mist-old-sluice' && id !== undefined)).toBe(true);
     expect(assembled.events.some(({ id }) => id === 'event.r55-sluice-inscription')).toBe(true);
     expect(assembled.landmarks.filter(({ mapResourceId }) => mapResourceId === ironRidge.data.id)).toHaveLength(4);
     expect(assembled.events.filter(({ mapResourceId }) => mapResourceId === ironRidge.data.id)).toHaveLength(4);
+    expect(assembled.landmarks.filter(({ mapResourceId }) => mapResourceId === saltRoad.data.id)).toHaveLength(4);
+    expect(assembled.events.filter(({ mapResourceId }) => mapResourceId === saltRoad.data.id)).toHaveLength(2);
     expect(nodes.nodes.some(({ id }) => id === 'event.r55-sluice-inscription')).toBe(true);
     expect(nodes.nodes.some(({ id }) => id === 'place.mist-sluice')).toBe(true);
   });

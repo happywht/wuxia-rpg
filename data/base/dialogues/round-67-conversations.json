@@ -1,0 +1,83 @@
+{
+  "conversations": [
+    {
+      "id": "dlg.luo-jinzi-salt-road",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "罗金子把秤砣挂回驿棚梁上，闻了闻木桶里发苦的水：「青岩驿走盐走得慢，倒先把井水尝出了怪味。你是从石脊那边来的？」",
+          "options": [
+            {
+              "text": "我替你去回声苦井核对水线。",
+              "nextNodeId": "accepted",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r67-well-waterline",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r67-well-waterline"
+                }
+              ]
+            },
+            {
+              "text": "井壁的水线我已经看过了。",
+              "nextNodeId": "completed",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r67-well-waterline",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "我还在找回声苦井。",
+              "nextNodeId": "active",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r67-well-waterline",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "青岩驿周围还有哪些旧路？",
+              "nextNodeId": "roads"
+            },
+            {
+              "text": "先不打扰了。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "accepted",
+          "text": "「井在驿西北，井沿有一道旧秤刻。照着那道刻痕看水线，别只听桶里盐沫响。」罗金子重新校正秤杆，给你让开路。"
+        },
+        {
+          "id": "active",
+          "text": "「水线还在井壁上，旧秤刻就刻在旁边。」罗金子朝驿西北的小路指了指。"
+        },
+        {
+          "id": "completed",
+          "text": "罗金子听完井壁刻痕，收起秤砣：「这才是能给货担定水份的实数。往后不必把井咸都怪到盐天头上。」"
+        },
+        {
+          "id": "roads",
+          "text": "「旧盐坪在北坡，回声苦井在西北。白石地上最怕把路痕当水线，记得找木签旁的石刻。」"
+        },
+        {
+          "id": "farewell",
+          "text": "罗金子点点头，又把驿棚里的秤砣挪到避风的一侧。"
+        }
+      ]
+    }
+  ]
+}

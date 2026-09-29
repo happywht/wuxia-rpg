@@ -1,6 +1,6 @@
 # 人物志（CHARACTERS）
 
-- 状态：Round 62 起基础世界共有 **14 名可交互 NPC**（江南道·七镇行旅 7 名、雾雨渡口 5 名、铁嶂北道 2 名），全部为原创人物；Round 51 将江南道地图扩为 100×100 并重排七名 NPC 到开局聚落周围，NPC 均有独立像素精灵帧。Round 59 为七位与芦桥集/南麓任务链相关的人物（陆贞娘、顾夜尘、姜百味、马尚义、石北、祝九弦、白鹭洲）补入按 `questStatus` 显隐的活动中/完成后区域回应，不接任务、不发效果。Round 62 增加铁嶂北道驿镇人物邵长庚、秦素砚，分别担任区域差事发布人和巡山旧簿谈话目标。身份数据在 `data/base/characters/round-03-npcs.json`，对话分布于 `dialogues/round-03-conversations.json`、`dialogues/round-30-conversations.json` 与 `dialogues/round-62-conversations.json`，图谱词条在 `data/base/knowledge_graph/nodes.json`。
+- 状态：截至 Round 67，基础世界共有 **15 名可交互 NPC**（江南道·七镇行旅 7 名、雾雨渡口 5 名、铁嶂北道 2 名、西陲盐道 1 名），全部为原创人物；Round 51 将江南道地图扩为 100×100 并重排七名 NPC 到开局聚落周围，NPC 均有独立像素精灵帧。Round 59 为七位与芦桥集/南麓任务链相关的人物（陆贞娘、顾夜尘、姜百味、马尚义、石北、祝九弦、白鹭洲）补入按 `questStatus` 显隐的活动中/完成后区域回应，不接任务、不发效果。Round 62 增加铁嶂北道驿镇人物邵长庚、秦素砚；Round 67 增加西陲盐道青岩驿的驿站主人罗金子，担任苦井辨线任务发布人。身份数据在 `data/base/characters/round-03-npcs.json`，对话分布于 `dialogues/round-03-conversations.json`、`dialogues/round-30-conversations.json`、`dialogues/round-62-conversations.json` 与 `dialogues/round-67-conversations.json`，图谱词条在 `data/base/knowledge_graph/nodes.json`。
 - 关联：`docs/NPC-SCHEDULES.md`（时段日程）、`docs/FACTIONS.md`（门派与师承）、`docs/KNOWLEDGE-GRAPH.md`（人物词条与关系边）、`docs/DIALOGUE-GUIDE.md`（对话写法）。
 
 ## 总表
@@ -21,8 +21,15 @@
 | **白鹭洲** | 雾雨渡口 | (4,4) | `dlg.bai-luzhou-ferry-master` | **渡董；渡籍与轮值章程（R30）；集期赶办发布人（R58）** |
 | 邵长庚 | 铁嶂北道·岩关驿镇 | (48,49) | `dlg.shao-changgeng-iron-ridge` | 驿镇更牌核验人；北隘校标、驿镇更次、碎岭清道发布人（R62） |
 | 秦素砚 | 铁嶂北道·岩关驿镇 | (57,49) | `dlg.qin-suyan-iron-ridge` | 抄录巡山旧簿；驿镇更次谈话目标（R62） |
+| 罗金子 | 西陲盐道·青岩驿 | (48,49) | `dlg.luo-jinzi-salt-road` | 青岩驿主人；苦井辨线发布人（R67） |
 
 加粗为 Round 30 新增。所有位置为 `npc-set` 中的基础 `position`；带 `schedule` 的人物会按历法时段在图内移动（见总表之外的 `NPC-SCHEDULES.md`）。放置校验要求基础位与全部日程位可走、不压玩家出生点、不与其他 NPC 或任何固定互动格（遭遇/擂台/工位/药炉/门派战入口/终章入口/关口/区域事件）重叠。
+
+## Round 67 新增人物
+
+### 罗金子（char.luo-jinzi）
+
+西陲盐道青岩驿的驿站主人，见惯盐车过关、挑夫歇脚。近来驿站水桶常泛咸沫，他请玩家到回声苦井核对水线与井壁刻痕，发布「苦井辨线」。基础位置在青岩驿 `(48,49)`；晨光时移到驿站账桌旁 `(49,48)`，入夜回到后院 `(47,50)`，其余时段留在基础位置。人物帧与时段行止都由角色 JSON 声明。
 
 ## Round 30 新增人物
 

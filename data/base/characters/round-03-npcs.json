@@ -337,6 +337,34 @@
           }
         }
       ]
+    },
+    {
+      "id": "char.luo-jinzi",
+      "name": "罗金子",
+      "mapResourceId": "map.round-67-salt-road",
+      "position": {
+        "col": 48,
+        "row": 49
+      },
+      "dialogueId": "dlg.luo-jinzi-salt-road",
+      "questGiver": true,
+      "spriteFrame": 347,
+      "schedule": [
+        {
+          "periodId": "period.morning",
+          "position": {
+            "col": 49,
+            "row": 48
+          }
+        },
+        {
+          "periodId": "period.night",
+          "position": {
+            "col": 47,
+            "row": 50
+          }
+        }
+      ]
     }
   ]
 }

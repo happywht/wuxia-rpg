@@ -304,6 +304,12 @@
     {"id":"kg.edge.r62-qin-ledger","fromId":"char.qin-suyan","toId":"quest.r62-post-ledger","relation":"participatesIn","summary":"秦素砚按驿镇旧簿校出烽台换班暗号。"},
     {"id":"kg.edge.r62-ledger-requires-pass","fromId":"quest.r62-post-ledger","toId":"quest.r62-north-pass-marks","relation":"requires","summary":"先校准碎岭界石，再核对北道更次。"},
     {"id":"kg.edge.r62-shao-offers-clear-road","fromId":"char.shao-changgeng","toId":"quest.r62-clear-ridge-road","relation":"participatesIn","summary":"邵长庚请玩家驱散占据碎岭路的拦路客。"},
-    {"id":"kg.edge.r62-clear-road-requires-ledger","fromId":"quest.r62-clear-ridge-road","toId":"quest.r62-post-ledger","relation":"requires","summary":"巡山更次核实后再清理碎岭拦路客。"}
+    {"id":"kg.edge.r62-clear-road-requires-ledger","fromId":"quest.r62-clear-ridge-road","toId":"quest.r62-post-ledger","relation":"requires","summary":"巡山更次核实后再清理碎岭拦路客。"},
+    {"id":"kg.edge.r67-salt-arrival-located","fromId":"event.r67-salt-road-arrival","toId":"map.round-67-salt-road","relation":"locatedAt","summary":"青岩东关的首次行旅标出西陲盐道入口。"},
+    {"id":"kg.edge.r67-well-event-place","fromId":"event.r67-well-reading","toId":"place.r67-brine-well","relation":"triggers","summary":"核对井壁刻痕后记下回声苦井的位置和水线。"},
+    {"id":"kg.edge.r67-luo-located","fromId":"char.luo-jinzi","toId":"map.round-67-salt-road","relation":"locatedAt","summary":"罗金子在青岩驿管理过路秤与盐货记录。"},
+    {"id":"kg.edge.r67-luo-knows-well","fromId":"char.luo-jinzi","toId":"place.r67-brine-well","relation":"knows","summary":"罗金子知道回声苦井的旧秤刻和汲水规矩。"},
+    {"id":"kg.edge.r67-luo-offers-waterline","fromId":"char.luo-jinzi","toId":"quest.r67-well-waterline","relation":"participatesIn","summary":"罗金子请玩家查明井水发苦是否与水线下降有关。"},
+    {"id":"kg.edge.r67-waterline-requires-well","fromId":"quest.r67-well-waterline","toId":"place.r67-brine-well","relation":"requires","summary":"苦井辨线须亲自核对回声苦井的水线与刻痕。"}
   ]
 }

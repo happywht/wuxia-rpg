@@ -1,6 +1,6 @@
 # 世界舆图与区域旅行
 
-Round 10 将单张网格地图扩展为由资料驱动的区域集合；Round 51 将起始区域扩展为 100×100 格的连续大地图，并换成公开 CC0 像素图集；Round 52 校正视觉地图坐标并加入资料地标图例及独立视口相机裁切；Round 55 将雾雨渡口扩建为第二张 100×100 十层 CC0 大地图并新增四个渡口地标；Round 57 让已选地标目的地在区域间接续；Round 62 新增第三块 100×100 铁嶂北道山地大区，含石关、松岭、驿镇、往返关口与区域任务链；Round 65 以官方 RPG Urban Pack 图集为起始区域增绘城镇街市两层，并把三图人物精灵升级为多帧正式像素人物；Round 66 增加独立 128×80 格五层全域地理总图，并可在全域总览/当前区域细图之间切换。地图尺寸、碰撞、分层贴图、区域命名、地标、关口端点和区域事件仍由 `data/` 声明；引擎只执行通用协议。
+Round 10 将单张网格地图扩展为由资料驱动的区域集合；Round 51 将起始区域扩展为 100×100 格的连续大地图，并换成公开 CC0 像素图集；Round 52 校正视觉地图坐标并加入资料地标图例及独立视口相机裁切；Round 55 将雾雨渡口扩建为第二张 100×100 十层 CC0 大地图并新增四个渡口地标；Round 57 让已选地标目的地在区域间接续；Round 62 新增第三块 100×100 铁嶂北道山地大区；Round 65 以官方 RPG Urban Pack 图集为起始区域增绘城镇街市两层，并把百格地图人物精灵升级为多帧正式像素人物；Round 66 增加独立 128×80 格五层全域地理总图；Round 67 新增第四张 100×100 西陲盐道地图，并把全域地理总图扩至 176×112 格。玩家可在四区总览与当前区域细图间切换，拖动、缩放和方向键平移。地图尺寸、碰撞、分层贴图、区域命名、地标、关口端点和区域事件仍由 `data/` 声明；引擎只执行通用协议。
 
 ## 当前地图资源总表
 
@@ -8,13 +8,14 @@ Round 10 将单张网格地图扩展为由资料驱动的区域集合；Round 51
 
 | 地图资源 id | 区域名 | 舆图坐标 | 尺寸（列×行） | 玩家起点 | 瓦片通行性 |
 |---|---|---:|---|---|---|
-| `map.round-01-grid` | 江南道·七镇行旅 | (42, 50) | 100×100 | (43, 37) | `.` 可走；`#` 水域/树木/屋顶阻挡 |
-| `map.round-10-mist-ferry` | 雾雨渡口 | (85, 80) | 100×100 | (7, 7) | `.`、`,` 可走；`~`、`#` 阻挡 |
-| `map.round-62-iron-ridge` | 铁嶂北道·岩关驿镇 | (83, 20) | 100×100 | (4, 7) | `.`、`,` 可走；`#` 岩壁/松林阻挡 |
+| `map.round-01-grid` | 江南道·七镇行旅 | (24, 52) | 100×100 | (43, 37) | `.` 可走；`#` 水域/树木/屋顶阻挡 |
+| `map.round-10-mist-ferry` | 雾雨渡口 | (76, 70) | 100×100 | (7, 7) | `.`、`,` 可走；`~`、`#` 阻挡 |
+| `map.round-62-iron-ridge` | 铁嶂北道·岩关驿镇 | (76, 30) | 100×100 | (4, 7) | `.`、`,` 可走；`#` 岩壁/松林阻挡 |
+| `map.round-67-salt-road` | 西陲盐道·青岩驿 | (24, 70) | 100×100 | (95, 74) | `.`、`,` 可走；`#` 盐碱岩脊/驿镇墙体阻挡 |
 
 - 世界图 `world.atlas` 的 `startingMapResourceId` 为 `map.round-01-grid`；每张地图的 `id` 与 manifest 资源 id 一致，地图格尺寸均为 48 世界像素。
-- 三张百格大地图均将 16×16 素材格最近邻放大至 48×48 世界像素；独立画面层从 Tiled GID 绘制（起始图七层——五层 Tiled 底稿加 Round 65 城镇街市两层、渡口图十层、铁嶂北道八层），移动碰撞始终只看 `grid`，不会根据美术像素推断阻挡。
-- 玩家行走在三张百格大地图时镜头均跟随并限制在地图范围内；地图视觉对象显式采用世界滚动系数，不继承场景为 HUD 设定的固定坐标。HUD、面板与天气覆盖层固定在画面上。
+- 四张百格大地图均将 16×16 素材格最近邻放大至 48×48 世界像素；独立画面层从 Tiled GID 绘制（起始图七层、渡口图十层、铁嶂北道八层、西陲盐道十层），移动碰撞始终只看 `grid`，不会根据美术像素推断阻挡。
+- 玩家行走在四张百格大地图时镜头均跟随并限制在地图范围内；地图视觉对象显式采用世界滚动系数，不继承场景为 HUD 设定的固定坐标。HUD、面板与天气覆盖层固定在画面上。
 - 芦苇河滩（`place.reedbank`）仍是知识图谱地点词条而非地图资源：第三张 `grid-map` 是铁嶂北道，河滩不可旅行，详见 [`WORLD-SETTING.md`](WORLD-SETTING.md) §2。
 
 ## 关口端点
@@ -27,6 +28,8 @@ Round 10 将单张网格地图扩展为由资料驱动的区域集合；Round 51
 | `gate.ferry-to-trial` | 回望石阶 | `map.round-10-mist-ferry` · (2, 4) | `map.round-01-grid` · (89, 50) |
 | `gate.ferry-north-to-iron-ridge` | 雾岬北口 | `map.round-10-mist-ferry` · (89, 15) | `map.round-62-iron-ridge` · (4, 7) |
 | `gate.iron-ridge-to-ferry-north` | 铁嶂南隘 | `map.round-62-iron-ridge` · (3, 7) | `map.round-10-mist-ferry` · (89, 16) |
+| `gate.iron-ridge-to-salt-road` | 石脊西道 | `map.round-62-iron-ridge` · (52, 90) | `map.round-67-salt-road` · (95, 74) |
+| `gate.salt-road-to-iron-ridge` | 青岩东关 | `map.round-67-salt-road` · (94, 74) | `map.round-62-iron-ridge` · (53, 90) |
 
 引擎装配规则（`src/engine/world-map.ts` 的 `assembleWorldMap`）：`from` 端点必须可走**且不得位于该图玩家出生格**；`to` 落点必须可走；两端地图必须都已登记进 `regions`。任一不满足即整条关口禁用并给出警告，不影响其他关口。协议不自动推断双向旅行——往返必须像上表一样显式声明两条记录。
 
@@ -48,6 +51,8 @@ Round 10 将单张网格地图扩展为由资料驱动的区域集合；Round 51
 | `event.r62-pass-marks` | `map.round-62-iron-ridge` · (30, 29) | 是 | 无 | `place.iron-ridge-pass`（碎岭旧道） |
 | `event.r62-post-ledger` | `map.round-62-iron-ridge` · (51, 49) | 是 | 无 | `place.iron-ridge-post`（岩关驿镇） |
 | `event.r62-beacon-code` | `map.round-62-iron-ridge` · (84, 83) | 是 | 无 | `place.iron-ridge-beacon`（北脊旧烽台） |
+| `event.r67-salt-road-arrival` | `map.round-67-salt-road` · (95, 74) | 是 | 无 | `map.round-67-salt-road`（西陲盐道·青岩驿） |
+| `event.r67-well-reading` | `map.round-67-salt-road` · (26, 28) | 是 | 无 | `place.r67-brine-well`（回声苦井） |
 
 ### 随机漫游奇遇（Round 43–44）
 
@@ -126,18 +131,24 @@ M 舆图的侧栏可点选已知地点或关口，直接点选地图内的色点
 
 回应试玩反馈的起始区域美术升级：起始大地图在既有五层 Tiled 美术之上新增 `urban-street-ground`（铺装街面）与 `urban-street-details`（路面细节）两个图层，素材来自官方 Kenney RPG Urban Pack（CC0）。生成器 `scripts/import-round65-urban-town.mjs` 只在原装饰层 2–5 均为空的可走格绘制小型街面、车道和市集铺地，共 42 格铺装；另在新街面上叠加 2 个井盖细节。近出生点阻挡格原本绘有墓园石碑、围墙与墓道，故本轮没有把它们误判为商铺或空白建筑位，没有放置门面/街灯/消防栓/行道树，也不覆盖现有土路。碰撞网格 `grid` 一格未动；数据测试逐格确认铺装可走且不压旧装饰，井盖一定有新路面底层，出生点、NPC、任务与跨区关口仍可达。三张百格地图的人物图集同轮切换到该图集：人物格只存在于图集列 23–26 的 4 格组（23–26 深色便装、131–134 浅色长袍、239–242 红褐上衣、347–350 橄榄工装、455–458 蓝色制服，每组为同一人物的 4 个静态朝向/姿态格），玩家用 24，14 名 NPC 的 `spriteFrame` 分配其中 14 个互异格，帧号仍完全由地图/NPC JSON 数据驱动，引擎无任何人物硬编码；专项测试同时守卫"角色列帧禁入环境图层"与"角色帧必须落在角色列"。专项审计见 [`tests/round65-urban-art.test.ts`](../tests/round65-urban-art.test.ts)。
 
-## Round 66 全域可移动舆图
+## Round 66–67 全域可移动舆图
 
-`data/base/world/world-map.json` 可选 `atlasArt` 声明独立的全域像素底图，`scripts/generate-round66-atlas.mjs`（`npm run generate:round-66-atlas`）从世界区域坐标、已装配大地图与明确登记的 Kenney Roguelike CC0 图集确定性生成 128×80 格、16 像素/格、五个分层的海面/陆地/海岸/地貌/道路。`world-map.schema.json` 与 Phaser-free `parseWorldMap` 均检查尺寸、图集引用、图层网格和瓦片范围；旧世界资料与不声明 `atlasArt` 的 MOD 仍可用，M 面板回退到本区细图。
+`data/base/world/world-map.json` 可选 `atlasArt` 声明独立的全域像素底图，`scripts/generate-round66-atlas.mjs`（`npm run generate:round-66-atlas`）从世界区域坐标、已装配大地图与明确登记的 Kenney Roguelike CC0 图集确定性生成 176×112 格、16 像素/格、五个分层的海面/陆地/海岸/地貌/道路。Round 67 重排四个区域锚点，让江南道/西陲盐道占据西侧、渡口/铁嶂北道占据东侧，留出可平移的开阔全图。`world-map.schema.json` 与 Phaser-free `parseWorldMap` 均检查尺寸、图集引用、图层网格和瓦片范围；旧世界资料与不声明 `atlasArt` 的 MOD 仍可用，M 面板回退到本区细图。
 
 M 默认打开宽幅全域总览：`regions[].atlasPosition` 决定区域落点，地图格换算为该区域在全图上的呈现范围，真实 `transitions.from/to` 端点生成关口连线，当前位置和 `discoveryNodeId` 门控后的已知地标由同一组投影函数计算。区域名和标题完全来自世界资料。玩家可拖动地图、用窗口内滚轮缩放或方向键平移；相机将图像与标记裁切在视窗内。按 **G** 或点击右上角按钮切到本区细图，原有格级路线、已选目的地与跨区行程提示仍按地图碰撞/关口规则运行；总览连线仅表达资料中的旅行连接，不会自动移动或传送。舆图会在 **M/Esc** 关闭。
 
-专项 `tests/round66-world-atlas.test.ts` 覆盖 128×80 五层图像数据、瓦片 GID 范围、旧资料回退、运行时错误输入、全部区域/关口/玩家坐标投影、地图边界与未发现地标隔离。确定性生成器在浏览器里实测后调整为连续主地表与更成片的林/脊线覆盖，以免缩放适配时呈现成噪点。
+专项 `tests/round66-world-atlas.test.ts` 与 `tests/round67-salt-road.test.ts` 覆盖两版全图尺寸、五层图像数据、瓦片 GID 范围、旧资料回退、运行时错误输入、全部区域/关口/玩家坐标投影、地图边界与未发现地标隔离。确定性生成器在浏览器里实测后调整为连续主地表与更成片的林/脊线覆盖，以免缩放适配时呈现成噪点。
+
+## Round 67 西陲盐道·青岩驿
+
+西陲盐道是第四块 100×100 可玩区域，位于全域舆图 `(24,70)`，从铁嶂北道石脊西道 `(52,90)` 抵达盐道青岩东关 `(95,74)`，另以盐道 `(94,74)` 回到铁嶂 `(53,90)`。`scripts/generate-round67-salt-road.mjs` / `npm run generate:round-67-salt-road` 确定性生成十层地貌、盐地覆盖、山路与驿站画面，独立碰撞图从新区域入口经 BFS 可达 8,280 格；生成器保护 58 个关口、地标、事件、NPC 日程、遭遇及其他游戏锚点。
+
+四个地图地标为青岩东关 `(95,74)`、青岩驿 `(48,49)`、回声苦井 `(26,28)`、白石晒盐坪 `(76,25)`。苦井地标仅在知识节点 `place.r67-brine-well` 已知后显露。首次抵达事件记录整个大区；苦井事件读出井壁水线并解锁地点见闻。驿站 NPC 罗金子 `(48,49)` 按晨光/夜间日程换位，提供「苦井辨线」差事：发现苦井后带回路线线索，完成时获得 24 经验与 17 银两。盐道另有可重战的拦路遭遇。区域、图层、人物、任务、发现、路线与奖励均为数据驱动，继续复用现有 Kenney CC0 图集，不新增授权来源。
 
 ## Round 51 地图美术资源
 
 - 起始大地图使用 `data/assets/kenney/roguelike-rpg/roguelikeSheet_transparent.png` 的 16×16 地表、道路、林木、岸线、聚落与屋顶瓦片，以及该 CC0 素材包附带的 `scripts/sources/kenney-roguelike-sample-map.tmx` 五层 100×100 地图作为底稿。`scripts/import-round51-kenney-world.mjs` 可从底稿重建**起始大地图**的 JSON 图层和独立碰撞网格（Round 55 起不再改写雾雨渡口地图，见上文「Round 55」一节）；扩展的林带、池塘、道路与第二聚落也都使用这张 CC0 图集。Round 65 起起始地图另有叠加其上的城镇街市两层（见上节）。
-- 玩家、NPC 和伙伴的人物帧：Round 51–64 使用 `data/assets/kenney/tiny-dungeon/tilemap_packed.png`；Round 65 起三张百格地图的 `art.actors` 与全部 NPC 帧改用 `data/assets/kenney/rpg-urban-pack/tilemap_packed.png`（432×288、27×18、16px、0 间距）。帧索引、图集尺寸和画面图层都随地图数据声明，NPC 可选 `spriteFrame` 覆盖默认人物帧。
+- 玩家、NPC 和伙伴的人物帧：Round 51–64 使用 `data/assets/kenney/tiny-dungeon/tilemap_packed.png`；Round 65 起百格地图的 `art.actors` 与全部 NPC 帧改用 `data/assets/kenney/rpg-urban-pack/tilemap_packed.png`（432×288、27×18、16px、0 间距）。帧索引、图集尺寸和画面图层都随地图数据声明，NPC 可选 `spriteFrame` 覆盖默认人物帧。
 - 三套图集的原始 `License.txt` 随游戏素材一起打包；许可来源、素材用途和发布边界见 [`REFERENCES.md`](REFERENCES.md) 第六节与 [`PLAYER-GUIDE.md`](PLAYER-GUIDE.md)。美术素材可替换而不改变地图移动碰撞协议。
 
 ## 资料协议

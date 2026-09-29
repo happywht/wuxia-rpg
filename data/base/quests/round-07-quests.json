@@ -846,6 +846,25 @@
         "currency": 32,
         "factionRenown": [{ "factionId": "faction.tiezhang-pai", "delta": 5 }]
       }
+    },
+    {
+      "id": "quest.r67-well-waterline",
+      "name": "苦井辨线",
+      "description": "罗金子说青岩驿的水桶近来常带咸沫，请你去回声苦井核对井壁水线，把结果带回驿站。",
+      "giverNpcId": "char.luo-jinzi",
+      "objectives": [
+        {
+          "id": "objective.r67-well-waterline",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r67-brine-well",
+          "requiredCount": 1,
+          "text": "查看回声苦井的水线与井壁刻痕"
+        }
+      ],
+      "rewards": {
+        "experience": 24,
+        "currency": 17
+      }
     }
   ]
 }
