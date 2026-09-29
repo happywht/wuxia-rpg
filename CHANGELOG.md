@@ -4,6 +4,16 @@
 
 ## [Unreleased]
 
+### Added (Round 81)
+
+- 将可移动全域舆图从 224×144 扩为 336×224 格，使用已登记的 Puny World CC0 图集拓展东岸与南方群岛；原十二层旧图区逐格不变。
+- 增加可选 atlasArt.regionFootprint 固定旧区域投影跨度；Schema/解析器尺寸上限为 384 格，并保留未声明此字段的历史地图兼容。
+- 舆图按 Home 可重置到当前总图/细图全景；增加确定性地图生成器及锚点投影、旧图层哈希、CC0 来源和视口测试。
+
+### Verification (Round 81)
+
+- `npm run smoke:round-81`：3 个测试文件/13 项通过；`npm run typecheck` 通过；`npm run check`：38 项基础资源 Schema、38 项 MOD 静态检查、类型检查、52 个测试文件/354 项用例及 Round 34/48 文档审计通过。`npm run build` 通过；Vite 保留既有 Phaser 大 chunk（1,374.54 kB）的体积提示。
+
 ### Added (Round 80)
 
 - `world-map` 区域事件可选声明环境交互提示、调查范围和接近方向；相邻路径受地形及动态人物/遭遇阻挡检查，条件与一次性状态继续复用原事件规则。

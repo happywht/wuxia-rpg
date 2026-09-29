@@ -324,6 +324,10 @@ export class WorldMapPanel {
     const toggleHandler = (): void => this.toggleView();
     toggle.on('down', toggleHandler);
     this.bindings.push({ key: toggle, handler: toggleHandler });
+    const fit = keyboard.addKey(codes.HOME);
+    const fitHandler = (): void => this.fitMapToViewport();
+    fit.on('down', fitHandler);
+    this.bindings.push({ key: fit, handler: fitHandler });
   }
 
   private unbindKeys(): void {
@@ -334,7 +338,7 @@ export class WorldMapPanel {
   private render(worldMap: WorldMapAssembly, currentMapResourceId: string, map: GridMap): void {
     addPixelPanelChrome(this.scene, this.container, { x: 28, y: 45, width: 904, height: 450 }, 0.9);
     this.addText(WIDTH / 2, 62, '江湖舆图', 20, COLORS.text, 0.5);
-    this.addText(WIDTH / 2, 99, '拖动平移 · 滚轮缩放 · 方向键微调 · W/S 选点 · Enter 规划 · G 切换视图 · M/Esc 收起', 12, COLORS.muted, 0.5, 720);
+    this.addText(WIDTH / 2, 99, '拖动平移 · 滚轮缩放 · 方向键微调 · Home 回全图 · W/S 选点 · Enter 规划 · G 切换视图 · M/Esc 收起', 12, COLORS.muted, 0.5, 720);
     if (worldMap.data.atlasArt !== undefined) {
       this.addText(778, 63, this.viewMode === 'world' ? 'G · 本区细图' : 'G · 全域总览', 11, COLORS.accent, 0.5)
         .setInteractive({ useHandCursor: true })
@@ -531,6 +535,13 @@ export class WorldMapPanel {
       this.mapBounds, this.mapWidth, this.mapHeight, this.viewportState,
       pointerX, pointerY, factor, this.baseScale * 0.5, this.baseScale * 6,
     );
+    this.updateMapPosition();
+  }
+
+  /** Restores a complete view of the current atlas/map without resetting the selected destination. */
+  private fitMapToViewport(): void {
+    if (this.mapImage === null) return;
+    this.viewportState = createMapViewport(this.mapBounds, this.mapWidth, this.mapHeight);
     this.updateMapPosition();
   }
 

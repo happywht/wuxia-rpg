@@ -82,9 +82,11 @@ export function projectWorldCell(
   const center = projectAtlasPosition(regionPosition, art);
   const u = map.columns <= 1 ? 0 : (position.col + 0.5) / map.columns - 0.5;
   const v = map.rows <= 1 ? 0 : (position.row + 0.5) / map.rows - 0.5;
+  const footprintColumns = art.regionFootprint?.columns ?? art.columns * WORLD_ATLAS_REGION_FOOTPRINT;
+  const footprintRows = art.regionFootprint?.rows ?? art.rows * WORLD_ATLAS_REGION_FOOTPRINT;
   return {
-    x: center.x + u * art.columns * art.tileSize * WORLD_ATLAS_REGION_FOOTPRINT,
-    y: center.y + v * art.rows * art.tileSize * WORLD_ATLAS_REGION_FOOTPRINT,
+    x: center.x + u * footprintColumns * art.tileSize,
+    y: center.y + v * footprintRows * art.tileSize,
   };
 }
 

@@ -47,6 +47,8 @@ export interface WorldAtlasArtData {
   columns: number;
   rows: number;
   tileSize: number;
+  /** Optional fixed region footprint in atlas cells, so adding distant map space does not stretch existing regions. */
+  regionFootprint?: { columns: number; rows: number };
   tilesets: GridMapTilesetData[];
   layers: GridMapArtLayerData[];
 }
@@ -256,12 +258,12 @@ function parseAtlasArt(value: unknown, errors: string[]): WorldAtlasArtData | nu
     errors.push(`${label}：应为对象`);
     return null;
   }
-  const allowed = new Set(['columns', 'rows', 'tileSize', 'tilesets', 'layers']);
+  const allowed = new Set(['columns', 'rows', 'tileSize', 'regionFootprint', 'tilesets', 'layers']);
   for (const key of Object.keys(value)) if (!allowed.has(key)) errors.push(`${label}.${key}：不是受支持的字段`);
   const dimension = (field: 'columns' | 'rows'): number | null => {
     const candidate = value[field];
-    if (!integer(candidate) || candidate < 1 || candidate > 256) {
-      errors.push(`${label}.${field}：应为 1–256 之间的整数`);
+    if (!integer(candidate) || candidate < 1 || candidate > 384) {
+      errors.push(`${label}.${field}：应为 1–384 之间的整数`);
       return null;
     }
     return candidate;
@@ -272,6 +274,19 @@ function parseAtlasArt(value: unknown, errors: string[]): WorldAtlasArtData | nu
     ? value.tileSize
     : null;
   if (tileSize === null) errors.push(`${label}.tileSize：应为 1–256 之间的整数`);
+  let regionFootprint: WorldAtlasArtData['regionFootprint'];
+  if (value.regionFootprint !== undefined) {
+    if (!isObject(value.regionFootprint) ||
+      typeof value.regionFootprint.columns !== 'number' || !Number.isFinite(value.regionFootprint.columns) ||
+      value.regionFootprint.columns <= 0 || value.regionFootprint.columns > 384 ||
+      typeof value.regionFootprint.rows !== 'number' || !Number.isFinite(value.regionFootprint.rows) ||
+      value.regionFootprint.rows <= 0 || value.regionFootprint.rows > 384 ||
+      Object.keys(value.regionFootprint).some((key) => key !== 'columns' && key !== 'rows')) {
+      errors.push(`${label}.regionFootprint：应为含正数 columns/rows 的对象`);
+    } else {
+      regionFootprint = { columns: value.regionFootprint.columns, rows: value.regionFootprint.rows };
+    }
+  }
 
   const tilesets: GridMapTilesetData[] = [];
   const tilesetIds = new Set<string>();
@@ -367,7 +382,7 @@ function parseAtlasArt(value: unknown, errors: string[]): WorldAtlasArtData | nu
 
   if (columns === null || rows === null || tileSize === null || layers.length !== rawLayers.length ||
     tilesets.length !== rawTilesets.length) return null;
-  return { columns, rows, tileSize, tilesets, layers };
+  return { columns, rows, tileSize, ...(regionFootprint === undefined ? {} : { regionFootprint }), tilesets, layers };
 }
 
 function parseEndpoint(value: unknown, label: string, errors: string[]): RegionEndpoint | null {
