@@ -192,10 +192,11 @@ describe('Round 65 urban street patch on the starting map', () => {
       'kenney.roguelike-rpg',
       'kenney.tiny-dungeon',
       'kenney.rpg-urban-pack',
+      'opengameart.rpg-town',
     ]);
     expect(art?.layers.map((layer) => layer.id)).toEqual([
       'layer-1', 'layer-2', 'layer-3', 'layer-4', 'layer-5',
-      'urban-street-ground', 'urban-street-details',
+      'urban-street-ground', 'urban-street-details', 'round76-jiangnan-orchard',
     ]);
     for (const layer of [ground, details]) {
       expect(layer?.tilesetId).toBe('kenney.rpg-urban-pack');

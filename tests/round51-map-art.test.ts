@@ -18,12 +18,13 @@ describe('Round 51 world art data', () => {
     expect(map.rows).toBe(100);
     expect(map.playerStart).toEqual({ col: 43, row: 37 });
     expect(art?.tileSize).toBe(16);
-    // Five Tiled layers (Round 51) plus the two Round 65 urban street layers.
-    expect(art?.layers).toHaveLength(7);
+    // Five original layers, two Round 65 street layers, then the Round 76 environment layer.
+    expect(art?.layers).toHaveLength(8);
     expect(art?.tilesets.map((tileset) => tileset.id)).toEqual([
       'kenney.roguelike-rpg',
       'kenney.tiny-dungeon',
       'kenney.rpg-urban-pack',
+      'opengameart.rpg-town',
     ]);
     expect(art?.actors.playerFrame).toBe(24);
     expect(art?.layers.every((layer) => layer.cells.length === map.rows && layer.cells.every((row) => row.length === map.columns))).toBe(true);
@@ -53,7 +54,7 @@ describe('Round 51 world art data', () => {
     const map = loadMap('../data/base/maps/round-10-mist-ferry.json');
     expect(map.columns).toBe(100);
     expect(map.rows).toBe(100);
-    expect(map.data.art?.layers).toHaveLength(10);
+    expect(map.data.art?.layers).toHaveLength(11);
     expect(map.canEnter(1, 4)).toBe(true);
     expect(map.canEnter(59, 65)).toBe(true);
     expect(map.isSolid(99, 99)).toBe(true);

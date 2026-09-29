@@ -45,14 +45,14 @@ describe('Round 62 iron-ridge playable region', () => {
     const ridge = maps.get(RIDGE_ID)!;
     expect(ridge.columns).toBe(100);
     expect(ridge.rows).toBe(100);
-    expect(ridge.data.art?.layers).toHaveLength(10);
+    expect(ridge.data.art?.layers).toHaveLength(11);
     expect(ridge.data.art?.layers.every((layer) =>
       layer.cells.length === ridge.rows && layer.cells.every((row) => row.length === ridge.columns),
     )).toBe(true);
-    const atlas = ridge.data.art?.tilesets.find(({ id }) => id === 'kenney.roguelike-rpg');
-    expect(atlas).toBeDefined();
+    const tilesets = ridge.data.art?.tilesets ?? [];
     for (const layer of ridge.data.art?.layers ?? []) {
-      expect(layer.tilesetId).toBe('kenney.roguelike-rpg');
+      const atlas = tilesets.find(({ id }) => id === layer.tilesetId);
+      expect(atlas, `missing tileset ${layer.tilesetId} for ${layer.id}`).toBeDefined();
       for (const row of layer.cells) {
         for (const gid of row) expect(gid & 0x0fffffff).toBeLessThanOrEqual(atlas!.tileCount);
       }

@@ -6,7 +6,7 @@
 
 ## 一、总体声明（必读）
 
-1. **本项目不包含任何原作游戏资产**：不复制、不嵌入、不改编文曲星系列或《白金英雄坛说》的角色、地名、对话、剧情、源代码、美术、音频或其他游戏文件。本仓库含自制程序与公开 CC0 授权的 Kenney 像素图集；图集文件、对应原始许可和实际用途登记在本文件第六节，不含原作图片或音频素材。
+1. **本项目不包含任何原作游戏资产**：不复制、不嵌入、不改编文曲星系列或《白金英雄坛说》的角色、地名、对话、剧情、源代码、美术、音频或其他游戏文件。本仓库含自制程序与公开 CC0 授权的 Kenney、OpenGameArt 像素图集；图集文件、对应原始许可和实际用途登记在本文件第六节，不含原作图片或音频素材。
 2. **历史类来源的内容授权未经验证**：go1980.org 文章未声明许可证；其余历史/回忆/第三方页面同样未确认授权。因此本项目仅以"事实摘要 + 链接引用"的方式使用，**不转载原文、不复制页面文字**。
 3. **证据分级诚实原则**：可检索的《白金英雄坛说》资料多为玩家回忆、攻略或衍生作品说明，未发现可作为完整官方规格的公开资料。凡属二手、单一来源或回忆性信息，均在 `docs/ORIGINAL-FIDELITY.md` 中标注置信度，不冒充定论。
 4. **项目许可边界**：当前仓库没有单独的项目 `LICENSE`。本表中的 npm 许可证仅记录依赖包的发布元数据，不代表项目代码/原创世界资料获得何种授权；历史网页和技术文档页面也未由此变成开放许可。分发边界见 `docs/RELEASE.md`，再分发前须由维护者确定并审阅项目自身授权政策。
@@ -75,6 +75,7 @@
 
 | 素材来源 | 官方页面 / 许可依据 | 本项目实际使用内容 | 授权与发行处理 |
 |---|---|---|---|
+| OpenGameArt：ansimuz 的 RPG Town Pixel Art Assets | [素材页](https://opengameart.org/content/rpg-town-pixel-art-assets)；[CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)；下载包内 `License.txt` | `data/assets/opengameart/rpg-town-pixel-art-assets/transparent-bg-tiles.png`（352×288、22×18 格、16px、RGBA 透明 PNG）：Round 76 五区 100×100 地图的低密度林木、岩石、岸线与驿镇环境补充图层；图层帧号由 `scripts/generate-round76-region-landmarks.mjs` 确定性生成 | 素材页标明 16×16 俯视图素与 CC0；包内许可注明作者 Luis Zuno（@ansimuz）及 CC0 1.0。保留原始 `License.txt`；仅发行透明打包图集与许可，不携带下载压缩包、角色/NPC 图集或 PSD |
 | Kenney Roguelike/RPG Pack | [素材页](https://kenney.nl/assets/roguelike-rpg-pack)；[Kenney 许可说明](https://kenney.nl/support) | `data/assets/kenney/roguelike-rpg/roguelikeSheet_transparent.png` 用于地表、道路、树木、岸线、建筑与聚落；素材包所附 `Map/sample_map.tmx` 作为 100×100 五层世界底稿，项目本地副本为 `scripts/sources/kenney-roguelike-sample-map.tmx`；Round 62 铁嶂北道八层地貌与 Round 74 云岭古道十层山地/松林/石路/驿站构图复用同一图集 | 素材包页面与作者说明采用 CC0/公有领域许可；保留原始 `License.txt`。地图扩建只复用该图集瓦片，不引入未授权外部素材；源码 TMX 不进入版本包 |
 | Kenney Tiny Dungeon | [素材页](https://kenney.nl/assets/tiny-dungeon)；[Kenney 许可说明](https://kenney.nl/support) | `data/assets/kenney/tiny-dungeon/tilemap_packed.png`；Round 65 前用于玩家、NPC 与伙伴像素人物，Round 65 起保留图集声明供旧资料/MOD 兼容引用 | CC0/公有领域许可；保留原始 `License.txt`，人物帧号由地图/NPC JSON 数据指定 |
 | Kenney Tiny Town | [素材页](https://kenney.nl/assets/tiny-town)；[Kenney 许可说明](https://kenney.nl/support) | `data/assets/kenney/tiny-town/tilemap_packed.png`（192×176、12×11 格、16px、0 间距）：Round 70 世界总图林木、驿车与告示牌装饰；图素帧号由 `scripts/generate-round70-atlas.mjs` 烘焙到世界图层数据 | 官方素材页标示 CC0；保留素材包原始 `License.txt`，只发行实际使用的打包图集与许可文件 |

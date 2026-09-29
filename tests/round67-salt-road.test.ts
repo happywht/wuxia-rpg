@@ -51,7 +51,7 @@ describe('Round 67 fourth playable region and expanded atlas', () => {
     expect(map.columns).toBe(100);
     expect(map.rows).toBe(100);
     expect(map.data.art?.tilesets.some(({ id }) => id === 'kenney.roguelike-rpg')).toBe(true);
-    expect(map.data.art?.layers).toHaveLength(10);
+    expect(map.data.art?.layers).toHaveLength(11);
     expect(map.data.art?.layers.every((layer) =>
       layer.cells.length === map.rows && layer.cells.every((row) => row.length === map.columns),
     )).toBe(true);

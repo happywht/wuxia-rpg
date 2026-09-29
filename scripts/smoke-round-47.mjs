@@ -172,10 +172,11 @@ try {
       'assets/kenney/tiny-dungeon/tilemap_packed.png',
       'assets/kenney/rpg-urban-pack/tilemap_packed.png',
       'assets/kenney/tiny-town/tilemap_packed.png',
+      'assets/opengameart/rpg-town-pixel-art-assets/transparent-bg-tiles.png',
       'assets/generated/world-palette.png',
     ]) {
       const response = await fetch(`${siteBase}${assetPath}`);
-      assert.equal(response.status, 200, `Kenney 图集在非根部署路径可访问：${assetPath}`);
+      assert.equal(response.status, 200, `像素图集在非根部署路径可访问：${assetPath}`);
       assert.match(response.headers.get('content-type') ?? '', /^image\/png/u, `PNG MIME 正确：${assetPath}`);
     }
     for (const licensePath of [
@@ -183,6 +184,7 @@ try {
       'assets/kenney/tiny-dungeon/License.txt',
       'assets/kenney/rpg-urban-pack/License.txt',
       'assets/kenney/tiny-town/License.txt',
+      'assets/opengameart/rpg-town-pixel-art-assets/License.txt',
     ]) {
       const response = await fetch(`${siteBase}${licensePath}`);
       assert.equal(response.status, 200, `原始 CC0 License 随包并可读取：${licensePath}`);
@@ -201,7 +203,7 @@ try {
     await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
   }
 
-  console.log(`通过：${archiveName} 可解包，${manifest.files.length} 个文件的大小/哈希与清单一致；静态包可挂载到 ${mountPath} 并加载 HTML/JS/CSS、示例 MOD、manifest 中全部基础资料/Schema、四张 Kenney PNG 图集、生成的世界调色板和原始 CC0 License。`);
+  console.log(`通过：${archiveName} 可解包，${manifest.files.length} 个文件的大小/哈希与清单一致；静态包可挂载到 ${mountPath} 并加载 HTML/JS/CSS、示例 MOD、manifest 中全部基础资料/Schema、四张 Kenney 与一张 OpenGameArt PNG 图集、生成的世界调色板和全部随包 CC0 License。`);
 } finally {
   await rm(tempRoot, { recursive: true, force: true });
 }

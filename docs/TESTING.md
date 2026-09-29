@@ -13,7 +13,9 @@ npm run smoke:round-46 # 真实资料驱动的开局→故事分支→多结局�
 npm run smoke:round-68 # 四区逐格旅程→日程→盐道存读档→苦井差事→渡口结局
 npm run smoke:round-69 # 真实授艺路径审计→守御/反击一击结算
 npm run smoke:round-74 # 云岭百格地图、跨区关口、任务链和真实 manifest 装配
+npm run smoke:round-76 # 五区补充图集帧、原碰撞/画层哈希与锚点
 npx vitest run tests/round75-region-event-approach.test.ts # 固定事件临近线索协议与五区数据
+npm run generate:round-76-region-landmarks # 确定性应用五区 24 个环境图素
 npm run package:release # 质量门槛 + 生产构建 + R72 chunk 审计 + R47 归档/路径 smoke + 版本化 Web 包
 npm run audit:round-72 # 检查入口/Phaser chunk、大小比例和生产 JS 引用闭合
 npm run typecheck   # tsc --noEmit，严格模式，包含 tests/ 与 vitest.config.ts
@@ -37,7 +39,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 
 - 测试框架：Vitest 5.0.2。官方指南要求 Vite >=6.4.0、Node >=22.12.0；本仓库使用 Vite 8.3.1 与 Node 22.18.0，符合要求（详见 [`docs/REFERENCES.md`](REFERENCES.md) #12；基准 API 见同文件 #16）。
 - 运行环境：Node（无 DOM、无浏览器、无网络、无真实时钟依赖）。
-- 覆盖统计：Round 74 全量发行验证为 45 个测试文件/303 个用例；Round 69 时为 41/292。R69 覆盖 30 门武学的起始/授艺来源、对白起点到学习效果的路径、门派导师匹配、属性曲线可达、四门身法守御映射、敌我守御的一击消耗及敌方攻击优先规则；完整历史结果见 `DEVLOG.md` Round 69。Round 51–62 增量覆盖地图/CC0 素材、舆图视口与相机坐标、地标和跨区寻路、地图扩区、见闻任务、任务导航以及动态占位路线；Round 63–64 覆盖跨时段步行模拟与多图七时段全部交互目标路线/商铺导航审计；Round 65 专项 `tests/round65-urban-art.test.ts` 11 用例以内置 PNG 调色板解码器审计城镇图集许可/网格/486 格非空、地图与 NPC 的角色帧（必须落在图集角色列）、起始图城镇两图层的帧引用、角色列帧禁入城镇图层与环境帧白名单双守卫、碰撞一致性及出生点/NPC/关口可达；当前 Round 66–74 回归检查 208×128 七层舆图、五区地图、跨区关口、数据驱动人物/任务资源装配及路线可达性。
+- 覆盖统计：Round 76 专项发行验证为 47 个测试文件/320 个用例；Round 69 时为 41/292。R69 覆盖 30 门武学的起始/授艺来源、对白起点到学习效果的路径、门派导师匹配、属性曲线可达、四门身法守御映射、敌我守御的一击消耗及敌方攻击优先规则；完整历史结果见 `DEVLOG.md` Round 69。Round 51–62 增量覆盖地图/CC0 素材、舆图视口与相机坐标、地标和跨区寻路、地图扩区、见闻任务、任务导航以及动态占位路线；Round 63–64 覆盖跨时段步行模拟与多图七时段全部交互目标路线/商铺导航审计；Round 65 专项 `tests/round65-urban-art.test.ts` 11 用例以内置 PNG 调色板解码器审计城镇图集许可/网格/486 格非空、地图与 NPC 的角色帧（必须落在图集角色列）、起始图城镇两图层的帧引用、角色列帧禁入城镇图层与环境帧白名单双守卫、碰撞一致性及出生点/NPC/关口可达；Round 66–74 回归检查 208×128 七层舆图、五区地图、跨区关口、数据驱动人物/任务资源装配及路线可达性；`tests/round76-region-landmark-art.test.ts` 用内置 PNG RGBA 解码器核查 CC0 图集、396 帧范围与透明度、五区图层、旧画面层/碰撞哈希及玩家/事件/地标/关口/NPC/遭遇锚点。隔离浏览器还核对全域舆图 M、细图 G 和方向键行走跟随。
 
 ## 配置：为什么有独立的 `vitest.config.ts`
 

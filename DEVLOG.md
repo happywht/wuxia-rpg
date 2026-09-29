@@ -4,6 +4,30 @@
 
 ---
 
+## Round 76 — 五区地标图素与环境层级（2026-09-29，已完成）
+
+### 计划与实现
+
+- 按 [`iterations/round-76/plan.md`](iterations/round-76/plan.md) 执行：为五张 100×100 可玩地图补充来源清晰的环境图素，保留碰撞、角色及互动锚点。
+- 核验 OpenGameArt ansimuz [RPG Town Pixel Art Assets](https://opengameart.org/content/rpg-town-pixel-art-assets) 素材页、下载包和原始许可：透明 PNG 为 352×288 RGBA，按 16×16 切为 22×18、396 帧；包内 `License.txt` 标注 CC0 并链接 CC0 1.0。仅复制进入项目的实际环境图集与原始许可，未导入素材包中的角色页或 PSD。
+- 新增 `scripts/generate-round76-region-landmarks.mjs` 与 `npm run generate:round-76-region-landmarks`，确定性写入 5 个 `art.tilesets` 声明及独立装饰层，共 24 个环境图素；对出生点、固定事件、地标、关口、NPC 基础/日程位置及遭遇锚点进行保护，且排除图集内的署名帧。
+- 五区分别增加江南果木/花丛、渡口摊位/木桶/岸栏、铁嶂松树/岭石、盐井花石/驿棚、云岭悬桥两侧栏杆/松石。`grid`、旧图层内容、地图尺寸、角色图集及玩法数据均不变。
+- `tests/round76-region-landmark-art.test.ts` 增加 PNG RGBA/帧号/许可、五区资料/图层、地图与原碰撞/旧层 SHA-256、人物/事件/地标/关口/NPC/日程/遇遭锚点及发行 allowlist 检查。地图生成器连续重跑后五图 SHA-256 不变。
+- 浏览器使用隔离 Vite 端口核对新游戏起始地图、M 208×128 全域舆图、G 本区 100×100 细图和方向键移动相机跟随。五区新图层另外以实际图集和地图图素合成近景检查；本轮未在浏览器逐个手走到五区新装饰格，也未操作原有 5178 用户页面/存档。
+
+### 验证
+
+- `npm run generate:round-76-region-landmarks`：通过，五图 24 个环境图素生成；连续两次执行五份地图 SHA-256 均相同。
+- `npm run smoke:round-76`：1 个测试文件/9 项测试通过；`npm run validate:data` 通过 34 项基础资源 Schema；`npm run typecheck` 通过。
+- `npm run package:release`：34 项基础资源 Schema、34 项 MOD 检查零问题、类型检查、47 个测试文件/320 项测试、Round 34/48 文档审计、139 模块生产构建、Round 72 chunk 审计、发行打包及子路径 smoke 全部通过。发行包 904,154 bytes，SHA-256 `b9c40d5f4569419d41cea556d16f9c11b7c1754c8d6313a596bdd05cc3c698ed`；86 个归档成员/85 个内容文件逐项哈希核验，并从 `/preview/wuxia-rpg/` 验证四张 Kenney 与一张 OpenGameArt 图集、五份 CC0 许可、基础资料和 Schema 可加载。
+- 全量首轮曾提示旧地图测试把图层数量及图集固定为历史版本；已更新为按各图层的 `tilesetId` 分别验证图集边界，并显式计入 R76 层，复跑后 320 项全部通过。
+- 隔离浏览器在端口 5191 实测新游戏起始地图、M 全域舆图、G 本区细图及方向键移动/相机跟随。各区新增装饰另经五区图素近景合成检查；本轮没有在浏览器逐区手走到每个装饰点，也未触碰用户原有 5178 页面或存档。
+- Vite 仍报告 Phaser runtime chunk 大于默认 500 KB 建议线；构建和审计成功，本轮没有调整既有分块策略。
+- `git diff --check` 与 Round 48 文档审计通过。
+
+### 提交
+
+- 提交信息：`round-76: 五区地标像素细节`。
 ## Round 75 — 五区固定见闻点临近线索（2026-09-29，已完成）
 
 ### 计划与实现

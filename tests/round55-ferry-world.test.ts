@@ -36,7 +36,7 @@ describe('large walkable regions and later atlas extensions', () => {
   it('expands to 100×100 CC0 layered terrain without reducing collision to a tiny scene', () => {
     expect(ferry.columns).toBe(100);
     expect(ferry.rows).toBe(100);
-    expect(ferry.data.art?.layers).toHaveLength(10);
+    expect(ferry.data.art?.layers).toHaveLength(11);
     expect(ferry.data.art?.layers.every((layer) =>
       layer.cells.length === 100 && layer.cells.every((row) => row.length === 100),
     )).toBe(true);

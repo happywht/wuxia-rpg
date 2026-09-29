@@ -50,14 +50,14 @@ describe('Round 74 cloud-ridge playable region', () => {
     const cloud = maps.get(CLOUD_ID)!;
     expect(cloud.columns).toBe(100);
     expect(cloud.rows).toBe(100);
-    expect(cloud.data.art?.layers).toHaveLength(10);
+    expect(cloud.data.art?.layers).toHaveLength(11);
     expect(cloud.data.art?.layers.every((layer) =>
       layer.cells.length === cloud.rows && layer.cells.every((row) => row.length === cloud.columns),
     )).toBe(true);
-    const atlas = cloud.data.art?.tilesets.find(({ id }) => id === 'kenney.roguelike-rpg');
-    expect(atlas).toBeDefined();
+    const tilesets = cloud.data.art?.tilesets ?? [];
     for (const layer of cloud.data.art?.layers ?? []) {
-      expect(layer.tilesetId).toBe('kenney.roguelike-rpg');
+      const atlas = tilesets.find(({ id }) => id === layer.tilesetId);
+      expect(atlas, `missing tileset ${layer.tilesetId} for ${layer.id}`).toBeDefined();
       for (const row of layer.cells) {
         for (const gid of row) expect(gid & 0x0fffffff).toBeLessThanOrEqual(atlas!.tileCount);
       }
