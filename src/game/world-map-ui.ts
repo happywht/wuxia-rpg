@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 
 import { type CellPosition, type GridMap } from '../engine/grid-map';
-import { findGridPath, findGridPathToAdjacentCell, summarizePathRuns } from '../engine/grid-path';
+import { summarizePathRuns } from '../engine/grid-path';
 import { clampMapViewport, createMapViewport, panMapViewport, zoomMapViewport, type MapViewportBounds, type MapViewportState } from '../engine/map-viewport';
 import { ensureGridMapArtTexture, ensureGridMapLayerTexture } from '../engine/grid-map-renderer';
 import { QUEST_NAVIGATION_ID_PREFIX, type QuestNavigationTarget } from '../engine/quest-navigation';
@@ -17,6 +17,7 @@ import {
   type WorldAtlasOverlays,
 } from '../engine/world-atlas-view';
 import { buildWorldMapWaypoints, cycleWorldWaypointIndex, normalizeWorldMapPointer, type WorldMapWaypoint } from '../engine/world-navigation';
+import { resolveCellNavigationGuide } from '../engine/world-navigation-guidance';
 import { uiFontSize } from './settings';
 import { addPixelPanelChrome, UI_FONT_FAMILY } from './ui-theme';
 
@@ -88,6 +89,7 @@ export class WorldMapPanel {
   private atlasPlayerPin: Phaser.GameObjects.Arc | null = null;
   private viewMode: 'world' | 'local' = 'world';
   private knownKnowledgeNodeIds: ReadonlySet<string> = new Set();
+  private blockedCells: ReadonlySet<string> = new Set();
   private routeCells: CellPosition[] | null = null;
   private selectedWaypointId: string | null = null;
   private focusedWaypointIndex = -1;
@@ -200,6 +202,7 @@ export class WorldMapPanel {
     knownKnowledgeNodeIds: ReadonlySet<string> = new Set(),
     selectedDestinationId: string | null = null,
     supplementalQuestTargets: readonly QuestNavigationTarget[] = [],
+    blockedCells: ReadonlySet<string> = new Set(),
   ): void {
     if (this.openState) return;
     this.openState = true;
@@ -209,6 +212,7 @@ export class WorldMapPanel {
     this.worldMap = worldMap;
     this.allMaps = maps;
     this.knownKnowledgeNodeIds = knownKnowledgeNodeIds;
+    this.blockedCells = blockedCells;
     this.viewMode = worldMap.data.atlasArt === undefined ? 'local' : 'world';
     this.bindKeys();
     this.scene.input.on('pointerdown', this.pointerDown);
@@ -264,6 +268,7 @@ export class WorldMapPanel {
     this.activeMap = null;
     this.worldMap = null;
     this.allMaps = new Map();
+    this.blockedCells = new Set();
     this.waypoints = [];
     this.routeCells = null;
     this.selectedWaypointId = null;
@@ -655,29 +660,53 @@ export class WorldMapPanel {
   private selectWaypoint(id: string): void {
     const waypoint = this.waypoints.find((candidate) => candidate.id === id);
     const map = this.activeMap;
-    if (waypoint === undefined || map === null) return;
+    const worldMap = this.worldMap;
+    if (waypoint === undefined || map === null || worldMap === null) return;
     const start = { col: this.playerCol, row: this.playerRow };
     const approachToGate = waypoint.kind === 'transition' ||
       waypoint.kind === 'remote-region' || waypoint.kind === 'remote-landmark';
-    this.routeCells = approachToGate
-      ? findGridPathToAdjacentCell(map, start, waypoint.position)
-      : waypoint.approachRadius === 1
-        ? findGridPathToAdjacentCell(map, start, waypoint.position)
-        : findGridPath(map, start, waypoint.position, { approachRadius: waypoint.approachRadius });
+    const destination = {
+      mapResourceId: map.data.id,
+      col: waypoint.position.col,
+      row: waypoint.position.row,
+      name: waypoint.name,
+      approachRadius: approachToGate ? 1 : waypoint.approachRadius,
+    };
+    const resolveGuide = (blockers?: ReadonlySet<string>) => resolveCellNavigationGuide(
+      worldMap,
+      map.data.id,
+      destination,
+      map,
+      start,
+      blockers,
+    );
+    const guide = resolveGuide(this.blockedCells);
+    this.routeCells = guide.status === 'en-route' || guide.status === 'at-gate' || guide.status === 'arrived'
+      ? guide.path
+      : null;
+    const staticGuide = this.blockedCells.size === 0 ? guide : resolveGuide();
+    const usesDetour = staticGuide.status !== 'route-broken' && staticGuide.status !== 'route-blocked' &&
+      staticGuide.status !== 'target-lost' && staticGuide.path.some((cell) =>
+        this.blockedCells.has(`${cell.col},${cell.row}`),
+      );
     this.selectedWaypointId = id;
     this.onDestinationPicked?.(waypoint.destinationId ?? null);
     const kindLabel = waypointLabel(waypoint);
     this.selectedNameText?.setText(`${kindLabel}：${waypoint.name}`);
-    if (this.routeCells === null) {
+    if (guide.status === 'route-blocked') {
+      this.routeDistanceText?.setText('动态人物 / 遭遇暂时挡住路线');
+      this.routeDirectionsText?.setText('等占位变化后重新打开舆图。');
+    } else if (this.routeCells === null) {
       this.routeDistanceText?.setText('当前地形没有可行路线');
       this.routeDirectionsText?.setText('请从别处重新规划。');
     } else {
       const steps = Math.max(0, this.routeCells.length - 1);
+      const detourNote = usesDetour ? ' · 已避开当前占位' : '';
       this.routeDistanceText?.setText(waypoint.kind === 'remote-landmark' || waypoint.kind === 'remote-region'
-        ? `首段步行 ${steps} 格至「${waypoint.nextTransitionName ?? '下一关口'}」旁`
+        ? `首段步行 ${steps} 格至「${waypoint.nextTransitionName ?? '下一关口'}」旁${detourNote}`
         : waypoint.kind === 'transition'
-          ? `步行 ${steps} 格到关口旁，按 E 通过`
-          : `步行 ${steps} 格 · 至地标或最近可行停靠点`);
+          ? `步行 ${steps} 格到关口旁，按 E 通过${detourNote}`
+          : `步行 ${steps} 格 · 至地标或最近可行停靠点${detourNote}`);
       this.routeDirectionsText?.setText(formatRouteDirections(this.routeCells));
     }
     if (waypoint.kind === 'remote-landmark' || waypoint.kind === 'remote-region') {

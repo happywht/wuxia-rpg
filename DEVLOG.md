@@ -4,6 +4,26 @@
 
 ---
 
+## Round 73 — 舆图路线避让动态人物与遭遇（2026-09-29，已完成）
+
+### 计划与实现
+
+- 按 [`iterations/round-73/plan.md`](iterations/round-73/plan.md) 执行。Round 72 隔离浏览器实走时发现渡口子夜的白鹭洲占位挡住按舆图得到的后段路线；问题在于 HUD 已读取动态阻挡，而 M 面板仍使用静态格寻路。
+- `GridScene` 打开舆图时传入与 HUD 指引相同的当前 NPC/有效遭遇阻挡集合。`WorldMapPanel` 对所选地标、关口及跨区首段统一调用 Phaser-free `resolveCellNavigationGuide`；可绕行时显示已避开当前占位，静态路线可达但动态封堵时给出临时阻挡提示，静态路线本身不可达时保留地形提示。打开期间探索输入暂停，关图后走格或跨时段再打开会用当下占位重算。
+- 新增 [`tests/round73-world-map-blockers.test.ts`](tests/round73-world-map-blockers.test.ts)，从生产地图、NPC/日程、历法和遭遇资料装配渡口；专项场景覆盖第 2 日子夜白鹭洲 `(4,4)` 与黄昏 `(3,4)` 的时段位置，核对静态原路径及动态避让路径。
+- 更新舆图/玩家指南、架构/数据摘要、Round 72 试玩后续说明和 74 轮路线图。浏览器未重走完整四区路线；在隔离的 5189 开发页打开 M 舆图确认面板仍能正常显示，5178 原有标签/存档未操作。
+
+### 验证
+
+- `npx vitest run tests/round73-world-map-blockers.test.ts`：1 个测试文件/1 项测试通过；`npm run typecheck` 通过；`git diff --check` 通过。
+- `npm run package:release`：30 项基础资源 Schema 通过、30 项 MOD 检查 0 问题、`tsc --noEmit` 通过、44 个测试文件/297 项测试通过、Round 34/48 文档审计通过、Round 72 chunk 审计通过；139 模块生产构建完成，发行包解包和 `/preview/wuxia-rpg/` 子路径 smoke 验证 79 项内容文件的大小/哈希及基础资料/Schema/贴图/license 请求。
+- 本次入口 571,392 B / gzip 155,934 B，Phaser chunk 1,374,548 B / gzip 355,827 B。Vite 仍提示 Phaser chunk 超过 500 KB；本轮未改分块策略。发行包 `release/wuxia-rpg-web-0.0.1.tgz` 为 849,204 bytes，SHA-256 `de4960016a5ca526c3ee89267504bae35d2e448f1b30e2402157104bc2c19633`。
+
+### 边界与后续
+
+- 本轮复现资料和自动回归覆盖了 Round 72 的渡口、时段与人物占位；未声称在浏览器重新走完整返程，也未更改静态地图碰撞、NPC 日程或存档格式。只手动确认 5189 开发页可打开 M 舆图。
+- 下轮可转向四区区域内容、支线地标交互及移动中可读提示，详见 [`ROADMAP.md`](ROADMAP.md) Round 74。
+
 ## Round 72 — 浏览器动态回程、结局实走与生产分块（2026-09-29，已完成）
 
 ### 计划与实现

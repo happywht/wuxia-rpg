@@ -31,3 +31,7 @@ npm run package:release
 ```
 
 浏览器到达结局画面并返回主菜单为手动验证。全量资料/MOD/类型/测试/文档审计、发行清单、子路径 JS chunk 请求结果记录在 `DEVLOG.md` Round 72。
+
+## Round 73 后续
+
+本轮记录的子夜导航现象暴露了舆图与现场占位不一致：实时路径规划仍可能将白鹭洲所在格当作可走格。Round 73 已让 M 舆图和 HUD 共用开图时的 NPC/有效遭遇阻挡集合，并以生产渡口地图、第二日子夜/黄昏人物日程建立自动回归。该修复是后续代码和测试结果，不改变以上浏览器试玩当时的观察；本轮没有再次通过浏览器走完该渡口路线。详情见 [`DEVLOG.md`](../DEVLOG.md) Round 73 与 [`round73-world-map-blockers.test.ts`](../tests/round73-world-map-blockers.test.ts)。

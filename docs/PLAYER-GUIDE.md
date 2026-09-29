@@ -1,6 +1,6 @@
 # 玩家手册
 
-这份手册对应当前仓库 Round 72 的可运行原型。菜单、键位与玩法以游戏内 H「操作手册」和现行资料为准；浏览器存档仅保存在当前浏览器的本地存储中。R00–R72 均有独立计划和提交；R50 最终验收边界见 [`FINAL-ACCEPTANCE.md`](FINAL-ACCEPTANCE.md)，四块百格地图、全域舆图、区域内容与路线证据见 [`MAP-ATLAS.md`](MAP-ATLAS.md)、[`ROUND-61-ROUTE-AUDIT.md`](ROUND-61-ROUTE-AUDIT.md)、[`ROUND-63-TIMED-ROUTE-AUDIT.md`](ROUND-63-TIMED-ROUTE-AUDIT.md)、[`ROUND-64-ROUTE-AUDIT.md`](ROUND-64-ROUTE-AUDIT.md)、[`ROUND-68-JOURNEY-PLAYTEST.md`](ROUND-68-JOURNEY-PLAYTEST.md)、[`ROUND-71-BROWSER-PLAYTEST.md`](ROUND-71-BROWSER-PLAYTEST.md) 和 [`ROUND-72-BROWSER-PLAYTEST.md`](ROUND-72-BROWSER-PLAYTEST.md)。Round 69 起四门身法拥有一次性守御战斗作用；无门派拦门刀法可向盘舷门外玩家授艺。Round 70 更新四区总图地貌与地图图素。招式名称、门槛和作用见 [`MARTIAL-ARTS.md`](MARTIAL-ARTS.md)。
+这份手册对应当前仓库 Round 73 的可运行原型。菜单、键位与玩法以游戏内 H「操作手册」和现行资料为准；浏览器存档仅保存在当前浏览器的本地存储中。R00–R73 均有独立计划和提交；R50 最终验收边界见 [`FINAL-ACCEPTANCE.md`](FINAL-ACCEPTANCE.md)，四块百格地图、全域舆图、区域内容与路线证据见 [`MAP-ATLAS.md`](MAP-ATLAS.md)、[`ROUND-61-ROUTE-AUDIT.md`](ROUND-61-ROUTE-AUDIT.md)、[`ROUND-63-TIMED-ROUTE-AUDIT.md`](ROUND-63-TIMED-ROUTE-AUDIT.md)、[`ROUND-64-ROUTE-AUDIT.md`](ROUND-64-ROUTE-AUDIT.md)、[`ROUND-68-JOURNEY-PLAYTEST.md`](ROUND-68-JOURNEY-PLAYTEST.md)、[`ROUND-71-BROWSER-PLAYTEST.md`](ROUND-71-BROWSER-PLAYTEST.md) 和 [`ROUND-72-BROWSER-PLAYTEST.md`](ROUND-72-BROWSER-PLAYTEST.md)。Round 69 起四门身法拥有一次性守御战斗作用；无门派拦门刀法可向盘舷门外玩家授艺。Round 70 更新四区总图地貌与地图图素。Round 73 让 M 舆图和 HUD 共用当前 NPC/遭遇占位，绕行时显示提示、临时封路时区别于地形断路。招式名称、门槛和作用见 [`MARTIAL-ARTS.md`](MARTIAL-ARTS.md)。
 
 ## 世界外观（Round 65 起）
 
@@ -46,7 +46,7 @@ npm run dev
 |---|---|---|
 | B | 背包 | 查看、使用、穿戴物品；在邻近商店处由 E 进入买卖 |
 | Q | 差事 | 查看任务状态与目标；↑/↓ 选择，Enter 接取/跟踪，A 放弃活动任务，N 对选中的进行中差事导航（见下），Esc 关闭 |
-| M | 舆图 | 默认看全域总览；按 **G** 或点右上角按钮切到本区细图。拖动地图、滚轮缩放、方向键平移；W/S 选点并用 Enter 规划。当前地图显示避开阻挡地形、当期 NPC 和活动遭遇的步行路线、格数和方向；选中的已知地标或差事目标在关闭/重开舆图、手动通过区域关口后继续作为目的地，画面左上 HUD 显示本区方向、剩余格数和下一关口。到关口旁后按 E 切区，导航不会替你移动或传送。抵达任务人物/遭遇/见闻目标后 HUD 会提示 F/E 操作或见闻条件等待；抵达地标附近后提示结束。带见闻门槛的地点发现后才显示，但已接取差事的当前目标会临时投影为「差事」金色标点。导航目标只保留在当前运行中，存读档后需重新选点；人物目标与寻路占位会随时段日程自动重算。M/Esc 关闭；打开期间探索输入锁定 |
+| M | 舆图 | 默认看全域总览；按 **G** 或点右上角按钮切到本区细图。拖动地图、滚轮缩放、方向键平移；W/S 选点并用 Enter 规划。M 舆图和 HUD 使用同一当前 NPC/活动遭遇占位；可绕行时路线标出「已避开当前占位」，静态地形有路但临时被占住时显示动态阻挡提示。关图后移动或等待时段变化，再打开会按新位置重算。已选地标/差事目标在关闭、重开和手动过关后继续保留；画面左上 HUD 显示本区方向、剩余格数和下一关口。到关口旁按 E 切区，导航不替你移动或传送。抵达任务人物/遭遇/见闻目标后 HUD 会提示 F/E 操作或见闻条件等待；抵达地标附近后提示结束。带见闻门槛的地点发现后才显示，但已接取差事的当前目标会临时投影为「差事」金色标点。导航目标只保留在当前运行中，存读档后需重新选点；人物目标与寻路占位会随时段日程自动重算。M/Esc 关闭；打开期间探索输入锁定 |
 | K | 百科 | 浏览已知人物、地点、物品、武学和事件关系 |
 | L | 图鉴 | 查看已发现内容与收集进度 |
 | J | 师门 | 查看所属门派、声望与可用师门行动；每位登记师父名字旁标注其所在区域名 |

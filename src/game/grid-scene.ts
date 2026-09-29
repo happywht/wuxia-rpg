@@ -2848,6 +2848,7 @@ export class GridScene extends Phaser.Scene {
       this.knownKnowledgeNodeIds,
       this.navigationDestinationId,
       questTarget === null ? [] : [questTarget],
+      this.navigationBlockedCells(),
     );
     this.updateInteractHint();
   }
