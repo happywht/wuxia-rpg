@@ -19,11 +19,15 @@ import {
 } from '../engine/grid-map-renderer';
 import {
   selectAdjacentTransition,
+  selectInteractableRegionEvent,
   selectNewRegionEventKnowledgeIds,
   selectRegionEventApproachClue,
   selectTriggeredRandomRegionEvent,
   selectTriggeredRegionEvents,
   type RegionEventContext,
+  type RegionEventData,
+  type RegionEventInteractionSelection,
+  type RandomRegionEventData,
   type RegionTransitionData,
 } from '../engine/world-map';
 import {
@@ -2066,6 +2070,15 @@ export class GridScene extends Phaser.Scene {
     }
   }
 
+  /** Turns toward a data-authored cell interaction without requiring an actor there. */
+  private faceInteractionCell(target: { col: number; row: number }): void {
+    this.playerFacing = directionBetweenCells(
+      { col: this.playerCol, row: this.playerRow },
+      target,
+    );
+    this.updatePlayerActorFrame(false);
+  }
+
   private buildHud(
     map: GridMap,
     optionalWarnings: readonly Diagnostic[],
@@ -2661,6 +2674,11 @@ export class GridScene extends Phaser.Scene {
     if (alchemyTarget !== null) {
       const known = alchemyTarget.recipes.filter((recipe) => this.knownKnowledgeNodeIds.has(recipe.discoveryNodeId)).length;
       this.interactText.setText(`按 E 在「${alchemyTarget.record.name}」炼药 · 已识药方 ${known}/${alchemyTarget.recipes.length}`);
+      return;
+    }
+    const mapEventTarget = this.interactableRegionEventTarget();
+    if (mapEventTarget !== null) {
+      this.interactText.setText(`按 E · ${mapEventTarget.prompt}`);
       return;
     }
     const gate = this.world === null
@@ -3550,6 +3568,12 @@ export class GridScene extends Phaser.Scene {
       this.updateInteractHint();
       return;
     }
+    const mapEvent = this.interactableRegionEventTarget();
+    if (mapEvent !== null) {
+      this.faceInteractionCell(mapEvent.event);
+      this.presentRegionEvents([mapEvent.event]);
+      return;
+    }
     const gate = this.world === null
       ? null
       : selectAdjacentTransition(this.world.worldMap.transitions, this.currentMapResourceId, {
@@ -3936,6 +3960,22 @@ export class GridScene extends Phaser.Scene {
     };
   }
 
+  /** Finds the nearest usable map event and keeps intermediate walls/actors from being targeted through. */
+  private interactableRegionEventTarget(): RegionEventInteractionSelection | null {
+    const world = this.world;
+    const map = this.map;
+    if (world === null || map === null) return null;
+    return selectInteractableRegionEvent(
+      world.worldMap.events,
+      { mapResourceId: this.currentMapResourceId, col: this.playerCol, row: this.playerRow },
+      this.completedRegionalEvents,
+      this.regionEventContext(),
+      (col, row) => map.canEnter(col, row) &&
+        !this.occupancy.isOccupied(col, row) &&
+        !this.encounterCells.has(`${col},${row}`),
+    );
+  }
+
   private triggerRegionEvents(prefix = '', afterPlayerStep = false): void {
     const world = this.world;
     if (world === null) {
@@ -3958,13 +3998,26 @@ export class GridScene extends Phaser.Scene {
         )
       : null;
     const allEvents = randomEvent === null ? events : [...events, randomEvent];
+    this.presentRegionEvents(allEvents, prefix);
+  }
+
+  /** Shares one-shot settlement, discovery and notice presentation across step and E-key events. */
+  private presentRegionEvents(
+    events: readonly (RegionEventData | RandomRegionEventData)[],
+    prefix = '',
+  ): void {
+    const world = this.world;
+    if (world === null) {
+      if (prefix.length > 0) this.showRegionNotice(prefix);
+      return;
+    }
     const notices = prefix.length > 0 ? [prefix] : [];
-    for (const event of allEvents) {
+    for (const event of events) {
       if (event.once) this.completedRegionalEvents.add(event.id);
       notices.push(event.text);
     }
     const newlyDiscoveredTitles = new Set<string>();
-    for (const nodeId of selectNewRegionEventKnowledgeIds(allEvents, this.knownKnowledgeNodeIds)) {
+    for (const nodeId of selectNewRegionEventKnowledgeIds(events, this.knownKnowledgeNodeIds)) {
       const node = world.knowledgeGraph.nodes.get(nodeId);
       if (node === undefined) continue;
       if (!this.markKnowledgeDiscovered(nodeId)) continue;

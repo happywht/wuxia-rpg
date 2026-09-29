@@ -14,6 +14,7 @@ npm run smoke:round-68 # 四区逐格旅程→日程→盐道存读档→苦井�
 npm run smoke:round-69 # 真实授艺路径审计→守御/反击一击结算
 npm run smoke:round-74 # 云岭百格地图、跨区关口、任务链和真实 manifest 装配
 npm run smoke:round-79 # 落潮湾海岛、CC0 图素、六区舆图及旧区域投影兼容
+npm run smoke:round-80 # 区域事件 E 调查、旧触发兼容、方向/范围/条件与遮挡
 npm run smoke:round-76 # 五区补充图集帧、原碰撞/画层哈希与锚点
 npm run smoke:round-77 # CC0 人物帧、方向动画数据、碰撞哈希和旧格式兼容
 npm run generate:round-77-characters # 确定性重建 CC0 人物图集与人物帧表
@@ -42,7 +43,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 
 - 测试框架：Vitest 5.0.2。官方指南要求 Vite >=6.4.0、Node >=22.12.0；本仓库使用 Vite 8.3.1 与 Node 22.18.0，符合要求（详见 [`docs/REFERENCES.md`](REFERENCES.md) #12；基准 API 见同文件 #16）。
 - 运行环境：Node（无 DOM、无浏览器、无网络、无真实时钟依赖）。
-- 覆盖统计：Round 77 专项发行验证为 48 个测试文件/324 个用例；Round 69 时为 41/292。R69 覆盖 30 门武学的起始/授艺来源、对白起点到学习效果的路径、门派导师匹配、属性曲线可达、四门身法守御映射、敌我守御的一击消耗及敌方攻击优先规则；完整历史结果见 `DEVLOG.md` Round 69。Round 51–62 增量覆盖地图/CC0 素材、舆图视口与相机坐标、地标和跨区寻路、地图扩区、见闻任务、任务导航以及动态占位路线；Round 63–64 覆盖跨时段步行模拟与多图七时段全部交互目标路线/商铺导航审计；Round 65 专项 `tests/round65-urban-art.test.ts` 以内置 PNG 调色板解码器审计城镇图集许可/网格/486 格与历史人物帧，并检查起始图城镇两图层帧引用、角色列帧禁入环境层、环境帧白名单、碰撞一致性及出生点/NPC/关口可达；Round 77 人物专项核查新 Puny 图集、方向帧/行走循环、十种外观和旧数据回退；Round 66–74 回归检查 208×128 七层舆图、五区地图、跨区关口、数据驱动人物/任务资源装配及路线可达性；`tests/round76-region-landmark-art.test.ts` 用内置 PNG RGBA 解码器核查 CC0 图集、396 帧范围与透明度、五区图层、旧画面层/碰撞哈希及玩家/事件/地标/关口/NPC/遭遇锚点。隔离浏览器还核对全域舆图 M、细图 G 和方向键行走跟随。
+- 覆盖统计：Round 80 当前 `npm run check` 为 51 个测试文件/349 个用例；Round 77 专项发行验证为 48/324，Round 69 时为 41/292。R69 覆盖 30 门武学的起始/授艺来源、对白起点到学习效果的路径、门派导师匹配、属性曲线可达、四门身法守御映射、敌我守御的一击消耗及敌方攻击优先规则；完整历史结果见 `DEVLOG.md` Round 69。Round 51–62 增量覆盖地图/CC0 素材、舆图视口与相机坐标、地标和跨区寻路、地图扩区、见闻任务、任务导航以及动态占位路线；Round 63–64 覆盖跨时段步行模拟与多图七时段全部交互目标路线/商铺导航审计；Round 65 专项 `tests/round65-urban-art.test.ts` 以内置 PNG 调色板解码器审计城镇图集许可/网格/486 格与历史人物帧，并检查起始图城镇两图层帧引用、角色列帧禁入环境层、环境帧白名单、碰撞一致性及出生点/NPC/关口可达；Round 77 人物专项核查新 Puny 图集、方向帧/行走循环、十种外观和旧数据回退；Round 66–74 回归检查 208×128 七层舆图、五区地图、跨区关口、数据驱动人物/任务资源装配及路线可达性；`tests/round76-region-landmark-art.test.ts` 用内置 PNG RGBA 解码器核查 CC0 图集、396 帧范围与透明度、五区图层、旧画面层/碰撞哈希及玩家/事件/地标/关口/NPC/遭遇锚点。隔离浏览器还核对全域舆图 M、细图 G 和方向键行走跟随。
 
 ## 配置：为什么有独立的 `vitest.config.ts`
 
@@ -75,6 +76,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 | `tests/input-settings.test.ts` | `src/game/input-settings.ts` | R41 输入回归：三档移动键位解析与键集（arrows 恰 4 键 / wasd 恰 4 键 / both 8 键）、逐键启用判定与帮助文本；摇杆死区（默认 0.5 与自定义）、主导轴、对角水平优先、非有限值；D-pad 基数优先于摇杆与对向键消解；标准映射采样（D-pad/左摇杆/A→confirm、B→back）；`GamepadEdgeTracker` 按住只发一次、换向即新边沿、释放重触发、confirm/back 边沿与 `reset()` |
 | `tests/round42-story.test.ts` | `src/engine/quest-system.ts`、`dialogue-graph.ts`、`ending-system.ts` 与基础故事资料 | R42 主线集成：完整载入并装配任务和四张目标对白图；校验 R31 渡籍补录到三段主线、共享前置互斥分支、对话任务/物品/图谱引用；实际驱动任务状态机完成两条路线，验证兄弟失败和各自唯一新结局可达 |
 | `tests/world-map.test.ts` | `src/engine/world-map.ts` 与 world-map schema | R43 漫游奇遇：旧地图缺省兼容、概率值拒绝、坏发现节点隔离、稳定候选顺序、无资格候选不消耗随机源、概率/一次性/可重复语义；R44 nearbyNpcIds 全员邻接判定与坏人物引用隔离 |
+| `tests/round80-region-interactions.test.ts` | `src/engine/world-map.ts`、world-map schema 和云岭/海岛真实地图 | R80 交互字段解析与 Ajv 校验、旧踏入事件兼容、按方向/距离筛选、视线阻挡、事件条件/一次性状态、坏接近格隔离及两处真实环境调查点；专项命令 `npm run smoke:round-80` |
 | `tests/round43-faction-routes.test.ts` | `src/engine/quest-system.ts`、`dialogue-runtime.ts` 与五派基础资料 | R43 门派支线：五项门派/见闻门槛与对白一致性、真实接取拒绝/成功、谈话完成及结果见闻发现、坏门派引用隔离 |
 | `tests/round44-dynamic-events.test.ts` | `npc-schedule.ts`、`world-map.ts`、任务/对白/声望协议与基础资料 | R44 集成：解析真实日程并证明黄昏玩家邻接/日中离场；双 NPC 条件、时辰条件；两项互斥任务的对白入口、目标、一次性声望/知识奖励和声望钳制 |
 | `tests/round45-balance.test.ts` | `arena-challenge.ts`、`turn-based-combat.ts`、角色成长和基础战斗/擂台资料 | R45 平衡回归：首夺一次性银两/物品、失败和重赛奖品为零、旧 `championships` 记录兼容、擂台每场战斗经验保留；无装备/无伙伴/起始散手开场实战 5 招胜出并验证升级补血 |
@@ -171,4 +173,6 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 - 2026-09-28（Round 38）：建立 Vitest 5 测试基线；抽取共享数据校验器 `scripts/lib/data-validation.mjs`（CLI 变薄）；新增四组 53 个单元测试；`tsconfig.json` 纳入 `tests/` 与 `vitest.config.ts` 严格检查。
 
 | `tests/round79-island-region.test.ts` | 海岛资料/图素、世界舆图与任务闭环 | 4 项检查：100×100 与 16px/27×65 CC0 图集引用、入口连通和渡口双向 BFS、四地标/三区域事件可达、旧区域投影像素不漂移、岛链总图层/图集边界、对白接取并发现灯标后完成任务；纳入 `npm run smoke:round-79`。 |
+| `tests/round80-region-interactions.test.ts` | 区域事件交互 Schema、选择器及云岭/海岛真实地图 | 覆盖声明校验、旧踏入事件、方向/距离、动态视线遮挡、条件/一次性状态与真实事件坐标；纳入 `npm run smoke:round-80`。 |
 - 2026-09-29（Round 79）：新增海岛区域专项与可重复生成命令；世界图夹具升级为六区/十向关口，覆盖 Puny World CC0 图集网格、任务发现奖励、舆图保留旧大陆图层及旧区域锚点稳定。专项命令 `npm run smoke:round-79`。
+- 2026-09-30（Round 80）：新增固定区域事件环境调查专项，覆盖 interaction Schema/解析、默认踏入事件、方向/距离/视线、条件/一次性与云岭悬桥/落潮湾灯标真实格位；`npm run smoke:round-80`。

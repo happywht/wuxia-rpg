@@ -72,32 +72,34 @@ Round 10 将单张网格地图扩展为由资料驱动的区域集合；Round 51
 
 引擎装配规则（`src/engine/world-map.ts` 的 `assembleWorldMap`）：`from` 端点必须可走**且不得位于该图玩家出生格**；`to` 落点必须可走；两端地图必须都已登记进 `regions`。任一不满足即整条关口禁用并给出警告，不影响其他关口。协议不自动推断双向旅行——往返必须像上表一样显式声明两条记录。
 
-## 区域事件触发格
+## 固定区域事件与环境交互
 
-当前基础世界声明的全部 `events`（坐标均为所在地图格）：
+当前基础世界声明的全部 `events`（坐标均为所在地图格）。默认事件在踏入对应格时结算；声明可选 `interaction` 的事件改为按 E 调查，坐标代表被调查对象所在格：
 
-| 事件 id | 地图 · 格 | 一次性 | 条件 | 成功发现 |
-|---|---|---|---|---|
-| `event.trial-cloudbreak` | `map.round-01-grid` · (43, 36) | 是 | 无 | — |
-| `event.ferry-first-arrival` | `map.round-10-mist-ferry` · (1, 4) | 是 | 无 | `event.old-footprints`（雨后的脚印） |
-| `event.reedbank-traces` | `map.round-10-mist-ferry` · (5, 4) | 是 | 已知 `event.old-footprints`；时段 黄昏/入夜；天气 细雨/降雨/骤雨 | `place.reedbank`（芦苇河滩） |
-| `event.r55-sluice-inscription` | `map.round-10-mist-ferry` · (46, 53) | 是 | 无 | `place.mist-sluice`（旧渠石闸） |
-| `event.r56-north-water-gauge` | `map.round-10-mist-ferry` · (86, 15) | 是 | 无 | `place.mist-north-cap`（雾岬北岸水尺） |
-| `event.r56-south-waterway-mark` | `map.round-10-mist-ferry` · (81, 87) | 是 | 无 | `place.mist-south-pool`（南湾苇池） |
-| `event.r58-market-first-visit` | `map.round-10-mist-ferry` · (59, 65) | 是 | 无 | `place.mist-willow-market`（芦桥集） |
-| `event.r58-south-hamlet-arrival` | `map.round-01-grid` · (70, 75) | 是 | 无 | `place.south-hamlet`（南麓聚落） |
-| `event.r62-ridge-arrival` | `map.round-62-iron-ridge` · (4, 7) | 是 | 无 | `map.round-62-iron-ridge`（铁嶂北道·岩关驿镇） |
-| `event.r62-pass-marks` | `map.round-62-iron-ridge` · (30, 29) | 是 | 无 | `place.iron-ridge-pass`（碎岭旧道） |
-| `event.r62-post-ledger` | `map.round-62-iron-ridge` · (51, 49) | 是 | 无 | `place.iron-ridge-post`（岩关驿镇） |
-| `event.r62-beacon-code` | `map.round-62-iron-ridge` · (84, 83) | 是 | 无 | `place.iron-ridge-beacon`（北脊旧烽台） |
-| `event.r67-salt-road-arrival` | `map.round-67-salt-road` · (95, 74) | 是 | 无 | `map.round-67-salt-road`（西陲盐道·青岩驿） |
-| `event.r67-well-reading` | `map.round-67-salt-road` · (26, 28) | 是 | 无 | `place.r67-brine-well`（回声苦井） |
-| `event.r74-cloud-arrival` | `map.round-74-cloud-ridge` · (50, 97) | 是 | 无 | `place.r74-cloud-ridge`（云岭古道） |
-| `event.r74-cloud-inscription` | `map.round-74-cloud-ridge` · (27, 31) | 是 | 无 | `place.r74-cloud-markers`（云纹石阶） |
-| `event.r74-cloud-bridge` | `map.round-74-cloud-ridge` · (72, 42) | 是 | 无 | `place.r74-cloud-bridge`（断索悬桥） |
-| `event.r79-arrival` | `map.round-79-isles` · (50, 12) | 是 | 无 | `place.r79-isles`（东海群岛·落潮湾） |
-| `event.r79-west-reef` | `map.round-79-isles` · (12, 31) | 是 | 无 | `place.r79-west-reef`（双礁浅滩） |
-| `event.r79-white-beacon` | `map.round-79-isles` · (80, 68) | 是 | 无 | `place.r79-white-beacon`（白沙灯标） |
+| 事件 id | 地图 · 格 | 触发方式 | 一次性 | 条件 | 成功发现 |
+|---|---|---|---|---|---|
+| `event.trial-cloudbreak` | `map.round-01-grid` · (43, 36) | 踏入 | 是 | 无 | — |
+| `event.ferry-first-arrival` | `map.round-10-mist-ferry` · (1, 4) | 踏入 | 是 | 无 | `event.old-footprints`（雨后的脚印） |
+| `event.reedbank-traces` | `map.round-10-mist-ferry` · (5, 4) | 踏入 | 是 | 已知 `event.old-footprints`；时段 黄昏/入夜；天气 细雨/降雨/骤雨 | `place.reedbank`（芦苇河滩） |
+| `event.r55-sluice-inscription` | `map.round-10-mist-ferry` · (46, 53) | 踏入 | 是 | 无 | `place.mist-sluice`（旧渠石闸） |
+| `event.r56-north-water-gauge` | `map.round-10-mist-ferry` · (86, 15) | 踏入 | 是 | 无 | `place.mist-north-cap`（雾岬北岸水尺） |
+| `event.r56-south-waterway-mark` | `map.round-10-mist-ferry` · (81, 87) | 踏入 | 是 | 无 | `place.mist-south-pool`（南湾苇池） |
+| `event.r58-market-first-visit` | `map.round-10-mist-ferry` · (59, 65) | 踏入 | 是 | 无 | `place.mist-willow-market`（芦桥集） |
+| `event.r58-south-hamlet-arrival` | `map.round-01-grid` · (70, 75) | 踏入 | 是 | 无 | `place.south-hamlet`（南麓聚落） |
+| `event.r62-ridge-arrival` | `map.round-62-iron-ridge` · (4, 7) | 踏入 | 是 | 无 | `map.round-62-iron-ridge`（铁嶂北道·岩关驿镇） |
+| `event.r62-pass-marks` | `map.round-62-iron-ridge` · (30, 29) | 踏入 | 是 | 无 | `place.iron-ridge-pass`（碎岭旧道） |
+| `event.r62-post-ledger` | `map.round-62-iron-ridge` · (51, 49) | 踏入 | 是 | 无 | `place.iron-ridge-post`（岩关驿镇） |
+| `event.r62-beacon-code` | `map.round-62-iron-ridge` · (84, 83) | 踏入 | 是 | 无 | `place.iron-ridge-beacon`（北脊旧烽台） |
+| `event.r67-salt-road-arrival` | `map.round-67-salt-road` · (95, 74) | 踏入 | 是 | 无 | `map.round-67-salt-road`（西陲盐道·青岩驿） |
+| `event.r67-well-reading` | `map.round-67-salt-road` · (26, 28) | 踏入 | 是 | 无 | `place.r67-brine-well`（回声苦井） |
+| `event.r74-cloud-arrival` | `map.round-74-cloud-ridge` · (50, 97) | 踏入 | 是 | 无 | `place.r74-cloud-ridge`（云岭古道） |
+| `event.r74-cloud-inscription` | `map.round-74-cloud-ridge` · (27, 31) | 踏入 | 是 | 无 | `place.r74-cloud-markers`（云纹石阶） |
+| `event.r74-cloud-bridge` | `map.round-74-cloud-ridge` · (72, 42) | 邻近按 E 调查 | 是 | 无 | `place.r74-cloud-bridge`（断索悬桥） |
+| `event.r79-arrival` | `map.round-79-isles` · (50, 12) | 踏入 | 是 | 无 | `place.r79-isles`（东海群岛·落潮湾） |
+| `event.r79-west-reef` | `map.round-79-isles` · (12, 31) | 踏入 | 是 | 无 | `place.r79-west-reef`（双礁浅滩） |
+| `event.r79-white-beacon` | `map.round-79-isles` · (80, 68) | 邻近按 E 调查 | 是 | 无 | `place.r79-white-beacon`（白沙灯标） |
+
+`interaction` 声明 `prompt`、可选曼哈顿距离 `range`（1–4，省略按 1 格）和可选 `approachDirections`（从玩家格朝向目标格的 `down/left/right/up`；省略表示四向均可）。调查目标必须与玩家同一行或同一列；两格以上时，中间地形必须可走且不能被 NPC/遭遇占用。交互只在提示、方向/距离、事件条件和一次性状态同时允许时出现，并在按 E 后复用固定事件文本、一次性完成记账及知识发现。含 `interaction` 的事件不会因走上目标格而自动结算。未声明该字段的旧世界图事件仍按原有踏入触发路径工作。
 
 ### 随机漫游奇遇（Round 43–44）
 
@@ -211,9 +213,9 @@ M 默认打开宽幅全域总览：`regions[].atlasPosition` 决定区域落点�
 1. 在 `data/base/manifest.json` 登记每份地图，schema id 使用 `grid-map`。地图 JSON 的 `id` 必须与 manifest resource id 完全相同。
 2. 登记唯一的 `world-map` 资源。其 `startingMapResourceId` 必须指向一份有效地图；`regions` 为每张地图提供标题、说明和 0–100 的舆图相对坐标；可选 `landmarks` 为相应地图提供地图内格坐标地标（端点与事件的坐标校验规则见上文「关口端点」「区域事件触发格」两节）。
 3. `transitions` 声明关口的 `from`/`to` 端点；`events` 声明区域事件的触发格。二者的静态字段（id、名称、文本、坐标）由 `world-map` Schema 与解析器校验，跨地图/图谱/历法/气候引用在装配期逐条校验。
-4. `events` 绑定固定可走格；`randomEvents` 是可选的漫游事件数组，每条需声明 `mapResourceId`、`chance`（0–1）与 `once`，可复用 `events` 的线索/时段/天气条件以及百科发现字段；`nearbyNpcIds` 要求列出的每名 NPC 都按当前地图和历法时段实际落位，并与玩家四向相邻。漫游事件只在成功走格后抽取，不会在等待、读档或跨区抵达时抽取。条件组之间为 AND：`knowledgeNodeIds` 中每个线索都必须已知，`periodIds` 和 `weatherIds` 各自按 OR 匹配一个当前值。条件未满足不会消耗一次性事件；固定格事件在移动、跨区抵达和原地等候后重查，漫游奇遇可在符合环境时继续走格重试。`once: true` 的两类事件只成功结算一次，完成 id 会随 v1 存档保存；固定格 `once: false` 每次检查都可提示。可选的 `discoverKnowledgeNodeId` 在成功触发时解锁一个已登记的百科节点；词条标题来自图谱资料。
+4. 默认 `events` 绑定固定可走格；含 `interaction` 的调查事件坐标表示目标格，可被阻挡，但须在声明方向/距离内至少有一个可走接近格。调查只发生在目标与玩家同一行或同一列，且中间格不可穿墙、穿 NPC 或遭遇。调查事件只响应 E，不随踏入目标格自动结算。`randomEvents` 是可选的漫游事件数组，每条需声明 `mapResourceId`、`chance`（0–1）与 `once`，可复用 `events` 的线索/时段/天气条件以及百科发现字段；`nearbyNpcIds` 要求列出的每名 NPC 都按当前地图和历法时段实际落位，并与玩家四向相邻。漫游事件只在成功走格后抽取，不会在等待、读档或跨区抵达时抽取。条件组之间为 AND：`knowledgeNodeIds` 中每个线索都必须已知，`periodIds` 和 `weatherIds` 各自按 OR 匹配一个当前值。条件未满足不会消耗一次性事件；固定格事件在移动、跨区抵达和原地等候后重查，漫游奇遇可在符合环境时继续走格重试。`once: true` 的两类事件只成功结算一次，完成 id 会随 v1 存档保存；固定格 `once: false` 每次检查都可提示。可选的 `discoverKnowledgeNodeId` 在成功触发时解锁一个已登记的百科节点；词条标题来自图谱资料。
 
-世界地图语义解析器检查 id 唯一性、地图/区域引用、地标坐标、端点和事件坐标；事件的图谱节点、历法时段、天气引用也会逐条校验。坏地标或事件（包括悬空条件引用）会单独禁用并写入诊断。地图装配完成后，若关口或事件格被 NPC/战斗遭遇占用，对应条目会被逐项隔离并写入诊断；同世界图中的其他有效条目仍可用。任一地图资源无效会使关键世界地图启动校验失败并给出资源诊断。
+世界地图语义解析器检查 id 唯一性、地图/区域引用、地标坐标、关口和事件坐标；事件的图谱节点、历法时段、天气引用也会逐条校验。旧式踏入事件必须位于可走格；调查事件坐标须在地图范围内，且至少存在一个符合声明方向/距离的可走接近格。坏地标或事件（包括悬空条件引用）会单独禁用并写入诊断。地图装配完成后，若关口或踏入事件格被 NPC/战斗遭遇占用，对应条目会被逐项隔离并写入诊断；调查事件运行时会把 NPC/遭遇视为视线阻挡；同世界图中的其他有效条目仍可用。任一地图资源无效会使关键世界地图启动校验失败并给出资源诊断。
 
 ### 固定格渡口奇遇示例（Round 17）
 

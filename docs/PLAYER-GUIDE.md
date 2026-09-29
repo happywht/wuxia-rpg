@@ -1,6 +1,6 @@
 # 玩家手册
 
-这份手册对应当前仓库 Round 79 的可运行原型。菜单、键位与玩法以游戏内 H「操作手册」和现行资料为准；浏览器存档仅保存在当前浏览器的本地存储中。R00–R79 均有独立计划和提交；R50 最终验收边界见 [`FINAL-ACCEPTANCE.md`](FINAL-ACCEPTANCE.md)，六块百格地图、全域舆图、区域内容与路线证据见 [`MAP-ATLAS.md`](MAP-ATLAS.md)、[`ROUND-61-ROUTE-AUDIT.md`](ROUND-61-ROUTE-AUDIT.md)、[`ROUND-63-TIMED-ROUTE-AUDIT.md`](ROUND-63-TIMED-ROUTE-AUDIT.md)、[`ROUND-64-ROUTE-AUDIT.md`](ROUND-64-ROUTE-AUDIT.md)、[`ROUND-68-JOURNEY-PLAYTEST.md`](ROUND-68-JOURNEY-PLAYTEST.md)、[`ROUND-71-BROWSER-PLAYTEST.md`](ROUND-71-BROWSER-PLAYTEST.md) 和 [`ROUND-72-BROWSER-PLAYTEST.md`](ROUND-72-BROWSER-PLAYTEST.md)。Round 69 起四门身法拥有一次性守御战斗作用；无门派拦门刀法可向盘舷门外玩家授艺。Round 70 更新四区总图地貌与地图图素；Round 74 新增云岭古道、双向铁嶂关口及两段链式任务；Round 75 为固定见闻点新增临近线索；Round 76 在五区补充 CC0 环境图素；Round 77 为五区玩家与 NPC 接入方向帧、行走动画和十种 CC0 角色外观。Round 73 让 M 舆图和 HUD 共用当前 NPC/遭遇占位，绕行时显示提示、临时封路时区别于地形断路。Round 79 新增落潮湾地图与「灯痕避礁」任务，将总舆图扩为 224×144；素材授权见 [`REFERENCES.md`](REFERENCES.md)。招式名称、门槛和作用见 [`MARTIAL-ARTS.md`](MARTIAL-ARTS.md)。
+这份手册对应当前仓库 Round 80 的可运行原型。菜单、键位与玩法以游戏内 H「操作手册」和现行资料为准；浏览器存档仅保存在当前浏览器的本地存储中。R00–R80 均有独立计划；R50 最终验收边界见 [`FINAL-ACCEPTANCE.md`](FINAL-ACCEPTANCE.md)，六块百格地图、全域舆图、区域内容与路线证据见 [`MAP-ATLAS.md`](MAP-ATLAS.md)、[`ROUND-61-ROUTE-AUDIT.md`](ROUND-61-ROUTE-AUDIT.md)、[`ROUND-63-TIMED-ROUTE-AUDIT.md`](ROUND-63-TIMED-ROUTE-AUDIT.md)、[`ROUND-64-ROUTE-AUDIT.md`](ROUND-64-ROUTE-AUDIT.md)、[`ROUND-68-JOURNEY-PLAYTEST.md`](ROUND-68-JOURNEY-PLAYTEST.md)、[`ROUND-71-BROWSER-PLAYTEST.md`](ROUND-71-BROWSER-PLAYTEST.md) 和 [`ROUND-72-BROWSER-PLAYTEST.md`](ROUND-72-BROWSER-PLAYTEST.md)。Round 69 起四门身法拥有一次性守御战斗作用；无门派拦门刀法可向盘舷门外玩家授艺。Round 70 更新四区总图地貌与地图图素；Round 74 新增云岭古道、双向铁嶂关口及两段链式任务；Round 75 为固定见闻点新增临近线索；Round 76 在五区补充 CC0 环境图素；Round 77 为五区玩家与 NPC 接入方向帧、行走动画和十种 CC0 角色外观。Round 73 让 M 舆图和 HUD 共用当前 NPC/遭遇占位，绕行时显示提示、临时封路时区别于地形断路。Round 79 新增落潮湾地图与「灯痕避礁」任务，将总舆图扩为 224×144；Round 80 为云岭悬桥和海岛灯标加入邻近按 E 调查，同时保留旧地图踏入事件兼容。素材授权见 [`REFERENCES.md`](REFERENCES.md)。招式名称、门槛和作用见 [`MARTIAL-ARTS.md`](MARTIAL-ARTS.md)。
 
 ## 世界外观（Round 65 起）
 ### 五区环境细节（Round 76）
@@ -30,6 +30,10 @@
 ## 探索时的临近线索（Round 75）
 
 靠近尚未发现的固定见闻点两格以内时，HUD 会显示一句由地图资料编写的氛围提示。线索只提示附近有值得查看的痕迹；走到触发格后，游戏才显示完整事件内容并登记见闻。若附近有可交谈人物、遭遇、擂台、门派战、工位、关口或结局入口，HUD 仍优先显示对应操作。已经发现或完成的一次性事件不会继续发出线索；带时段、天气、知识或邻近人物条件的事件也只有条件满足时才提示。
+
+## 调查环境事件（Round 80）
+
+带调查提示的环境事件不会在玩家踏上目标格时自动触发。走到提示所指方向的同一行/列，在允许范围内面向目标，且中间没有墙、NPC 或遭遇挡路时，按 **E** 调查。事件数据可限制调查方向、距离和条件；不满足条件或一次性事件已经完成时不会显示交互提示。未声明调查方式的旧地图事件仍会在进入触发格时生效。
 
 ## 开始游戏
 

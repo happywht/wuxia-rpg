@@ -1,4 +1,12 @@
-import type { CellPosition, GridMap, GridMapArtLayerData, GridMapTilesetData } from './grid-map';
+import {
+  directionBetweenCells,
+  GRID_MAP_ACTOR_DIRECTIONS,
+  type CellPosition,
+  type GridMap,
+  type GridMapActorDirection,
+  type GridMapArtLayerData,
+  type GridMapTilesetData,
+} from './grid-map';
 
 /** Data-only world atlas protocol. Coordinates in the atlas are presentation hints. */
 export interface WorldMapData {
@@ -64,6 +72,25 @@ export interface RegionEventData extends CellPosition {
   once: boolean;
   conditions?: RegionEventConditionsData;
   discoverKnowledgeNodeId?: string;
+  /**
+   * Optional E-key inspection declaration. When present, the event activates
+   * only through a facing interaction instead of by stepping onto the cell;
+   * omitted declarations keep the legacy step-trigger behaviour.
+   */
+  interaction?: RegionEventInteractionData;
+}
+
+/** Cardinal facing reused from grid actors: how the player looks at a target. */
+export type RegionEventApproachDirection = GridMapActorDirection;
+
+/** Declares a fixed event as scenery the player inspects with the E key. */
+export interface RegionEventInteractionData {
+  /** Non-empty HUD prompt shown while the target is inspectable. */
+  prompt: string;
+  /** Maximum aligned cell distance to the target; defaults to 1. */
+  range?: number;
+  /** Allowed facings from the player toward the target; any cardinal when omitted. */
+  approachDirections?: RegionEventApproachDirection[];
 }
 
 /** A roaming event attempted after a successful player grid step. */
@@ -169,6 +196,50 @@ function parseRegionEventConditions(value: unknown, label: string, errors: strin
     errors.push(`${label}：至少需要一种线索、时段或天气条件`);
   }
   return conditions;
+}
+
+function parseRegionEventInteraction(value: unknown, label: string, errors: string[]): RegionEventInteractionData | null {
+  if (!isObject(value)) {
+    errors.push(`${label}：应为对象`);
+    return null;
+  }
+  const allowedKeys = new Set(['prompt', 'range', 'approachDirections']);
+  for (const key of Object.keys(value)) {
+    if (!allowedKeys.has(key)) errors.push(`${label}.${key}：不是受支持的字段`);
+  }
+  const prompt = nonEmpty(value.prompt) ? value.prompt : null;
+  if (prompt === null) errors.push(`${label}.prompt：应为非空字符串`);
+
+  let range: number | null | undefined;
+  if (value.range === undefined) range = undefined;
+  else if (integer(value.range) && value.range >= REGION_EVENT_INTERACTION_MIN_RANGE &&
+    value.range <= REGION_EVENT_INTERACTION_MAX_RANGE) range = value.range;
+  else {
+    range = null;
+    errors.push(`${label}.range：应为 ${REGION_EVENT_INTERACTION_MIN_RANGE}–${REGION_EVENT_INTERACTION_MAX_RANGE} 之间的整数`);
+  }
+
+  let approachDirections: RegionEventApproachDirection[] | null | undefined;
+  if (value.approachDirections === undefined) approachDirections = undefined;
+  else if (!Array.isArray(value.approachDirections) || value.approachDirections.length === 0) {
+    approachDirections = null;
+    errors.push(`${label}.approachDirections：应为 down/left/right/up 的非空数组`);
+  } else if (!value.approachDirections.every((entry) =>
+    typeof entry === 'string' && (GRID_MAP_ACTOR_DIRECTIONS as readonly string[]).includes(entry))) {
+    approachDirections = null;
+    errors.push(`${label}.approachDirections：应只包含 down/left/right/up 方向`);
+  } else if (new Set(value.approachDirections).size !== value.approachDirections.length) {
+    approachDirections = null;
+    errors.push(`${label}.approachDirections：不应包含重复方向`);
+  } else {
+    approachDirections = [...value.approachDirections] as RegionEventApproachDirection[];
+  }
+
+  if (prompt === null || range === null || approachDirections === null) return null;
+  const interaction: RegionEventInteractionData = { prompt };
+  if (range !== undefined) interaction.range = range;
+  if (approachDirections !== undefined) interaction.approachDirections = approachDirections;
+  return interaction;
 }
 
 function parseCell(value: unknown, label: string, errors: string[]): CellPosition | null {
@@ -398,6 +469,9 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
     const discoverKnowledgeNodeId = entry.discoverKnowledgeNodeId === undefined
       ? undefined
       : nonEmpty(entry.discoverKnowledgeNodeId) ? entry.discoverKnowledgeNodeId : null;
+    const interaction = entry.interaction === undefined
+      ? undefined
+      : parseRegionEventInteraction(entry.interaction, `${label}.interaction`, errors);
     if (id === null) errors.push(`${label}.id：应为非空字符串`);
     if (mapResourceId === null) errors.push(`${label}.mapResourceId：应为非空字符串`);
     if (text === null) errors.push(`${label}.text：应为非空字符串`);
@@ -405,12 +479,13 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
     if (once === null) errors.push(`${label}.once：应为布尔值`);
     if (discoverKnowledgeNodeId === null) errors.push(`${label}.discoverKnowledgeNodeId：应为非空字符串`);
     if (id !== null && mapResourceId !== null && text !== null && approachText !== null && once !== null &&
-      cell !== null && conditions !== null && discoverKnowledgeNodeId !== null) {
+      cell !== null && conditions !== null && discoverKnowledgeNodeId !== null && interaction !== null) {
       events.push({
         id, mapResourceId, ...cell, text, once,
         ...(approachText === undefined ? {} : { approachText }),
         ...(conditions === undefined ? {} : { conditions }),
         ...(discoverKnowledgeNodeId === undefined ? {} : { discoverKnowledgeNodeId }),
+        ...(interaction === undefined ? {} : { interaction }),
       });
     }
   });
@@ -459,6 +534,45 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
       events,
       randomEvents,
     } };
+}
+
+/**
+ * Offset from an interaction target to the player cell facing it along each
+ * approach direction. `up` means the target sits above the player, so the
+ * player cell lies one step below the target, and so on for the other cards.
+ */
+const APPROACH_DIRECTION_PLAYER_OFFSETS: Record<RegionEventApproachDirection, CellPosition> = {
+  down: { col: 0, row: -1 },
+  left: { col: 1, row: 0 },
+  right: { col: -1, row: 0 },
+  up: { col: 0, row: 1 },
+};
+
+/**
+ * True when at least one declared approach direction has a walkable player
+ * cell within the declared range. Only the standing cell is checked here;
+ * live line-of-sight between the player and the target stays a runtime
+ * concern because passability can change after assembly.
+ */
+function hasWalkableInteractionApproach(
+  map: GridMap,
+  col: number,
+  row: number,
+  interaction: RegionEventInteractionData,
+): boolean {
+  const range = interaction.range ?? REGION_EVENT_INTERACTION_DEFAULT_RANGE;
+  return GRID_MAP_ACTOR_DIRECTIONS.some((direction) => {
+    if (interaction.approachDirections !== undefined &&
+      !interaction.approachDirections.includes(direction)) return false;
+    const offset = APPROACH_DIRECTION_PLAYER_OFFSETS[direction];
+    for (let distance = 1; distance <= range; distance += 1) {
+      const approachCol = col + offset.col * distance;
+      const approachRow = row + offset.row * distance;
+      if (!map.canEnter(approachCol, approachRow)) break;
+      return true;
+    }
+    return false;
+  });
 }
 
 /** Resolves map references and isolates bad region links/events to their row. */
@@ -526,7 +640,13 @@ export function assembleWorldMap(
     const problems: string[] = [];
     if (seenEvents.has(event.id)) problems.push('id 重复');
     if (!regions.some((region) => region.mapResourceId === event.mapResourceId)) problems.push('地图不在世界图区域中');
-    if (map === undefined || !map.canEnter(event.col, event.row)) problems.push('触发坐标不可通行');
+    if (event.interaction === undefined) {
+      if (map === undefined || !map.canEnter(event.col, event.row)) problems.push('触发坐标不可通行');
+    } else if (map === undefined || event.col >= map.data.columns || event.row >= map.data.rows) {
+      problems.push('交互坐标超出地图范围');
+    } else if (!hasWalkableInteractionApproach(map, event.col, event.row, event.interaction)) {
+      problems.push('交互目标在声明方向与调查距离内无可通行接近格');
+    }
     if (eventReferences !== undefined) {
       if (event.discoverKnowledgeNodeId !== undefined &&
         !eventReferences.knowledgeNodeIds.has(event.discoverKnowledgeNodeId)) {
@@ -611,7 +731,11 @@ export function regionEventConditionsMet(
   return true;
 }
 
-/** Selects ready events at an exact cell without mutating completion or knowledge state. */
+/**
+ * Selects ready step-triggered events at an exact cell without mutating
+ * completion or knowledge state. Events carrying an interaction declaration
+ * are E-key inspections and never fire by stepping onto their cell.
+ */
 export function selectTriggeredRegionEvents(
   events: readonly RegionEventData[],
   location: { mapResourceId: string } & CellPosition,
@@ -619,6 +743,7 @@ export function selectTriggeredRegionEvents(
   context: RegionEventContext,
 ): RegionEventData[] {
   return events.filter((event) =>
+    event.interaction === undefined &&
     event.mapResourceId === location.mapResourceId &&
     event.col === location.col && event.row === location.row &&
     (!event.once || !completedEventIds.has(event.id)) &&
@@ -660,6 +785,75 @@ export function selectRegionEventApproachClue(
     }
   }
   return best === null ? null : best.approachText;
+}
+
+/** Bounds for the optional interaction `range`; authored distance in aligned cells. */
+export const REGION_EVENT_INTERACTION_MIN_RANGE = 1;
+export const REGION_EVENT_INTERACTION_MAX_RANGE = 4;
+export const REGION_EVENT_INTERACTION_DEFAULT_RANGE = 1;
+
+/** One inspectable interaction target with everything the HUD and settlement need. */
+export interface RegionEventInteractionSelection {
+  event: RegionEventData;
+  prompt: string;
+  /** Facing from the player toward the target that satisfied the declaration. */
+  approachDirection: RegionEventApproachDirection;
+  /** Aligned cell distance between the player and the target. */
+  distance: number;
+}
+
+/**
+ * Picks the single best E-key interaction target around the player without
+ * mutating completion or knowledge state. Candidates must sit on the same
+ * row or column within their declared range (default 1); the target cell
+ * itself may be solid, but every strictly intermediate cell must pass the
+ * optional passability callback. The approach facing is computed from the
+ * player toward the target and filtered by the authored direction list,
+ * live event conditions and once-completion still apply, and equal
+ * distances resolve by stable event id.
+ */
+export function selectInteractableRegionEvent(
+  events: readonly RegionEventData[],
+  location: { mapResourceId: string } & CellPosition,
+  completedEventIds: ReadonlySet<string>,
+  context: RegionEventContext,
+  isPassable?: (col: number, row: number) => boolean,
+): RegionEventInteractionSelection | null {
+  let best: RegionEventInteractionSelection | null = null;
+  for (const event of events) {
+    const interaction = event.interaction;
+    if (interaction === undefined || event.mapResourceId !== location.mapResourceId) continue;
+    if (event.once && completedEventIds.has(event.id)) continue;
+    if (!regionEventConditionsMet(event, context)) continue;
+    const deltaCol = event.col - location.col;
+    const deltaRow = event.row - location.row;
+    // Aligned cardinal targets only: same column or same row as the player.
+    if (deltaCol !== 0 && deltaRow !== 0) continue;
+    const distance = Math.abs(deltaCol) + Math.abs(deltaRow);
+    if (distance < 1 || distance > (interaction.range ?? REGION_EVENT_INTERACTION_DEFAULT_RANGE)) continue;
+    const approachDirection = directionBetweenCells(location, event);
+    if (interaction.approachDirections !== undefined &&
+      !interaction.approachDirections.includes(approachDirection)) continue;
+    if (isPassable !== undefined) {
+      // Line of sight: every cell strictly between player and target, so the
+      // (possibly solid) target itself is never tested by the callback.
+      const stepCol = Math.sign(deltaCol);
+      const stepRow = Math.sign(deltaRow);
+      let clear = true;
+      for (let step = 1; step < distance; step += 1) {
+        if (!isPassable(location.col + stepCol * step, location.row + stepRow * step)) {
+          clear = false;
+          break;
+        }
+      }
+      if (!clear) continue;
+    }
+    if (best === null || distance < best.distance ||
+      (distance === best.distance && event.id.localeCompare(best.event.id) < 0)) {
+      best = { event, prompt: interaction.prompt, approachDirection, distance };
+    }
+  }
+  return best;
 }
 
 /** Returns first-time node discoveries for a ready batch without mutating the save state. */

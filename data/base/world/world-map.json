@@ -605,7 +605,11 @@
       "text": "桥索的断口被人用麻绳临时捆住，石板上留着几道新鲜靴印。悬桥另一头仍能看见被截住的山道。",
       "approachText": "断索在风里轻晃，石板上痕迹杂乱。",
       "once": true,
-      "discoverKnowledgeNodeId": "place.r74-cloud-bridge"
+      "discoverKnowledgeNodeId": "place.r74-cloud-bridge",
+      "interaction": {
+        "prompt": "查看断索悬桥的断口",
+        "approachDirections": ["left", "right"]
+      }
     },
     {
       "id": "event.r79-arrival",
@@ -635,7 +639,11 @@
       "text": "灯标底座刻着三道潮痕，最深的一道指向礁脉西侧的回湾。",
       "approachText": "白沙上的旧石灯标露出半截，基座刻痕还未被盐风磨平。",
       "once": true,
-      "discoverKnowledgeNodeId": "place.r79-white-beacon"
+      "discoverKnowledgeNodeId": "place.r79-white-beacon",
+      "interaction": {
+        "prompt": "细看白沙上的石灯标",
+        "approachDirections": ["up", "left", "right"]
+      }
     }
   ],
   "randomEvents": [
