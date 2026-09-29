@@ -4,6 +4,19 @@
 
 ## [Unreleased]
 
+### Added (Round 75)
+
+- 为五区 17 个固定区域事件补充资料驱动的临近线索；玩家靠近未发现地点时可先察觉线索，抵达触发格后仍由原事件揭示完整内容。
+- 新增最近线索选择规则：按曼哈顿距离 1–2 格筛选，结合事件条件/完成/已发现状态，同距离按事件 id 稳定选择；HUD 线索提示让位于所有直接交互。
+- 为线索协议新增专项回归测试，覆盖旧资料兼容、五区数据、条件和距离边界。
+
+### Verification (Round 75)
+
+- `npx.cmd vitest run tests/round75-region-event-approach.test.ts`：1 个测试文件、8 项用例通过。
+- `npm.cmd run validate:data`：manifest 与 34 个基础资料 Schema 全部通过。
+- `npm.cmd run typecheck`：通过；`npm.cmd run package:release` 全通，46 个测试文件/311 项测试、文档审计、生产构建、发行打包与子路径 smoke 均通过；发行包 873,201 bytes，SHA-256 `ac5906152c7dba5768dd22552d32a2dfeb18f0cf0e6dbc29a609c3b2e772ccae`。
+- 隔离浏览器实测：在固定事件触发格外显示临近线索；相邻 NPC 操作提示保持优先，抵达触发格后才出现完整事件文本。
+
 ### Added (Round 74)
 
 - 新增云岭古道 100×100 十层 CC0 山地地图、双向铁嶂关口、沈雨霁、三处可发现见闻和两段链式任务；全域舆图扩为 208×128。

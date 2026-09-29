@@ -1,6 +1,6 @@
 # 玩家手册
 
-这份手册对应当前仓库 Round 74 的可运行原型。菜单、键位与玩法以游戏内 H「操作手册」和现行资料为准；浏览器存档仅保存在当前浏览器的本地存储中。R00–R74 均有独立计划和提交；R50 最终验收边界见 [`FINAL-ACCEPTANCE.md`](FINAL-ACCEPTANCE.md)，五块百格地图、全域舆图、区域内容与路线证据见 [`MAP-ATLAS.md`](MAP-ATLAS.md)、[`ROUND-61-ROUTE-AUDIT.md`](ROUND-61-ROUTE-AUDIT.md)、[`ROUND-63-TIMED-ROUTE-AUDIT.md`](ROUND-63-TIMED-ROUTE-AUDIT.md)、[`ROUND-64-ROUTE-AUDIT.md`](ROUND-64-ROUTE-AUDIT.md)、[`ROUND-68-JOURNEY-PLAYTEST.md`](ROUND-68-JOURNEY-PLAYTEST.md)、[`ROUND-71-BROWSER-PLAYTEST.md`](ROUND-71-BROWSER-PLAYTEST.md) 和 [`ROUND-72-BROWSER-PLAYTEST.md`](ROUND-72-BROWSER-PLAYTEST.md)。Round 69 起四门身法拥有一次性守御战斗作用；无门派拦门刀法可向盘舷门外玩家授艺。Round 70 更新四区总图地貌与地图图素；Round 74 新增云岭古道、双向铁嶂关口及两段链式任务。Round 73 让 M 舆图和 HUD 共用当前 NPC/遭遇占位，绕行时显示提示、临时封路时区别于地形断路。招式名称、门槛和作用见 [`MARTIAL-ARTS.md`](MARTIAL-ARTS.md)。
+这份手册对应当前仓库 Round 75 的可运行原型。菜单、键位与玩法以游戏内 H「操作手册」和现行资料为准；浏览器存档仅保存在当前浏览器的本地存储中。R00–R75 均有独立计划和提交；R50 最终验收边界见 [`FINAL-ACCEPTANCE.md`](FINAL-ACCEPTANCE.md)，五块百格地图、全域舆图、区域内容与路线证据见 [`MAP-ATLAS.md`](MAP-ATLAS.md)、[`ROUND-61-ROUTE-AUDIT.md`](ROUND-61-ROUTE-AUDIT.md)、[`ROUND-63-TIMED-ROUTE-AUDIT.md`](ROUND-63-TIMED-ROUTE-AUDIT.md)、[`ROUND-64-ROUTE-AUDIT.md`](ROUND-64-ROUTE-AUDIT.md)、[`ROUND-68-JOURNEY-PLAYTEST.md`](ROUND-68-JOURNEY-PLAYTEST.md)、[`ROUND-71-BROWSER-PLAYTEST.md`](ROUND-71-BROWSER-PLAYTEST.md) 和 [`ROUND-72-BROWSER-PLAYTEST.md`](ROUND-72-BROWSER-PLAYTEST.md)。Round 69 起四门身法拥有一次性守御战斗作用；无门派拦门刀法可向盘舷门外玩家授艺。Round 70 更新四区总图地貌与地图图素；Round 74 新增云岭古道、双向铁嶂关口及两段链式任务；Round 75 为固定见闻点新增临近线索。Round 73 让 M 舆图和 HUD 共用当前 NPC/遭遇占位，绕行时显示提示、临时封路时区别于地形断路。招式名称、门槛和作用见 [`MARTIAL-ARTS.md`](MARTIAL-ARTS.md)。
 
 ## 世界外观（Round 65 起）
 
@@ -15,6 +15,10 @@
 - 全域图用低噪声程序调色板显示大块地貌，叠加官方 Kenney Tiny Town CC0 林木、驿车和告示牌图素；街景与玩家/NPC 像素角色仍使用对应 Kenney CC0 图集。地图来源与授权见 [`REFERENCES.md`](REFERENCES.md)。每个 100×100 区域仍保留完整细节地图用于实际探索。M/Esc 关闭舆图。
 
 五区关口与新地图可达性由 Round 74 专项回归验证；四区关口、跨多时段行路、盐道事件、远区存档恢复和返回终章的引擎闭环在 Round 68 长途旅程回归中使用当时的四区资料验证；浏览器本轮另实际走过江南道石阶渡口并进入雾雨渡口。两种验证的范围分别记录在 [`ROUND-68-JOURNEY-PLAYTEST.md`](ROUND-68-JOURNEY-PLAYTEST.md) 和 Round 74 开发记录中。
+
+## 探索时的临近线索（Round 75）
+
+靠近尚未发现的固定见闻点两格以内时，HUD 会显示一句由地图资料编写的氛围提示。线索只提示附近有值得查看的痕迹；走到触发格后，游戏才显示完整事件内容并登记见闻。若附近有可交谈人物、遭遇、擂台、门派战、工位、关口或结局入口，HUD 仍优先显示对应操作。已经发现或完成的一次性事件不会继续发出线索；带时段、天气、知识或邻近人物条件的事件也只有条件满足时才提示。
 
 ## 开始游戏
 

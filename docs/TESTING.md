@@ -13,6 +13,7 @@ npm run smoke:round-46 # 真实资料驱动的开局→故事分支→多结局�
 npm run smoke:round-68 # 四区逐格旅程→日程→盐道存读档→苦井差事→渡口结局
 npm run smoke:round-69 # 真实授艺路径审计→守御/反击一击结算
 npm run smoke:round-74 # 云岭百格地图、跨区关口、任务链和真实 manifest 装配
+npx vitest run tests/round75-region-event-approach.test.ts # 固定事件临近线索协议与五区数据
 npm run package:release # 质量门槛 + 生产构建 + R72 chunk 审计 + R47 归档/路径 smoke + 版本化 Web 包
 npm run audit:round-72 # 检查入口/Phaser chunk、大小比例和生产 JS 引用闭合
 npm run typecheck   # tsc --noEmit，严格模式，包含 tests/ 与 vitest.config.ts

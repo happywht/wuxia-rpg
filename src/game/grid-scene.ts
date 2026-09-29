@@ -11,8 +11,10 @@ import {
 import {
   selectAdjacentTransition,
   selectNewRegionEventKnowledgeIds,
+  selectRegionEventApproachClue,
   selectTriggeredRandomRegionEvent,
   selectTriggeredRegionEvents,
+  type RegionEventContext,
   type RegionTransitionData,
 } from '../engine/world-map';
 import {
@@ -2621,6 +2623,19 @@ export class GridScene extends Phaser.Scene {
       this.interactText.setText(endingGate.gate.approachText);
       return;
     }
+    // Lowest-priority contextual hint: with no actionable target around, a
+    // nearby undiscovered event may still surface its ambient approach clue.
+    // It never replaces a control prompt — only the idle fallback lines.
+    const approachClue = this.world === null ? null : selectRegionEventApproachClue(
+      this.world.worldMap.events,
+      { mapResourceId: this.currentMapResourceId, col: this.playerCol, row: this.playerRow },
+      this.completedRegionalEvents,
+      this.regionEventContext(),
+    );
+    if (approachClue !== null) {
+      this.interactText.setText(approachClue);
+      return;
+    }
     if (this.placedNpcs.length === 0 && this.activeEncounters().length === 0) {
       this.interactText.setText(this.companionState.activeCompanionId === null
         ? '暂无可交互人物'
@@ -3814,23 +3829,28 @@ export class GridScene extends Phaser.Scene {
   }
 
   /** Fires ready events authored for the exact current cell. */
+  /** Live knowledge/period/weather/adjacent-NPC state shared by region-event evaluation. */
+  private regionEventContext(): RegionEventContext {
+    const nearbyNpcIds = new Set(this.placedNpcs
+      .filter((npc) =>
+        Math.abs(npc.col - this.playerCol) + Math.abs(npc.row - this.playerRow) === 1,
+      )
+      .map((npc) => npc.record.id));
+    return {
+      knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
+      periodId: this.clock?.currentPeriod().id ?? null,
+      weatherId: this.currentClimate()?.weather.id ?? null,
+      nearbyNpcIds,
+    };
+  }
+
   private triggerRegionEvents(prefix = '', afterPlayerStep = false): void {
     const world = this.world;
     if (world === null) {
       if (prefix.length > 0) this.showRegionNotice(prefix);
       return;
     }
-    const nearbyNpcIds = new Set(this.placedNpcs
-      .filter((npc) =>
-        Math.abs(npc.col - this.playerCol) + Math.abs(npc.row - this.playerRow) === 1,
-      )
-      .map((npc) => npc.record.id));
-    const eventContext = {
-      knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
-      periodId: this.clock?.currentPeriod().id ?? null,
-      weatherId: this.currentClimate()?.weather.id ?? null,
-      nearbyNpcIds,
-    };
+    const eventContext = this.regionEventContext();
     const events = selectTriggeredRegionEvents(
       world.worldMap.events,
       { mapResourceId: this.currentMapResourceId, col: this.playerCol, row: this.playerRow },

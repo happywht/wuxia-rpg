@@ -359,6 +359,7 @@
       "col": 1,
       "row": 4,
       "text": "渡口边留着一行新鲜脚印，雨水还没有将它们冲散。",
+      "approachText": "滩涂泥面上留着新踩出的印子。",
       "once": true,
       "discoverKnowledgeNodeId": "event.old-footprints"
     },
@@ -368,6 +369,7 @@
       "col": 43,
       "row": 36,
       "text": "云隙投下一束日光，石面上的旧刻痕清晰起来。",
+      "approachText": "云隙的光落在石面上，似有刻痕。",
       "once": true
     },
     {
@@ -376,6 +378,7 @@
       "col": 5,
       "row": 4,
       "text": "沿着脚印走到芦苇边，泥面下露出一截被水草缠住的旧桩。渡船人认得那是废船道留下的系缆桩。",
+      "approachText": "雨声里芦苇丛下似压着硬物。",
       "once": true,
       "conditions": {
         "knowledgeNodeIds": [
@@ -399,6 +402,7 @@
       "col": 46,
       "row": 53,
       "text": "石闸背水的一面刻着数道潮尺。最深的一痕旁，还留着旧船号的半个‘芦’字；枯水时，窄槽能把南湾的浅舟引回渡镇。",
+      "approachText": "石闸背水一面隐约有凿刻的旧痕。",
       "once": true,
       "discoverKnowledgeNodeId": "place.mist-sluice"
     },
@@ -408,6 +412,7 @@
       "col": 86,
       "row": 15,
       "text": "雾气散开时，北岸石桩露出半截潮尺。石北留下的旧拓片与刻痕相合，水尺尽头正是雾岬林地。",
+      "approachText": "雾隙里北岸立着半截石头。",
       "once": true,
       "discoverKnowledgeNodeId": "place.mist-north-cap"
     },
@@ -417,6 +422,7 @@
       "col": 81,
       "row": 87,
       "text": "苇根间埋着一块斜立的旧水标。刮去泥皮后，刻线与石闸潮尺首尾相接，标出通往南湾的浅槽。",
+      "approachText": "苇根间斜插着一截异物。",
       "once": true,
       "discoverKnowledgeNodeId": "place.mist-south-pool"
     },
@@ -426,6 +432,7 @@
       "col": 59,
       "row": 65,
       "text": "河湾旧棚下挂着半幅褪色的芦字幌子，边上还留着船号刻痕。比过旧渠碑上的残字后，渡口人认出这里便是早年歇脚开市的芦桥集。",
+      "approachText": "河湾旧棚下挂着褪色的旧物。",
       "once": true,
       "discoverKnowledgeNodeId": "place.mist-willow-market"
     },
@@ -435,6 +442,7 @@
       "col": 70,
       "row": 75,
       "text": "山脚一排排竹匾正晾着新采的茶叶，村口石阶沿旧驿道向南折去。马尚义托人问过的南麓聚落，就在这片坡地尽头。",
+      "approachText": "山脚飘来晾茶的青气，坡后有炊烟。",
       "once": true,
       "discoverKnowledgeNodeId": "place.south-hamlet"
     },
@@ -444,6 +452,7 @@
       "col": 4,
       "row": 7,
       "text": "越过雾岬北口，山风从黑石关门间穿过。驿路旧牌已裂，却还指向铁嶂北面的岩关驿镇。",
+      "approachText": "隘口风声很硬，木牌在风里轻响。",
       "once": true,
       "discoverKnowledgeNodeId": "map.round-62-iron-ridge"
     },
@@ -453,6 +462,7 @@
       "col": 30,
       "row": 29,
       "text": "碎岭路旁的石面留着几道新旧交错的凿痕。旧道并非塌毁，只是有人把驿路界石挪进了坡下。",
+      "approachText": "路旁石面上錾痕新旧交叠。",
       "once": true,
       "discoverKnowledgeNodeId": "place.iron-ridge-pass"
     },
@@ -462,6 +472,7 @@
       "col": 51,
       "row": 49,
       "text": "驿镇墙上的旧簿写着各家换班时辰，落款与雾岬水尺拓片上的铁嶂印记相合。",
+      "approachText": "驿墙下钉着一卷翻旧的纸页。",
       "once": true,
       "discoverKnowledgeNodeId": "place.iron-ridge-post"
     },
@@ -471,6 +482,7 @@
       "col": 84,
       "row": 83,
       "text": "烽台石缝里压着一页未烧尽的更次簿，记下的三短一长，正是驿镇旧例的巡山暗号。",
+      "approachText": "烽台石缝里压着薄薄的旧物。",
       "once": true,
       "discoverKnowledgeNodeId": "place.iron-ridge-beacon"
     },
@@ -480,6 +492,7 @@
       "col": 95,
       "row": 74,
       "text": "沿石脊西道来到青岩东关，盐风卷过路旁的旧秤杆；关墙后仍能看见驿站烟囱。",
+      "approachText": "盐风渐重，关口轮廓在石脊后显出。",
       "once": true,
       "discoverKnowledgeNodeId": "map.round-67-salt-road"
     },
@@ -489,6 +502,7 @@
       "col": 26,
       "row": 28,
       "text": "井壁留下几圈新旧水线，最下方那道被盐垢盖住。凿痕旁的木签写着前一轮汲水的日子。",
+      "approachText": "井栏上盐垢层层，湿痕未干。",
       "once": true,
       "discoverKnowledgeNodeId": "place.r67-brine-well"
     },
@@ -498,6 +512,7 @@
       "col": 50,
       "row": 97,
       "text": "穿过断云南隘，松涛声从云层下传来。路边残存的旧牌写着「断云栈道」，山腰似乎还有一间客舍。",
+      "approachText": "云隙间松涛阵阵，坡道旁木影斜立。",
       "once": true,
       "discoverKnowledgeNodeId": "place.r74-cloud-ridge"
     },
@@ -507,6 +522,7 @@
       "col": 27,
       "row": 31,
       "text": "第三道石阶刻纹没有指向山门，而是沿着一条旧索孔转向东坡。刻痕旁还留着新拓纸纤维。",
+      "approachText": "石阶侧壁刻痕密集，纸痕犹新。",
       "once": true,
       "discoverKnowledgeNodeId": "place.r74-cloud-markers"
     },
@@ -516,6 +532,7 @@
       "col": 72,
       "row": 42,
       "text": "桥索的断口被人用麻绳临时捆住，石板上留着几道新鲜靴印。悬桥另一头仍能看见被截住的山道。",
+      "approachText": "断索在风里轻晃，石板上痕迹杂乱。",
       "once": true,
       "discoverKnowledgeNodeId": "place.r74-cloud-bridge"
     }

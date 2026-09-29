@@ -59,6 +59,8 @@ export interface RegionEventData extends CellPosition {
   id: string;
   mapResourceId: string;
   text: string;
+  /** Optional ambient notice surfaced while the player is near, not on, the cell. */
+  approachText?: string;
   once: boolean;
   conditions?: RegionEventConditionsData;
   discoverKnowledgeNodeId?: string;
@@ -384,6 +386,9 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
     const id = nonEmpty(entry.id) ? entry.id : null;
     const mapResourceId = nonEmpty(entry.mapResourceId) ? entry.mapResourceId : null;
     const text = nonEmpty(entry.text) ? entry.text : null;
+    const approachText = entry.approachText === undefined
+      ? undefined
+      : nonEmpty(entry.approachText) ? entry.approachText : null;
     const cell = parseCell(entry, label, errors);
     const once = typeof entry.once === 'boolean' ? entry.once : null;
     const conditions = entry.conditions === undefined
@@ -395,12 +400,14 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
     if (id === null) errors.push(`${label}.id：应为非空字符串`);
     if (mapResourceId === null) errors.push(`${label}.mapResourceId：应为非空字符串`);
     if (text === null) errors.push(`${label}.text：应为非空字符串`);
+    if (approachText === null) errors.push(`${label}.approachText：应为非空字符串`);
     if (once === null) errors.push(`${label}.once：应为布尔值`);
     if (discoverKnowledgeNodeId === null) errors.push(`${label}.discoverKnowledgeNodeId：应为非空字符串`);
-    if (id !== null && mapResourceId !== null && text !== null && once !== null && cell !== null &&
-      conditions !== null && discoverKnowledgeNodeId !== null) {
+    if (id !== null && mapResourceId !== null && text !== null && approachText !== null && once !== null &&
+      cell !== null && conditions !== null && discoverKnowledgeNodeId !== null) {
       events.push({
         id, mapResourceId, ...cell, text, once,
+        ...(approachText === undefined ? {} : { approachText }),
         ...(conditions === undefined ? {} : { conditions }),
         ...(discoverKnowledgeNodeId === undefined ? {} : { discoverKnowledgeNodeId }),
       });
@@ -616,6 +623,42 @@ export function selectTriggeredRegionEvents(
     (!event.once || !completedEventIds.has(event.id)) &&
     regionEventConditionsMet(event, context),
   );
+}
+
+/** Manhattan distance within which a fixed event's approach clue may surface. */
+export const REGION_EVENT_APPROACH_RADIUS = 2;
+
+/**
+ * Picks the nearest eligible fixed event's ambient clue around the player.
+ * Only the data-authored clue string is returned — never the full discovery
+ * text or node ids. The exact trigger cell stays silent (the event itself
+ * fires there), live event conditions still apply, completed one-shot events
+ * and already-discovered nodes are suppressed, and equal distances resolve
+ * by stable event id.
+ */
+export function selectRegionEventApproachClue(
+  events: readonly RegionEventData[],
+  location: { mapResourceId: string } & CellPosition,
+  completedEventIds: ReadonlySet<string>,
+  context: RegionEventContext,
+  radius: number = REGION_EVENT_APPROACH_RADIUS,
+): string | null {
+  if (!Number.isFinite(radius) || radius < 0) return null;
+  let best: { id: string; approachText: string; distance: number } | null = null;
+  for (const event of events) {
+    if (event.approachText === undefined || event.mapResourceId !== location.mapResourceId) continue;
+    if (event.once && completedEventIds.has(event.id)) continue;
+    if (event.discoverKnowledgeNodeId !== undefined &&
+      context.knownKnowledgeNodeIds.has(event.discoverKnowledgeNodeId)) continue;
+    if (!regionEventConditionsMet(event, context)) continue;
+    const distance = Math.abs(event.col - location.col) + Math.abs(event.row - location.row);
+    if (distance <= 0 || distance > radius) continue;
+    if (best === null || distance < best.distance ||
+      (distance === best.distance && event.id.localeCompare(best.id) < 0)) {
+      best = { id: event.id, approachText: event.approachText, distance };
+    }
+  }
+  return best === null ? null : best.approachText;
 }
 
 /** Returns first-time node discoveries for a ready batch without mutating the save state. */

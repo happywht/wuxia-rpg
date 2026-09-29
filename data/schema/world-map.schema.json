@@ -62,6 +62,7 @@
           "col": { "type": "integer", "minimum": 0, "maximum": 255 },
           "row": { "type": "integer", "minimum": 0, "maximum": 255 },
           "text": { "type": "string", "minLength": 1 },
+          "approachText": { "type": "string", "minLength": 1 },
           "once": { "type": "boolean" },
           "conditions": { "$ref": "#/definitions/regionEventConditions" },
           "discoverKnowledgeNodeId": { "type": "string", "minLength": 1 }
