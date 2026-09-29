@@ -121,7 +121,7 @@
                 "maximum": 9999
               },
               "martialArtIds": {
-                "description": "敌人可用的武学 id 列表；每个 id 须存在于已加载且未禁用的武学集合（运行时逐条校验）。敌方回合在可用攻击中选择威力最高者。",
+                "description": "敌人可用的武学 id 列表；每个 id 须存在于已加载且未禁用的武学集合（运行时逐条校验）。敌方优先选择可支付的最高威力攻击；没有可用攻击时才选择守御招式。",
                 "type": "array",
                 "uniqueItems": true,
                 "minItems": 1,

@@ -223,7 +223,9 @@ export class MartialArtForgePanel {
     });
     const previewY = top + height - 112;
     if (preview.ok) {
-      const effect = preview.art.combat.kind === 'attack' ? '攻击' : '疗伤';
+      const effect = preview.art.combat.kind === 'attack'
+        ? '攻击'
+        : preview.art.combat.kind === 'heal' ? '疗伤' : '守御';
       this.addText(left + 30, previewY,
         `预览：${effect}功力 ${preview.art.combat.power} · 内力 ${preview.art.combat.qiCost} · 预算 ${preview.budget}/${CUSTOM_MARTIAL_ART_MAX_BUDGET} · 创制 ${preview.silverCost} 两`,
         12, UI_PALETTE.jade);

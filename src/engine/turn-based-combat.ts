@@ -17,9 +17,11 @@
  * CombatSession.playerUse} call (the UI renders the appended log entries).
  * Formulas are fixed protocol: attack damage `max(1, power + attackerForce
  * − floor(defenderBody / 3))`, heal amount `power + floor(actorResolve / 2)`
- * capped at the health maximum. The enemy deterministically picks the
- * highest-power affordable attack (ties broken by ascending art id) and
- * passes when none is affordable. An invalid or unaffordable player action
+ * capped at the health maximum, and guard reduces the next incoming hit by
+ * its data power while leaving at least one damage. The enemy deterministically
+ * picks the highest-power affordable attack (ties broken by ascending art id),
+ * otherwise the highest-power affordable guard, and passes when neither is
+ * affordable. An invalid or unaffordable player action
  * consumes neither turn nor resources. Victory experience is granted exactly
  * once through the Round 04 progression API; defeat restores the player by
  * the encounter's declared ratios (always to at least 1 health); fleeing
@@ -521,9 +523,33 @@ export function computeAttackDamage(
   return Math.max(1, Math.trunc(power + attackerForce - Math.floor(defenderBody / 3)));
 }
 
+/** Applies a one-hit guard while keeping attack damage at least one. */
+export function computeDamageAfterGuard(
+  incomingDamage: number,
+  guardPower: number,
+): { damage: number; prevented: number } {
+  const incoming = Math.max(1, Math.trunc(incomingDamage));
+  const damage = Math.max(1, incoming - Math.max(0, Math.trunc(guardPower)));
+  return { damage, prevented: incoming - damage };
+}
+
 /** Heal amount: `power + floor(actor.resolve / 2)`. */
 export function computeHealAmount(power: number, actorResolve: number): number {
   return Math.trunc(power + Math.floor(actorResolve / 2));
+}
+
+/** Deterministic strongest-action selection with an id tie-break. */
+function strongestAffordableArt(
+  arts: readonly MartialArtData[],
+  availableQi: number,
+  kind: 'attack' | 'guard',
+): MartialArtData | null {
+  return arts
+    .filter((art) => art.combat.kind === kind && availableQi >= art.combat.qiCost)
+    .reduce<MartialArtData | null>((best, art) => {
+      if (best === null || art.combat.power > best.combat.power) return art;
+      return art.combat.power === best.combat.power && art.id < best.id ? art : best;
+    }, null);
 }
 
 // ---------------------------------------------------------------------------
@@ -595,6 +621,8 @@ export class CombatSession {
   private readonly companion: CombatSessionConfig['companion'];
   private readonly meridianResourceRules: MeridianResourceRules | undefined;
   private successfulPlayerActions = 0;
+  private playerGuardPower = 0;
+  private enemyGuardPower = 0;
 
   private readonly enemy: CombatantView & { attributes: AttributeMap; arts: MartialArtData[] };
 
@@ -678,8 +706,9 @@ export class CombatSession {
    * Attempts one player action. An unknown art or one the player cannot
    * afford is refused without consuming the turn or any resource. A valid
    * action resolves, then the enemy answers (highest-power affordable
-   * attack, ties by ascending art id; an enemy with no affordable attack
-   * passes), then the phase returns to `player-turn` unless someone fell.
+   * attack, otherwise highest-power affordable guard, ties by ascending art
+   * id; an enemy with neither passes), then the phase returns to `player-turn`
+   * unless someone fell.
    */
   playerUse(artId: string): { ok: true } | { ok: false; reason: ActionRefusalReason } {
     if (this.phase !== 'player-turn') {
@@ -695,23 +724,34 @@ export class CombatSession {
 
     this.player.qi.current -= art.combat.qiCost;
     if (art.combat.kind === 'attack') {
-      const damage = computeAttackDamage(
+      const baseDamage = computeAttackDamage(
         art.combat.power,
         this.player.attributes.force,
         this.enemy.attributes.body,
       );
+      const guarded = computeDamageAfterGuard(baseDamage, this.enemyGuardPower);
+      this.enemyGuardPower = 0;
+      const damage = guarded.damage;
       this.enemy.health.current = Math.max(0, this.enemy.health.current - damage);
       this.logEntries.push({
         kind: 'player-action',
-        text: `${this.playerName}使出「${art.name}」，对${this.enemy.name}造成 ${damage} 点伤害`,
+        text: `${this.playerName}使出「${art.name}」，对${this.enemy.name}造成 ${damage} 点伤害${
+          guarded.prevented > 0 ? `（守御抵挡 ${guarded.prevented} 点）` : ''
+        }`,
       });
-    } else {
+    } else if (art.combat.kind === 'heal') {
       const amount = computeHealAmount(art.combat.power, this.player.attributes.resolve);
       const healed = Math.min(amount, this.player.health.max - this.player.health.current);
       this.player.health.current += healed;
       this.logEntries.push({
         kind: 'player-action',
         text: `${this.playerName}运起「${art.name}」，恢复 ${healed} 点生命`,
+      });
+    } else {
+      this.playerGuardPower = Math.max(this.playerGuardPower, art.combat.power);
+      this.logEntries.push({
+        kind: 'player-action',
+        text: `${this.playerName}使出「${art.name}」，摆出守势（下次受击至多减伤 ${this.playerGuardPower} 点）`,
       });
     }
 
@@ -769,23 +809,21 @@ export class CombatSession {
     return { ok: true };
   }
 
-  /** Deterministic enemy answer: strongest affordable attack or a pass. */
+  /** Deterministic enemy answer: strongest attack, then strongest guard, or pass. */
   private enemyTurn(): void {
-    const choice = this.enemy.arts
-      .filter(
-        (art) => art.combat.kind === 'attack' && this.enemy.qi.current >= art.combat.qiCost,
-      )
-      .reduce<MartialArtData | null>((best, art) => {
-        if (best === null) {
-          return art;
-        }
-        if (art.combat.power > best.combat.power) {
-          return art;
-        }
-        return art.combat.power === best.combat.power && art.id < best.id ? art : best;
-      }, null);
-
-    if (choice === null) {
+    const attack = strongestAffordableArt(this.enemy.arts, this.enemy.qi.current, 'attack');
+    if (attack === null) {
+      const guard = strongestAffordableArt(this.enemy.arts, this.enemy.qi.current, 'guard');
+      if (guard !== null) {
+        this.enemy.qi.current -= guard.combat.qiCost;
+        this.enemyGuardPower = Math.max(this.enemyGuardPower, guard.combat.power);
+        this.logEntries.push({
+          kind: 'enemy-action',
+          text: `${this.enemy.name}使出「${guard.name}」，摆出守势（下次受击至多减伤 ${this.enemyGuardPower} 点）`,
+        });
+        this.phase = 'player-turn';
+        return;
+      }
       this.logEntries.push({
         kind: 'enemy-idle',
         text: `${this.enemy.name}内力不济，蓄势未发`,
@@ -794,16 +832,21 @@ export class CombatSession {
       return;
     }
 
-    this.enemy.qi.current -= choice.combat.qiCost;
-    const damage = computeAttackDamage(
-      choice.combat.power,
+    this.enemy.qi.current -= attack.combat.qiCost;
+    const baseDamage = computeAttackDamage(
+      attack.combat.power,
       this.enemy.attributes.force,
       this.player.attributes.body,
     );
+    const guarded = computeDamageAfterGuard(baseDamage, this.playerGuardPower);
+    this.playerGuardPower = 0;
+    const damage = guarded.damage;
     this.player.health.current = Math.max(0, this.player.health.current - damage);
     this.logEntries.push({
       kind: 'enemy-action',
-      text: `${this.enemy.name}使出「${choice.name}」，对${this.playerName}造成 ${damage} 点伤害`,
+      text: `${this.enemy.name}使出「${attack.name}」，对${this.playerName}造成 ${damage} 点伤害${
+        guarded.prevented > 0 ? `（守御抵挡 ${guarded.prevented} 点）` : ''
+      }`,
     });
 
     if (this.player.health.current <= 0) {

@@ -70,7 +70,7 @@
       "requirements": { "level": 6, "attributes": { "agility": 16, "insight": 12 } },
       "initialProficiency": 0,
       "proficiencyCap": 300,
-      "combat": { "kind": "attack", "power": 10, "qiCost": 3 }
+      "combat": { "kind": "guard", "power": 14, "qiCost": 4 }
     },
     {
       "id": "skill.r32-tingyu-luoyu-jian",
@@ -214,7 +214,7 @@
       "requirements": { "level": 2, "attributes": { "agility": 11, "insight": 10 } },
       "initialProficiency": 0,
       "proficiencyCap": 180,
-      "combat": { "kind": "attack", "power": 12, "qiCost": 3 }
+      "combat": { "kind": "guard", "power": 9, "qiCost": 3 }
     },
     {
       "id": "skill.r32-yunyin-qingfeng-zhang",
@@ -250,7 +250,7 @@
       "requirements": { "level": 8, "attributes": { "agility": 16, "insight": 15 } },
       "initialProficiency": 0,
       "proficiencyCap": 320,
-      "combat": { "kind": "attack", "power": 20, "qiCost": 8 }
+      "combat": { "kind": "guard", "power": 16, "qiCost": 6 }
     },
     {
       "id": "skill.r32-hanshan-zhumo-bi",
@@ -346,7 +346,7 @@
       "requirements": { "level": 3, "attributes": { "agility": 12, "body": 10 } },
       "initialProficiency": 0,
       "proficiencyCap": 210,
-      "combat": { "kind": "attack", "power": 12, "qiCost": 3 }
+      "combat": { "kind": "guard", "power": 9, "qiCost": 3 }
     },
     {
       "id": "skill.r32-panzhou-pobai-dao",

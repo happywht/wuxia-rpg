@@ -213,6 +213,13 @@
               ]
             },
             {
+              "text": "不求入门，想学一式市井拦门刀法。",
+              "nextNodeId": "r32-open-lessons",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.panzhou-daochang", "isMember": false }
+              ]
+            },
+            {
               "text": "请师父指点护船与刀场功夫。",
               "nextNodeId": "r32-lessons",
               "conditions": [
@@ -310,6 +317,14 @@
         {
           "id": "accepted",
           "text": "祝九弦把一截缆绳抛过来，看你接住了才咧嘴一笑：「接得稳，就有得教。刀场的规矩记牢——上船先认缆桩，出刀先认人。哪条船要护、哪步不能退，比刀法先学。」"
+        },
+        {
+          "id": "r32-open-lessons",
+          "text": "祝九弦看了看你的站姿：「拦门刀法是护院和行路人常用的开门路数，不是刀场秘传。先把脚下站稳，学成后莫拿它欺人。」",
+          "options": [
+            { "text": "请教拦门刀法。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.lanmen-daofa" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.lanmen-daofa" }] },
+            { "text": "我想再考虑。", "nextNodeId": "farewell" }
+          ]
         },
         {
           "id": "r32-lessons",

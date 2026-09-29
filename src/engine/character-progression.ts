@@ -18,7 +18,7 @@
  * martial-art faction references) and isolates those failures per entry.
  *
  * Round 05 adds the combat action of a martial art (`combat`: attack/heal,
- * power, qi cost — numbers come from data) and the profile's starting
+ * Round 69 adds one-hit guard; power and qi cost come from data) and the profile's starting
  * martial-art list, validated per reference by
  * {@link resolveStartingMartialArts} against the indexed arts.
  *
@@ -111,12 +111,12 @@ export interface CharacterProfileSetData {
 }
 
 /** Combat-action kinds (protocol; the concrete numbers stay in data). */
-export type CombatActionKind = 'attack' | 'heal';
+export type CombatActionKind = 'attack' | 'heal' | 'guard';
 
 /** Wire format of a martial art's combat effect (Round 05). */
 export interface CombatActionData {
   kind: CombatActionKind;
-  /** Raw magnitude: attack damage base or heal amount base. */
+  /** Magnitude: attack/heal base or damage prevented on the next incoming hit. */
   power: number;
   /** Qi spent per use; an action costing more than the current qi is unusable. */
   qiCost: number;
@@ -174,7 +174,7 @@ export interface MartialArtData {
   };
   initialProficiency: number;
   proficiencyCap: number;
-  /** Combat use of the art (Round 05): attack/heal, power and qi cost. */
+  /** Combat use of the art (Round 05/69): attack, heal or one-hit guard. */
   combat: CombatActionData;
 }
 
@@ -318,7 +318,9 @@ function requireCombatAction(raw: unknown): CombatActionData | null {
     return null;
   }
   const kind: CombatActionKind | null =
-    source.kind === 'attack' || source.kind === 'heal' ? source.kind : null;
+    source.kind === 'attack' || source.kind === 'heal' || source.kind === 'guard'
+      ? source.kind
+      : null;
   const power = requireIntegerInRange(source.power, 1, 999);
   const qiCost = requireIntegerInRange(source.qiCost, 0, 99);
   if (kind === null || power === null || qiCost === null) {
@@ -797,7 +799,7 @@ export function parseMartialArtSet(raw: unknown): SetParseResult<MartialArtSetDa
     }
     if (combat === null) {
       problems.push(
-        `${label}.combat：应含 kind（attack/heal）、power（1–999 整数）与 qiCost（0–99 整数）`,
+        `${label}.combat：应含 kind（attack/heal/guard）、power（1–999 整数）与 qiCost（0–99 整数）`,
       );
     }
 

@@ -66,21 +66,27 @@ const LABELS = {
   qi: '内力',
   attackKind: '攻击',
   healKind: '恢复',
+  guardKind: '守御',
   fleeAction: '撤退',
   selectHint: '↑/↓ 滚动与选择 · Enter 确认 · Esc 撤退',
   closeHint: 'Enter / Esc 离开战场',
   insufficientQi: '内力不足，该行动无法使出',
 } as const;
 
-function actionKindLabel(kind: string): string {
-  return kind === 'attack' ? LABELS.attackKind : LABELS.healKind;
+function actionKindLabel(kind: PlayerActionView['art']['combat']['kind']): string {
+  switch (kind) {
+    case 'attack': return LABELS.attackKind;
+    case 'heal': return LABELS.healKind;
+    case 'guard': return LABELS.guardKind;
+  }
 }
 
 function actionLineText(action: PlayerActionView, active: boolean): string {
   const combat = action.art.combat;
-  return `${active ? CURSOR_ACTIVE : CURSOR_IDLE}「${action.art.name}」　${actionKindLabel(
-    combat.kind,
-  )} ${combat.power} · ${LABELS.qi} ${combat.qiCost}`;
+  const effect = combat.kind === 'guard'
+    ? `${actionKindLabel(combat.kind)} 至多减伤 ${combat.power}`
+    : `${actionKindLabel(combat.kind)} ${combat.power}`;
+  return `${active ? CURSOR_ACTIVE : CURSOR_IDLE}「${action.art.name}」　${effect} · ${LABELS.qi} ${combat.qiCost}`;
 }
 
 type PanelKeyBinding = {

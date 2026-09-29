@@ -325,11 +325,12 @@ describe('Round 59 regional dialogue echoes', () => {
 
   it('keeps every pre-existing option of the seven greet nodes intact', () => {
     // Anchored greet-node option counts: pre-existing options plus the
-    // Round 59 echoes (shi-bei carries two quest pairs, hence four).
+    // Round 59 echoes (shi-bei carries two quest pairs, hence four); Zhu
+    // also has the Round 69 outsider lesson entry.
     const expectedBaseline: Record<string, number> = {
       'dlg.shi-bei-mentor': 13, // 9 pre-existing + 4 echoes
       'dlg.bai-luzhou-ferry-master': 16, // 14 pre-existing + 2 echoes
-      'dlg.zhu-jiuxian-mentor': 14, // 12 pre-existing + 2 echoes
+      'dlg.zhu-jiuxian-mentor': 15, // 12 pre-existing + 2 echoes + outsider lesson
       'dlg.ma-shangyi-notice-board': 5, // 3 pre-existing + 2 echoes
       'dlg.lu-zhenniang-teastall': 9, // 7 pre-existing + 2 echoes
       'dlg.jiang-baiwei-peddler': 4, // 2 pre-existing + 2 echoes
@@ -356,6 +357,13 @@ describe('Round 59 regional dialogue echoes', () => {
       const start = conversation.nodes.find((node) => node.id === conversation.startNodeId)!;
       expect((start.options ?? []).some((option) => option.text === text), `${dialogueId}: ${text}`).toBe(true);
     }
+
+    const zhu = dialogueAssembly.conversations.get('dlg.zhu-jiuxian-mentor')!;
+    const zhuStart = zhu.nodes.find((node) => node.id === zhu.startNodeId)!;
+    const outsiderLesson = zhuStart.options?.find((option) => option.nextNodeId === 'r32-open-lessons');
+    expect(outsiderLesson?.conditions).toEqual([
+      { kind: 'factionMembership', factionId: 'faction.panzhou-daochang', isMember: false },
+    ]);
   });
 
   it.each(ECHO_SPECS)(

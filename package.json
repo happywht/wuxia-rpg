@@ -48,7 +48,8 @@
     "smoke:round-44": "vitest run tests/world-map.test.ts tests/quest-system.test.ts tests/round44-dynamic-events.test.ts",
     "smoke:round-46": "vitest run tests/round46-vertical-slice.test.ts",
     "smoke:round-47": "node scripts/smoke-round-47.mjs",
-    "smoke:round-68": "vitest run tests/round68-long-journey.test.ts"
+    "smoke:round-68": "vitest run tests/round68-long-journey.test.ts",
+    "smoke:round-69": "vitest run tests/round69-martial-paths.test.ts tests/round69-guard-combat.test.ts"
   },
   "dependencies": {
     "ajv": "^8.20.0",

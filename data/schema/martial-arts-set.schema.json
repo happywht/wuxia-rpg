@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://wuxia-rpg.invalid/schema/martial-arts-set",
   "title": "武学集合",
-  "description": "武学集合 JSON 的静态结构契约：字段名、类型与取值范围。名称、类别、简介、门槛、熟练度参数与战斗作用（Round 05：attack/heal、power、qiCost）全部来自数据；factionIds 为空数组表示不限门派。跨资源语义（factionIds 是否指向已加载的有效门派）由运行时索引逐条校验。",
+  "description": "武学集合 JSON 的静态结构契约：字段名、类型与取值范围。名称、类别、简介、门槛、熟练度参数与战斗作用（attack/heal/guard、power、qiCost）全部来自数据；factionIds 为空数组表示不限门派。跨资源语义（factionIds 是否指向已加载的有效门派）由运行时索引逐条校验。",
   "definitions": {
     "attributeRequirementMap": {
       "description": "部分核心属性到最低要求数值的映射；省略的属性不设门槛。",
@@ -113,12 +113,12 @@
             "required": ["kind", "power", "qiCost"],
             "properties": {
               "kind": {
-                "description": "作用类型：attack 造成伤害，heal 恢复自身生命。",
+            "description": "作用类型：attack 造成伤害，heal 恢复自身生命，guard 使下一次受击减伤。",
                 "type": "string",
-                "enum": ["attack", "heal"]
+                "enum": ["attack", "heal", "guard"]
               },
               "power": {
-                "description": "作用强度基数：攻击伤害基数或治疗量基数。",
+                "description": "作用强度：攻击伤害基数、治疗量基数或守御减伤值。守御只作用于下一次来袭且至少承受 1 点伤害。",
                 "type": "integer",
                 "minimum": 1,
                 "maximum": 999

@@ -1,6 +1,6 @@
 # 玩家手册
 
-这份手册对应当前仓库 Round 68 的可运行原型。菜单、键位与玩法以游戏内 H「操作手册」和现行资料为准；浏览器存档仅保存在当前浏览器的本地存储中。R00–R68 均有独立计划和提交；R50 最终验收边界见 [`FINAL-ACCEPTANCE.md`](FINAL-ACCEPTANCE.md)，四块百格地图、全域舆图、区域内容与路线证据见 [`MAP-ATLAS.md`](MAP-ATLAS.md)、[`ROUND-61-ROUTE-AUDIT.md`](ROUND-61-ROUTE-AUDIT.md)、[`ROUND-63-TIMED-ROUTE-AUDIT.md`](ROUND-63-TIMED-ROUTE-AUDIT.md)、[`ROUND-64-ROUTE-AUDIT.md`](ROUND-64-ROUTE-AUDIT.md) 和 [`ROUND-68-JOURNEY-PLAYTEST.md`](ROUND-68-JOURNEY-PLAYTEST.md)。
+这份手册对应当前仓库 Round 69 的可运行原型。菜单、键位与玩法以游戏内 H「操作手册」和现行资料为准；浏览器存档仅保存在当前浏览器的本地存储中。R00–R69 均有独立计划和提交；R50 最终验收边界见 [`FINAL-ACCEPTANCE.md`](FINAL-ACCEPTANCE.md)，四块百格地图、全域舆图、区域内容与路线证据见 [`MAP-ATLAS.md`](MAP-ATLAS.md)、[`ROUND-61-ROUTE-AUDIT.md`](ROUND-61-ROUTE-AUDIT.md)、[`ROUND-63-TIMED-ROUTE-AUDIT.md`](ROUND-63-TIMED-ROUTE-AUDIT.md)、[`ROUND-64-ROUTE-AUDIT.md`](ROUND-64-ROUTE-AUDIT.md) 和 [`ROUND-68-JOURNEY-PLAYTEST.md`](ROUND-68-JOURNEY-PLAYTEST.md)。Round 69 起四门身法拥有一次性守御战斗作用；无门派拦门刀法可向盘舷门外玩家授艺。招式名称、门槛和作用见 [`MARTIAL-ARTS.md`](MARTIAL-ARTS.md)。
 
 ## 世界外观（Round 65 起）
 
@@ -64,7 +64,7 @@ npm run dev
 2. 对话选项可能因差事状态、物品数量、善恶、声望或人物关系而显隐。按 ↑/↓ 选择，Enter 确认；Esc 退出。效果在整个选项都可执行后一次性提交。
 3. 在 Q 差事面板查看接取条件、目标和奖励。收集物可先完成、后接取；接取时按当前背包数量记进度。见闻目标在首次发现对应词条时完成（例如走到带发现事件的地点触发见闻），此前已发现的词条在接取时直接计入。跟踪中的差事会显示目标提示。
 4. **差事目标导航**：在 Q 面板选中一项进行中的差事按 N，会自动跟踪它、关闭日志并打开 M 舆图，选中该项差事下一个未完成且有地图位置的目标（金色「差事」标点）：人物目标指向其当前时段所在格（会随日程移动重算），战斗目标指向遭遇位置，见闻目标指向触发该词条的地图事件/地标，采集目标指向一家确实上架该物品、且现存数量够补齐剩余份数的在营商铺（优先同区域的卖家，店主位置同样随时段日程重算）；跨区域目标会先指到下一道关口。导航只给路线与提示，玩家仍需手动走格；每次成功移动都会从当前位置重算，跨入新时段时人物目标、NPC 占位和路线也会随日程刷新。寻路绕开当前 NPC 与尚存遭遇。到人物旁按 F 直接交谈；到遭遇旁按 E 交手（身旁另有 NPC 时，E 会优先处理人物）；到见闻触发格后若没出现新见闻，先看 HUD 条件提示，受时段/天气影响时可按 V 原地等候；到采集目标的店主旁按 E 直接交易（购买后差事计数自动核对，库存买空后路线会改指其他够货的卖家或给出说明）。目标完成或差事结束后行路提示自动更新或清除。跨时段长路线的实际步行核验见 [`ROUND-63-TIMED-ROUTE-AUDIT.md`](ROUND-63-TIMED-ROUTE-AUDIT.md)，三张地图全部交互目标的七时段审计见 [`ROUND-64-ROUTE-AUDIT.md`](ROUND-64-ROUTE-AUDIT.md)。
-5. 战斗中用 ↑/↓ 或 W/S 选择可用招式，Enter 行动；内力不足的招式不可用。Esc 撤退，撤退不是胜利。战斗结束后按 Enter 或 Esc 收起战报。
+5. 战斗中用 ↑/↓ 或 W/S 选择可用招式，Enter 行动；内力不足的招式不可用。身法守御会消耗内力并减轻下一次来袭，挡后失效且至少会受 1 点伤害。Esc 撤退，撤退不是胜利。战斗结束后按 Enter 或 Esc 收起战报。
 6. 角色经验、任务奖励、装备、经脉、门派和存档都按当前资料规则结算；具体人物、路线与奖励不写死在本手册中。
 
 ## 存档与设置
