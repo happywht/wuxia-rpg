@@ -226,6 +226,7 @@ function loadJourneyWorld(): JourneyWorld {
     [CLOUD_RIDGE_ID, 'round-74-cloud-ridge.json'],
     ['map.round-79-isles', 'round-79-isles.json'],
     ['map.round-82-east-coast', 'round-82-east-coast.json'],
+    ['map.round-84-windward-isle', 'round-84-windward-isle.json'],
   ] as const) {
     const parsed = requireParsed(parseGridMap(readJson(`../data/base/maps/${file}`)), file);
     expect(parsed.map.data.id, `${file} stable id`).toBe(id);
@@ -256,7 +257,7 @@ function loadJourneyWorld(): JourneyWorld {
   if ('ok' in worldResult) throw new Error(worldResult.errors.join('\n'));
   expect(worldResult.warnings, '全域/关口/事件装配').toEqual([]);
   expect(worldResult.regions.map(({ mapResourceId }) => mapResourceId).sort())
-    .toEqual([JIANGNAN_ID, FERRY_ID, IRON_RIDGE_ID, SALT_ROAD_ID, CLOUD_RIDGE_ID, 'map.round-79-isles', 'map.round-82-east-coast'].sort());
+    .toEqual([JIANGNAN_ID, FERRY_ID, IRON_RIDGE_ID, SALT_ROAD_ID, CLOUD_RIDGE_ID, 'map.round-79-isles', 'map.round-82-east-coast', 'map.round-84-windward-isle'].sort());
 
   const npcIds = new Set(npcSet.npcs.map(({ id }) => id));
   const itemIndex = indexItems(itemSet);

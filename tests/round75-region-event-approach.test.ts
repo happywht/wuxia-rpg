@@ -63,7 +63,7 @@ describe('Round 75 region-event approach clues', () => {
     if (!blankClue.ok) expect(blankClue.errors.join('\n')).toContain('approachText');
   });
 
-  it('ships clues on fixed discovery events across all seven regions and leaves random events untouched', () => {
+  it('ships clues on fixed discovery events across all eight regions and leaves random events untouched', () => {
     const parsed = parseWorldMap(readJson('../data/base/world/world-map.json'));
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
@@ -72,7 +72,7 @@ describe('Round 75 region-event approach clues', () => {
       expect(event.approachText, `${event.id} 需要临近线索`).toBeTruthy();
       mapsWithClues.add(event.mapResourceId);
     }
-    expect(mapsWithClues.size).toBe(7);
+    expect(mapsWithClues.size).toBe(8);
     // Arrival and non-arrival landmarks both carry clues in shipped data.
     expect(parsed.data.events.some(({ id }) => id.endsWith('-arrival'))).toBe(true);
     expect(parsed.data.events.some(({ id }) => !id.endsWith('-arrival'))).toBe(true);

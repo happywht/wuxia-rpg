@@ -1,0 +1,26 @@
+{
+  "quests": [
+    {
+      "id": "quest.r84-lantern-ledger",
+      "name": "风回灯影",
+      "description": "阮回澜请你登上风回岛东坡的灯标，把今季灯影落下的浪线方位记回石厝旧簿。",
+      "giverNpcId": "char.r84-ruan-huilan",
+      "objectives": [
+        {
+          "id": "objective.r84-read-windward-beacon",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r84-windward-beacon",
+          "requiredCount": 1,
+          "text": "在风回灯标记下灯影方位"
+        }
+      ],
+      "rewards": {
+        "experience": 34,
+        "currency": 26,
+        "discoverKnowledgeNodeIds": [
+          "place.r84-spring-hollow"
+        ]
+      }
+    }
+  ]
+}

@@ -19,6 +19,8 @@ npm run smoke:round-81 # 扩图、旧投影稳定、CC0 素材与视口复位
 npm run smoke:round-82 # 海岸地图、往返关口、旧区域投影和潮尺任务
 npm run smoke:round-83 # 港镇多资源装配、商店/NPC 日程、海岸任务与坏资源隔离
 npm run generate:round-83-east-coast # 确定性重建青帆埠角色、商店、任务和图谱登记
+npm run smoke:round-84 # 384×256 舆图、风回岛关口、素材与灯影任务闭环
+npm run generate:round-84-windward-isle # 确定性扩展舆图并重建风回岛数据
 npm run smoke:round-76 # 五区补充图集帧、原碰撞/画层哈希与锚点
 npm run smoke:round-77 # CC0 人物帧、方向动画数据、碰撞哈希和旧格式兼容
 npm run generate:round-77-characters # 确定性重建 CC0 人物图集与人物帧表
@@ -151,7 +153,7 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 
 - 2026-09-29（Round 78）：新增人物朝向/地图纵深专项，检查五区前景行数据、相互面向方向函数、同一行遮挡 tie-break、静态 NPC 回退和未知图层标记拒绝；专项命令为 `npm run smoke:round-78`。
 - 2026-09-29（Round 65）：新增 `tests/round65-urban-art.test.ts`（内置纯 Node PNG 调色板解码器，审计 RPG Urban Pack CC0 许可文本、432×288/27×18 网格与 486 格非空、三图角色图集与帧落在角色列、14 名 NPC 帧非空/互异/不与玩家共用、起始图两种新路面层的帧引用、角色列帧禁入环境层、铺装只落于原装饰空白的可走格、井盖具有路面底层、出生点/NPC/关口 BFS 可达）；`tests/round51-map-art.test.ts` 图层数/图集清单/玩家帧断言随协议演进更新。同日两次视觉纠偏：先以联络表排除把门窗误作人物/路面的错误帧；再发现原阻挡区属于墓园后，取消门面覆盖，限制地面仅落于可走且原装饰为空的格子。专项 2 文件 14 用例与关联回归 5 文件 16 用例通过；全量与发行数字见 `DEVLOG.md` Round 65 验证段。
-- 2026-09-29（Round 66）：新增 `tests/round66-world-atlas.test.ts` 5 项全域舆图回归；该测试夹具随 Round 70/74 迭代，当前检查 336×224 十六层（保留 R80 原十二层并增添四个 Puny World 东/南拓展层）的尺寸/GID、主地表连续性、旧世界无 `atlasArt` 兼容、坏尺寸/帧拒绝、所有区域/关口/玩家投影及未发现地标隔离。Round 66 当时的 128×80 五层历史结果及浏览器操作仍见 `DEVLOG.md` Round 66。
+- 2026-09-29（Round 66）：新增 `tests/round66-world-atlas.test.ts` 5 项全域舆图回归；该测试夹具随 Round 70/74/84 迭代，当前检查 384×256 二十层（保留原十六层并增添四个 Puny World 东/南拓展层）的尺寸/GID、主地表连续性、旧世界无 `atlasArt` 兼容、坏尺寸/帧拒绝、所有区域/关口/玩家投影及未发现地标隔离。Round 66 当时的 128×80 五层历史结果及浏览器操作仍见 `DEVLOG.md` Round 66。
 - 2026-09-29（Round 67）：新增 `tests/round67-salt-road.test.ts` 4 项回归，检查 100×100 盐道图、十层 Kenney CC0 画面、8,280 个入口连通可行格、58 个受保护锚点；其全域投影夹具现随地图扩展更新为六图/336×224/十个有向关口。罗金子日程、敌对遭遇和苦井发现任务回归保持不变。`tests/round52-map-landmarks.test.ts` 增加盐道三处普通地标与回声苦井发现门控断言。Round 67 当时的四区投影与六个关口历史结果见 `DEVLOG.md` Round 67。
 - 2026-09-29（Round 68）：新增 `tests/round68-long-journey.test.ts` 一项集成回归与 `npm run smoke:round-68`，逐格使用当前四区真实地图、动态 NPC/遭遇、日历气候、存档 API 与结局 API 完成盐道去返/任务/结局路线；测试为逐段方向路径新增关口相邻格断言。浏览器试玩记录明示人工实走首个关口及舆图操作；完整后半程由自动引擎集成回归覆盖，未冒称浏览器手测。最终全量统计和命令见 `DEVLOG.md` Round 68。
 - 2026-09-29（Round 74）：新增五区云岭专项回归与 `smoke:round-74`，并扩展真实 manifest 世界装配断言，确保多份 `npc-set`/`quest-set` 资源均进入 NPC、对白和任务运行集；补齐云岭地图知识节点与图谱边端点。
@@ -178,9 +180,11 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 
 | `tests/round79-island-region.test.ts` | 海岛资料/图素、世界舆图与任务闭环 | 4 项检查：100×100 与 16px/27×65 CC0 图集引用、入口连通和渡口双向 BFS、四地标/三区域事件可达、旧区域投影像素不漂移、岛链总图层/图集边界、对白接取并发现灯标后完成任务；纳入 `npm run smoke:round-79`。 |
 | `tests/round80-region-interactions.test.ts` | 区域事件交互 Schema、选择器及云岭/海岛真实地图 | 覆盖声明校验、旧踏入事件、方向/距离、动态视线遮挡、条件/一次性状态与真实事件坐标；纳入 `npm run smoke:round-80`。 |
-| `tests/round81-world-atlas.test.ts` | 扩展全域舆图、区域投影、已登记 CC0 图素与视口 | 校验 336×224 Schema/解析上限、旧 224×144 区域哈希、全部既有锚点像素坐标、东/南新地貌、许可引用及 fit/pan/reset；纳入 `npm run smoke:round-81`。 |
+| `tests/round81-world-atlas.test.ts` | 扩展全域舆图、区域投影、已登记 CC0 图素与视口 | 校验当前 384×256 Schema/解析上限、旧 336×224 区域逐格哈希、全部既有锚点像素坐标、东/南新地貌、许可引用及 fit/pan/reset；纳入 `npm run smoke:round-81` 和 `npm run smoke:round-84`。 |
 | `tests/round82-east-coast.test.ts` | 东溟海岸、双向步行关口、CC0 像素素材和潮尺任务闭环 | 校验第七张 100×100 地图、旧六区投影、两端 BFS 可达、锚点与调查方向、素材尺寸/许可、对白接取、见闻完成及任务奖励；纳入 `npm run smoke:round-82`。 |
 | `tests/round83-east-coast-town.test.ts` | 内容集合装配器与青帆埠港镇资料 | 校验跨资源 items/shops/encounters 合并、损坏集合隔离、重复 id 首项优先、七时段 NPC 可达与无冲突、限量商品购买、互动门控、两段任务奖励及图谱引用；纳入 `npm run smoke:round-83`。 |
+| `tests/round84-windward-isle.test.ts` | 风回岛地图、舆图扩展、双向关口和灯影任务 | 校验 100×100 可走岛图、CC0 图集/GID、384×256 新海岛地貌、两端 BFS 可达、地标/事件通路、对白接取任务、灯标发现奖励及图谱端点；纳入 `npm run smoke:round-84`。 |
 - 2026-09-29（Round 79）：新增海岛区域专项与可重复生成命令；世界图夹具升级为六区/十向关口，覆盖 Puny World CC0 图集网格、任务发现奖励、舆图保留旧大陆图层及旧区域锚点稳定。专项命令 `npm run smoke:round-79`。
 - 2026-09-30（Round 80）：新增固定区域事件环境调查专项，覆盖 interaction Schema/解析、默认踏入事件、方向/距离/视线、条件/一次性与云岭悬桥/落潮湾灯标真实格位；`npm run smoke:round-80`。
 - 2026-09-30（Round 81）：新增 336×224 超大舆图专项，锁定旧 12 层历史像素、六区及全部关口/地标/玩家投影，验证新拓展图素、Schema 最大尺寸、Puny World CC0 来源与适配视口；`npm run smoke:round-81`。
+- 2026-09-30（Round 84）：舆图当前扩至 384×256；逐格哈希守护旧 336×224 画布、更新八区投影兼容，并新增风回岛地图/关口/任务测试；`npm run smoke:round-84`。

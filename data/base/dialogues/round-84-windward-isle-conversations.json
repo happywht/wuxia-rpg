@@ -1,0 +1,76 @@
+{
+  "conversations": [
+    {
+      "id": "dlg.r84-ruan-huilan-lantern",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "阮回澜把一盏罩着铁纱的风灯搁在石阶上：「岛上只剩我一户守灯。灯标旧簿记了三十年风候，你若肯替我上一趟东坡，把今年灯影的方位记下来，这簿子就能续写。」",
+          "options": [
+            {
+              "text": "我去东坡看灯标。",
+              "nextNodeId": "accepted",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r84-lantern-ledger",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r84-lantern-ledger"
+                }
+              ]
+            },
+            {
+              "text": "灯影方位已经记下了。",
+              "nextNodeId": "completed",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r84-lantern-ledger",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "石厝村为何只剩一户？",
+              "nextNodeId": "hamlet"
+            },
+            {
+              "text": "风回岛的潮路怎么走？",
+              "nextNodeId": "tides"
+            },
+            {
+              "text": "改日再谈。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "accepted",
+          "text": "「沿松道向东，坡顶那座白石堆就是灯标。风从东南来时灯影最长，把落在哪一道浪线上记清楚。」"
+        },
+        {
+          "id": "completed",
+          "text": "阮回澜把你的记录誊进旧簿：「灯影南移了半指——秋后渔船该改走南汊了。这簿子往后就交给过路人续。」"
+        },
+        {
+          "id": "hamlet",
+          "text": "「早年间石厝有十几户，都吃灯标的饭。风候一年比一年乱，看得懂旧簿的人陆续渡海去了青帆埠。」"
+        },
+        {
+          "id": "tides",
+          "text": "「从西滩上岛要赶在涨潮前。退潮时沙脊露出三道，走中间那道最稳，两侧都是软泥。」"
+        },
+        {
+          "id": "farewell",
+          "text": "阮回澜提起风灯，往灯标坡道的方向去了。"
+        }
+      ]
+    }
+  ]
+}

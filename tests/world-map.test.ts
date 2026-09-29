@@ -68,6 +68,7 @@ describe('world map roaming events', () => {
       ['map.round-74-cloud-ridge', mapStub('map.round-74-cloud-ridge')],
       ['map.round-79-isles', mapStub('map.round-79-isles')],
       ['map.round-82-east-coast', mapStub('map.round-82-east-coast')],
+      ['map.round-84-windward-isle', mapStub('map.round-84-windward-isle')],
     ]), {
       knowledgeNodeIds: new Set([
         'event.old-footprints', 'event.r43-wayfarer-letter', 'place.reedbank', 'event.r44-dock-claim',
@@ -80,6 +81,7 @@ describe('world map roaming events', () => {
         'place.r79-isles', 'place.r79-west-reef', 'place.r79-white-beacon',
         'place.r82-east-coast', 'place.r82-blue-sail-market', 'place.r82-east-tide-gauge', 'place.r82-fog-cove',
         'place.r83-net-shoals', 'place.r83-night-channel',
+        'place.r84-windward-isle', 'place.r84-stone-hamlet', 'place.r84-windward-beacon', 'place.r84-spring-hollow',
       ]),
       periodIds: new Set(['period.dusk', 'period.night']),
       weatherIds: new Set(['weather.drizzle', 'weather.rain', 'weather.storm']),

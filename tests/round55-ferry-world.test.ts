@@ -23,6 +23,7 @@ describe('large walkable regions and later atlas extensions', () => {
   const cloudRidge = parseMap('../data/base/maps/round-74-cloud-ridge.json');
   const isles = parseMap('../data/base/maps/round-79-isles.json');
   const eastCoast = parseMap('../data/base/maps/round-82-east-coast.json');
+  const windwardIsle = parseMap('../data/base/maps/round-84-windward-isle.json');
   const worldData = readJson('../data/base/world/world-map.json') as {
     transitions: Array<{ id: string; from: { mapResourceId: string; col: number; row: number }; to: { mapResourceId: string; col: number; row: number } }>;
     landmarks: Array<{ id: string; mapResourceId: string; col: number; row: number }>;
@@ -119,6 +120,7 @@ describe('large walkable regions and later atlas extensions', () => {
       [cloudRidge.data.id, cloudRidge],
       [isles.data.id, isles],
       [eastCoast.data.id, eastCoast],
+      [windwardIsle.data.id, windwardIsle],
     ]), {
       knowledgeNodeIds: new Set(nodes.nodes.map(({ id }) => id)),
       periodIds: new Set(calendar.periods.map(({ id }) => id)),
@@ -128,8 +130,8 @@ describe('large walkable regions and later atlas extensions', () => {
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
     expect(assembled.warnings).toEqual([]);
-    expect(assembled.regions).toHaveLength(7);
-    expect(assembled.transitions).toHaveLength(12);
+    expect(assembled.regions).toHaveLength(8);
+    expect(assembled.transitions).toHaveLength(14);
     expect(assembled.landmarks.some(({ id }) => id === 'landmark.mist-willow-market')).toBe(true);
     expect(assembled.landmarks.some(({ id }) => id === 'landmark.mist-old-sluice' && id !== undefined)).toBe(true);
     expect(assembled.events.some(({ id }) => id === 'event.r55-sluice-inscription')).toBe(true);

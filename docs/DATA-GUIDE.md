@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：截至 Round 83，基础世界含 20 名 NPC、5 个门派、50 项任务、52 件物品、30 种武学、240 个图谱节点/348 条边，manifest 登记 48 项资源。七张区域地图均为 100×100 格；东溟海岸使用 Shade Puny World、ansimuz RPG Town 与 Puny Characters CC0 图素，并沿用 336×224 十六层全域舆图。地图碰撞、剧情与跨区连接仍由独立 JSON 声明，生成器保护玩法锚点；素材授权、MOD 和导航协议见 `REFERENCES.md`、`MOD-GUIDE.md`、`MAP-ATLAS.md`。
+- 状态：截至 Round 84，基础世界含 21 名 NPC、5 个门派、51 项任务、52 件物品、30 种武学、250 个图谱节点/356 条边，manifest 登记 52 项资源。八张区域地图均为 100×100 格；东溟海岸与风回岛复用已登记 Shade Puny World、ansimuz RPG Town 与 Puny Characters CC0 图素，全域舆图现为 384×256、20 层。地图碰撞、剧情与跨区连接仍由独立 JSON 声明，生成器保护玩法锚点；素材授权、MOD 和导航协议见 `REFERENCES.md`、`MOD-GUIDE.md`、`MAP-ATLAS.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -280,6 +280,10 @@ NPC 条目可选声明 `spriteFrames`，键固定为 `down`、`left`、`right`�
 ## Round 83：港镇可组合内容集合
 
 物品、商店与战斗遭遇可以像 NPC、对白和任务一样按轮次拆分成多个 manifest 资源。`world-loader.ts` 按 manifest 次序遍历所有 `items-set`、`shops-set`、`battle-encounters`；结构无效的可选集合单独告警并跳过，同类其他集合仍装配。全局重复物品 id 保留较早声明，商店与遭遇沿用逐记录首项优先；商店货架引用在全部物品索引完成后统一校验。Round 83 示例文件位于 `items/`、`shops/`、`battles/`、`characters/`、`dialogues/` 和 `quests/`，运行 `npm run generate:round-83-east-coast` 重建；`npm run smoke:round-83` 检查多资源合并、坏集合隔离、交易、七时段坐标和任务链。
+
+## Round 84：风回岛数据资源与舆图扩展
+
+Round 84 在旧 336×224 区域逐格不变的条件下，把 `world-map.json` 的舆图扩至 384×256，并增加四个独立 CC0 地貌图层。`map.round-84-windward-isle` 为新的 `grid-map`，其碰撞 `grid` 与 Puny World/RPG Town 视觉图层分开；manifest 另登记 NPC、对白与任务资源。两个 `transition` 端点引用地图 id 和格坐标，起点/落点都需要通过 BFS 可达检查。任务的 `discoverKnowledge` 目标指向灯标词条，奖励发现淡泉词条；对应事件、地点、人物、任务和两向关系由图谱节点/边共同校验。运行 `npm run generate:round-84-windward-isle` 重建，`npm run smoke:round-84` 覆盖尺寸、GID、连接、交互和奖励闭环。
 
 ## Round 80：地图环境对象调查
 

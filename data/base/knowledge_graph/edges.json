@@ -347,6 +347,14 @@
     {"id":"kg.edge.r83-recovery-encounter","fromId":"quest.r83-net-recovery","toId":"event.r83-tide-wake-looters","relation":"requires","summary":"潮沟夺网要求击退夺网客。"},
     {"id":"kg.edge.r83-recovery-shoals","fromId":"quest.r83-net-recovery","toId":"place.r83-net-shoals","relation":"rewards","summary":"找回浮标后重新得知回标浅滩。"},
     {"id":"kg.edge.r83-night-event-place","fromId":"event.r83-night-channel","toId":"place.r83-night-channel","relation":"triggers","summary":"夜潮灯影照亮回湾石标后发现安全航线。"},
-    {"id":"kg.edge.r83-channel-quest-place","fromId":"quest.r83-night-channel","toId":"place.r83-night-channel","relation":"requires","summary":"暮潮牵标要求玩家调查夜间石标。"}
+    {"id":"kg.edge.r83-channel-quest-place","fromId":"quest.r83-night-channel","toId":"place.r83-night-channel","relation":"requires","summary":"暮潮牵标要求玩家调查夜间石标。"},
+    {"id":"kg.edge.r84-arrival-isle","fromId":"event.r84-arrival","toId":"place.r84-windward-isle","relation":"triggers","summary":"初登西滩时发现风回岛。"},
+    {"id":"kg.edge.r84-isle-map","fromId":"place.r84-windward-isle","toId":"map.round-84-windward-isle","relation":"locatedAt","summary":"风回岛由百格探索地图承载。"},
+    {"id":"kg.edge.r84-hamlet-event","fromId":"event.r84-hamlet-ledger","toId":"place.r84-stone-hamlet","relation":"triggers","summary":"翻看檐下旧簿后得知石厝小村的来历。"},
+    {"id":"kg.edge.r84-beacon-event","fromId":"event.r84-beacon-watch","toId":"place.r84-windward-beacon","relation":"triggers","summary":"观察灯影后发现风候变化的痕迹。"},
+    {"id":"kg.edge.r84-npc-location","fromId":"char.r84-ruan-huilan","toId":"map.round-84-windward-isle","relation":"locatedAt","summary":"阮回澜在风回岛石厝守灯。"},
+    {"id":"kg.edge.r84-npc-quest","fromId":"char.r84-ruan-huilan","toId":"quest.r84-lantern-ledger","relation":"participatesIn","summary":"阮回澜委托玩家记录灯影方位。"},
+    {"id":"kg.edge.r84-quest-beacon","fromId":"quest.r84-lantern-ledger","toId":"place.r84-windward-beacon","relation":"requires","summary":"风回灯影需要玩家调查东坡灯标。"},
+    {"id":"kg.edge.r84-quest-spring","fromId":"quest.r84-lantern-ledger","toId":"place.r84-spring-hollow","relation":"rewards","summary":"完成风回灯影后，阮回澜带你认下岛心淡泉。"}
   ]
 }

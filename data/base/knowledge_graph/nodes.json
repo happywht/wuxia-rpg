@@ -755,6 +755,16 @@
     {"id":"event.r83-tide-wake-looters","kind":"event","title":"潮沟夺网","summary":"潮沟夺网客拖走沿岸渔具并占住退潮浅滩。","knownByDefault":false},
     {"id":"event.r83-night-channel","kind":"event","title":"暮潮石标","summary":"黄昏或入夜后可按灯影辨认石标回湾线。","knownByDefault":false},
     {"id":"quest.r83-net-recovery","kind":"quest","title":"潮沟夺网","summary":"击退夺网客，找回浅滩的网具与浮标。","knownByDefault":false},
-    {"id":"quest.r83-night-channel","kind":"quest","title":"暮潮牵标","summary":"在黄昏或入夜时辨认沿岸回湾航线。","knownByDefault":false}
+    {"id":"quest.r83-night-channel","kind":"quest","title":"暮潮牵标","summary":"在黄昏或入夜时辨认沿岸回湾航线。","knownByDefault":false},
+    {"id":"map.round-84-windward-isle","kind":"place","title":"风回岛探索地图","summary":"从青帆埠东南潮滩涉水可登的外海岛屿百格地图。","knownByDefault":false},
+    {"id":"place.r84-windward-isle","kind":"place","title":"东溟外海·风回岛","summary":"东溟外海中的步行岛屿，西滩沙脊连着石厝小村与东坡灯标。","knownByDefault":false},
+    {"id":"place.r84-stone-hamlet","kind":"place","title":"石厝小村","summary":"风回岛上的石头村落，如今只剩守灯人一户。","knownByDefault":false},
+    {"id":"place.r84-windward-beacon","kind":"place","title":"风回灯标","summary":"岛东坡顶的白石灯标，灯影方位记录着季节风候。","knownByDefault":false},
+    {"id":"place.r84-spring-hollow","kind":"place","title":"淡泉洼","summary":"岛心地势低洼处的淡水泉，是岛民取水的旧地。","knownByDefault":false},
+    {"id":"char.r84-ruan-huilan","kind":"character","title":"阮回澜","summary":"风回岛最后的守灯人，续写石厝灯簿三十年。","knownByDefault":false},
+    {"id":"quest.r84-lantern-ledger","kind":"quest","title":"风回灯影","summary":"登上岛东坡灯标记下今季灯影方位，续写石厝旧簿。","knownByDefault":false},
+    {"id":"event.r84-arrival","kind":"event","title":"初登风回","summary":"涉过潮滩沙脊首次踏上风回岛西滩。","knownByDefault":false},
+    {"id":"event.r84-hamlet-ledger","kind":"event","title":"石厝灯簿","summary":"在石厝村檐下翻看守灯人续写的旧簿。","knownByDefault":false},
+    {"id":"event.r84-beacon-watch","kind":"event","title":"灯标夜风","summary":"在坡顶灯标观察灯影落下的浪线方位。","knownByDefault":false}
   ]
 }

@@ -1,0 +1,22 @@
+{
+  "npcs": [
+    {
+      "id": "char.r84-ruan-huilan",
+      "name": "阮回澜",
+      "mapResourceId": "map.round-84-windward-isle",
+      "position": {
+        "col": 51,
+        "row": 49
+      },
+      "dialogueId": "dlg.r84-ruan-huilan-lantern",
+      "questGiver": true,
+      "spriteFrame": 176,
+      "spriteFrames": {
+        "down": 160,
+        "right": 168,
+        "up": 176,
+        "left": 184
+      }
+    }
+  ]
+}

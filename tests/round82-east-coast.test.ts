@@ -43,31 +43,31 @@ for (const resource of manifest.resources.filter(({ schema }) => schema === 'gri
 }
 
 describe('Round 82 eastern coastline and walkable world expansion', () => {
-  it('adds a seventh walkable region while preserving all Round 81 region pins', () => {
+  it('preserves earlier region pins while keeping the coast reachable from the expanded atlas', () => {
     const rawWorld = readJson('../data/base/world/world-map.json');
     const parsed = parseWorldMap(rawWorld);
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
 
-    expect(parsed.data.regions).toHaveLength(7);
-    expect(parsed.data.transitions).toHaveLength(12);
-    expect(maps.size).toBe(7);
+    expect(parsed.data.regions).toHaveLength(8);
+    expect(parsed.data.transitions).toHaveLength(14);
+    expect(maps.size).toBe(8);
     expect(maps.has(COAST_ID)).toBe(true);
 
     const oldPositions = new Map([
-      ['map.round-01-grid', { x: 12.35820867, y: 26.19730951 }],
-      ['map.round-10-mist-ferry', { x: 39.54626882, y: 34.7399102 }],
-      ['map.round-62-iron-ridge', { x: 39.54626882, y: 14.80717483 }],
-      ['map.round-67-salt-road', { x: 12.35820867, y: 34.7399102 }],
-      ['map.round-74-cloud-ridge', { x: 53.14029823, y: 29.04484286 }],
-      ['map.round-79-isles', { x: 33.28358209, y: 57.07174888 }],
+      ['map.round-01-grid', { x: 10.80939923, y: 22.909804 }],
+      ['map.round-10-mist-ferry', { x: 34.59007847, y: 30.38039206 }],
+      ['map.round-62-iron-ridge', { x: 34.59007847, y: 12.94901956 }],
+      ['map.round-67-salt-road', { x: 10.80939923, y: 30.38039206 }],
+      ['map.round-74-cloud-ridge', { x: 46.48041751, y: 25.39999983 }],
+      ['map.round-79-isles', { x: 29.11227154, y: 49.90980392 }],
     ]);
     for (const [id, position] of oldPositions) {
       expect(parsed.data.regions.find(({ mapResourceId }) => mapResourceId === id)?.atlasPosition).toEqual(position);
     }
-    expect(parsed.data.atlasArt).toMatchObject({ columns: 336, rows: 224, tileSize: 16 });
+    expect(parsed.data.atlasArt).toMatchObject({ columns: 384, rows: 256, tileSize: 16 });
     const newRegion = parsed.data.regions.find(({ mapResourceId }) => mapResourceId === COAST_ID)!;
-    expect(newRegion).toMatchObject({ name: '东溟海岸·青帆埠', atlasPosition: { x: 85, y: 44 } });
+    expect(newRegion).toMatchObject({ name: '东溟海岸·青帆埠', atlasPosition: { x: 74.34725849, y: 38.47843137 } });
     const atlasColumn = Math.round(newRegion.atlasPosition.x / 100 * (parsed.data.atlasArt!.columns - 1));
     const atlasRow = Math.round(newRegion.atlasPosition.y / 100 * (parsed.data.atlasArt!.rows - 1));
     const eastLand = parsed.data.atlasArt!.layers.find(({ id }) => id === 'world-r81-expanse-land')!;

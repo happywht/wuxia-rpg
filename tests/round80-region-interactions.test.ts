@@ -341,6 +341,7 @@ describe('Round 80 region interaction protocol', () => {
     const interactive = parsed.data.events.filter(({ interaction }) => interaction !== undefined);
     expect(interactive.map(({ id }) => id)).toEqual([
       'event.r74-cloud-bridge', 'event.r79-white-beacon', 'event.r82-tide-gauge', 'event.r83-night-channel',
+      'event.r84-beacon-watch',
     ]);
 
     const bridge = interactive.find(({ id }) => id === 'event.r74-cloud-bridge')!;
