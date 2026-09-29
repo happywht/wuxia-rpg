@@ -174,6 +174,7 @@ try {
       'assets/kenney/tiny-town/tilemap_packed.png',
       'assets/opengameart/rpg-town-pixel-art-assets/transparent-bg-tiles.png',
       'assets/opengameart/puny-characters/actors.png',
+      'assets/opengameart/puny-world/tileset.png',
       'assets/generated/world-palette.png',
     ]) {
       const response = await fetch(`${siteBase}${assetPath}`);
@@ -187,6 +188,7 @@ try {
       'assets/kenney/tiny-town/License.txt',
       'assets/opengameart/rpg-town-pixel-art-assets/License.txt',
       'assets/opengameart/puny-characters/NOTICE.txt',
+      'assets/opengameart/puny-world/NOTICE.txt',
     ]) {
       const response = await fetch(`${siteBase}${licensePath}`);
       assert.equal(response.status, 200, `素材许可或来源声明随包并可读取：${licensePath}`);
@@ -205,7 +207,7 @@ try {
     await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
   }
 
-  console.log(`通过：${archiveName} 可解包，${manifest.files.length} 个文件的大小/哈希与清单一致；静态包可挂载到 ${mountPath} 并加载 HTML/JS/CSS、示例 MOD、manifest 中全部基础资料/Schema、四张 Kenney 与两张 OpenGameArt PNG 图集、生成的世界调色板及随包许可/来源声明。`);
+  console.log(`通过：${archiveName} 可解包，${manifest.files.length} 个文件的大小/哈希与清单一致；静态包可挂载到 ${mountPath} 并加载 HTML/JS/CSS、示例 MOD、manifest 中全部基础资料/Schema、四张 Kenney 与三张 OpenGameArt PNG 图集、生成的世界调色板及随包许可/来源声明。`);
 } finally {
   await rm(tempRoot, { recursive: true, force: true });
 }

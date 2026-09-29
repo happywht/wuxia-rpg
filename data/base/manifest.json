@@ -26,6 +26,26 @@
       "schema": "grid-map"
     },
     {
+      "id": "npc.round-79-isles-set",
+      "path": "characters/round-79-isles-npcs.json",
+      "schema": "npc-set"
+    },
+    {
+      "id": "dialogue.round-79-isles-set",
+      "path": "dialogues/round-79-isles-conversations.json",
+      "schema": "dialogue-set"
+    },
+    {
+      "id": "quest.round-79-isles-set",
+      "path": "quests/round-79-isles-quests.json",
+      "schema": "quest-set"
+    },
+    {
+      "id": "map.round-79-isles",
+      "path": "maps/round-79-isles.json",
+      "schema": "grid-map"
+    },
+    {
       "id": "world.atlas",
       "path": "world/world-map.json",
       "schema": "world-map"

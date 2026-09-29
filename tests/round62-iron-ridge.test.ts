@@ -39,6 +39,7 @@ describe('Round 62 iron-ridge playable region', () => {
     [RIDGE_ID, loadMap('../data/base/maps/round-62-iron-ridge.json')],
     ['map.round-67-salt-road', loadMap('../data/base/maps/round-67-salt-road.json')],
     ['map.round-74-cloud-ridge', loadMap('../data/base/maps/round-74-cloud-ridge.json')],
+    ['map.round-79-isles', loadMap('../data/base/maps/round-79-isles.json')],
   ]);
 
   it('uses a complete, layered 100×100 CC0 map with bounded atlas gids and a clear route spine', () => {
@@ -63,7 +64,7 @@ describe('Round 62 iron-ridge playable region', () => {
       .toContain('CC0');
   });
 
-  it('assembles the five-region atlas and keeps the iron-ridge gate as a real two-way walking connection', () => {
+  it('assembles the six-region atlas and keeps the iron-ridge gate as a real two-way walking connection', () => {
     const parsed = parseWorldMap(readJson('../data/base/world/world-map.json'));
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
@@ -83,8 +84,8 @@ describe('Round 62 iron-ridge playable region', () => {
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
     expect(assembled.warnings).toEqual([]);
-    expect(assembled.regions).toHaveLength(5);
-    expect(assembled.transitions).toHaveLength(8);
+    expect(assembled.regions).toHaveLength(6);
+    expect(assembled.transitions).toHaveLength(10);
 
     const ferry = maps.get('map.round-10-mist-ferry')!;
     const ridge = maps.get(RIDGE_ID)!;

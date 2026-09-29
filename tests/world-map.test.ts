@@ -66,6 +66,7 @@ describe('world map roaming events', () => {
       ['map.round-62-iron-ridge', mapStub('map.round-62-iron-ridge')],
       ['map.round-67-salt-road', mapStub('map.round-67-salt-road')],
       ['map.round-74-cloud-ridge', mapStub('map.round-74-cloud-ridge')],
+      ['map.round-79-isles', mapStub('map.round-79-isles')],
     ]), {
       knowledgeNodeIds: new Set([
         'event.old-footprints', 'event.r43-wayfarer-letter', 'place.reedbank', 'event.r44-dock-claim',
@@ -75,6 +76,7 @@ describe('world map roaming events', () => {
         'map.round-67-salt-road', 'place.r67-brine-well',
         'event.r67-salt-road-arrival', 'event.r67-well-reading',
         'place.r74-cloud-markers', 'place.r74-cloud-bridge', 'place.r74-cloud-ridge',
+        'place.r79-isles', 'place.r79-west-reef', 'place.r79-white-beacon',
       ]),
       periodIds: new Set(['period.dusk', 'period.night']),
       weatherIds: new Set(['weather.drizzle', 'weather.rain', 'weather.storm']),

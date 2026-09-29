@@ -151,8 +151,8 @@
       "type": "object", "additionalProperties": false,
       "required": ["x", "y"],
       "properties": {
-        "x": { "type": "integer", "minimum": 0, "maximum": 100 },
-        "y": { "type": "integer", "minimum": 0, "maximum": 100 }
+        "x": { "type": "number", "minimum": 0, "maximum": 100 },
+        "y": { "type": "number", "minimum": 0, "maximum": 100 }
       }
     },
     "regionEventConditions": {

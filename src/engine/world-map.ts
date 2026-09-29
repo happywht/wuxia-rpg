@@ -327,12 +327,13 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
     const name = nonEmpty(entry.name) ? entry.name : null;
     const description = typeof entry.description === 'string' ? entry.description : null;
     const pos = entry.atlasPosition;
-    const atlasPosition = isObject(pos) && integer(pos.x) && integer(pos.y) && pos.x >= 0 && pos.x <= 100 && pos.y >= 0 && pos.y <= 100
+    const atlasPosition = isObject(pos) && typeof pos.x === 'number' && Number.isFinite(pos.x) &&
+      typeof pos.y === 'number' && Number.isFinite(pos.y) && pos.x >= 0 && pos.x <= 100 && pos.y >= 0 && pos.y <= 100
       ? { x: pos.x, y: pos.y } : null;
     if (mapResourceId === null) errors.push(`${label}.mapResourceId：应为非空字符串`);
     if (name === null) errors.push(`${label}.name：应为非空字符串`);
     if (description === null) errors.push(`${label}.description：应为字符串`);
-    if (atlasPosition === null) errors.push(`${label}.atlasPosition：x/y 应为 0–100 整数`);
+    if (atlasPosition === null) errors.push(`${label}.atlasPosition：x/y 应为 0–100 有限数值`);
     if (mapResourceId !== null && name !== null && description !== null && atlasPosition !== null)
       regions.push({ mapResourceId, name, description, atlasPosition });
   });

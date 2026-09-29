@@ -1,0 +1,14 @@
+{
+  "npcs": [
+    {
+      "id": "char.r79-shao-tinglan",
+      "name": "邵听澜",
+      "mapResourceId": "map.round-79-isles",
+      "position": { "col": 55, "row": 54 },
+      "dialogueId": "dlg.r79-shao-tinglan-tide-chart",
+      "questGiver": true,
+      "spriteFrame": 208,
+      "spriteFrames": { "down": 192, "right": 200, "up": 208, "left": 216 }
+    }
+  ]
+}

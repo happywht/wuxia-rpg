@@ -1,0 +1,7 @@
+Asset: 16x16 Puny World Tileset
+Author: Shade
+Source page: https://opengameart.org/content/16x16-puny-world-tileset
+Source image: https://opengameart.org/sites/default/files/punyworld-overworld-tileset_0.png
+License: CC0 (the OpenGameArt source page identifies the asset as CC0 and states that it may be used and modified in commercial and non-commercial games without attribution).
+
+This project uses the original 432x1040 PNG as a 27x65 sheet of 16x16 pixel tiles for the Round 79 coastal region and its world-atlas inset. The image is included because shipped map data directly references its tile indices.

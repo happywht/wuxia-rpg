@@ -61,6 +61,8 @@ async function ensureBuildIsPresent() {
     'assets/opengameart/rpg-town-pixel-art-assets/License.txt',
     'assets/opengameart/puny-characters/actors.png',
     'assets/opengameart/puny-characters/NOTICE.txt',
+    'assets/opengameart/puny-world/tileset.png',
+    'assets/opengameart/puny-world/NOTICE.txt',
     'assets/generated/world-palette.png',
   ];
   for (const relative of required) {

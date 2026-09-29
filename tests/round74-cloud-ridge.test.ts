@@ -44,6 +44,7 @@ describe('Round 74 cloud-ridge playable region', () => {
     [RIDGE_ID, loadMap('../data/base/maps/round-62-iron-ridge.json')],
     ['map.round-67-salt-road', loadMap('../data/base/maps/round-67-salt-road.json')],
     [CLOUD_ID, loadMap('../data/base/maps/round-74-cloud-ridge.json')],
+    ['map.round-79-isles', loadMap('../data/base/maps/round-79-isles.json')],
   ]);
 
   it('ships a complete, layered 100×100 CC0 map with bounded atlas gids and walkable ridge trails', () => {
@@ -88,8 +89,8 @@ describe('Round 74 cloud-ridge playable region', () => {
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
     expect(assembled.warnings).toEqual([]);
-    expect(assembled.regions).toHaveLength(5);
-    expect(assembled.transitions).toHaveLength(8);
+    expect(assembled.regions).toHaveLength(6);
+    expect(assembled.transitions).toHaveLength(10);
 
     const ridge = maps.get(RIDGE_ID)!;
     const cloud = maps.get(CLOUD_ID)!;
@@ -229,7 +230,7 @@ describe('Round 74 cloud-ridge playable region', () => {
     expect(journal.states.get(BRIDGE_ID)?.status).toBe('completed');
   });
 
-  it('integrates into the shipped five-region atlas without reference warnings and stays on land', () => {
+  it('integrates into the shipped six-region atlas without reference warnings and stays on land', () => {
     const manifest = readJson('../data/base/manifest.json') as {
       resources: { id: string; path: string; schema: string }[];
     };

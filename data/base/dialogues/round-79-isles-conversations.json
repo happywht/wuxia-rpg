@@ -1,0 +1,37 @@
+{
+  "conversations": [
+    {
+      "id": "dlg.r79-shao-tinglan-tide-chart",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "邵听澜把一块潮痕木牌翻过来：「灯标脚下有三道旧刻。认出最深的一道，来回船就不必再贴着暗礁走。」",
+          "options": [
+            {
+              "text": "我去白沙灯标看看潮痕。",
+              "nextNodeId": "chart-accepted",
+              "conditions": [{ "kind": "questStatus", "questId": "quest.r79-tide-chart", "status": "offered" }],
+              "effects": [{ "kind": "acceptQuest", "questId": "quest.r79-tide-chart" }]
+            },
+            {
+              "text": "灯标刻痕我已经记下了。",
+              "nextNodeId": "chart-complete",
+              "conditions": [{ "kind": "questStatus", "questId": "quest.r79-tide-chart", "status": "completed" }]
+            },
+            { "text": "先看看落潮湾。", "nextNodeId": "farewell" }
+          ]
+        },
+        {
+          "id": "chart-accepted",
+          "text": "「从潮声驿向东南走，白沙上那盏矮石灯还立着。刻痕朝海的一面最清楚，别把浪线当成旧航道。」"
+        },
+        {
+          "id": "chart-complete",
+          "text": "邵听澜把潮痕誊进木牌：「西侧回湾果然能避开暗礁。下次涨潮，船可以照这条线绕过去。」"
+        },
+        { "id": "farewell", "text": "她将木牌收回布套，继续听着湾口的潮声。" }
+      ]
+    }
+  ]
+}

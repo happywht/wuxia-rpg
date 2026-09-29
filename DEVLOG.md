@@ -4,6 +4,26 @@
 
 ---
 
+## Round 79 — 东海群岛与可移动舆图扩展（2026-09-29，已完成）
+
+### 计划与实现
+
+- 计划见 [`iterations/round-79/plan.md`](iterations/round-79/plan.md)：依用户将“超大可移动地图、正式像素角色/地图素材”列为优先项，把原环境图素交互协议顺延至 R80。
+- 核验 OpenGameArt [16x16 Puny World Tileset](https://opengameart.org/content/16x16-puny-world-tileset) 素材页的作者 Shade 与 CC0 声明；下载图集实测为 432×1040 像素、27×65 个 16×16 单元格。只纳入新增地图引用的图集和项目编写的 `NOTICE.txt`，来源、许可和发行边界登记在 `docs/REFERENCES.md` 及发行白名单。
+- 新增确定性海岛生成器 `scripts/generate-round79-isles.mjs` 与 `data/base/maps/round-79-isles.json`：落潮湾为 100×100 格，独立碰撞和视觉图层；6,164 格陆地、入口连通 5,866 格、293 处树木。雾雨渡口与岛上配置双向步行关口，新增四处地标、三项发现事件、航路记录人邵听澜及发现灯标后完成的「灯痕避礁」任务。
+- `scripts/generate-round79-atlas.mjs` 在不替换 Round 70 原有海洋/陆地/海岸/林地/地势/道路/聚落七层的前提下，把舆图扩为 224×144，并增加岛屿图层和航线。旧五区像素中心保持不变；`atlasPosition` Schema 与运行时解析改为接收 0–100 范围内的有限小数，保留历史地图/MOD 的整数坐标兼容。
+- 更新六区世界地图、资源 manifest、知识图谱、针对旧五区数量的测试夹具与地图说明；新增海岛专项测试和 `generate:round-79-isles` / `smoke:round-79` 命令。`CHANGELOG.md`、`ROADMAP.md`、README、玩家手册、舆图、测试指南、数据/架构指南均更新到 R79。
+
+### 最终验收
+
+- `npm run generate:round-79-isles`：通过；海岛 6,164 格陆地、入口连通 5,866 格、293 处林木；舆图为 224×144，6 区/10 关口/7 条区域路线。重复生成后地图 SHA-256 `487A6F886AB26FD6F097DF3090CDC7FD096E19A95368DD7F7439984616CF7CE1`、舆图 SHA-256 `4D7C49747841B49391DF468715C3C7DB1DA5C5F5DDA0E0EBCD4BF8E8AB6250A0` 不变。
+- `npm run smoke:round-79`：3 个文件 / 13 项测试通过。额外针对改动过的旧地图/任务/长旅程用例运行 `npx vitest run tests/round52-map-landmarks.test.ts tests/round68-long-journey.test.ts tests/world-map.test.ts tests/round58-region-quests.test.ts tests/round59-regional-dialogue.test.ts tests/round75-region-event-approach.test.ts`：6 个文件 / 43 项测试通过。
+- 首次全量 `npm test`：50 个文件 / 335 项中 334 项通过；唯一失败是文档审计在 DEVLOG 尚未写入 R79 时拒绝验收。补齐本节并把 R79 坐标、双向关口、事件和任务逐项同步到地图/任务/世界设定后，`npm run check` 最终通过：38 项基础资源 Schema、38 项 MOD 资源零问题、TypeScript、50 个测试文件/335 项测试、Round 34 与 Round 48 文档审计全部通过。
+- `npm run package:release`：生产构建、Round 72 chunk 审计、发行打包与 Round 47 子路径 smoke 均通过；发行包 `release/wuxia-rpg-web-0.0.1.tgz` 为 1,052,151 bytes，SHA-256 `9faca62ba57f6921715d0a1f40a3266cadd6e4952c566cf6fc66951ce22ba9d5`，94 项归档/93 个内容文件。发行 smoke 经 R79 扩展后核验四张 Kenney 与三张 OpenGameArt PNG 图集的子路径访问、CC0 NOTICE、基础资料/Schema 与逐文件哈希；直接解包路径确认含 `assets/opengameart/puny-world/tileset.png` 与 `NOTICE.txt`。Vite 仍提示 1.37 MB Phaser chunk 超过默认 500 kB 建议阈值，构建成功。
+- 隔离预览 `http://127.0.0.1:5193/`：实际新开局并打开 M，总览显示 6 区及 224×144 尺寸；滚轮放大后地图仍裁切在视口内，进一步放大后拖动使地貌/标记画面平移；G 可切换至当前区域细图并返回全域总览。新岛绘入总览可见；此浏览器回合没有步行穿过新关口进入海岛，故不把岛内角色/图素渲染声明为手测；新地图图集帧范围、碰撞锚点和任务路径由资料校验及专项回归覆盖。
+
+---
+
 ## Round 78 — NPC 朝向与地图前景纵深（2026-09-29，已完成）
 
 ### 计划与实现

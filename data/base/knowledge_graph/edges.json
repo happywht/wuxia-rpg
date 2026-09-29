@@ -320,6 +320,14 @@
     {"id":"kg.edge.r74-shen-offers-marks","fromId":"char.r74-shen-yuji","toId":"quest.r74-cloud-marks","relation":"participatesIn","summary":"沈雨霁请玩家拓录石阶上的旧刻痕。"},
     {"id":"kg.edge.r74-marks-requires-place","fromId":"quest.r74-cloud-marks","toId":"place.r74-cloud-markers","relation":"requires","summary":"云阶辨刻须找到云纹石阶的旧索孔。"},
     {"id":"kg.edge.r74-shen-offers-bridge","fromId":"char.r74-shen-yuji","toId":"quest.r74-cloud-bridge","relation":"participatesIn","summary":"沈雨霁请玩家清出被拦路客占据的悬桥。"},
-    {"id":"kg.edge.r74-bridge-requires-marks","fromId":"quest.r74-cloud-bridge","toId":"quest.r74-cloud-marks","relation":"requires","summary":"先核对云阶刻痕，再依旧路向清理断索悬桥。"}
+    {"id":"kg.edge.r74-bridge-requires-marks","fromId":"quest.r74-cloud-bridge","toId":"quest.r74-cloud-marks","relation":"requires","summary":"先核对云阶刻痕，再依旧路向清理断索悬桥。"},
+    {"id":"kg.edge.r79-arrival-place","fromId":"event.r79-arrival","toId":"place.r79-isles","relation":"triggers","summary":"初次踏上落潮湾时发现东海群岛。"},
+    {"id":"kg.edge.r79-isles-located","fromId":"place.r79-isles","toId":"map.round-79-isles","relation":"locatedAt","summary":"落潮湾位于东海群岛的百格海岛区域。"},
+    {"id":"kg.edge.r79-reef-event-place","fromId":"event.r79-west-reef","toId":"place.r79-west-reef","relation":"triggers","summary":"检查退潮后的绳结后记下双礁浅滩。"},
+    {"id":"kg.edge.r79-beacon-event-place","fromId":"event.r79-white-beacon","toId":"place.r79-white-beacon","relation":"triggers","summary":"读取灯标底座潮痕后发现白沙灯标。"},
+    {"id":"kg.edge.r79-shao-located","fromId":"char.r79-shao-tinglan","toId":"map.round-79-isles","relation":"locatedAt","summary":"邵听澜在潮声驿整理海路记录。"},
+    {"id":"kg.edge.r79-shao-offers-chart","fromId":"char.r79-shao-tinglan","toId":"quest.r79-tide-chart","relation":"participatesIn","summary":"邵听澜请玩家辨认白沙灯标的旧潮痕。"},
+    {"id":"kg.edge.r79-chart-requires-beacon","fromId":"quest.r79-tide-chart","toId":"place.r79-white-beacon","relation":"requires","summary":"灯痕避礁需要亲自查看白沙灯标。"},
+    {"id":"kg.edge.r79-chart-rewards-reef","fromId":"quest.r79-tide-chart","toId":"place.r79-west-reef","relation":"rewards","summary":"完成潮痕辨认后把双礁浅滩列入航路记录。"}
   ]
 }

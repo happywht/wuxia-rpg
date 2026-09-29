@@ -672,6 +672,69 @@
       "title": "断索清桥",
       "summary": "依刻痕线索清出被占据的断索悬桥。",
       "knownByDefault": false
+    },
+    {
+      "id": "place.r79-isles",
+      "kind": "place",
+      "title": "东海群岛·落潮湾",
+      "summary": "潮汐在沙洲间开合，落潮时可循旧路穿过礁脉。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.r79-west-reef",
+      "kind": "place",
+      "title": "双礁浅滩",
+      "summary": "退潮后可见旧绳结与狭窄的沙脊。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.r79-white-beacon",
+      "kind": "place",
+      "title": "白沙灯标",
+      "summary": "灯标基座刻着避开暗礁的旧潮痕。",
+      "knownByDefault": false
+    },
+    {
+      "id": "char.r79-shao-tinglan",
+      "kind": "character",
+      "title": "邵听澜",
+      "summary": "在潮声驿抄录水路与礁脉变化的航路记录人。",
+      "knownByDefault": false
+    },
+    {
+      "id": "quest.r79-tide-chart",
+      "kind": "quest",
+      "title": "灯痕避礁",
+      "summary": "辨认白沙灯标上的潮痕，为往来船只补全安全航线。",
+      "knownByDefault": false
+    },
+    {
+      "id": "map.round-79-isles",
+      "kind": "place",
+      "title": "落潮湾海岛区域",
+      "summary": "从雾雨渡口乘船进入的东海群岛百格探索区域。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r79-arrival",
+      "kind": "event",
+      "title": "落潮初航",
+      "summary": "初次登上海岛后记录潮汐与回渡方向。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r79-west-reef",
+      "kind": "event",
+      "title": "退潮绳结",
+      "summary": "退潮后检查浅滩边的绳结，辨认礁间沙脊。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r79-white-beacon",
+      "kind": "event",
+      "title": "白沙灯标潮痕",
+      "summary": "灯标基座刻痕标出避开暗礁的回湾航线。",
+      "knownByDefault": false
     }
   ]
 }

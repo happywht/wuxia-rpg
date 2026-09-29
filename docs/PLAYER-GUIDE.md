@@ -1,6 +1,6 @@
 # 玩家手册
 
-这份手册对应当前仓库 Round 78 的可运行原型。菜单、键位与玩法以游戏内 H「操作手册」和现行资料为准；浏览器存档仅保存在当前浏览器的本地存储中。R00–R78 均有独立计划和提交；R50 最终验收边界见 [`FINAL-ACCEPTANCE.md`](FINAL-ACCEPTANCE.md)，五块百格地图、全域舆图、区域内容与路线证据见 [`MAP-ATLAS.md`](MAP-ATLAS.md)、[`ROUND-61-ROUTE-AUDIT.md`](ROUND-61-ROUTE-AUDIT.md)、[`ROUND-63-TIMED-ROUTE-AUDIT.md`](ROUND-63-TIMED-ROUTE-AUDIT.md)、[`ROUND-64-ROUTE-AUDIT.md`](ROUND-64-ROUTE-AUDIT.md)、[`ROUND-68-JOURNEY-PLAYTEST.md`](ROUND-68-JOURNEY-PLAYTEST.md)、[`ROUND-71-BROWSER-PLAYTEST.md`](ROUND-71-BROWSER-PLAYTEST.md) 和 [`ROUND-72-BROWSER-PLAYTEST.md`](ROUND-72-BROWSER-PLAYTEST.md)。Round 69 起四门身法拥有一次性守御战斗作用；无门派拦门刀法可向盘舷门外玩家授艺。Round 70 更新四区总图地貌与地图图素；Round 74 新增云岭古道、双向铁嶂关口及两段链式任务；Round 75 为固定见闻点新增临近线索；Round 76 在五区补充 CC0 环境图素；Round 77 为五区玩家与 NPC 接入方向帧、行走动画和十种 CC0 角色外观。Round 73 让 M 舆图和 HUD 共用当前 NPC/遭遇占位，绕行时显示提示、临时封路时区别于地形断路。招式名称、门槛和作用见 [`MARTIAL-ARTS.md`](MARTIAL-ARTS.md)。
+这份手册对应当前仓库 Round 79 的可运行原型。菜单、键位与玩法以游戏内 H「操作手册」和现行资料为准；浏览器存档仅保存在当前浏览器的本地存储中。R00–R79 均有独立计划和提交；R50 最终验收边界见 [`FINAL-ACCEPTANCE.md`](FINAL-ACCEPTANCE.md)，六块百格地图、全域舆图、区域内容与路线证据见 [`MAP-ATLAS.md`](MAP-ATLAS.md)、[`ROUND-61-ROUTE-AUDIT.md`](ROUND-61-ROUTE-AUDIT.md)、[`ROUND-63-TIMED-ROUTE-AUDIT.md`](ROUND-63-TIMED-ROUTE-AUDIT.md)、[`ROUND-64-ROUTE-AUDIT.md`](ROUND-64-ROUTE-AUDIT.md)、[`ROUND-68-JOURNEY-PLAYTEST.md`](ROUND-68-JOURNEY-PLAYTEST.md)、[`ROUND-71-BROWSER-PLAYTEST.md`](ROUND-71-BROWSER-PLAYTEST.md) 和 [`ROUND-72-BROWSER-PLAYTEST.md`](ROUND-72-BROWSER-PLAYTEST.md)。Round 69 起四门身法拥有一次性守御战斗作用；无门派拦门刀法可向盘舷门外玩家授艺。Round 70 更新四区总图地貌与地图图素；Round 74 新增云岭古道、双向铁嶂关口及两段链式任务；Round 75 为固定见闻点新增临近线索；Round 76 在五区补充 CC0 环境图素；Round 77 为五区玩家与 NPC 接入方向帧、行走动画和十种 CC0 角色外观。Round 73 让 M 舆图和 HUD 共用当前 NPC/遭遇占位，绕行时显示提示、临时封路时区别于地形断路。Round 79 新增落潮湾地图与「灯痕避礁」任务，将总舆图扩为 224×144；素材授权见 [`REFERENCES.md`](REFERENCES.md)。招式名称、门槛和作用见 [`MARTIAL-ARTS.md`](MARTIAL-ARTS.md)。
 
 ## 世界外观（Round 65 起）
 ### 五区环境细节（Round 76）
@@ -20,10 +20,10 @@
 
 ## 全域舆图（Round 66–70）
 
-- **M** 默认打开 208×128 格的全域舆图；滚轮缩放后可拖动查看细节，也可用方向键平移。地图边缘限制在舆图视窗内，不会盖住右侧地点清单。画布呈现五区大陆、海岸和河道的相对位置，实际探索仍进入各自独立的 100×100 地图。
+- **M** 默认打开 224×144 格的全域舆图；滚轮缩放后可拖动查看细节，也可用方向键平移。地图边缘限制在舆图视窗内，不会盖住右侧地点清单。画布呈现五区大陆与东海南部岛链、海岸和河道的相对位置，实际探索仍进入各自独立的 100×100 地图。
 - **G**（或面板右上角按钮）在全域总览与当前区域细图之间切换。细图保留地图格级寻路；已选目标与当前玩家位置会继续显示/规划。
 - 区域位置、名称、关口连线、当前位置由世界资料投影。江南道与西陲盐道位于舆图西侧，雾雨渡口与铁嶂北道位于中东部，云岭古道延至东侧；已发现地点才显示在地图与清单内。跨区时会显示第一段走到关口旁的提示；旅行仍需实际步行并按 **E** 过关。
-- 全域图用低噪声程序调色板显示大块地貌，叠加官方 Kenney Tiny Town CC0 林木、驿车和告示牌图素；街景仍使用 Kenney CC0 图集，五区玩家/NPC/伙伴现使用 OpenGameArt Puny Characters CC0 图集。地图来源与授权见 [`REFERENCES.md`](REFERENCES.md)。每个 100×100 区域仍保留完整细节地图用于实际探索。M/Esc 关闭舆图。
+- 全域图用低噪声程序调色板显示大块地貌，叠加官方 Kenney Tiny Town CC0 林木、驿车和告示牌图素及 Shade Puny World CC0 海岛图素；街景仍使用 Kenney CC0 图集，前五区玩家/NPC/伙伴现使用 OpenGameArt Puny Characters CC0 图集。地图来源与授权见 [`REFERENCES.md`](REFERENCES.md)。每个 100×100 区域仍保留完整细节地图用于实际探索。M/Esc 关闭舆图。
 
 五区关口与新地图可达性由 Round 74 专项回归验证；四区关口、跨多时段行路、盐道事件、远区存档恢复和返回终章的引擎闭环在 Round 68 长途旅程回归中使用当时的四区资料验证；浏览器本轮另实际走过江南道石阶渡口并进入雾雨渡口。两种验证的范围分别记录在 [`ROUND-68-JOURNEY-PLAYTEST.md`](ROUND-68-JOURNEY-PLAYTEST.md) 和 Round 74 开发记录中。
 
@@ -48,7 +48,7 @@ npm run dev
 
 | 操作 | 默认键位 | 说明 |
 |---|---|---|
-| 移动 | 方向键；或设置启用时 WASD | 一次按键尝试移动一格，墙体、人物和占位物会阻挡通行；每次成功走格按日历基础步耗时与当日天气额外耗时推进游戏时间，天气加时显示在 HUD；五张 100×100 大地图镜头跟随玩家并停在地图边缘，移动方案可在设置中切换 |
+| 移动 | 方向键；或设置启用时 WASD | 一次按键尝试移动一格，墙体、人物和占位物会阻挡通行；每次成功走格按日历基础步耗时与当日天气额外耗时推进游戏时间，天气加时显示在 HUD；六张 100×100 大地图镜头跟随玩家并停在地图边缘，移动方案可在设置中切换 |
 | 通用交互 | E | 与相邻人物、关口、区域事件、工位或终章石交互；具体目标由当前格局决定 |
 | 直接交谈 | F | 与相邻人物打开对话；任务发布人的 E 入口另可打开其差事名录 |
 | 等候 | V | 原地推进一小段时间；打开面板时不生效，可用于等待时段/天气条件变化 |

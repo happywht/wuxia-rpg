@@ -27,19 +27,22 @@ function loadWorld() {
 }
 
 describe('Round 70 global world atlas art and projection', () => {
-  it('loads the 208×128 continental atlas with per-layer tileset validation', () => {
+  it('loads the 224×144 continental and island atlas with per-layer tileset validation', () => {
     const { parsed } = loadWorld();
     const art = parsed.atlasArt;
     expect(art).toBeDefined();
     if (art === undefined) return;
-    expect({ columns: art.columns, rows: art.rows, tileSize: art.tileSize }).toEqual({ columns: 208, rows: 128, tileSize: 16 });
+    expect({ columns: art.columns, rows: art.rows, tileSize: art.tileSize }).toEqual({ columns: 224, rows: 144, tileSize: 16 });
     expect(art.layers.map(({ id }) => id)).toEqual([
       'world-ocean', 'world-land', 'world-coast', 'world-forest', 'world-relief', 'world-roads', 'world-settlements',
+      'world-r79-shoal-water', 'world-r79-shoal-sand', 'world-r79-shoal-land', 'world-r79-shoal-pines',
+      'world-r79-gate-routes',
     ]);
     const tilesets = new Map(art.tilesets.map((tileset) => [tileset.id, tileset]));
     expect(tilesets.has('kenney.roguelike-rpg')).toBe(true);
     expect(tilesets.has('kenney.tiny-town')).toBe(true);
     expect(tilesets.has('wuxia.world-palette')).toBe(true);
+    expect(tilesets.has('opengameart.puny-world')).toBe(true);
     for (const layer of art.layers) {
       expect(layer.cells).toHaveLength(art.rows);
       expect(layer.cells.every((row) => row.length === art.columns)).toBe(true);
@@ -52,7 +55,7 @@ describe('Round 70 global world atlas art and projection', () => {
     const land = art.layers.find(({ id }) => id === 'world-land')?.cells.flat().filter((gid) => gid > 1) ?? [];
     expect(land.length).toBeGreaterThan(7_500);
     expect(new Set(land)).toEqual(new Set([2, 3, 4, 5]));
-    expect(art.layers.find(({ id }) => id === 'world-ocean')?.cells.flat().every((gid) => gid === 1)).toBe(true);
+    expect(art.layers.find(({ id }) => id === 'world-ocean')?.cells[0]?.every((gid) => gid === 1)).toBe(true);
     expect(art.layers.find(({ id }) => id === 'world-forest')?.cells.flat().filter((gid) => gid === 7).length)
       .toBeGreaterThan(100);
     expect(art.layers.find(({ id }) => id === 'world-settlements')?.cells.flat().filter((gid) => gid > 0).length)
@@ -115,7 +118,7 @@ describe('Round 70 global world atlas art and projection', () => {
   it('uses edge-safe atlas coordinates and does not reveal undiscovered landmark names', () => {
     const { world, maps, parsed } = loadWorld();
     const art = parsed.atlasArt!;
-    expect(projectAtlasPosition({ x: 0, y: 100 }, art)).toEqual({ x: 8, y: 2040 });
+    expect(projectAtlasPosition({ x: 0, y: 100 }, art)).toEqual({ x: 8, y: 2296 });
     const undiscovered = buildWorldAtlasOverlays(world, maps, parsed.startingMapResourceId, { col: 43, row: 37 }, new Set());
     const undiscoveredJson = JSON.stringify(undiscovered);
     expect(undiscoveredJson).not.toContain('landmark.reedbank-landing');

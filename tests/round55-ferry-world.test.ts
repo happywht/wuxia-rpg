@@ -21,6 +21,7 @@ describe('large walkable regions and later atlas extensions', () => {
   const ironRidge = parseMap('../data/base/maps/round-62-iron-ridge.json');
   const saltRoad = parseMap('../data/base/maps/round-67-salt-road.json');
   const cloudRidge = parseMap('../data/base/maps/round-74-cloud-ridge.json');
+  const isles = parseMap('../data/base/maps/round-79-isles.json');
   const worldData = readJson('../data/base/world/world-map.json') as {
     transitions: Array<{ id: string; from: { mapResourceId: string; col: number; row: number }; to: { mapResourceId: string; col: number; row: number } }>;
     landmarks: Array<{ id: string; mapResourceId: string; col: number; row: number }>;
@@ -101,7 +102,7 @@ describe('large walkable regions and later atlas extensions', () => {
     expect(worldData.landmarks.find(({ id }) => id === 'landmark.mist-old-sluice')?.id).toBe('landmark.mist-old-sluice');
   });
 
-  it('assembles all five maps and preserves data-driven landmark and knowledge references', () => {
+  it('assembles all six maps and preserves data-driven landmark and knowledge references', () => {
     const parsed = parseWorldMap(readJson('../data/base/world/world-map.json'));
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
@@ -115,6 +116,7 @@ describe('large walkable regions and later atlas extensions', () => {
       [ironRidge.data.id, ironRidge],
       [saltRoad.data.id, saltRoad],
       [cloudRidge.data.id, cloudRidge],
+      [isles.data.id, isles],
     ]), {
       knowledgeNodeIds: new Set(nodes.nodes.map(({ id }) => id)),
       periodIds: new Set(calendar.periods.map(({ id }) => id)),
@@ -124,8 +126,8 @@ describe('large walkable regions and later atlas extensions', () => {
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
     expect(assembled.warnings).toEqual([]);
-    expect(assembled.regions).toHaveLength(5);
-    expect(assembled.transitions).toHaveLength(8);
+    expect(assembled.regions).toHaveLength(6);
+    expect(assembled.transitions).toHaveLength(10);
     expect(assembled.landmarks.some(({ id }) => id === 'landmark.mist-willow-market')).toBe(true);
     expect(assembled.landmarks.some(({ id }) => id === 'landmark.mist-old-sluice' && id !== undefined)).toBe(true);
     expect(assembled.events.some(({ id }) => id === 'event.r55-sluice-inscription')).toBe(true);

@@ -1,0 +1,20 @@
+{
+  "quests": [
+    {
+      "id": "quest.r79-tide-chart",
+      "name": "灯痕避礁",
+      "description": "邵听澜请你查看白沙灯标的旧潮痕，辨出能够绕开暗礁的回湾航线。",
+      "giverNpcId": "char.r79-shao-tinglan",
+      "objectives": [
+        {
+          "id": "objective.r79-white-beacon",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r79-white-beacon",
+          "requiredCount": 1,
+          "text": "在白沙灯标读出旧潮痕"
+        }
+      ],
+      "rewards": { "experience": 32, "currency": 24, "discoverKnowledgeNodeIds": ["place.r79-west-reef"] }
+    }
+  ]
+}

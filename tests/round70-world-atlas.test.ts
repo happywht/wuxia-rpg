@@ -27,10 +27,10 @@ function loadWorld() {
   return { data: parsed.data, assembled, maps };
 }
 
-function projectCell(region: { atlasPosition: { x: number; y: number } }, map: { columns: number; rows: number }, point: { col: number; row: number }) {
+function projectCell(region: { atlasPosition: { x: number; y: number } }, map: { columns: number; rows: number }, point: { col: number; row: number }, columns: number, rows: number) {
   return {
-    col: Math.round(region.atlasPosition.x / 100 * 207 + ((point.col + 0.5) / map.columns - 0.5) * 208 * 0.16),
-    row: Math.round(region.atlasPosition.y / 100 * 127 + ((point.row + 0.5) / map.rows - 0.5) * 128 * 0.16),
+    col: Math.round(region.atlasPosition.x / 100 * (columns - 1) + ((point.col + 0.5) / map.columns - 0.5) * columns * 0.16),
+    row: Math.round(region.atlasPosition.y / 100 * (rows - 1) + ((point.row + 0.5) / map.rows - 0.5) * rows * 0.16),
   };
 }
 
@@ -45,14 +45,23 @@ describe('Round 70 continental world atlas', () => {
     for (const region of data.regions) {
       const col = Math.round(region.atlasPosition.x / 100 * (art.columns - 1));
       const row = Math.round(region.atlasPosition.y / 100 * (art.rows - 1));
-      expect(land[row]?.[col]).toBeGreaterThan(1);
+      if (region.mapResourceId === 'map.round-79-isles') {
+        const shoalLand = art.layers.find(({ id }) => id === 'world-r79-shoal-land')!.cells;
+        expect(shoalLand[row]?.[col]).toBeGreaterThan(0);
+      } else {
+        expect(land[row]?.[col]).toBeGreaterThan(1);
+      }
     }
     for (const transition of data.transitions) {
       for (const endpoint of [transition.from, transition.to]) {
         const region = regionById.get(endpoint.mapResourceId)!;
         const map = maps.get(endpoint.mapResourceId)!;
-        const cell = projectCell(region, map, endpoint);
-        expect(land[cell.row]?.[cell.col]).toBeGreaterThan(1);
+        const cell = projectCell(region, map, endpoint, art.columns, art.rows);
+        if (endpoint.mapResourceId === 'map.round-79-isles') {
+          expect(art.layers.find(({ id }) => id === 'world-r79-gate-routes')?.cells[cell.row]?.[cell.col]).toBeGreaterThan(0);
+        } else {
+          expect(land[cell.row]?.[cell.col]).toBeGreaterThan(1);
+        }
       }
     }
   });
