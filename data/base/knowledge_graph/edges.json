@@ -328,6 +328,14 @@
     {"id":"kg.edge.r79-shao-located","fromId":"char.r79-shao-tinglan","toId":"map.round-79-isles","relation":"locatedAt","summary":"邵听澜在潮声驿整理海路记录。"},
     {"id":"kg.edge.r79-shao-offers-chart","fromId":"char.r79-shao-tinglan","toId":"quest.r79-tide-chart","relation":"participatesIn","summary":"邵听澜请玩家辨认白沙灯标的旧潮痕。"},
     {"id":"kg.edge.r79-chart-requires-beacon","fromId":"quest.r79-tide-chart","toId":"place.r79-white-beacon","relation":"requires","summary":"灯痕避礁需要亲自查看白沙灯标。"},
-    {"id":"kg.edge.r79-chart-rewards-reef","fromId":"quest.r79-tide-chart","toId":"place.r79-west-reef","relation":"rewards","summary":"完成潮痕辨认后把双礁浅滩列入航路记录。"}
+    {"id":"kg.edge.r79-chart-rewards-reef","fromId":"quest.r79-tide-chart","toId":"place.r79-west-reef","relation":"rewards","summary":"完成潮痕辨认后把双礁浅滩列入航路记录。"},
+    {"id":"kg.edge.r82-arrival-coast","fromId":"event.r82-arrival","toId":"place.r82-east-coast","relation":"triggers","summary":"初抵青帆埠时发现东溟海岸。"},
+    {"id":"kg.edge.r82-coast-map","fromId":"place.r82-east-coast","toId":"map.round-82-east-coast","relation":"locatedAt","summary":"东溟海岸由青帆埠的百格探索地图承载。"},
+    {"id":"kg.edge.r82-market-place","fromId":"event.r82-blue-sail-market","toId":"place.r82-blue-sail-market","relation":"triggers","summary":"翻看旧簿后得知青帆埠的潮路记载。"},
+    {"id":"kg.edge.r82-gauge-place","fromId":"event.r82-tide-gauge","toId":"place.r82-east-tide-gauge","relation":"triggers","summary":"抄录东汊潮尺后发现旧水位刻痕。"},
+    {"id":"kg.edge.r82-npc-location","fromId":"char.r82-wen-chaozhi","toId":"map.round-82-east-coast","relation":"locatedAt","summary":"温朝之在青帆埠保管渡潮簿。"},
+    {"id":"kg.edge.r82-npc-quest","fromId":"char.r82-wen-chaozhi","toId":"quest.r82-follow-the-tide","relation":"participatesIn","summary":"温朝之委托玩家补全东汊潮尺记录。"},
+    {"id":"kg.edge.r82-quest-gauge","fromId":"quest.r82-follow-the-tide","toId":"place.r82-east-tide-gauge","relation":"requires","summary":"潮尺旧记需要玩家调查东汊石潮尺。"},
+    {"id":"kg.edge.r82-quest-cove","fromId":"quest.r82-follow-the-tide","toId":"place.r82-fog-cove","relation":"rewards","summary":"完成潮尺旧记后，温朝之补绘雾隐湾的安全水路。"}
   ]
 }

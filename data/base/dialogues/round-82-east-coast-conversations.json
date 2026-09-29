@@ -1,0 +1,68 @@
+{
+  "conversations": [
+    {
+      "id": "dlg.r82-wen-chaozhi-tide-record",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "温朝之把一册被海风卷起边角的簿子压在柜台上：「旧潮尺就在东汊。刻痕若还认得出来，我就能把这段沿岸水路补给外来的行船人。」",
+          "options": [
+            {
+              "text": "我去核对东汊潮尺。",
+              "nextNodeId": "accepted",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r82-follow-the-tide",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r82-follow-the-tide"
+                }
+              ]
+            },
+            {
+              "text": "我已把刻痕抄回来了。",
+              "nextNodeId": "completed",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r82-follow-the-tide",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "说说青帆埠的水路。",
+              "nextNodeId": "routes"
+            },
+            {
+              "text": "改日再谈。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "accepted",
+          "text": "「沿栈桥向南绕过潮汊，岸边三道短痕才是今秋的水位。石面滑，站在西南一侧看最清楚。」"
+        },
+        {
+          "id": "completed",
+          "text": "温朝之将你的拓记抄进旧簿：「东边雾湾的礁脊也标出来了。往后走这条水路，不必再摸着黑猜潮头。」"
+        },
+        {
+          "id": "routes",
+          "text": "「青帆埠靠的是潮汊旧道。风急时不争近路，沿松坡走到石潮尺，再顺着沙脊回湾。」"
+        },
+        {
+          "id": "farewell",
+          "text": "温朝之把旧簿合上，留出一角柜台给等船的行旅歇脚。"
+        }
+      ]
+    }
+  ]
+}

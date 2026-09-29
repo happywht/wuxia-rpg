@@ -334,12 +334,14 @@ describe('Round 80 region interaction protocol', () => {
     expect(assembled.warnings.join('\n')).toContain('node.deleted-by-mod');
   });
 
-  it('ships exactly the broken bridge and the white beacon as interaction scenery', () => {
+  it('ships the broken bridge, white beacon and east-coast tide gauge as interaction scenery', () => {
     const parsed = parseWorldMap(readJson('../data/base/world/world-map.json'));
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
     const interactive = parsed.data.events.filter(({ interaction }) => interaction !== undefined);
-    expect(interactive.map(({ id }) => id)).toEqual(['event.r74-cloud-bridge', 'event.r79-white-beacon']);
+    expect(interactive.map(({ id }) => id)).toEqual([
+      'event.r74-cloud-bridge', 'event.r79-white-beacon', 'event.r82-tide-gauge',
+    ]);
 
     const bridge = interactive.find(({ id }) => id === 'event.r74-cloud-bridge')!;
     expect(bridge.interaction).toEqual({
@@ -350,6 +352,12 @@ describe('Round 80 region interaction protocol', () => {
     expect(beacon.interaction).toEqual({
       prompt: '细看白沙上的石灯标',
       approachDirections: ['up', 'left', 'right'],
+    });
+    const tideGauge = interactive.find(({ id }) => id === 'event.r82-tide-gauge')!;
+    expect(tideGauge.interaction).toEqual({
+      prompt: '抄录东汊石潮尺的刻痕',
+      range: 1,
+      approachDirections: ['left', 'down'],
     });
     // Both stay within the authored default range of one cell.
     expect(bridge.interaction!.range).toBeUndefined();

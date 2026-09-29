@@ -176,6 +176,7 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 | `tests/round79-island-region.test.ts` | 海岛资料/图素、世界舆图与任务闭环 | 4 项检查：100×100 与 16px/27×65 CC0 图集引用、入口连通和渡口双向 BFS、四地标/三区域事件可达、旧区域投影像素不漂移、岛链总图层/图集边界、对白接取并发现灯标后完成任务；纳入 `npm run smoke:round-79`。 |
 | `tests/round80-region-interactions.test.ts` | 区域事件交互 Schema、选择器及云岭/海岛真实地图 | 覆盖声明校验、旧踏入事件、方向/距离、动态视线遮挡、条件/一次性状态与真实事件坐标；纳入 `npm run smoke:round-80`。 |
 | `tests/round81-world-atlas.test.ts` | 扩展全域舆图、区域投影、已登记 CC0 图素与视口 | 校验 336×224 Schema/解析上限、旧 224×144 区域哈希、全部既有锚点像素坐标、东/南新地貌、许可引用及 fit/pan/reset；纳入 `npm run smoke:round-81`。 |
+| `tests/round82-east-coast.test.ts` | 东溟海岸、双向步行关口、CC0 像素素材和潮尺任务闭环 | 校验第七张 100×100 地图、旧六区投影、两端 BFS 可达、锚点与调查方向、素材尺寸/许可、对白接取、见闻完成及任务奖励；纳入 `npm run smoke:round-82`。 |
 - 2026-09-29（Round 79）：新增海岛区域专项与可重复生成命令；世界图夹具升级为六区/十向关口，覆盖 Puny World CC0 图集网格、任务发现奖励、舆图保留旧大陆图层及旧区域锚点稳定。专项命令 `npm run smoke:round-79`。
 - 2026-09-30（Round 80）：新增固定区域事件环境调查专项，覆盖 interaction Schema/解析、默认踏入事件、方向/距离/视线、条件/一次性与云岭悬桥/落潮湾灯标真实格位；`npm run smoke:round-80`。
 - 2026-09-30（Round 81）：新增 336×224 超大舆图专项，锁定旧 12 层历史像素、六区及全部关口/地标/玩家投影，验证新拓展图素、Schema 最大尺寸、Puny World CC0 来源与适配视口；`npm run smoke:round-81`。

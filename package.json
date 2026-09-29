@@ -64,7 +64,9 @@
     "smoke:round-79": "vitest run tests/round79-island-region.test.ts tests/round74-cloud-ridge.test.ts tests/round67-salt-road.test.ts",
     "smoke:round-80": "vitest run tests/round80-region-interactions.test.ts tests/world-map.test.ts tests/round74-cloud-ridge.test.ts tests/round79-island-region.test.ts",
     "generate:round-81-atlas": "node scripts/generate-round81-atlas.mjs",
+    "generate:round-82-east-coast": "node scripts/generate-round82-east-coast.mjs",
     "smoke:round-81": "vitest run tests/round81-world-atlas.test.ts tests/round79-island-region.test.ts tests/round51-map-viewport.test.ts",
+    "smoke:round-82": "vitest run tests/round82-east-coast.test.ts tests/round81-world-atlas.test.ts tests/round79-island-region.test.ts tests/round74-cloud-ridge.test.ts tests/round80-region-interactions.test.ts",
     "smoke:round-76": "vitest run tests/round76-region-landmark-art.test.ts",
     "smoke:round-77": "vitest run tests/round77-character-art.test.ts"
   },

@@ -105,11 +105,11 @@ describe('Round 81 expanded movable atlas', () => {
     }
     expect(cells('world-r81-expanse-land').some((row, y) => y < 144 && row.slice(224).some((gid) => gid > 0))).toBe(true);
     expect(cells('world-r81-expanse-land').slice(144).some((row) => row.some((gid) => gid > 0))).toBe(true);
-    expect(data.regions).toHaveLength(6);
-    expect(data.transitions).toHaveLength(10);
+    expect(data.regions).toHaveLength(7);
+    expect(data.transitions).toHaveLength(12);
   });
 
-  it('keeps six region centers plus every old gate, landmark and player projection in the same atlas pixels', () => {
+  it('keeps the six Round 80 region centers plus every old gate, landmark and player projection in the same atlas pixels', () => {
     const data = parseCurrentWorld();
     const art = data.atlasArt!;
     const maps = loadMaps();
@@ -119,7 +119,8 @@ describe('Round 81 expanded movable atlas', () => {
     const oldArt = { ...art, columns: 224, rows: 144, regionFootprint: undefined };
 
     for (const region of data.regions) {
-      const oldPosition = round80AnchorPositions.get(region.mapResourceId)!;
+      const oldPosition = round80AnchorPositions.get(region.mapResourceId);
+      if (oldPosition === undefined) continue;
       const before = projectAtlasPosition(oldPosition, oldArt);
       const after = projectAtlasPosition(region.atlasPosition, art);
       expect(Math.abs(after.x - before.x), region.mapResourceId).toBeLessThanOrEqual(0.001);
@@ -128,7 +129,8 @@ describe('Round 81 expanded movable atlas', () => {
     for (const endpoint of world.transitions.flatMap(({ from, to }) => [from, to])) {
       const region = world.regions.find(({ mapResourceId }) => mapResourceId === endpoint.mapResourceId)!;
       const map = maps.get(endpoint.mapResourceId)!;
-      const oldPosition = round80AnchorPositions.get(region.mapResourceId)!;
+      const oldPosition = round80AnchorPositions.get(region.mapResourceId);
+      if (oldPosition === undefined) continue;
       const before = projectWorldCell(endpoint, map, oldPosition, oldArt);
       const after = projectWorldCell(endpoint, map, region.atlasPosition, art);
       expect(Math.abs(after.x - before.x), region.mapResourceId).toBeLessThanOrEqual(0.001);
@@ -137,7 +139,8 @@ describe('Round 81 expanded movable atlas', () => {
     for (const landmark of world.landmarks) {
       const region = world.regions.find(({ mapResourceId }) => mapResourceId === landmark.mapResourceId)!;
       const map = maps.get(landmark.mapResourceId)!;
-      const oldPosition = round80AnchorPositions.get(region.mapResourceId)!;
+      const oldPosition = round80AnchorPositions.get(region.mapResourceId);
+      if (oldPosition === undefined) continue;
       const before = projectWorldCell(landmark, map, oldPosition, oldArt);
       const after = projectWorldCell(landmark, map, region.atlasPosition, art);
       expect(Math.abs(after.x - before.x), landmark.id).toBeLessThanOrEqual(0.001);

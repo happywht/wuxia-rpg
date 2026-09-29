@@ -55,6 +55,15 @@
         "x": 33.28358209,
         "y": 57.07174888
       }
+    },
+    {
+      "mapResourceId": "map.round-82-east-coast",
+      "name": "东溟海岸·青帆埠",
+      "description": "青帆埠倚着东汊海湾，木栈桥、松坡和旧潮尺串起一条能步行抵达的海岸路。",
+      "atlasPosition": {
+        "x": 85,
+        "y": 44
+      }
     }
   ],
   "landmarks": [
@@ -279,6 +288,41 @@
       "name": "白沙灯标",
       "category": "other",
       "discoveryNodeId": "place.r79-white-beacon"
+    },
+    {
+      "id": "landmark.r82-west-dock",
+      "mapResourceId": "map.round-82-east-coast",
+      "col": 6,
+      "row": 50,
+      "name": "西岸栈桥",
+      "category": "crossing"
+    },
+    {
+      "id": "landmark.r82-blue-sail-market",
+      "mapResourceId": "map.round-82-east-coast",
+      "col": 47,
+      "row": 49,
+      "name": "青帆埠",
+      "category": "settlement",
+      "discoveryNodeId": "place.r82-blue-sail-market"
+    },
+    {
+      "id": "landmark.r82-east-tide-gauge",
+      "mapResourceId": "map.round-82-east-coast",
+      "col": 78,
+      "row": 72,
+      "name": "东汊潮尺",
+      "category": "other",
+      "discoveryNodeId": "place.r82-east-tide-gauge"
+    },
+    {
+      "id": "landmark.r82-fog-cove",
+      "mapResourceId": "map.round-82-east-coast",
+      "col": 68,
+      "row": 78,
+      "name": "雾隐湾",
+      "category": "water",
+      "discoveryNodeId": "place.r82-fog-cove"
     }
   ],
   "transitions": [
@@ -420,6 +464,34 @@
         "mapResourceId": "map.round-10-mist-ferry",
         "col": 96,
         "row": 90
+      }
+    },
+    {
+      "id": "gate.r82-cloud-ridge-to-east-coast",
+      "name": "越岭东行",
+      "from": {
+        "mapResourceId": "map.round-74-cloud-ridge",
+        "col": 96,
+        "row": 50
+      },
+      "to": {
+        "mapResourceId": "map.round-82-east-coast",
+        "col": 6,
+        "row": 50
+      }
+    },
+    {
+      "id": "gate.r82-east-coast-to-cloud-ridge",
+      "name": "回望云岭",
+      "from": {
+        "mapResourceId": "map.round-82-east-coast",
+        "col": 5,
+        "row": 50
+      },
+      "to": {
+        "mapResourceId": "map.round-74-cloud-ridge",
+        "col": 95,
+        "row": 50
       }
     }
   ],
@@ -649,6 +721,44 @@
           "up",
           "left",
           "right"
+        ]
+      }
+    },
+    {
+      "id": "event.r82-arrival",
+      "mapResourceId": "map.round-82-east-coast",
+      "col": 6,
+      "row": 50,
+      "text": "越过云岭最后一道松坡，海风穿过东汊，青帆埠的木栈桥在潮光里显出轮廓。",
+      "approachText": "往东南的路坡渐缓，风里已经有咸涩的潮气。",
+      "once": true,
+      "discoverKnowledgeNodeId": "place.r82-east-coast"
+    },
+    {
+      "id": "event.r82-blue-sail-market",
+      "mapResourceId": "map.round-82-east-coast",
+      "col": 47,
+      "row": 49,
+      "text": "柜台上挂着几页褪色的渡潮簿，末页记着每年秋汛前改道的日期。",
+      "approachText": "青帆集市的柜台边压着一本潮渍斑斑的旧簿。",
+      "once": true,
+      "discoverKnowledgeNodeId": "place.r82-blue-sail-market"
+    },
+    {
+      "id": "event.r82-tide-gauge",
+      "mapResourceId": "map.round-82-east-coast",
+      "col": 78,
+      "row": 72,
+      "text": "三道刻痕由深至浅排在石面上，最浅的一道旁边还留着一枚旧帆钉。",
+      "approachText": "潮汊尽头的石面泛着白盐，刻线在水痕间断断续续。",
+      "once": true,
+      "discoverKnowledgeNodeId": "place.r82-east-tide-gauge",
+      "interaction": {
+        "prompt": "抄录东汊石潮尺的刻痕",
+        "range": 1,
+        "approachDirections": [
+          "left",
+          "down"
         ]
       }
     }

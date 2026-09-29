@@ -46,6 +46,26 @@
       "schema": "grid-map"
     },
     {
+      "id": "map.round-82-east-coast",
+      "path": "maps/round-82-east-coast.json",
+      "schema": "grid-map"
+    },
+    {
+      "id": "npc.round-82-east-coast-set",
+      "path": "characters/round-82-east-coast-npcs.json",
+      "schema": "npc-set"
+    },
+    {
+      "id": "dialogue.round-82-east-coast-set",
+      "path": "dialogues/round-82-east-coast-conversations.json",
+      "schema": "dialogue-set"
+    },
+    {
+      "id": "quest.round-82-east-coast-set",
+      "path": "quests/round-82-east-coast-quests.json",
+      "schema": "quest-set"
+    },
+    {
       "id": "world.atlas",
       "path": "world/world-map.json",
       "schema": "world-map"

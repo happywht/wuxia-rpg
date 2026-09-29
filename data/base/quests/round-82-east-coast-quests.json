@@ -1,0 +1,26 @@
+{
+  "quests": [
+    {
+      "id": "quest.r82-follow-the-tide",
+      "name": "潮尺旧记",
+      "description": "温朝之请你到东汊潮尺核对刻痕，把被潮雾遮住的沿岸水路补进青帆埠旧簿。",
+      "giverNpcId": "char.r82-wen-chaozhi",
+      "objectives": [
+        {
+          "id": "objective.r82-read-tide-gauge",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r82-east-tide-gauge",
+          "requiredCount": 1,
+          "text": "调查青帆埠东面的石潮尺"
+        }
+      ],
+      "rewards": {
+        "experience": 36,
+        "currency": 28,
+        "discoverKnowledgeNodeIds": [
+          "place.r82-fog-cove"
+        ]
+      }
+    }
+  ]
+}

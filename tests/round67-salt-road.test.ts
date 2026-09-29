@@ -45,6 +45,7 @@ describe('Round 67 fourth playable region and expanded atlas', () => {
     [SALT_ID, loadMap('../data/base/maps/round-67-salt-road.json')],
     ['map.round-74-cloud-ridge', loadMap('../data/base/maps/round-74-cloud-ridge.json')],
     ['map.round-79-isles', loadMap('../data/base/maps/round-79-isles.json')],
+    ['map.round-82-east-coast', loadMap('../data/base/maps/round-82-east-coast.json')],
   ]);
 
   it('generates a layered 100×100 Kenney CC0 map with a distinct salt-pan overlay', () => {
@@ -83,8 +84,8 @@ describe('Round 67 fourth playable region and expanded atlas', () => {
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
     expect(assembled.warnings).toEqual([]);
-    expect(assembled.regions).toHaveLength(6);
-    expect(assembled.transitions).toHaveLength(10);
+    expect(assembled.regions).toHaveLength(7);
+    expect(assembled.transitions).toHaveLength(12);
     expect(worldParse.data.atlasArt).toMatchObject({ columns: 336, rows: 224, tileSize: 16 });
     const salt = maps.get(SALT_ID)!;
     const saltIncoming = assembled.transitions.find(({ id }) => id === 'gate.iron-ridge-to-salt-road')!;

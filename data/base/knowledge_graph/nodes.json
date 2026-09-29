@@ -735,6 +735,16 @@
       "title": "白沙灯标潮痕",
       "summary": "灯标基座刻痕标出避开暗礁的回湾航线。",
       "knownByDefault": false
-    }
+    },
+    {"id":"map.round-82-east-coast","kind":"place","title":"青帆埠海岸区域","summary":"从云岭古道步行东行可抵达的海湾与栈桥区域。","knownByDefault":false},
+    {"id":"place.r82-east-coast","kind":"place","title":"东溟海岸·青帆埠","summary":"云岭古道以东的海岸港埠，松坡小路通往潮汊和栈桥。","knownByDefault":false},
+    {"id":"place.r82-blue-sail-market","kind":"place","title":"青帆埠渡潮簿","summary":"镇中旧簿收录行船避开秋汛暗流的日期与路向。","knownByDefault":false},
+    {"id":"place.r82-east-tide-gauge","kind":"place","title":"东汊石潮尺","summary":"海湾岸边三道石刻记录了季节水位变化。","knownByDefault":false},
+    {"id":"place.r82-fog-cove","kind":"place","title":"雾隐湾","summary":"沿岸沙脊绕过潮汊后可见的回湾，避开外海礁线。","knownByDefault":false},
+    {"id":"char.r82-wen-chaozhi","kind":"character","title":"温朝之","summary":"青帆埠渡潮簿的保管人，熟悉旧栈桥和近海水路。","knownByDefault":false},
+    {"id":"quest.r82-follow-the-tide","kind":"quest","title":"潮尺旧记","summary":"替温朝之核对东汊石潮尺，补全海岸行船记录。","knownByDefault":false},
+    {"id":"event.r82-arrival","kind":"event","title":"越岭见海","summary":"走出云岭松坡后首次抵达东溟海岸。","knownByDefault":false},
+    {"id":"event.r82-blue-sail-market","kind":"event","title":"渡潮簿旧页","summary":"翻看青帆埠柜台上的旧水路记录。","knownByDefault":false},
+    {"id":"event.r82-tide-gauge","kind":"event","title":"东汊潮尺刻痕","summary":"调查石潮尺并记录季节水位。","knownByDefault":false}
   ]
 }

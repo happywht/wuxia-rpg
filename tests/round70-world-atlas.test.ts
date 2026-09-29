@@ -53,7 +53,10 @@ describe('Round 70 continental world atlas', () => {
     for (const region of data.regions) {
       const col = Math.round(region.atlasPosition.x / 100 * (art.columns - 1));
       const row = Math.round(region.atlasPosition.y / 100 * (art.rows - 1));
-      if (region.mapResourceId === 'map.round-79-isles') {
+      if (region.mapResourceId === 'map.round-82-east-coast') {
+        const coastLand = art.layers.find(({ id }) => id === 'world-r81-expanse-land')!.cells;
+        expect(coastLand[row]?.[col]).toBeGreaterThan(0);
+      } else if (region.mapResourceId === 'map.round-79-isles') {
         const shoalLand = art.layers.find(({ id }) => id === 'world-r79-shoal-land')!.cells;
         expect(shoalLand[row]?.[col]).toBeGreaterThan(0);
       } else {
@@ -65,7 +68,9 @@ describe('Round 70 continental world atlas', () => {
         const region = regionById.get(endpoint.mapResourceId)!;
         const map = maps.get(endpoint.mapResourceId)!;
         const cell = projectCell(region, map, endpoint, art.columns, art.rows, footprint);
-        if (endpoint.mapResourceId === 'map.round-79-isles') {
+        if (endpoint.mapResourceId === 'map.round-82-east-coast') {
+          expect(art.layers.find(({ id }) => id === 'world-r81-expanse-land')?.cells[cell.row]?.[cell.col]).toBeGreaterThan(0);
+        } else if (endpoint.mapResourceId === 'map.round-79-isles') {
           expect(art.layers.find(({ id }) => id === 'world-r79-gate-routes')?.cells[cell.row]?.[cell.col]).toBeGreaterThan(0);
         } else {
           expect(land[cell.row]?.[cell.col]).toBeGreaterThan(1);

@@ -1,0 +1,22 @@
+{
+  "npcs": [
+    {
+      "id": "char.r82-wen-chaozhi",
+      "name": "温朝之",
+      "mapResourceId": "map.round-82-east-coast",
+      "position": {
+        "col": 50,
+        "row": 52
+      },
+      "dialogueId": "dlg.r82-wen-chaozhi-tide-record",
+      "questGiver": true,
+      "spriteFrame": 144,
+      "spriteFrames": {
+        "down": 128,
+        "right": 136,
+        "up": 144,
+        "left": 152
+      }
+    }
+  ]
+}

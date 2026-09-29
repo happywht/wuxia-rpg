@@ -4,6 +4,25 @@
 
 ---
 
+## Round 82 — 东溟海岸可步行探索线（2026-09-30，已完成）
+
+### 计划与实现
+
+- 计划见 [`iterations/round-82/plan.md`](iterations/round-82/plan.md)。新增第七张 100×100 东溟海岸·青帆埠地图，复用已登记的 Puny World 与 RPG Town CC0 图素；云岭古道东缘与青帆埠西码头数据配置双向步行关口。
+- 新增区域人物温朝之、对话和「潮尺旧记」调查任务；玩家可在东汊石潮尺邻近按 E 调查，完成后获得经验、银两并发现雾隐湾图谱条目。新区地标、区域事件和关口仍由地图/剧情资料声明，不在引擎内写入地名或对白。
+- 新增确定性地图生成器及专项回归，覆盖 100×100 尺寸、素材帧范围、可达区域、关口往返坐标、角色/对白/任务/图谱引用和生成稳定性；同步更新七区地图册与数据、玩家及素材文档。
+- 因基础世界新增地图和图谱记录，修正旧轮次测试夹具中固定的六图数量、世界图节点/边数量和新增舆图图层坐标断言；未修改旧地图资源本体。
+
+### 验证
+
+- `npm run generate:round-82-east-coast`：生成 5,407 个海岸陆地格、5,103 个入口连通可行格、299 株松树及 301 个岸线格。生成器复跑后地图、人物、对白、任务、舆图、manifest 和图谱共 8 个输出文件的 SHA-256 全部不变。
+- `npm run smoke:round-82`：5 个测试文件、32 项用例通过。专项历史兼容回归：`npx vitest run tests/round52-map-landmarks.test.ts tests/round58-region-quests.test.ts tests/round59-regional-dialogue.test.ts tests/round68-long-journey.test.ts tests/round70-world-atlas.test.ts tests/round75-region-event-approach.test.ts tests/world-map.test.ts`：7 个测试文件、46 项用例通过。
+- `npm run check`：42 项基础资源 Schema 通过，42 项 MOD 资源检查零问题，TypeScript 通过，53 个测试文件/358 项用例通过，Round 34 与 Round 48 文档审计通过。
+- `npm run build`：上述完整质量门槛再次通过，Vite 139 个模块构建成功。Phaser runtime chunk 为 1,374.54 kB，仍有超过 500 kB 的体积建议提示。
+- 隔离浏览器 `http://127.0.0.1:5194/` 显示七区总舆图、当前区域细图，并按键选择关口后显示步行路线规划。此轮没有实际逐区走过云岭关口抵达海岸，也没有在页面中完成任务/回程；这部分只由可达性、跨资源和任务专项自动回归覆盖，不记为浏览器手测。
+
+---
+
 ## Round 81 — 超大可移动舆图拓界（2026-09-30，已完成）
 
 ### 计划与实现

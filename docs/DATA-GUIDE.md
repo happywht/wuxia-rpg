@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：截至 Round 81，已有地图、NPC/对话、成长/战斗、物品/任务、伙伴、擂台/门派战、自创武学、经脉、锻造炼丹、存档、区域旅行、知识图谱/图鉴、昼夜天气/NPC 日程、奇遇、声望、多结局与成就。基础内容为 17 名 NPC、5 个门派、47 项任务、51 件物品、30 种武学、220 个图谱节点/329 条边。六张区域地图均为 Kenney CC0 百格像素底图，并在 Round 76 叠加 OpenGameArt CC0 环境层：起始图八层（五层 Tiled 底稿 + R65 城镇街市两层 + R76 环境层）、其余四张旧区各十一层，新海岛图三层；`world-map.json` 的可选 `atlasArt` 声明 336×224 十六层全域总图，供 M/G 双视图使用。`npm run generate:round-70-atlas` 确定性生成大陆海岸、程序调色板、河道/岸线、旧大陆五区地貌、林地、聚落和关口路线；Tiny Town 图素与调色板分别声明 tileset id，各图层按自己的图集容量校验。Phaser-free 投影层仍按区域细图坐标、玩家位置与知识发现门槛计算标记。R68 用生产数据解析/装配和寻路、时钟、任务、存档与结局 API 完成当时的四区 749 格往返、跨六时段与第二日、盐道恢复后完成见闻差事并选择渡口结局；R69 加入可达武学授艺路径核验、无门派拦门刀法门外路线以及 `guard` 一击守御协议；R71 在浏览器实测跨三道关口、接取盐道差事、保存刷新续档及苦井见闻，并观察了当前位置动态重规划。该轮的引擎 749 步轨迹仅为参考，不代表浏览器走完；R72 已在浏览器实走盐道返渡口、选择「行舟万里」并返回主菜单。R73 的舆图沿用 HUD 的 Phaser-free 路线规则，并读取开图时当前放置的 NPC 与有效遭遇占位；R74 扩至 208×128，新增云岭古道地图、铁嶂双向关口、沈雨霁与两项链式差事，且由加载器装配 manifest 中所有 `npc-set` 与 `quest-set` 资源；R79 再扩至 224×144，新增群岛地图、双向渡口、Shade 的 Puny World CC0 图素、一位新人物与一项潮痕差事，旧七层大陆图和旧区域中心投影保留。Round 75 为五区 17 个固定区域事件补充可选 `approachText`，旧资料可省略；Round 76 以 `art.tilesets` 登记 OpenGameArt 图集并新增 24 个独立视觉装饰图素，碰撞仍仅读 `grid`，数据生成器保护全部出生点/人物/遭遇/事件/地标/关口锚点；人物帧/地图贴图/武学效果由 JSON 声明；素材授权、MOD、多地图旅行和导航协议分别见 `REFERENCES.md`、`MOD-GUIDE.md`、`MAP-ATLAS.md`。
+- 状态：截至 Round 82，基础世界含 18 名 NPC、5 个门派、48 项任务、51 件物品、30 种武学、230 个图谱节点/337 条边，manifest 登记 42 项资源。七张区域地图均为 100×100 格；新东溟海岸使用 Shade Puny World 与 ansimuz RPG Town CC0 图素，并沿用 336×224 十六层全域舆图。地图碰撞、剧情与跨区连接仍由独立 JSON 声明，生成器保护玩法锚点；素材授权、MOD 和导航协议见 `REFERENCES.md`、`MOD-GUIDE.md`、`MAP-ATLAS.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -272,6 +272,10 @@ NPC 条目可选声明 `spriteFrames`，键固定为 `down`、`left`、`right`�
 `atlasArt.columns` 和 `rows` 描述全域图底图尺寸；Schema 和运行时解析器都限制为 1–384 格。Round 81 的默认总图是 336×224 格，旧十二图层的前 224×144 格保持原值，新增层只负责显示更远的海岸、海面、沙滩、草地和松林。图层与碰撞无关；真实地图、地标、关口仍按已有资源和世界地图协议声明。
 
 可选 `atlasArt.regionFootprint` 以舆图格表示区域投影所覆盖的旧宽高。投影器在画布尺寸变化后仍使用该跨度定位区域内玩家、地标和关口。省略字段的历史资源沿用 `atlasArt.columns/rows × 0.16` 的原推导，保持旧 MOD 的投影兼容。Home 只重置视口缩放与偏移，不改变玩家位置或旅行数据。
+
+## Round 82：东溟海岸数据资源
+
+第七张 `grid-map` 使用独立碰撞 `grid` 与 CC0 图素 `art.layers`，资源 id 为 `map.round-82-east-coast`。新增 `npc-set`、`dialogue-set`、`quest-set` 资源分别声明温朝之、状态条件对白和「潮尺旧记」；`world-map` 集中声明区域坐标、两向关口、四处地标和三个固定事件。知识发现 id 必须同时登记在 `knowledge_graph/nodes.json`，关系端点登记在 `edges.json`。运行 `npm run generate:round-82-east-coast` 可确定性重建这些资源，`npm run smoke:round-82` 覆盖引用、碰撞路线、互动提示和奖励；运行 `npm run validate:data` 检查静态 Schema，`npm run check` 另做跨资源装配校验。
 
 ## Round 80：地图环境对象调查
 
