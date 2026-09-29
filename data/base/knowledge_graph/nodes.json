@@ -569,6 +569,13 @@
       "knownByDefault": false
     },
     {
+      "id": "map.round-74-cloud-ridge",
+      "kind": "place",
+      "title": "云岭古道·断云栈道",
+      "summary": "铁嶂北道东侧的百格山道，沿云纹石阶、云栈客舍与断索悬桥向南北展开。",
+      "knownByDefault": false
+    },
+    {
       "id": "place.r67-brine-well",
       "kind": "place",
       "title": "回声苦井",
@@ -601,6 +608,69 @@
       "kind": "event",
       "title": "回声井水线",
       "summary": "从回声苦井的刻痕读出驿站汲水水线已经下降。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.r74-cloud-ridge",
+      "kind": "place",
+      "title": "云岭古道",
+      "summary": "铁嶂以东的松岭旧栈道，南接断云南隘，山腰有云栈客舍。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.r74-cloud-markers",
+      "kind": "place",
+      "title": "云纹石阶",
+      "summary": "第三道石阶刻纹沿旧索孔转向东坡，指向断索悬桥。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.r74-cloud-bridge",
+      "kind": "place",
+      "title": "断索悬桥",
+      "summary": "云岭古道东侧的悬桥护索被截，拦路客据桥阻行。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r74-cloud-arrival",
+      "kind": "event",
+      "title": "初入云岭",
+      "summary": "越过断云南隘，认出云岭栈道与山腰客舍。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r74-cloud-inscription",
+      "kind": "event",
+      "title": "云阶刻痕",
+      "summary": "从云纹石阶的旧索孔认出通往悬桥的旧路向。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r74-cloud-bridge",
+      "kind": "event",
+      "title": "断索桥痕",
+      "summary": "断索悬桥仍被拦路客占据，护索需要修整。",
+      "knownByDefault": false
+    },
+    {
+      "id": "char.r74-shen-yuji",
+      "kind": "character",
+      "title": "沈雨霁",
+      "summary": "云栈客舍的山道绘图人，按时段在客舍周围巡视。",
+      "knownByDefault": false
+    },
+    {
+      "id": "quest.r74-cloud-marks",
+      "kind": "quest",
+      "title": "云阶辨刻",
+      "summary": "替沈雨霁拓下云纹石阶的旧刻痕。",
+      "knownByDefault": false
+    },
+    {
+      "id": "quest.r74-cloud-bridge",
+      "kind": "quest",
+      "title": "断索清桥",
+      "summary": "依刻痕线索清出被占据的断索悬桥。",
       "knownByDefault": false
     }
   ]

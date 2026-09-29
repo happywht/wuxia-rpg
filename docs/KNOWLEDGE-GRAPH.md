@@ -13,7 +13,7 @@ Round 11 建立可替换的图谱资料和玩家见闻状态。当前实现用�
 
 每条关系使用 `id`、`fromId`、`toId`、`relation` 和 `summary`。关系枚举为 `mentorOf`、`parentOf`、`hostileTo`、`belongsTo`、`locatedAt`、`holds`、`triggers`、`requires`、`rewards`、`knows`、`participatesIn`、`influences`。两个端点必须都声明在节点集内。
 
-当前基础资料包含 **201 个节点和 311 条关系**，其中 7 个结局节点。边可选声明 `attitudeSpread`（非零 -1…1）：其 `fromId` 人物的关系变化按该有符号系数传递给 `toId` 人物。该字段只适用于两端都是人物的边；结构越界的边由 parser 隔离，端点类别不符时只移除传播系数并警告。没有系数的旧边不改变关系值。结局节点只保存百科摘要；可达性、锁定原因和终章文本来自独立 `ending-set` 资料，具体条件见 [`ENDINGS.md`](ENDINGS.md)。
+当前基础资料包含 **211 个节点和 321 条关系**，其中 7 个结局节点。Round 74 增加云岭古道地图与地点、三则发现事件、沈雨霁和两项链式差事节点，以及 10 条位置、发现、参与和任务前置关系。边可选声明 `attitudeSpread`（非零 -1…1）：其 `fromId` 人物的关系变化按该有符号系数传递给 `toId` 人物。该字段只适用于两端都是人物的边；结构越界的边由 parser 隔离，端点类别不符时只移除传播系数并警告。没有系数的旧边不改变关系值。结局节点只保存百科摘要；可达性、锁定原因和终章文本来自独立 `ending-set` 资料，具体条件见 [`ENDINGS.md`](ENDINGS.md)。
 
 示例：
 

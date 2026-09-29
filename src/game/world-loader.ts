@@ -137,7 +137,6 @@ import {
 export const WORLD_MAP_RESOURCE_ID = 'world.atlas';
 const CALENDAR_RESOURCE_ID = 'calendar.base';
 const CLIMATE_RESOURCE_ID = 'climate.base';
-const NPC_RESOURCE_ID = 'npc.round-03-set';
 const CHARACTER_PROFILE_RESOURCE_ID = 'character-profile.round-04-set';
 const FACTION_RESOURCE_ID = 'faction.round-04-set';
 const MARTIAL_ART_RESOURCE_ID = 'martial-art.round-04-set';
@@ -152,7 +151,6 @@ const ENDING_RESOURCE_ID = 'ending.round-27-set';
 const ACHIEVEMENT_RESOURCE_ID = 'achievement.round-28-set';
 const ITEM_RESOURCE_ID = 'item.round-06-set';
 const SHOP_RESOURCE_ID = 'shop.round-06-set';
-const QUEST_RESOURCE_ID = 'quest.round-07-set';
 const COMPANION_RESOURCE_ID = 'companion.round-19-set';
 const KNOWLEDGE_NODE_RESOURCE_ID = 'knowledge.round-11-nodes';
 const KNOWLEDGE_EDGE_RESOURCE_ID = 'knowledge.round-11-edges';
@@ -503,13 +501,19 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
       maps.set(resource.id, parsedMap.map);
     }
     const knowledgeResult = assembleKnowledgeGraphContent(result.resources);
-    const npcResource = result.resources.get(NPC_RESOURCE_ID);
-    const parsedNpcReferences = npcResource === undefined ? null : parseNpcSet(npcResource.value);
+    const npcIds = new Set<string>();
+    for (const resource of result.resources.values()) {
+      if (resource.schema !== 'npc-set') continue;
+      const parsed = parseNpcSet(resource.value);
+      if (parsed.ok) {
+        for (const npc of parsed.set.npcs) npcIds.add(npc.id);
+      }
+    }
     const worldMapResult = assembleWorldMap(parsedWorldMap.data, maps, {
       knowledgeNodeIds: new Set(knowledgeResult.graph.nodes.keys()),
       periodIds: new Set(parsedCalendar.calendar.periods.map((period) => period.id)),
       weatherIds: new Set(parsedClimate.climate.weathers.map((weather) => weather.id)),
-      npcIds: new Set(parsedNpcReferences?.ok ? parsedNpcReferences.set.npcs.map((npc) => npc.id) : []),
+      npcIds,
     });
     if ('ok' in worldMapResult && !worldMapResult.ok) {
       return { ok: false, title: '世界地图引用无效', lines: worldMapResult.errors };
@@ -775,20 +779,20 @@ function assembleOptionalContent(
     }
   }
 
-  let npcSet: NpcSetData | null = null;
-  const npcResource = resources.get(NPC_RESOURCE_ID);
-  if (npcResource !== undefined) {
+  const npcResources = [...resources.values()].filter((resource) => resource.schema === 'npc-set');
+  let npcSet: NpcSetData | null = npcResources.length === 0 ? null : { npcs: [] };
+  for (const npcResource of npcResources) {
     const parsed = parseNpcSet(npcResource.value);
     if (!parsed.ok) {
       warnings.push({
-        resource: NPC_RESOURCE_ID,
+        resource: npcResource.id,
         origin: 'npc-assembly',
         severity: 'warning',
-        message: 'NPC 资料结构不合规，本轮禁用全部人物',
+        message: `NPC 资料结构不合规，已禁用资源 "${npcResource.id}" 中的人物`,
         details: parsed.errors,
       });
     } else {
-      npcSet = parsed.set;
+      npcSet!.npcs.push(...parsed.set.npcs);
     }
   }
 
@@ -807,7 +811,6 @@ function assembleOptionalContent(
     for (const npc of placement.npcs) {
       if (globallySeenNpcIds.has(npc.record.id)) {
         warnings.push({
-          resource: NPC_RESOURCE_ID,
           origin: 'npc-assembly',
           severity: 'warning',
           message: `NPC "${npc.record.id}" 在多张地图重复登记，保留世界图首条记录`,
@@ -821,7 +824,6 @@ function assembleOptionalContent(
   }
   for (const message of new Set(placements.flatMap((placement) => placement.warnings))) {
     warnings.push({
-      resource: NPC_RESOURCE_ID,
       origin: 'npc-assembly',
       severity: 'warning',
       message,
@@ -884,7 +886,6 @@ function assembleOptionalContent(
   for (const npc of allNpcs) {
     if (npc.record.shopId !== null && !shopAssembly.shops.has(npc.record.shopId)) {
       warnings.push({
-        resource: NPC_RESOURCE_ID,
         origin: 'shop-assembly',
         severity: 'warning',
         message: `NPC "${npc.record.id}"（${npc.record.name}）引用的商店 "${npc.record.shopId}" 不存在或已因校验失败被禁用，交互回落到对话`,
@@ -1241,7 +1242,6 @@ function assembleOptionalContent(
   });
   for (const message of npcSchedules.warnings) {
     warnings.push({
-      resource: NPC_RESOURCE_ID,
       origin: 'npc-schedule',
       severity: 'warning',
       message,
@@ -1249,20 +1249,20 @@ function assembleOptionalContent(
     });
   }
 
-  let questSet: QuestSetData | null = null;
-  const questResource = resources.get(QUEST_RESOURCE_ID);
-  if (questResource !== undefined) {
+  const questResources = [...resources.values()].filter((resource) => resource.schema === 'quest-set');
+  let questSet: QuestSetData | null = questResources.length === 0 ? null : { quests: [] };
+  for (const questResource of questResources) {
     const parsed = parseQuestSet(questResource.value);
     if (!parsed.ok) {
       warnings.push({
-        resource: QUEST_RESOURCE_ID,
+        resource: questResource.id,
         origin: 'quest-assembly',
         severity: 'warning',
-        message: '任务资料结构不合规，本轮禁用全部任务',
+        message: '任务资料结构不合规，已禁用此资源中的任务',
         details: parsed.errors,
       });
     } else {
-      questSet = parsed.set;
+      questSet!.quests.push(...parsed.set.quests);
     }
   }
   const questAssembly = assembleQuests({
@@ -1278,7 +1278,6 @@ function assembleOptionalContent(
   });
   for (const message of questAssembly.warnings) {
     warnings.push({
-      resource: QUEST_RESOURCE_ID,
       origin: 'quest-assembly',
       severity: 'warning',
       message,

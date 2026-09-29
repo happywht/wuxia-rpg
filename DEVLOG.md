@@ -4,6 +4,29 @@
 
 ---
 
+## Round 74 — 云岭古道与可移动大陆舆图扩展（2026-09-29，已完成）
+
+### 计划与实现
+
+- 按 [`iterations/round-74/plan.md`](iterations/round-74/plan.md) 执行：新增第五张 100×100 百格区域地图，拓宽可拖动缩放的大陆总图，并加入人物、事件、知识图谱及链式任务。
+- 新增 `scripts/generate-round74-cloud-ridge.mjs` 与 `npm run generate:round-74-cloud-ridge`。当前生成结果为 7,842 个可行格、7,464 个入口连通可达格、10 层 CC0 山地贴图，并通过 63 个关口/地标/事件/NPC 日程/遭遇锚点检查。铁嶂北道确定性重建后为 10 层贴图、7,818 个可行格，111 个锚点通过 BFS；总图生成器扩为 208×128。
+- 新增云岭人物沈雨霁、区域事件、图谱节点和「云阶辨刻」→「断索清桥」任务链；铁嶂南隘与云岭栈道使用双向步行关口。新增知识图谱地图节点后，基础图谱为 211 个节点/321 条边。
+- 整世界回归发现加载器原先将 NPC 与任务限制为单个固定资源 id，导致已登记的分区人物和任务不进入运行时集合。本轮改为按 `npc-set`/`quest-set` Schema 合并所有 manifest 资源，保留各资源独立解析与警告隔离；Round 49 真实资料集成测试现在断言沈雨霁和两项任务实际被装配。
+- 更新地图、任务、人物、图谱、架构、数据/测试指南、素材用途、README、路线图和变更日志。隔离的 5189 浏览器页实测 M 总图、滚轮缩放、拖动平移和 G 本区细图切换；5178 页及本地存档未操作。浏览器未手走至云岭或手动完成任务链，后者由专项自动化覆盖。
+
+### 验证
+
+- `npm run generate:round-62-iron-ridge`、`npm run generate:round-74-cloud-ridge` 与 `npm run generate:round-70-atlas`：通过；上述地图与舆图数据生成完成。
+- 确定性复核：分别在再次运行 R62、R74、R70 生成器前后计算 SHA-256，铁嶂地图 `A5EBBEE9E1F43A4605417D5115CC1A51D97892FAF3912EEF869D7E02B9629B33`、云岭地图 `C8A2D5F66F0D2447CFCB41A0C9687308F5BA7BF85FEE6CECEAF4DDB995EF678A`、大陆舆图 `C0243B472C5E9A9AB08FDAD8C9A7306B4AC8ED224BC616B524338235F3D3F9DD` 均逐字节不变。
+- `npm run typecheck`：通过。`npm run smoke:round-74`：2 个文件/6 项测试通过。完整 `npm test`：45 个测试文件/303 项通过。
+- `npm run package:release`：manifest 的 34 项基础资源 Schema 通过，34 项 MOD 检查无问题，`tsc --noEmit`、Round 34 与 Round 48 文档审计通过；Vite 139 模块生产构建成功。发行包 `release/wuxia-rpg-web-0.0.1.tgz` 为 872,450 bytes，SHA-256 `d06cba8cbfebad58ce95c60dd25f06e47724b95e944ee9e68aec2c4c7043d468`，84 个归档成员/83 个内容文件。Round 47 子路径 smoke 解包核验 83 个文件哈希，并从 `/preview/wuxia-rpg/` 请求 HTML/JS/CSS、MOD、manifest 全部资料与 Schema、Kenney 图集和 CC0 License。
+- 初次完整回归指出两条历史图谱计数断言过期，以及 Round 48 文档审计只累计每个 Schema 的第一份资料；已更新历史断言，并让文档审计累计所有同 Schema 资源。修复后完整发行流程通过。构建仍提示 Phaser chunk 超过 Vite 默认 500 KB 建议阈值；Round 72 已单独记录静态分块情况，本轮未改变构建策略。
+
+### 边界与后续
+
+- 手动浏览器验证覆盖总图浏览交互，不代表走过云岭关口或人工完成任务；真实地图锚点/往返路径/区域事件/任务流转以专项和全世界装配自动回归核验。
+- 下轮可加深新区探索反馈与区域叙事，维持 M 舆图扩张空间及数据驱动区域接入方式，见 [`ROADMAP.md`](ROADMAP.md) Round 75。
+
 ## Round 73 — 舆图路线避让动态人物与遭遇（2026-09-29，已完成）
 
 ### 计划与实现

@@ -55,10 +55,13 @@ describe('Round 49 default world integrity', () => {
       };
       expect(resourceSources).toHaveLength(manifest.resources.length);
       expect(assembly.npcs.length).toBeGreaterThanOrEqual(10);
+      expect(assembly.npcs.some(({ record }) => record.id === 'char.r74-shen-yuji')).toBe(true);
       expect(assembly.dialogues.size).toBeGreaterThan(0);
       expect(assembly.progression.factions.size).toBeGreaterThanOrEqual(5);
       expect(assembly.progression.martialArts.size).toBeGreaterThanOrEqual(30);
       expect(assembly.quests.size).toBeGreaterThanOrEqual(20);
+      expect(assembly.quests.has('quest.r74-cloud-marks')).toBe(true);
+      expect(assembly.quests.has('quest.r74-cloud-bridge')).toBe(true);
       expect(assembly.items.size).toBeGreaterThanOrEqual(50);
       expect(optionalWarnings.map(({ resource, origin, message, details }) => ({
         resource,

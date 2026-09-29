@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -71,6 +71,36 @@ describe('Round 48 documentation audit', () => {
 
   it('accepts a consistent fixture', async () => {
     const report = await auditRound48Docs({ root: await makeFixture() });
+    expect(report).toEqual({ ok: true, problems: [] });
+  });
+
+  it('sums content counts across multiple resources with the same schema', async () => {
+    const root = await makeFixture();
+    const manifestPath = path.join(root, 'data/base/manifest.json');
+    const manifest = JSON.parse(await readFile(manifestPath, 'utf8')) as {
+      resources: { id: string; path: string; schema: string }[];
+    };
+    manifest.resources.push(
+      { id: 'npc.extra', path: 'characters/extra.json', schema: 'npc-set' },
+      { id: 'quest.extra', path: 'quests/extra.json', schema: 'quest-set' },
+    );
+    await writeFile(manifestPath, JSON.stringify(manifest), 'utf8');
+    await writeFile(
+      path.join(root, 'docs/ARCHITECTURE.md'),
+      '截至 Round 49 使用 ./base/ 相对基址；9 项资源、7 个资源 Schema 家族、7 份 draft-07 JSON Schema。',
+      'utf8',
+    );
+    await mkdir(path.join(root, 'data/base/characters'), { recursive: true });
+    await mkdir(path.join(root, 'data/base/quests'), { recursive: true });
+    await writeFile(path.join(root, 'data/base/characters/extra.json'), JSON.stringify({ npcs: [{}] }), 'utf8');
+    await writeFile(path.join(root, 'data/base/quests/extra.json'), JSON.stringify({ quests: [{}] }), 'utf8');
+    await writeFile(
+      path.join(root, 'docs/DATA-GUIDE.md'),
+      '截至 Round 49 数据资料，2 名 NPC，1 个门派，2 项任务，1 件物品，1 种武学，1 个图谱节点/1 条边。',
+      'utf8',
+    );
+
+    const report = await auditRound48Docs({ root });
     expect(report).toEqual({ ok: true, problems: [] });
   });
 

@@ -29,8 +29,8 @@ function loadWorld() {
 
 function projectCell(region: { atlasPosition: { x: number; y: number } }, map: { columns: number; rows: number }, point: { col: number; row: number }) {
   return {
-    col: Math.round(region.atlasPosition.x / 100 * 175 + ((point.col + 0.5) / map.columns - 0.5) * 176 * 0.16),
-    row: Math.round(region.atlasPosition.y / 100 * 111 + ((point.row + 0.5) / map.rows - 0.5) * 112 * 0.16),
+    col: Math.round(region.atlasPosition.x / 100 * 207 + ((point.col + 0.5) / map.columns - 0.5) * 208 * 0.16),
+    row: Math.round(region.atlasPosition.y / 100 * 127 + ((point.row + 0.5) / map.rows - 0.5) * 128 * 0.16),
   };
 }
 

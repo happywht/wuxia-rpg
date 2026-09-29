@@ -21,6 +21,11 @@
       "schema": "grid-map"
     },
     {
+      "id": "map.round-74-cloud-ridge",
+      "path": "maps/round-74-cloud-ridge.json",
+      "schema": "grid-map"
+    },
+    {
       "id": "world.atlas",
       "path": "world/world-map.json",
       "schema": "world-map"
@@ -38,6 +43,11 @@
     {
       "id": "npc.round-03-set",
       "path": "characters/round-03-npcs.json",
+      "schema": "npc-set"
+    },
+    {
+      "id": "npc.round-74-cloud-ridge-set",
+      "path": "characters/round-74-cloud-ridge-npcs.json",
       "schema": "npc-set"
     },
     {
@@ -63,6 +73,11 @@
     {
       "id": "dialogue.round-67-set",
       "path": "dialogues/round-67-conversations.json",
+      "schema": "dialogue-set"
+    },
+    {
+      "id": "dialogue.round-74-cloud-ridge-set",
+      "path": "dialogues/round-74-cloud-ridge-conversations.json",
       "schema": "dialogue-set"
     },
     {
@@ -138,6 +153,11 @@
     {
       "id": "quest.round-07-set",
       "path": "quests/round-07-quests.json",
+      "schema": "quest-set"
+    },
+    {
+      "id": "quest.round-74-cloud-ridge-set",
+      "path": "quests/round-74-cloud-ridge-quests.json",
       "schema": "quest-set"
     },
     {

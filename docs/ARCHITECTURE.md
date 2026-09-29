@@ -1,6 +1,6 @@
 # 架构说明（ARCHITECTURE）
 
-- 状态：截至 Round 73，核心玩法与资料/引擎解耦继续扩展；基础内容为 15 名 NPC、5 个门派、44 项差事、51 件物品、30 种武学、201 个图谱节点/311 条关系和 4 张互通百格地图。基础 manifest 有 30 项资源，覆盖 24 个资源 Schema 家族；仓库含 26 份 draft-07 JSON Schema。R51–62 已完成 CC0 图集接入、大地图镜头/舆图、寻路与跨区导航及三块区域内容；R63–64 增加时天气路线审计、商铺采集导航与三图七时段交互路线检查；R65 以官方 RPG Urban Pack（CC0）图集叠加街面并升级人物精灵；R66–67 增加资料驱动的可移动全域总图、切换细图以及通过双向关口连接的第四张西陲盐道地图；R68 以真实资料闭环验证四区逐格行旅、日程跨越、远区存读档和返回结局选择；R69 补全全部武学授艺路径审计、开放门外拦门刀法并加入数据驱动守御动作；R70 扩展大陆海岸与四区地貌层，接入 Kenney Tiny Town CC0 地图图素和低噪声程序地表，并扩大可拖动/缩放舆图视口；R71 记录隔离浏览器四区三关、任务、远区续档和苦井见闻实测，核对舆图从实时位置重规划；R72 在隔离浏览器实走盐道返渡口、绕开动态 NPC 并打开/选择结局，再返回主菜单，同时将 Phaser 运行时代码分为可独立缓存的生产 chunk；R73 让 M 舆图与 HUD 共用当前时段 NPC/有效遭遇占位，绕行与动态封堵提示和地形断路分开，回归使用真实渡口地图及白鹭洲日程。全图投影、地图内容、招式效果和任务继续由数据声明。整个产品目标仍在推进。
+- 状态：截至 Round 74，核心玩法与资料/引擎解耦继续扩展；基础内容为 16 名 NPC、5 个门派、46 项差事、51 件物品、30 种武学、211 个图谱节点/321 条关系和 5 张互通百格地图。基础 manifest 有 34 项资源，覆盖 24 个资源 Schema 家族；仓库含 26 份 draft-07 JSON Schema。R51–62 已完成 CC0 图集接入、大地图镜头/舆图、寻路与跨区导航及三块区域内容；R63–64 增加时天气路线审计、商铺采集导航与三图七时段交互路线检查；R65 以官方 RPG Urban Pack（CC0）图集叠加街面并升级人物精灵；R66–67 增加资料驱动的可移动全域总图、切换细图以及通过双向关口连接的第四张西陲盐道地图；R68 以真实资料闭环验证四区逐格行旅、日程跨越、远区存读档和返回结局选择；R69 补全全部武学授艺路径审计、开放门外拦门刀法并加入数据驱动守御动作；R70 扩展大陆海岸与四区地貌层，接入 Kenney Tiny Town CC0 地图图素和低噪声程序地表，并扩大可拖动/缩放舆图视口；R71 记录隔离浏览器四区三关、任务、远区续档和苦井见闻实测，核对舆图从实时位置重规划；R72 在隔离浏览器实走盐道返渡口、绕开动态 NPC 并打开/选择结局，再返回主菜单，同时将 Phaser 运行时代码分为可独立缓存的生产 chunk；R73 让 M 舆图与 HUD 共用当前时段 NPC/有效遭遇占位，绕行与动态封堵提示和地形断路分开，回归使用真实渡口地图及白鹭洲日程；R74 新增云岭古道百格地图、双向铁嶂关口和两段数据驱动任务，并扩充 Kenney CC0 全域图到 208×128。全图投影、地图内容、招式效果和任务继续由数据声明。整个产品目标仍在推进。
 - 关联：`docs/ADR.md`（技术选型依据）、`docs/DATA-GUIDE.md`（数据面细节）
 
 ---
@@ -31,9 +31,9 @@
 
 ## 2. 启动流程与缺失数据的降级策略
 
-Round 01 的切片式地图加载已由后续统一加载器取代。当前 Vite 将 `data/` 与 `mods/` 作为受限静态资料目录，生产构建复制资料并以相对基址 `./` 加载 `base/manifest.json`、`schema/`、`base/<resource.path>` 与已启用 MOD 覆盖；相对 URL 支持域名根路径和仓库子路径。缺失/HTTP 错误、JSON 无法解析、Schema 或语义检查失败时，场景显示结构化可读诊断。实际版本包只包含允许列表中的构建资源和说明，不带开发代码或依赖。Round 47 烟测当时从解包版本包子路径加载 26 项基础资源；Round 62 烟测按当时 manifest 核验 28 项资源及 26 份 Schema，当前 R67 manifest 有 30 项资源。详细证据见 `DEVLOG.md`。
+Round 01 的切片式地图加载已由后续统一加载器取代。当前 Vite 将 `data/` 与 `mods/` 作为受限静态资料目录，生产构建复制资料并以相对基址 `./` 加载 `base/manifest.json`、`schema/`、`base/<resource.path>` 与已启用 MOD 覆盖；相对 URL 支持域名根路径和仓库子路径。缺失/HTTP 错误、JSON 无法解析、Schema 或语义检查失败时，场景显示结构化可读诊断。实际版本包只包含允许列表中的构建资源和说明，不带开发代码或依赖。Round 47 烟测当时从解包版本包子路径加载 26 项基础资源；Round 62 烟测按当时 manifest 核验 28 项，Round 67 时为 30 项，Round 74 扩展至 34 项资源，当前共 26 份 Schema。详细证据见 `DEVLOG.md`。
 
-Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id、相对路径、schema id 和按顺序启用的 MOD。加载顺序为：Ajv 校验 manifest → 加载并编译被引用的 schema → 加载并校验基础资源 → 按启用顺序读取同路径 MOD 覆盖并重复校验 → 通过事件总线广播结果 → 场景消费资源。Round 03 起 manifest 注册地图/NPC/对话，Round 04 登记角色/门派/武学，Round 05 登记战斗遭遇，Round 06 登记物品/商店，Round 07 登记任务；Round 10 根据 `grid-map` schema 家族收集全部地图，并要求 `world-map` 资源解析出有效起始地图；Round 11 将知识节点与关系作为两个可选、独立 schema 资源登记，缺失任一者时以空集合继续，坏引用只隔离相关关系或对话选项；Round 14 登记**必需**的 `game-calendar` 历法资源，未登记或语义无效时提供可读错误并拒绝加载；Round 15 登记**必需**的 `climate` 资源，必须与历法月份完整分区且权重引用有效；Round 16 的 NPC 日程是 NPC 资源的可选扩展，逐项引用历法时段并按地图校验占位；Round 21 的 `faction-war-set` 为可选资源，跨资源检查入口格、两派、双方对手武学及结局知识节点。地图、区域、图谱、历法、气候、日程和门派战协议均由 Phaser 无关模块执行。运行状态仍独立保存到浏览器本地存储，不混入世界资料。
+Round 02 已接入正式资料管线。`data/base/manifest.json` 列出资源 id、相对路径、schema id 和按顺序启用的 MOD。加载顺序为：Ajv 校验 manifest → 加载并编译被引用的 schema → 加载并校验基础资源 → 按启用顺序读取同路径 MOD 覆盖并重复校验 → 通过事件总线广播结果 → 场景消费资源。Round 03 起 manifest 注册地图/NPC/对话，Round 04 登记角色/门派/武学，Round 05 登记战斗遭遇，Round 06 登记物品/商店，Round 07 登记任务；Round 10 根据 `grid-map` schema 家族收集全部地图，并要求 `world-map` 资源解析出有效起始地图；Round 11 将知识节点与关系作为两个可选、独立 schema 资源登记，缺失任一者时以空集合继续，坏引用只隔离相关关系或对话选项；Round 14 登记**必需**的 `game-calendar` 历法资源，未登记或语义无效时提供可读错误并拒绝加载；Round 15 登记**必需**的 `climate` 资源，必须与历法月份完整分区且权重引用有效；Round 16 的 NPC 日程是 NPC 资源的可选扩展，逐项引用历法时段并按地图校验占位；Round 21 的 `faction-war-set` 为可选资源，跨资源检查入口格、两派、双方对手武学及结局知识节点；Round 74 起 `npc-set` 与 `quest-set` 也按 manifest Schema 汇总任意数量的资源，资源内的错误仍单独隔离并报告。地图、区域、图谱、历法、气候、日程和门派战协议均由 Phaser 无关模块执行。运行状态仍独立保存到浏览器本地存储，不混入世界资料。
 
 Round 22 在上述流程中可选登记武学创制组件资源；它按 JSON Schema 与 Phaser-free 语义规则校验，缺失或错误只禁用 C 键创制入口，玩家自创定义则写入独立的运行时存档字段，不回写世界资料。该组件资源和对应 Schema 也支持同名 MOD 覆盖。
 
@@ -73,7 +73,7 @@ Round 22 在上述流程中可选登记武学创制组件资源；它按 JSON Sc
 
 ## 3. JSON Schema 校验（Ajv，Round 02 已接入）
 
-- 当前 `data/schema/` 有 26 份 draft-07 JSON Schema：`manifest`、`grid-map`、`world-map`、`game-calendar`、`climate`、`knowledge-nodes`、`knowledge-edges`、`npc-set`、`dialogue-set`、`character-profiles`、`faction-set`、`martial-arts-set`、`battle-encounters`、`items-set`、`shops-set`、`quest-set`、`companion-set`、`arena-set`、`faction-war-set`、`martial-art-components`、`meridian-set`、`equipment-forge-set`、`alchemy-set`、`ending-set`、`achievement-set` 与 `content-package`。当前基础 manifest 登记 30 项资源、覆盖 24 个资源 Schema 家族；`manifest` 与 `content-package` 是独立契约，不计入这 24 个世界资源家族。
+- 当前 `data/schema/` 有 26 份 draft-07 JSON Schema：`manifest`、`grid-map`、`world-map`、`game-calendar`、`climate`、`knowledge-nodes`、`knowledge-edges`、`npc-set`、`dialogue-set`、`character-profiles`、`faction-set`、`martial-arts-set`、`battle-encounters`、`items-set`、`shops-set`、`quest-set`、`companion-set`、`arena-set`、`faction-war-set`、`martial-art-components`、`meridian-set`、`equipment-forge-set`、`alchemy-set`、`ending-set`、`achievement-set` 与 `content-package`。当前基础 manifest 登记 34 项资源、覆盖 24 个资源 Schema 家族；`manifest` 与 `content-package` 是独立契约，不计入这 24 个世界资源家族。
 - Ajv 8.x 在加载期校验 manifest、基础资源和每份 MOD 覆盖（开发/生产相同），不在游戏循环内反复校验。
 - 跨字段规则分层完成：地图尺寸/出生点、世界图地图/区域/关口/事件引用、关口坐标和可走性、历法 id/时段起点唯一性与零点时段存在性、气候季节对历法月份的完整分区及天气权重引用等由语义解析补足；世界图跨地图装配后还会排除与 NPC/战斗遭遇重叠的关口或区域事件。角色成长、武学、物品/商店、任务与对话引用仍按原有模块逐项校验；对话范围顺序由防御解析器隔离。失败时只禁用受影响的最小条目，世界图起始地图、历法与气候等关键资料无效则提供可读启动错误。
 - 错误输出为结构化诊断（来源、资源、消息和字段路径），可被事件总线订阅并显示在场景。

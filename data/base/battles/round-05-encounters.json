@@ -240,6 +240,30 @@
         "defeat": "你被截担头目逼回盐坪外，驼铃渐渐远去。",
         "flee": "你退到石坡边，截担客仍守着那段路。"
       }
+    },
+    {
+      "id": "encounter.r74-cloud-bridge-bandits",
+      "name": "断索悬桥拦路客",
+      "mapResourceId": "map.round-74-cloud-ridge",
+      "position": { "col": 76, "row": 42 },
+      "profileId": "char.scribe-apprentice",
+      "enemy": {
+        "name": "拦索头目",
+        "attributes": { "body": 9, "force": 10, "agility": 8, "insight": 5, "resolve": 7 },
+        "health": 64,
+        "qi": 16,
+        "martialArtIds": ["skill.jianghu-sanshou", "skill.tiezhang-zhuanggong"]
+      },
+      "victoryExperience": 48,
+      "defeatRecovery": { "healthRatio": 0.6, "qiRatio": 0.6 },
+      "repeatable": true,
+      "texts": {
+        "approach": "断索悬桥边有人拦住去路，按 E 应战",
+        "intro": "头目抬脚踩住断掉的桥索：「上山的路今天归我，想过就留下路费。」",
+        "victory": "拦路客退进松林，悬桥前重新留出一条可走的山径。",
+        "defeat": "你被逼退到云栈客舍附近，只能稍作休整再来。",
+        "flee": "你退回石阶，拦路客仍守在断索边。"
+      }
     }
   ]
 }

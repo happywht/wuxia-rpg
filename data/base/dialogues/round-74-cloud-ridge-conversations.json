@@ -1,0 +1,68 @@
+{
+  "conversations": [
+    {
+      "id": "dlg.r74-shen-yuji-cloud-ridge",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "沈雨霁把一卷油纸图压在客舍窗边：「山上的旧栈道被云遮了半截，石阶刻纹倒比路牌记得牢。你若肯走一趟，我也能把南北路向补全。」",
+          "options": [
+            {
+              "text": "我去云纹石阶拓下刻痕。",
+              "nextNodeId": "marks-accepted",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r74-cloud-marks", "status": "offered" }
+              ],
+              "effects": [
+                { "kind": "acceptQuest", "questId": "quest.r74-cloud-marks" }
+              ]
+            },
+            {
+              "text": "我已经找到了石阶刻痕。",
+              "nextNodeId": "marks-complete",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r74-cloud-marks", "status": "completed" }
+              ]
+            },
+            {
+              "text": "我去断索悬桥清出栈道。",
+              "nextNodeId": "bridge-accepted",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r74-cloud-bridge", "status": "offered" }
+              ],
+              "effects": [
+                { "kind": "acceptQuest", "questId": "quest.r74-cloud-bridge" }
+              ]
+            },
+            {
+              "text": "悬桥附近已经可以通行。",
+              "nextNodeId": "bridge-complete",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r74-cloud-bridge", "status": "completed" }
+              ]
+            },
+            { "text": "先歇一会儿。", "nextNodeId": "farewell" }
+          ]
+        },
+        {
+          "id": "marks-accepted",
+          "text": "「石阶在客舍西北，云散时能看见第三道刻纹。照着石缝拓全，不要只抄路牌上的字。」沈雨霁把炭笔和薄纸递给你。"
+        },
+        {
+          "id": "marks-complete",
+          "text": "沈雨霁把拓痕对着旧图看了片刻：「这不是修路人的记号，是桥索换过方向。得先到断索悬桥看看，不能照旧线硬走。」"
+        },
+        {
+          "id": "bridge-accepted",
+          "text": "「悬桥在栈道东侧，拦路的人拆了两段护索。」她指向山坳，「确认没有人被困，再把路清出来。」"
+        },
+        {
+          "id": "bridge-complete",
+          "text": "沈雨霁将新拓的路线添进图卷：「山口到悬桥终于连成一线。往后有人问路，也不必再靠猜云势。」"
+        },
+        { "id": "farewell", "text": "沈雨霁收起油纸图，让出窗边那张靠山的空凳。" }
+      ]
+    }
+  ]
+}

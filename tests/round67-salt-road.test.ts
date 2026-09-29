@@ -43,6 +43,7 @@ describe('Round 67 fourth playable region and expanded atlas', () => {
     ['map.round-10-mist-ferry', loadMap('../data/base/maps/round-10-mist-ferry.json')],
     ['map.round-62-iron-ridge', loadMap('../data/base/maps/round-62-iron-ridge.json')],
     [SALT_ID, loadMap('../data/base/maps/round-67-salt-road.json')],
+    ['map.round-74-cloud-ridge', loadMap('../data/base/maps/round-74-cloud-ridge.json')],
   ]);
 
   it('generates a layered 100×100 Kenney CC0 map with a distinct salt-pan overlay', () => {
@@ -62,7 +63,7 @@ describe('Round 67 fourth playable region and expanded atlas', () => {
       .toContain('CC0');
   });
 
-  it('projects all four regions onto the enlarged 176×112 atlas and keeps every gate path real', () => {
+  it('projects all five regions onto the enlarged 208×128 atlas and keeps every gate path real', () => {
     const worldParse = parseWorldMap(readJson('../data/base/world/world-map.json'));
     expect(worldParse.ok).toBe(true);
     if (!worldParse.ok) return;
@@ -81,9 +82,9 @@ describe('Round 67 fourth playable region and expanded atlas', () => {
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
     expect(assembled.warnings).toEqual([]);
-    expect(assembled.regions).toHaveLength(4);
-    expect(assembled.transitions).toHaveLength(6);
-    expect(worldParse.data.atlasArt).toMatchObject({ columns: 176, rows: 112, tileSize: 16 });
+    expect(assembled.regions).toHaveLength(5);
+    expect(assembled.transitions).toHaveLength(8);
+    expect(worldParse.data.atlasArt).toMatchObject({ columns: 208, rows: 128, tileSize: 16 });
     const salt = maps.get(SALT_ID)!;
     const saltIncoming = assembled.transitions.find(({ id }) => id === 'gate.iron-ridge-to-salt-road')!;
     const saltOutgoing = assembled.transitions.find(({ id }) => id === 'gate.salt-road-to-iron-ridge')!;

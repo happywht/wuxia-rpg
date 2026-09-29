@@ -6,7 +6,7 @@ import { deflateSync } from 'node:zlib';
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const worldPath = resolve(repoRoot, 'data/base/world/world-map.json');
 const manifestPath = resolve(repoRoot, 'data/base/manifest.json');
-const atlas = { columns: 176, rows: 112, tileSize: 16 };
+const atlas = { columns: 208, rows: 128, tileSize: 16 };
 
 async function readJson(path) {
   return JSON.parse(await readFile(path, 'utf8'));
@@ -149,6 +149,7 @@ const islands = [
   { x: 23, y: 18, rx: 5, ry: 3 },
   { x: 157, y: 51, rx: 4, ry: 6 },
   { x: 84, y: 97, rx: 5, ry: 2 },
+  { x: 181, y: 65, rx: 23, ry: 20 },
 ];
 const onLandShape = (col, row) => {
   const x = col + 0.5;
@@ -177,6 +178,10 @@ const biomes = [
   {
     frame: paletteFrames.salt,
     points: [[9, 61], [18, 55], [29, 56], [38, 59], [47, 64], [53, 71], [52, 82], [45, 91], [35, 97], [23, 94], [13, 88], [9, 78], [12, 69]],
+  },
+  {
+    frame: paletteFrames.rock,
+    points: [[160, 56], [169, 49], [181, 48], [192, 53], [199, 61], [198, 70], [191, 78], [180, 82], [168, 78], [161, 70]],
   },
 ];
 const groundFrame = (col, row) => {
@@ -288,6 +293,7 @@ const forestPatches = [
   { x: 61, y: 76, rx: 12, ry: 10, salt: 0x703 },
   { x: 146, y: 69, rx: 11, ry: 10, salt: 0x704 },
   { x: 120, y: 27, rx: 8, ry: 11, salt: 0x705 },
+  { x: 181, y: 65, rx: 8, ry: 10, salt: 0x706 },
 ];
 const groveFrames = [5, 6, 17, 20, 29, 31];
 for (let row = 0; row < atlas.rows; row++) {

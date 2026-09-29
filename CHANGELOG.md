@@ -4,6 +4,22 @@
 
 ## [Unreleased]
 
+### Added (Round 74)
+
+- 新增云岭古道 100×100 十层 CC0 山地地图、双向铁嶂关口、沈雨霁、三处可发现见闻和两段链式任务；全域舆图扩为 208×128。
+- 新增云岭区域专项回归和 `npm run smoke:round-74`，覆盖真实 manifest 五区装配与任务链。
+
+### Changed (Round 74)
+
+- 世界加载器按 manifest 中声明的 Schema 汇总所有 `npc-set` 与 `quest-set` 资源，分拆后的区域人物和任务可正常进入运行数据。
+- 为云岭地图补入知识图谱节点；文档审计按 schema family 汇总分拆资源的内容数量。
+- 更新相关地图、人物、任务、图谱、数据架构、测试、素材授权及玩家指南。
+
+### Verification (Round 74)
+
+- `npm run package:release` 通过：34 项基础资料 Schema、34 项 MOD 检查零问题、类型检查、45 个测试文件/303 项测试、Round 34/48 文档审计、139 模块生产构建及发行归档子路径 smoke；发行包 872,450 bytes，SHA-256 `d06cba8cbfebad58ce95c60dd25f06e47724b95e944ee9e68aec2c4c7043d468`。
+- `npm run smoke:round-74`：2 个测试文件/6 项测试通过。隔离浏览器验证 M/G 总图与细图切换、缩放和平移；没有在浏览器手走新区任务。
+
 ### Added (Round 73)
 
 - M 舆图在选中地点或关口时会读取当前已放置 NPC 与有效遭遇占位，使用与 HUD 相同的 Phaser-free 路线规则规划。

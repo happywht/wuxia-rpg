@@ -134,28 +134,41 @@ export async function auditRound48Docs({ root }) {
     };
     const counts = {};
     for (const [schema, [collection, label]] of Object.entries(countSpec)) {
-      const resource = manifest.resources.find((entry) => entry.schema === schema);
-      if (resource === undefined || typeof resource.path !== 'string') {
+      const resources = manifest.resources.filter((entry) => entry.schema === schema);
+      if (resources.length === 0) {
         problems.push(`manifest 缺少用于计数的 ${schema} 资源`);
         continue;
       }
       const baseDirectory = path.resolve(root, 'data/base');
-      const resourceFile = path.resolve(baseDirectory, ...resource.path.split('/'));
-      const resourceRelative = path.relative(baseDirectory, resourceFile);
-      if (resourceRelative.startsWith('..') || path.isAbsolute(resourceRelative)) {
-        problems.push(`${schema} 资源路径越出 data/base`);
-        continue;
-      }
-      try {
-        const resourceData = JSON.parse(await readFile(resourceFile, 'utf8'));
-        if (!Array.isArray(resourceData?.[collection])) {
-          problems.push(`${resource.path} 缺少 ${collection} 数组`);
+      let total = 0;
+      let valid = true;
+      for (const resource of resources) {
+        if (typeof resource.path !== 'string') {
+          problems.push(`${schema} 资源缺少 path`);
+          valid = false;
           continue;
         }
-        counts[schema] = { count: resourceData[collection].length, label };
-      } catch (error) {
-        problems.push(`${resource.path} 无法读取计数：${error instanceof Error ? error.message : String(error)}`);
+        const resourceFile = path.resolve(baseDirectory, ...resource.path.split('/'));
+        const resourceRelative = path.relative(baseDirectory, resourceFile);
+        if (resourceRelative.startsWith('..') || path.isAbsolute(resourceRelative)) {
+          problems.push(`${schema} 资源路径越出 data/base`);
+          valid = false;
+          continue;
+        }
+        try {
+          const resourceData = JSON.parse(await readFile(resourceFile, 'utf8'));
+          if (!Array.isArray(resourceData?.[collection])) {
+            problems.push(`${resource.path} 缺少 ${collection} 数组`);
+            valid = false;
+            continue;
+          }
+          total += resourceData[collection].length;
+        } catch (error) {
+          problems.push(`${resource.path} 无法读取计数：${error instanceof Error ? error.message : String(error)}`);
+          valid = false;
+        }
       }
+      if (valid) counts[schema] = { count: total, label };
     }
     const expectedPhrases = [
       ['npc-set', ' 名 NPC'],

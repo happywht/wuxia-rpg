@@ -310,6 +310,16 @@
     {"id":"kg.edge.r67-luo-located","fromId":"char.luo-jinzi","toId":"map.round-67-salt-road","relation":"locatedAt","summary":"罗金子在青岩驿管理过路秤与盐货记录。"},
     {"id":"kg.edge.r67-luo-knows-well","fromId":"char.luo-jinzi","toId":"place.r67-brine-well","relation":"knows","summary":"罗金子知道回声苦井的旧秤刻和汲水规矩。"},
     {"id":"kg.edge.r67-luo-offers-waterline","fromId":"char.luo-jinzi","toId":"quest.r67-well-waterline","relation":"participatesIn","summary":"罗金子请玩家查明井水发苦是否与水线下降有关。"},
-    {"id":"kg.edge.r67-waterline-requires-well","fromId":"quest.r67-well-waterline","toId":"place.r67-brine-well","relation":"requires","summary":"苦井辨线须亲自核对回声苦井的水线与刻痕。"}
+    {"id":"kg.edge.r67-waterline-requires-well","fromId":"quest.r67-well-waterline","toId":"place.r67-brine-well","relation":"requires","summary":"苦井辨线须亲自核对回声苦井的水线与刻痕。"},
+    {"id":"kg.edge.r74-arrival-map","fromId":"event.r74-cloud-arrival","toId":"map.round-74-cloud-ridge","relation":"locatedAt","summary":"初入云岭的首次行旅标出断云栈道入口。"},
+    {"id":"kg.edge.r74-arrival-place","fromId":"event.r74-cloud-arrival","toId":"place.r74-cloud-ridge","relation":"triggers","summary":"越过断云南隘后发现云岭古道。"},
+    {"id":"kg.edge.r74-inscription-place","fromId":"event.r74-cloud-inscription","toId":"place.r74-cloud-markers","relation":"triggers","summary":"检查石阶刻痕后记下云纹石阶位置。"},
+    {"id":"kg.edge.r74-bridge-place","fromId":"event.r74-cloud-bridge","toId":"place.r74-cloud-bridge","relation":"triggers","summary":"查看断索与靴印后记下悬桥位置。"},
+    {"id":"kg.edge.r74-shen-located","fromId":"char.r74-shen-yuji","toId":"map.round-74-cloud-ridge","relation":"locatedAt","summary":"沈雨霁在云栈客舍记录山道走向。"},
+    {"id":"kg.edge.r74-shen-knows-markers","fromId":"char.r74-shen-yuji","toId":"place.r74-cloud-markers","relation":"knows","summary":"沈雨霁知道云纹石阶的旧索孔记号。"},
+    {"id":"kg.edge.r74-shen-offers-marks","fromId":"char.r74-shen-yuji","toId":"quest.r74-cloud-marks","relation":"participatesIn","summary":"沈雨霁请玩家拓录石阶上的旧刻痕。"},
+    {"id":"kg.edge.r74-marks-requires-place","fromId":"quest.r74-cloud-marks","toId":"place.r74-cloud-markers","relation":"requires","summary":"云阶辨刻须找到云纹石阶的旧索孔。"},
+    {"id":"kg.edge.r74-shen-offers-bridge","fromId":"char.r74-shen-yuji","toId":"quest.r74-cloud-bridge","relation":"participatesIn","summary":"沈雨霁请玩家清出被拦路客占据的悬桥。"},
+    {"id":"kg.edge.r74-bridge-requires-marks","fromId":"quest.r74-cloud-bridge","toId":"quest.r74-cloud-marks","relation":"requires","summary":"先核对云阶刻痕，再依旧路向清理断索悬桥。"}
   ]
 }

@@ -1,0 +1,37 @@
+{
+  "quests": [
+    {
+      "id": "quest.r74-cloud-marks",
+      "name": "云阶辨刻",
+      "description": "沈雨霁请你到云纹石阶拓下旧刻痕，核对断云栈道的南北路向。",
+      "giverNpcId": "char.r74-shen-yuji",
+      "objectives": [
+        {
+          "id": "objective.r74-cloud-marks",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r74-cloud-markers",
+          "requiredCount": 1,
+          "text": "到云纹石阶辨认第三道刻痕"
+        }
+      ],
+      "rewards": { "experience": 28, "currency": 20 }
+    },
+    {
+      "id": "quest.r74-cloud-bridge",
+      "name": "断索清桥",
+      "description": "石阶刻痕指出悬桥护索曾被改过。先查明山桥现状，再驱散占路者，让云岭栈道重新连通。",
+      "giverNpcId": "char.r74-shen-yuji",
+      "prerequisiteQuestIds": ["quest.r74-cloud-marks"],
+      "objectives": [
+        {
+          "id": "objective.r74-cloud-bridge",
+          "kind": "defeatEncounter",
+          "targetId": "encounter.r74-cloud-bridge-bandits",
+          "requiredCount": 1,
+          "text": "击退断索悬桥附近的拦路客"
+        }
+      ],
+      "rewards": { "experience": 44, "currency": 32 }
+    }
+  ]
+}
