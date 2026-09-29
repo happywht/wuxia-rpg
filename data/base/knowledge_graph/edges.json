@@ -336,6 +336,17 @@
     {"id":"kg.edge.r82-npc-location","fromId":"char.r82-wen-chaozhi","toId":"map.round-82-east-coast","relation":"locatedAt","summary":"温朝之在青帆埠保管渡潮簿。"},
     {"id":"kg.edge.r82-npc-quest","fromId":"char.r82-wen-chaozhi","toId":"quest.r82-follow-the-tide","relation":"participatesIn","summary":"温朝之委托玩家补全东汊潮尺记录。"},
     {"id":"kg.edge.r82-quest-gauge","fromId":"quest.r82-follow-the-tide","toId":"place.r82-east-tide-gauge","relation":"requires","summary":"潮尺旧记需要玩家调查东汊石潮尺。"},
-    {"id":"kg.edge.r82-quest-cove","fromId":"quest.r82-follow-the-tide","toId":"place.r82-fog-cove","relation":"rewards","summary":"完成潮尺旧记后，温朝之补绘雾隐湾的安全水路。"}
+    {"id":"kg.edge.r82-quest-cove","fromId":"quest.r82-follow-the-tide","toId":"place.r82-fog-cove","relation":"rewards","summary":"完成潮尺旧记后，温朝之补绘雾隐湾的安全水路。"},
+    {"id":"kg.edge.r83-merchant-location","fromId":"char.r83-jin-yunfan","toId":"place.r82-east-coast","relation":"locatedAt","summary":"金云帆在青帆埠经营潮行补给摊。"},
+    {"id":"kg.edge.r83-merchant-stock","fromId":"char.r83-jin-yunfan","toId":"item.r83-sea-salt-ointment","relation":"holds","summary":"金云帆的补给摊售有海盐敷膏。"},
+    {"id":"kg.edge.r83-fisher-location","fromId":"char.r83-gu-chaosheng","toId":"place.r82-east-coast","relation":"locatedAt","summary":"顾潮生在青帆埠附近巡潮。"},
+    {"id":"kg.edge.r83-fisher-recovery","fromId":"char.r83-gu-chaosheng","toId":"quest.r83-net-recovery","relation":"participatesIn","summary":"顾潮生委托玩家找回潮沟网具。"},
+    {"id":"kg.edge.r83-fisher-channel","fromId":"char.r83-gu-chaosheng","toId":"quest.r83-night-channel","relation":"participatesIn","summary":"顾潮生请玩家辨认暮潮回湾线。"},
+    {"id":"kg.edge.r83-raiders-location","fromId":"char.r83-tide-wake-leader","toId":"place.r82-east-coast","relation":"locatedAt","summary":"夺网客头目出没在东汊潮沟浅滩。"},
+    {"id":"kg.edge.r83-encounter-raider","fromId":"event.r83-tide-wake-looters","toId":"char.r83-tide-wake-leader","relation":"triggers","summary":"在潮沟浅滩遭遇夺网头目。"},
+    {"id":"kg.edge.r83-recovery-encounter","fromId":"quest.r83-net-recovery","toId":"event.r83-tide-wake-looters","relation":"requires","summary":"潮沟夺网要求击退夺网客。"},
+    {"id":"kg.edge.r83-recovery-shoals","fromId":"quest.r83-net-recovery","toId":"place.r83-net-shoals","relation":"rewards","summary":"找回浮标后重新得知回标浅滩。"},
+    {"id":"kg.edge.r83-night-event-place","fromId":"event.r83-night-channel","toId":"place.r83-night-channel","relation":"triggers","summary":"夜潮灯影照亮回湾石标后发现安全航线。"},
+    {"id":"kg.edge.r83-channel-quest-place","fromId":"quest.r83-night-channel","toId":"place.r83-night-channel","relation":"requires","summary":"暮潮牵标要求玩家调查夜间石标。"}
   ]
 }

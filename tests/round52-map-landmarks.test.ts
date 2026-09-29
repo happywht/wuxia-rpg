@@ -61,6 +61,7 @@ describe('Round 52 data-driven map landmarks', () => {
       'landmark.r82-blue-sail-market',
       'landmark.r82-east-tide-gauge',
       'landmark.r82-fog-cove',
+      'landmark.r83-night-channel',
     ]);
     // Legacy direct callers pass no reference ids, so the discovery gate on
     // the reedbank landing must not be validated (and not hide the landmark).
@@ -155,6 +156,8 @@ describe('Round 53 landmark discovery gating', () => {
       'place.r82-blue-sail-market',
       'place.r82-east-tide-gauge',
       'place.r82-fog-cove',
+      'place.r83-net-shoals',
+      'place.r83-night-channel',
     ]),
     periodIds: new Set(['period.dusk', 'period.night']),
     weatherIds: new Set(['weather.drizzle', 'weather.rain', 'weather.storm']),
@@ -187,7 +190,7 @@ describe('Round 53 landmark discovery gating', () => {
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
     expect(assembled.landmarks.map(({ id }) => id)).not.toContain('landmark.reedbank-landing');
-    expect(assembled.landmarks).toHaveLength(29);
+    expect(assembled.landmarks).toHaveLength(30);
     expect(assembled.events.map(({ id }) => id)).not.toContain('event.reedbank-traces');
     const joined = assembled.warnings.join('\n');
     expect(joined).toContain('landmark.reedbank-landing');

@@ -1,0 +1,100 @@
+{
+  "npcs": [
+    {
+      "id": "char.r83-jin-yunfan",
+      "name": "金云帆",
+      "mapResourceId": "map.round-82-east-coast",
+      "position": {
+        "col": 43,
+        "row": 50
+      },
+      "dialogueId": "dlg.r83-jin-yunfan-provisions",
+      "shopId": "shop.r83-blue-sail-provisions",
+      "spriteFrame": 40,
+      "spriteFrames": {
+        "down": 32,
+        "right": 40,
+        "up": 48,
+        "left": 56
+      },
+      "schedule": [
+        {
+          "periodId": "period.dawn",
+          "position": {
+            "col": 42,
+            "row": 49
+          }
+        },
+        {
+          "periodId": "period.afternoon",
+          "position": {
+            "col": 44,
+            "row": 51
+          }
+        },
+        {
+          "periodId": "period.dusk",
+          "position": {
+            "col": 46,
+            "row": 52
+          }
+        },
+        {
+          "periodId": "period.night",
+          "position": {
+            "col": 35,
+            "row": 58
+          }
+        }
+      ]
+    },
+    {
+      "id": "char.r83-gu-chaosheng",
+      "name": "顾潮生",
+      "mapResourceId": "map.round-82-east-coast",
+      "position": {
+        "col": 62,
+        "row": 63
+      },
+      "dialogueId": "dlg.r83-gu-chaosheng-tide-line",
+      "questGiver": true,
+      "spriteFrame": 104,
+      "spriteFrames": {
+        "down": 96,
+        "right": 104,
+        "up": 112,
+        "left": 120
+      },
+      "schedule": [
+        {
+          "periodId": "period.dawn",
+          "position": {
+            "col": 60,
+            "row": 62
+          }
+        },
+        {
+          "periodId": "period.afternoon",
+          "position": {
+            "col": 64,
+            "row": 66
+          }
+        },
+        {
+          "periodId": "period.dusk",
+          "position": {
+            "col": 65,
+            "row": 68
+          }
+        },
+        {
+          "periodId": "period.night",
+          "position": {
+            "col": 58,
+            "row": 68
+          }
+        }
+      ]
+    }
+  ]
+}

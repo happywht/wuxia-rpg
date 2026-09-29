@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：截至 Round 82，基础世界含 18 名 NPC、5 个门派、48 项任务、51 件物品、30 种武学、230 个图谱节点/337 条边，manifest 登记 42 项资源。七张区域地图均为 100×100 格；新东溟海岸使用 Shade Puny World 与 ansimuz RPG Town CC0 图素，并沿用 336×224 十六层全域舆图。地图碰撞、剧情与跨区连接仍由独立 JSON 声明，生成器保护玩法锚点；素材授权、MOD 和导航协议见 `REFERENCES.md`、`MOD-GUIDE.md`、`MAP-ATLAS.md`。
+- 状态：截至 Round 83，基础世界含 20 名 NPC、5 个门派、50 项任务、52 件物品、30 种武学、240 个图谱节点/348 条边，manifest 登记 48 项资源。七张区域地图均为 100×100 格；东溟海岸使用 Shade Puny World、ansimuz RPG Town 与 Puny Characters CC0 图素，并沿用 336×224 十六层全域舆图。地图碰撞、剧情与跨区连接仍由独立 JSON 声明，生成器保护玩法锚点；素材授权、MOD 和导航协议见 `REFERENCES.md`、`MOD-GUIDE.md`、`MAP-ATLAS.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -276,6 +276,10 @@ NPC 条目可选声明 `spriteFrames`，键固定为 `down`、`left`、`right`�
 ## Round 82：东溟海岸数据资源
 
 第七张 `grid-map` 使用独立碰撞 `grid` 与 CC0 图素 `art.layers`，资源 id 为 `map.round-82-east-coast`。新增 `npc-set`、`dialogue-set`、`quest-set` 资源分别声明温朝之、状态条件对白和「潮尺旧记」；`world-map` 集中声明区域坐标、两向关口、四处地标和三个固定事件。知识发现 id 必须同时登记在 `knowledge_graph/nodes.json`，关系端点登记在 `edges.json`。运行 `npm run generate:round-82-east-coast` 可确定性重建这些资源，`npm run smoke:round-82` 覆盖引用、碰撞路线、互动提示和奖励；运行 `npm run validate:data` 检查静态 Schema，`npm run check` 另做跨资源装配校验。
+
+## Round 83：港镇可组合内容集合
+
+物品、商店与战斗遭遇可以像 NPC、对白和任务一样按轮次拆分成多个 manifest 资源。`world-loader.ts` 按 manifest 次序遍历所有 `items-set`、`shops-set`、`battle-encounters`；结构无效的可选集合单独告警并跳过，同类其他集合仍装配。全局重复物品 id 保留较早声明，商店与遭遇沿用逐记录首项优先；商店货架引用在全部物品索引完成后统一校验。Round 83 示例文件位于 `items/`、`shops/`、`battles/`、`characters/`、`dialogues/` 和 `quests/`，运行 `npm run generate:round-83-east-coast` 重建；`npm run smoke:round-83` 检查多资源合并、坏集合隔离、交易、七时段坐标和任务链。
 
 ## Round 80：地图环境对象调查
 

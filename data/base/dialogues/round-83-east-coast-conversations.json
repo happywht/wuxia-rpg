@@ -1,0 +1,132 @@
+{
+  "conversations": [
+    {
+      "id": "dlg.r83-jin-yunfan-provisions",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "金云帆把几只药罐摆在潮簿旁：「我收的是沿岸行船人的钱，卖的也是沿岸行船人的东西。」",
+          "options": [
+            {
+              "text": "海盐敷膏怎么用？",
+              "nextNodeId": "ointment"
+            },
+            {
+              "text": "青帆埠近来有什么动静？",
+              "nextNodeId": "harbor"
+            },
+            {
+              "text": "我先看看货。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "ointment",
+          "text": "「浅伤先洗净再敷。若伤口深，别拿盐膏硬堵，找郎中看过再说。」"
+        },
+        {
+          "id": "harbor",
+          "text": "「退潮后有人往潮沟里拖东西。顾潮生看过几回，最近连系浮标也少了。」"
+        },
+        {
+          "id": "farewell",
+          "text": "金云帆将木匣盖好，给后来等船的人让出半张凳子。"
+        }
+      ]
+    },
+    {
+      "id": "dlg.r83-gu-chaosheng-tide-line",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "顾潮生把一段断开的浮标绳放在膝边：「潮尺记的是水位，可没人把夜里那道回湾线标清。先把潮沟里拖网的人赶走，我再带你认灯。」",
+          "options": [
+            {
+              "text": "我去潮沟找回浮标和网具。",
+              "nextNodeId": "recovery-accepted",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r83-net-recovery",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r83-net-recovery"
+                }
+              ]
+            },
+            {
+              "text": "网具已经拿回来了。",
+              "nextNodeId": "recovery-complete",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r83-net-recovery",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "我去辨认夜里的回湾线。",
+              "nextNodeId": "channel-accepted",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r83-night-channel",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r83-night-channel"
+                }
+              ]
+            },
+            {
+              "text": "回湾线已经记下了。",
+              "nextNodeId": "channel-complete",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r83-night-channel",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "先说说这片潮沟。",
+              "nextNodeId": "tidal-flat"
+            }
+          ]
+        },
+        {
+          "id": "recovery-accepted",
+          "text": "「浅滩东边有拖网的脚印，别踩进湿沙里的旧木桩。浮标绳断口还挂着蓝漆。」"
+        },
+        {
+          "id": "recovery-complete",
+          "text": "「浮标能重新连起来了。等入夜以后，再去浅滩北侧看灯影落在哪道浪线上。」"
+        },
+        {
+          "id": "channel-accepted",
+          "text": "「天色暗下来再找。石标背海的一面有一条刻线，灯影碰到刻线时，浅湾就能绕过外礁。」"
+        },
+        {
+          "id": "channel-complete",
+          "text": "「这回涨潮时就有路标可循。走水路的人不用再拿命赌浪头了。」"
+        },
+        {
+          "id": "tidal-flat",
+          "text": "「白日看沙纹只能辨风，天黑后才看得出潮沟怎么转。两样都要记，才算真懂这段海岸。」"
+        }
+      ]
+    }
+  ]
+}

@@ -16,6 +16,9 @@ npm run smoke:round-74 # 云岭百格地图、跨区关口、任务链和真实 
 npm run smoke:round-79 # 落潮湾海岛、CC0 图素、六区舆图及旧区域投影兼容
 npm run smoke:round-80 # 区域事件 E 调查、旧触发兼容、方向/范围/条件与遮挡
 npm run smoke:round-81 # 扩图、旧投影稳定、CC0 素材与视口复位
+npm run smoke:round-82 # 海岸地图、往返关口、旧区域投影和潮尺任务
+npm run smoke:round-83 # 港镇多资源装配、商店/NPC 日程、海岸任务与坏资源隔离
+npm run generate:round-83-east-coast # 确定性重建青帆埠角色、商店、任务和图谱登记
 npm run smoke:round-76 # 五区补充图集帧、原碰撞/画层哈希与锚点
 npm run smoke:round-77 # CC0 人物帧、方向动画数据、碰撞哈希和旧格式兼容
 npm run generate:round-77-characters # 确定性重建 CC0 人物图集与人物帧表
@@ -177,6 +180,7 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 | `tests/round80-region-interactions.test.ts` | 区域事件交互 Schema、选择器及云岭/海岛真实地图 | 覆盖声明校验、旧踏入事件、方向/距离、动态视线遮挡、条件/一次性状态与真实事件坐标；纳入 `npm run smoke:round-80`。 |
 | `tests/round81-world-atlas.test.ts` | 扩展全域舆图、区域投影、已登记 CC0 图素与视口 | 校验 336×224 Schema/解析上限、旧 224×144 区域哈希、全部既有锚点像素坐标、东/南新地貌、许可引用及 fit/pan/reset；纳入 `npm run smoke:round-81`。 |
 | `tests/round82-east-coast.test.ts` | 东溟海岸、双向步行关口、CC0 像素素材和潮尺任务闭环 | 校验第七张 100×100 地图、旧六区投影、两端 BFS 可达、锚点与调查方向、素材尺寸/许可、对白接取、见闻完成及任务奖励；纳入 `npm run smoke:round-82`。 |
+| `tests/round83-east-coast-town.test.ts` | 内容集合装配器与青帆埠港镇资料 | 校验跨资源 items/shops/encounters 合并、损坏集合隔离、重复 id 首项优先、七时段 NPC 可达与无冲突、限量商品购买、互动门控、两段任务奖励及图谱引用；纳入 `npm run smoke:round-83`。 |
 - 2026-09-29（Round 79）：新增海岛区域专项与可重复生成命令；世界图夹具升级为六区/十向关口，覆盖 Puny World CC0 图集网格、任务发现奖励、舆图保留旧大陆图层及旧区域锚点稳定。专项命令 `npm run smoke:round-79`。
 - 2026-09-30（Round 80）：新增固定区域事件环境调查专项，覆盖 interaction Schema/解析、默认踏入事件、方向/距离/视线、条件/一次性与云岭悬桥/落潮湾灯标真实格位；`npm run smoke:round-80`。
 - 2026-09-30（Round 81）：新增 336×224 超大舆图专项，锁定旧 12 层历史像素、六区及全部关口/地标/玩家投影，验证新拓展图素、Schema 最大尺寸、Puny World CC0 来源与适配视口；`npm run smoke:round-81`。

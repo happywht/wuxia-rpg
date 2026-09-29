@@ -4,6 +4,16 @@
 
 ## [Unreleased]
 
+### Added (Round 83)
+
+- 青帆埠新增金云帆限量补给摊、海盐敷膏、顾潮生七时段行程、潮沟夺网战斗和「潮沟夺网」→「暮潮牵标」两段任务；夜间石标需先完成前置差事后调查。
+- 世界装配器现按 manifest 顺序合并所有 `items-set`、`shops-set` 与 `battle-encounters` 资源；结构错误只隔离对应资源，重复 id 确定性保留首条，原 Round 06/05 单资源资料仍可加载。
+- 新增 Round 83 内容生成器与资源装配/交易/日程/路线/任务/图谱专项测试；同步七区地图、人物、任务、物品、架构及数据作者说明。
+
+### Verification (Round 83)
+
+- `npm run generate:round-83-east-coast` 可重跑；专项 `npm run smoke:round-83`：4 个测试文件/26 项通过。完整验证记录在 `DEVLOG.md`。
+
 ### Added (Round 82)
 
 - 新增第七张 100×100 东溟海岸·青帆埠可玩地图，复用已登记的 Puny World 与 RPG Town CC0 像素图素；云岭古道东缘和青帆埠西码头配置双向步行关口。

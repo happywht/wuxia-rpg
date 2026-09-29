@@ -1,0 +1,44 @@
+{
+  "encounters": [
+    {
+      "id": "encounter.r83-tide-wake-looters",
+      "name": "潮沟夺网客",
+      "mapResourceId": "map.round-82-east-coast",
+      "position": {
+        "col": 73,
+        "row": 68
+      },
+      "profileId": "char.scribe-apprentice",
+      "knowledgeNodeId": "char.r83-tide-wake-leader",
+      "enemy": {
+        "name": "夺网头目",
+        "attributes": {
+          "body": 8,
+          "force": 8,
+          "agility": 7,
+          "insight": 5,
+          "resolve": 6
+        },
+        "health": 52,
+        "qi": 10,
+        "martialArtIds": [
+          "skill.jianghu-sanshou",
+          "skill.lanmen-daofa"
+        ]
+      },
+      "victoryExperience": 0,
+      "defeatRecovery": {
+        "healthRatio": 0.65,
+        "qiRatio": 0.6
+      },
+      "repeatable": true,
+      "texts": {
+        "approach": "潮沟边有人把旧渔网往船上拖，按 E 阻止夺网客",
+        "intro": "那人将湿网往肩上一甩：「退潮露出的东西，谁捡到就是谁的。」",
+        "victory": "夺网客丢下渔网退进礁石后，几只系船浮标也重新露了出来。",
+        "defeat": "你被夺网客逼离潮沟，渔网又被拖向浅滩。",
+        "flee": "你暂退到松坡边，夺网客仍守着那片退潮浅滩。"
+      }
+    }
+  ]
+}

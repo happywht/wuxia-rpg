@@ -1,0 +1,17 @@
+{
+  "items": [
+    {
+      "id": "item.r83-sea-salt-ointment",
+      "name": "海盐敷膏",
+      "description": "青帆埠药摊以海盐、松脂和晒干的芦根调成的小罐敷膏，能压住擦伤的灼痛。",
+      "category": "consumable",
+      "stackLimit": 9,
+      "buyPrice": 26,
+      "sellPrice": 8,
+      "consumable": {
+        "healthRestore": 22,
+        "qiRestore": 0
+      }
+    }
+  ]
+}

@@ -140,7 +140,6 @@ const CLIMATE_RESOURCE_ID = 'climate.base';
 const CHARACTER_PROFILE_RESOURCE_ID = 'character-profile.round-04-set';
 const FACTION_RESOURCE_ID = 'faction.round-04-set';
 const MARTIAL_ART_RESOURCE_ID = 'martial-art.round-04-set';
-const ENCOUNTER_RESOURCE_ID = 'encounter.round-05-set';
 const ARENA_RESOURCE_ID = 'arena.round-20-set';
 const FACTION_WAR_RESOURCE_ID = 'faction-war.round-21-set';
 const MARTIAL_ART_COMPONENT_RESOURCE_ID = 'martial-art-components.round-22-set';
@@ -149,8 +148,6 @@ const EQUIPMENT_FORGE_RESOURCE_ID = 'equipment-forge.round-24-set';
 const ALCHEMY_RESOURCE_ID = 'alchemy.round-25-set';
 const ENDING_RESOURCE_ID = 'ending.round-27-set';
 const ACHIEVEMENT_RESOURCE_ID = 'achievement.round-28-set';
-const ITEM_RESOURCE_ID = 'item.round-06-set';
-const SHOP_RESOURCE_ID = 'shop.round-06-set';
 const COMPANION_RESOURCE_ID = 'companion.round-19-set';
 const KNOWLEDGE_NODE_RESOURCE_ID = 'knowledge.round-11-nodes';
 const KNOWLEDGE_EDGE_RESOURCE_ID = 'knowledge.round-11-edges';
@@ -836,6 +833,8 @@ function assembleOptionalContent(
 
   // Items first, then shops: shop stock references resolve against the
   // indexed items, and NPC shop references resolve against assembled shops.
+  // Each optional schema family can be split across manifest resources; one
+  // malformed extension must not disable the other valid resource files.
   const itemAssembly = assembleItemContent(resources);
   warnings.push(...itemAssembly.warnings);
 
@@ -873,7 +872,6 @@ function assembleOptionalContent(
   });
   for (const message of shopAssembly.warnings) {
     warnings.push({
-      resource: SHOP_RESOURCE_ID,
       origin: 'shop-assembly',
       severity: 'warning',
       message,
@@ -896,20 +894,20 @@ function assembleOptionalContent(
 
   // Encounters resolve against the map, placed NPCs, profiles and arts.
   let encounters: PlacedEncounter[] = [];
-  let encounterSet: BattleEncounterSetData | null = null;
-  const encounterResource = resources.get(ENCOUNTER_RESOURCE_ID);
-  if (encounterResource !== undefined) {
+  const encounterResources = [...resources.values()].filter((resource) => resource.schema === 'battle-encounters');
+  let encounterSet: BattleEncounterSetData | null = encounterResources.length === 0 ? null : { encounters: [] };
+  for (const encounterResource of encounterResources) {
     const parsed = parseBattleEncounterSet(encounterResource.value);
     if (!parsed.ok) {
       warnings.push({
-        resource: ENCOUNTER_RESOURCE_ID,
+        resource: encounterResource.id,
         origin: 'encounter-assembly',
         severity: 'warning',
-        message: '遭遇资料结构不合规，本轮禁用全部战斗遭遇',
+        message: `遭遇资料结构不合规，已禁用资源 "${encounterResource.id}" 中的遭遇`,
         details: parsed.errors,
       });
     } else {
-      encounterSet = parsed.set;
+      encounterSet!.encounters.push(...parsed.set.encounters);
     }
   }
   const encounterPlacements = [...maps.keys()].map((currentMapResourceId) =>
@@ -934,7 +932,6 @@ function assembleOptionalContent(
     for (const encounter of placement.encounters) {
       if (globallySeenEncounterIds.has(encounter.record.id)) {
         warnings.push({
-          resource: ENCOUNTER_RESOURCE_ID,
           origin: 'encounter-assembly',
           severity: 'warning',
           message: `遭遇 "${encounter.record.id}" 在多张地图重复登记，保留世界图首条记录`,
@@ -948,7 +945,6 @@ function assembleOptionalContent(
   }
   for (const message of new Set(encounterPlacements.flatMap((placement) => placement.warnings))) {
     warnings.push({
-      resource: ENCOUNTER_RESOURCE_ID,
       origin: 'encounter-assembly',
       severity: 'warning',
       message,
@@ -1554,11 +1550,11 @@ function assembleProgressionContent(
 }
 
 /**
- * Assembles the optional Round 06 item dataset and parses the shop set.
- * Structural failures disable the whole resource with a warning; duplicate
- * item ids keep the first declaration. A missing (unregistered) resource
- * is legitimate — the world then simply has no items or shops. Nothing
- * here can block the map. Shop cross-references run in
+ * Assembles item and shop datasets from every manifest resource of their
+ * schema. Structural failures disable only their own resource; duplicate
+ * item ids keep the first declaration across manifest order. Missing
+ * resources are legitimate — the world then simply has no items or shops.
+ * Nothing here can block the map. Shop cross-references run in
  * {@link assembleOptionalContent} once NPC placement is known.
  */
 function assembleItemContent(
@@ -1566,49 +1562,48 @@ function assembleItemContent(
 ): { items: ReadonlyMap<string, ItemRecordData>; shopSet: ShopSetData | null; warnings: Diagnostic[] } {
   const warnings: Diagnostic[] = [];
 
-  let items = new Map<string, ItemRecordData>();
-  const itemResource = resources.get(ITEM_RESOURCE_ID);
-  if (itemResource !== undefined) {
+  const itemResources = [...resources.values()].filter((resource) => resource.schema === 'items-set');
+  const itemRecords: ItemRecordData[] = [];
+  for (const itemResource of itemResources) {
     const parsed = parseItemSet(itemResource.value);
     if (!parsed.ok) {
       warnings.push({
-        resource: ITEM_RESOURCE_ID,
+        resource: itemResource.id,
         origin: 'item-assembly',
         severity: 'warning',
-        message: '物品资料结构不合规，本轮禁用全部物品与交易',
+        message: `物品资料结构不合规，已禁用资源 "${itemResource.id}" 中的物品`,
         details: parsed.errors,
       });
     } else {
-      const index = indexItems(parsed.set);
-      for (const id of index.duplicateIds) {
-        warnings.push({
-          resource: ITEM_RESOURCE_ID,
-          origin: 'item-assembly',
-          severity: 'warning',
-          message: `物品 id "${id}" 重复，保留先声明者`,
-          details: [],
-        });
-      }
-      items = index.byId;
+      itemRecords.push(...parsed.set.items);
     }
   }
+  const itemIndex = indexItems({ items: itemRecords });
+  for (const id of itemIndex.duplicateIds) {
+    warnings.push({
+      origin: 'item-assembly',
+      severity: 'warning',
+      message: `物品 id "${id}" 在多个条目中重复，保留 manifest 顺序中的首条`,
+      details: [],
+    });
+  }
 
-  let shopSet: ShopSetData | null = null;
-  const shopResource = resources.get(SHOP_RESOURCE_ID);
-  if (shopResource !== undefined) {
+  const shopResources = [...resources.values()].filter((resource) => resource.schema === 'shops-set');
+  let shopSet: ShopSetData | null = shopResources.length === 0 ? null : { shops: [] };
+  for (const shopResource of shopResources) {
     const parsed = parseShopSet(shopResource.value);
     if (!parsed.ok) {
       warnings.push({
-        resource: SHOP_RESOURCE_ID,
+        resource: shopResource.id,
         origin: 'shop-assembly',
         severity: 'warning',
-        message: '商店资料结构不合规，本轮禁用全部商店',
+        message: `商店资料结构不合规，已禁用资源 "${shopResource.id}" 中的商店`,
         details: parsed.errors,
       });
     } else {
-      shopSet = parsed.set;
+      shopSet!.shops.push(...parsed.set.shops);
     }
   }
 
-  return { items, shopSet, warnings };
+  return { items: itemIndex.byId, shopSet, warnings };
 }

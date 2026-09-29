@@ -79,6 +79,7 @@ describe('world map roaming events', () => {
         'place.r74-cloud-markers', 'place.r74-cloud-bridge', 'place.r74-cloud-ridge',
         'place.r79-isles', 'place.r79-west-reef', 'place.r79-white-beacon',
         'place.r82-east-coast', 'place.r82-blue-sail-market', 'place.r82-east-tide-gauge', 'place.r82-fog-cove',
+        'place.r83-net-shoals', 'place.r83-night-channel',
       ]),
       periodIds: new Set(['period.dusk', 'period.night']),
       weatherIds: new Set(['weather.drizzle', 'weather.rain', 'weather.storm']),

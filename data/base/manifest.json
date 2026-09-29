@@ -66,6 +66,36 @@
       "schema": "quest-set"
     },
     {
+      "id": "npc.round-83-east-coast-set",
+      "path": "characters/round-83-east-coast-npcs.json",
+      "schema": "npc-set"
+    },
+    {
+      "id": "dialogue.round-83-east-coast-set",
+      "path": "dialogues/round-83-east-coast-conversations.json",
+      "schema": "dialogue-set"
+    },
+    {
+      "id": "quest.round-83-east-coast-set",
+      "path": "quests/round-83-east-coast-quests.json",
+      "schema": "quest-set"
+    },
+    {
+      "id": "item.round-83-east-coast-set",
+      "path": "items/round-83-east-coast-items.json",
+      "schema": "items-set"
+    },
+    {
+      "id": "shop.round-83-east-coast-set",
+      "path": "shops/round-83-east-coast-shops.json",
+      "schema": "shops-set"
+    },
+    {
+      "id": "encounter.round-83-east-coast-set",
+      "path": "battles/round-83-east-coast-encounters.json",
+      "schema": "battle-encounters"
+    },
+    {
       "id": "world.atlas",
       "path": "world/world-map.json",
       "schema": "world-map"

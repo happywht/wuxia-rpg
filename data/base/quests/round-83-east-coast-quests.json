@@ -1,0 +1,51 @@
+{
+  "quests": [
+    {
+      "id": "quest.r83-net-recovery",
+      "name": "潮沟夺网",
+      "description": "顾潮生说退潮后有人从潮沟拖走网具和浮标。击退夺网客，找回浅滩上的潮标。",
+      "giverNpcId": "char.r83-gu-chaosheng",
+      "prerequisiteQuestIds": [
+        "quest.r82-follow-the-tide"
+      ],
+      "objectives": [
+        {
+          "id": "objective.r83-defeat-tide-wake-looters",
+          "kind": "defeatEncounter",
+          "targetId": "encounter.r83-tide-wake-looters",
+          "requiredCount": 1,
+          "text": "击退潮沟里的夺网客"
+        }
+      ],
+      "rewards": {
+        "experience": 42,
+        "currency": 34,
+        "discoverKnowledgeNodeIds": [
+          "place.r83-net-shoals"
+        ]
+      }
+    },
+    {
+      "id": "quest.r83-night-channel",
+      "name": "暮潮牵标",
+      "description": "浮标网具复位后，顾潮生请你在黄昏或入夜时辨出石标上的回湾刻线。",
+      "giverNpcId": "char.r83-gu-chaosheng",
+      "prerequisiteQuestIds": [
+        "quest.r83-net-recovery"
+      ],
+      "objectives": [
+        {
+          "id": "objective.r83-discover-night-channel",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r83-night-channel",
+          "requiredCount": 1,
+          "text": "在黄昏或入夜时调查浅滩石标"
+        }
+      ],
+      "rewards": {
+        "experience": 36,
+        "currency": 30
+      }
+    }
+  ]
+}

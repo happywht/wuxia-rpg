@@ -1,0 +1,29 @@
+{
+  "shops": [
+    {
+      "id": "shop.r83-blue-sail-provisions",
+      "name": "青帆埠潮行补给摊",
+      "npcId": "char.r83-jin-yunfan",
+      "greeting": "「行船靠潮，走路靠脚。海盐敷膏、回春膏和清心丸都在木匣里，买多少我记多少。」",
+      "sellRate": 0.55,
+      "stock": [
+        {
+          "itemId": "item.r83-sea-salt-ointment",
+          "quantity": 6
+        },
+        {
+          "itemId": "item.huichun-gao",
+          "quantity": -1
+        },
+        {
+          "itemId": "item.qingxin-wan",
+          "quantity": 5
+        },
+        {
+          "itemId": "item.r32.clam-shell",
+          "quantity": 4
+        }
+      ]
+    }
+  ]
+}

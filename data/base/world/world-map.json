@@ -323,6 +323,15 @@
       "name": "雾隐湾",
       "category": "water",
       "discoveryNodeId": "place.r82-fog-cove"
+    },
+    {
+      "id": "landmark.r83-night-channel",
+      "mapResourceId": "map.round-82-east-coast",
+      "col": 63,
+      "row": 72,
+      "name": "暮潮牵标",
+      "category": "other",
+      "discoveryNodeId": "place.r83-night-channel"
     }
   ],
   "transitions": [
@@ -755,6 +764,33 @@
       "discoverKnowledgeNodeId": "place.r82-east-tide-gauge",
       "interaction": {
         "prompt": "抄录东汊石潮尺的刻痕",
+        "range": 1,
+        "approachDirections": [
+          "left",
+          "down"
+        ]
+      }
+    },
+    {
+      "id": "event.r83-night-channel",
+      "mapResourceId": "map.round-82-east-coast",
+      "col": 63,
+      "row": 72,
+      "text": "石标背面有一道细刻，夜潮灯影落在刻线里时，沙脊外侧正好让出一条回湾水路。",
+      "approachText": "旧石标朝海的一面被盐壳盖住，旁边留有刚换过的浮标绳。",
+      "once": true,
+      "conditions": {
+        "knowledgeNodeIds": [
+          "place.r83-net-shoals"
+        ],
+        "periodIds": [
+          "period.dusk",
+          "period.night"
+        ]
+      },
+      "discoverKnowledgeNodeId": "place.r83-night-channel",
+      "interaction": {
+        "prompt": "辨认暮潮灯影下的石标刻线",
         "range": 1,
         "approachDirections": [
           "left",

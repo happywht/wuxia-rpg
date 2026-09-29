@@ -745,6 +745,16 @@
     {"id":"quest.r82-follow-the-tide","kind":"quest","title":"潮尺旧记","summary":"替温朝之核对东汊石潮尺，补全海岸行船记录。","knownByDefault":false},
     {"id":"event.r82-arrival","kind":"event","title":"越岭见海","summary":"走出云岭松坡后首次抵达东溟海岸。","knownByDefault":false},
     {"id":"event.r82-blue-sail-market","kind":"event","title":"渡潮簿旧页","summary":"翻看青帆埠柜台上的旧水路记录。","knownByDefault":false},
-    {"id":"event.r82-tide-gauge","kind":"event","title":"东汊潮尺刻痕","summary":"调查石潮尺并记录季节水位。","knownByDefault":false}
+    {"id":"event.r82-tide-gauge","kind":"event","title":"东汊潮尺刻痕","summary":"调查石潮尺并记录季节水位。","knownByDefault":false},
+    {"id":"char.r83-jin-yunfan","kind":"character","title":"金云帆","summary":"在青帆埠经营潮行补给摊，按时辰往返集市与近岸住处。","knownByDefault":false},
+    {"id":"char.r83-gu-chaosheng","kind":"character","title":"顾潮生","summary":"青帆埠巡潮渔户，白日查看浮标，入夜记录回湾灯影。","knownByDefault":false},
+    {"id":"char.r83-tide-wake-leader","kind":"character","title":"潮沟夺网头目","summary":"退潮时带人拖走网具与系船浮标的夺网客头目。","knownByDefault":false},
+    {"id":"item.r83-sea-salt-ointment","kind":"item","title":"海盐敷膏","summary":"青帆埠以海盐、松脂和芦根调成的浅伤敷膏。","knownByDefault":false},
+    {"id":"place.r83-net-shoals","kind":"place","title":"回标浅滩","summary":"潮沟夺网客撤走后重新接回浮标绳的浅滩。","knownByDefault":false},
+    {"id":"place.r83-night-channel","kind":"place","title":"暮潮牵标","summary":"灯影与石刻重合时显出的安全回湾线。","knownByDefault":false},
+    {"id":"event.r83-tide-wake-looters","kind":"event","title":"潮沟夺网","summary":"潮沟夺网客拖走沿岸渔具并占住退潮浅滩。","knownByDefault":false},
+    {"id":"event.r83-night-channel","kind":"event","title":"暮潮石标","summary":"黄昏或入夜后可按灯影辨认石标回湾线。","knownByDefault":false},
+    {"id":"quest.r83-net-recovery","kind":"quest","title":"潮沟夺网","summary":"击退夺网客，找回浅滩的网具与浮标。","knownByDefault":false},
+    {"id":"quest.r83-night-channel","kind":"quest","title":"暮潮牵标","summary":"在黄昏或入夜时辨认沿岸回湾航线。","knownByDefault":false}
   ]
 }

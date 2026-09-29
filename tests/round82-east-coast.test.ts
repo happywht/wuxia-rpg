@@ -105,12 +105,12 @@ describe('Round 82 eastern coastline and walkable world expansion', () => {
     expect(findGridPath(cloud, returnGate.to, outbound.from)).not.toBeNull();
 
     const coastLandmarks = assembled.landmarks.filter(({ mapResourceId }) => mapResourceId === COAST_ID);
-    expect(coastLandmarks).toHaveLength(4);
+    expect(coastLandmarks).toHaveLength(5);
     for (const landmark of coastLandmarks) {
       expect(findGridPath(coast, coast.playerStart, landmark)).not.toBeNull();
     }
     const coastEvents = assembled.events.filter(({ mapResourceId }) => mapResourceId === COAST_ID);
-    expect(coastEvents).toHaveLength(3);
+    expect(coastEvents).toHaveLength(4);
     for (const event of coastEvents) {
       if (event.interaction === undefined) {
         expect(findGridPath(coast, coast.playerStart, event)).not.toBeNull();
