@@ -20580,7 +20580,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "layer-3",
@@ -30786,7 +30787,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "layer-4",
@@ -40992,7 +40994,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "layer-5",
@@ -51198,7 +51201,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "urban-street-ground",
@@ -71610,7 +71614,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "round76-jiangnan-orchard",
@@ -81816,7 +81821,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       }
     ],
     "actors": {

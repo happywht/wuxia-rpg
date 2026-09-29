@@ -4,6 +4,28 @@
 
 ---
 
+## Round 78 — NPC 朝向与地图前景纵深（2026-09-29，已完成）
+
+### 计划与实现
+
+- 在改动源码或游戏资料之前写入 [`iterations/round-78/plan.md`](iterations/round-78/plan.md)，按计划覆盖 NPC/伙伴朝向、地图遮挡、旧资料回退、五区锚点保护及发行验证。
+- 新增 `spriteFrames` 可选四向静止帧，Schema 与 `parseNpcSet` 要求四方向完整且均为非负整数，NPC 装配把全部帧号与地图人物图集做交叉范围校验；保留原 `spriteFrame` 作为旧数据和默认外观回退。五区十六名 NPC 由 `scripts/generate-round78-actor-depth.mjs` 确定性生成四向映射。
+- 通用方向规则用于 E 商店/任务板/对话与 F 对话：玩家转向相邻目标，有方向帧的 NPC 面向玩家。伙伴每次重定位按其所在格到玩家格的方向取帧。
+- 地图图层 schema 新增可选 `depthSort: "y"`。五区树木、屋舍、山石与环境前景显式启用；底图、全图总览纹理和遮挡前景各用独立内容缓存键。被标记图层编成稀疏行切片，与玩家/NPC/伙伴及名字牌在共享场景容器中排序，按角色脚底和行底深度决定遮挡。
+- 瓦片画布烘焙设置 `imageSmoothingEnabled = false`，角色脚底/前景行深度使用微小稳定偏移；区域切换时玩家对象先从旧角色容器摘下，避免容器销毁时丢失。
+- 新增 `tests/round78-actor-depth.test.ts`、`npm run generate:round-78-actor-depth` 与 `npm run smoke:round-78`；更新 MAP-ATLAS、DATA-GUIDE、ARCHITECTURE、TESTING、README、ROADMAP 与 CHANGELOG。
+
+### 最终验收
+
+- `npm run generate:round-78-actor-depth`：通过；连续重跑后五张地图和两份 NPC JSON 的 SHA-256 汇总不变。
+- `npm run smoke:round-78`：3 个文件/12 项测试通过；`npx vitest run tests/docs-audit-round-48.test.ts tests/round76-region-landmark-art.test.ts tests/round78-actor-depth.test.ts`：3 个文件/26 项测试通过。
+- `npm run package:release`：最终全量质量门槛通过。34 项基础资源 Schema、34 项 MOD 检查零问题、`tsc --noEmit`、49 个测试文件/331 项测试、Round 34/48 文档审计、139 模块生产构建、Round 72 chunk 审计和 Round 47 子路径发行 smoke 均通过。发行包 `release/wuxia-rpg-web-0.0.1.tgz` 为 925,709 bytes、SHA-256 `a66dafba83539351c25dfeb17ef8a5b649f7a1e4bd7aa2d3fc7f332985eab594`；归档 88 项/含 87 个内容文件，挂载到 `/preview/wuxia-rpg/` 后全部文件哈希与数据、Schema、CC0 图集/许可加载通过。Vite 仍给 1.37 MB Phaser runtime 提示超过默认 500 kB 建议阈值，生产构建成功。
+- 第一次发行门槛发现 Round 48 文档审计仍硬编码上一轮进度，Round 76 历史美术哈希也把新加的 `depthSort` 渲染元数据计入旧地图内容。更新路线图完成状态和 R79 计划、玩家/架构/数据指南现状；历史图层回归只忽略新路由标记后再次全量通过，图层 GID/碰撞不变。
+- 隔离预览仅操作 5193 端口：新开局、方向键走到相邻人物、F 打开对话、Esc 返回场景均可运行；没有操作 5178 用户页，也未保存/覆盖存档。当前窗口可见像素边缘清晰，未能提供第二个窗口尺寸：此 in-app browser 没有视口大小调节入口，快捷键尝试也未造成可见尺寸变化。人物朝向/图层深度用例通过；浏览器画面未声称逐一手走检查五区遮挡点或全平台缩放。
+- `npm run validate:data`、`npm run typecheck`、`git diff --check`：通过。
+
+---
+
 ## Round 77 — CC0 像素人物与方向动画（2026-09-29，已完成）
 
 ### 计划与实现

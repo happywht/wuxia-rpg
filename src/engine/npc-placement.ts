@@ -14,7 +14,12 @@
  * exactly that NPC, never the whole cast.
  */
 
-import { type CellPosition, type GridMap } from './grid-map';
+import {
+  GRID_MAP_ACTOR_DIRECTIONS,
+  type CellPosition,
+  type GridMap,
+  type GridMapActorDirection,
+} from './grid-map';
 
 /** Wire format of one NPC entry inside an npc-set JSON file. */
 export interface NpcRecordData {
@@ -31,6 +36,8 @@ export interface NpcRecordData {
   questGiver: boolean;
   /** Optional zero-based tile frame in the map's validated character atlas. */
   spriteFrame?: number;
+  /** Optional cardinal idle poses in the map's validated character atlas. */
+  spriteFrames?: Record<GridMapActorDirection, number>;
   /** Optional time-of-day destinations (Round 16), normalized to an empty array. */
   schedule: NpcScheduleEntryData[];
 }
@@ -93,10 +100,30 @@ export function parseNpcSet(raw: unknown): NpcSetParseResult {
     const shopId = requireNonEmptyString(entry.shopId);
     const questGiver = entry.questGiver === undefined ? false : entry.questGiver === true;
     const spriteFrame = entry.spriteFrame === undefined ? undefined : requireInteger(entry.spriteFrame);
+    const problems: string[] = [];
+    const spriteFrames: Partial<Record<GridMapActorDirection, number>> = {};
+    if (entry.spriteFrames !== undefined) {
+      if (!isPlainObject(entry.spriteFrames)) {
+        problems.push(`${label}.spriteFrames：应为四向帧号对象`);
+      } else {
+        for (const direction of GRID_MAP_ACTOR_DIRECTIONS) {
+          const frame = requireInteger(entry.spriteFrames[direction]);
+          if (frame === null || frame < 0) {
+            problems.push(`${label}.spriteFrames.${direction}：应为非负整数`);
+          } else {
+            spriteFrames[direction] = frame;
+          }
+        }
+        for (const direction of Object.keys(entry.spriteFrames)) {
+          if (!(GRID_MAP_ACTOR_DIRECTIONS as readonly string[]).includes(direction)) {
+            problems.push(`${label}.spriteFrames：未知方向 ${direction}`);
+          }
+        }
+      }
+    }
     const position = isPlainObject(entry.position) ? entry.position : null;
     const col = position === null ? null : requireInteger(position.col);
     const row = position === null ? null : requireInteger(position.row);
-    const problems: string[] = [];
     const schedule: NpcScheduleEntryData[] = [];
     if (entry.schedule !== undefined && !Array.isArray(entry.schedule)) {
       problems.push(`${label}.schedule：应为时段日程数组`);
@@ -167,6 +194,9 @@ export function parseNpcSet(raw: unknown): NpcSetParseResult {
       schedule,
       position: { col, row },
       ...(typeof spriteFrame !== 'number' ? {} : { spriteFrame }),
+      ...(Object.keys(spriteFrames).length === 0
+        ? {}
+        : { spriteFrames: spriteFrames as Record<GridMapActorDirection, number> }),
     });
   });
 
@@ -271,13 +301,24 @@ export function assembleNpcPlacements(input: NpcAssemblyInput): NpcAssemblyResul
       }
     }
 
-    if (record.mapResourceId === input.currentMapResourceId && record.spriteFrame !== undefined && npcMap !== undefined) {
+    if (record.mapResourceId === input.currentMapResourceId &&
+      (record.spriteFrame !== undefined || record.spriteFrames !== undefined) && npcMap !== undefined) {
       const art = npcMap.data.art;
       const actorTileset = art === undefined
         ? undefined
         : art.tilesets.find((tileset) => tileset.id === art.actors.tilesetId);
-      if (actorTileset === undefined || record.spriteFrame >= actorTileset.tileCount) {
-        problems.push(`人物精灵帧 ${record.spriteFrame} 超出地图声明的人物图集`);
+      const frames = [
+        ...(record.spriteFrame === undefined ? [] : [record.spriteFrame]),
+        ...Object.values(record.spriteFrames ?? {}),
+      ];
+      if (actorTileset === undefined) {
+        problems.push('人物精灵帧引用了缺失的地图人物图集');
+      } else {
+        for (const frame of frames) {
+          if (frame >= actorTileset.tileCount) {
+            problems.push(`人物精灵帧 ${frame} 超出地图声明的人物图集`);
+          }
+        }
       }
     }
 

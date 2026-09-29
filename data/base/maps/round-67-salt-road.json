@@ -20619,7 +20619,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "salt-road-brine-pans",
@@ -41031,7 +41032,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "salt-road-caravan-post-2",
@@ -51237,7 +51239,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "salt-road-caravan-post-3",
@@ -61443,7 +61446,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "salt-road-caravan-post-4",
@@ -71649,7 +71653,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "salt-road-caravan-post-5",
@@ -81855,7 +81860,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "salt-road-caravan-post-6",
@@ -92061,7 +92067,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "salt-road-stone-trails",
@@ -112473,7 +112480,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       }
     ]
   }

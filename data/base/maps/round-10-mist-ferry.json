@@ -41000,7 +41000,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "mist-willow-market-1",
@@ -51206,7 +51207,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "mist-willow-market-2",
@@ -61412,7 +61414,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "mist-willow-market-3",
@@ -71618,7 +71621,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "mist-willow-market-4",
@@ -81824,7 +81828,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "mist-willow-market-5",
@@ -92030,7 +92035,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "mist-river-trails",
@@ -112442,7 +112448,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       }
     ],
     "actors": {

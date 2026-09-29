@@ -33,6 +33,8 @@ export interface GridMapArtLayerData {
   id: string;
   tilesetId: string;
   cells: number[][];
+  /** Draw this layer as row slices that can pass in front of actors. */
+  depthSort?: 'y';
 }
 
 /** Layered pixels-only art reusable by gameplay maps and the world atlas. */
@@ -45,6 +47,30 @@ export interface GridMapImageArtData {
 /** Cardinal directions understood by grid movement and actor frame metadata. */
 export const GRID_MAP_ACTOR_DIRECTIONS = ['down', 'left', 'right', 'up'] as const;
 export type GridMapActorDirection = typeof GRID_MAP_ACTOR_DIRECTIONS[number];
+
+/** Direction an actor should face when standing at `from` and looking at `to`. */
+export function directionBetweenCells(
+  from: CellPosition,
+  to: CellPosition,
+): GridMapActorDirection {
+  const deltaCol = to.col - from.col;
+  const deltaRow = to.row - from.row;
+  if (Math.abs(deltaCol) > Math.abs(deltaRow)) return deltaCol < 0 ? 'left' : 'right';
+  if (deltaRow !== 0) return deltaRow < 0 ? 'up' : 'down';
+  return deltaCol < 0 ? 'left' : 'right';
+}
+
+/** Returns the direction opposite the one an adjacent actor is facing. */
+export function oppositeGridMapActorDirection(
+  direction: GridMapActorDirection,
+): GridMapActorDirection {
+  switch (direction) {
+    case 'down': return 'up';
+    case 'left': return 'right';
+    case 'right': return 'left';
+    case 'up': return 'down';
+  }
+}
 
 /** Optional direction-aware player frames; omitted by older maps and MODs. */
 export interface GridMapPlayerFrames {
@@ -226,6 +252,9 @@ function validateGridMapArt(art: unknown, columns: unknown, rows: unknown, error
         return;
       }
       if (typeof candidate.id !== 'string' || candidate.id.trim().length === 0) errors.push(`${path}.id: expected a non-empty string`);
+      if (candidate.depthSort !== undefined && candidate.depthSort !== 'y') {
+        errors.push(`${path}.depthSort: expected "y" when provided`);
+      }
       if (typeof candidate.tilesetId !== 'string' || !tilesets.has(candidate.tilesetId)) {
         errors.push(`${path}.tilesetId: does not name a declared sprite sheet`);
       }

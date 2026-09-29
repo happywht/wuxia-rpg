@@ -3,11 +3,15 @@ import Phaser from 'phaser';
 import type { Diagnostic } from '../engine/data-loader';
 import {
   GridMap,
+  directionBetweenCells,
+  oppositeGridMapActorDirection,
   selectGridMapPlayerFrame,
   type GridMapActorDirection,
 } from '../engine/grid-map';
 import {
   cellCenterOffset,
+  gridMapActorDepth,
+  createGridMapDepthRows,
   createGridMapActor,
   loadGridMapArtAssets,
   renderGridMap,
@@ -765,6 +769,7 @@ export class GridScene extends Phaser.Scene {
       this.showErrorState('地图缺少玩家像素精灵', ['当前地图 art.actors 未提供可用人物图集。'], true);
       return;
     }
+    this.setWorldActorDepth(this.marker);
     this.configureMapCamera(activeMap, this.marker);
 
     this.renderNpcs(activeMap);
@@ -1825,12 +1830,15 @@ export class GridScene extends Phaser.Scene {
   /** Draws every placed NPC and its data-driven name label. */
   private renderNpcs(map: GridMap): void {
     this.npcLayer = this.add.container().setScrollFactor(1);
+    if (this.marker !== null) this.npcLayer.add(this.marker);
+    this.npcLayer.add(createGridMapDepthRows(this, map, this.mapOrigin.x, this.mapOrigin.y));
     this.npcVisuals.clear();
     (this.world?.assembly.npcs ?? [])
       .filter((npc) => npc.record.mapResourceId === this.currentMapResourceId)
       .forEach((npc) => this.createNpcVisual(npc, map));
     this.syncNpcVisuals(false);
     this.refreshCompanionFollower(null);
+    this.sortWorldActorLayer();
   }
 
   private setMapOrigin(map: GridMap): void {
@@ -1861,7 +1869,7 @@ export class GridScene extends Phaser.Scene {
     const center = cellCenterOffset(map, npc.col, npc.row);
     const x = this.mapOrigin.x + center.x;
     const y = this.mapOrigin.y + center.y;
-    const marker = createGridMapActor(this, map, x, y, npc.record.spriteFrame) ??
+    const marker = createGridMapActor(this, map, x, y, npc.record.spriteFrame ?? npc.record.spriteFrames?.down) ??
       this.add.circle(x, y, map.tileSize * 0.25, 0x7ec8a9).setDepth(10);
     const label = this.registerScaledText(this.add
       .text(x, y - map.tileSize * 0.42 - 4, npc.record.name, {
@@ -1870,6 +1878,7 @@ export class GridScene extends Phaser.Scene {
         color: UI.textPrimary,
       })
       .setOrigin(0.5, 1), 10);
+    this.setWorldActorDepth(marker, label, map.tileSize);
     this.addWorldObjects(this.npcLayer, [marker, label]);
     this.npcVisuals.set(npc.record.id, { marker, label });
   }
@@ -1945,12 +1954,19 @@ export class GridScene extends Phaser.Scene {
       const x = this.mapOrigin.x + center.x;
       const y = this.mapOrigin.y + center.y;
       if (animate && !currentReducedMotion()) {
-        this.tweens.add({ targets: visual.marker, x, y, duration: 420 });
+        this.tweens.add({
+          targets: visual.marker,
+          x,
+          y,
+          duration: 420,
+          onUpdate: () => this.setWorldActorDepth(visual.marker, visual.label, map.tileSize),
+        });
         this.tweens.add({ targets: visual.label, x, y: y - map.tileSize * 0.42 - 4, duration: 420 });
       } else {
         // Includes reduced motion: schedule changes reposition NPCs directly.
         visual.marker.setPosition(x, y);
         visual.label.setPosition(x, y - map.tileSize * 0.42 - 4);
+        this.setWorldActorDepth(visual.marker, visual.label, map.tileSize);
       }
     }
   }
@@ -1975,7 +1991,8 @@ export class GridScene extends Phaser.Scene {
     if (this.companionFollower === null) {
       const center = cellCenterOffset(map, this.playerCol, this.playerRow);
       const marker = createGridMapActor(
-        this, map, this.mapOrigin.x + center.x, this.mapOrigin.y + center.y, npc.record.spriteFrame,
+        this, map, this.mapOrigin.x + center.x, this.mapOrigin.y + center.y,
+        npc.record.spriteFrame ?? npc.record.spriteFrames?.down,
       ) ?? this.add.circle(this.mapOrigin.x + center.x, this.mapOrigin.y + center.y, map.tileSize * 0.25, 0x48c8a3);
       const label = this.registerScaledText(this.add.text(
         this.mapOrigin.x + center.x,
@@ -2011,6 +2028,42 @@ export class GridScene extends Phaser.Scene {
     visual.label.setText(npc.record.name);
     visual.marker.setPosition(x, y).setVisible(true);
     visual.label.setPosition(x, y - map.tileSize * 0.42 - 4).setVisible(true);
+    const facing = directionBetweenCells(cell, { col: this.playerCol, row: this.playerRow });
+    if (visual.marker instanceof Phaser.GameObjects.Image && npc.record.spriteFrames !== undefined) {
+      setGridMapActorFrame(this, map, visual.marker, npc.record.spriteFrames[facing]);
+    }
+    this.setWorldActorDepth(visual.marker, visual.label, map.tileSize);
+  }
+
+  private setWorldActorDepth(
+    marker: WorldActorMarker,
+    label?: Phaser.GameObjects.Text,
+    tileSize = this.map?.tileSize ?? 0,
+  ): void {
+    const footDepth = gridMapActorDepth(marker.y, tileSize);
+    marker.setDepth(footDepth);
+    label?.setDepth(footDepth + 0.005);
+    this.sortWorldActorLayer();
+  }
+
+  private sortWorldActorLayer(): void {
+    this.npcLayer?.sort('depth');
+  }
+
+  /** Turns the player toward an adjacent NPC and, when available, the NPC back. */
+  private faceInteractionTarget(target: PlacedNpc): void {
+    const towardNpc = directionBetweenCells(
+      { col: this.playerCol, row: this.playerRow },
+      { col: target.col, row: target.row },
+    );
+    this.playerFacing = towardNpc;
+    this.updatePlayerActorFrame(false);
+    const towardPlayer = oppositeGridMapActorDirection(towardNpc);
+    const visual = this.npcVisuals.get(target.record.id);
+    const frame = target.record.spriteFrames?.[towardPlayer];
+    if (visual?.marker instanceof Phaser.GameObjects.Image && frame !== undefined && this.map !== null) {
+      setGridMapActorFrame(this, this.map, visual.marker, frame);
+    }
   }
 
   private buildHud(
@@ -3377,6 +3430,7 @@ export class GridScene extends Phaser.Scene {
       row: this.playerRow,
     });
     if (target !== null) {
+      this.faceInteractionTarget(target);
       this.recordKnowledgeObservations({ characterIds: [target.record.id] });
       const shop =
         target.record.shopId === null ? undefined : this.shops.get(target.record.shopId);
@@ -3557,6 +3611,7 @@ export class GridScene extends Phaser.Scene {
     if (target === null) {
       return;
     }
+    this.faceInteractionTarget(target);
     this.openDialogueWith(target);
   }
 
@@ -3761,6 +3816,7 @@ export class GridScene extends Phaser.Scene {
           const step = Math.min(walkFrames.length - 1, Math.floor(tween.progress * walkFrames.length));
           this.updatePlayerActorFrame(true, step);
         }
+        this.setWorldActorDepth(marker, undefined, map.tileSize);
       },
       onComplete: finishMove,
     });
@@ -3814,6 +3870,7 @@ export class GridScene extends Phaser.Scene {
     }
 
     this.mapLayer?.destroy();
+    if (this.marker !== null) this.npcLayer?.remove(this.marker);
     this.npcLayer?.destroy();
     this.encounterLayer?.destroy();
     this.mapLayer = null;

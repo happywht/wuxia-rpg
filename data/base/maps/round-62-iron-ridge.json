@@ -20619,7 +20619,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "iron-ridge-pines",
@@ -30825,7 +30826,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "iron-ridge-post-town-1",
@@ -41031,7 +41033,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "iron-ridge-post-town-2",
@@ -51237,7 +51240,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "iron-ridge-post-town-3",
@@ -61443,7 +61447,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "iron-ridge-post-town-4",
@@ -71649,7 +71654,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "iron-ridge-post-town-5",
@@ -81855,7 +81861,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "iron-ridge-post-town-6",
@@ -92061,7 +92068,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       },
       {
         "id": "iron-ridge-mountain-paths",
@@ -112473,7 +112481,8 @@
             0,
             0
           ]
-        ]
+        ],
+        "depthSort": "y"
       }
     ]
   }

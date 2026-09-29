@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import { parseGridMap } from '../src/engine/grid-map';
-import { gridMapArtTextureKey, renderGridMap } from '../src/engine/grid-map-renderer';
+import { gridMapGroundTextureKey, renderGridMap } from '../src/engine/grid-map-renderer';
 
 function loadStartingMap() {
   const value = JSON.parse(readFileSync(new URL('../data/base/maps/round-01-grid.json', import.meta.url), 'utf8')) as unknown;
@@ -21,7 +21,7 @@ describe('Round 52 world-map camera space', () => {
       add(child: typeof containerChildren[number][number]) { containerChildren[0]?.push(child); return this; },
     };
     const scene = {
-      textures: { exists: (key: string) => key === gridMapArtTextureKey(map) },
+      textures: { exists: (key: string) => key === gridMapGroundTextureKey(map) },
       add: {
         container: () => { containerChildren.push([]); return container; },
         image: () => {

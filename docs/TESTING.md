@@ -94,6 +94,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 | `tests/round68-long-journey.test.ts` | 五张基础地图、世界图、日历/气候、NPC 日程、遭遇、对白/任务/图谱、v1 存档和结局资料 | R68 历史四区 749 格逐步往返与五次切图、六时段/跨日、真实事件发现、远区保存/恢复、盐道见闻差事及行舟万里结局；世界装配包含第五区，旅程步骤保持原历史范围；专项命令 `npm run smoke:round-68` |
 | `tests/round74-cloud-ridge.test.ts` | 五张区域图、世界舆图、NPC 日程、遭遇、对白/任务/图谱 | R74 云岭 100×100/十层与 GID、双向关口 BFS、所有地标/事件/NPC/遭遇锚点可达、两段任务链及 208×128 总图整合；与 `round49-default-world-integrity.test.ts` 共同覆盖分拆 NPC/任务资源装配，专项命令 `npm run smoke:round-74` |
 | `tests/round77-character-art.test.ts` | CC0 人物图集、五区地图/NPC 资料、`grid-map` 帧选择器 | 4 项检查：PNG 320 帧/十种外观实际 alpha、五区方向 idle/三帧 walk 与碰撞哈希、NPC 外观分布、缺省方向映射与示例 MOD 兼容、发行包 CC0 来源清单 |
+| `tests/round78-actor-depth.test.ts` | 五区地图/NPC 资料、`grid-map` 朝向规则和地图渲染深度函数 | 7 项检查：四向互相面向、显式前景行筛选/缓存通道、同一行遮挡 tie-break、NPC 四向帧/图集范围和旧静态格式回退、未知深度值拒绝 |
 | `tests/round69-martial-paths.test.ts` | 基础角色、武学、全部对话、NPC 与门派资料 | R69 从对话起点核验授艺条件/效果/门派导师；覆盖 30 门目录、五派数量、无门派招式公开路线和裸成长属性门槛可达性 |
 | `tests/round69-guard-combat.test.ts` | 基础角色、武学、开场遭遇与 `CombatSession` | R69 四门真实身法守御映射、内力支出、下一次攻击减伤、最低 1 点伤害、敌方守御消耗及攻击优先；专项命令 `npm run smoke:round-69` |
 | `tests/round56-discovery-quests.test.ts`（及 R56 扩展的任务/世界地图/图谱既有测试） | quest-set/知识图谱/世界图资料与 `quest-system.ts` | R56 发现见闻回归：`discoverKnowledge` 目标与两段渡口巡标差事的解析/装配引用校验、首次发现信号只推进匹配目标一次、接取时已知见闻回填、旧档恢复重算、奖励见闻级联推进与发现门控地标/事件引用；专项命令 `npx vitest run tests/quest-system.test.ts tests/round56-discovery-quests.test.ts` 为 2 文件/29 用例 |
@@ -131,6 +132,7 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 | `npm run smoke:round-44` | Round 44 NPC 日程附近条件、任务声望/见闻奖励与渡口互斥分支回归 |
 | `npm run smoke:round-46` | Round 46 真实资料驱动的开局、任务/战斗/成长、存档恢复和两条结局路线纵向回归 |
 | `npm run smoke:round-47` | Round 47 npm 版本归档解包/哈希核验及非根路径 HTML/JS/CSS/MOD/当前 manifest 资源与 Schema、全部 CC0 图集/许可加载验证（先运行 `npm run package:release`） |
+| `npm run smoke:round-78` | NPC 四向交互、五区前景行、旧 NPC 单帧兼容和默认世界装配专项 |
 | `npm run audit:final` | 完整 Git checkout 专用的 R00–R50 最终结构审计；核对 51 份计划标题、子任务小节（至少两项）和至少 10 分钟计划工时估算、逐轮 round commit、同 Schema 多资源合并计数、Schema 家族、同名 MOD 样例、资料解耦/错误回退证据文件与必需交付文档 |
 | `npm run smoke:round-20` | 擂台首夺货币/物品彩头、逐场经验、连战与旧/新 v1 存档回归（R45 扩展） |
 | `npm run typecheck` | 严格类型检查（check 的第 3 步） |
@@ -140,6 +142,7 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 
 ## 变更记录
 
+- 2026-09-29（Round 78）：新增人物朝向/地图纵深专项，检查五区前景行数据、相互面向方向函数、同一行遮挡 tie-break、静态 NPC 回退和未知图层标记拒绝；专项命令为 `npm run smoke:round-78`。
 - 2026-09-29（Round 65）：新增 `tests/round65-urban-art.test.ts`（内置纯 Node PNG 调色板解码器，审计 RPG Urban Pack CC0 许可文本、432×288/27×18 网格与 486 格非空、三图角色图集与帧落在角色列、14 名 NPC 帧非空/互异/不与玩家共用、起始图两种新路面层的帧引用、角色列帧禁入环境层、铺装只落于原装饰空白的可走格、井盖具有路面底层、出生点/NPC/关口 BFS 可达）；`tests/round51-map-art.test.ts` 图层数/图集清单/玩家帧断言随协议演进更新。同日两次视觉纠偏：先以联络表排除把门窗误作人物/路面的错误帧；再发现原阻挡区属于墓园后，取消门面覆盖，限制地面仅落于可走且原装饰为空的格子。专项 2 文件 14 用例与关联回归 5 文件 16 用例通过；全量与发行数字见 `DEVLOG.md` Round 65 验证段。
 - 2026-09-29（Round 66）：新增 `tests/round66-world-atlas.test.ts` 5 项全域舆图回归；该测试夹具随 Round 70/74 迭代，当前检查 208×128 七层 Kenney CC0 图层的尺寸/GID、主地表连续性、旧世界无 `atlasArt` 兼容、坏尺寸/帧拒绝、所有区域/关口/玩家投影及未发现地标隔离。Round 66 当时的 128×80 五层历史结果及浏览器操作仍见 `DEVLOG.md` Round 66。
 - 2026-09-29（Round 67）：新增 `tests/round67-salt-road.test.ts` 4 项回归，检查 100×100 盐道图、十层 Kenney CC0 画面、8,280 个入口连通可行格、58 个受保护锚点；其全域投影夹具现随地图扩展更新为五图/208×128/八个有向关口。罗金子日程、敌对遭遇和苦井发现任务回归保持不变。`tests/round52-map-landmarks.test.ts` 增加盐道三处普通地标与回声苦井发现门控断言。Round 67 当时的四区投影与六个关口历史结果见 `DEVLOG.md` Round 67。

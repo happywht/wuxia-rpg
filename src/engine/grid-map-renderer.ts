@@ -2,7 +2,7 @@ import type Phaser from 'phaser';
 
 const PIXEL_FILTER_MODE = 1;
 
-import { GridMap, parseHexColor, type GridMapImageArtData, type GridMapTilesetData } from './grid-map';
+import { GridMap, parseHexColor, type GridMapArtLayerData, type GridMapImageArtData, type GridMapTilesetData } from './grid-map';
 
 /**
  * Renders a validated {@link GridMap} as flat colored rectangles.
@@ -137,7 +137,7 @@ export function renderGridMap(
   // opt both the container and its children back into camera scrolling.
   const container = scene.add.container(originX, originY).setScrollFactor(1);
   if (map.data.art !== undefined) {
-    const artTextureKey = ensureGridMapArtTexture(scene, map);
+    const artTextureKey = ensureGridMapGroundTexture(scene, map);
     if (artTextureKey === null) throw new Error(`无法生成地图贴图：${map.data.id}`);
     const image = scene.add.image(0, 0, artTextureKey).setOrigin(0, 0)
       .setDisplaySize(map.pixelWidth, map.pixelHeight).setScrollFactor(1);
@@ -175,17 +175,69 @@ export function gridMapTilesetTextureKey(tilesetId: string): string {
   return `wuxia-atlas-${(hash >>> 0).toString(16)}`;
 }
 
-/** Stable cached ground-texture key, including a hash so live data edits rebuild it. */
-export function gridMapArtTextureKey(map: GridMap): string {
+/** Stable key for a map art channel; layer metadata participates in the hash. */
+function mapArtTextureKey(map: GridMap, channel: string, layers: readonly GridMapArtLayerData[]): string {
   const art = map.data.art;
   if (art === undefined) return '';
   let hash = 2166136261;
   const mix = (value: number): void => { hash = Math.imul(hash ^ value, 16777619); };
-  for (const layer of art.layers) {
+  const mixString = (value: string): void => {
+    for (let index = 0; index < value.length; index++) mix(value.charCodeAt(index));
+    mix(0xff);
+  };
+  mixString(channel);
+  for (const value of [map.columns, map.rows, map.tileSize, art.tileSize]) mix(value);
+  for (const tileset of art.tilesets) {
+    mixString(tileset.id);
+    mixString(tileset.image);
+    for (const value of [tileset.tileSize, tileset.columns, tileset.rows, tileset.spacing, tileset.tileCount]) mix(value);
+  }
+  for (const layer of layers) {
     for (let index = 0; index < layer.id.length; index++) mix(layer.id.charCodeAt(index));
+    mix(layer.depthSort === 'y' ? 1 : 0);
     for (const row of layer.cells) for (const gid of row) mix(gid >>> 0);
   }
-  return `wuxia-map-art-${(hash >>> 0).toString(16)}`;
+  return `wuxia-map-${channel}-${(hash >>> 0).toString(16)}`;
+}
+
+/** Stable key for the complete art composite used by world-map thumbnails. */
+export function gridMapArtTextureKey(map: GridMap): string {
+  const art = map.data.art;
+  return art === undefined ? '' : mapArtTextureKey(map, 'art', art.layers);
+}
+
+/** Ground composite excludes only layers explicitly assigned to y-sort. */
+export function gridMapGroundTextureKey(map: GridMap): string {
+  const art = map.data.art;
+  return art === undefined ? '' : mapArtTextureKey(map, 'ground', art.layers.filter((layer) => layer.depthSort !== 'y'));
+}
+
+/** Front-object atlas contains only layers explicitly assigned to y-sort. */
+export function gridMapDepthTextureKey(map: GridMap): string {
+  const art = map.data.art;
+  return art === undefined ? '' : mapArtTextureKey(map, 'depth', art.layers.filter((layer) => layer.depthSort === 'y'));
+}
+
+/** Stable foot anchor used to interleave characters with environmental rows. */
+export function gridMapActorDepth(y: number, tileSize: number): number {
+  return y + tileSize / 2 + 0.001;
+}
+
+/** Slightly wins ties over an actor whose feet share this foreground row. */
+export function gridMapDepthRowDepth(originY: number, row: number, tileSize: number): number {
+  return originY + (row + 1) * tileSize + 0.01;
+}
+
+/** Map rows containing at least one non-empty y-sorted tile. */
+export function gridMapDepthRowIndexes(map: GridMap): number[] {
+  const layers = map.data.art?.layers.filter((layer) => layer.depthSort === 'y') ?? [];
+  const visibleRows = new Set<number>();
+  for (const layer of layers) {
+    layer.cells.forEach((row, rowIndex) => {
+      if (row.some((gid) => (gid & 0x0fffffff) !== 0)) visibleRows.add(rowIndex);
+    });
+  }
+  return [...visibleRows].sort((a, b) => a - b);
 }
 
 /** Loads the distinct source images required by a validated set of maps. */
@@ -239,6 +291,48 @@ export function ensureGridMapArtTexture(scene: Phaser.Scene, map: GridMap): stri
   return ensureGridMapLayerTexture(scene, art, map.columns, map.rows, key);
 }
 
+/** Bakes only the non-occluding layer channel used below actors in gameplay. */
+export function ensureGridMapGroundTexture(scene: Phaser.Scene, map: GridMap): string | null {
+  const art = map.data.art;
+  if (art === undefined) return null;
+  const key = gridMapGroundTextureKey(map);
+  const layers = art.layers.filter((layer) => layer.depthSort !== 'y');
+  return ensureGridMapLayerTexture(scene, { ...art, layers }, map.columns, map.rows, key);
+}
+
+/**
+ * Creates one transparent image slice per non-empty map row for all y-sorted
+ * layers. Each slice anchors at the row's lower edge and can be interleaved
+ * with character feet inside a shared Phaser container.
+ */
+export function createGridMapDepthRows(
+  scene: Phaser.Scene,
+  map: GridMap,
+  originX: number,
+  originY: number,
+): Phaser.GameObjects.Image[] {
+  const art = map.data.art;
+  if (art === undefined) return [];
+  const layers = art.layers.filter((layer) => layer.depthSort === 'y');
+  if (layers.length === 0) return [];
+  const key = gridMapDepthTextureKey(map);
+  const textureKey = ensureGridMapLayerTexture(scene, { ...art, layers }, map.columns, map.rows, key);
+  if (textureKey === null) throw new Error(`无法生成地图前景贴图：${map.data.id}`);
+  const texture = scene.textures.get(textureKey);
+  const rowWidth = map.columns * art.tileSize;
+  return gridMapDepthRowIndexes(map).map((row) => {
+    const frameKey = `depth-row-${row}`;
+    if (!texture.has(frameKey) && texture.add(frameKey, 0, 0, row * art.tileSize, rowWidth, art.tileSize) === null) {
+      throw new Error(`无法读取地图前景行 ${row}（地图“${map.data.id}”）。`);
+    }
+    return scene.add.image(originX, originY + row * map.tileSize, textureKey, frameKey)
+      .setOrigin(0, 0)
+      .setDisplaySize(map.pixelWidth, map.tileSize)
+      .setScrollFactor(1)
+      .setDepth(gridMapDepthRowDepth(originY, row, map.tileSize));
+  });
+}
+
 /** Bakes any validated layered tile image; dimensions are explicit so other data sets can reuse it. */
 export function ensureGridMapLayerTexture(
   scene: Phaser.Scene,
@@ -253,6 +347,7 @@ export function ensureGridMapLayerTexture(
   const texture = scene.textures.createCanvas(key, width, height);
   if (texture === null) return null;
   const context = texture.context;
+  context.imageSmoothingEnabled = false;
   const tilesets = new Map(art.tilesets.map((tileset) => [tileset.id, tileset]));
   for (const layer of art.layers) {
     const tileset = tilesets.get(layer.tilesetId);
@@ -295,7 +390,7 @@ export function createGridMapActor(
   const texture = scene.textures.get(key);
   const frameKey = ensureGridMapActorFrame(texture, tileset, frame);
   return scene.add.image(x, y, key, frameKey).setScrollFactor(1)
-    .setDisplaySize(map.tileSize, map.tileSize).setDepth(10);
+    .setDisplaySize(map.tileSize, map.tileSize).setDepth(gridMapActorDepth(y, map.tileSize));
 }
 
 /** Changes an existing actor image to another validated frame in its map atlas. */

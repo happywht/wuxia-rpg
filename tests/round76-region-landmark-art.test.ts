@@ -197,7 +197,10 @@ describe('Round 76 five-region art layers', () => {
     const priorTerrainArt = {
       tileSize: art.tileSize,
       tilesets: art.tilesets.filter((tileset) => tileset.id !== TILESET_ID && tileset.id !== 'opengameart.puny-characters'),
-      layers: art.layers.filter((layer) => !layer.id.startsWith('round76-')),
+      // Round 78 adds renderer routing metadata without changing historical tile cells.
+      layers: art.layers
+        .filter((layer) => !layer.id.startsWith('round76-'))
+        .map(({ id, tilesetId, cells }) => ({ id, tilesetId, cells })),
     };
     expect(sha256(priorTerrainArt)).toBe(spec.priorArtHash);
     expect(art.actors.tilesetId).toBe('opengameart.puny-characters');

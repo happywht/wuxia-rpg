@@ -26,7 +26,13 @@
             "row": 37
           }
         }
-      ]
+      ],
+      "spriteFrames": {
+        "down": 64,
+        "right": 72,
+        "up": 80,
+        "left": 88
+      }
     },
     {
       "id": "char.lu-zhenniang",
@@ -54,7 +60,13 @@
             "row": 38
           }
         }
-      ]
+      ],
+      "spriteFrames": {
+        "down": 288,
+        "right": 296,
+        "up": 304,
+        "left": 312
+      }
     },
     {
       "id": "char.gu-yechen",
@@ -66,7 +78,13 @@
       },
       "dialogueId": "dlg.gu-yechen-roadside",
       "questGiver": true,
-      "spriteFrame": 208
+      "spriteFrame": 208,
+      "spriteFrames": {
+        "down": 192,
+        "right": 200,
+        "up": 208,
+        "left": 216
+      }
     },
     {
       "id": "char.jiang-baiwei",
@@ -95,7 +113,13 @@
             "row": 39
           }
         }
-      ]
+      ],
+      "spriteFrames": {
+        "down": 96,
+        "right": 104,
+        "up": 112,
+        "left": 120
+      }
     },
     {
       "id": "char.ma-shangyi",
@@ -123,7 +147,13 @@
             "row": 41
           }
         }
-      ]
+      ],
+      "spriteFrames": {
+        "down": 0,
+        "right": 8,
+        "up": 16,
+        "left": 24
+      }
     },
     {
       "id": "char.ye-tingzhou",
@@ -135,7 +165,13 @@
       },
       "dialogueId": "dlg.ye-tingzhou-mentor",
       "questGiver": true,
-      "spriteFrame": 232
+      "spriteFrame": 232,
+      "spriteFrames": {
+        "down": 224,
+        "right": 232,
+        "up": 240,
+        "left": 248
+      }
     },
     {
       "id": "char.shi-bei",
@@ -163,7 +199,13 @@
             "row": 2
           }
         }
-      ]
+      ],
+      "spriteFrames": {
+        "down": 128,
+        "right": 136,
+        "up": 144,
+        "left": 152
+      }
     },
     {
       "id": "char.wen-suxin",
@@ -191,7 +233,13 @@
             "row": 7
           }
         }
-      ]
+      ],
+      "spriteFrames": {
+        "down": 32,
+        "right": 40,
+        "up": 48,
+        "left": 56
+      }
     },
     {
       "id": "char.rong-su-qing",
@@ -203,7 +251,13 @@
       },
       "dialogueId": "dlg.rong-su-qing-herbalist",
       "questGiver": true,
-      "spriteFrame": 256
+      "spriteFrame": 256,
+      "spriteFrames": {
+        "down": 256,
+        "right": 264,
+        "up": 272,
+        "left": 280
+      }
     },
     {
       "id": "char.liu-tinglan",
@@ -231,7 +285,13 @@
             "row": 43
           }
         }
-      ]
+      ],
+      "spriteFrames": {
+        "down": 160,
+        "right": 168,
+        "up": 176,
+        "left": 184
+      }
     },
     {
       "id": "char.zhu-jiuxian",
@@ -259,7 +319,13 @@
             "row": 3
           }
         }
-      ]
+      ],
+      "spriteFrames": {
+        "down": 64,
+        "right": 72,
+        "up": 80,
+        "left": 88
+      }
     },
     {
       "id": "char.bai-luzhou",
@@ -280,7 +346,13 @@
             "row": 4
           }
         }
-      ]
+      ],
+      "spriteFrames": {
+        "down": 288,
+        "right": 296,
+        "up": 304,
+        "left": 312
+      }
     },
     {
       "id": "char.shao-changgeng",
@@ -308,7 +380,13 @@
             "row": 50
           }
         }
-      ]
+      ],
+      "spriteFrames": {
+        "down": 192,
+        "right": 200,
+        "up": 208,
+        "left": 216
+      }
     },
     {
       "id": "char.qin-suyan",
@@ -336,7 +414,13 @@
             "row": 50
           }
         }
-      ]
+      ],
+      "spriteFrames": {
+        "down": 96,
+        "right": 104,
+        "up": 112,
+        "left": 120
+      }
     },
     {
       "id": "char.luo-jinzi",
@@ -364,7 +448,13 @@
             "row": 50
           }
         }
-      ]
+      ],
+      "spriteFrames": {
+        "down": 0,
+        "right": 8,
+        "up": 16,
+        "left": 24
+      }
     }
   ]
 }

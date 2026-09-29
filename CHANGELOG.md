@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+### Added (Round 78)
+
+- NPC 资料可声明四向静止帧；E/F 与人物交互时玩家与 NPC 互相转向，伙伴跟随后转向玩家，旧单帧 NPC 资料继续可用。
+- 地图 art 图层支持 `depthSort: "y"`，五区树木、屋舍、山石等前景逐行与角色脚底排序；合成画布禁用平滑采样。
+- 增加确定性人物/前景元数据生成器、深度/朝向兼容专项回归和可复用的 R78 验证命令。
+
 ### Added (Round 77)
 
 - 接入 Shade 的 OpenGameArt Puny Characters CC0 素材，生成十种外观、四向 idle 与三帧 walk 的紧凑 16px 透明角色图集；发行保留来源通知。

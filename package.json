@@ -20,6 +20,7 @@
     "generate:round-74-cloud-ridge": "node scripts/generate-round74-cloud-ridge.mjs",
     "generate:round-76-region-landmarks": "node scripts/generate-round76-region-landmarks.mjs",
     "generate:round-77-characters": "node scripts/generate-round77-character-atlas.mjs",
+    "generate:round-78-actor-depth": "node scripts/generate-round78-actor-depth.mjs",
     "generate:round-71-browser-trace": "node scripts/generate-round71-browser-trace.mjs",
     "generate:round-67-salt-road": "node scripts/generate-round67-salt-road.mjs",
     "generate:round-55-ferry": "node scripts/generate-round55-ferry-world.mjs",
@@ -58,6 +59,7 @@
     "smoke:round-69": "vitest run tests/round69-martial-paths.test.ts tests/round69-guard-combat.test.ts",
     "smoke:round-70": "vitest run tests/round66-world-atlas.test.ts tests/round70-world-atlas.test.ts",
     "smoke:round-74": "vitest run tests/round74-cloud-ridge.test.ts tests/round49-default-world-integrity.test.ts",
+    "smoke:round-78": "vitest run tests/round78-actor-depth.test.ts tests/round77-character-art.test.ts tests/round49-default-world-integrity.test.ts",
     "smoke:round-76": "vitest run tests/round76-region-landmark-art.test.ts",
     "smoke:round-77": "vitest run tests/round77-character-art.test.ts"
   },

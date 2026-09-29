@@ -66,6 +66,18 @@
             "minimum": 0,
             "maximum": 1048575
           },
+          "spriteFrames": {
+            "description": "可选：人物图集中朝下、左、右、上的静止帧；省略时沿用 spriteFrame 静态帧。",
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["down", "left", "right", "up"],
+            "properties": {
+              "down": { "type": "integer", "minimum": 0, "maximum": 1048575 },
+              "left": { "type": "integer", "minimum": 0, "maximum": 1048575 },
+              "right": { "type": "integer", "minimum": 0, "maximum": 1048575 },
+              "up": { "type": "integer", "minimum": 0, "maximum": 1048575 }
+            }
+          },
           "schedule": {
             "description": "可选：按历法时段声明地图内位置（Round 16）；未声明当前时段时回到基础 position。",
             "type": "array",

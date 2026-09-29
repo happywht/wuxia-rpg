@@ -26,7 +26,13 @@
             "row": 44
           }
         }
-      ]
+      ],
+      "spriteFrames": {
+        "down": 224,
+        "right": 232,
+        "up": 240,
+        "left": 248
+      }
     }
   ]
 }
