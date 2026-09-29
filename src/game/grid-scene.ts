@@ -1,12 +1,17 @@
 import Phaser from 'phaser';
 
 import type { Diagnostic } from '../engine/data-loader';
-import { GridMap } from '../engine/grid-map';
+import {
+  GridMap,
+  selectGridMapPlayerFrame,
+  type GridMapActorDirection,
+} from '../engine/grid-map';
 import {
   cellCenterOffset,
   createGridMapActor,
   loadGridMapArtAssets,
   renderGridMap,
+  setGridMapActorFrame,
 } from '../engine/grid-map-renderer';
 import {
   selectAdjacentTransition,
@@ -293,6 +298,7 @@ export class GridScene extends Phaser.Scene {
   private npcLayer: Phaser.GameObjects.Container | null = null;
   private encounterLayer: Phaser.GameObjects.Container | null = null;
   private marker: WorldActorMarker | null = null;
+  private playerFacing: GridMapActorDirection = 'down';
   private playerCol = 0;
   private playerRow = 0;
 
@@ -3698,6 +3704,12 @@ export class GridScene extends Phaser.Scene {
       return; // Also locked while a dialogue, battle, backpack or shop panel is open — or a data hot reload is rebuilding the world.
     }
 
+    if (dCol < 0) this.playerFacing = 'left';
+    else if (dCol > 0) this.playerFacing = 'right';
+    else if (dRow < 0) this.playerFacing = 'up';
+    else if (dRow > 0) this.playerFacing = 'down';
+    this.updatePlayerActorFrame(false);
+
     const previousCell = { col: this.playerCol, row: this.playerRow };
     const targetCol = this.playerCol + dCol;
     const targetRow = this.playerRow + dRow;
@@ -3723,11 +3735,13 @@ export class GridScene extends Phaser.Scene {
     const target = cellCenterOffset(map, targetCol, targetRow);
     const finishMove = (): void => {
       this.moving = false;
+      this.updatePlayerActorFrame(false);
       this.refreshCompanionFollower(previousCell);
       this.triggerRegionEvents('', true);
       void this.runPendingDataReload(); // Safe boundary for a latched data change.
     };
     this.moving = true;
+    this.updatePlayerActorFrame(true, 0);
     if (currentReducedMotion()) {
       // Round 41: reduced motion snaps the marker to the target cell and
       // settles synchronously — game state advances on the same code path,
@@ -3741,8 +3755,29 @@ export class GridScene extends Phaser.Scene {
       x: this.mapOrigin.x + target.x,
       y: this.mapOrigin.y + target.y,
       duration: MOVE_DURATION_MS,
+      onUpdate: (tween) => {
+        const walkFrames = map.data.art?.actors.playerFrames?.walk[this.playerFacing];
+        if (walkFrames !== undefined && walkFrames.length > 0) {
+          const step = Math.min(walkFrames.length - 1, Math.floor(tween.progress * walkFrames.length));
+          this.updatePlayerActorFrame(true, step);
+        }
+      },
       onComplete: finishMove,
     });
+  }
+
+  private updatePlayerActorFrame(moving: boolean, stepIndex = 0): void {
+    const map = this.map;
+    const marker = this.marker;
+    const actors = map?.data.art?.actors;
+    if (map === null || map === undefined || marker === null || actors === undefined ||
+      !(marker instanceof Phaser.GameObjects.Image)) return;
+    setGridMapActorFrame(
+      this,
+      map,
+      marker,
+      selectGridMapPlayerFrame(actors, this.playerFacing, moving, stepIndex),
+    );
   }
 
   /** Travels through one validated world-map endpoint after a fresh occupancy check. */

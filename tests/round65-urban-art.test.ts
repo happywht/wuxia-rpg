@@ -110,9 +110,6 @@ const VERIFIED_ACTOR_CELLS = [
   347, 348, 349, 350, // olive work-overalls outfit
   455, 456, 457, 458, // blue-uniform outfit
 ];
-const PLAYER_FRAME = 24;
-const DEFAULT_NPC_FRAME = 131;
-
 /** Environment frames visually confirmed as urban street/plaza surfaces. */
 const VERIFIED_ENV_FRAMES = new Set<number>([
   ...[432, 433, 434, 435, 436], // marked/concrete roadway
@@ -139,44 +136,29 @@ describe('Round 65 urban pack licensing and atlas integrity', () => {
   });
 });
 
-describe('Round 65 urban actor frames', () => {
+describe('Round 65 urban actor sheet retained after the Round 77 character upgrade', () => {
   const mapPaths = [
     '../data/base/maps/round-01-grid.json',
     '../data/base/maps/round-10-mist-ferry.json',
     '../data/base/maps/round-62-iron-ridge.json',
   ];
 
-  it.each(mapPaths)('declares the urban actor atlas on %s with opaque player/default frames', (path) => {
+  it.each(mapPaths)('retains the licensed urban sheet while maps use the Round 77 actor sheet: %s', (path) => {
     const map = loadMap(path);
     const art = map.data.art;
-    expect(art?.actors.tilesetId).toBe('kenney.rpg-urban-pack');
-    expect(art?.actors.playerFrame).toBe(PLAYER_FRAME);
-    expect(art?.actors.defaultNpcFrame).toBe(DEFAULT_NPC_FRAME);
+    expect(art?.actors.tilesetId).toBe('opengameart.puny-characters');
+    expect(art?.actors.playerFrame).toBe(256);
+    expect(art?.actors.playerFrames?.idle.down).toBe(256);
     const tileset = art?.tilesets.find((entry) => entry.id === 'kenney.rpg-urban-pack');
     expect(tileset).toMatchObject({ columns: ATLAS_COLUMNS, rows: ATLAS_ROWS, spacing: 0, tileCount: 486 });
-    for (const frame of [art?.actors.playerFrame, art?.actors.defaultNpcFrame]) {
-      expect(frame, 'actor frame must sit in the character columns').toBeDefined();
-      expect((frame ?? 0) % ATLAS_COLUMNS).toBeGreaterThanOrEqual(23);
-      expect(atlasTileIsOpaque(atlas, frame ?? -1)).toBe(true);
-    }
   });
 
-  it('drives every NPC sprite frame from character data on opaque, distinct atlas cells', () => {
-    const npcSet = loadNpcs('../data/base/characters/round-03-npcs.json');
-    expect(npcSet.npcs.length).toBeGreaterThanOrEqual(14);
-    const frames = new Set<number>();
-    for (const npc of npcSet.npcs) {
-      const frame = npc.spriteFrame;
-      expect(frame, npc.id).toBeDefined();
-      expect(VERIFIED_ACTOR_CELLS, `${npc.id} frame ${frame} is not a verified character cell`).toContain(frame);
-      expect(frame ?? 0).toBeLessThan(ATLAS_COLUMNS * ATLAS_ROWS);
-      expect(atlasTileIsOpaque(atlas, frame ?? -1), `${npc.id} frame ${frame}`).toBe(true);
-      frames.add(frame ?? -1);
+  it('keeps the five original static Kenney character outfits available for old map data', () => {
+    expect(VERIFIED_ACTOR_CELLS).toHaveLength(20);
+    for (const frame of VERIFIED_ACTOR_CELLS) {
+      expect(frame % ATLAS_COLUMNS).toBeGreaterThanOrEqual(23);
+      expect(atlasTileIsOpaque(atlas, frame), `legacy character frame ${frame}`).toBe(true);
     }
-    // 14 distinct cells drawn from 5 base outfits (each outfit has 4 static
-    // facing/pose variants in the character columns), none shared with the player.
-    expect(frames.size).toBeGreaterThanOrEqual(13);
-    expect(frames.has(PLAYER_FRAME)).toBe(false);
   });
 });
 
@@ -193,6 +175,7 @@ describe('Round 65 urban street patch on the starting map', () => {
       'kenney.tiny-dungeon',
       'kenney.rpg-urban-pack',
       'opengameart.rpg-town',
+      'opengameart.puny-characters',
     ]);
     expect(art?.layers.map((layer) => layer.id)).toEqual([
       'layer-1', 'layer-2', 'layer-3', 'layer-4', 'layer-5',

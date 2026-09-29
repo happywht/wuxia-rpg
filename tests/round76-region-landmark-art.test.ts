@@ -16,7 +16,7 @@ const MAPS = [
     id: 'map.round-01-grid',
     layer: 'round76-jiangnan-orchard',
     collisionHash: '0ebca5f79f1718d31f33cc9efa3e3c9f022a676122772ebc65c80882d5c55519',
-    priorArtHash: '71c9d111e277287eb3368dba075ef1b96b63f07022236082b208ed253fb610ff',
+    priorArtHash: 'db84a211939f3a1b87f7ad9b4dd1c3a0f75ef959ac60b3ee42527769e87f0462',
     start: { col: 43, row: 37 },
   },
   {
@@ -24,7 +24,7 @@ const MAPS = [
     id: 'map.round-10-mist-ferry',
     layer: 'round76-mist-river-market',
     collisionHash: '2de5414beda5988ca79b08f7ef1fabb76fa295ac4777fd243571fb9cbce6e754',
-    priorArtHash: 'a178619c0d2bd3fffcaff0a75e0aaaec6cc988e6ca069738a45fe56600d5c808',
+    priorArtHash: '930be0ba16ba53bc774b4f3a3818c9ad3ef6720e26446cb318d2a7aca1efe0dc',
     start: { col: 7, row: 7 },
   },
   {
@@ -32,7 +32,7 @@ const MAPS = [
     id: 'map.round-62-iron-ridge',
     layer: 'round76-iron-ridge-pass',
     collisionHash: '19198b97b771cebbbba05a52115213940d3406beedd163ae726bbe13ba60b3ff',
-    priorArtHash: 'bcde32136953bd8c7a3f98c9ab82d72216a933fa73997f951af85495d5d48e22',
+    priorArtHash: 'da204b89b5338b93dd70456e868b55771efbf6fcf71b6754f8d8ba84afd8e66d',
     start: { col: 4, row: 7 },
   },
   {
@@ -40,7 +40,7 @@ const MAPS = [
     id: 'map.round-67-salt-road',
     layer: 'round76-salt-well-and-post',
     collisionHash: '036340bed97f662c5b166ca94eaffbd379194e00104b6bc3511ee21a3c3353b3',
-    priorArtHash: '3d19c781a00080e625ea87af3facce4dd37f3b8c8b18cb5ae91aa17cd6f21cb2',
+    priorArtHash: '153482efec0462d276b1d5941763aa9cae87b6ee4501904915f662d1a3e1cda5',
     start: { col: 95, row: 74 },
   },
   {
@@ -48,7 +48,7 @@ const MAPS = [
     id: 'map.round-74-cloud-ridge',
     layer: 'round76-cloud-bridge-rails',
     collisionHash: '1de394f64c39ad3c6481800534c4f024a4536d3b949ef39a9331cefbc0a846ec',
-    priorArtHash: 'bf52b4765cbc8827f1d557057160a39d3e3dd6684cb008553d00beefd4d6b25f',
+    priorArtHash: 'ec60918e9c58b4dcefad4e888eaa923527c0cf65d52173a22aa2853b7a10f44c',
     start: { col: 50, row: 97 },
   },
 ] as const;
@@ -181,7 +181,7 @@ describe('Round 76 CC0 environment atlas', () => {
 });
 
 describe('Round 76 five-region art layers', () => {
-  it.each(MAPS)('$id preserves its 100×100 collision and original art', (spec) => {
+  it.each(MAPS)('$id preserves its 100×100 collision and pre-existing terrain art', (spec) => {
     const map = loadMap(spec.file);
     const art = map.art;
     expect(map.id).toBe(spec.id);
@@ -194,14 +194,13 @@ describe('Round 76 five-region art layers', () => {
     expect(art).toBeDefined();
     if (art === undefined) throw new Error(`${spec.id} is missing art`);
 
-    const priorArt = {
+    const priorTerrainArt = {
       tileSize: art.tileSize,
-      tilesets: art.tilesets.filter((tileset) => tileset.id !== TILESET_ID),
+      tilesets: art.tilesets.filter((tileset) => tileset.id !== TILESET_ID && tileset.id !== 'opengameart.puny-characters'),
       layers: art.layers.filter((layer) => !layer.id.startsWith('round76-')),
-      actors: art.actors,
     };
-    expect(sha256(priorArt)).toBe(spec.priorArtHash);
-    expect(art.actors.tilesetId).not.toBe(TILESET_ID);
+    expect(sha256(priorTerrainArt)).toBe(spec.priorArtHash);
+    expect(art.actors.tilesetId).toBe('opengameart.puny-characters');
 
     const r76Layers = art.layers.filter((layer) => layer.id.startsWith('round76-'));
     expect(r76Layers).toHaveLength(1);

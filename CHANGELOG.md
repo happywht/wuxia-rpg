@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+### Added (Round 77)
+
+- 接入 Shade 的 OpenGameArt Puny Characters CC0 素材，生成十种外观、四向 idle 与三帧 walk 的紧凑 16px 透明角色图集；发行保留来源通知。
+- 五区玩家按朝向显示静止帧并播放三帧步行动画，16 名 NPC 通过角色资料使用十种服饰外观；旧地图缺省方向帧表时回退既有静态帧。
+- 增加人物图集生成器、数据/发行专项测试，并调整前序地图美术回归，使其将历史地形不变性与当前人物素材升级分别校验。
+
 ### Added (Round 76)
 
 - 接入 OpenGameArt ansimuz 的 RPG Town CC0 16×16 透明图集；发行白名单仅包含实际使用 PNG 和随包原始 License。

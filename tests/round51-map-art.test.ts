@@ -18,15 +18,17 @@ describe('Round 51 world art data', () => {
     expect(map.rows).toBe(100);
     expect(map.playerStart).toEqual({ col: 43, row: 37 });
     expect(art?.tileSize).toBe(16);
-    // Five original layers, two Round 65 street layers, then the Round 76 environment layer.
+    // Five original layers, two Round 65 street layers, the Round 76 environment layer, and the Round 77 actor atlas.
     expect(art?.layers).toHaveLength(8);
     expect(art?.tilesets.map((tileset) => tileset.id)).toEqual([
       'kenney.roguelike-rpg',
       'kenney.tiny-dungeon',
       'kenney.rpg-urban-pack',
       'opengameart.rpg-town',
+      'opengameart.puny-characters',
     ]);
-    expect(art?.actors.playerFrame).toBe(24);
+    expect(art?.actors.playerFrame).toBe(256);
+    expect(art?.actors.playerFrames?.idle.down).toBe(256);
     expect(art?.layers.every((layer) => layer.cells.length === map.rows && layer.cells.every((row) => row.length === map.columns))).toBe(true);
     expect(map.data.grid.join('').length).toBe(10_000);
     expect([...map.data.grid.join('')].filter((cell) => cell === '.').length).toBeGreaterThan(7_000);

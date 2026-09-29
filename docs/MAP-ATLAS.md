@@ -1,6 +1,13 @@
 # 世界舆图与区域旅行
 
-Round 10 将单张网格地图扩展为由资料驱动的区域集合；Round 51 将起始区域扩展为 100×100 格的连续大地图，并换成公开 CC0 像素图集；Round 52 校正视觉地图坐标并加入资料地标图例及独立视口相机裁切；Round 55 将雾雨渡口扩建为第二张 100×100 十层 CC0 大地图并新增四个渡口地标；Round 57 让已选地标目的地在区域间接续；Round 62 新增第三块 100×100 铁嶂北道山地大区；Round 65 以官方 RPG Urban Pack 图集为起始区域增绘城镇街市两层，并把百格地图人物精灵升级为多帧正式像素人物；Round 66 增加独立全域地理总图；Round 67 新增第四张 100×100 西陲盐道地图，并把总图扩至 176×112 格；Round 68 以四区真实资料串联长途、存档与结局回归；Round 70 重塑大陆海岸、四区地貌、林地和聚落图素，扩大舆图可视窗；Round 74 新增第五张 100×100 云岭古道地图、双向铁嶂关口、区域任务链，并将总图扩至 208×128 格；Round 75 为五区固定见闻事件增加数据驱动的临近线索；Round 76 为五区分别增加低密度果木、渡口市集、岭道松石、盐井驿棚与云岭栈桥环境细节。玩家可在五区总览与当前区域细图间切换，拖动、缩放和方向键平移。地图尺寸、碰撞、分层贴图、区域命名、地标、关口端点和区域事件仍由 `data/` 声明；引擎只执行通用协议。
+Round 10 将单张网格地图扩展为由资料驱动的区域集合；Round 51 将起始区域扩展为 100×100 格的连续大地图，并换成公开 CC0 像素图集；Round 52 校正视觉地图坐标并加入资料地标图例及独立视口相机裁切；Round 55 将雾雨渡口扩建为第二张 100×100 十层 CC0 大地图并新增四个渡口地标；Round 57 让已选地标目的地在区域间接续；Round 62 新增第三块 100×100 铁嶂北道山地大区；Round 65 以官方 RPG Urban Pack 图集为起始区域增绘城镇街市两层，并把百格地图人物精灵升级为多帧正式像素人物；Round 66 增加独立全域地理总图；Round 67 新增第四张 100×100 西陲盐道地图，并把总图扩至 176×112 格；Round 68 以四区真实资料串联长途、存档与结局回归；Round 70 重塑大陆海岸、四区地貌、林地和聚落图素，扩大舆图可视窗；Round 74 新增第五张 100×100 云岭古道地图、双向铁嶂关口、区域任务链，并将总图扩至 208×128 格；Round 75 为五区固定见闻事件增加数据驱动的临近线索；Round 76 为五区分别增加低密度果木、渡口市集、岭道松石、盐井驿棚与云岭栈桥环境细节；Round 77 将玩家与 NPC 更新为外部 CC0 像素人物并加入方向帧和步行动画。玩家可在五区总览与当前区域细图间切换，拖动、缩放和方向键平移。地图尺寸、碰撞、分层贴图、区域命名、地标、关口端点和区域事件仍由 `data/` 声明；引擎只执行通用协议。
+
+## Round 77 CC0 人物图集与朝向
+
+- 五区地图的 `art.actors.tilesetId` 统一指向 OpenGameArt Shade 的 Puny Characters 合成图集 `opengameart.puny-characters`；图集为 320×256、20×16 格，每格 16×16。十种服饰外观各保留八个方向的 idle 帧与三帧 walk 循环；角色在 48 世界像素格内最近邻放大显示，脚点仍对齐格中心。
+- `art.actors.playerFrames` 由地图 JSON 明确声明上下左右 idle 与 walk 帧号。通用移动输入按方向选帧、移动补间切换三帧并在抵达后回到 idle；无此可选字段的旧地图/MOD 回退到原 `playerFrame`。
+- NPC 外观与静止朝向仍由其资料 `spriteFrame` 指定；同屏人物分配十种基础外观，伙伴复用对应 NPC 图素。引擎只校验帧号并绘制图集，不知道服饰、职业或人物身份。
+- `npm run generate:round-77-characters` 可从 `scripts/sources/opengameart/puny-characters/` 重建图集与人物帧映射。`tests/round77-character-art.test.ts` 校验 CC0 通知、320 帧透明像素、五区朝向/动画数据、碰撞哈希、NPC 外观分布和旧格式兼容；来源/发行处理见 [`REFERENCES.md`](REFERENCES.md)。
 
 ## Round 76 五区环境细节
 
@@ -182,8 +189,8 @@ M 默认打开宽幅全域总览：`regions[].atlasPosition` 决定区域落点�
 ## Round 51 地图美术资源
 
 - 起始大地图使用 `data/assets/kenney/roguelike-rpg/roguelikeSheet_transparent.png` 的 16×16 地表、道路、林木、岸线、聚落与屋顶瓦片，以及该 CC0 素材包附带的 `scripts/sources/kenney-roguelike-sample-map.tmx` 五层 100×100 地图作为底稿。`scripts/import-round51-kenney-world.mjs` 可从底稿重建**起始大地图**的 JSON 图层和独立碰撞网格（Round 55 起不再改写雾雨渡口地图，见上文「Round 55」一节）；扩展的林带、池塘、道路与第二聚落也都使用这张 CC0 图集。Round 65 起起始地图另有叠加其上的城镇街市两层（见上节）。
-- 玩家、NPC 和伙伴的人物帧：Round 51–64 使用 `data/assets/kenney/tiny-dungeon/tilemap_packed.png`；Round 65 起百格地图的 `art.actors` 与全部 NPC 帧改用 `data/assets/kenney/rpg-urban-pack/tilemap_packed.png`（432×288、27×18、16px、0 间距）。帧索引、图集尺寸和画面图层都随地图数据声明，NPC 可选 `spriteFrame` 覆盖默认人物帧。
-- 三套图集的原始 `License.txt` 随游戏素材一起打包；许可来源、素材用途和发布边界见 [`REFERENCES.md`](REFERENCES.md) 第六节与 [`PLAYER-GUIDE.md`](PLAYER-GUIDE.md)。美术素材可替换而不改变地图移动碰撞协议。
+- 玩家、NPC 和伙伴的人物帧：Round 51–64 使用 `data/assets/kenney/tiny-dungeon/tilemap_packed.png`；Round 65–76 的百格地图使用 `data/assets/kenney/rpg-urban-pack/tilemap_packed.png`；Round 77 起五区演员切换到 `data/assets/opengameart/puny-characters/actors.png`，由地图 `art.actors` 与 NPC `spriteFrame` 指定。旧地图/MOD 仍可指向各自的 Kenney 图集或省略方向帧映射。
+- Kenney 图集保留随包原始 `License.txt`；Round 77 的生成图集附带项目来源与 CC0 `NOTICE.txt`。许可来源、素材用途和发布边界见 [`REFERENCES.md`](REFERENCES.md) 第六节与 [`PLAYER-GUIDE.md`](PLAYER-GUIDE.md)。美术素材可替换而不改变地图移动碰撞协议。
 
 ## 资料协议
 

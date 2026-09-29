@@ -4,6 +4,29 @@
 
 ---
 
+## Round 77 — CC0 像素人物与方向动画（2026-09-29，已完成）
+
+### 计划与实现
+
+- 计划见 [`iterations/round-77/plan.md`](iterations/round-77/plan.md)：核验可发行素材，接入玩家方向待机/行走帧与 NPC 差异外观，保持碰撞、地图和旧 MOD 回退。
+- 接续核查时发现本工作区已有 Round 77 实现改动，但计划文件实际缺失；此前进度称文件已写入并不准确。依照用户“不撤销”要求保留现有实现，现补录计划。本轮因此没有满足“先写计划再开发”的时间顺序；Round 78 将在任何实现改动前先建立计划。
+- 核验 OpenGameArt [Puny Characters](https://opengameart.org/content/puny-characters) 素材页所列 Shade 作者信息及 CC0 1.0；裁切生成运行时透明图集，原始十张图保存在生成源目录，发行白名单只取压缩后图集和 `NOTICE.txt`。
+- 五张 100×100 地图添加数据驱动玩家方向帧；十六名 NPC 以人物 JSON 的 `spriteFrame` 选用十种服饰外观。场景在方向输入时切换 idle，移动期间播放三帧 walk，完成后回到对应 idle；未提供帧表的旧地图走原静态帧路径。
+- 首次运行全量测试发现 Round 51、65、76 的历史断言把活动角色帧固定为旧静态图集。本轮调整为分别验证 Round 77 人物帧、保留旧 Kenney 人物格、锁定既有地形层/碰撞，并增加新旧 OpenGameArt 图集的发行检查；地形与玩法锚点保护保持原强度。
+
+### 当前验证记录
+
+- `npm run validate:data`：通过，manifest 与 34 个基础资源 Schema 均有效。
+- `npm run typecheck`：通过。
+- `npm run smoke:round-77`：通过，人物素材/五区方向帧/NPC 帧/旧数据回退/发行清单专项 4 项通过。
+- 首次 `npm run package:release`：发现 4 个历史测试文件的 12 项旧帧/当前资源断言不再匹配；调整断言后再次运行，全量检查通过。
+- 第二次 `npm test`（由发行流程执行）：48 个测试文件/324 项测试全部通过；34 项基础资源 Schema 通过、34 项 MOD 检查零问题、类型与 Round 34/48 文档审计通过。
+- `npm run generate:round-77-characters`：通过；重复生成后运行时图集 SHA-256 仍为 `22d6e054f48db7759e66e064c14e74aeecb5254facc74310a78799fd79a970cc`。
+- `npm run package:release`：生产构建、Round 72 chunk 审计、发行包打包及 `/preview/wuxia-rpg/` 子路径 smoke 全部通过。生成 `release/wuxia-rpg-web-0.0.1.tgz`，921,609 bytes、87 个内容文件，SHA-256 `5ec4dcce83549fd4124a1e8eb2965d6089b3095697a3001804c1a8ee38ff1e40`；smoke 核验内容清单大小/哈希、地图/Schema、四张 Kenney 与两张 OpenGameArt 图集及其许可/来源声明。
+- 隔离浏览器在 5193 端口加载新开局地图和十种外观人物；一次 ArrowRight 输入后仍显示可玩地图，无浏览器 warning/error。未做玩家格坐标的屏幕文本 OCR，也未触碰原有 5178 页面与存档。
+
+---
+
 ## Round 76 — 五区地标图素与环境层级（2026-09-29，已完成）
 
 ### 计划与实现

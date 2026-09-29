@@ -14,6 +14,8 @@ npm run smoke:round-68 # 四区逐格旅程→日程→盐道存读档→苦井�
 npm run smoke:round-69 # 真实授艺路径审计→守御/反击一击结算
 npm run smoke:round-74 # 云岭百格地图、跨区关口、任务链和真实 manifest 装配
 npm run smoke:round-76 # 五区补充图集帧、原碰撞/画层哈希与锚点
+npm run smoke:round-77 # CC0 人物帧、方向动画数据、碰撞哈希和旧格式兼容
+npm run generate:round-77-characters # 确定性重建 CC0 人物图集与人物帧表
 npx vitest run tests/round75-region-event-approach.test.ts # 固定事件临近线索协议与五区数据
 npm run generate:round-76-region-landmarks # 确定性应用五区 24 个环境图素
 npm run package:release # 质量门槛 + 生产构建 + R72 chunk 审计 + R47 归档/路径 smoke + 版本化 Web 包
@@ -39,7 +41,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 
 - 测试框架：Vitest 5.0.2。官方指南要求 Vite >=6.4.0、Node >=22.12.0；本仓库使用 Vite 8.3.1 与 Node 22.18.0，符合要求（详见 [`docs/REFERENCES.md`](REFERENCES.md) #12；基准 API 见同文件 #16）。
 - 运行环境：Node（无 DOM、无浏览器、无网络、无真实时钟依赖）。
-- 覆盖统计：Round 76 专项发行验证为 47 个测试文件/320 个用例；Round 69 时为 41/292。R69 覆盖 30 门武学的起始/授艺来源、对白起点到学习效果的路径、门派导师匹配、属性曲线可达、四门身法守御映射、敌我守御的一击消耗及敌方攻击优先规则；完整历史结果见 `DEVLOG.md` Round 69。Round 51–62 增量覆盖地图/CC0 素材、舆图视口与相机坐标、地标和跨区寻路、地图扩区、见闻任务、任务导航以及动态占位路线；Round 63–64 覆盖跨时段步行模拟与多图七时段全部交互目标路线/商铺导航审计；Round 65 专项 `tests/round65-urban-art.test.ts` 11 用例以内置 PNG 调色板解码器审计城镇图集许可/网格/486 格非空、地图与 NPC 的角色帧（必须落在图集角色列）、起始图城镇两图层的帧引用、角色列帧禁入城镇图层与环境帧白名单双守卫、碰撞一致性及出生点/NPC/关口可达；Round 66–74 回归检查 208×128 七层舆图、五区地图、跨区关口、数据驱动人物/任务资源装配及路线可达性；`tests/round76-region-landmark-art.test.ts` 用内置 PNG RGBA 解码器核查 CC0 图集、396 帧范围与透明度、五区图层、旧画面层/碰撞哈希及玩家/事件/地标/关口/NPC/遭遇锚点。隔离浏览器还核对全域舆图 M、细图 G 和方向键行走跟随。
+- 覆盖统计：Round 77 专项发行验证为 48 个测试文件/324 个用例；Round 69 时为 41/292。R69 覆盖 30 门武学的起始/授艺来源、对白起点到学习效果的路径、门派导师匹配、属性曲线可达、四门身法守御映射、敌我守御的一击消耗及敌方攻击优先规则；完整历史结果见 `DEVLOG.md` Round 69。Round 51–62 增量覆盖地图/CC0 素材、舆图视口与相机坐标、地标和跨区寻路、地图扩区、见闻任务、任务导航以及动态占位路线；Round 63–64 覆盖跨时段步行模拟与多图七时段全部交互目标路线/商铺导航审计；Round 65 专项 `tests/round65-urban-art.test.ts` 以内置 PNG 调色板解码器审计城镇图集许可/网格/486 格与历史人物帧，并检查起始图城镇两图层帧引用、角色列帧禁入环境层、环境帧白名单、碰撞一致性及出生点/NPC/关口可达；Round 77 人物专项核查新 Puny 图集、方向帧/行走循环、十种外观和旧数据回退；Round 66–74 回归检查 208×128 七层舆图、五区地图、跨区关口、数据驱动人物/任务资源装配及路线可达性；`tests/round76-region-landmark-art.test.ts` 用内置 PNG RGBA 解码器核查 CC0 图集、396 帧范围与透明度、五区图层、旧画面层/碰撞哈希及玩家/事件/地标/关口/NPC/遭遇锚点。隔离浏览器还核对全域舆图 M、细图 G 和方向键行走跟随。
 
 ## 配置：为什么有独立的 `vitest.config.ts`
 
@@ -91,6 +93,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 | `tests/round67-salt-road.test.ts` | 西陲盐道地图/全域舆图/图谱/对白/任务装配资料 | R67 盐道 100×100/十层、入口 BFS 可达格、更新后的五图八关口装配、事件与地标可达、罗金子日程与差事完成闭环 |
 | `tests/round68-long-journey.test.ts` | 五张基础地图、世界图、日历/气候、NPC 日程、遭遇、对白/任务/图谱、v1 存档和结局资料 | R68 历史四区 749 格逐步往返与五次切图、六时段/跨日、真实事件发现、远区保存/恢复、盐道见闻差事及行舟万里结局；世界装配包含第五区，旅程步骤保持原历史范围；专项命令 `npm run smoke:round-68` |
 | `tests/round74-cloud-ridge.test.ts` | 五张区域图、世界舆图、NPC 日程、遭遇、对白/任务/图谱 | R74 云岭 100×100/十层与 GID、双向关口 BFS、所有地标/事件/NPC/遭遇锚点可达、两段任务链及 208×128 总图整合；与 `round49-default-world-integrity.test.ts` 共同覆盖分拆 NPC/任务资源装配，专项命令 `npm run smoke:round-74` |
+| `tests/round77-character-art.test.ts` | CC0 人物图集、五区地图/NPC 资料、`grid-map` 帧选择器 | 4 项检查：PNG 320 帧/十种外观实际 alpha、五区方向 idle/三帧 walk 与碰撞哈希、NPC 外观分布、缺省方向映射与示例 MOD 兼容、发行包 CC0 来源清单 |
 | `tests/round69-martial-paths.test.ts` | 基础角色、武学、全部对话、NPC 与门派资料 | R69 从对话起点核验授艺条件/效果/门派导师；覆盖 30 门目录、五派数量、无门派招式公开路线和裸成长属性门槛可达性 |
 | `tests/round69-guard-combat.test.ts` | 基础角色、武学、开场遭遇与 `CombatSession` | R69 四门真实身法守御映射、内力支出、下一次攻击减伤、最低 1 点伤害、敌方守御消耗及攻击优先；专项命令 `npm run smoke:round-69` |
 | `tests/round56-discovery-quests.test.ts`（及 R56 扩展的任务/世界地图/图谱既有测试） | quest-set/知识图谱/世界图资料与 `quest-system.ts` | R56 发现见闻回归：`discoverKnowledge` 目标与两段渡口巡标差事的解析/装配引用校验、首次发现信号只推进匹配目标一次、接取时已知见闻回填、旧档恢复重算、奖励见闻级联推进与发现门控地标/事件引用；专项命令 `npx vitest run tests/quest-system.test.ts tests/round56-discovery-quests.test.ts` 为 2 文件/29 用例 |

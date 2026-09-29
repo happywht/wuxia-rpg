@@ -42,13 +42,40 @@ export interface GridMapImageArtData {
   layers: GridMapArtLayerData[];
 }
 
+/** Cardinal directions understood by grid movement and actor frame metadata. */
+export const GRID_MAP_ACTOR_DIRECTIONS = ['down', 'left', 'right', 'up'] as const;
+export type GridMapActorDirection = typeof GRID_MAP_ACTOR_DIRECTIONS[number];
+
+/** Optional direction-aware player frames; omitted by older maps and MODs. */
+export interface GridMapPlayerFrames {
+  idle: Record<GridMapActorDirection, number>;
+  walk: Record<GridMapActorDirection, number[]>;
+}
+
 /** Optional presentation data. Collision and movement remain in `grid`. */
 export interface GridMapArtData extends GridMapImageArtData {
   actors: {
     tilesetId: string;
     playerFrame: number;
     defaultNpcFrame: number;
+    playerFrames?: GridMapPlayerFrames;
   };
+}
+
+/** Resolves a player animation frame with a stable legacy fallback. */
+export function selectGridMapPlayerFrame(
+  actors: GridMapArtData['actors'],
+  direction: GridMapActorDirection,
+  moving: boolean,
+  stepIndex = 0,
+): number {
+  const frames = actors.playerFrames;
+  if (frames === undefined) return actors.playerFrame;
+  if (!moving) return frames.idle[direction] ?? actors.playerFrame;
+  const cycle = frames.walk[direction];
+  if (!Array.isArray(cycle) || cycle.length === 0) return frames.idle[direction] ?? actors.playerFrame;
+  const index = ((Math.trunc(stepIndex) % cycle.length) + cycle.length) % cycle.length;
+  return cycle[index] ?? actors.playerFrame;
 }
 
 /** Grid-cell coordinates; (0, 0) is the top-left cell. */
@@ -243,6 +270,50 @@ function validateGridMapArt(art: unknown, columns: unknown, rows: unknown, error
     checkIntegerInRange(value, 0, 1_048_575, `art.actors.${field}`, errors);
     if (actorTileset !== undefined && typeof value === 'number' && value >= actorTileset.tileCount) {
       errors.push(`art.actors.${field}: frame ${value} exceeds sprite sheet "${actorTileset.id}"`);
+    }
+  }
+  if (art.actors.playerFrames !== undefined) {
+    const playerFrames = art.actors.playerFrames;
+    if (!isPlainObject(playerFrames)) {
+      errors.push('art.actors.playerFrames: expected an object');
+    } else {
+      for (const action of ['idle', 'walk'] as const) {
+        const actionFrames = playerFrames[action];
+        if (!isPlainObject(actionFrames)) {
+          errors.push(`art.actors.playerFrames.${action}: expected a direction map`);
+          continue;
+        }
+        for (const direction of GRID_MAP_ACTOR_DIRECTIONS) {
+          const value = actionFrames[direction];
+          if (action === 'idle') {
+            checkIntegerInRange(value, 0, 1_048_575, `art.actors.playerFrames.idle.${direction}`, errors);
+            if (actorTileset !== undefined && typeof value === 'number' && value >= actorTileset.tileCount) {
+              errors.push(`art.actors.playerFrames.idle.${direction}: frame ${value} exceeds sprite sheet "${actorTileset.id}"`);
+            }
+            continue;
+          }
+          if (!Array.isArray(value) || value.length === 0) {
+            errors.push(`art.actors.playerFrames.walk.${direction}: expected a non-empty frame array`);
+            continue;
+          }
+          value.forEach((frame, index) => {
+            checkIntegerInRange(frame, 0, 1_048_575, `art.actors.playerFrames.walk.${direction}[${index}]`, errors);
+            if (actorTileset !== undefined && typeof frame === 'number' && frame >= actorTileset.tileCount) {
+              errors.push(`art.actors.playerFrames.walk.${direction}[${index}]: frame ${frame} exceeds sprite sheet "${actorTileset.id}"`);
+            }
+          });
+        }
+        for (const direction of Object.keys(actionFrames)) {
+          if (!(GRID_MAP_ACTOR_DIRECTIONS as readonly string[]).includes(direction)) {
+            errors.push(`art.actors.playerFrames.${action}: unknown direction "${direction}"`);
+          }
+        }
+      }
+      for (const action of Object.keys(playerFrames)) {
+        if (action !== 'idle' && action !== 'walk') {
+          errors.push(`art.actors.playerFrames: unknown action "${action}"`);
+        }
+      }
     }
   }
 }

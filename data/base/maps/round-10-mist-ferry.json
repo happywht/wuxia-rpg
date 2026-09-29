@@ -166,6 +166,15 @@
         "rows": 18,
         "spacing": 0,
         "tileCount": 396
+      },
+      {
+        "id": "opengameart.puny-characters",
+        "image": "assets/opengameart/puny-characters/actors.png",
+        "tileSize": 16,
+        "columns": 20,
+        "rows": 16,
+        "spacing": 0,
+        "tileCount": 320
       }
     ],
     "layers": [
@@ -112437,9 +112446,39 @@
       }
     ],
     "actors": {
-      "tilesetId": "kenney.rpg-urban-pack",
-      "playerFrame": 24,
-      "defaultNpcFrame": 131
+      "tilesetId": "opengameart.puny-characters",
+      "playerFrame": 256,
+      "defaultNpcFrame": 64,
+      "playerFrames": {
+        "idle": {
+          "down": 256,
+          "right": 264,
+          "up": 272,
+          "left": 280
+        },
+        "walk": {
+          "down": [
+            257,
+            258,
+            259
+          ],
+          "right": [
+            265,
+            266,
+            267
+          ],
+          "up": [
+            273,
+            274,
+            275
+          ],
+          "left": [
+            281,
+            282,
+            283
+          ]
+        }
+      }
     }
   }
 }

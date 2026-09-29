@@ -1,0 +1,6 @@
+Puny Characters by Shade (OpenGameArt.org)
+Source page: https://opengameart.org/content/puny-characters
+License: CC0 1.0 Universal
+License deed: https://creativecommons.org/publicdomain/zero/1.0/
+
+The OpenGameArt source page identifies this work as CC0 and states that it may be used and modified without attribution. The original 32x32-cell character sheets are cropped to their centered 16x16 character area and packed into actors.png. The release includes only this generated atlas and this provenance notice; source sheets used by the generator remain in scripts/sources/ and are not copied into the release package.

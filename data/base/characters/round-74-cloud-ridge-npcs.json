@@ -4,13 +4,28 @@
       "id": "char.r74-shen-yuji",
       "name": "沈雨霁",
       "mapResourceId": "map.round-74-cloud-ridge",
-      "position": { "col": 39, "row": 43 },
+      "position": {
+        "col": 39,
+        "row": 43
+      },
       "dialogueId": "dlg.r74-shen-yuji-cloud-ridge",
       "questGiver": true,
-      "spriteFrame": 350,
+      "spriteFrame": 248,
       "schedule": [
-        { "periodId": "period.morning", "position": { "col": 38, "row": 42 } },
-        { "periodId": "period.dusk", "position": { "col": 41, "row": 44 } }
+        {
+          "periodId": "period.morning",
+          "position": {
+            "col": 38,
+            "row": 42
+          }
+        },
+        {
+          "periodId": "period.dusk",
+          "position": {
+            "col": 41,
+            "row": 44
+          }
+        }
       ]
     }
   ]

@@ -292,17 +292,40 @@ export function createGridMapActor(
   if (tileset === undefined) return null;
   const frame = frameIndex ?? art.actors.defaultNpcFrame;
   const key = gridMapTilesetTextureKey(tileset.id);
-  const frameKey = `actor-${tileset.id}-${frame}`;
   const texture = scene.textures.get(key);
-  if (!texture.has(frameKey)) {
-    const sourceX = (frame % tileset.columns) * (tileset.tileSize + tileset.spacing);
-    const sourceY = Math.floor(frame / tileset.columns) * (tileset.tileSize + tileset.spacing);
-    if (texture.add(frameKey, 0, sourceX, sourceY, tileset.tileSize, tileset.tileSize) === null) {
-      throw new Error(`无法读取人物精灵帧 ${frame}（图集“${tileset.id}”）。`);
-    }
-  }
+  const frameKey = ensureGridMapActorFrame(texture, tileset, frame);
   return scene.add.image(x, y, key, frameKey).setScrollFactor(1)
     .setDisplaySize(map.tileSize, map.tileSize).setDepth(10);
+}
+
+/** Changes an existing actor image to another validated frame in its map atlas. */
+export function setGridMapActorFrame(
+  scene: Phaser.Scene,
+  map: GridMap,
+  actor: Phaser.GameObjects.Image,
+  frameIndex: number,
+): void {
+  const art = map.data.art;
+  const tileset = art?.tilesets.find((entry) => entry.id === art.actors.tilesetId);
+  if (art === undefined || tileset === undefined) return;
+  const key = gridMapTilesetTextureKey(tileset.id);
+  const frameKey = ensureGridMapActorFrame(scene.textures.get(key), tileset, frameIndex);
+  actor.setTexture(key, frameKey);
+}
+
+function ensureGridMapActorFrame(
+  texture: Phaser.Textures.Texture,
+  tileset: GridMapTilesetData,
+  frame: number,
+): string {
+  const frameKey = `actor-${tileset.id}-${frame}`;
+  if (texture.has(frameKey)) return frameKey;
+  const sourceX = (frame % tileset.columns) * (tileset.tileSize + tileset.spacing);
+  const sourceY = Math.floor(frame / tileset.columns) * (tileset.tileSize + tileset.spacing);
+  if (texture.add(frameKey, 0, sourceX, sourceY, tileset.tileSize, tileset.tileSize) === null) {
+    throw new Error(`无法读取人物精灵帧 ${frame}（图集“${tileset.id}”）。`);
+  }
+  return frameKey;
 }
 
 function drawTiledFrame(
