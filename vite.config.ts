@@ -182,6 +182,19 @@ export default defineConfig(async () => {
     },
     build: {
       target: 'es2022',
+      rolldownOptions: {
+        output: {
+          codeSplitting: {
+            groups: [
+              {
+                name: 'phaser-runtime',
+                test: /[\\/]node_modules[\\/]phaser[\\/]/,
+                priority: 100,
+              },
+            ],
+          },
+        },
+      },
     },
   };
 });

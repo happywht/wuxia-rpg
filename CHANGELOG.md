@@ -4,6 +4,21 @@
 
 ## [Unreleased]
 
+### Added (Round 72)
+
+- **渡口回程与结局浏览器实测**：从 Round 71 盐道续档按 M 舆图动态导航穿越铁嶂、雾雨渡口；绕开 NPC 占位后抵达「照心石」，实选「行舟万里」并确认尾声和返回主菜单，保留结局截图及操作记录。
+- **生产 JS 分块审计**：Vite/Rolldown 将 Phaser runtime 提取为独立 chunk；新审计核对入口比例和 JS 引用，发行 smoke 在子路径检查 chunk/import 均可访问。
+
+### Changed (Round 72)
+
+- `vite.config.ts` 使用 `build.rolldownOptions.output.codeSplitting.groups` 生成可独立缓存的 Phaser chunk。此为静态分块，游戏启动仍会请求 Phaser；不声称减少首屏总下载量。
+- 更新玩家/地图指南、架构说明、来源表、路线图和开发记录。
+
+### Verification (Round 72)
+
+- `npm run package:release`：30 项资源 Schema、30 项 MOD 零问题、类型检查、43 个测试文件/296 项测试、Round 34/48 文档审计、生产 chunk 审计与发行子路径 smoke 全部通过。应用入口 570,700 B、Phaser chunk 1,374,548 B；gzip 合计 511,674 B。发行包 848,840 bytes，SHA-256 `ada26664fc93b409cd57ff50b92066b76baa40034812a85f7bc4f6ea1fb95205`，80 个归档成员/79 个内容清单文件。
+- 隔离浏览器实走结局门、结局列表、「行舟万里」尾声与返回主菜单；分块生产预览启动成功。试玩限制见 `docs/ROUND-72-BROWSER-PLAYTEST.md` 与 `DEVLOG.md` Round 72。
+
 ### Added (Round 71)
 
 - **可复现的四区浏览器行旅轨迹**：由 Round 68 真实资料长旅程导出分区方向序列、五次关口交互及存档检查点，并增加轨迹结构回归；该轨迹用于导航参考，不把引擎模拟等同于浏览器实走。

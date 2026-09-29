@@ -4,6 +4,30 @@
 
 ---
 
+## Round 72 — 浏览器动态回程、结局实走与生产分块（2026-09-29，已完成）
+
+### 计划与实现
+
+- 按 [`iterations/round-72/plan.md`](iterations/round-72/plan.md) 执行。Round 71 隔离续档从西陲盐道 `(32,30)` 起步，游戏时刻第 1 年青阳 1 日 17:13；只操作 5189 端口，没有访问用户原有 5178 标签/存档。
+- 依据游戏内 M 舆图回到青岩东关，过关至铁嶂北道 `(53,90)`（19:49）；导航选雾雨渡口、走完 132 格路线至 `(4,7)`，22:01 过图后到渡口 `(89,16)`（22:46）。渡口「回望石阶」线路显示 98 格；夜间 NPC 占位挡住两步后，在实际坐标 `(5,4)`（次日 00:44）再次打开地图、绕经 `(5,3)` 并从东侧抵达结局门 `(8,3)`（00:52）。没有把被挡输入计作走格或绕过运行时状态。
+- 到达 `(8,3)` 后按 E 打开「照心石」结局 UI。列表 7 项中前六项未满足，「行舟万里」显示已达成；按 Enter 展示该结局尾声，再按 Esc 并等候资料加载，确认返回主菜单的三个入口。尾声图保存在 [`iterations/round-72/evidence/ending-screen.png`](iterations/round-72/evidence/ending-screen.png)；未声称结局后另存新档。真实操作记录见 [`docs/ROUND-72-BROWSER-PLAYTEST.md`](docs/ROUND-72-BROWSER-PLAYTEST.md)。
+- 在 `vite.config.ts` 使用 Vite 8/Rolldown `build.rolldownOptions.output.codeSplitting.groups` 将 Phaser 抽为 `phaser-runtime` chunk；新增 `scripts/audit-round-72-chunks.mjs` 并接入 `package:release`。Round 47 静态子路径 smoke 现在逐个请求归档 JS 文件及 JS import，确认 chunk 随包且相对路径可解。
+- 构建量测：Round 71 基线单入口 1,945,736 B / gzip 511,347 B；Round 72 应用入口 570,700 B / gzip 155,847 B，Phaser chunk 1,374,548 B / gzip 355,827 B，合计 1,945,248 B / gzip 511,674 B。入口减 70.7%，但 chunk gzip 总和增加 327 B；静态 import 使两个块仍在启动时请求，因此只获得入口分离和缓存独立性，不宣称首屏下载下降。Vite 对 >500 KB 的 Phaser chunk 仍显示非阻断建议。
+
+### 验证
+
+- 首次 `npm run package:release` 的文档审计指出 `ARCHITECTURE.md` 与 `DATA-GUIDE.md` 状态摘要停在 Round 71；更新后 Round 48 文档审计 9 项通过，全流程重跑成功。
+- `npx vite build`：139 个模块构建通过；入口与 `phaser-runtime` 独立输出。`npm run audit:round-72`：两个 chunk 通过名称、比例及本地 JS 引用闭合校验。
+- `npm run package:release`：30 项基础资源 Schema 通过、30 项 MOD 检查 0 问题、`tsc --noEmit` 通过、43 个测试文件/296 项测试通过、Round 34/48 文档审计通过、chunk 审计通过；发行包归档和 `/preview/wuxia-rpg/` smoke 均通过，验证 79 个清单文件大小/SHA-256 和分块后 JS 引用路径。发布包 `release/wuxia-rpg-web-0.0.1.tgz` 为 848,840 bytes，SHA-256 `ada26664fc93b409cd57ff50b92066b76baa40034812a85f7bc4f6ea1fb95205`。
+- `npm run preview -- --host 127.0.0.1 --port 5192 --strictPort`：浏览器实际启动生产构建并显示菜单；与发行 smoke 的非根路径请求配合确认分块无启动/部署路径回归。`git diff --check` 通过。
+
+### 边界与后续
+
+- 静态分块尚未让 Phaser 延后加载；总 gzip 没有下降。后续只有在有真实冷启动收益并经生产浏览器验证后，才应考虑改启动/菜单生命周期。
+- 实际结局体验与返回主菜单已验证；没有在尾声后创建新存档，也未操作 5178 来源。整轮证据与范围见 [`docs/ROUND-72-BROWSER-PLAYTEST.md`](docs/ROUND-72-BROWSER-PLAYTEST.md)。
+
+---
+
 ## Round 71 — 四区浏览器行旅、盐道续档与动态路线核对（2026-09-29，已完成）
 
 ### 计划与实现

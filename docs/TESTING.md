@@ -12,7 +12,8 @@ npm run benchmark:round-40 # 性能/内存基准（R40 起；与 npm test 双向
 npm run smoke:round-46 # 真实资料驱动的开局→故事分支→多结局纵向集成回归
 npm run smoke:round-68 # 四区逐格旅程→日程→盐道存读档→苦井差事→渡口结局
 npm run smoke:round-69 # 真实授艺路径审计→守御/反击一击结算
-npm run package:release # 质量门槛 + 生产构建 + R47 归档/路径 smoke + 版本化 Web 包
+npm run package:release # 质量门槛 + 生产构建 + R72 chunk 审计 + R47 归档/路径 smoke + 版本化 Web 包
+npm run audit:round-72 # 检查入口/Phaser chunk、大小比例和生产 JS 引用闭合
 npm run typecheck   # tsc --noEmit，严格模式，包含 tests/ 与 vitest.config.ts
 npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现，见下文）
 ```
@@ -28,7 +29,7 @@ npm run validate:data  # 基础资料 CLI 校验（与测试共享同一实现�
 5. `npm run audit:round-34` — 文档一致性审计（地图/对白/任务/世界设定）；
 6. `npm run audit:round-48-docs` — R48 建立的玩家/MOD 手册、README/发布包索引、当前完成轮次/资料状态、发布包收录与授权边界审计；当前轮次从路线图已完成条目动态读取。
 
-`npm run build` 先完整通过 `check` 再执行 Vite 生产构建：门槛失败时不会开始打包（此前 build 只跑 `tsc --noEmit`，类型检查不重复执行）。
+`npm run build` 先完整通过 `check` 再执行 Vite 生产构建：门槛失败时不会开始打包（此前 build 只跑 `tsc --noEmit`，类型检查不重复执行）。`npm run package:release` 在 build 后执行 Round 72 chunk 审计，再创建发行归档；Round 47 smoke 会从 `/preview/wuxia-rpg/` 子路径逐个请求发行包内的 JS chunk 和其 JS import，防止入口分离后漏包或路径解析错误。
 
 `.github/workflows/quality-gates.yml` 在 push、pull request 与 workflow_dispatch 触发时于 Node 22 运行器上执行 `npm ci`（锁文件精确安装 + npm 缓存）→ `npm run build`（含完整门槛）→ `smoke:round-35`/`36`/`37` 回归烟测；仅 `contents: read` 权限、15 分钟超时、无部署发布步骤。CI 与本地命令完全同源；workflow 首次实际运行状态以 GitHub Actions 页面为准。
 

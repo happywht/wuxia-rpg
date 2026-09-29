@@ -146,6 +146,22 @@ try {
       assert.ok(assetPath.startsWith('./'), `HTML 资源使用相对基址：${assetPath}`);
       assert.equal((await fetch(new URL(assetPath, siteBase))).status, 200, `静态资源可访问：${assetPath}`);
     }
+    const javascriptFiles = packageFiles.filter((filePath) => filePath.startsWith('assets/') && filePath.endsWith('.js'));
+    assert.ok(javascriptFiles.some((filePath) => /\/phaser-runtime-[^/]+\.js$/u.test(filePath)), '发行包含独立 Phaser chunk');
+    for (const filePath of javascriptFiles) {
+      const scriptUrl = new URL(filePath, siteBase);
+      const scriptResponse = await fetch(scriptUrl);
+      assert.equal(scriptResponse.status, 200, `发行包 JS chunk 可访问：${filePath}`);
+      const source = await scriptResponse.text();
+      const imports = /(?:\bfrom\s*|\bimport\s*(?:\(\s*)?)['"]([^'"]+)['"]/gu;
+      for (const match of source.matchAll(imports)) {
+        const reference = match[1];
+        if (reference === undefined || !reference.endsWith('.js')) continue;
+        const target = new URL(reference, scriptUrl);
+        assert.equal(target.origin, scriptUrl.origin, `JS import stays on the package origin: ${reference}`);
+        assert.equal((await fetch(target)).status, 200, `JS import resolves below the package subpath: ${reference}`);
+      }
+    }
 
     const modResponse = await fetch(`${siteBase}mods/example/maps/round-01-grid.json`);
     assert.equal(modResponse.status, 200, '示例 MOD JSON 与站点一同被发布');

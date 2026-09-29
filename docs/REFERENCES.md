@@ -1,6 +1,6 @@
 # 参考来源与使用边界（REFERENCES）
 
-核验日期：2026-09-29。历史/回忆类来源统一编号 **#1–#5**，官方技术来源统一编号 **#6–#20**；软件包元数据在独立表格中按精确包版本记录，不参与原作对照编号。来源授权状态只在核验到明确许可时标为已知；没有核验页面许可时，仅作事实性查阅，不复制内容。
+核验日期：2026-09-29。历史/回忆类来源统一编号 **#1–#5**，官方技术来源统一编号 **#6–#22**；软件包元数据在独立表格中按精确包版本记录，不参与原作对照编号。来源授权状态只在核验到明确许可时标为已知；没有核验页面许可时，仅作事实性查阅，不复制内容。
 
 ---
 
@@ -42,6 +42,8 @@
 | 18 | [Phaser GamepadPlugin 官方 API 文档](https://docs.phaser.io/api-documentation/class/input-gamepad-gamepadplugin) | Round 41 场景接入依据：`this.input.gamepad` 场景级插件、`input: { gamepad: true }` 配置启用、`pad1`–`pad4`/`getAll()`/`total` 设备发现、`enabled` 开关与 SSL/浏览器安全限制说明 | 页面许可未逐页核实；只查阅/转述技术事实，不复制文档段落、示例代码或素材 |
 | 19 | [GitHub Pages 配置发布源文档](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site) | Round 47 静态发布方案与人工 Pages source 配置依据；Actions 发布由静态构建、Pages artifact 与独立 deploy job 组成 | 文档页面许可未逐页核实；只查阅/转述操作事实，不复制文档段落、示例代码或素材 |
 | 20 | GitHub 官方 Actions 仓库：[upload-pages-artifact](https://github.com/actions/upload-pages-artifact)、[deploy-pages](https://github.com/actions/deploy-pages)、[upload-artifact](https://github.com/actions/upload-artifact) | Round 47 将生产 `dist/` 上传 Pages、部署此前 Pages artifact，并保留版本包为短期 Actions artifact；workflow 按官方 action 文档声明独立权限和环境 | 各仓库为官方维护开源 action；本轮未逐版本核验仓库内全部依赖许可，不复制 action 源码或文档段落；按官方发布列表锁定 major/minor/patch 标签 |
+| 21 | [Vite Build Options](https://vite.dev/config/build-options) | Round 72 核对 Vite 8 生产构建中的 `build.rolldownOptions` 与兼容但已弃用的 `rollupOptions` 配置入口 | 页面许可未逐页核实；只查阅/转述技术事实，不复制文档段落、示例代码或素材 |
+| 22 | [Rolldown `OutputOptions.codeSplitting`](https://rolldown.rs/reference/OutputOptions.codeSplitting) | Round 72 Phaser 运行时分块配置、模块分组优先级与路径分隔符匹配方式 | 页面许可未逐页核实；只查阅/转述技术事实，不复制文档段落、示例代码或素材 |
 
 ## 四、软件包许可核验（npm 元数据）
 
