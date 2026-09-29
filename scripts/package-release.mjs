@@ -55,6 +55,9 @@ async function ensureBuildIsPresent() {
     'assets/kenney/tiny-dungeon/License.txt',
     'assets/kenney/rpg-urban-pack/tilemap_packed.png',
     'assets/kenney/rpg-urban-pack/License.txt',
+    'assets/kenney/tiny-town/tilemap_packed.png',
+    'assets/kenney/tiny-town/License.txt',
+    'assets/generated/world-palette.png',
   ];
   for (const relative of required) {
     try {

@@ -26,27 +26,37 @@ function loadWorld() {
   return { raw, parsed: parsed.data, world, maps };
 }
 
-describe('Round 66 global world atlas art and projection', () => {
-  it('loads a deterministic wide CC0 atlas from five valid image layers', () => {
+describe('Round 70 global world atlas art and projection', () => {
+  it('loads the 176×112 continental atlas with per-layer tileset validation', () => {
     const { parsed } = loadWorld();
     const art = parsed.atlasArt;
     expect(art).toBeDefined();
     if (art === undefined) return;
     expect({ columns: art.columns, rows: art.rows, tileSize: art.tileSize }).toEqual({ columns: 176, rows: 112, tileSize: 16 });
     expect(art.layers.map(({ id }) => id)).toEqual([
-      'world-ocean', 'world-land', 'world-coast', 'world-relief', 'world-roads',
+      'world-ocean', 'world-land', 'world-coast', 'world-forest', 'world-relief', 'world-roads', 'world-settlements',
     ]);
-    const tileset = art.tilesets[0];
-    expect(tileset?.id).toBe('kenney.roguelike-rpg');
+    const tilesets = new Map(art.tilesets.map((tileset) => [tileset.id, tileset]));
+    expect(tilesets.has('kenney.roguelike-rpg')).toBe(true);
+    expect(tilesets.has('kenney.tiny-town')).toBe(true);
+    expect(tilesets.has('wuxia.world-palette')).toBe(true);
     for (const layer of art.layers) {
       expect(layer.cells).toHaveLength(art.rows);
       expect(layer.cells.every((row) => row.length === art.columns)).toBe(true);
+      const tileset = tilesets.get(layer.tilesetId);
+      expect(tileset).toBeDefined();
       expect(layer.cells.flat().every((gid) => (gid & 0x0fffffff) <= (tileset?.tileCount ?? 0))).toBe(true);
     }
     expect(art.layers.find(({ id }) => id === 'world-roads')?.cells.flat().filter((gid) => gid > 0).length)
       .toBeGreaterThan(100);
-    const land = art.layers.find(({ id }) => id === 'world-land')?.cells.flat().filter((gid) => gid > 0) ?? [];
-    expect(land.filter((gid) => gid === 8).length / land.length).toBeGreaterThan(0.96);
+    const land = art.layers.find(({ id }) => id === 'world-land')?.cells.flat().filter((gid) => gid > 1) ?? [];
+    expect(land.length).toBeGreaterThan(7_500);
+    expect(new Set(land)).toEqual(new Set([2, 3, 4, 5]));
+    expect(art.layers.find(({ id }) => id === 'world-ocean')?.cells.flat().every((gid) => gid === 1)).toBe(true);
+    expect(art.layers.find(({ id }) => id === 'world-forest')?.cells.flat().filter((gid) => gid === 7).length)
+      .toBeGreaterThan(100);
+    expect(art.layers.find(({ id }) => id === 'world-settlements')?.cells.flat().filter((gid) => gid > 0).length)
+      .toBeGreaterThanOrEqual(12);
   });
 
   it('keeps old worlds and MOD overrides valid without optional atlasArt', () => {

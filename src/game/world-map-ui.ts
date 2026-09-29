@@ -62,7 +62,7 @@ export class WorldMapPanel {
   private readonly bindings: Binding[] = [];
   private readonly onClose?: () => void;
   private readonly onDestinationPicked?: (destinationId: string | null) => void;
-  private readonly mapBounds: MapViewportBounds = { x: 122, y: 128, width: 520, height: 298 };
+  private readonly mapBounds: MapViewportBounds = { x: 48, y: 116, width: 616, height: 340 };
   private openState = false;
   private mapImage: Phaser.GameObjects.Image | null = null;
   private mapContent: Phaser.GameObjects.Container | null = null;
@@ -327,7 +327,7 @@ export class WorldMapPanel {
   }
 
   private render(worldMap: WorldMapAssembly, currentMapResourceId: string, map: GridMap): void {
-    addPixelPanelChrome(this.scene, this.container, { x: 90, y: 45, width: 780, height: 450 }, 0.9);
+    addPixelPanelChrome(this.scene, this.container, { x: 28, y: 45, width: 904, height: 450 }, 0.9);
     this.addText(WIDTH / 2, 62, '江湖舆图', 20, COLORS.text, 0.5);
     this.addText(WIDTH / 2, 99, '拖动平移 · 滚轮缩放 · 方向键微调 · W/S 选点 · Enter 规划 · G 切换视图 · M/Esc 收起', 12, COLORS.muted, 0.5, 720);
     if (worldMap.data.atlasArt !== undefined) {
@@ -466,7 +466,7 @@ export class WorldMapPanel {
     this.routeDistanceText = this.addText(672, 415, '', 11, COLORS.text, 0);
     this.routeDirectionsText = this.addText(672, 437, '', 10, COLORS.muted, 0);
     this.routeDestinationText = this.addText(672, 465, '', 10, COLORS.muted, 0);
-    this.addText(122, 443, this.viewMode === 'world'
+    this.addText(48, 465, this.viewMode === 'world'
       ? `全域总图 · ${worldMap.regions.length} 个区域 · ${worldMap.data.atlasArt?.columns ?? 0}×${worldMap.data.atlasArt?.rows ?? 0} 格`
       : `${map.data.name} · 格坐标 (${this.playerCol}, ${this.playerRow})`, 11, COLORS.muted, 0);
     if (this.mapContent !== null) this.createAtlasCamera();

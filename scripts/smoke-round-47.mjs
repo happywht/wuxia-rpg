@@ -155,6 +155,8 @@ try {
       'assets/kenney/roguelike-rpg/roguelikeSheet_transparent.png',
       'assets/kenney/tiny-dungeon/tilemap_packed.png',
       'assets/kenney/rpg-urban-pack/tilemap_packed.png',
+      'assets/kenney/tiny-town/tilemap_packed.png',
+      'assets/generated/world-palette.png',
     ]) {
       const response = await fetch(`${siteBase}${assetPath}`);
       assert.equal(response.status, 200, `Kenney 图集在非根部署路径可访问：${assetPath}`);
@@ -164,6 +166,7 @@ try {
       'assets/kenney/roguelike-rpg/License.txt',
       'assets/kenney/tiny-dungeon/License.txt',
       'assets/kenney/rpg-urban-pack/License.txt',
+      'assets/kenney/tiny-town/License.txt',
     ]) {
       const response = await fetch(`${siteBase}${licensePath}`);
       assert.equal(response.status, 200, `原始 CC0 License 随包并可读取：${licensePath}`);
@@ -182,7 +185,7 @@ try {
     await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
   }
 
-  console.log(`通过：${archiveName} 可解包，${manifest.files.length} 个文件的大小/哈希与清单一致；静态包可挂载到 ${mountPath} 并加载 HTML/JS/CSS、示例 MOD、manifest 中全部基础资料/Schema，以及三张 Kenney PNG 图集与原始 CC0 License。`);
+  console.log(`通过：${archiveName} 可解包，${manifest.files.length} 个文件的大小/哈希与清单一致；静态包可挂载到 ${mountPath} 并加载 HTML/JS/CSS、示例 MOD、manifest 中全部基础资料/Schema、四张 Kenney PNG 图集、生成的世界调色板和原始 CC0 License。`);
 } finally {
   await rm(tempRoot, { recursive: true, force: true });
 }

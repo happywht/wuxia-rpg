@@ -41,6 +41,9 @@ describe('Round 51 world art data', () => {
       '../data/assets/kenney/tiny-dungeon/License.txt',
       '../data/assets/kenney/rpg-urban-pack/tilemap_packed.png',
       '../data/assets/kenney/rpg-urban-pack/License.txt',
+      '../data/assets/kenney/tiny-town/tilemap_packed.png',
+      '../data/assets/kenney/tiny-town/License.txt',
+      '../data/assets/generated/world-palette.png',
     ]) {
       expect(existsSync(new URL(path, import.meta.url))).toBe(true);
     }
