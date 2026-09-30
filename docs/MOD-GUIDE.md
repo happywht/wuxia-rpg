@@ -71,3 +71,7 @@ world-map可省略regionGuides；每条mapResourceId/role(hub/investigation/chal
 ## Round 107 可选敌方循环
 
 覆盖既有battle资源时可添加enemy.behavior，规则见DATA-GUIDE.md；省略保持旧AI。必须把artId也放入该enemy.martialArtIds，武学须实际存在，cue不能代替真实效果。powerBonus仅attack有效；guardDisruptsBonus:true需正bonus，使现有守御先卸额外蓄势。数据结构失败拒绝资源，装配坏引用隔离遭遇；调用validate:data后仍需实际测试内力不足回退与战斗预告。不增加存档版本或持久化战斗中间状态。
+
+## Round 108 结局路径与回响
+
+同路径覆盖ending-set可使用可选unlockRoutes和epilogueSections；具体字段/数量见DATA-GUIDE.md。原路径仍参与评估，替代路径为OR，不能把互斥选择写成一个AND；original为保留路线id。variants按顺序取首个满足条件项，必须提供fallbackText以兼容缺少新见闻的旧档。条件引用必须存在，否则运行时隔离所属结局并给出诊断，其他结局可用。资料源不保存评估后文本；选择时解析副本，章节文本保持数据驱动。

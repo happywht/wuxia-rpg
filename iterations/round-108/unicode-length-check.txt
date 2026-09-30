@@ -1,0 +1,1 @@
+PASS: local Ajv maxLength=2 accepts two astral codepoints (UTF-16 length=4), rejects three.

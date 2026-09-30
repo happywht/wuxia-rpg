@@ -36,6 +36,23 @@ export interface EndingData {
   epilogue: string;
   priority: number;
   conditions: EndingConditionData[];
+  /** Additional complete paths; the original conditions remain a valid path. */
+  unlockRoutes?: EndingUnlockRoute[];
+  /** Each section selects its first matching variant, otherwise its fallback. */
+  epilogueSections?: EndingEpilogueSection[];
+}
+
+export interface EndingUnlockRoute {
+  id: string;
+  title: string;
+  epilogue: string;
+  conditions: EndingConditionData[];
+}
+export interface EndingEpilogueSection {
+  id: string;
+  title: string;
+  fallbackText: string;
+  variants: { id: string; text: string; conditions: EndingConditionData[] }[];
 }
 
 export interface EndingSetData {
@@ -131,6 +148,52 @@ function parseCondition(raw: unknown): EndingConditionData | null {
   }
 }
 
+function conditionList(raw: unknown): EndingConditionData[] | null {
+  if (!Array.isArray(raw) || raw.length < 1 || raw.length > 12) return null;
+  const parsed = raw.map(parseCondition);
+  return parsed.some(value => value === null) ? null : parsed as EndingConditionData[];
+}
+
+function parseAdditions(entry: Record<string, unknown>): Pick<EndingData, 'unlockRoutes' | 'epilogueSections'> | null {
+  const result: Pick<EndingData, 'unlockRoutes' | 'epilogueSections'> = {};
+  if (entry.unlockRoutes !== undefined) {
+    if (!Array.isArray(entry.unlockRoutes) || entry.unlockRoutes.length < 1 || entry.unlockRoutes.length > 8) return null;
+    const seen = new Set<string>();
+    result.unlockRoutes = [];
+    for (const route of entry.unlockRoutes) {
+      if (!object(route) || Object.keys(route).some(key => !['id', 'title', 'epilogue', 'conditions'].includes(key)) ||
+        !identifier(route.id, '') || route.id === 'original' || seen.has(route.id) || !boundedText(route.title, 48) || !boundedText(route.epilogue, 600)) return null;
+      const conditions = conditionList(route.conditions);
+      if (conditions === null) return null;
+      seen.add(route.id);
+      result.unlockRoutes.push({ id: route.id, title: route.title, epilogue: route.epilogue, conditions });
+    }
+  }
+  if (entry.epilogueSections !== undefined) {
+    if (!Array.isArray(entry.epilogueSections) || entry.epilogueSections.length < 1 || entry.epilogueSections.length > 8) return null;
+    const seen = new Set<string>();
+    result.epilogueSections = [];
+    for (const section of entry.epilogueSections) {
+      if (!object(section) || Object.keys(section).some(key => !['id', 'title', 'fallbackText', 'variants'].includes(key)) ||
+        !identifier(section.id, '') || seen.has(section.id) || !boundedText(section.title, 48) ||
+        !boundedText(section.fallbackText, 240) || !Array.isArray(section.variants) || section.variants.length < 1 || section.variants.length > 8) return null;
+      const variants: EndingEpilogueSection['variants'] = [];
+      const variantIds = new Set<string>();
+      for (const variant of section.variants) {
+        if (!object(variant) || Object.keys(variant).some(key => !['id', 'text', 'conditions'].includes(key)) ||
+          !identifier(variant.id, '') || variantIds.has(variant.id) || !boundedText(variant.text, 240)) return null;
+        const conditions = conditionList(variant.conditions);
+        if (conditions === null) return null;
+        variantIds.add(variant.id);
+        variants.push({ id: variant.id, text: variant.text, conditions });
+      }
+      seen.add(section.id);
+      result.epilogueSections.push({ id: section.id, title: section.title, fallbackText: section.fallbackText, variants });
+    }
+  }
+  return result;
+}
+
 /** Defensive semantic parse; a malformed ending is isolated from its peers. */
 export function parseEndingSet(raw: unknown): EndingParseResult {
   if (!object(raw) || !identifier(raw.id, 'ending.set.') || !object(raw.gate) ||
@@ -170,6 +233,11 @@ export function parseEndingSet(raw: unknown): EndingParseResult {
         valid = false;
       } else conditions.push(parsed);
     });
+    const additions = parseAdditions(entry);
+    if (additions === null) {
+      warnings.push(label + '：额外达成路径或尾声分节无效，已禁用该结局');
+      valid = false;
+    }
     if (valid) endings.push({
       id: entry.id,
       knowledgeNodeId: entry.knowledgeNodeId,
@@ -177,6 +245,7 @@ export function parseEndingSet(raw: unknown): EndingParseResult {
       epilogue: entry.epilogue,
       priority: entry.priority,
       conditions,
+      ...additions,
     });
   });
   return {
@@ -235,7 +304,10 @@ export function assembleEndingSet(input: EndingAssemblyInput): {
       continue;
     }
     let valid = true;
-    for (const condition of ending.conditions) {
+    const allConditions = [...ending.conditions,
+      ...(ending.unlockRoutes ?? []).flatMap(route => route.conditions),
+      ...(ending.epilogueSections ?? []).flatMap(section => section.variants.flatMap(variant => variant.conditions))];
+    for (const condition of allConditions) {
       if (condition.kind === 'questStatus' && !input.questIds.has(condition.questId)) {
         warnings.push('结局 "' + ending.id + '" 的任务条件 "' + condition.questId + '" 不存在，已禁用该结局');
         valid = false;
@@ -275,6 +347,9 @@ export interface EvaluatedEnding {
   ending: EndingData;
   available: boolean;
   unmetHints: readonly string[];
+  routes: readonly { id: string; title: string; available: boolean; unmetHints: readonly string[] }[];
+  /** Chosen path introduction plus state-resolved aftermath; pure and unsaved. */
+  resolvedEpilogue: string;
 }
 
 function within(value: number, minValue?: number, maxValue?: number): boolean {
@@ -301,16 +376,27 @@ function meetsCondition(condition: EndingConditionData, context: EndingEvaluatio
   }
 }
 
-/** Pure, deterministic evaluation: all declared conditions are conjunctive. */
+/** Pure evaluation: conditions within each route are conjunctive; any complete route unlocks. */
 export function evaluateEndings(
   endingSet: AssembledEndingSet,
   context: EndingEvaluationContext,
 ): EvaluatedEnding[] {
   return endingSet.endings.map((ending) => {
-    const unmetHints = ending.conditions
-      .filter((condition) => !meetsCondition(condition, context))
-      .map((condition) => condition.hint);
-    return { ending, available: unmetHints.length === 0, unmetHints };
+    const paths = [{ id: 'original', title: '原有旅程', epilogue: ending.epilogue, conditions: ending.conditions },
+      ...(ending.unlockRoutes ?? [])];
+    const routes = paths.map(path => {
+      const unmetHints = path.conditions.filter(condition => !meetsCondition(condition, context)).map(condition => condition.hint);
+      return { id: path.id, title: path.title, available: unmetHints.length === 0, unmetHints };
+    });
+    const availableIndex = routes.findIndex(route => route.available);
+    const nearest = routes.reduce((best, route) => route.unmetHints.length < best.unmetHints.length ? route : best, routes[0]!);
+    const introduction = paths[availableIndex < 0 ? 0 : availableIndex]!.epilogue;
+    const sections = (ending.epilogueSections ?? []).map(section => {
+      const variant = section.variants.find(candidate => candidate.conditions.every(condition => meetsCondition(condition, context)));
+      return section.title + '\n' + (variant?.text ?? section.fallbackText);
+    });
+    return { ending, available: availableIndex >= 0, unmetHints: availableIndex >= 0 ? [] : nearest.unmetHints,
+      routes, resolvedEpilogue: [introduction, ...sections].join('\n\n') };
   });
 }
 
@@ -327,7 +413,7 @@ export function selectEnding(
   const evaluated = evaluateEndings(endingSet, context).find((candidate) => candidate.ending.id === endingId);
   if (evaluated === undefined) return { ok: false, reason: '该结局当前不可用' };
   if (!evaluated.available) return { ok: false, reason: evaluated.unmetHints.join('；') };
-  return { ok: true, ending: evaluated.ending };
+  return { ok: true, ending: { ...evaluated.ending, epilogue: evaluated.resolvedEpilogue } };
 }
 
 /** The gate follows the world's standard four-way adjacency interaction rule. */

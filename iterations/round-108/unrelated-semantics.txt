@@ -1,0 +1,2 @@
+warning: in the working copy of 'data/base/endings/round-27-endings.json', LF will be replaced by CRLF the next time Git touches it
+PASS: 七个原结局/入口/条件/引言语义保持；基础资料仅三个结局新增R108字段。

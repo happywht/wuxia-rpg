@@ -4,7 +4,10 @@
     "id": "ending.gate.mirror-stone",
     "name": "照心石",
     "mapResourceId": "map.round-10-mist-ferry",
-    "position": { "col": 8, "row": 2 },
+    "position": {
+      "col": 8,
+      "row": 2
+    },
     "approachText": "碑面映出雨夜旧路。按 E 静观此行，看看江湖为你留下哪些归处。"
   },
   "endings": [
@@ -15,10 +18,28 @@
       "epilogue": "你将药送到了伤者手中，也把雨夜里未解的脚印告诉愿意倾听的人。后来渡口每逢灯节，乡邻都会多放一盏河灯；有人说那盏灯照的是旧船道，有人说照的是肯为陌路人停步的心。",
       "priority": 50,
       "conditions": [
-        { "kind": "questStatus", "questId": "quest.round-07-medicine-run", "status": "completed", "hint": "完成「巷口送药」差事" },
-        { "kind": "morality", "minValue": 5, "hint": "善恶值达到 5" },
-        { "kind": "npcRelationship", "npcId": "char.lu-zhenniang", "minValue": 10, "hint": "与茶棚主人结下足够信任" },
-        { "kind": "knowledgeKnown", "nodeId": "event.old-footprints", "hint": "查明雨后脚印的线索" }
+        {
+          "kind": "questStatus",
+          "questId": "quest.round-07-medicine-run",
+          "status": "completed",
+          "hint": "完成「巷口送药」差事"
+        },
+        {
+          "kind": "morality",
+          "minValue": 5,
+          "hint": "善恶值达到 5"
+        },
+        {
+          "kind": "npcRelationship",
+          "npcId": "char.lu-zhenniang",
+          "minValue": 10,
+          "hint": "与茶棚主人结下足够信任"
+        },
+        {
+          "kind": "knowledgeKnown",
+          "nodeId": "event.old-footprints",
+          "hint": "查明雨后脚印的线索"
+        }
       ]
     },
     {
@@ -28,11 +49,35 @@
       "epilogue": "巷口风波平息后，你仍记得剑阁教习所说的“先听雨，后出剑”。多年之后，你受托守在江南药道的旧约边，不凭门墙压人，也不让约定沦为空纸。剑阁弟子行经此处，常会向石碑留下一礼。",
       "priority": 40,
       "conditions": [
-        { "kind": "questStatus", "questId": "quest.round-07-clear-alley", "status": "completed", "hint": "完成「巷口除患」差事" },
-        { "kind": "factionMembership", "factionId": "faction.tingyu-jiange", "isMember": true, "hint": "拜入听雨剑阁" },
-        { "kind": "factionRenown", "factionId": "faction.tingyu-jiange", "minValue": 10, "hint": "听雨剑阁声望达到 10" },
-        { "kind": "npcRelationship", "npcId": "char.ye-tingzhou", "minValue": 5, "hint": "与叶庭舟保持足够信任" },
-        { "kind": "renown", "minValue": 5, "hint": "江湖声望达到 5" }
+        {
+          "kind": "questStatus",
+          "questId": "quest.round-07-clear-alley",
+          "status": "completed",
+          "hint": "完成「巷口除患」差事"
+        },
+        {
+          "kind": "factionMembership",
+          "factionId": "faction.tingyu-jiange",
+          "isMember": true,
+          "hint": "拜入听雨剑阁"
+        },
+        {
+          "kind": "factionRenown",
+          "factionId": "faction.tingyu-jiange",
+          "minValue": 10,
+          "hint": "听雨剑阁声望达到 10"
+        },
+        {
+          "kind": "npcRelationship",
+          "npcId": "char.ye-tingzhou",
+          "minValue": 5,
+          "hint": "与叶庭舟保持足够信任"
+        },
+        {
+          "kind": "renown",
+          "minValue": 5,
+          "hint": "江湖声望达到 5"
+        }
       ]
     },
     {
@@ -42,11 +87,35 @@
       "epilogue": "你没有绕开最难的一段巷路。铁嶂派把那次守街的经历刻进桩功谱，新弟子练至气息不乱时，便要下山走一趟渡口。你不再以强弱论人，只把每一根扎稳的脚跟留给后来者。",
       "priority": 35,
       "conditions": [
-        { "kind": "questStatus", "questId": "quest.round-07-clear-alley", "status": "completed", "hint": "完成「巷口除患」差事" },
-        { "kind": "factionMembership", "factionId": "faction.tiezhang-pai", "isMember": true, "hint": "拜入铁嶂派" },
-        { "kind": "factionRenown", "factionId": "faction.tiezhang-pai", "minValue": 10, "hint": "铁嶂派声望达到 10" },
-        { "kind": "npcRelationship", "npcId": "char.shi-bei", "minValue": 0, "hint": "与石北保持中立，不因失信而交恶" },
-        { "kind": "renown", "minValue": 5, "hint": "江湖声望达到 5" }
+        {
+          "kind": "questStatus",
+          "questId": "quest.round-07-clear-alley",
+          "status": "completed",
+          "hint": "完成「巷口除患」差事"
+        },
+        {
+          "kind": "factionMembership",
+          "factionId": "faction.tiezhang-pai",
+          "isMember": true,
+          "hint": "拜入铁嶂派"
+        },
+        {
+          "kind": "factionRenown",
+          "factionId": "faction.tiezhang-pai",
+          "minValue": 10,
+          "hint": "铁嶂派声望达到 10"
+        },
+        {
+          "kind": "npcRelationship",
+          "npcId": "char.shi-bei",
+          "minValue": 0,
+          "hint": "与石北保持中立，不因失信而交恶"
+        },
+        {
+          "kind": "renown",
+          "minValue": 5,
+          "hint": "江湖声望达到 5"
+        }
       ]
     },
     {
@@ -56,11 +125,35 @@
       "epilogue": "药道与山庄并未因你而归于一人之手。你带着医理往来村镇，闻素心把护身之法教给愿意守夜的人。后来人记住的不是你赢过多少场，而是每当风雨压低屋檐，总有人知道该如何把灯重新点亮。",
       "priority": 35,
       "conditions": [
-        { "kind": "questStatus", "questId": "quest.round-07-medicine-run", "status": "completed", "hint": "完成「巷口送药」差事" },
-        { "kind": "factionMembership", "factionId": "faction.yunyin-shanzhuang", "isMember": true, "hint": "加入云隐山庄" },
-        { "kind": "factionRenown", "factionId": "faction.yunyin-shanzhuang", "minValue": 10, "hint": "云隐山庄声望达到 10" },
-        { "kind": "npcRelationship", "npcId": "char.wen-suxin", "minValue": 0, "hint": "与闻素心保持中立，不因失信而交恶" },
-        { "kind": "morality", "minValue": 5, "hint": "善恶值达到 5" }
+        {
+          "kind": "questStatus",
+          "questId": "quest.round-07-medicine-run",
+          "status": "completed",
+          "hint": "完成「巷口送药」差事"
+        },
+        {
+          "kind": "factionMembership",
+          "factionId": "faction.yunyin-shanzhuang",
+          "isMember": true,
+          "hint": "加入云隐山庄"
+        },
+        {
+          "kind": "factionRenown",
+          "factionId": "faction.yunyin-shanzhuang",
+          "minValue": 10,
+          "hint": "云隐山庄声望达到 10"
+        },
+        {
+          "kind": "npcRelationship",
+          "npcId": "char.wen-suxin",
+          "minValue": 0,
+          "hint": "与闻素心保持中立，不因失信而交恶"
+        },
+        {
+          "kind": "morality",
+          "minValue": 5,
+          "hint": "善恶值达到 5"
+        }
       ]
     },
     {
@@ -70,8 +163,320 @@
       "epilogue": "你没有把名字留在任何一块门墙下。认清脚印指向何方后，你向渡船借了一叶轻舟，沿着尚未写进舆图的水路继续走。江湖没有替你选定终点；此后遇到的每个人，仍会把新的答案交到你手里。",
       "priority": 10,
       "conditions": [
-        { "kind": "knowledgeKnown", "nodeId": "event.old-footprints", "hint": "至少走出旧渡口，查见雨后的脚印" },
-        { "kind": "factionMembership", "isMember": false, "hint": "保持无门无派，或先行离门" }
+        {
+          "kind": "knowledgeKnown",
+          "nodeId": "event.old-footprints",
+          "hint": "至少走出旧渡口，查见雨后的脚印"
+        },
+        {
+          "kind": "factionMembership",
+          "isMember": false,
+          "hint": "保持无门无派，或先行离门"
+        }
+      ],
+      "unlockRoutes": [
+        {
+          "id": "r108-voyage",
+          "title": "三章自由行路",
+          "epilogue": "你把三章记录带回照心石前，仍未把自己的去处交给门墙。公开与有限传证可以混合，急药也没有一份够用的完美分法。轻舟载着已经核清的用途和仍未解的残篇来路，下一程不再替过去编出无代价的答案。",
+          "conditions": [
+            {
+              "kind": "knowledgeKnown",
+              "nodeId": "event.r100-mainland-close",
+              "hint": "到沈雨霁处结清大陆三地调查与两处决定"
+            },
+            {
+              "kind": "knowledgeKnown",
+              "nodeId": "event.r101-north-close",
+              "hint": "到沈问秋处结清北境四地调查与两处决定"
+            },
+            {
+              "kind": "knowledgeKnown",
+              "nodeId": "event.r102-sea-close",
+              "hint": "到虞星槎处结清海路六差事与两处决定"
+            },
+            {
+              "kind": "factionMembership",
+              "isMember": false,
+              "hint": "保持无门无派，或先行离门"
+            }
+          ]
+        }
+      ],
+      "epilogueSections": [
+        {
+          "id": "r108-mainland",
+          "title": "大陆：更簿与井药",
+          "fallbackText": "大陆调查与两处决定尚未结案，本页不替报信人或驿井补写一个已完成的答案。残篇作者与纸龄仍无定论。",
+          "variants": [
+            {
+              "id": "r108-mainland-0-0",
+              "text": "更簿公开了署名，过路人得以核牌，秦素砚所护的报信人却承受了避处的负担。你交出的回春膏留在驿井，伤者先得到照应，你自己的药囊少了一份。井壁记水、更簿记班、索孔记工；三类刻记不能合成残篇密钥。再启行前，你承认这份取舍仍由后来的人继续承担。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-mainland-close",
+                  "hint": "到沈雨霁处结清大陆三地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-open",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-well-aid",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-mainland-0-1",
+              "text": "更簿公开了署名，过路人得以核牌，秦素砚所护的报信人却承受了避处的负担。你保留了自用药，驿井伤者仍待后批补给，罗金子的不满没有因结案消失。井壁记水、更簿记班、索孔记工；三类刻记不能合成残篇密钥。再启行前，你承认这份取舍仍由后来的人继续承担。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-mainland-close",
+                  "hint": "到沈雨霁处结清大陆三地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-open",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-well-reserve",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-mainland-1-0",
+              "text": "更簿保留了无名证词，你另留回春膏供报信人避路救急，报信人较能安行，过路人核牌仍留一处待询缺口。你交出的回春膏留在驿井，伤者先得到照应，你自己的药囊少了一份。井壁记水、更簿记班、索孔记工；三类刻记不能合成残篇密钥。再启行前，你承认这份取舍仍由后来的人继续承担。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-mainland-close",
+                  "hint": "到沈雨霁处结清大陆三地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-guard",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-well-aid",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-mainland-1-1",
+              "text": "更簿保留了无名证词，你另留回春膏供报信人避路救急，报信人较能安行，过路人核牌仍留一处待询缺口。你保留了自用药，驿井伤者仍待后批补给，罗金子的不满没有因结案消失。井壁记水、更簿记班、索孔记工；三类刻记不能合成残篇密钥。再启行前，你承认这份取舍仍由后来的人继续承担。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-mainland-close",
+                  "hint": "到沈雨霁处结清大陆三地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-guard",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-well-reserve",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "r108-north",
+          "title": "北境：今烽与旧界",
+          "fallbackText": "北境调查与两处决定尚未结案，照雪号码和霜松旧刻的处理仍须本人核妥。本页不把前朝碑刻充作当朝界令。",
+          "variants": [
+            {
+              "id": "r108-north-0-0",
+              "text": "你付清心丸公开了今烽番号，散客辨火较方便，谷照雪仍须防范照抄号码的冒号客。你另付清心丸公开前朝注记，旧路可查，柳寻径却多承受了一份巡路争执。雁候记活物、今烽报当下、谷刻记前朝屯界，旧驿线另有来路；这些不能替残篇断年。再启行前，你承认这份取舍仍由后来的人继续承担。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-north-close",
+                  "hint": "到沈问秋处结清北境四地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-code-open",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-mark-public",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-north-0-1",
+              "text": "你付清心丸公开了今烽番号，散客辨火较方便，谷照雪仍须防范照抄号码的冒号客。你另付回春膏只留内部旧刻记录，巡路人较安静，沈问秋和外来路客却不易查到旧路。雁候记活物、今烽报当下、谷刻记前朝屯界，旧驿线另有来路；这些不能替残篇断年。再启行前，你承认这份取舍仍由后来的人继续承担。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-north-close",
+                  "hint": "到沈问秋处结清北境四地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-code-open",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-mark-private",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-north-1-0",
+              "text": "你付回春膏限定报码队传号，队内校验较快，雪夜散客仍承担等候询号的寒意。你另付清心丸公开前朝注记，旧路可查，柳寻径却多承受了一份巡路争执。雁候记活物、今烽报当下、谷刻记前朝屯界，旧驿线另有来路；这些不能替残篇断年。再启行前，你承认这份取舍仍由后来的人继续承担。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-north-close",
+                  "hint": "到沈问秋处结清北境四地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-code-limited",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-mark-public",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-north-1-1",
+              "text": "你付回春膏限定报码队传号，队内校验较快，雪夜散客仍承担等候询号的寒意。你另付回春膏只留内部旧刻记录，巡路人较安静，沈问秋和外来路客却不易查到旧路。雁候记活物、今烽报当下、谷刻记前朝屯界，旧驿线另有来路；这些不能替残篇断年。再启行前，你承认这份取舍仍由后来的人继续承担。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-north-close",
+                  "hint": "到沈问秋处结清北境四地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-code-limited",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-mark-private",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "r108-sea",
+          "title": "海路：急药与传航",
+          "fallbackText": "海路六差事与两处决定尚未结案，本页不把灯已点亮写成所有散船都已获助，也不推定残篇的作者。",
+          "variants": [
+            {
+              "id": "r108-sea-0-0",
+              "text": "海盐敷膏留给岸上救伤，顾潮生先照应归船伤者，岑隐礁的礁上急药仍未补齐。两片贝壳作公开辨潮样记，散船多了可查的潮时，虞星槎仍承担辨假号的余担。回湾线、风灯向、水则、潮痕、灯谱用途各异；海路给出阶段答案，不替残篇认作者或纸龄。再启行前，你承认这份取舍仍由后来的人继续承担。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-sea-close",
+                  "hint": "到虞星槎处结清海路六差事与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-shore-aid",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-public",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-sea-0-1",
+              "text": "海盐敷膏留给岸上救伤，顾潮生先照应归船伤者，岑隐礁的礁上急药仍未补齐。清心丸留给熟船值守，队内认船较快，陌生散船夜航仍要停下来核簿。回湾线、风灯向、水则、潮痕、灯谱用途各异；海路给出阶段答案，不替残篇认作者或纸龄。再启行前，你承认这份取舍仍由后来的人继续承担。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-sea-close",
+                  "hint": "到虞星槎处结清海路六差事与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-shore-aid",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-crew",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-sea-1-0",
+              "text": "回春膏留给守礁急用，岑隐礁有药应急，岸上伤者却还要等待下一批。两片贝壳作公开辨潮样记，散船多了可查的潮时，虞星槎仍承担辨假号的余担。回湾线、风灯向、水则、潮痕、灯谱用途各异；海路给出阶段答案，不替残篇认作者或纸龄。再启行前，你承认这份取舍仍由后来的人继续承担。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-sea-close",
+                  "hint": "到虞星槎处结清海路六差事与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-keeper-aid",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-public",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-sea-1-1",
+              "text": "回春膏留给守礁急用，岑隐礁有药应急，岸上伤者却还要等待下一批。清心丸留给熟船值守，队内认船较快，陌生散船夜航仍要停下来核簿。回湾线、风灯向、水则、潮痕、灯谱用途各异；海路给出阶段答案，不替残篇认作者或纸龄。再启行前，你承认这份取舍仍由后来的人继续承担。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-sea-close",
+                  "hint": "到虞星槎处结清海路六差事与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-keeper-aid",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-crew",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            }
+          ]
+        }
       ]
     },
     {
@@ -92,6 +497,320 @@
           "nodeId": "event.r42-public-record-vow",
           "hint": "选择公开复核并为异议留档"
         }
+      ],
+      "unlockRoutes": [
+        {
+          "id": "r108-open",
+          "title": "三章公开记录",
+          "epilogue": "你把大陆更簿、北境今烽与海路潮记分栏相对，公开范围的三次取舍留下可查的记录，也留下需要保护与辨假的人。公簿没有给残篇写上一个未经证明的作者；它给后来人保留了继续问证的入口。",
+          "conditions": [
+            {
+              "kind": "knowledgeKnown",
+              "nodeId": "event.r100-mainland-close",
+              "hint": "到沈雨霁处结清大陆三地调查与两处决定"
+            },
+            {
+              "kind": "knowledgeKnown",
+              "nodeId": "event.r101-north-close",
+              "hint": "到沈问秋处结清北境四地调查与两处决定"
+            },
+            {
+              "kind": "knowledgeKnown",
+              "nodeId": "event.r102-sea-close",
+              "hint": "到虞星槎处结清海路六差事与两处决定"
+            },
+            {
+              "kind": "knowledgeKnown",
+              "nodeId": "event.r100-record-open",
+              "hint": "大陆更簿选择公开署名；若已保护姓名的本次旅程请走其他归处"
+            },
+            {
+              "kind": "knowledgeKnown",
+              "nodeId": "event.r101-code-open",
+              "hint": "北境选择公开番号；若已限定报码的本次旅程请走其他归处"
+            },
+            {
+              "kind": "knowledgeKnown",
+              "nodeId": "event.r102-pilot-public",
+              "hint": "海路选择公开传示潮时；若已限定熟船的本次旅程请走其他归处"
+            }
+          ]
+        }
+      ],
+      "epilogueSections": [
+        {
+          "id": "r108-mainland",
+          "title": "大陆：更簿与井药",
+          "fallbackText": "大陆调查与两处决定尚未结案，本页不替报信人或驿井补写一个已完成的答案。残篇作者与纸龄仍无定论。",
+          "variants": [
+            {
+              "id": "r108-mainland-0-0",
+              "text": "更簿公开了署名，过路人得以核牌，秦素砚所护的报信人却承受了避处的负担。你交出的回春膏留在驿井，伤者先得到照应，你自己的药囊少了一份。井壁记水、更簿记班、索孔记工；三类刻记不能合成残篇密钥。留在可查记录中的代价，也须与获益一同公开。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-mainland-close",
+                  "hint": "到沈雨霁处结清大陆三地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-open",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-well-aid",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-mainland-0-1",
+              "text": "更簿公开了署名，过路人得以核牌，秦素砚所护的报信人却承受了避处的负担。你保留了自用药，驿井伤者仍待后批补给，罗金子的不满没有因结案消失。井壁记水、更簿记班、索孔记工；三类刻记不能合成残篇密钥。留在可查记录中的代价，也须与获益一同公开。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-mainland-close",
+                  "hint": "到沈雨霁处结清大陆三地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-open",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-well-reserve",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-mainland-1-0",
+              "text": "更簿保留了无名证词，你另留回春膏供报信人避路救急，报信人较能安行，过路人核牌仍留一处待询缺口。你交出的回春膏留在驿井，伤者先得到照应，你自己的药囊少了一份。井壁记水、更簿记班、索孔记工；三类刻记不能合成残篇密钥。留在可查记录中的代价，也须与获益一同公开。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-mainland-close",
+                  "hint": "到沈雨霁处结清大陆三地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-guard",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-well-aid",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-mainland-1-1",
+              "text": "更簿保留了无名证词，你另留回春膏供报信人避路救急，报信人较能安行，过路人核牌仍留一处待询缺口。你保留了自用药，驿井伤者仍待后批补给，罗金子的不满没有因结案消失。井壁记水、更簿记班、索孔记工；三类刻记不能合成残篇密钥。留在可查记录中的代价，也须与获益一同公开。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-mainland-close",
+                  "hint": "到沈雨霁处结清大陆三地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-guard",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-well-reserve",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "r108-north",
+          "title": "北境：今烽与旧界",
+          "fallbackText": "北境调查与两处决定尚未结案，照雪号码和霜松旧刻的处理仍须本人核妥。本页不把前朝碑刻充作当朝界令。",
+          "variants": [
+            {
+              "id": "r108-north-0-0",
+              "text": "你付清心丸公开了今烽番号，散客辨火较方便，谷照雪仍须防范照抄号码的冒号客。你另付清心丸公开前朝注记，旧路可查，柳寻径却多承受了一份巡路争执。雁候记活物、今烽报当下、谷刻记前朝屯界，旧驿线另有来路；这些不能替残篇断年。留在可查记录中的代价，也须与获益一同公开。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-north-close",
+                  "hint": "到沈问秋处结清北境四地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-code-open",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-mark-public",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-north-0-1",
+              "text": "你付清心丸公开了今烽番号，散客辨火较方便，谷照雪仍须防范照抄号码的冒号客。你另付回春膏只留内部旧刻记录，巡路人较安静，沈问秋和外来路客却不易查到旧路。雁候记活物、今烽报当下、谷刻记前朝屯界，旧驿线另有来路；这些不能替残篇断年。留在可查记录中的代价，也须与获益一同公开。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-north-close",
+                  "hint": "到沈问秋处结清北境四地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-code-open",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-mark-private",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-north-1-0",
+              "text": "你付回春膏限定报码队传号，队内校验较快，雪夜散客仍承担等候询号的寒意。你另付清心丸公开前朝注记，旧路可查，柳寻径却多承受了一份巡路争执。雁候记活物、今烽报当下、谷刻记前朝屯界，旧驿线另有来路；这些不能替残篇断年。留在可查记录中的代价，也须与获益一同公开。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-north-close",
+                  "hint": "到沈问秋处结清北境四地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-code-limited",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-mark-public",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-north-1-1",
+              "text": "你付回春膏限定报码队传号，队内校验较快，雪夜散客仍承担等候询号的寒意。你另付回春膏只留内部旧刻记录，巡路人较安静，沈问秋和外来路客却不易查到旧路。雁候记活物、今烽报当下、谷刻记前朝屯界，旧驿线另有来路；这些不能替残篇断年。留在可查记录中的代价，也须与获益一同公开。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-north-close",
+                  "hint": "到沈问秋处结清北境四地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-code-limited",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-mark-private",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "r108-sea",
+          "title": "海路：急药与传航",
+          "fallbackText": "海路六差事与两处决定尚未结案，本页不把灯已点亮写成所有散船都已获助，也不推定残篇的作者。",
+          "variants": [
+            {
+              "id": "r108-sea-0-0",
+              "text": "海盐敷膏留给岸上救伤，顾潮生先照应归船伤者，岑隐礁的礁上急药仍未补齐。两片贝壳作公开辨潮样记，散船多了可查的潮时，虞星槎仍承担辨假号的余担。回湾线、风灯向、水则、潮痕、灯谱用途各异；海路给出阶段答案，不替残篇认作者或纸龄。留在可查记录中的代价，也须与获益一同公开。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-sea-close",
+                  "hint": "到虞星槎处结清海路六差事与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-shore-aid",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-public",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-sea-0-1",
+              "text": "海盐敷膏留给岸上救伤，顾潮生先照应归船伤者，岑隐礁的礁上急药仍未补齐。清心丸留给熟船值守，队内认船较快，陌生散船夜航仍要停下来核簿。回湾线、风灯向、水则、潮痕、灯谱用途各异；海路给出阶段答案，不替残篇认作者或纸龄。留在可查记录中的代价，也须与获益一同公开。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-sea-close",
+                  "hint": "到虞星槎处结清海路六差事与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-shore-aid",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-crew",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-sea-1-0",
+              "text": "回春膏留给守礁急用，岑隐礁有药应急，岸上伤者却还要等待下一批。两片贝壳作公开辨潮样记，散船多了可查的潮时，虞星槎仍承担辨假号的余担。回湾线、风灯向、水则、潮痕、灯谱用途各异；海路给出阶段答案，不替残篇认作者或纸龄。留在可查记录中的代价，也须与获益一同公开。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-sea-close",
+                  "hint": "到虞星槎处结清海路六差事与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-keeper-aid",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-public",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-sea-1-1",
+              "text": "回春膏留给守礁急用，岑隐礁有药应急，岸上伤者却还要等待下一批。清心丸留给熟船值守，队内认船较快，陌生散船夜航仍要停下来核簿。回湾线、风灯向、水则、潮痕、灯谱用途各异；海路给出阶段答案，不替残篇认作者或纸龄。留在可查记录中的代价，也须与获益一同公开。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-sea-close",
+                  "hint": "到虞星槎处结清海路六差事与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-keeper-aid",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-crew",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            }
+          ]
+        }
       ]
     },
     {
@@ -111,6 +830,320 @@
           "kind": "knowledgeKnown",
           "nodeId": "event.r42-protected-witness-vow",
           "hint": "选择先保护证人并保留待核对的凭据"
+        }
+      ],
+      "unlockRoutes": [
+        {
+          "id": "r108-shelter",
+          "title": "三章有限传证",
+          "epilogue": "你把三章记录留在能校验的人手里，没有让更簿姓名、今烽番号与潮时一同散向所有过路人。灯下留住凭据，也留下外来人不易追问的空白。保护可以是一条路，但不能把未得到便利的人从尾声里删去。",
+          "conditions": [
+            {
+              "kind": "knowledgeKnown",
+              "nodeId": "event.r100-mainland-close",
+              "hint": "到沈雨霁处结清大陆三地调查与两处决定"
+            },
+            {
+              "kind": "knowledgeKnown",
+              "nodeId": "event.r101-north-close",
+              "hint": "到沈问秋处结清北境四地调查与两处决定"
+            },
+            {
+              "kind": "knowledgeKnown",
+              "nodeId": "event.r102-sea-close",
+              "hint": "到虞星槎处结清海路六差事与两处决定"
+            },
+            {
+              "kind": "knowledgeKnown",
+              "nodeId": "event.r100-record-guard",
+              "hint": "大陆更簿选择保护姓名；若已公开署名的本次旅程请走其他归处"
+            },
+            {
+              "kind": "knowledgeKnown",
+              "nodeId": "event.r101-code-limited",
+              "hint": "北境选择限定报码；若已公开号码的本次旅程请走其他归处"
+            },
+            {
+              "kind": "knowledgeKnown",
+              "nodeId": "event.r102-pilot-crew",
+              "hint": "海路选择熟船传示潮时；若已公开传示的本次旅程请走其他归处"
+            }
+          ]
+        }
+      ],
+      "epilogueSections": [
+        {
+          "id": "r108-mainland",
+          "title": "大陆：更簿与井药",
+          "fallbackText": "大陆调查与两处决定尚未结案，本页不替报信人或驿井补写一个已完成的答案。残篇作者与纸龄仍无定论。",
+          "variants": [
+            {
+              "id": "r108-mainland-0-0",
+              "text": "更簿公开了署名，过路人得以核牌，秦素砚所护的报信人却承受了避处的负担。你交出的回春膏留在驿井，伤者先得到照应，你自己的药囊少了一份。井壁记水、更簿记班、索孔记工；三类刻记不能合成残篇密钥。你护住的人与仍待询的人，都在这份有限传证的账上。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-mainland-close",
+                  "hint": "到沈雨霁处结清大陆三地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-open",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-well-aid",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-mainland-0-1",
+              "text": "更簿公开了署名，过路人得以核牌，秦素砚所护的报信人却承受了避处的负担。你保留了自用药，驿井伤者仍待后批补给，罗金子的不满没有因结案消失。井壁记水、更簿记班、索孔记工；三类刻记不能合成残篇密钥。你护住的人与仍待询的人，都在这份有限传证的账上。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-mainland-close",
+                  "hint": "到沈雨霁处结清大陆三地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-open",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-well-reserve",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-mainland-1-0",
+              "text": "更簿保留了无名证词，你另留回春膏供报信人避路救急，报信人较能安行，过路人核牌仍留一处待询缺口。你交出的回春膏留在驿井，伤者先得到照应，你自己的药囊少了一份。井壁记水、更簿记班、索孔记工；三类刻记不能合成残篇密钥。你护住的人与仍待询的人，都在这份有限传证的账上。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-mainland-close",
+                  "hint": "到沈雨霁处结清大陆三地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-guard",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-well-aid",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-mainland-1-1",
+              "text": "更簿保留了无名证词，你另留回春膏供报信人避路救急，报信人较能安行，过路人核牌仍留一处待询缺口。你保留了自用药，驿井伤者仍待后批补给，罗金子的不满没有因结案消失。井壁记水、更簿记班、索孔记工；三类刻记不能合成残篇密钥。你护住的人与仍待询的人，都在这份有限传证的账上。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-mainland-close",
+                  "hint": "到沈雨霁处结清大陆三地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-guard",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-well-reserve",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "r108-north",
+          "title": "北境：今烽与旧界",
+          "fallbackText": "北境调查与两处决定尚未结案，照雪号码和霜松旧刻的处理仍须本人核妥。本页不把前朝碑刻充作当朝界令。",
+          "variants": [
+            {
+              "id": "r108-north-0-0",
+              "text": "你付清心丸公开了今烽番号，散客辨火较方便，谷照雪仍须防范照抄号码的冒号客。你另付清心丸公开前朝注记，旧路可查，柳寻径却多承受了一份巡路争执。雁候记活物、今烽报当下、谷刻记前朝屯界，旧驿线另有来路；这些不能替残篇断年。你护住的人与仍待询的人，都在这份有限传证的账上。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-north-close",
+                  "hint": "到沈问秋处结清北境四地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-code-open",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-mark-public",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-north-0-1",
+              "text": "你付清心丸公开了今烽番号，散客辨火较方便，谷照雪仍须防范照抄号码的冒号客。你另付回春膏只留内部旧刻记录，巡路人较安静，沈问秋和外来路客却不易查到旧路。雁候记活物、今烽报当下、谷刻记前朝屯界，旧驿线另有来路；这些不能替残篇断年。你护住的人与仍待询的人，都在这份有限传证的账上。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-north-close",
+                  "hint": "到沈问秋处结清北境四地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-code-open",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-mark-private",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-north-1-0",
+              "text": "你付回春膏限定报码队传号，队内校验较快，雪夜散客仍承担等候询号的寒意。你另付清心丸公开前朝注记，旧路可查，柳寻径却多承受了一份巡路争执。雁候记活物、今烽报当下、谷刻记前朝屯界，旧驿线另有来路；这些不能替残篇断年。你护住的人与仍待询的人，都在这份有限传证的账上。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-north-close",
+                  "hint": "到沈问秋处结清北境四地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-code-limited",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-mark-public",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-north-1-1",
+              "text": "你付回春膏限定报码队传号，队内校验较快，雪夜散客仍承担等候询号的寒意。你另付回春膏只留内部旧刻记录，巡路人较安静，沈问秋和外来路客却不易查到旧路。雁候记活物、今烽报当下、谷刻记前朝屯界，旧驿线另有来路；这些不能替残篇断年。你护住的人与仍待询的人，都在这份有限传证的账上。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-north-close",
+                  "hint": "到沈问秋处结清北境四地调查与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-code-limited",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-mark-private",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "r108-sea",
+          "title": "海路：急药与传航",
+          "fallbackText": "海路六差事与两处决定尚未结案，本页不把灯已点亮写成所有散船都已获助，也不推定残篇的作者。",
+          "variants": [
+            {
+              "id": "r108-sea-0-0",
+              "text": "海盐敷膏留给岸上救伤，顾潮生先照应归船伤者，岑隐礁的礁上急药仍未补齐。两片贝壳作公开辨潮样记，散船多了可查的潮时，虞星槎仍承担辨假号的余担。回湾线、风灯向、水则、潮痕、灯谱用途各异；海路给出阶段答案，不替残篇认作者或纸龄。你护住的人与仍待询的人，都在这份有限传证的账上。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-sea-close",
+                  "hint": "到虞星槎处结清海路六差事与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-shore-aid",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-public",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-sea-0-1",
+              "text": "海盐敷膏留给岸上救伤，顾潮生先照应归船伤者，岑隐礁的礁上急药仍未补齐。清心丸留给熟船值守，队内认船较快，陌生散船夜航仍要停下来核簿。回湾线、风灯向、水则、潮痕、灯谱用途各异；海路给出阶段答案，不替残篇认作者或纸龄。你护住的人与仍待询的人，都在这份有限传证的账上。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-sea-close",
+                  "hint": "到虞星槎处结清海路六差事与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-shore-aid",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-crew",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-sea-1-0",
+              "text": "回春膏留给守礁急用，岑隐礁有药应急，岸上伤者却还要等待下一批。两片贝壳作公开辨潮样记，散船多了可查的潮时，虞星槎仍承担辨假号的余担。回湾线、风灯向、水则、潮痕、灯谱用途各异；海路给出阶段答案，不替残篇认作者或纸龄。你护住的人与仍待询的人，都在这份有限传证的账上。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-sea-close",
+                  "hint": "到虞星槎处结清海路六差事与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-keeper-aid",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-public",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            },
+            {
+              "id": "r108-sea-1-1",
+              "text": "回春膏留给守礁急用，岑隐礁有药应急，岸上伤者却还要等待下一批。清心丸留给熟船值守，队内认船较快，陌生散船夜航仍要停下来核簿。回湾线、风灯向、水则、潮痕、灯谱用途各异；海路给出阶段答案，不替残篇认作者或纸龄。你护住的人与仍待询的人，都在这份有限传证的账上。",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-sea-close",
+                  "hint": "到虞星槎处结清海路六差事与两处决定"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-keeper-aid",
+                  "hint": "已有第一处实际选择"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-crew",
+                  "hint": "已有第二处实际选择"
+                }
+              ]
+            }
+          ]
         }
       ]
     }

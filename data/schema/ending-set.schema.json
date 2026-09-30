@@ -5,134 +5,488 @@
   "description": "声明终章地图入口、结局叙事与数据驱动达成条件。",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "gate", "endings"],
+  "required": [
+    "id",
+    "gate",
+    "endings"
+  ],
   "properties": {
-    "id": { "type": "string", "pattern": "^ending\\.set\\.[A-Za-z0-9._-]+$" },
+    "id": {
+      "type": "string",
+      "pattern": "^ending\\.set\\.[A-Za-z0-9._-]+$"
+    },
     "gate": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "name", "mapResourceId", "position", "approachText"],
+      "required": [
+        "id",
+        "name",
+        "mapResourceId",
+        "position",
+        "approachText"
+      ],
       "properties": {
-        "id": { "type": "string", "pattern": "^ending\\.gate\\.[A-Za-z0-9._-]+$" },
-        "name": { "type": "string", "minLength": 1, "maxLength": 48 },
-        "mapResourceId": { "type": "string", "pattern": "^map\\.[A-Za-z0-9._-]+$" },
+        "id": {
+          "type": "string",
+          "pattern": "^ending\\.gate\\.[A-Za-z0-9._-]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 48
+        },
+        "mapResourceId": {
+          "type": "string",
+          "pattern": "^map\\.[A-Za-z0-9._-]+$"
+        },
         "position": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["col", "row"],
+          "required": [
+            "col",
+            "row"
+          ],
           "properties": {
-            "col": { "type": "integer", "minimum": 0, "maximum": 255 },
-            "row": { "type": "integer", "minimum": 0, "maximum": 255 }
+            "col": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 255
+            },
+            "row": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 255
+            }
           }
         },
-        "approachText": { "type": "string", "minLength": 1, "maxLength": 120 }
+        "approachText": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        }
       }
     },
     "endings": {
       "type": "array",
       "minItems": 1,
       "maxItems": 32,
-      "items": { "$ref": "#/definitions/ending" }
+      "items": {
+        "$ref": "#/definitions/ending"
+      }
     }
   },
   "definitions": {
     "ending": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "knowledgeNodeId", "title", "epilogue", "priority", "conditions"],
+      "required": [
+        "id",
+        "knowledgeNodeId",
+        "title",
+        "epilogue",
+        "priority",
+        "conditions"
+      ],
       "properties": {
-        "id": { "type": "string", "pattern": "^ending\\.[A-Za-z0-9._-]+$" },
-        "knowledgeNodeId": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
-        "title": { "type": "string", "minLength": 1, "maxLength": 48 },
-        "epilogue": { "type": "string", "minLength": 1, "maxLength": 600 },
-        "priority": { "type": "integer", "minimum": -1000, "maximum": 1000 },
+        "id": {
+          "type": "string",
+          "pattern": "^ending\\.[A-Za-z0-9._-]+$"
+        },
+        "knowledgeNodeId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 48
+        },
+        "epilogue": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": -1000,
+          "maximum": 1000
+        },
         "conditions": {
           "type": "array",
           "minItems": 1,
           "maxItems": 12,
-          "items": { "$ref": "#/definitions/condition" }
+          "items": {
+            "$ref": "#/definitions/condition"
+          }
+        },
+        "unlockRoutes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "$ref": "#/definitions/unlockRoute"
+          }
+        },
+        "epilogueSections": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "$ref": "#/definitions/epilogueSection"
+          }
         }
       }
     },
     "condition": {
       "oneOf": [
         {
-          "type": "object", "additionalProperties": false,
-          "required": ["kind", "hint", "questId", "status"],
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "hint",
+            "questId",
+            "status"
+          ],
           "properties": {
-            "kind": { "const": "questStatus" },
-            "hint": { "$ref": "#/definitions/hint" },
-            "questId": { "type": "string", "pattern": "^quest\\.[A-Za-z0-9._-]+$" },
-            "status": { "enum": ["locked", "offered", "active", "completed", "failed"] }
+            "kind": {
+              "const": "questStatus"
+            },
+            "hint": {
+              "$ref": "#/definitions/hint"
+            },
+            "questId": {
+              "type": "string",
+              "pattern": "^quest\\.[A-Za-z0-9._-]+$"
+            },
+            "status": {
+              "enum": [
+                "locked",
+                "offered",
+                "active",
+                "completed",
+                "failed"
+              ]
+            }
           }
         },
         {
-          "type": "object", "additionalProperties": false,
-          "required": ["kind", "hint"],
-          "anyOf": [{ "required": ["minValue"] }, { "required": ["maxValue"] }],
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "hint"
+          ],
+          "anyOf": [
+            {
+              "required": [
+                "minValue"
+              ]
+            },
+            {
+              "required": [
+                "maxValue"
+              ]
+            }
+          ],
           "properties": {
-            "kind": { "const": "morality" },
-            "hint": { "$ref": "#/definitions/hint" },
-            "minValue": { "type": "integer", "minimum": -100, "maximum": 100 },
-            "maxValue": { "type": "integer", "minimum": -100, "maximum": 100 }
+            "kind": {
+              "const": "morality"
+            },
+            "hint": {
+              "$ref": "#/definitions/hint"
+            },
+            "minValue": {
+              "type": "integer",
+              "minimum": -100,
+              "maximum": 100
+            },
+            "maxValue": {
+              "type": "integer",
+              "minimum": -100,
+              "maximum": 100
+            }
           }
         },
         {
-          "type": "object", "additionalProperties": false,
-          "required": ["kind", "hint"],
-          "anyOf": [{ "required": ["minValue"] }, { "required": ["maxValue"] }],
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "hint"
+          ],
+          "anyOf": [
+            {
+              "required": [
+                "minValue"
+              ]
+            },
+            {
+              "required": [
+                "maxValue"
+              ]
+            }
+          ],
           "properties": {
-            "kind": { "const": "renown" },
-            "hint": { "$ref": "#/definitions/hint" },
-            "minValue": { "type": "integer", "minimum": 0, "maximum": 1000 },
-            "maxValue": { "type": "integer", "minimum": 0, "maximum": 1000 }
+            "kind": {
+              "const": "renown"
+            },
+            "hint": {
+              "$ref": "#/definitions/hint"
+            },
+            "minValue": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "maxValue": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            }
           }
         },
         {
-          "type": "object", "additionalProperties": false,
-          "required": ["kind", "hint", "npcId"],
-          "anyOf": [{ "required": ["minValue"] }, { "required": ["maxValue"] }],
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "hint",
+            "npcId"
+          ],
+          "anyOf": [
+            {
+              "required": [
+                "minValue"
+              ]
+            },
+            {
+              "required": [
+                "maxValue"
+              ]
+            }
+          ],
           "properties": {
-            "kind": { "const": "npcRelationship" },
-            "hint": { "$ref": "#/definitions/hint" },
-            "npcId": { "type": "string", "pattern": "^char\\.[A-Za-z0-9._-]+$" },
-            "minValue": { "type": "integer", "minimum": -100, "maximum": 100 },
-            "maxValue": { "type": "integer", "minimum": -100, "maximum": 100 }
+            "kind": {
+              "const": "npcRelationship"
+            },
+            "hint": {
+              "$ref": "#/definitions/hint"
+            },
+            "npcId": {
+              "type": "string",
+              "pattern": "^char\\.[A-Za-z0-9._-]+$"
+            },
+            "minValue": {
+              "type": "integer",
+              "minimum": -100,
+              "maximum": 100
+            },
+            "maxValue": {
+              "type": "integer",
+              "minimum": -100,
+              "maximum": 100
+            }
           }
         },
         {
-          "type": "object", "additionalProperties": false,
-          "required": ["kind", "hint", "isMember"],
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "hint",
+            "isMember"
+          ],
           "properties": {
-            "kind": { "const": "factionMembership" },
-            "hint": { "$ref": "#/definitions/hint" },
-            "factionId": { "type": "string", "pattern": "^faction\\.[A-Za-z0-9._-]+$" },
-            "isMember": { "type": "boolean" }
+            "kind": {
+              "const": "factionMembership"
+            },
+            "hint": {
+              "$ref": "#/definitions/hint"
+            },
+            "factionId": {
+              "type": "string",
+              "pattern": "^faction\\.[A-Za-z0-9._-]+$"
+            },
+            "isMember": {
+              "type": "boolean"
+            }
           }
         },
         {
-          "type": "object", "additionalProperties": false,
-          "required": ["kind", "hint", "factionId"],
-          "anyOf": [{ "required": ["minValue"] }, { "required": ["maxValue"] }],
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "hint",
+            "factionId"
+          ],
+          "anyOf": [
+            {
+              "required": [
+                "minValue"
+              ]
+            },
+            {
+              "required": [
+                "maxValue"
+              ]
+            }
+          ],
           "properties": {
-            "kind": { "const": "factionRenown" },
-            "hint": { "$ref": "#/definitions/hint" },
-            "factionId": { "type": "string", "pattern": "^faction\\.[A-Za-z0-9._-]+$" },
-            "minValue": { "type": "integer", "minimum": 0, "maximum": 1000 },
-            "maxValue": { "type": "integer", "minimum": 0, "maximum": 1000 }
+            "kind": {
+              "const": "factionRenown"
+            },
+            "hint": {
+              "$ref": "#/definitions/hint"
+            },
+            "factionId": {
+              "type": "string",
+              "pattern": "^faction\\.[A-Za-z0-9._-]+$"
+            },
+            "minValue": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "maxValue": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            }
           }
         },
         {
-          "type": "object", "additionalProperties": false,
-          "required": ["kind", "hint", "nodeId"],
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "hint",
+            "nodeId"
+          ],
           "properties": {
-            "kind": { "const": "knowledgeKnown" },
-            "hint": { "$ref": "#/definitions/hint" },
-            "nodeId": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" }
+            "kind": {
+              "const": "knowledgeKnown"
+            },
+            "hint": {
+              "$ref": "#/definitions/hint"
+            },
+            "nodeId": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$"
+            }
           }
         }
       ]
     },
-    "hint": { "type": "string", "minLength": 1, "maxLength": 140 }
+    "hint": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 140
+    },
+    "unlockRoute": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "epilogue",
+        "conditions"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+          "maxLength": 96,
+          "not": {
+            "const": "original"
+          }
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 48,
+          "pattern": "\\S"
+        },
+        "epilogue": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600,
+          "pattern": "\\S"
+        },
+        "conditions": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "$ref": "#/definitions/condition"
+          }
+        }
+      }
+    },
+    "epilogueSection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "fallbackText",
+        "variants"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+          "maxLength": 96
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 48,
+          "pattern": "\\S"
+        },
+        "fallbackText": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240,
+          "pattern": "\\S"
+        },
+        "variants": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "text",
+              "conditions"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$",
+                "maxLength": 96
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 240,
+                "pattern": "\\S"
+              },
+              "conditions": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 12,
+                "items": {
+                  "$ref": "#/definitions/condition"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
