@@ -795,7 +795,7 @@
     {
       "id": "quest.r62-north-pass-marks",
       "name": "北隘校标",
-      "description": "邵长庚看过雾岬水尺拓片后，请你沿北道核对碎岭旧路的界石。石面上的凿痕可能说明驿路并未塌断，而是被人挪了路标。",
+      "description": "沿碎岭旧道核对界石凿痕，确认路标改动；见闻记入即结算，之后找邵长庚接驿镇更次，不需要拾取铜扣或拓片。",
       "giverNpcId": "char.shao-changgeng",
       "requiredKnowledgeNodeId": "place.mist-north-cap",
       "objectives": [
@@ -812,7 +812,7 @@
     {
       "id": "quest.r62-post-ledger",
       "name": "驿镇更次",
-      "description": "界石凿痕与驿路旧制相合。邵长庚请你把消息带给秦素砚，核对旧烽台的巡山更次，免得夜间再有人借错牌拦路。",
+      "description": "界石已核，找秦素砚对更簿；交谈即结算。随后决定公开署名或保护报信人，代价与结果记录见闻，再到邵长庚处接清道。",
       "giverNpcId": "char.shao-changgeng",
       "prerequisiteQuestIds": ["quest.r62-north-pass-marks"],
       "objectives": [
@@ -829,7 +829,7 @@
     {
       "id": "quest.r62-clear-ridge-road",
       "name": "碎岭清道",
-      "description": "巡山更次已经校妥，碎岭拦路客却仍扣着界石。邵长庚托你清出通路，让铁嶂北道重新按驿簿往来。",
+      "description": "更次已校，击退碎岭拦路客。返回邵长庚可知更簿选择的回响，并获石脊西道去青岩驿、断云北隘去云岭的续查方向。",
       "giverNpcId": "char.shao-changgeng",
       "prerequisiteQuestIds": ["quest.r62-post-ledger"],
       "objectives": [
@@ -850,7 +850,7 @@
     {
       "id": "quest.r67-well-waterline",
       "name": "苦井辨线",
-      "description": "罗金子说青岩驿的水桶近来常带咸沫，请你去回声苦井核对井壁水线，把结果带回驿站。",
+      "description": "到回声苦井核对水线和货担秤刻；发现见闻即结算。返回罗金子复核后，可选择留下回春膏或保留药品，随后回铁嶂再向云岭对照石阶。",
       "giverNpcId": "char.luo-jinzi",
       "objectives": [
         {

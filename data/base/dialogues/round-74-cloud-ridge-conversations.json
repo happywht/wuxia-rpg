@@ -12,42 +12,148 @@
               "text": "我去云纹石阶拓下刻痕。",
               "nextNodeId": "marks-accepted",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r74-cloud-marks", "status": "offered" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r74-cloud-marks",
+                  "status": "offered"
+                }
               ],
               "effects": [
-                { "kind": "acceptQuest", "questId": "quest.r74-cloud-marks" }
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r74-cloud-marks"
+                }
               ]
             },
             {
               "text": "我已经找到了石阶刻痕。",
               "nextNodeId": "marks-complete",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r74-cloud-marks", "status": "completed" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r74-cloud-marks",
+                  "status": "completed"
+                }
               ]
             },
             {
               "text": "我去断索悬桥清出栈道。",
               "nextNodeId": "bridge-accepted",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r74-cloud-bridge", "status": "offered" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r74-cloud-bridge",
+                  "status": "offered"
+                }
               ],
               "effects": [
-                { "kind": "acceptQuest", "questId": "quest.r74-cloud-bridge" }
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r74-cloud-bridge"
+                }
               ]
             },
             {
               "text": "悬桥附近已经可以通行。",
               "nextNodeId": "bridge-complete",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r74-cloud-bridge", "status": "completed" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r74-cloud-bridge",
+                  "status": "completed"
+                }
               ]
             },
-            { "text": "先歇一会儿。", "nextNodeId": "farewell" }
+            {
+              "text": "把更簿、井壁和石阶对照，残篇来路能坐实多少？",
+              "nextNodeId": "r100-paper-check",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r62-post-ledger",
+                  "status": "completed"
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r67-well-waterline",
+                  "status": "completed"
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r74-cloud-marks",
+                  "status": "completed"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r100-paper-crosscheck"
+                }
+              ]
+            },
+            {
+              "text": "青岩驿有人带话来吗？",
+              "nextNodeId": "r100-aid-echo",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-well-aid"
+                }
+              ]
+            },
+            {
+              "text": "青岩驿有人带话来吗？",
+              "nextNodeId": "r100-reserve-echo",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-well-reserve"
+                }
+              ]
+            },
+            {
+              "text": "三地调查与清道完成，我要向哪里续查？",
+              "nextNodeId": "r100-mainland-close",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r62-clear-ridge-road",
+                  "status": "completed"
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r74-cloud-bridge",
+                  "status": "completed"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-settled"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-well-settled"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-paper-crosscheck"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r100-mainland-close"
+                }
+              ]
+            },
+            {
+              "text": "先歇一会儿。",
+              "nextNodeId": "farewell"
+            }
           ]
         },
         {
           "id": "marks-accepted",
-          "text": "「石阶在客舍西北，云散时能看见第三道刻纹。照着石缝拓全，不要只抄路牌上的字。」沈雨霁把炭笔和薄纸递给你。"
+          "text": "「石阶在客舍西北，第三道刻纹沿石缝续进去。看全刻痕，记入见闻即可，不必带回一份拓片。」沈雨霁在油纸图上圈出石阶。"
         },
         {
           "id": "marks-complete",
@@ -59,9 +165,28 @@
         },
         {
           "id": "bridge-complete",
-          "text": "沈雨霁将新拓的路线添进图卷：「山口到悬桥终于连成一线。往后有人问路，也不必再靠猜云势。」"
+          "text": "沈雨霁在图上划掉路障：「悬桥边的拦路客已散，护索还要另行修补。你能走过这一路，不等于每个后来人都能不看脚下。」"
         },
-        { "id": "farewell", "text": "沈雨霁收起油纸图，让出窗边那张靠山的空凳。" }
+        {
+          "id": "farewell",
+          "text": "沈雨霁收起油纸图，让出窗边那张靠山的空凳。"
+        },
+        {
+          "id": "r100-paper-check",
+          "text": "沈雨霁将三处记法并排：「更簿三短一长是换更，井壁圈线是记水份，石阶第三道刻纹指向旧索孔，旁边留着新拓纸纤维。三处并非同一套暗码，不能用刻痕给残篇断纸龄。书院转述的水纹纸药墨仍是待核的水路线索；山路上有人近日拓图，不等于他写了残篇，下一步应查船货记录。下一段沿越岭东行到青帆埠查船货，北台栈道的界标另有边防线索。」"
+        },
+        {
+          "id": "r100-aid-echo",
+          "text": "「罗金子托过路人说，你留了回春膏。」沈雨霁看了看你的行囊，「人能先在驿棚救急，你上悬桥反而得算好剩药；这不是无代价的善举。」"
+        },
+        {
+          "id": "r100-reserve-echo",
+          "text": "「罗金子说你把药留给了自己。」沈雨霁没有责你，「山路确实险，可驿棚没补上缺口。下回过井边，别把那里的人都当作只会讨东西。」"
+        },
+        {
+          "id": "r100-mainland-close",
+          "text": "沈雨霁把清道与清桥两笔划在图上：「路障已清，不等于护索已修复，更不等于幕后查明。你对更簿和补给的选择，各处人都记着。大陆这一程已弄清三处刻痕分工；要继续追纸墨，东行问船货，北行核旧界标。」"
+        }
       ]
     }
   ]

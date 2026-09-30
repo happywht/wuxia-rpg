@@ -11,38 +11,100 @@
             {
               "text": "我见过北岸水尺，想核对它指的旧道。",
               "nextNodeId": "north-mark",
-              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "place.mist-north-cap" }]
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "place.mist-north-cap"
+                }
+              ]
             },
             {
               "text": "碎岭旧道的界石已有线索。",
               "nextNodeId": "pass-active",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r62-north-pass-marks", "status": "active" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r62-north-pass-marks",
+                  "status": "active"
+                }
               ]
             },
             {
               "text": "北道已经清出来了。",
               "nextNodeId": "road-clear",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r62-clear-ridge-road", "status": "completed" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r62-clear-ridge-road",
+                  "status": "completed"
+                }
               ]
             },
-            { "text": "我再看看驿路。", "nextNodeId": "farewell" }
+            {
+              "text": "更簿处理之后，驿路有什么变化？",
+              "nextNodeId": "r100-open-echo",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-open"
+                }
+              ]
+            },
+            {
+              "text": "更簿处理之后，驿路有什么变化？",
+              "nextNodeId": "r100-guard-echo",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-guard"
+                }
+              ]
+            },
+            {
+              "text": "清道之后，我要如何续查纸墨来路？",
+              "nextNodeId": "r100-road-links",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r62-clear-ridge-road",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "我再看看驿路。",
+              "nextNodeId": "farewell"
+            }
           ]
         },
         {
           "id": "north-mark",
-          "text": "邵长庚将水尺拓片压在门楼图上：「北道还认得这几道刻线。去碎岭核过界石，再把更次交给秦素砚；她管旧簿，比我记得细。」"
+          "text": "邵长庚把水尺刻线与门楼图并排看：「先到碎岭旧道核界石，再来我这里接驿镇更次，找秦素砚对簿。只认你见到的凿痕，不必带一块石头回来。」"
         },
         {
           "id": "pass-active",
-          "text": "「先看凿痕，再别碰移过的界石。」邵长庚将一枚旧铜扣交给你辨认，「驿簿的记号总能对上。」"
+          "text": "「旧制是三短一长，界石若被挪过，凿痕还在。」邵长庚指向北坡，「核过刻痕，差事便记妥；下一程到驿镇找秦素砚。」"
         },
         {
           "id": "road-clear",
           "text": "邵长庚把更牌挂回门边：「石路能走了，才算驿道重新活过来。铁嶂的人记你这一程。」"
         },
-        { "id": "farewell", "text": "「若还要查北道，等风小些再上坡。」邵长庚低头重新整理更牌。" }
+        {
+          "id": "farewell",
+          "text": "「若还要查北道，等风小些再上坡。」邵长庚低头重新整理更牌。"
+        },
+        {
+          "id": "r100-open-echo",
+          "text": "邵长庚点了点更牌：「你公开了更次，路客来核牌的人多了；秦素砚还在替报信人找避处。清道是清道，不能说已把幕后人查尽。」"
+        },
+        {
+          "id": "r100-guard-echo",
+          "text": "邵长庚把更牌背面翻给你：「姓名留在秦素砚那里，我这里只改错牌。少了公开证词，路客要多问一遍；报信人暂能照常巡路。」"
+        },
+        {
+          "id": "r100-road-links",
+          "text": "「石脊西道在铁嶂南端，通青岩驿；断云北隘在北端，通云岭。」邵长庚摊开路图，「先核青岩苦井的货担刻线，再向沈雨霁问云纹石阶。三处记法对上，只能说明旧商路相通，不能凭此认出残篇作者。」"
+        }
       ]
     },
     {
@@ -56,21 +118,140 @@
             {
               "text": "邵长庚托我来核对巡山更次。",
               "nextNodeId": "ledger-checked",
-              "conditions": [{ "kind": "questStatus", "questId": "quest.r62-post-ledger", "status": "active" }]
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r62-post-ledger",
+                  "status": "active"
+                }
+              ]
             },
-            { "text": "我想看看这本旧簿。", "nextNodeId": "ledger" },
-            { "text": "先不打扰你。", "nextNodeId": "farewell" }
+            {
+              "text": "我想看看这本旧簿。",
+              "nextNodeId": "ledger"
+            },
+            {
+              "text": "更次已核妥，怎样处理报信人的姓名？",
+              "nextNodeId": "r100-record-choice",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r62-post-ledger",
+                  "status": "completed"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-settled",
+                  "isKnown": false
+                }
+              ]
+            },
+            {
+              "text": "先不打扰你。",
+              "nextNodeId": "farewell"
+            }
           ]
         },
         {
           "id": "ledger-checked",
-          "text": "秦素砚用指节敲了敲石片：「三短一长，子夜换人。把这一页交回邵长庚，旧烽台就不会再被错牌占住。」"
+          "text": "秦素砚敲了敲桌上的石片：「三短一长，是换更记法，不是纸龄。你这一问已把更次核妥，谢仪照簿结清；不必再交一页不存在的字据。下一步在邵长庚处接碎岭清道。」"
         },
         {
           "id": "ledger",
           "text": "她翻开旧簿：「北道的更次不是按钟声记，而是照烽台回声。雾岬水尺一动，山上的石刻便能校时。」"
         },
-        { "id": "farewell", "text": "秦素砚合上簿册，把桌角的石片压稳。" }
+        {
+          "id": "farewell",
+          "text": "秦素砚合上簿册，把桌角的石片压稳。"
+        },
+        {
+          "id": "r100-record-choice",
+          "text": "秦素砚把名字一栏遮住：「旧簿指向有人借错牌占路，可报信人也在山中。公开更次能让路客自查，却会让报信人暴露；只报刻线，查路的人便少一份可公开的证词，还得留一份回春膏给他避路救急。选定后记入见闻，不能改选。」",
+          "options": [
+            {
+              "text": "公开更次与署名（秦素砚关系−4，江湖声望+3）。",
+              "nextNodeId": "r100-record-open",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-settled",
+                  "isKnown": false
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "adjustRelationship",
+                  "npcId": "char.qin-suyan",
+                  "delta": -4
+                },
+                {
+                  "kind": "adjustRenown",
+                  "delta": 3
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r100-record-open"
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r100-record-settled"
+                }
+              ]
+            },
+            {
+              "text": "隐去姓名并留回春膏×1（消耗药品，声望−2、秦素砚关系+4）。",
+              "nextNodeId": "r100-record-guard",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-settled",
+                  "isKnown": false
+                },
+                {
+                  "kind": "itemCount",
+                  "itemId": "item.huichun-gao",
+                  "minCount": 1
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "takeItem",
+                  "itemId": "item.huichun-gao",
+                  "quantity": 1
+                },
+                {
+                  "kind": "adjustRenown",
+                  "delta": -2
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "npcId": "char.qin-suyan",
+                  "delta": 4
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r100-record-guard"
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r100-record-settled"
+                }
+              ]
+            },
+            {
+              "text": "暂不定夺。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "r100-record-open",
+          "text": "秦素砚将姓名摊开：「路客能互相核牌了，可那个人要躲一阵。下回到青岩驿，听听罗金子怎样看这件事。」"
+        },
+        {
+          "id": "r100-record-guard",
+          "text": "她遮住姓名：「药留给他救急，我替他记这份情。没有公开证词，旁人不会把功劳都算给你。到青岩驿核井壁水线，那里能把货担秤刻与更牌记法分开。」"
+        }
       ]
     }
   ]

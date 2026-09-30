@@ -312,7 +312,7 @@ export function isConditionMet(
         condition.maxValue,
       );
     case 'knowledgeKnown':
-      return context.knownKnowledgeNodeIds.has(condition.nodeId);
+      return context.knownKnowledgeNodeIds.has(condition.nodeId) === (condition.isKnown ?? true);
     case 'npcKnows':
       return npcKnows(context.social, condition.npcId ?? context.speakerNpcId, condition.nodeId);
     case 'factionMembership': {

@@ -3504,6 +3504,62 @@
       "toId": "place.r97-goose-window",
       "relation": "triggers",
       "summary": "眺望石窗时望见雁路。"
+    },
+    {
+      "id": "kg.edge.r100-record-open",
+      "fromId": "char.qin-suyan",
+      "toId": "event.r100-record-open",
+      "relation": "knows",
+      "summary": "人物在本轮条件对白中处理或复核此事；此静态关联不表示运行时已知。"
+    },
+    {
+      "id": "kg.edge.r100-record-guard",
+      "fromId": "char.qin-suyan",
+      "toId": "event.r100-record-guard",
+      "relation": "knows",
+      "summary": "人物在本轮条件对白中处理或复核此事；此静态关联不表示运行时已知。"
+    },
+    {
+      "id": "kg.edge.r100-record-settled",
+      "fromId": "char.qin-suyan",
+      "toId": "event.r100-record-settled",
+      "relation": "knows",
+      "summary": "人物在本轮条件对白中处理或复核此事；此静态关联不表示运行时已知。"
+    },
+    {
+      "id": "kg.edge.r100-well-aid",
+      "fromId": "char.luo-jinzi",
+      "toId": "event.r100-well-aid",
+      "relation": "knows",
+      "summary": "人物在本轮条件对白中处理或复核此事；此静态关联不表示运行时已知。"
+    },
+    {
+      "id": "kg.edge.r100-well-reserve",
+      "fromId": "char.luo-jinzi",
+      "toId": "event.r100-well-reserve",
+      "relation": "knows",
+      "summary": "人物在本轮条件对白中处理或复核此事；此静态关联不表示运行时已知。"
+    },
+    {
+      "id": "kg.edge.r100-well-settled",
+      "fromId": "char.luo-jinzi",
+      "toId": "event.r100-well-settled",
+      "relation": "knows",
+      "summary": "人物在本轮条件对白中处理或复核此事；此静态关联不表示运行时已知。"
+    },
+    {
+      "id": "kg.edge.r100-paper-crosscheck",
+      "fromId": "char.r74-shen-yuji",
+      "toId": "event.r100-paper-crosscheck",
+      "relation": "knows",
+      "summary": "人物在本轮条件对白中处理或复核此事；此静态关联不表示运行时已知。"
+    },
+    {
+      "id": "kg.edge.r100-mainland-close",
+      "fromId": "char.r74-shen-yuji",
+      "toId": "event.r100-mainland-close",
+      "relation": "knows",
+      "summary": "人物在本轮条件对白中处理或复核此事；此静态关联不表示运行时已知。"
     }
   ]
 }

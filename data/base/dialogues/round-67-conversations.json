@@ -52,6 +52,42 @@
               "nextNodeId": "roads"
             },
             {
+              "text": "水线核过了，过路人的补给怎么办？",
+              "nextNodeId": "r100-well-choice",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r67-well-waterline",
+                  "status": "completed"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-well-settled",
+                  "isKnown": false
+                }
+              ]
+            },
+            {
+              "text": "公开更簿后，货路怎样？",
+              "nextNodeId": "r100-open-echo",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-open"
+                }
+              ]
+            },
+            {
+              "text": "遮去更簿姓名后，货路怎样？",
+              "nextNodeId": "r100-guard-echo",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-guard"
+                }
+              ]
+            },
+            {
               "text": "先不打扰了。",
               "nextNodeId": "farewell"
             }
@@ -67,7 +103,7 @@
         },
         {
           "id": "completed",
-          "text": "罗金子听完井壁刻痕，收起秤砣：「这才是能给货担定水份的实数。往后不必把井咸都怪到盐天头上。」"
+          "text": "罗金子听完井壁刻痕：「刻线是旧货担记水份的秤记，井咸不能全怪盐天。看过水线，差事已结，回来说话只是复核，不另领一次谢仪。去云岭找沈雨霁，查石阶第三道刻纹究竟指路还是指索。」"
         },
         {
           "id": "roads",
@@ -76,6 +112,102 @@
         {
           "id": "farewell",
           "text": "罗金子点点头，又把驿棚里的秤砣挪到避风的一侧。"
+        },
+        {
+          "id": "r100-well-choice",
+          "text": "「井水发苦，过路人要多备药。」罗金子指着货担，「你可留一份回春膏作救急，也可自己带着继续走山路。我会照实告诉云岭的人，不替你装好人。选定后不可改选。」",
+          "options": [
+            {
+              "text": "留下回春膏×1（消耗药品，善恶+2、罗金子关系+4）。",
+              "nextNodeId": "r100-well-aid",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-well-settled",
+                  "isKnown": false
+                },
+                {
+                  "kind": "itemCount",
+                  "itemId": "item.huichun-gao",
+                  "minCount": 1
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "takeItem",
+                  "itemId": "item.huichun-gao",
+                  "quantity": 1
+                },
+                {
+                  "kind": "adjustMorality",
+                  "delta": 2
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "npcId": "char.luo-jinzi",
+                  "delta": 4
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r100-well-aid"
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r100-well-settled"
+                }
+              ]
+            },
+            {
+              "text": "保留药品给自己的山路（罗金子关系−4，江湖声望−2）。",
+              "nextNodeId": "r100-well-reserve",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-well-settled",
+                  "isKnown": false
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "adjustRelationship",
+                  "npcId": "char.luo-jinzi",
+                  "delta": -4
+                },
+                {
+                  "kind": "adjustRenown",
+                  "delta": -2
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r100-well-reserve"
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r100-well-settled"
+                }
+              ]
+            },
+            {
+              "text": "我先筹备，稍后再定。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "r100-well-aid",
+          "text": "罗金子把药收入救急货担：「这份药留在驿棚，你自己的回春膏就少一份。往东关回铁嶂，再过断云北隘找沈雨霁，她会知道是谁帮过这段路。」"
+        },
+        {
+          "id": "r100-well-reserve",
+          "text": "罗金子没有伸手：「自己的命也是命，只是驿棚的缺口还在。往东关回铁嶂，再过断云北隘，沈雨霁若问，我就照你今天的选择说。」"
+        },
+        {
+          "id": "r100-open-echo",
+          "text": "罗金子压低声音：「更次摊开后，货担不用只信一张旧牌；那个署名的人却得避开陌生客。你让账好查了，也让一个人难过路。」"
+        },
+        {
+          "id": "r100-guard-echo",
+          "text": "「报信人还能在驿棚露脸，货主却仍追问是谁作证。」罗金子拨了拨秤珠，「守住一个名字，便要承受账目不够公开的疑问。」"
         }
       ]
     }

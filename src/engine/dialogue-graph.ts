@@ -57,7 +57,7 @@ export type DialogueConditionData =
   | { kind: 'renown'; minValue?: number; maxValue?: number }
   | { kind: 'factionRenown'; factionId: string; minValue?: number; maxValue?: number }
   | { kind: 'npcRelationship'; npcId: string; minValue?: number; maxValue?: number }
-  | { kind: 'knowledgeKnown'; nodeId: string }
+  | { kind: 'knowledgeKnown'; nodeId: string; isKnown?: boolean }
   | { kind: 'npcKnows'; npcId?: string; nodeId: string }
   | { kind: 'factionMembership'; factionId?: string; isMember: boolean }
   | { kind: 'martialArtEligible'; martialArtId: string }
@@ -253,9 +253,10 @@ function parseCondition(raw: unknown): DialogueConditionData | null {
       return { kind: 'npcRelationship', npcId, ...(minValue !== undefined ? { minValue } : {}), ...(maxValue !== undefined ? { maxValue } : {}) };
     }
     case 'knowledgeKnown': {
-      if (!hasOnlyKeys(source, ['kind', 'nodeId'])) return null;
+      if (!hasOnlyKeys(source, ['kind', 'nodeId', 'isKnown'])) return null;
       const nodeId = requireNonEmptyString(source.nodeId);
-      return nodeId === null ? null : { kind: 'knowledgeKnown', nodeId };
+      if (source.isKnown !== undefined && typeof source.isKnown !== 'boolean') return null;
+      return nodeId === null ? null : { kind: 'knowledgeKnown', nodeId, ...(source.isKnown === undefined ? {} : { isKnown: source.isKnown as boolean }) };
     }
     case 'npcKnows': {
       if (!hasOnlyKeys(source, ['kind', 'npcId', 'nodeId'])) return null;

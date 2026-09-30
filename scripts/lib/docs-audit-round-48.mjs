@@ -40,7 +40,7 @@ export async function auditRound48Docs({ root }) {
     if (!releaseSmoke.includes(`'${guide}'`)) problems.push(`版本包 smoke 未解包验证 ${guide}`);
   }
 
-  const roadmapRounds = [...roadmap.matchAll(/^- \*\*R(\d{2})\*\* — ([^\r\n]+)/gm)];
+  const roadmapRounds = [...roadmap.matchAll(/^- \*\*R(\d{2,})\*\* — ([^\r\n]+)/gm)];
   const completedRounds = roadmapRounds
     .filter(([, , summary]) => summary.includes('已完成：'))
     .map(([, round]) => Number(round))

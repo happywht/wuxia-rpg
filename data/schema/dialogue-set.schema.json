@@ -163,13 +163,14 @@
           "anyOf": [{ "required": ["minValue"] }, { "required": ["maxValue"] }]
         },
         {
-          "description": "玩家已获知指定知识节点时成立。",
+          "description": "默认要求已获知；isKnown 为 false 时要求尚未知晓指定节点。",
           "type": "object",
           "additionalProperties": false,
           "required": ["kind", "nodeId"],
           "properties": {
             "kind": { "const": "knowledgeKnown" },
-            "nodeId": { "type": "string", "minLength": 1, "maxLength": 64 }
+            "nodeId": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "isKnown": { "type": "boolean" }
           }
         },
         {

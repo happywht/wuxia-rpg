@@ -1,6 +1,6 @@
 # 人物志（CHARACTERS）
 
-- 状态：Round 97 已完成，基础世界共有 **38 名可交互 NPC**；全部为原创人物，七时段人物使用独立日程和对话资源。季无潮、虞星槎负责澜心洲—引航礁航路差事；本轮人物、对白和任务位于 `data/base/characters/round-97-lanxin-reef-npcs.json`、`data/base/dialogues/round-97-lanxin-reef-conversations.json` 与 `data/base/quests/round-97-lanxin-reef-quests.json`。
+- 状态：截至 Round 100，基础世界共有 **38 名可交互 NPC**；全部为原创人物，七时段人物使用独立日程和对话资源。季无潮、虞星槎负责澜心洲—引航礁航路差事；本轮人物、对白和任务位于 `data/base/characters/round-97-lanxin-reef-npcs.json`、`data/base/dialogues/round-97-lanxin-reef-conversations.json` 与 `data/base/quests/round-97-lanxin-reef-quests.json`。
 - 关联：`docs/NPC-SCHEDULES.md`（时段日程）、`docs/FACTIONS.md`（门派与师承）、`docs/KNOWLEDGE-GRAPH.md`（人物词条与关系边）、`docs/DIALOGUE-GUIDE.md`（对话写法）。
 
 ## 总表
@@ -152,3 +152,7 @@
 
 - **岑汐**（中溟·千里石塘，基础位置 `(46,47)`）：石塘望潮人，按七时段在礁路与灯浮石之间望潮守灯；发布「石塘灯浮记」，请玩家登礁辨认灯序并回西岬复命。
 - **洛盐**（南溟·半月环礁，基础位置 `(48,50)`）：环礁船娘，按七时段在湖心沙脊旁泊船候客；前置差事完成后发布「半月的回信」，托玩家回千里石塘抄录望序台潮序并带回环礁交付。两人都复用既有 Puny Characters CC0 方向帧，日程、对白和任务引用由 Round 96 独立 JSON 声明。
+
+## Round 100 四人回响
+
+秦素砚要求处理报信姓名；邵长庚区分路客核牌与证人安全；罗金子既核货担水份也面对驿棚补给缺口；沈雨霁根据留药/自备回应，并对照三地刻痕。各入口按实际任务/见闻条件显示，返回回声不刷奖励。

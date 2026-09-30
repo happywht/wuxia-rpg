@@ -3,7 +3,7 @@
     {
       "id": "quest.r74-cloud-marks",
       "name": "云阶辨刻",
-      "description": "沈雨霁请你到云纹石阶拓下旧刻痕，核对断云栈道的南北路向。",
+      "description": "辨认云纹石阶的第三道刻痕，发现见闻即结算。若已核铁嶂更簿与青岩井壁，返回沈雨霁能对照三地记法，限定残篇纸墨的阶段性答案。",
       "giverNpcId": "char.r74-shen-yuji",
       "objectives": [
         {
@@ -19,7 +19,7 @@
     {
       "id": "quest.r74-cloud-bridge",
       "name": "断索清桥",
-      "description": "石阶刻痕指出悬桥护索曾被改过。先查明山桥现状，再驱散占路者，让云岭栈道重新连通。",
+      "description": "石阶刻痕显示护索方向改动，击退断索悬桥拦路客。清桥并非自动修复护索；完成铁嶂清道、两处立场与三地对照后，可向沈雨霁询问东行船货和北台界标。",
       "giverNpcId": "char.r74-shen-yuji",
       "prerequisiteQuestIds": ["quest.r74-cloud-marks"],
       "objectives": [

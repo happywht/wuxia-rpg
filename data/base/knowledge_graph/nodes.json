@@ -2715,6 +2715,62 @@
       "title": "眺望望雁口",
       "summary": "望见北去海天与雁阵航路。",
       "knownByDefault": false
+    },
+    {
+      "id": "event.r100-record-open",
+      "kind": "event",
+      "title": "更簿公开署名",
+      "summary": "玩家公开铁嶂更次与报信姓名，秦素砚关系−4、江湖声望+3；路客可核牌，报信人需要避处。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r100-record-guard",
+      "kind": "event",
+      "title": "更簿隐去姓名",
+      "summary": "玩家保护报信姓名并留下回春膏×1，秦素砚关系+4、江湖声望−2；报信人仍能巡路，货主缺少公开证词。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r100-record-settled",
+      "kind": "event",
+      "title": "更簿立场已定",
+      "summary": "玩家已作一次更簿处理选择；公开与保护不可同时选择或重复结算。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r100-well-aid",
+      "kind": "event",
+      "title": "青岩救急留药",
+      "summary": "玩家在井水调查后留下回春膏×1，善恶+2、罗金子关系+4；药品留在驿棚，自身行囊减少。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r100-well-reserve",
+      "kind": "event",
+      "title": "青岩行囊留药",
+      "summary": "玩家保留药品自备山路，罗金子关系−4、江湖声望−2；驿棚补给缺口仍在。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r100-well-settled",
+      "kind": "event",
+      "title": "青岩补给已定",
+      "summary": "玩家已决定援助或自备，不能重复结算或改选。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r100-paper-crosscheck",
+      "kind": "event",
+      "title": "三地刻痕对照",
+      "summary": "更簿三短一长记换更，井壁圈线记水份，石阶刻纹指旧索孔并留有新拓纤维；三处并非同一暗码，不足以判残篇纸龄、同批纸或作者。水纹纸药墨仍需船货记录核实。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r100-mainland-close",
+      "kind": "event",
+      "title": "大陆调查阶段结案",
+      "summary": "更簿与补给立场、三地对照、碎岭和悬桥战斗完成；路障清除不等于护索修复，东行船货与北台界标继续未解线索。",
+      "knownByDefault": false
     }
   ]
 }
