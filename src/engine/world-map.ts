@@ -258,6 +258,132 @@ function parseCell(value: unknown, label: string, errors: string[]): CellPositio
   return { col: value.col, row: value.row };
 }
 
+/** Canonical wire token of one atlas row run: positive decimal length and unsigned gid. */
+const ATLAS_RLE_TOKEN = /^([1-9][0-9]*):(0|[1-9][0-9]*)$/;
+
+/** Validates one legacy dense `cells` matrix into the runtime row list. */
+function parseDenseAtlasLayer(
+  cells: unknown,
+  columns: number | null,
+  rows: number | null,
+  tileset: GridMapTilesetData | undefined,
+  path: string,
+  errors: string[],
+): number[][] | null {
+  if (!Array.isArray(cells)) {
+    errors.push(`${path}.cells：应为二维数组`);
+    return null;
+  }
+  if (rows !== null && cells.length !== rows) {
+    errors.push(`${path}.cells：应有 ${rows} 行，实际 ${cells.length} 行`);
+  }
+  let valid = true;
+  const parsedRows: number[][] = [];
+  cells.forEach((row, rowIndex) => {
+    if (!Array.isArray(row)) {
+      errors.push(`${path}.cells[${rowIndex}]：应为数组`);
+      valid = false;
+      return;
+    }
+    if (columns !== null && row.length !== columns) {
+      errors.push(`${path}.cells[${rowIndex}]：应有 ${columns} 格，实际 ${row.length} 格`);
+      valid = false;
+    }
+    const parsedRow: number[] = [];
+    row.forEach((gid, colIndex) => {
+      if (!integer(gid) || gid < 0 || gid > 0xffffffff) {
+        errors.push(`${path}.cells[${rowIndex}][${colIndex}]：应为无符号整数 GID`);
+        valid = false;
+        return;
+      }
+      const frame = gid & 0x0fffffff;
+      if (frame !== 0 && (tileset === undefined || frame > tileset.tileCount)) {
+        errors.push(`${path}.cells[${rowIndex}][${colIndex}]：帧 ${frame} 超出图集`);
+        valid = false;
+      }
+      parsedRow.push(gid);
+    });
+    parsedRows.push(parsedRow);
+  });
+  return valid ? parsedRows : null;
+}
+
+/**
+ * Decodes one compact `cellsRle` wire layer — a string per atlas row of
+ * comma-separated `runLength:gid` tokens — into the dense runtime matrix.
+ * Row count, per-row run totals and tileset frame bounds are enforced here
+ * so malformed rows surface as readable errors instead of render holes.
+ */
+function parseRleAtlasLayer(
+  cellsRle: unknown,
+  columns: number | null,
+  rows: number | null,
+  tileset: GridMapTilesetData | undefined,
+  path: string,
+  errors: string[],
+): number[][] | null {
+  if (!Array.isArray(cellsRle)) {
+    errors.push(`${path}.cellsRle：应为字符串数组`);
+    return null;
+  }
+  if (rows !== null && cellsRle.length !== rows) {
+    errors.push(`${path}.cellsRle：应有 ${rows} 行，实际 ${cellsRle.length} 行`);
+  }
+  let valid = true;
+  const parsedRows: number[][] = [];
+  cellsRle.forEach((row, rowIndex) => {
+    const rowPath = `${path}.cellsRle[${rowIndex}]`;
+    if (typeof row !== 'string') {
+      errors.push(`${rowPath}：应为字符串`);
+      valid = false;
+      return;
+    }
+    if (row.length === 0) {
+      errors.push(`${rowPath}：不应为空行`);
+      valid = false;
+      return;
+    }
+    let total = 0;
+    let rowValid = true;
+    const parsedRow: number[] = [];
+    row.split(',').forEach((token, tokenIndex) => {
+      const match = ATLAS_RLE_TOKEN.exec(token);
+      if (match === null) {
+        errors.push(`${rowPath}：第 ${tokenIndex + 1} 段 "${token}" 应为 游程:GID（正数十进制游程与无符号 GID）`);
+        rowValid = false;
+        return;
+      }
+      const runLength = Number(match[1]);
+      const gid = Number(match[2]);
+      if (runLength > 512 || gid > 0xffffffff) {
+        errors.push(`${rowPath}：第 ${tokenIndex + 1} 段 "${token}" 超出游程或 GID 上限`);
+        rowValid = false;
+        return;
+      }
+      total += runLength;
+      if (columns !== null && total > columns) {
+        errors.push(`${rowPath}：游程超过列数上限 ${columns} 格`);
+        rowValid = false;
+        return;
+      }
+      const frame = gid & 0x0fffffff;
+      if (frame !== 0 && (tileset === undefined || frame > tileset.tileCount)) {
+        errors.push(`${rowPath}：第 ${tokenIndex + 1} 段 "${token}" 的帧 ${frame} 超出图集`);
+        rowValid = false;
+        return;
+      }
+      for (let repeat = 0; repeat < runLength; repeat += 1) parsedRow.push(gid);
+    });
+    if (rowValid && columns !== null && total !== columns) {
+      errors.push(`${rowPath}：游程应有 ${columns} 格，实际 ${total} 格`);
+      rowValid = false;
+    }
+    if (!rowValid) valid = false;
+    parsedRows.push(parsedRow);
+  });
+  return valid ? parsedRows : null;
+}
+
 function parseAtlasArt(value: unknown, errors: string[]): WorldAtlasArtData | null {
   const label = 'atlasArt';
   if (!isObject(value)) {
@@ -340,48 +466,32 @@ function parseAtlasArt(value: unknown, errors: string[]): WorldAtlasArtData | nu
   } else rawLayers.forEach((entry, layerIndex) => {
     const path = `${label}.layers[${layerIndex}]`;
     if (!isObject(entry)) { errors.push(`${path}：应为对象`); return; }
-    const { id, tilesetId, cells } = entry;
+    for (const key of Object.keys(entry)) {
+      if (key !== 'id' && key !== 'tilesetId' && key !== 'cells' && key !== 'cellsRle') {
+        errors.push(`${path}.${key}：不是受支持的字段`);
+      }
+    }
+    const { id, tilesetId, cells, cellsRle } = entry;
     if (!nonEmpty(id)) errors.push(`${path}.id：应为非空字符串`);
     if (nonEmpty(id) && layerIds.has(id)) errors.push(`${path}.id：图层 id 重复`);
     if (nonEmpty(id)) layerIds.add(id);
     if (!nonEmpty(tilesetId) || !tilesetIds.has(tilesetId)) {
       errors.push(`${path}.tilesetId：未引用已声明图集`);
     }
-    if (!Array.isArray(cells)) {
-      errors.push(`${path}.cells：应为二维数组`);
+    if (cells !== undefined && cellsRle !== undefined) {
+      errors.push(`${path}：cells 与 cellsRle 只能提供其中一种`);
       return;
     }
-    if (rows !== null && cells.length !== rows) errors.push(`${path}.cells：应有 ${rows} 行，实际 ${cells.length} 行`);
-    let valid = true;
-    const parsedRows: number[][] = [];
-    cells.forEach((row, rowIndex) => {
-      if (!Array.isArray(row)) {
-        errors.push(`${path}.cells[${rowIndex}]：应为数组`);
-        valid = false;
-        return;
-      }
-      if (columns !== null && row.length !== columns) {
-        errors.push(`${path}.cells[${rowIndex}]：应有 ${columns} 格，实际 ${row.length} 格`);
-        valid = false;
-      }
-      const parsedRow: number[] = [];
-      row.forEach((gid, colIndex) => {
-        if (!integer(gid) || gid < 0 || gid > 0xffffffff) {
-          errors.push(`${path}.cells[${rowIndex}][${colIndex}]：应为无符号整数 GID`);
-          valid = false;
-          return;
-        }
-        const frame = gid & 0x0fffffff;
-        const tileset = tilesets.find((candidate) => candidate.id === tilesetId);
-        if (frame !== 0 && (tileset === undefined || frame > tileset.tileCount)) {
-          errors.push(`${path}.cells[${rowIndex}][${colIndex}]：帧 ${frame} 超出图集`);
-          valid = false;
-        }
-        parsedRow.push(gid);
-      });
-      parsedRows.push(parsedRow);
-    });
-    if (nonEmpty(id) && nonEmpty(tilesetId) && tilesetIds.has(tilesetId) && valid) {
+    const tileset = tilesets.find((candidate) => candidate.id === tilesetId);
+    let parsedRows: number[][] | null = null;
+    if (cells !== undefined) {
+      parsedRows = parseDenseAtlasLayer(cells, columns, rows, tileset, path, errors);
+    } else if (cellsRle !== undefined) {
+      parsedRows = parseRleAtlasLayer(cellsRle, columns, rows, tileset, path, errors);
+    } else {
+      errors.push(`${path}：应提供 cells 或 cellsRle 之一`);
+    }
+    if (parsedRows !== null && nonEmpty(id) && nonEmpty(tilesetId) && tilesetIds.has(tilesetId)) {
       layers.push({ id, tilesetId, cells: parsedRows });
     }
   });

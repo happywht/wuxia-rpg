@@ -75,9 +75,13 @@ describe('Round 81 global world atlas art and projection', () => {
 
   it('rejects malformed atlas dimensions and GIDs at the runtime parser boundary', () => {
     const raw = readJson('../data/base/world/world-map.json') as {
-      atlasArt: { columns: number; layers: { cells: number[][] }[]; tilesets: { tileCount: number }[] };
+      atlasArt: { columns: number; layers: Record<string, any>[] };
     };
-    raw.atlasArt.layers[0]!.cells[0]![0] = 10_000;
+    // The shipped atlas is row-RLE now; swap in a legacy dense layer with an
+    // oversized GID so the dense wire path stays validated alongside RLE.
+    const denseLayer = raw.atlasArt.layers[0]!;
+    delete denseLayer.cellsRle;
+    denseLayer.cells = [[10_000]];
     const badFrame = parseWorldMap(raw);
     expect(badFrame.ok).toBe(false);
     if (!badFrame.ok) expect(badFrame.errors.join('\n')).toContain('超出图集');
@@ -86,7 +90,7 @@ describe('Round 81 global world atlas art and projection', () => {
     wrongSize.atlasArt.columns -= 1;
     const badSize = parseWorldMap(wrongSize);
     expect(badSize.ok).toBe(false);
-    if (!badSize.ok) expect(badSize.errors.join('\n')).toContain('应有');
+    if (!badSize.ok) expect(badSize.errors.join('\n')).toContain('超过列数上限');
   });
 
   it('projects every assembled region, all gate directions and the player from authored data', () => {

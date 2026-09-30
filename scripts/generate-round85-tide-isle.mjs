@@ -2,6 +2,8 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { decodeAtlasCells, encodeAtlasCells } from './lib/atlas-rle.mjs';
+
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const base = resolve(root, 'data/base');
 const paths = {
@@ -103,6 +105,20 @@ if (windwardMap.id !== windwardId || windwardMap.grid.length !== 100) {
 const previous = world.atlasArt;
 const atlasReady = previous?.columns === overview.columns && previous?.rows === overview.rows &&
   extensionIds.every((id) => previous.layers.some((layer) => layer.id === id));
+// Decode every layer once — legacy dense stays dense, compact RLE expands —
+// so the generator below always operates on dense matrices and the final
+// write re-encodes deterministically. `previous` aliases `world.atlasArt`.
+if (previous !== undefined) {
+  previous.layers = previous.layers.map((layer) => {
+    if (layer.cells !== undefined && layer.cellsRle !== undefined) {
+      throw new Error(`舆图图层 ${layer.id} 同时声明 cells 与 cellsRle。`);
+    }
+    const cells = layer.cells !== undefined
+      ? layer.cells
+      : decodeAtlasCells(layer.cellsRle, previous.rows, previous.columns);
+    return { id: layer.id, tilesetId: layer.tilesetId, cells };
+  });
+}
 let extensionCount = null;
 if (!atlasReady) {
   if (previous === undefined || previous.columns !== expectedOld.columns || previous.rows !== expectedOld.rows) {
@@ -745,6 +761,14 @@ manifest.resources = (manifest.resources ?? []).filter((entry) => !resourceEntri
 const atlasIndex = manifest.resources.findIndex((entry) => entry.id === 'world.atlas');
 if (atlasIndex < 0) throw new Error('manifest 缺少 world.atlas，拒绝孤立新增区域。');
 manifest.resources.splice(atlasIndex, 0, ...resourceEntries);
+
+// Persist every atlas layer in the compact row-RLE wire format; regions,
+// landmarks, transitions, events and all other atlas values stay unchanged.
+world.atlasArt.layers = world.atlasArt.layers.map((layer) => ({
+  id: layer.id,
+  tilesetId: layer.tilesetId,
+  cellsRle: encodeAtlasCells(layer.cells),
+}));
 
 await Promise.all([
   writeNewJson(paths.map, mapData, '潮生屿地图'),

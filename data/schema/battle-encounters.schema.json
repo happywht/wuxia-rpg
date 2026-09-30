@@ -42,6 +42,12 @@
     "stableId": {
       "type": "string",
       "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$"
+    },
+    "stableIdList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/definitions/stableId" }
     }
   },
   "type": "object",
@@ -92,6 +98,10 @@
           "knowledgeNodeId": {
             "description": "可选的图谱人物节点 id；玩家首次面对该遭遇时记录人物见闻。无效或非人物引用在运行时忽略，不影响战斗。",
             "$ref": "#/definitions/stableId"
+          },
+          "tideIds": {
+            "description": "可选气候潮位门槛；仅相位 id 命中时遭遇标记、阻挡与战斗生效。",
+            "$ref": "#/definitions/stableIdList"
           },
           "enemy": {
             "type": "object",

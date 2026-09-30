@@ -1,0 +1,22 @@
+{
+  "npcs": [
+    {
+      "id": "char.r86-lu-yubai",
+      "name": "陆余白",
+      "mapResourceId": "map.round-85-tide-isle",
+      "position": {
+        "col": 18,
+        "row": 54
+      },
+      "dialogueId": "dlg.r86-lu-yubai-tide-supplies",
+      "shopId": "shop.r86-tide-isle-supplies",
+      "spriteFrame": 272,
+      "spriteFrames": {
+        "down": 256,
+        "right": 264,
+        "up": 272,
+        "left": 280
+      }
+    }
+  ]
+}

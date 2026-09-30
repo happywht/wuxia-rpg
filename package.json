@@ -68,11 +68,13 @@
     "generate:round-83-east-coast": "node scripts/generate-round83-east-coast-content.mjs",
     "generate:round-84-windward-isle": "node scripts/generate-round84-windward-isle.mjs",
     "generate:round-85-tide-isle": "node scripts/generate-round85-tide-isle.mjs",
+    "generate:round-86-tide-isle": "node scripts/generate-round86-tide-isle.mjs",
     "smoke:round-81": "vitest run tests/round81-world-atlas.test.ts tests/round79-island-region.test.ts tests/round51-map-viewport.test.ts",
     "smoke:round-82": "vitest run tests/round82-east-coast.test.ts tests/round81-world-atlas.test.ts tests/round79-island-region.test.ts tests/round74-cloud-ridge.test.ts tests/round80-region-interactions.test.ts",
     "smoke:round-83": "vitest run tests/round83-east-coast-town.test.ts tests/round82-east-coast.test.ts tests/round81-world-atlas.test.ts tests/round80-region-interactions.test.ts",
     "smoke:round-84": "vitest run tests/round84-windward-isle.test.ts tests/round83-east-coast-town.test.ts tests/round82-east-coast.test.ts tests/round81-world-atlas.test.ts tests/round80-region-interactions.test.ts",
     "smoke:round-85": "vitest run tests/round85-tide-isle.test.ts tests/round85-tide-system.test.ts tests/round84-windward-isle.test.ts tests/round83-east-coast-town.test.ts tests/round82-east-coast.test.ts tests/round81-world-atlas.test.ts tests/round79-island-region.test.ts tests/round74-cloud-ridge.test.ts tests/round70-world-atlas.test.ts tests/round67-salt-road.test.ts tests/round66-world-atlas.test.ts tests/round62-iron-ridge.test.ts tests/round55-ferry-world.test.ts",
+    "smoke:round-86": "vitest run tests/round86-tide-and-supply.test.ts tests/round86-world-atlas-rle.test.ts tests/round86-world-atlas-labels.test.ts tests/round85-tide-isle.test.ts tests/round85-tide-system.test.ts tests/round51-map-viewport.test.ts",
     "smoke:round-76": "vitest run tests/round76-region-landmark-art.test.ts",
     "smoke:round-77": "vitest run tests/round77-character-art.test.ts"
   },

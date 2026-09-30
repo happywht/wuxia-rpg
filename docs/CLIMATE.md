@@ -1,6 +1,6 @@
 # 季节、天气与潮汐资料
 
-Round 15 将季节、每日天气、环境叠色与雨雪移动代价接入游戏。Round 85 增加可选潮汐周期、HUD 潮位显示与区域事件潮位条件。资料契约是 `data/schema/climate.schema.json`，基础数据在 `data/base/worldview/climate.json`，manifest 资源 id 为 `climate.base`。气候是必需世界资料，与 `calendar.base` 一同加载；移除资料后世界加载会给出可读诊断，不会静默使用引擎内置四季或天气。
+Round 15 将季节、每日天气、环境叠色与雨雪移动代价接入游戏。Round 85 增加可选潮汐周期、HUD 潮位显示与区域事件潮位条件；Round 86 让 `battle-encounters` 可选引用潮位相位，场景在相位切换时同步遭遇标记、阻挡、寻路和战斗入口。资料契约是 `data/schema/climate.schema.json`，基础数据在 `data/base/worldview/climate.json`，manifest 资源 id 为 `climate.base`。气候是必需世界资料，与 `calendar.base` 一同加载；移除资料后世界加载会给出可读诊断，不会静默使用引擎内置四季或天气。
 
 ## 资料结构
 

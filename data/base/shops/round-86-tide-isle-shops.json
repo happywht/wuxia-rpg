@@ -1,0 +1,29 @@
+{
+  "shops": [
+    {
+      "id": "shop.r86-tide-isle-supplies",
+      "name": "潮线药囊",
+      "npcId": "char.r86-lu-yubai",
+      "greeting": "陆余白掀开油布药囊：「货不多，都是过礁能用上的。买走一份，下一批得等船靠岸。」",
+      "sellRate": 0.3,
+      "stock": [
+        {
+          "itemId": "item.huichun-gao",
+          "quantity": 3
+        },
+        {
+          "itemId": "item.qingxin-wan",
+          "quantity": 3
+        },
+        {
+          "itemId": "item.r32.songzhen-xuesan",
+          "quantity": 2
+        },
+        {
+          "itemId": "item.r32.ouling-huqitang",
+          "quantity": 2
+        }
+      ]
+    }
+  ]
+}

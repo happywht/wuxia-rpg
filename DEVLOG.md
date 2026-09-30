@@ -4,6 +4,25 @@
 
 ---
 
+## Round 86 — 舆图 RLE、低潮战斗与潮生屿补给（2026-09-30，已完成）
+
+### 计划与实现
+
+- 计划先写于 [`iterations/round-86/plan.md`](iterations/round-86/plan.md)：压缩 448×320 舆图 JSON，同时保持旧 dense MOD；为潮生屿加入低潮战斗、有限药品商店与地图可读性回归。
+- 为 `world-map` 图层增加互斥的 `cells`/`cellsRle` wire 编码。Schema 检查 RLE token 语法；`parseWorldMap` 校验行数、列游程、GID/图集帧并还原到既有运行时矩阵。Round 85 生成器读取两种来源并确定性写出规范 RLE，旧 dense MOD 和现有渲染消费者不变。
+- `data/base/world/world-map.json` 从 **51,898,361 B** 缩至 **262,094 B**（约缩减 99.5%）；转换前的 24 层逐层 SHA-256 基线与 RLE 解码后的矩阵全部一致。压缩改善资料文件的磁盘/传输体积；运行时仍解码为密集矩阵，本轮不宣称降低渲染内存占用。
+- 舆图区域标签按当前视口位置、优先当前区域尝试上/下/左右等位置，降低总览重叠。新增陆余白 `(18,54)`、「潮线药囊」有限药架（四种既有药品，共 10 份），以及只在 `tide.low` 出现的礁道夺货客 `(57,51)`。相位变化同步遭遇标记、占格/寻路和战斗入口；遭遇可重复且胜利经验为 0。NPC、对白、商店、战斗和图谱关系以独立数据资源声明，并沿用已登记 CC0 素材。
+
+### 验证
+
+- `npm run generate:round-85-tide-isle` 与 `npm run generate:round-86-tide-isle` 各连续执行两遍；世界图、manifest、两轮 NPC/对白/任务和 Round 86 店铺/战斗/知识图谱共 12 个输出文件在第二遍后 SHA-256 全部不变。
+- `npm run smoke:round-86`：6 个测试文件、34 项通过，覆盖 RLE 与 dense 兼容、24 层无损解码、九区标签视口内不重叠、潮位遭遇、有限库存以及存档解析/恢复后余货一致。
+- `npm run validate:data`：manifest Schema 与 60 个基础资源 Schema 通过；`npm run typecheck`：通过；`npm run audit:round-34`：通过。
+- `npm run check`：60 项资源静态校验/MOD 扫描零问题，类型检查通过，60 个测试文件/398 项通过，Round 34/48 文档审计通过。`npm run build`：完整检查再次通过，Vite 139 个模块生产构建成功；Phaser runtime chunk 为 1,374.54 kB（gzip 357.49 kB），触发默认 500 kB 体积建议。
+- 隔离本地预览 `http://127.0.0.1:5195/`：新开局进入 M 舆图，看到 9 个区域和 448×320 尺寸；滚轮改变缩放、拖动移动地图、Home 恢复全景，按 S 选点并按 Enter 显示 56 格路线。此检查未实际走到潮生屿或进入低潮战斗；遭遇相位与库存存档由自动回归覆盖。预览用临时 localhost 端口，未触碰用户原有 `5178` 标签页或其存档。
+
+---
+
 ## Round 85 — 潮生屿与资料化潮汐（2026-09-30，已完成）
 
 ### 计划与实现

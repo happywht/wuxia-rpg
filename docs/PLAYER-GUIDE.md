@@ -1,6 +1,6 @@
 # 玩家手册
 
-这份手册对应当前仓库 Round 85 的可运行原型。菜单、键位与玩法以游戏内 H「操作手册」和现行资料为准；浏览器存档仅保存在当前浏览器的本地存储中。R00–R85 均有独立计划；R50 最终验收边界见 [`FINAL-ACCEPTANCE.md`](FINAL-ACCEPTANCE.md)，九块百格地图、全域舆图、区域内容与路线证据见 [`MAP-ATLAS.md`](MAP-ATLAS.md)、[`ROUND-61-ROUTE-AUDIT.md`](ROUND-61-ROUTE-AUDIT.md)、[`ROUND-63-TIMED-ROUTE-AUDIT.md`](ROUND-63-TIMED-ROUTE-AUDIT.md)、[`ROUND-64-ROUTE-AUDIT.md`](ROUND-64-ROUTE-AUDIT.md)、[`ROUND-68-JOURNEY-PLAYTEST.md`](ROUND-68-JOURNEY-PLAYTEST.md)、[`ROUND-71-BROWSER-PLAYTEST.md`](ROUND-71-BROWSER-PLAYTEST.md) 和 [`ROUND-72-BROWSER-PLAYTEST.md`](ROUND-72-BROWSER-PLAYTEST.md)。Round 69 起四门身法拥有一次性守御战斗作用；无门派拦门刀法可向盘舷门外玩家授艺。Round 70 更新四区总图地貌与地图图素；Round 74 新增云岭古道、双向铁嶂关口及两段链式任务；Round 75 为固定见闻点新增临近线索；Round 76 在五区补充 CC0 环境图素；Round 77 为五区玩家与 NPC 接入方向帧、行走动画和十种 CC0 角色外观。Round 73 让 M 舆图和 HUD 共用当前 NPC/遭遇占位，绕行时显示提示、临时封路时区别于地形断路。Round 79 新增落潮湾地图与「灯痕避礁」任务，将总舆图扩为 224×144；Round 80 为云岭悬桥和海岛灯标加入邻近按 E 调查，同时保留旧地图踏入事件兼容；Round 81 将可移动舆图扩为 336×224，并支持 Home 回到全图；Round 82 新增东溟海岸百格地图；Round 83 新增青帆埠居民、商店、遭遇和暮潮任务链；Round 84 将总图扩至 384×256，加入可步行风回岛和「风回灯影」任务；Round 85 将总图扩至 448×320，新增可步行潮生屿、潮位显示和「低潮礁道」任务。素材授权见 [`REFERENCES.md`](REFERENCES.md)。招式名称、门槛和作用见 [`MARTIAL-ARTS.md`](MARTIAL-ARTS.md)。
+这份手册对应当前仓库 Round 86 的可运行原型。菜单、键位与玩法以游戏内 H「操作手册」和现行资料为准；浏览器存档仅保存在当前浏览器的本地存储中。R00–R86 均有独立计划；R50 最终验收边界见 [`FINAL-ACCEPTANCE.md`](FINAL-ACCEPTANCE.md)，九块百格地图、全域舆图、区域内容与路线证据见 [`MAP-ATLAS.md`](MAP-ATLAS.md)、[`ROUND-61-ROUTE-AUDIT.md`](ROUND-61-ROUTE-AUDIT.md)、[`ROUND-63-TIMED-ROUTE-AUDIT.md`](ROUND-63-TIMED-ROUTE-AUDIT.md)、[`ROUND-64-ROUTE-AUDIT.md`](ROUND-64-ROUTE-AUDIT.md)、[`ROUND-68-JOURNEY-PLAYTEST.md`](ROUND-68-JOURNEY-PLAYTEST.md)、[`ROUND-71-BROWSER-PLAYTEST.md`](ROUND-71-BROWSER-PLAYTEST.md) 和 [`ROUND-72-BROWSER-PLAYTEST.md`](ROUND-72-BROWSER-PLAYTEST.md)。Round 69 起四门身法拥有一次性守御战斗作用；无门派拦门刀法可向盘舷门外玩家授艺。Round 70 更新四区总图地貌与地图图素；Round 74 新增云岭古道、双向铁嶂关口及两段链式任务；Round 75 为固定见闻点新增临近线索；Round 76 在五区补充 CC0 环境图素；Round 77 为五区玩家与 NPC 接入方向帧、行走动画和十种 CC0 角色外观。Round 73 让 M 舆图和 HUD 共用当前 NPC/遭遇占位，绕行时显示提示、临时封路时区别于地形断路。Round 79 新增落潮湾地图与「灯痕避礁」任务，将总舆图扩为 224×144；Round 80 为云岭悬桥和海岛灯标加入邻近按 E 调查，同时保留旧地图踏入事件兼容；Round 81 将可移动舆图扩为 336×224，并支持 Home 回到全图；Round 82 新增东溟海岸百格地图；Round 83 新增青帆埠居民、商店、遭遇和暮潮任务链；Round 84 将总图扩至 384×256，加入可步行风回岛和「风回灯影」任务；Round 85 将总图扩至 448×320，新增可步行潮生屿、潮位显示和「低潮礁道」任务；Round 86 加入总图 RLE 压缩、全景标签避让、潮生屿限量药囊和低潮重复战斗。素材授权见 [`REFERENCES.md`](REFERENCES.md)。招式名称、门槛和作用见 [`MARTIAL-ARTS.md`](MARTIAL-ARTS.md)。
 
 ## 世界外观（Round 65 起）
 ### 五区环境细节（Round 76）
@@ -33,7 +33,7 @@ Round 83 延续海岸故事：完成「潮尺旧记」后向顾潮生接取「�
 
 Round 84 从青帆埠东南潮滩 `(91,71)` 步行进入风回岛 `(2,50)`；与阮回澜交谈接取「风回灯影」，走到东坡灯标 `(80,38)` 按 **E** 调查灯影方位，完成后获得经验、银两和淡泉洼见闻。岛上西滩 `(1,50)` 可步行回到青帆埠 `(90,71)`。舆图扩为 384×256，旧 336×224 区域像素保持不变；风回岛地貌与人物素材来自已登记的 CC0 图集。
 
-Round 85 从风回岛南滩 `(97,50)` 步行进入潮生屿 `(2,50)`；与谢照汀交谈接取「低潮礁道」，在礁盘 `(26,56)` 等待 HUD 显示低潮后按 **E** 勘测水则，再从潮生屿 `(1,50)` 步行返回风回岛 `(96,50)`。交付后获得经验、银两和退潮石窝见闻。潮位由游戏内历日确定，不依赖系统时钟；相位变化会同步反映在 HUD 与礁道交互条件中。全域舆图扩为 448×320，原 384×256 区域像素保持不变；新岛继续复用已登记的 CC0 图集。
+Round 85 从风回岛南滩 `(97,50)` 步行进入潮生屿 `(2,50)`；与谢照汀交谈接取「低潮礁道」，在礁盘 `(26,56)` 等待 HUD 显示低潮后按 **E** 勘测水则，再从潮生屿 `(1,50)` 步行返回风回岛 `(96,50)`。交付后获得经验、银两和退潮石窝见闻。Round 86 在潮生屿 `(18,54)` 加入陆余白的「潮线药囊」限量补给摊，药品售罄后会在交易界面显示剩余数；礁道 `(57,51)` 的黑鳍七只在低潮出现，可重复挑战且不提供经验。潮位由游戏内历日确定，不依赖系统时钟；相位变化会同步反映在 HUD、事件交互和礁道遭遇中。全域舆图扩为 448×320，原 384×256 区域像素保持不变；新岛继续复用已登记的 CC0 图集。
 
 ## 探索时的临近线索（Round 75）
 

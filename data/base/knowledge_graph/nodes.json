@@ -777,6 +777,10 @@
     {"id":"event.r85-arrival","kind":"event","title":"初登潮生","summary":"渡过南溟水道首次踏上潮生屿西滩。","knownByDefault":false},
     {"id":"event.r85-reef-channel","kind":"event","title":"低潮勘碑","summary":"趁低潮拓下水则碑上的百年潮位刻度。","knownByDefault":false},
     {"id":"event.r85-camp-hearth","kind":"event","title":"营地炊烟","summary":"在松林边营地认识守礁人的常备行装。","knownByDefault":false},
-    {"id":"event.r85-tide-pool","kind":"event","title":"石窝潮池","summary":"退潮后在礁盘内侧看见留水的潮池。","knownByDefault":false}
+    {"id":"event.r85-tide-pool","kind":"event","title":"石窝潮池","summary":"退潮后在礁盘内侧看见留水的潮池。","knownByDefault":false},
+    {"id":"char.r86-lu-yubai","kind":"character","title":"陆余白","summary":"潮生屿潮线外的药囊商，按有限库存售卖过礁药物，并熟悉低潮时的礁道风险。","knownByDefault":false},
+    {"id":"place.r86-tide-isle-supply","kind":"place","title":"潮线药囊摊","summary":"陆余白在潮生屿设置的临时补给点，摆在可步行的内岸，货品数量有限。","knownByDefault":false},
+    {"id":"char.r86-heiqi-qi","kind":"character","title":"黑鳍七","summary":"只在低潮礁道露面的夺货客，守着退潮后显露的窄路拦截行旅。","knownByDefault":false},
+    {"id":"event.r86-reef-raiders","kind":"event","title":"低潮夺货","summary":"低潮时黑鳍七一伙人在潮生屿礁道拦船货；涨潮后退回浪线外。","knownByDefault":false}
   ]
 }

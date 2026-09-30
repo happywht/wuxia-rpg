@@ -86,6 +86,7 @@ import {
 } from '../engine/character-progression';
 import {
   CombatSession,
+  encounterMatchesTide,
   type PlacedEncounter,
   selectEncounterTarget,
 } from '../engine/turn-based-combat';
@@ -361,6 +362,8 @@ export class GridScene extends Phaser.Scene {
   private encounterCells = new Map<string, PlacedEncounter>();
   /** Marker graphics per encounter id, removed when a foe is defeated. */
   private encounterMarkers = new Map<string, Phaser.GameObjects.GameObject[]>();
+  /** Tide phase used when encounter markers and occupied cells were last synchronized. */
+  private lastEncounterTideId: string | null | undefined;
 
   /** Player runtime state; created from the chosen character profile
    * (Round 06: independent of encounters, so the backpack works even when
@@ -1378,6 +1381,7 @@ export class GridScene extends Phaser.Scene {
 
   private renderEncounterMarkers(map: GridMap): void {
     this.encounterLayer = this.add.container().setScrollFactor(1);
+    this.lastEncounterTideId = this.currentClimate()?.tide?.id ?? null;
     for (const encounter of this.activeEncounters()) {
       const center = cellCenterOffset(map, encounter.col, encounter.row);
       const size = map.tileSize * ENCOUNTER_SIZE_RATIO;
@@ -1512,10 +1516,57 @@ export class GridScene extends Phaser.Scene {
    * versioned save snapshots.
    */
   private activeEncounters(): PlacedEncounter[] {
+    const tideId = this.currentClimate()?.tide?.id ?? null;
     return this.encounters.filter(
       (encounter) =>
-        encounter.record.repeatable || !this.completedEncounters.has(encounter.record.id),
+        encounterMatchesTide(encounter.record, tideId) &&
+        (encounter.record.repeatable || !this.completedEncounters.has(encounter.record.id)),
     );
+  }
+
+  /** Updates tide-gated encounter markers and occupied cells after the clock changes phase. */
+  private syncTideGatedEncounters(): void {
+    const tideId = this.currentClimate()?.tide?.id ?? null;
+    if (tideId === this.lastEncounterTideId || this.map === null) return;
+    this.lastEncounterTideId = tideId;
+    const active = this.activeEncounters();
+    const activeIds = new Set(active.map((encounter) => encounter.record.id));
+    for (const [id, markers] of this.encounterMarkers) {
+      if (activeIds.has(id)) continue;
+      for (const marker of markers) marker.destroy();
+      this.encounterMarkers.delete(id);
+    }
+    this.encounterCells = new Map(active.map((encounter) => [
+      `${encounter.col},${encounter.row}`,
+      encounter,
+    ]));
+    for (const encounter of active) {
+      if (this.encounterMarkers.has(encounter.record.id)) continue;
+      this.addTideGatedEncounterMarker(this.map, encounter);
+    }
+    this.updateInteractHint();
+  }
+
+  private addTideGatedEncounterMarker(map: GridMap, encounter: PlacedEncounter): void {
+    const center = cellCenterOffset(map, encounter.col, encounter.row);
+    const size = map.tileSize * ENCOUNTER_SIZE_RATIO;
+    const body = this.add.rectangle(
+      this.mapOrigin.x + center.x,
+      this.mapOrigin.y + center.y,
+      size,
+      size,
+      ENCOUNTER_FILL,
+    );
+    body.setStrokeStyle(3, ENCOUNTER_BORDER);
+    body.setAngle(45);
+    const label = this.registerScaledText(this.add.text(
+      this.mapOrigin.x + center.x,
+      this.mapOrigin.y + center.y - size / 2 - 4,
+      encounter.record.enemy.name,
+      { fontFamily: UI.fontFamily, fontSize: uiFontSize(10), color: UI.textPrimary },
+    ).setOrigin(0.5, 1), 10);
+    this.addWorldObjects(this.encounterLayer, [body, label]);
+    this.encounterMarkers.set(encounter.record.id, [body, label]);
   }
 
   /** Opens the data-authored signup card; item capacity is reserved up front. */
@@ -2407,6 +2458,7 @@ export class GridScene extends Phaser.Scene {
     this.updateTimeHud();
     this.updateDaylight(true);
     this.updateClimatePresentation(true);
+    this.syncTideGatedEncounters();
     this.syncNpcSchedule(true);
   }
 

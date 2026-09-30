@@ -279,6 +279,26 @@
       "id": "knowledge.round-11-edges",
       "path": "knowledge_graph/edges.json",
       "schema": "knowledge-edges"
+    },
+    {
+      "id": "npc.round-86-tide-isle-set",
+      "path": "characters/round-86-tide-isle-npcs.json",
+      "schema": "npc-set"
+    },
+    {
+      "id": "dialogue.round-86-tide-isle-set",
+      "path": "dialogues/round-86-tide-isle-conversations.json",
+      "schema": "dialogue-set"
+    },
+    {
+      "id": "shop.round-86-tide-isle-set",
+      "path": "shops/round-86-tide-isle-shops.json",
+      "schema": "shops-set"
+    },
+    {
+      "id": "encounter.round-86-tide-isle-set",
+      "path": "battles/round-86-tide-isle-encounters.json",
+      "schema": "battle-encounters"
     }
   ],
   "enabledMods": []

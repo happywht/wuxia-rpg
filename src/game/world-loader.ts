@@ -532,6 +532,7 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
       new Set(knowledgeResult.graph.nodes.keys()),
       knowledgeResult.graph.nodes,
       calendarPeriodIds,
+      new Set(parsedClimate.climate.tideCycle?.phases.map((phase) => phase.id) ?? []),
       parsedCalendar.calendar.periods,
     );
     assembly.warnings.push(...knowledgeResult.warnings);
@@ -689,6 +690,7 @@ function assembleOptionalContent(
   knowledgeNodeIds: ReadonlySet<string>,
   knowledgeNodes: ReadonlyMap<string, KnowledgeNodeData>,
   timeOfDayPeriodIds: ReadonlySet<string>,
+  climateTideIds: ReadonlySet<string>,
   calendarPeriods: GameCalendarData['periods'],
 ): WorldAssembly {
   const warnings: Diagnostic[] = [];
@@ -925,6 +927,7 @@ function assembleOptionalContent(
       profiles: progressionAssembled.assembly.profiles,
       martialArts: progressionAssembled.assembly.martialArts,
       knowledgeCharacterNodeIds,
+      tideIds: climateTideIds,
     }),
   );
   const globallySeenEncounterIds = new Set<string>();

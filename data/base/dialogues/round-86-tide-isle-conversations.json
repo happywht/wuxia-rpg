@@ -1,0 +1,38 @@
+{
+  "conversations": [
+    {
+      "id": "dlg.r86-lu-yubai-tide-supplies",
+      "startNodeId": "hello",
+      "nodes": [
+        {
+          "id": "hello",
+          "text": "陆余白把药囊放在潮线外的石台上：「岛上没药铺，这几味常用药只备了几份。过礁前看清水色，别等伤口见了海水才想起买药。」",
+          "options": [
+            {
+              "text": "退潮时这片礁盘很危险？",
+              "nextNodeId": "reef"
+            },
+            {
+              "text": "我先看看补给。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "reef",
+          "text": "「低潮会露出一条窄路，也会有人趁乱翻船货。你若听见礁石后有人喊价，先看清他手里拿的是药还是刀。」",
+          "options": [
+            {
+              "text": "记下了。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "farewell",
+          "text": "陆余白把余下的药包重新系紧，免得涨潮时被浪头卷走。"
+        }
+      ]
+    }
+  ]
+}

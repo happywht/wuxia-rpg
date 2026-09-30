@@ -65,6 +65,8 @@ export interface BattleEncounterData {
   profileId: string;
   /** Optional graph character entry revealed when the player faces this foe. */
   knowledgeNodeId?: string;
+  /** Optional climate tide phases during which this encounter exists. */
+  tideIds?: string[];
   enemy: EncounterEnemyData;
   victoryExperience: number;
   defeatRecovery: {
@@ -241,6 +243,7 @@ export function parseBattleEncounterSet(raw: unknown): BattleEncounterSetParseRe
     const knowledgeNodeId = entry.knowledgeNodeId === undefined
       ? null
       : requireNonEmptyString(entry.knowledgeNodeId);
+    const tideIds = entry.tideIds === undefined ? undefined : requireIdList(entry.tideIds);
     const victoryExperience = requireIntegerInRange(entry.victoryExperience, 0, 1_000_000);
     const repeatable = typeof entry.repeatable === 'boolean' ? entry.repeatable : null;
 
@@ -273,6 +276,9 @@ export function parseBattleEncounterSet(raw: unknown): BattleEncounterSetParseRe
     if (entry.knowledgeNodeId !== undefined && knowledgeNodeId === null) {
       problems.push(`${label}.knowledgeNodeId：应为非空知识节点 id`);
     }
+    if (entry.tideIds !== undefined && (tideIds === undefined || tideIds === null || tideIds.length === 0)) {
+      problems.push(`${label}.tideIds：应为非空且不重复的潮位 id 数组`);
+    }
     if (victoryExperience === null) {
       problems.push(`${label}.victoryExperience：应为 0–1000000 的整数`);
     }
@@ -294,6 +300,7 @@ export function parseBattleEncounterSet(raw: unknown): BattleEncounterSetParseRe
       profileId === null ||
       victoryExperience === null ||
       repeatable === null ||
+      (entry.tideIds !== undefined && (tideIds === undefined || tideIds === null)) ||
       col === null ||
       row === null ||
       healthRatio === null ||
@@ -313,6 +320,7 @@ export function parseBattleEncounterSet(raw: unknown): BattleEncounterSetParseRe
       position: { col, row },
       profileId,
       ...(knowledgeNodeId !== null ? { knowledgeNodeId } : {}),
+      ...(tideIds !== undefined && tideIds !== null ? { tideIds } : {}),
       enemy,
       victoryExperience,
       defeatRecovery: { healthRatio, qiRatio },
@@ -359,6 +367,16 @@ export interface BattleEncounterAssemblyInput {
   martialArts: ReadonlyMap<string, MartialArtData>;
   /** Knowledge node ids whose kind is character, used for optional encounter discoveries. */
   knowledgeCharacterNodeIds: ReadonlySet<string>;
+  /** Valid climate tide phase ids; optional only for legacy direct engine callers. */
+  tideIds?: ReadonlySet<string>;
+}
+
+/** Whether a parsed encounter is active in the supplied tide phase. */
+export function encounterMatchesTide(
+  encounter: Pick<BattleEncounterData, 'tideIds'>,
+  tideId: string | null,
+): boolean {
+  return encounter.tideIds === undefined || (tideId !== null && encounter.tideIds.includes(tideId));
 }
 
 export interface BattleEncounterAssemblyResult {
@@ -404,6 +422,12 @@ export function assembleBattleEncounters(
   for (const record of input.encounterSet.encounters) {
     const problems: string[] = [];
     const encounterMap = input.maps.get(record.mapResourceId);
+
+    for (const tideId of record.tideIds ?? []) {
+      if (input.tideIds !== undefined && !input.tideIds.has(tideId)) {
+        problems.push(`引用的潮位 id "${tideId}" 未在气候资料中登记`);
+      }
+    }
 
     if (!input.knownResourceIds.has(record.mapResourceId)) {
       problems.push(`引用的地图资源 "${record.mapResourceId}" 未登记或加载失败`);

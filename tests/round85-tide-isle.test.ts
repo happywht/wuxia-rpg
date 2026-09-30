@@ -111,8 +111,18 @@ describe('Round 85 Tide Isle and the 448×320 atlas', () => {
       'world-r85-expanse-water', 'world-r85-expanse-sand',
       'world-r85-expanse-land', 'world-r85-expanse-pines',
     ]);
+    // Round 86 wire format: every atlas layer ships as compact row-RLE strings.
+    expect(art.layers.every((layer: any) =>
+      layer.cells === undefined && Array.isArray(layer.cellsRle) &&
+      layer.cellsRle.length === ATLAS_ROWS)).toBe(true);
 
-    const layers = new Map<string, any>(art.layers.map((layer: any) => [layer.id, layer]));
+    // All per-cell guarantees below read the dense matrix decoded by the live
+    // parser, so they keep proving pixel-level equality with pre-Round-85 data.
+    const parsedWorld = parseWorldMap(world);
+    expect(parsedWorld.ok).toBe(true);
+    if (!parsedWorld.ok) return;
+    const decodedArt = parsedWorld.data.atlasArt!;
+    const layers = new Map<string, any>(decodedArt.layers.map((layer: any) => [layer.id, layer]));
     for (const [id, expected] of Object.entries(oldLayerHashes)) {
       const layer = layers.get(id);
       expect(layer, id).toBeDefined();
@@ -120,7 +130,7 @@ describe('Round 85 Tide Isle and the 448×320 atlas', () => {
       const hash = createHash('sha256').update(JSON.stringify(oldArea)).digest('hex');
       expect(hash, id).toBe(expected);
     }
-    for (const layer of art.layers) {
+    for (const layer of decodedArt.layers) {
       expect(layer.cells).toHaveLength(ATLAS_ROWS);
       expect(layer.cells.every((row: number[]) => row.length === ATLAS_COLUMNS)).toBe(true);
     }
@@ -182,8 +192,11 @@ describe('Round 85 Tide Isle and the 448×320 atlas', () => {
     const col = Math.round(region.atlasPosition.x / 100 * (ATLAS_COLUMNS - 1));
     const row = Math.round(region.atlasPosition.y / 100 * (ATLAS_ROWS - 1));
     expect({ col, row }).toEqual({ col: 405, row: 280 });
-    const land = world.atlasArt.layers.find(({ id }: { id: string }) => id === 'world-r85-expanse-land');
-    expect(land.cells[row][col]).toBeGreaterThan(0);
+    const parsedWorld = parseWorldMap(world);
+    expect(parsedWorld.ok).toBe(true);
+    if (!parsedWorld.ok) return;
+    const land = parsedWorld.data.atlasArt!.layers.find(({ id }) => id === 'world-r85-expanse-land');
+    expect(land!.cells[row]![col]).toBeGreaterThan(0);
   });
 
   it('parses the expanded atlas and resolves the tide-gated event against climate data', () => {

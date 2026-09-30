@@ -8,6 +8,7 @@ import { QUEST_NAVIGATION_ID_PREFIX, type QuestNavigationTarget } from '../engin
 import { type WorldMapAssembly } from '../engine/world-map';
 import {
   buildWorldAtlasOverlays,
+  layoutWorldAtlasRegionLabels,
   projectWorldCell,
   worldAtlasArtTextureKey,
   type WorldAtlasConnection,
@@ -561,10 +562,27 @@ export class WorldMapPanel {
       this.viewportState.y - this.mapBounds.y,
     ).setScale(this.viewportState.scale);
     if (this.viewMode === 'world' && this.atlasOverlays !== null) {
+      const regionLabelPositions = this.atlasRegionPins.map((entry) => {
+        const [x, y] = this.mapWorldContentPosition(entry.marker.position);
+        return { entry, x, y };
+      });
+      const labelPlacements = layoutWorldAtlasRegionLabels(
+        regionLabelPositions.map(({ entry, x, y }) => ({
+          mapResourceId: entry.marker.mapResourceId,
+          x,
+          y,
+          width: entry.label.width,
+          height: entry.label.height,
+        })),
+        { width: this.mapBounds.width, height: this.mapBounds.height },
+        this.activeMap?.data.id,
+      );
       for (const entry of this.atlasRegionPins) {
         const [x, y] = this.mapWorldContentPosition(entry.marker.position);
         entry.pin.setPosition(x, y);
-        entry.label.setPosition(x, y - 10);
+        const placement = labelPlacements.get(entry.marker.mapResourceId);
+        entry.label.setPosition(placement?.x ?? x, placement?.y ?? y - 10);
+        if (placement !== undefined) entry.label.setOrigin(placement.originX, placement.originY);
       }
       for (const entry of this.atlasLandmarkPins) {
         const [x, y] = this.mapWorldContentPosition(entry.marker.position);

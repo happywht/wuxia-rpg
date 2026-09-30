@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：截至 Round 85；基础世界含 23 名 NPC、5 个门派、52 项任务、52 件物品、30 种武学、262 个图谱节点/366 条边，manifest 登记 56 项资源。九张区域地图均为 100×100 格；东溟海岸与两座外海岛复用已登记 Shade Puny World、ansimuz RPG Town 与 Puny Characters CC0 图素，全域舆图为 448×320、24 层。地图碰撞、剧情与跨区连接仍由独立 JSON 声明，生成器保护玩法锚点；素材授权、MOD 和导航协议见 `REFERENCES.md`、`MOD-GUIDE.md`、`MAP-ATLAS.md`。
+- 状态：截至 Round 86；基础世界含 24 名 NPC、5 个门派、52 项任务、52 件物品、30 种武学、266 个图谱节点/370 条边，manifest 登记 60 项资源。九张区域地图均为 100×100 格；东溟海岸与两座外海岛复用已登记 Shade Puny World、ansimuz RPG Town 与 Puny Characters CC0 图素，全域舆图为 448×320、24 层。舆图 JSON 以 RLE 保存；运行时解码为旧密集格矩阵。地图碰撞、剧情与跨区连接仍由独立 JSON 声明，生成器保护玩法锚点；素材授权、MOD 和导航协议见 `REFERENCES.md`、`MOD-GUIDE.md`、`MAP-ATLAS.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -269,7 +269,7 @@ NPC 条目可选声明 `spriteFrames`，键固定为 `down`、`left`、`right`�
 
 ## Round 81：全域舆图扩展
 
-`atlasArt.columns` 和 `rows` 描述全域图底图尺寸；Schema 和运行时解析器都限制为 1–384 格。Round 81 的默认总图是 336×224 格，旧十二图层的前 224×144 格保持原值，新增层只负责显示更远的海岸、海面、沙滩、草地和松林。图层与碰撞无关；真实地图、地标、关口仍按已有资源和世界地图协议声明。
+`atlasArt.columns` 和 `rows` 描述全域图底图尺寸；Schema 和运行时解析器都限制为 1–512 格。Round 86 的默认总图为 448×320 格，24 个图层压缩后仍逐格还原；图层与碰撞无关，真实地图、地标、关口仍按已有资源和世界地图协议声明。
 
 可选 `atlasArt.regionFootprint` 以舆图格表示区域投影所覆盖的旧宽高。投影器在画布尺寸变化后仍使用该跨度定位区域内玩家、地标和关口。省略字段的历史资源沿用 `atlasArt.columns/rows × 0.16` 的原推导，保持旧 MOD 的投影兼容。Home 只重置视口缩放与偏移，不改变玩家位置或旅行数据。
 
@@ -288,6 +288,12 @@ Round 84 在旧 336×224 区域逐格不变的条件下，把 `world-map.json` �
 ## Round 85：扩展舆图、潮生屿与潮汐条件
 
 Round 85 将全域舆图扩为 448×320 格和 24 个渲染层，在保持原 384×256 区域中二十层旧像素不变的前提下添加南部海域与岛屿。新增 `map.round-85-tide-isle`、人物/对白/任务集合均独立登记；风回岛和潮生屿之间有显式双向 `transition`，入口与主要互动锚点通过路径可达校验。气候资料可选配置 `tideCycle.cycleMinutes`、`phaseOffsetMinutes` 与有序 `phases`；相位时长必须合计为周期，id 不重复，周期须整除游戏日。`tideIds` 作为区域事件条件引用这些相位，加载器校验悬空 id；HUD 与事件读取同一 `ClimateRuntime`，旧 climate 覆盖省略潮汐字段时返回无潮位状态。运行 `npm run generate:round-85-tide-isle` 幂等重建，`npm run smoke:round-85` 覆盖数据闭环与旧区域兼容。
+
+## Round 86：舆图行 RLE、低潮遭遇与限量补给
+
+全域图层可选且只允许使用 `cells`（旧密集二维 GID 数组）或 `cellsRle`（逐行字符串数组）其中一种；解析器把 RLE 解码为同一个运行时 `cells` 矩阵，因此地图渲染、哈希、坐标投影和 MOD 运行协议不变。每行由逗号分隔的 `游程:GID` 十进制段构成，例如宽 448 格的一行可写为 `2:0,1:12,445:0`。游程为正整数、GID 为无符号整数；生成器输出规范串，合并相邻同 GID 游程。Schema 和解析器拒绝缺失/双重编码、坏 token、行数或列数不符、超界 GID/图集帧。当前 448×320、24 层舆图由 51,898,361 B 缩至 262,094 B，逐层 SHA-256 与转换前密集矩阵一致。
+
+战斗遭遇也可选声明 `tideIds`，数组中每个 id 必须引用 `climate.json` 的潮位相位。潮生屿 `encounter.r86-reef-raiders` 只在 `tide.low` 活跃：涨潮会移除遭遇标记并释放占格，低潮则恢复阻挡与战斗入口。该遭遇可重复且胜利经验为 0。陆余白的限量药囊商店与人物对白位于独立资源；有限货架复用既有商店库存及存档恢复规则。
 
 ## Round 80：地图环境对象调查
 

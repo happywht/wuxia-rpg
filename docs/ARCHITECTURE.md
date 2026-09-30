@@ -1,6 +1,6 @@
 # 架构说明（ARCHITECTURE）
 
-- 状态：截至 Round 85；基础资料含 23 名 NPC、5 个门派、52 项差事、52 件物品、30 种武学、262 个图谱节点/366 条关系及九张互通百格地图。基础 manifest 有 56 项资源，覆盖 24 个资源 Schema 家族；仓库含 26 份 draft-07 JSON Schema。可移动舆图为 448×320，新增潮生屿、双向步行路线、资料化潮汐和低潮礁道任务；R83 的多资源聚合与逐文件错误隔离仍按 manifest 顺序运行。整个产品目标仍在推进。
+- 状态：截至 Round 86；基础资料含 24 名 NPC、5 个门派、52 项差事、52 件物品、30 种武学、266 个图谱节点/370 条关系及九张互通百格地图。基础 manifest 有 60 项资源，覆盖 24 个资源 Schema 家族；仓库含 26 份 draft-07 JSON Schema。448×320、24 层可移动舆图以行 RLE 保存，加载后仍是原有运行时网格；潮生屿有双向步行路线、资料化潮汐、低潮礁战与限量补给。R83 的多资源聚合与逐文件错误隔离仍按 manifest 顺序运行。整个产品目标仍在推进。
 - 关联：`docs/ADR.md`（技术选型依据）、`docs/DATA-GUIDE.md`（数据面细节）
 
 ---
@@ -125,6 +125,7 @@ Round 22 在上述流程中可选登记武学创制组件资源；它按 JSON Sc
 - Round 54 的 `world-travel.ts` 与 `world-navigation.ts` 继续保持 Phaser-free：前者在已装配区域/关口图上按有向边运行稳定 BFS，后者将可见直接去向或已知远区地标投影到当前地图首关口。`world-map-ui.ts` 负责把本图碰撞格路线、行程区域列表、pin 和侧栏点击/W-S/Enter 组合为呈现；pointer 输入按 FIT canvas 的 client/backing 尺寸统一坐标。跨图段不会拿外地图坐标寻路，也不会从有向边推造回程。
 - Round 57 增加 `world-navigation-guidance.ts`，以可见地标 id 解析当前区域路线段；地图格路线每次走格/切区后重算，不缓存跨区坐标。`grid-path.ts` 的邻格寻路将关口停靠在可行的四向交互格，`world-map-ui.ts` 通过选点回调通知场景并在重开时恢复 projection，GridScene 持有仅本次运行有效的 landmark id 并将新路线写入 HUD。路线提示不自动移动；目标 id 不进入 v1 存档。纯函数返回到达/目标失效/路线失效状态，画面文案与按键提示仍由 `src/game/` 负责。
 - Round 66 扩展 `WorldMapData` 的可选 `atlasArt` 呈现字段，但不扩展碰撞/旅行规则；Schema 与 `parseWorldMap` 校验独立全域底图的栅格、图集和帧，缺字段的旧 MOD/存档继续使用。`world-atlas-view.ts` 在 Phaser-free 层由区域坐标、区域细图格点、有效关口端点和已知知识节点计算标记；确定性生成器把 Kenney CC0 瓦片生成为 176×112 格五层全域底图。Round 67 仅扩展底图尺寸、区域资料坐标与生成器内容，并通过数据增加西陲盐道地图；不新增引擎专属地区分支。`world-map-ui.ts` 默认开启可裁切的全域视图，G/按钮切到本区细图，既有本区寻路仍在原碰撞图上执行，跨区提示依旧需手动走到关口。
+- Round 86 为 `atlasArt.layers[]` 增加互斥的密集 `cells` 与逐行 `cellsRle` wire 编码；Ajv Schema 与 `parseWorldMap` 分别验证行数、游程宽度、GID/图集帧和编码互斥，解析后统一交给渲染器密集矩阵，旧 MOD 无需迁移。Round 85 生成器读入两种编码并确定性写成 RLE。`world-atlas-view.ts` 提供视口内区域文字避让布局，地图碰撞与跨区寻路协议未变。战斗遭遇的可选 `tideIds` 在装配时对照气候相位校验，运行时据同一潮位状态同步标记、占格/寻路和战斗入口。
 - Round 61 扩展 `world-navigation-guidance.ts` 的可选占位集合：`GridScene` 每次重算时传入当期 NPC 和活动遭遇格，纯逻辑寻路把这些动态格视作阻挡，同时仍将人物/遭遇目标停在真实的四向交互格。若只因动态占位暂时封路则保留当前目的地并在后续状态刷新时重算；地形自身断路仍使用既有失效处理。目标导航协议另传内容无关的 `talk`/`battle`/`discover` 提示枚举，抵达 HUD 由场景映射为 F/E/V 操作文案；地标仍不带任务动作，运行状态不进入存档。`tests/round61-route-audit.test.ts` 以真实地图、任务、NPC、遭遇与七时段日历审核两区内的 42 条路线并锁定距离范围；人物坐标、日程等实际资料留在 `data/`。
 - Round 64 让 `quest-navigation.ts` 把 `collectItem` 目标也解析为空间目标：解析器接收装配商店表、可选逐店运行时库存与当前地图 id，在"货架数量 `-1` 视为无限、正数为有限、`0`/未上架视为不可用"的规则下筛选能补齐剩余份数的卖家，优先当前地图、否则按装配顺序确定选取，目标投射到店主当前时段位置并携带内容无关的 `shop` 抵达提示（E 对相邻 NPC 先开商铺、F 直接交谈）；无任何商店上架、全部上架店铺库存不足或店主无法定位分别返回新增的精确 no-target 原因，不编造坐标。`world-navigation.ts` 另提供 `deriveNpcRegionNames` 纯函数，J 师门页据此在师父名旁显示装配数据派生的区域名，未解析导师回退通用占位。`tests/round64-route-audit.test.ts` 以三张真实地图、七时段日程与全部师父/给予者/谈话目标审计 462 项入口可达性（静态断连与动态阻挡均为零，见 `docs/ROUND-64-ROUTE-AUDIT.md`）。
 

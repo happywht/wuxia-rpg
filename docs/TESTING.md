@@ -186,8 +186,12 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 | `tests/round84-windward-isle.test.ts` | 风回岛地图、舆图扩展、双向关口和灯影任务 | 校验 100×100 可走岛图、CC0 图集/GID、384×256 新海岛地貌、两端 BFS 可达、地标/事件通路、对白接取任务、灯标发现奖励及图谱端点；纳入 `npm run smoke:round-84`。 |
 | `tests/round85-tide-isle.test.ts` | 潮生屿地图、舆图扩展、潮位事件与跨岛任务 | 校验 448×320/24 层舆图、旧二十层矩阵哈希与八区像素锚点、CC0 图集/GID、两端 BFS、潮位引用、气候装配、任务对白与图谱关系；纳入 `npm run smoke:round-85`。 |
 | `tests/round85-tide-system.test.ts` | 游戏内潮汐周期和低潮事件条件 | 校验 720 分钟周期边界、旧 climate MOD 兼容、重复/无效相位拒绝，以及 `tideIds` 按相位放行；纳入 `npm run smoke:round-85`。 |
+| `tests/round86-world-atlas-rle.test.ts` | 舆图逐行 RLE 协议与历史密集 MOD 兼容 | 检查 JSON Schema 编码互斥、坏 token/尺寸/GID 拒绝、旧密集层解析、生成器 RLE 无损往返及 24 层历史 SHA-256；纳入 `npm run smoke:round-86`。 |
+| `tests/round86-world-atlas-labels.test.ts` | 全景区域标题排布 | 用真实 448×320 总图的九区坐标与视口缩放，检查完整标注处于 616×340 视口内且互不重叠，并让当前区域保留原始锚点；纳入 `npm run smoke:round-86`。 |
+| `tests/round86-tide-and-supply.test.ts` | 潮生屿低潮战斗、NPC 与有限药囊 | 检查遭遇只在 `tide.low` 存在且可重复、不奖励经验，气候相位引用有效；整世界装配、补给 NPC/商店库存、物品引用和知识图谱无告警；纳入 `npm run smoke:round-86`。 |
 - 2026-09-29（Round 79）：新增海岛区域专项与可重复生成命令；世界图夹具升级为六区/十向关口，覆盖 Puny World CC0 图集网格、任务发现奖励、舆图保留旧大陆图层及旧区域锚点稳定。专项命令 `npm run smoke:round-79`。
 - 2026-09-30（Round 80）：新增固定区域事件环境调查专项，覆盖 interaction Schema/解析、默认踏入事件、方向/距离/视线、条件/一次性与云岭悬桥/落潮湾灯标真实格位；`npm run smoke:round-80`。
 - 2026-09-30（Round 81）：新增 336×224 超大舆图专项，锁定旧 12 层历史像素、六区及全部关口/地标/玩家投影，验证新拓展图素、Schema 最大尺寸、Puny World CC0 来源与适配视口；`npm run smoke:round-81`。
 - 2026-09-30（Round 84）：舆图当前扩至 384×256；逐格哈希守护旧 336×224 画布、更新八区投影兼容，并新增风回岛地图/关口/任务测试；`npm run smoke:round-84`。
 - 2026-09-30（Round 85）：舆图当前扩至 448×320；SHA-256 锁定旧 384×256 二十层像素和八个旧区域中心；新增潮生屿、低潮门控、跨岛任务及历史装配夹具，复用已登记 CC0 素材；`npm run smoke:round-85`。
+- 2026-09-30（Round 86）：新增逐行 RLE Schema/解码、密集 MOD 兼容、448×320 九区全景标签避让、潮生屿低潮遭遇与限量药囊/存档测试；`npm run smoke:round-86`（专项 6 文件/34 项）。

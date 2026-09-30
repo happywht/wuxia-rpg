@@ -7,6 +7,21 @@ export interface WorldAtlasPoint {
   y: number;
 }
 
+export interface WorldAtlasRegionLabelMeasurement {
+  mapResourceId: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface WorldAtlasRegionLabelPlacement {
+  x: number;
+  y: number;
+  originX: number;
+  originY: number;
+}
+
 export interface WorldAtlasRegionMarker {
   mapResourceId: string;
   name: string;
@@ -40,6 +55,79 @@ export interface WorldAtlasOverlays {
 
 /** Fraction of the overview's width/height occupied by one region's local extent. */
 export const WORLD_ATLAS_REGION_FOOTPRINT = 0.16;
+
+/**
+ * Places fixed-size map callouts without hiding region names at overview zoom.
+ * Labels prefer their traditional above-marker anchor, then try nearby sides
+ * in a stable order. The active region is placed first so crowded neighbors
+ * move around the player's current location rather than covering it.
+ */
+export function layoutWorldAtlasRegionLabels(
+  labels: readonly WorldAtlasRegionLabelMeasurement[],
+  bounds: { width: number; height: number },
+  primaryMapResourceId?: string,
+  gap = 4,
+): ReadonlyMap<string, WorldAtlasRegionLabelPlacement> {
+  const placed: Array<{ mapResourceId: string; left: number; top: number; right: number; bottom: number }> = [];
+  const result = new Map<string, WorldAtlasRegionLabelPlacement>();
+  const candidates = (label: WorldAtlasRegionLabelMeasurement): WorldAtlasRegionLabelPlacement[] => [
+    { x: label.x, y: label.y - 10, originX: 0.5, originY: 1 },
+    { x: label.x + label.width / 2 + 6, y: label.y, originX: 0, originY: 0.5 },
+    { x: label.x - label.width / 2 - 6, y: label.y, originX: 1, originY: 0.5 },
+    { x: label.x, y: label.y + 6, originX: 0.5, originY: 0 },
+    { x: label.x + label.width / 2 + 6, y: label.y - label.height / 2 - 4, originX: 0, originY: 1 },
+    { x: label.x - label.width / 2 - 6, y: label.y - label.height / 2 - 4, originX: 1, originY: 1 },
+    { x: label.x + label.width / 2 + 6, y: label.y + label.height / 2 + 4, originX: 0, originY: 0 },
+    { x: label.x - label.width / 2 - 6, y: label.y + label.height / 2 + 4, originX: 1, originY: 0 },
+  ];
+  const ordered = [...labels].sort((a, b) => {
+    if (a.mapResourceId === b.mapResourceId) return 0;
+    if (a.mapResourceId === primaryMapResourceId) return -1;
+    if (b.mapResourceId === primaryMapResourceId) return 1;
+    return labels.indexOf(a) - labels.indexOf(b);
+  });
+
+  for (const label of ordered) {
+    const options = candidates(label);
+    let selected: WorldAtlasRegionLabelPlacement | undefined;
+    let selectedBox: typeof placed[number] | undefined;
+    for (const option of options) {
+      const box = {
+        mapResourceId: label.mapResourceId,
+        left: option.x - label.width * option.originX,
+        top: option.y - label.height * option.originY,
+        right: option.x + label.width * (1 - option.originX),
+        bottom: option.y + label.height * (1 - option.originY),
+      };
+      const inside = box.left >= 0 && box.top >= 0 && box.right <= bounds.width && box.bottom <= bounds.height;
+      const overlaps = placed.some((other) =>
+        box.left < other.right + gap && box.right + gap > other.left &&
+        box.top < other.bottom + gap && box.bottom + gap > other.top,
+      );
+      if (inside && !overlaps) {
+        selected = option;
+        selectedBox = box;
+        break;
+      }
+    }
+
+    // A zoomed-in label can be partly clipped with its marker; keep that
+    // relationship when there is no fully visible collision-free position.
+    if (selected === undefined) {
+      selected = options[0]!;
+      selectedBox = {
+        mapResourceId: label.mapResourceId,
+        left: selected.x - label.width * selected.originX,
+        top: selected.y - label.height * selected.originY,
+        right: selected.x + label.width * (1 - selected.originX),
+        bottom: selected.y + label.height * (1 - selected.originY),
+      };
+    }
+    result.set(label.mapResourceId, selected);
+    placed.push(selectedBox!);
+  }
+  return result;
+}
 
 /** Stable cache key that naturally invalidates after a hot-reloaded atlas edit. */
 export function worldAtlasArtTextureKey(world: WorldMapAssembly): string | null {

@@ -365,6 +365,10 @@
     {"id":"kg.edge.r85-keeper-location","fromId":"char.r85-cen-yinjiao","toId":"map.round-85-tide-isle","relation":"locatedAt","summary":"岑隐礁在潮生屿松林边守礁。"},
     {"id":"kg.edge.r85-surveyor-quest","fromId":"char.r85-xie-zhaoting","toId":"quest.r85-low-tide-channel","relation":"participatesIn","summary":"谢照汀委托玩家勘测低潮礁道。"},
     {"id":"kg.edge.r85-quest-reef","fromId":"quest.r85-low-tide-channel","toId":"place.r85-reef-channel","relation":"requires","summary":"低潮礁道需要玩家趁低潮调查礁道。"},
-    {"id":"kg.edge.r85-quest-pool","fromId":"quest.r85-low-tide-channel","toId":"place.r85-tide-pool","relation":"rewards","summary":"完成低潮礁道后得知退潮石窝的方位。"}
+    {"id":"kg.edge.r85-quest-pool","fromId":"quest.r85-low-tide-channel","toId":"place.r85-tide-pool","relation":"rewards","summary":"完成低潮礁道后得知退潮石窝的方位。"},
+    {"id":"edge.r86-lu-yubai-supply","fromId":"char.r86-lu-yubai","toId":"place.r86-tide-isle-supply","relation":"locatedAt","summary":"陆余白在潮线药囊摊售卖有限补给。"},
+    {"id":"edge.r86-supply-isle","fromId":"place.r86-tide-isle-supply","toId":"place.r85-tide-isle","relation":"locatedAt","summary":"潮线药囊摊位于南溟·潮生屿内岸。"},
+    {"id":"edge.r86-raider-participates","fromId":"char.r86-heiqi-qi","toId":"event.r86-reef-raiders","relation":"participatesIn","summary":"黑鳍七在低潮时带人拦截礁道旅客。"},
+    {"id":"edge.r86-event-isle","fromId":"event.r86-reef-raiders","toId":"place.r85-tide-isle","relation":"locatedAt","summary":"低潮夺货发生在南溟·潮生屿东侧礁道。"}
   ]
 }

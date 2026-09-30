@@ -1,0 +1,47 @@
+{
+  "encounters": [
+    {
+      "id": "encounter.r86-reef-raiders",
+      "name": "礁道夺货客",
+      "mapResourceId": "map.round-85-tide-isle",
+      "position": {
+        "col": 57,
+        "row": 51
+      },
+      "profileId": "char.scribe-apprentice",
+      "knowledgeNodeId": "char.r86-heiqi-qi",
+      "tideIds": [
+        "tide.low"
+      ],
+      "enemy": {
+        "name": "黑鳍七",
+        "attributes": {
+          "body": 7,
+          "force": 8,
+          "agility": 8,
+          "insight": 5,
+          "resolve": 6
+        },
+        "health": 48,
+        "qi": 8,
+        "martialArtIds": [
+          "skill.jianghu-sanshou",
+          "skill.lanmen-daofa"
+        ]
+      },
+      "victoryExperience": 0,
+      "defeatRecovery": {
+        "healthRatio": 0.7,
+        "qiRatio": 0.65
+      },
+      "repeatable": true,
+      "texts": {
+        "approach": "退潮礁道上有人拦住去路，按 E 应战；涨潮后礁客会退回船边。",
+        "intro": "黑鳍七横刀挡在礁道中央：「潮水退了，这批船货就归我。」",
+        "victory": "黑鳍七被逼退到浪线外，暂时让出了窄道。",
+        "defeat": "你被黑鳍七压退到安全水线，潮声盖过了他的笑声。",
+        "flee": "你退回干燥处，黑鳍七仍在低潮礁道上徘徊。"
+      }
+    }
+  ]
+}
