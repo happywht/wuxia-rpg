@@ -191,6 +191,26 @@
       "schema": "quest-set"
     },
     {
+      "id": "map.round-92-north-pass",
+      "path": "maps/round-92-north-pass.json",
+      "schema": "grid-map"
+    },
+    {
+      "id": "npc.round-92-north-pass-set",
+      "path": "characters/round-92-north-pass-npcs.json",
+      "schema": "npc-set"
+    },
+    {
+      "id": "dialogue.round-92-north-pass-set",
+      "path": "dialogues/round-92-north-pass-conversations.json",
+      "schema": "dialogue-set"
+    },
+    {
+      "id": "quest.round-92-north-pass-set",
+      "path": "quests/round-92-north-pass-quests.json",
+      "schema": "quest-set"
+    },
+    {
       "id": "world.atlas",
       "path": "world/world-map.json",
       "schema": "world-map"

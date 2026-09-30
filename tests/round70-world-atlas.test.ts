@@ -68,6 +68,9 @@ describe('Round 70 continental world atlas', () => {
       } else if (region.mapResourceId === 'map.round-91-cloud-north-terrace') {
         const terraceLand = art.layers.find(({ id }) => id === 'world-r91-terrace-land')!.cells;
         expect(terraceLand[row]?.[col]).toBeGreaterThan(0);
+      } else if (region.mapResourceId === 'map.round-92-north-pass') {
+        const passSnow = art.layers.find(({ id }) => id === 'world-r92-pass-snow')!.cells;
+        expect(passSnow[row]?.[col]).toBeGreaterThan(0);
       } else if (region.mapResourceId === 'map.round-79-isles') {
         const shoalLand = art.layers.find(({ id }) => id === 'world-r79-shoal-land')!.cells;
         expect(shoalLand[row]?.[col]).toBeGreaterThan(0);
@@ -91,6 +94,11 @@ describe('Round 70 continental world atlas', () => {
         } else if (endpoint.mapResourceId === 'map.round-91-cloud-north-terrace') {
           // Round 91 gates may land on the plateau floor or the rim trail.
           const painted = ['world-r91-terrace-land', 'world-r91-terrace-route', 'world-r91-terrace-cliffs']
+            .some((layerId) => (art.layers.find(({ id }) => id === layerId)?.cells[cell.row]?.[cell.col] ?? 0) > 0);
+          expect(painted, `${transition.id} endpoint on bare atlas`).toBe(true);
+        } else if (endpoint.mapResourceId === 'map.round-92-north-pass') {
+          // Round 92 gates land on the snow field, the packed trail or the rim.
+          const painted = ['world-r92-pass-snow', 'world-r92-pass-route', 'world-r92-pass-detail']
             .some((layerId) => (art.layers.find(({ id }) => id === layerId)?.cells[cell.row]?.[cell.col] ?? 0) > 0);
           expect(painted, `${transition.id} endpoint on bare atlas`).toBe(true);
         } else if (endpoint.mapResourceId === 'map.round-79-isles') {

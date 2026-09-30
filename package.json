@@ -71,6 +71,7 @@
     "generate:round-86-tide-isle": "node scripts/generate-round86-tide-isle.mjs",
     "generate:round-87-southwest-isles": "node scripts/generate-round87-southwest-isles.mjs",
     "generate:round-91-cloud-north-terrace": "node scripts/generate-round91-cloud-north-terrace.mjs",
+    "generate:round-92-north-pass": "node scripts/generate-round92-north-pass.mjs",
     "smoke:round-81": "vitest run tests/round81-world-atlas.test.ts tests/round79-island-region.test.ts tests/round51-map-viewport.test.ts",
     "smoke:round-82": "vitest run tests/round82-east-coast.test.ts tests/round81-world-atlas.test.ts tests/round79-island-region.test.ts tests/round74-cloud-ridge.test.ts tests/round80-region-interactions.test.ts",
     "smoke:round-83": "vitest run tests/round83-east-coast-town.test.ts tests/round82-east-coast.test.ts tests/round81-world-atlas.test.ts tests/round80-region-interactions.test.ts",
@@ -82,6 +83,7 @@
     "smoke:round-89": "vitest run tests/round89-cross-region-route.test.ts tests/round88-mist-schedule.test.ts tests/round87-southwest-isles.test.ts tests/round82-east-coast.test.ts tests/round80-region-interactions.test.ts tests/world-map.test.ts",
     "smoke:round-90": "vitest run tests/round90-region-arrivals.test.ts tests/round89-cross-region-route.test.ts tests/round82-east-coast.test.ts tests/round74-cloud-ridge.test.ts tests/world-map.test.ts",
     "smoke:round-91": "vitest run tests/round91-cloud-north-terrace.test.ts tests/round87-southwest-isles.test.ts tests/round86-world-atlas-rle.test.ts tests/round86-world-atlas-labels.test.ts tests/round74-cloud-ridge.test.ts tests/round51-map-viewport.test.ts",
+    "smoke:round-92": "vitest run tests/round92-north-pass.test.ts tests/round91-cloud-north-terrace.test.ts tests/round87-southwest-isles.test.ts tests/round86-world-atlas-rle.test.ts tests/round86-world-atlas-labels.test.ts tests/round74-cloud-ridge.test.ts tests/round51-map-viewport.test.ts",
     "smoke:round-76": "vitest run tests/round76-region-landmark-art.test.ts",
     "smoke:round-77": "vitest run tests/round77-character-art.test.ts"
   },

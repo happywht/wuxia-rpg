@@ -24,8 +24,8 @@ const rawWorld = readJson('../data/base/world/world-map.json');
 
 /**
  * SHA-256 over `JSON.stringify(cells)` of every atlas layer captured from the
- * Round 87 expansion (512×384 dense matrices); the RLE conversion must decode
- * back to these exact matrices, cell for cell.
+ * dense migration and later append-only region rounds; the RLE conversion must
+ * decode back to these exact matrices, cell for cell.
  */
 const denseLayerHashes: Record<string, string> = {
 "world-ocean": "8db1c12c69c2bf1cc350c299ebd71952e4aab1bcee7d13d5f57785c0a72429d3",
@@ -61,6 +61,11 @@ const denseLayerHashes: Record<string, string> = {
   "world-r91-terrace-walls": "04458ab4711364524af78eaa43130f94bf63d1775999eb146c387ebccbae3f49",
   "world-r91-terrace-detail": "b6052cb8366fbdbc7ce13e521bb729bb8672ce6a847c0bc7cf22bdcf5ad69064",
   "world-r91-terrace-route": "0834aa69e253f6cc24cecc0db01f234d708ee880ad1053c70d8edc5c019df89a",
+  "world-r92-pass-snow": "fe2dafb156b95c67f199c249e5633b1da28ab5ed88b999f75b8a39f99b3bd404",
+  "world-r92-pass-trees": "c459bc00db2261bc5e542227de1adc6a335276ae0b2b85e032eef2b40fd9ebc6",
+  "world-r92-pass-walls": "17337604e8923eab70fbc43b4714113c0d5be642efca54d9b875e33073cb20f5",
+  "world-r92-pass-detail": "e5c7f85b687bac8c39572951293f04b5b7efa1c87e3331d9a6b068ad5a311af6",
+  "world-r92-pass-route": "e81f7a388bd70675a45b54584e8226b65bde32400a4339057fd3d06102aeab19",
 };
 
 const CANONICAL_ROW = /^[1-9][0-9]*:(0|[1-9][0-9]*)(,[1-9][0-9]*:(0|[1-9][0-9]*))*$/;
@@ -106,7 +111,7 @@ describe('Round 86 world-atlas row-RLE wire protocol', () => {
     expect(validate(rawWorld), JSON.stringify(validate.errors)).toBe(true);
 
     const art = rawWorld.atlasArt;
-    expect(art.layers).toHaveLength(33);
+    expect(art.layers).toHaveLength(38);
     for (const layer of art.layers) {
       expect(layer.cells, layer.id).toBeUndefined();
       expect(layer.cellsRle, layer.id).toHaveLength(art.rows);

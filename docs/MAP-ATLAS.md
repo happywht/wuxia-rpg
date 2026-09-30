@@ -1,6 +1,6 @@
 # 世界舆图与区域旅行
 
-Round 10 将单张网格地图扩展为资料驱动的区域集合；Round 79 新增第六张东海群岛·落潮湾；Round 81 将可移动总图扩至 336×224；Round 82 新增第七张东溟海岸·青帆埠；Round 83 丰富港镇居民、商店和任务；Round 84 将总图扩至 384×256 并新增风回岛；Round 85 将总图扩至 448×320 并新增第九张南溟·潮生屿；Round 86 将 24 层总图改用 RLE 储存并优化全景区域标签；Round 87 将总图扩至 512×384、28 层并新增西南列岛·雾航湾；Round 89 为青帆埠东岸加入发现后显示的旧水槽潮路标记与跨区任务目标；Round 91 将总图扩至 640×448、33 个 RLE 图层并新增云岭北台·雁回崖。当前玩家可在十一区总览与当前区域细图间切换，拖动、缩放和方向键平移。地图尺寸、碰撞、分层贴图、区域命名、地标、关口端点和区域事件仍由 `data/` 声明；引擎只执行通用协议。
+Round 10 将单张网格地图扩展为资料驱动的区域集合；Round 79 新增第六张东海群岛·落潮湾；Round 81 将可移动总图扩至 336×224；Round 82 新增第七张东溟海岸·青帆埠；Round 83 丰富港镇居民、商店和任务；Round 84 将总图扩至 384×256 并新增风回岛；Round 85 将总图扩至 448×320 并新增第九张南溟·潮生屿；Round 86 将 24 层总图改用 RLE 储存并优化全景区域标签；Round 87 将总图扩至 512×384、28 层并新增西南列岛·雾航湾；Round 89 为青帆埠东岸加入发现后显示的旧水槽潮路标记与跨区任务目标；Round 91 将总图扩至 640×448、33 个 RLE 图层并新增云岭北台·雁回崖；Round 92 保持画布尺寸和旧层不变，再增 5 层北境雪带图素并新增照雪关。当前玩家可在十二处区域总览与当前区域细图间切换，拖动、缩放和方向键平移。地图尺寸、碰撞、分层贴图、区域命名、地标、关口端点和区域事件仍由 `data/` 声明；引擎只执行通用协议。
 
 ## Round 89：雾航湾至东汊旧水槽
 
@@ -109,10 +109,11 @@ Round 10 将单张网格地图扩展为资料驱动的区域集合；Round 79 �
 | `map.round-85-tide-isle` | 南溟·潮生屿 | (63.38028169, 62.63982103) | 100×100 | (2, 50) | `.`、`,` 可走；`~` 海水与 `#` 松林/礁石阻挡 |
 | `map.round-87-southwest-isles` | 西南列岛·雾航湾 | (10.95461659, 77.18120805) | 100×100 | (2, 50) | `.`、`,` 可走；`~` 海水与 `#` 松林/礁石阻挡 |
 | `map.round-91-cloud-north-terrace` | 云岭北台·雁回崖 | (90.14084507, 21.47651007) | 100×100 | (50, 97) | `.`、`,` 可走；`#` 峭壁阻挡 |
+| `map.round-92-north-pass` | 北境·照雪关 | (90.14084507, 5.36912752) | 100×100 | (50, 97) | `.`、`,`、`=` 可走；`#`、`~` 冰崖/山体阻挡 |
 
-- 世界图 `world.atlas` 的 `startingMapResourceId` 为 `map.round-01-grid`；十一张地图的 `id` 均与 manifest 资源 id 一致，地图格尺寸均为 48 世界像素。
-- 十一张百格大地图均将 16×16 素材格最近邻放大至 48×48 世界像素；独立画面层从 Tiled GID 绘制（Round 76 后起始图八层，其他旧区域图各十一层，Round 79、82、84、85、87 海岛/海岸各四层），移动碰撞始终只看 `grid`，不会根据美术像素推断阻挡。
-- 玩家行走在十一张百格大地图时镜头均跟随并限制在地图范围内；地图视觉对象显式采用世界滚动系数，不继承场景为 HUD 设定的固定坐标。HUD、面板与天气覆盖层固定在画面上。
+- 世界图 `world.atlas` 的 `startingMapResourceId` 为 `map.round-01-grid`；十二张地图的 `id` 均与 manifest 资源 id 一致，地图格尺寸均为 48 世界像素。
+- 十二张百格大地图均将 16×16 素材格最近邻放大至 48×48 世界像素；独立画面层从 Tiled GID 绘制（Round 76 后起始图八层，其他旧区域图各十一层，Round 79、82、84、85、87 海岛/海岸各四层，Round 92 北境使用分层雪地/冰河/关墙图素），移动碰撞始终只看 `grid`，不会根据美术像素推断阻挡。
+- 玩家行走在十二张百格大地图时镜头均跟随并限制在地图范围内；地图视觉对象显式采用世界滚动系数，不继承场景为 HUD 设定的固定坐标。HUD、面板与天气覆盖层固定在画面上。
 - 芦苇河滩（`place.reedbank`）仍是知识图谱地点词条而非地图资源：第三张 `grid-map` 是铁嶂北道，河滩不可旅行，详见 [`WORLD-SETTING.md`](WORLD-SETTING.md) §2。
 
 ## 关口端点
@@ -141,6 +142,8 @@ Round 10 将单张网格地图扩展为资料驱动的区域集合；Round 79 �
 | `gate.r87-southwest-to-isles` | 东北归帆 | `map.round-87-southwest-isles` · (1, 50) | `map.round-79-isles` · (6, 31) |
 | `gate.r91-cloud-ridge-to-terrace` | 北台栈道 | `map.round-74-cloud-ridge` · (62, 2) | `map.round-91-cloud-north-terrace` · (50, 97) |
 | `gate.r91-terrace-to-cloud-ridge` | 南归栈道 | `map.round-91-cloud-north-terrace` · (49, 97) | `map.round-74-cloud-ridge` · (63, 2) |
+| `gate.r92-terrace-to-north-pass` | 北境栈道 | `map.round-91-cloud-north-terrace` · (50, 2) | `map.round-92-north-pass` · (50, 97) |
+| `gate.r92-north-pass-to-terrace` | 南归雪道 | `map.round-92-north-pass` · (49, 97) | `map.round-91-cloud-north-terrace` · (49, 2) |
 
 引擎装配规则（`src/engine/world-map.ts` 的 `assembleWorldMap`）：`from` 端点必须可走**且不得位于该图玩家出生格**；`to` 落点必须可走；两端地图必须都已登记进 `regions`。任一不满足即整条关口禁用并给出警告，不影响其他关口。协议不自动推断双向旅行——往返必须像上表一样显式声明两条记录。
 
@@ -189,6 +192,10 @@ Round 10 将单张网格地图扩展为资料驱动的区域集合；Round 79 �
 | `event.r91-goose-bridge` | `map.round-91-cloud-north-terrace` · (50, 48) | 踏入 | 是 | 无 | `place.r91-goose-bridge`（悬空雁桥） |
 | `event.r91-goose-terrace` | `map.round-91-cloud-north-terrace` · (50, 12) | 邻近按 E 调查 | 是 | 时段 晨光/日中/午后 | `place.r91-goose-terrace`（观雁台） |
 | `event.r91-goose-stone` | `map.round-91-cloud-north-terrace` · (82, 28) | 踏入 | 是 | 无 | `place.r91-goose-stone`（雁栖石） |
+| `event.r92-arrival` | `map.round-92-north-pass` · (50, 97) | 踏入 | 是 | 无 | `place.r92-north-pass`（北境·照雪关） |
+| `event.r92-mirror-river` | `map.round-92-north-pass` · (50, 49) | 踏入 | 是 | 无 | `place.r92-mirror-river`（镜面冰河） |
+| `event.r92-snow-beacon` | `map.round-92-north-pass` · (58, 23) | 黄昏/入夜/子夜、落雪时邻近按 E 调查 | 是 | 时段 黄昏/入夜/子夜；天气 落雪 | `place.r92-snow-beacon`（照雪烽燧） |
+| `event.r92-north-cairn` | `map.round-92-north-pass` · (50, 8) | 踏入 | 是 | 无 | `place.r92-north-cairn`（北界碑） |
 
 `interaction` 声明 `prompt`、可选曼哈顿距离 `range`（1–4，省略按 1 格）和可选 `approachDirections`（从玩家格朝向目标格的 `down/left/right/up`；省略表示四向均可）。调查目标必须与玩家同一行或同一列；两格以上时，中间地形必须可走且不能被 NPC/遭遇占用。交互只在提示、方向/距离、事件条件和一次性状态同时允许时出现，并在按 E 后复用固定事件文本、一次性完成记账及知识发现。含 `interaction` 的事件不会因走上目标格而自动结算。未声明该字段的旧世界图事件仍按原有踏入触发路径工作。
 
@@ -364,3 +371,10 @@ Round 79 新增第六块 100×100 海岛地图「东海群岛·落潮湾」，�
 - 新增第十一张 100×100「云岭北台·雁回崖」地图，8 个美术层使用 Ansimuz Tiny RPG Mountain CC0 山地/桥梁 PNG，碰撞由独立 `grid` 定义。云岭古道 `(62,2)` 通往北台 `(50,97)`，回程北台 `(49,97)` 到古道 `(63,2)`；入口可达聂栖雁 `(50,20)`、观雁台调查点、雁栖石与返程关口。
 - 聂栖雁按七时段活动，发布「崖台雁候」：抵达北台后，于晨光/日中/午后调查观雁台，再返回交付；奖励 32 经验、24 银两和雁栖石见闻。人物、对白、任务、事件和图谱均为独立数据资源。
 - `npm run generate:round-91-cloud-north-terrace` 确定性重建；`npm run smoke:round-91` 覆盖旧图层/锚点稳定、双向路径、资料闭环、素材授权与生成器幂等。浏览器操作记录见本轮 DEVLOG。
+
+## Round 92：北境·照雪关与雪带图层
+
+- 舆图仍为 640×448 格，图层从 33 增至 38。`world-r92-pass-snow`、`trees`、`walls`、`detail`、`route` 五层都只在雁回崖以北留白绘制；Round 92 专项逐格核对原 33 层、旧区域中心和新标记，避免北境雪层盖住旧地貌。
+- 新增第十二张 100×100 地图「北境·照雪关」。自雁回崖 `(50,2)` 经北境栈道进入 `(50,97)`，返程从照雪关 `(49,97)` 走南归雪道抵达雁回崖 `(49,2)`；冰河、山脊、关墙及烽燧的阻挡在独立 `grid`，贴图不承担碰撞。生成器统计 7,740 个可行格且逐格可由入口到达。
+- 雪地与冰面细节来自 OpenGameArt zaphgames Winter Tileset；实际只引用目检确认的 18 个唯一 0 基帧，空白、chroma-key 与黑占位均排除。雪松、岩坎、城关和冰河分层，角色继续使用既有 CC0 Puny Characters 图集。来源、许可文本和发行白名单见 [`REFERENCES.md`](REFERENCES.md)。
+- 新增守烽人谷照雪（七时段日程）、「雪燧传烽」和 4 个区域发现事件；任务要求先抵达北境，在落雪日的黄昏/入夜/子夜调查烽燧，再回到谷照雪处复命。角色、任务、对白、触发条件和图谱见独立资料，测试命令为 `npm run smoke:round-92`。

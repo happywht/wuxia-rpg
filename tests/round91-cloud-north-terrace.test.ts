@@ -90,7 +90,7 @@ describe('Round 91 Cloud Ridge North Terrace', () => {
 
     const art = parsed.data.atlasArt!;
     expect([art.columns, art.rows, art.tileSize]).toEqual([640, 448, 16]);
-    expect(art.layers).toHaveLength(33);
+    expect(art.layers).toHaveLength(38);
     const layers = new Map(art.layers.map((layer) => [layer.id, layer]));
     for (const [id, expectedHash] of Object.entries(baseline.layers)) {
       const layer = layers.get(id);

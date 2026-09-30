@@ -80,8 +80,8 @@ describe('Round 84 Windward Isle and expanded world atlas', () => {
     expect(parsed.ok).toBe(true);
     if (!parsed.ok || parsed.data.atlasArt === undefined) return;
     expect(parsed.data.atlasArt).toMatchObject({ columns: 640, rows: 448, tileSize: 16 });
-    expect(parsed.data.regions).toHaveLength(11);
-    expect(parsed.data.transitions).toHaveLength(20);
+    expect(parsed.data.regions).toHaveLength(12);
+    expect(parsed.data.transitions).toHaveLength(22);
 
     const region = parsed.data.regions.find(({ mapResourceId }) => mapResourceId === ISLE_ID)!;
     const col = Math.round(region.atlasPosition.x / 100 * (parsed.data.atlasArt.columns - 1));
@@ -92,8 +92,13 @@ describe('Round 84 Windward Isle and expanded world atlas', () => {
     expect(land.cells.flat().filter((gid) => gid > 0).length).toBeGreaterThan(2_000);
 
     const oldArea = parsed.data.atlasArt.layers.filter(({ id }) => !id.startsWith('world-r84-') && !id.startsWith('world-r85-') && !id.startsWith('world-r87-') &&
-      !id.startsWith('world-r91-'));
-    expect(oldArea).toHaveLength(16);
+      !id.startsWith('world-r91-') && !id.startsWith('world-r92-'));
+    expect(oldArea.map(({ id }) => id)).toEqual([
+      'world-ocean', 'world-land', 'world-coast', 'world-forest', 'world-relief', 'world-roads', 'world-settlements',
+      'world-r79-shoal-water', 'world-r79-shoal-sand', 'world-r79-shoal-land', 'world-r79-shoal-pines',
+      'world-r79-gate-routes',
+      'world-r81-expanse-water', 'world-r81-expanse-sand', 'world-r81-expanse-land', 'world-r81-expanse-pines',
+    ]);
     expect(oldArea.every((layer) => layer.cells.length === 448 && layer.cells.every((line) => line.length === 640))).toBe(true);
   });
 

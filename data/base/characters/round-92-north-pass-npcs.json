@@ -1,0 +1,73 @@
+{
+  "npcs": [
+    {
+      "id": "char.r92-gu-zhaoxue",
+      "name": "谷照雪",
+      "mapResourceId": "map.round-92-north-pass",
+      "position": {
+        "col": 50,
+        "row": 26
+      },
+      "dialogueId": "dlg.r92-gu-zhaoxue-vigil",
+      "questGiver": true,
+      "spriteFrame": 64,
+      "spriteFrames": {
+        "down": 64,
+        "right": 72,
+        "up": 80,
+        "left": 88
+      },
+      "schedule": [
+        {
+          "periodId": "period.midnight",
+          "position": {
+            "col": 51,
+            "row": 27
+          }
+        },
+        {
+          "periodId": "period.dawn",
+          "position": {
+            "col": 58,
+            "row": 24
+          }
+        },
+        {
+          "periodId": "period.morning",
+          "position": {
+            "col": 50,
+            "row": 26
+          }
+        },
+        {
+          "periodId": "period.midday",
+          "position": {
+            "col": 50,
+            "row": 26
+          }
+        },
+        {
+          "periodId": "period.afternoon",
+          "position": {
+            "col": 52,
+            "row": 28
+          }
+        },
+        {
+          "periodId": "period.dusk",
+          "position": {
+            "col": 58,
+            "row": 24
+          }
+        },
+        {
+          "periodId": "period.night",
+          "position": {
+            "col": 51,
+            "row": 27
+          }
+        }
+      ]
+    }
+  ]
+}

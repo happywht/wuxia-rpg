@@ -90,3 +90,8 @@ Kenney 的许可 FAQ 明确说明 Kenney.nl 提供的素材可在 CC0 条款下�
 
 - **OpenGameArt Ansimuz Tiny RPG Mountain Tileset**： [素材页](https://opengameart.org/content/tiny-rpg-mountain-tileset)，[源压缩包](https://opengameart.org/sites/default/files/tiny_rpg_mountain_files.zip)。页面标记 CC0；包内原始 `public-license.txt` 允许个人/商业使用、修改、再分发且不要求署名。
 - 实际使用 `data/assets/opengameart/tiny-rpg-mountain/tileset.png`（368×128，23×8 个 16px 格）与 `bridge.png`（160×80，10×5 个 16px 格），为雁回崖地图地貌/桥梁层和 640×448 舆图扩展提供山崖、石阶与木桥图素。发行只包含运行时引用 PNG、原许可和 NOTICE；未带入预览图或 Aseprite 源。
+
+### Round 92 新增素材
+
+- **OpenGameArt zaphgames Winter Tileset [16x16]**： [素材页](https://opengameart.org/content/winter-tileset-16x16)，[源 PNG](https://opengameart.org/sites/default/files/snowy_tileset_zaph_0.png)。页面明确标注 CC0（作者原话 "I'll make it CC0-license so you guys can do whatever"）；随素材附带 CC0 1.0 通用法律文本 `CC0-1.0.txt`。
+- 实际使用 `data/assets/opengameart/winter-tileset-zaph/tileset.png`（256×256，16×16 个 16px 格，RGBA；SHA-256 cf8371e2a8418ea16d25e997affab5e9a6a3e954aacaf8e015c467b1004f4dd1），为照雪关地图雪原/冰河/关墙/烽燧层和 640×448 舆图北部留白提供雪面、冰面、雪松、石墙与冰崖图素。生成器只使用经逐帧目检的 18 个唯一帧（0 基编号：0、1、2、16–18、32、48、51、64、67、80、96、105–109）；未经使用的图块、玫红 chroma-key 格、纯黑占位与大片空白均不进入资料引用。发行仅包含运行时引用 PNG、CC0 法律文本和 NOTICE；未带入预览图或作者源文件。

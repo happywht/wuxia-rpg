@@ -1,0 +1,40 @@
+{
+  "quests": [
+    {
+      "id": "quest.r92-snow-beacon",
+      "name": "雪燧传烽",
+      "description": "守烽人谷照雪请你北上越过镜面冰河，在黄昏、入夜或子夜的落雪天登上照雪烽燧点验本季烽号，把燧书带回给她。",
+      "giverNpcId": "char.r92-gu-zhaoxue",
+      "objectives": [
+        {
+          "id": "objective.r92-arrive-north-pass",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r92-north-pass",
+          "requiredCount": 1,
+          "text": "从雁回崖北境栈口进入照雪关"
+        },
+        {
+          "id": "objective.r92-verify-snow-beacon",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r92-snow-beacon",
+          "requiredCount": 1,
+          "text": "落雪日的黄昏、入夜或子夜，在照雪烽燧点验烽号"
+        },
+        {
+          "id": "objective.r92-report-gu-zhaoxue",
+          "kind": "talkToNpc",
+          "targetId": "char.r92-gu-zhaoxue",
+          "requiredCount": 1,
+          "text": "把燧书带回给谷照雪"
+        }
+      ],
+      "rewards": {
+        "experience": 34,
+        "currency": 26,
+        "discoverKnowledgeNodeIds": [
+          "place.r92-north-cairn"
+        ]
+      }
+    }
+  ]
+}

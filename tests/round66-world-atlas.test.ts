@@ -44,6 +44,8 @@ describe('Round 81 global world atlas art and projection', () => {
       'world-r87-expanse-land', 'world-r87-expanse-pines',
       'world-r91-terrace-land', 'world-r91-terrace-cliffs', 'world-r91-terrace-walls',
       'world-r91-terrace-detail', 'world-r91-terrace-route',
+      'world-r92-pass-snow', 'world-r92-pass-trees', 'world-r92-pass-walls',
+      'world-r92-pass-detail', 'world-r92-pass-route',
     ]);
     const tilesets = new Map(art.tilesets.map((tileset) => [tileset.id, tileset]));
     expect(tilesets.has('kenney.roguelike-rpg')).toBe(true);

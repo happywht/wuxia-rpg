@@ -1,0 +1,91 @@
+{
+  "conversations": [
+    {
+      "id": "dlg.r92-gu-zhaoxue-vigil",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "关墙下的石屋里，守烽人谷照雪正把松明捆上燧杆，见你踩雪进来，拍了拍身边的木墩：「北境照雪关，三十年没有生人从雁回崖那边走上来了。你若肯替我上一回燧，把这季的烽号点验清楚，屋里的烈酒分你一坛。」",
+          "options": [
+            {
+              "text": "燧书我点。",
+              "nextNodeId": "accepted",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r92-snow-beacon",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r92-snow-beacon"
+                }
+              ]
+            },
+            {
+              "text": "燧书已经验回来了。",
+              "nextNodeId": "completed",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r92-snow-beacon",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "我正要上燧点验。",
+              "nextNodeId": "active",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r92-snow-beacon",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "烽燧怎么走？",
+              "nextNodeId": "route"
+            },
+            {
+              "text": "你在关里守什么？",
+              "nextNodeId": "keeper"
+            },
+            {
+              "text": "改日再谈。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "accepted",
+          "text": "「出关门往北，先过镜面冰河——认准中渡那条踏痕走，两岸的冰缝蓝得发黑，掉下去神仙也捞不上来。过河后石径直上，燧在关墙外东北的高台上。点验要挑落雪日的黄昏、入夜或子夜，雪光映着火号，三里外都数得清。在燧下按 E 记全三烽，回来找我。」"
+        },
+        {
+          "id": "active",
+          "text": "「记住了：只走中渡，只在落雪日暮夜点验。三烽一号不点全，燧书就作废。我在这儿给你温着酒。」"
+        },
+        {
+          "id": "completed",
+          "text": "谷照雪接过燧书，凑在灯下逐烽核对，忽然笑出一口白气：「三烽全对，火色还比去年亮——北境这条线，还活着。」她把一坛烈酒墩在你面前，酒封上落着经年的雪印。"
+        },
+        {
+          "id": "route",
+          "text": "「南栈口进来一路向北，冰河中渡有踏痕；过了河是关门，我就在门里住。燧台在东北高处，台南留了踏脚的雪坡。再往北走到雪原尽头，有块北界碑——界外就不是大梁的地图了。」"
+        },
+        {
+          "id": "keeper",
+          "text": "「谷家四代守这盏燧。烽号是北境的命：雪原上什么都会白得一样，只有火不会。祖父说，只要照雪烽还亮着，山下的人就知道关外还有人。」"
+        },
+        {
+          "id": "farewell",
+          "text": "谷照雪重新背起燧杆，向东北高台的方向走去，靴印在雪地里拖出长长一行。"
+        }
+      ]
+    }
+  ]
+}

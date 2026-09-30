@@ -812,6 +812,17 @@
     {"id":"event.r91-arrival","kind":"event","title":"初登北台","summary":"从断云栈道北端栈口首次踏上云岭北台。","knownByDefault":false},
     {"id":"event.r91-goose-bridge","kind":"event","title":"雁桥听风","summary":"在悬空雁桥上听清守雁人数雁的旧路。","knownByDefault":false},
     {"id":"event.r91-goose-terrace","kind":"event","title":"台心记雁","summary":"白日在观雁台心记下头雁的一字阵形。","knownByDefault":false},
-    {"id":"event.r91-goose-stone","kind":"event","title":"雁石旧约","summary":"在雁栖石下发现守雁人的清水旧约。","knownByDefault":false}
+    {"id":"event.r91-goose-stone","kind":"event","title":"雁石旧约","summary":"在雁栖石下发现守雁人的清水旧约。","knownByDefault":false},
+    {"id":"map.round-92-north-pass","kind":"place","title":"北境照雪关探索地图","summary":"从雁回崖北境栈口可入的照雪关百格地图。","knownByDefault":false},
+    {"id":"place.r92-north-pass","kind":"place","title":"北境·照雪关","summary":"雁回崖以北的极北雪原，冰河、关墙与烽燧守着版图北界。","knownByDefault":false},
+    {"id":"place.r92-mirror-river","kind":"place","title":"镜面冰河","summary":"横过照雪关中部的封冻冰河，只有中渡踏痕可以过人。","knownByDefault":false},
+    {"id":"place.r92-snow-beacon","kind":"place","title":"照雪烽燧","summary":"关墙外东北高台上的石燧，雪夜烽号三里外可见。","knownByDefault":false},
+    {"id":"place.r92-north-cairn","kind":"place","title":"北界碑","summary":"雪原尽头的界碑，刻着大梁北界的极限。","knownByDefault":false},
+    {"id":"char.r92-gu-zhaoxue","kind":"character","title":"谷照雪","summary":"谷家第四代守烽人，在照雪关的石屋里守着北境烽号。","knownByDefault":false},
+    {"id":"quest.r92-snow-beacon","kind":"quest","title":"雪燧传烽","summary":"越过镜面冰河在照雪烽燧点验烽号，把燧书带回给谷照雪。","knownByDefault":false},
+    {"id":"event.r92-arrival","kind":"event","title":"初入照雪关","summary":"从雁回崖北境栈口首次踏上北境雪原。","knownByDefault":false},
+    {"id":"event.r92-mirror-river","kind":"event","title":"冰河中渡","summary":"在镜面冰河中渡认清守关人拖粮的旧线。","knownByDefault":false},
+    {"id":"event.r92-snow-beacon","kind":"event","title":"雪夜点燧","summary":"落雪日暮夜在照雪烽燧点验本季烽号。","knownByDefault":false},
+    {"id":"event.r92-north-cairn","kind":"event","title":"界碑读雪","summary":"在北界碑下读出大梁版图的北限。","knownByDefault":false}
   ]
 }

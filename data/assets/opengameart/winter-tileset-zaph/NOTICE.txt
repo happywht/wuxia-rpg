@@ -1,0 +1,21 @@
+Winter Tileset [16x16] by zaphgames (OpenGameArt.org)
+Source page: https://opengameart.org/content/winter-tileset-16x16
+Source image: https://opengameart.org/sites/default/files/snowy_tileset_zaph_0.png
+License: CC0 1. Universal (Creative Commons public domain dedication),
+as stated on the OpenGameArt page; the full CC0 1.0 legal text is shipped
+alongside this file as CC0-1.0.txt.
+
+This directory ships the unmodified source PNG actually referenced by the
+game data plus the CC0 legal text:
+- tileset.png (256x256, 16x16 grid of 16px cells, RGBA; SHA-256
+  cf8371e2a8418ea16d25e997affab5e9a6a3e954aacaf8e015c467b1004f4dd1) —
+  snow fields, ice sheets, snow pines, stone walls, wooden fences, ice
+  cliffs and lamp/wood accents used by the Round 92 "North Reach -
+  Snowlit Pass" (北境·照雪关) map layers and the 640x448 world overview
+  extension drawn inside the previously blank northern band.
+
+The game data references only the following 18 unique, visually reviewed
+zero-based frames from this sheet: 0, 1, 2, 16-18, 32, 48, 51, 64, 67, 80,
+96, and 105-109. Other sheet cells—including magenta chroma-key filler,
+solid-black filler, and blank cells—are not referenced. No preview images or
+source files from the author are shipped.

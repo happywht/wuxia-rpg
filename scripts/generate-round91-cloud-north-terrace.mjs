@@ -378,8 +378,11 @@ const tilesetById = new Map(tilesets.map((entry) => [entry.id, entry]));
 const actorTileset = tilesetById.get(actorId);
 
 // 布局锚点：南口入山/回程、三座跨涧木桥、观雁台与守雁人、雁栖石。
+// Round 92 起北界另开「北境栈口」，衔接照雪关的双向步行关口。
 const start = at(50, 97);
 const terraceReturn = at(49, 97);
+const terraceNorthGate = at(50, 2);
+const terraceNorthArrival = at(49, 2);
 const keeperPosition = at(50, 20);
 const platformEventCell = at(50, 12);
 const bridgeEventCell = at(50, 48);
@@ -429,7 +432,7 @@ const landmarks = [
   { id: 'landmark.r91-goose-terrace', mapResourceId: mapId, ...platformEventCell, name: '观雁台', category: 'other', discoveryNodeId: nodeIds.platform },
   { id: 'landmark.r91-goose-stone', mapResourceId: mapId, ...stoneEventCell, name: '雁栖石', category: 'other', discoveryNodeId: nodeIds.stone },
 ];
-for (const point of [start, terraceReturn, keeperPosition, platformEventCell, bridgeEventCell, stoneEventCell]) {
+for (const point of [start, terraceReturn, terraceNorthGate, terraceNorthArrival, keeperPosition, platformEventCell, bridgeEventCell, stoneEventCell]) {
   reserveAnchor('人物/关口/地标', point, 2);
 }
 for (const landmark of landmarks) reserveAnchor('地标 ' + landmark.id, landmark, 1);
@@ -502,7 +505,9 @@ for (let row = 0; row < rows; row += 1) {
     const road = roads.has(cellKey);
     const anchor = anchors.has(cellKey);
     const southGate = col >= 48 && col <= 52;
-    const boundary = col < 3 || row < 3 || col > 96 || (row > 96 && !southGate);
+    // 北境栈口与南口同宽，Round 92 的照雪关关口由此接入。
+    const northGate = col >= 48 && col <= 52;
+    const boundary = col < 3 || col > 96 || (row > 96 && !southGate) || (row < 3 && !northGate);
     const onPlatformWall = insidePlatform(col, row) && (
       row === platform.row || row === platform.row + platform.rows - 1 ||
       col === platform.col || col === platform.col + platform.columns - 1
@@ -599,7 +604,7 @@ function reachableFrom(origin, mapGridRows, mapColumns, mapRows, label) {
   return reached;
 }
 const reachable = reachableFrom(start, mapGrid, columns, rows, '雁回崖');
-for (const point of [terraceReturn, keeperPosition, platformEventCell, bridgeEventCell, stoneEventCell]) {
+for (const point of [terraceReturn, terraceNorthGate, terraceNorthArrival, keeperPosition, platformEventCell, bridgeEventCell, stoneEventCell]) {
   if (!reachable.has(key(point.col, point.row))) throw new Error('雁回崖锚点不可达：' + key(point.col, point.row));
 }
 // 观雁台是 E 键调查点：事件格自身可走，且至少一个正交邻格从入口可达。

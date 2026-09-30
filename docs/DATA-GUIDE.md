@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：截至 Round 91；基础世界含 28 名 NPC、5 个门派、55 项任务、52 件物品、30 种武学、图谱汇总为 297 个图谱节点/403 条边，manifest 登记 71 项资源。十一张区域地图均为 100×100 格；全域舆图为 640×448、33 层并以 RLE 保存。气候资源可声明轻雾粒子表现；航路人物、目的地发现门控、青帆埠调查事件和返程任务阶段由独立 JSON 声明，漫游奇遇可按 `trigger: regionArrival` 与 `transitionIds` 声明入境关口抵达触发，读档后 NPC 日程仍由时间派生，不新增存档字段。素材授权、MOD 和导航协议见 `REFERENCES.md`、`MOD-GUIDE.md`、`MAP-ATLAS.md`。
+- 状态：截至 Round 92；基础世界含 29 名 NPC、5 个门派、56 项任务、52 件物品、30 种武学、图谱汇总为 308 个图谱节点/413 条边，manifest 登记 75 项资源。十二张区域地图均为 100×100 格；全域舆图为 640×448、38 层并以 RLE 保存，其中前 33 层沿用 Round 91 基线，Round 92 五层绘制北部雪关。气候资源可声明轻雾粒子表现；航路人物、目的地发现门控、青帆埠调查事件、雪夜烽燧调查和跨区差事阶段由独立 JSON 声明，漫游奇遇可按 `trigger: regionArrival` 与 `transitionIds` 声明入境关口抵达触发，读档后 NPC 日程仍由时间派生，不新增存档字段。素材授权、MOD 和导航协议见 `REFERENCES.md`、`MOD-GUIDE.md`、`MAP-ATLAS.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -269,7 +269,7 @@ NPC 条目可选声明 `spriteFrames`，键固定为 `down`、`left`、`right`�
 
 ## Round 81：全域舆图扩展
 
-`atlasArt.columns` 和 `rows` 描述全域图底图尺寸；Schema 和运行时解析器都限制为 1–640 格。Round 91 的默认总图为 640×448 格、33 个图层压缩后仍逐格还原；图层与碰撞无关，真实地图、地标、关口仍按已有资源和世界地图协议声明。
+`atlasArt.columns` 和 `rows` 描述全域图底图尺寸；Schema 和运行时解析器都限制为 1–640 格。Round 92 的默认总图为 640×448 格、38 个图层压缩后仍逐格还原；前 33 层与 Round 91 基线相同，新增五层只在北部雪关投影内绘制。图层与碰撞无关，真实地图、地标、关口仍按已有资源和世界地图协议声明。
 
 可选 `atlasArt.regionFootprint` 以舆图格表示区域投影所覆盖的旧宽高。投影器在画布尺寸变化后仍使用该跨度定位区域内玩家、地标和关口。省略字段的历史资源沿用 `atlasArt.columns/rows × 0.16` 的原推导，保持旧 MOD 的投影兼容。Home 只重置视口缩放与偏移，不改变玩家位置或旅行数据。
 
@@ -360,3 +360,9 @@ Round 85 将全域舆图扩为 448×320 格和 24 个渲染层，在保持原 38
 ## Round 91：雁回崖与大图扩展
 
 世界舆图 `atlasArt` 的尺寸上限提升为 640×448 格，图层扩至 33 层；生成器以旧舆图基线逐格保护 512×384 旧区域，并重新计算归一化投影以保持旧地图绝对格中心。新增 `map.round-91-cloud-north-terrace` 为独立 100×100 `grid-map`，8 个山地/桥梁图素层引用 OpenGameArt Ansimuz Tiny RPG Mountain CC0 图集，碰撞只读 `grid`。雁回崖与云岭古道有两向显式 `transition`；人物日程、时段调查门控、任务目标/奖励和图谱关系均由独立资源声明。运行 `npm run generate:round-91-cloud-north-terrace` 重建，`npm run smoke:round-91` 检查引用、路径、旧投影与幂等。
+
+## Round 92：照雪关与北境雪带
+
+`map.round-92-north-pass` 是独立的 100×100 `grid-map`：碰撞字符在 `grid` 声明，雪原/冰河/山脊/雪松/关墙/山径分层绘制，并引用 OGA zaphgames 冬季 CC0 图集和既有 Puny Characters 人物集。玩家由雁回崖 `(50,2)` 进入照雪关 `(50,97)`，由 `(49,97)` 可步行返回雁回崖 `(49,2)`；专项检查该地图 7,740 个可走格均从入口可达。
+
+全域舆图保持 640×448 格和旧区投影，新增 `world-r92-pass-snow`、`world-r92-pass-trees`、`world-r92-pass-walls`、`world-r92-pass-detail`、`world-r92-pass-route` 五个 16px 图素层；原 33 层逐格保护。守烽人日程、对话、雪夜烽燧调查任务、发现事件、地标和图谱节点/边分别登记为人物、对白、任务及世界资料。`npm run generate:round-92-north-pass` 可确定性重建；`npm run smoke:round-92` 覆盖素材白名单、资源/图谱引用、两向路线、画布层稳定和跨轮生成器重跑。
