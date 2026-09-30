@@ -173,8 +173,8 @@ describe('Round 85 Tide Isle and the 640×448 atlas', () => {
 
   it('keeps all eight old region centers in the same atlas pixels after rebasing', () => {
     const world = readJson('../data/base/world/world-map.json');
-    expect(world.regions).toHaveLength(12);
-    expect(world.transitions).toHaveLength(22);
+    expect(world.regions).toHaveLength(13);
+    expect(world.transitions).toHaveLength(24);
     for (const [mapResourceId, anchor] of Object.entries(round84RegionAnchors)) {
       const region = world.regions.find((entry: any) => entry.mapResourceId === mapResourceId);
       expect(region, mapResourceId).toBeDefined();

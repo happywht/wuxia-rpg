@@ -1,0 +1,119 @@
+{
+  "columns": 640,
+  "rows": 448,
+  "tileSize": 16,
+  "layers": {
+    "world-ocean": "8db1c12c69c2bf1cc350c299ebd71952e4aab1bcee7d13d5f57785c0a72429d3",
+    "world-land": "d1cdbb3d91c3e859ee507aa258645cf1d1a67db350c977292fe85e0cfeb5aa40",
+    "world-coast": "53e329f6773b47cf070b99daf8ce50cf40bde3faee09f0999705709bc7dfee43",
+    "world-forest": "c3c25c030e14138dbf379153c9724dbc3f144bab3292509872d163288be7caf1",
+    "world-relief": "edcfe615af63481da1a284a46e42a75043f4c3dd395dd49bc136cf3e5e62f1f3",
+    "world-roads": "907987b87e0835878fce09fcd402b6eb7f3a5c841d036691cd9762167538feb4",
+    "world-settlements": "b6b7bce13edec0aa13700e97ea18981de103e0b790ae7d0e2ce9b26aa7d4d631",
+    "world-r79-shoal-water": "55e95b7eb57edd311ede603bf731d7548826717749d874a31c3981f029706353",
+    "world-r79-shoal-sand": "e936174a1e947b0686d932d738d9a73fd8ef76c363163c75d917c88f627de7ca",
+    "world-r79-shoal-land": "21a1dcdd270779887192f9782163ef300538a027d4b68b0c635fc5c82e316070",
+    "world-r79-shoal-pines": "36424f70e5c36d053e9bad9b9db098f3c04a873b390d03dae84a92f5e29007b3",
+    "world-r79-gate-routes": "137b2b8238f64995b5ce6b547dc3e74b07dc45b9692e6700f52302265977411e",
+    "world-r81-expanse-water": "99265a2bedfabc272153031edfc5e397d7d96711ffd3474cb1b2ea03720ec1a5",
+    "world-r81-expanse-sand": "58d86f4927e89679c4c740583098833b60c08c201b780374a4439ca15345f9d2",
+    "world-r81-expanse-land": "8297855cca75c5f8c77a905de6bd3260321082f3627305a47d1154500f55e166",
+    "world-r81-expanse-pines": "84a1b9422b643afe0c2c7ebf4eaa6ee68df6e74e8c2bf0e2f6ec83c5491ac6fc",
+    "world-r84-expanse-water": "f3e7047cf15b0d51bb7c063efca8b7c340466c0cb858cc2a0f8d5a4562278762",
+    "world-r84-expanse-sand": "0a4b180347b4d8638d3e881080a2148783f929cb65c4fcf4a8a8aa4e6082d047",
+    "world-r84-expanse-land": "958a2ef0e9dc0913dc6586e5ac03f6ce29bd5c17550e7e86a56edbb09350b056",
+    "world-r84-expanse-pines": "f29368463137484f3d624e2fec7a9d57f7a3d5950aed63812d9637fa535ce484",
+    "world-r85-expanse-water": "6a747acca1dbf7150b19c68156d5c4106381b4cf119cff67b026c98be3607400",
+    "world-r85-expanse-sand": "2a3e634ad3839d3f0aca91bd4a0c10a41288707fdfb9f7d9637e6a5f220564d7",
+    "world-r85-expanse-land": "129aededc309b6b13220fc01b5122fb18f6b9905877abc4c2da58c3e2adeb699",
+    "world-r85-expanse-pines": "b46ded2a166377936edefceca953ccbcc7f6474e5053210403e66c53b6ed34e8",
+    "world-r87-expanse-water": "6b823cd955df71841828f286ad21ef4c3a07fc5fd0fa9de1ff38202c8a661747",
+    "world-r87-expanse-sand": "6932b1f8ccc67faf55c00837e0e83e77396f73000aab588026e2685a98c53e70",
+    "world-r87-expanse-land": "d7e4b9a1626c7dc60f239e0b011533043fcf6460885901d4fdd9bd647f4d9230",
+    "world-r87-expanse-pines": "ba38f2470186ad4019bacd03d56ef4bca8458880f8e1b198f3054711ae0597e3",
+    "world-r91-terrace-land": "c7849ddacb6d456371cb93d40c01f19e64052e8359ffcc2aae23c743a6898914",
+    "world-r91-terrace-cliffs": "02fa6f75e185a6f194af84924f6b126f32b69eeab436b7eb9789113274b0b9de",
+    "world-r91-terrace-walls": "04458ab4711364524af78eaa43130f94bf63d1775999eb146c387ebccbae3f49",
+    "world-r91-terrace-detail": "b6052cb8366fbdbc7ce13e521bb729bb8672ce6a847c0bc7cf22bdcf5ad69064",
+    "world-r91-terrace-route": "0834aa69e253f6cc24cecc0db01f234d708ee880ad1053c70d8edc5c019df89a",
+    "world-r92-pass-snow": "fe2dafb156b95c67f199c249e5633b1da28ab5ed88b999f75b8a39f99b3bd404",
+    "world-r92-pass-trees": "c459bc00db2261bc5e542227de1adc6a335276ae0b2b85e032eef2b40fd9ebc6",
+    "world-r92-pass-walls": "17337604e8923eab70fbc43b4714113c0d5be642efca54d9b875e33073cb20f5",
+    "world-r92-pass-detail": "e5c7f85b687bac8c39572951293f04b5b7efa1c87e3331d9a6b068ad5a311af6",
+    "world-r92-pass-route": "e81f7a388bd70675a45b54584e8226b65bde32400a4339057fd3d06102aeab19"
+  },
+  "regions": {
+    "map.round-01-grid": {
+      "percent": {
+        "x": 6.47887309,
+        "y": 13.06935128
+      }
+    },
+    "map.round-10-mist-ferry": {
+      "percent": {
+        "x": 20.73239445,
+        "y": 17.33109614
+      }
+    },
+    "map.round-62-iron-ridge": {
+      "percent": {
+        "x": 20.73239445,
+        "y": 7.38702458
+      }
+    },
+    "map.round-67-salt-road": {
+      "percent": {
+        "x": 6.47887309,
+        "y": 17.33109614
+      }
+    },
+    "map.round-74-cloud-ridge": {
+      "percent": {
+        "x": 27.85915479,
+        "y": 14.48993279
+      }
+    },
+    "map.round-79-isles": {
+      "percent": {
+        "x": 17.44913928,
+        "y": 28.47203579
+      }
+    },
+    "map.round-82-east-coast": {
+      "percent": {
+        "x": 44.56181534,
+        "y": 21.950783
+      }
+    },
+    "map.round-84-windward-isle": {
+      "percent": {
+        "x": 55.55555556,
+        "y": 27.96420582
+      }
+    },
+    "map.round-85-tide-isle": {
+      "percent": {
+        "x": 63.38028169,
+        "y": 62.63982103
+      }
+    },
+    "map.round-87-southwest-isles": {
+      "percent": {
+        "x": 10.95461659,
+        "y": 77.18120805
+      }
+    },
+    "map.round-91-cloud-north-terrace": {
+      "percent": {
+        "x": 90.14084507,
+        "y": 21.47651007
+      }
+    },
+    "map.round-92-north-pass": {
+      "percent": {
+        "x": 90.14084507,
+        "y": 5.36912752
+      }
+    }
+  }
+}

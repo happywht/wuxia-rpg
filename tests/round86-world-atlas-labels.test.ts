@@ -34,8 +34,8 @@ describe('Round 86 atlas overview callouts', () => {
     });
     const placements = layoutWorldAtlasRegionLabels(labels, bounds, 'map.round-85-tide-isle');
 
-    expect(labels).toHaveLength(12);
-    expect(placements.size).toBe(12);
+    expect(labels).toHaveLength(13);
+    expect(placements.size).toBe(13);
     const boxes = labels.map((label) => {
       const placement = placements.get(label.mapResourceId);
       expect(placement).toBeDefined();

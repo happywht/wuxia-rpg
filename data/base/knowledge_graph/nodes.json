@@ -823,6 +823,17 @@
     {"id":"event.r92-arrival","kind":"event","title":"初入照雪关","summary":"从雁回崖北境栈口首次踏上北境雪原。","knownByDefault":false},
     {"id":"event.r92-mirror-river","kind":"event","title":"冰河中渡","summary":"在镜面冰河中渡认清守关人拖粮的旧线。","knownByDefault":false},
     {"id":"event.r92-snow-beacon","kind":"event","title":"雪夜点燧","summary":"落雪日暮夜在照雪烽燧点验本季烽号。","knownByDefault":false},
-    {"id":"event.r92-north-cairn","kind":"event","title":"界碑读雪","summary":"在北界碑下读出大梁版图的北限。","knownByDefault":false}
+    {"id":"event.r92-north-cairn","kind":"event","title":"界碑读雪","summary":"在北界碑下读出大梁版图的北限。","knownByDefault":false},
+    {"id":"map.round-93-snow-pine-valley","kind":"place","title":"北境霜松谷探索地图","summary":"从照雪关西缘冰桥可入的霜松谷百格地图。","knownByDefault":false},
+    {"id":"place.r93-snow-pine-valley","kind":"place","title":"北境·霜松谷","summary":"照雪关以西的雪松林谷，冰溪与风口崖之间藏着前朝界标。","knownByDefault":false},
+    {"id":"place.r93-pine-sea","kind":"place","title":"松海","summary":"渡口西岸的整面雪松林，风过时如潮声起伏。","knownByDefault":false},
+    {"id":"place.r93-old-mark","kind":"place","title":"旧界标","summary":"前朝屯垦的青石界碑，刻着「北墉屯界，西至松谷」。","knownByDefault":false},
+    {"id":"place.r93-wind-gap","kind":"place","title":"风口崖","summary":"横亘谷北的石崖，豁口风声如哨，是天时将至的先报。","knownByDefault":false},
+    {"id":"char.r93-liu-xunjing","kind":"character","title":"柳寻径","summary":"北境巡路人，常年看守霜松谷里的前朝界标。","knownByDefault":false},
+    {"id":"quest.r93-boundary-mark","kind":"quest","title":"界标寻踪","summary":"越过冰溪在旧界标下拓下前朝刻文，带回给巡路人柳寻径。","knownByDefault":false},
+    {"id":"event.r93-arrival","kind":"event","title":"初入霜松谷","summary":"从照雪关西缘冰桥首次踏进雪松林谷。","knownByDefault":false},
+    {"id":"event.r93-pine-sea","kind":"event","title":"松海听涛","summary":"在渡口西岸听整面松海被风吹起雪潮。","knownByDefault":false},
+    {"id":"event.r93-old-mark","kind":"event","title":"界标拓文","summary":"在旧界标下拓下前朝屯垦的界刻。","knownByDefault":false},
+    {"id":"event.r93-wind-gap","kind":"event","title":"风口望北","summary":"在风口崖豁口望见舆图之外的灰白北境。","knownByDefault":false}
   ]
 }

@@ -66,6 +66,11 @@ const denseLayerHashes: Record<string, string> = {
   "world-r92-pass-walls": "17337604e8923eab70fbc43b4714113c0d5be642efca54d9b875e33073cb20f5",
   "world-r92-pass-detail": "e5c7f85b687bac8c39572951293f04b5b7efa1c87e3331d9a6b068ad5a311af6",
   "world-r92-pass-route": "e81f7a388bd70675a45b54584e8226b65bde32400a4339057fd3d06102aeab19",
+  "world-r93-valley-snow": "9eab23a9e29f5654cd5d909eb15d77f155280dcc84343dac5112353d909a2071",
+  "world-r93-valley-trees": "fa156d38ea8de06c336851c38a3377df6117383c9252be8170bd3be372768054",
+  "world-r93-valley-walls": "e32110b8273cda40ceb3b6f831184422d8c82f3a1d9a699062fad04f8c58a37f",
+  "world-r93-valley-detail": "cae78e47a243887187558db5e056d4950d13e28246a596c0ec4fdd0277adf34c",
+  "world-r93-valley-route": "64783a1dca3ffcf9a7602da5b3050ce588eaa271d1cb283c9a11c494abe6a2c9",
 };
 
 const CANONICAL_ROW = /^[1-9][0-9]*:(0|[1-9][0-9]*)(,[1-9][0-9]*:(0|[1-9][0-9]*))*$/;
@@ -111,7 +116,7 @@ describe('Round 86 world-atlas row-RLE wire protocol', () => {
     expect(validate(rawWorld), JSON.stringify(validate.errors)).toBe(true);
 
     const art = rawWorld.atlasArt;
-    expect(art.layers).toHaveLength(38);
+    expect(art.layers).toHaveLength(43);
     for (const layer of art.layers) {
       expect(layer.cells, layer.id).toBeUndefined();
       expect(layer.cellsRle, layer.id).toHaveLength(art.rows);

@@ -4,6 +4,31 @@
 
 ---
 
+## Round 93 — 北境霜松谷与可移动雪道（2026-09-30，已完成）
+
+### 计划与实现
+
+- 计划先写于 [`iterations/round-93/plan.md`](iterations/round-93/plan.md)：在 640×448 舆图接入照雪关以西的第十三块百格地图「北境·霜松谷」，保留原 38 个舆图图层、旧区中心和既有地貌，接通东西向冰桥，加入巡路人、界标调查差事和图谱见闻。
+- `scripts/generate-round93-snow-pine-valley.mjs` 生成 5 个北境舆图图层、一张 100×100 雪谷地图、柳寻径七时段日程、对白、「界标寻踪」和 4 个区域事件/地标。游戏素材复用仓库既有 OpenGameArt zaphgames Winter CC0 图集，只引用 R92 已目检许可帧；没有添加新图集或外部素材。
+- 新舆图仍为 640×448，以 RLE 保存 43 层；雪谷有 6,426 个可走格，其中 6,418 个从入口可达。新增统计：雪地 1,329 格、岩坎 214 格、雪松 262 格、界墙 51 格、东西冰桥 258 格。新关口双向联通照雪关，路线可到巡路人、旧界标和返程入口。
+- 基础资料扩至 13 个区域、24 条关口、30 名 NPC、57 项任务、319 个图谱节点/423 条关系、79 项 manifest 资源。Round 92 生成器现固定核对 Round 91 原 33 层基线并在其后重建 R92 图层，保留 Round 93 及更后图层；Round 93 生成器也按 38 层 R92 基线恢复自己的五层，避免调换重跑次序时漂移。
+- 新增 `tests/round93-snow-pine-valley.test.ts`，覆盖像素/区域基线、帧白名单、双向关口、调查链、素材授权与 R93/R92/R91/R87 顺序重跑；同步扩展受影响历史区域计数与旧 landmark 测试夹具。修正舆图审计中 `regionFootprint` 单位：引擎按格数使用 35.84×23.04，不是画布百分比。
+
+### 验证
+
+- `npm run generate:round-93-snow-pine-valley`：通过；产生 1,329 雪地、214 岩坎、262 雪松、51 墙体、258 冰桥格，6,418 个入口可达格。
+- `npm run smoke:round-93`：通过，8 个文件/51 项测试；`npx vitest run tests/round52-map-landmarks.test.ts tests/round93-snow-pine-valley.test.ts`：通过，2 个文件/15 项测试。
+- 浏览器手动确认 M 舆图开合、拖拽平移、滚轮缩放、Home 回全图、W/S 聚焦与 Enter 路线选择。没有在浏览器实际行走照雪关—霜松谷双向入口；自动化专项覆盖目标、返程和可达路线。
+- `npm run check`：通过；79 项基础资源 Schema 校验、79 项 MOD 扫描（0 问题）、TypeScript、67 个测试文件/440 项测试，以及 Round 34 与 Round 48 文档审计全部通过。
+- `npm run build`：通过；Vite 8.3.1 构建 139 个模块。Phaser runtime chunk 为 1,374.54 kB（gzip 357.49 kB），Vite 默认 500 kB 体积提示不阻断构建。
+- `git diff --check`：通过，无空白错误。
+
+### 提交
+
+- `round-93: 新增北境霜松谷与双向雪道`；commit `61e485cf85b32c9ecc6fbe19bf533d3acfcbffa3`。
+
+---
+
 ## Round 92 — 北境雪关与 12 区舆图（2026-09-30，已完成）
 
 ### 计划与实现

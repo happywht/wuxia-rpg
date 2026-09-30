@@ -1,0 +1,40 @@
+{
+  "quests": [
+    {
+      "id": "quest.r93-boundary-mark",
+      "name": "界标寻踪",
+      "description": "北境巡路人柳寻径请你沿雪谷西行，越过冰溪找到谷中那块前朝屯垦的旧界标，拓下刻文带回石屋。",
+      "giverNpcId": "char.r93-liu-xunjing",
+      "objectives": [
+        {
+          "id": "objective.r93-arrive-snow-pine-valley",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r93-snow-pine-valley",
+          "requiredCount": 1,
+          "text": "从照雪关西缘冰桥进入霜松谷"
+        },
+        {
+          "id": "objective.r93-survey-old-mark",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r93-old-mark",
+          "requiredCount": 1,
+          "text": "在旧界标下拓下前朝刻文"
+        },
+        {
+          "id": "objective.r93-report-liu-xunjing",
+          "kind": "talkToNpc",
+          "targetId": "char.r93-liu-xunjing",
+          "requiredCount": 1,
+          "text": "把拓文带回给柳寻径"
+        }
+      ],
+      "rewards": {
+        "experience": 30,
+        "currency": 22,
+        "discoverKnowledgeNodeIds": [
+          "place.r93-wind-gap"
+        ]
+      }
+    }
+  ]
+}

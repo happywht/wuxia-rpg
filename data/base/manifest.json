@@ -211,6 +211,26 @@
       "schema": "quest-set"
     },
     {
+      "id": "map.round-93-snow-pine-valley",
+      "path": "maps/round-93-snow-pine-valley.json",
+      "schema": "grid-map"
+    },
+    {
+      "id": "npc.round-93-snow-pine-valley-set",
+      "path": "characters/round-93-snow-pine-valley-npcs.json",
+      "schema": "npc-set"
+    },
+    {
+      "id": "dialogue.round-93-snow-pine-valley-set",
+      "path": "dialogues/round-93-snow-pine-valley-conversations.json",
+      "schema": "dialogue-set"
+    },
+    {
+      "id": "quest.round-93-snow-pine-valley-set",
+      "path": "quests/round-93-snow-pine-valley-quests.json",
+      "schema": "quest-set"
+    },
+    {
       "id": "world.atlas",
       "path": "world/world-map.json",
       "schema": "world-map"

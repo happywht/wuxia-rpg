@@ -1,0 +1,91 @@
+{
+  "conversations": [
+    {
+      "id": "dlg.r93-liu-xunjing-rounds",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "巡路人的石屋里，柳寻径正把一副旧皮裹脚在火墙上烘着，见你推门进来，抬了抬下巴：「霜松谷三十年没来过生面孔——上一个还是从照雪关那头绕冰桥过来的。你既然进得来谷，就帮我办件差事：谷西有块前朝的界标，拓张刻文回来，我给你备了御寒的烈酒。」",
+          "options": [
+            {
+              "text": "拓文我拓。",
+              "nextNodeId": "accepted",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r93-boundary-mark",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r93-boundary-mark"
+                }
+              ]
+            },
+            {
+              "text": "拓文已经带回来了。",
+              "nextNodeId": "completed",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r93-boundary-mark",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "我正往谷西去。",
+              "nextNodeId": "active",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r93-boundary-mark",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "界标怎么走？",
+              "nextNodeId": "route"
+            },
+            {
+              "text": "你巡的什么路？",
+              "nextNodeId": "patroller"
+            },
+            {
+              "text": "改日再谈。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "accepted",
+          "text": "「出石屋沿主径向西南，先过冰溪——认准渡口的踏痕走，溪心两道冰缝蓝得发黑，压不得。过溪后松林里岔路多，抱定西南方向，界标是块半人高的青石，立在林间空地上。到了石下按 E 拓文，纸上我给你裁好了。」"
+        },
+        {
+          "id": "active",
+          "text": "「记住：只走渡口踏痕，只拓碑阳刻文。碑背那半截是前朝屯垦的田亩数，字迹漫了，拓了也认不出。我在这儿给你温着酒。」"
+        },
+        {
+          "id": "completed",
+          "text": "柳寻径接过拓文，凑在灯下看了半晌，指腹顺着刻痕慢慢描过：「『北墉屯界，西至松谷』——好字，是前朝戍卒的手笔。」他把拓文仔细折进皮筒，又给你满上一碗热酒：「界标既还在，这条谷的账就还没烂完。」"
+        },
+        {
+          "id": "route",
+          "text": "「东口进来沿主径走，过冰溪渡口往西南，穿过两片松林就是界标。往北那条岔路通风口崖，崖口风大，站得住再去看——谷里的风向，崖上先知道。」"
+        },
+        {
+          "id": "patroller",
+          "text": "「巡路人，巡的是界。前朝在这谷里屯过垦，界桩立了一溜，如今雪埋风磨，就剩谷西那块还立得直。我每年把它脚下的雪扫开两回，刻文描一遍——界标倒了，这谷就说不清是谁的了。」"
+        },
+        {
+          "id": "farewell",
+          "text": "柳寻径重新裹上脚，背起雪铲出门，向着谷西的方向走进松影里，靴声很快被落雪吃掉。"
+        }
+      ]
+    }
+  ]
+}

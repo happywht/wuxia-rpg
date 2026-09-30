@@ -1,0 +1,73 @@
+{
+  "npcs": [
+    {
+      "id": "char.r93-liu-xunjing",
+      "name": "柳寻径",
+      "mapResourceId": "map.round-93-snow-pine-valley",
+      "position": {
+        "col": 48,
+        "row": 58
+      },
+      "dialogueId": "dlg.r93-liu-xunjing-rounds",
+      "questGiver": true,
+      "spriteFrame": 160,
+      "spriteFrames": {
+        "down": 160,
+        "right": 168,
+        "up": 176,
+        "left": 184
+      },
+      "schedule": [
+        {
+          "periodId": "period.midnight",
+          "position": {
+            "col": 49,
+            "row": 59
+          }
+        },
+        {
+          "periodId": "period.dawn",
+          "position": {
+            "col": 42,
+            "row": 54
+          }
+        },
+        {
+          "periodId": "period.morning",
+          "position": {
+            "col": 48,
+            "row": 58
+          }
+        },
+        {
+          "periodId": "period.midday",
+          "position": {
+            "col": 48,
+            "row": 58
+          }
+        },
+        {
+          "periodId": "period.afternoon",
+          "position": {
+            "col": 56,
+            "row": 54
+          }
+        },
+        {
+          "periodId": "period.dusk",
+          "position": {
+            "col": 34,
+            "row": 44
+          }
+        },
+        {
+          "periodId": "period.night",
+          "position": {
+            "col": 49,
+            "row": 59
+          }
+        }
+      ]
+    }
+  ]
+}

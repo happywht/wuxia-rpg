@@ -412,6 +412,16 @@
     {"id":"kg.edge.r92-keeper-quest","fromId":"char.r92-gu-zhaoxue","toId":"quest.r92-snow-beacon","relation":"participatesIn","summary":"谷照雪委托玩家点验本季烽号。"},
     {"id":"kg.edge.r92-quest-beacon","fromId":"quest.r92-snow-beacon","toId":"place.r92-snow-beacon","relation":"requires","summary":"雪燧传烽需要玩家上照雪烽燧调查。"},
     {"id":"kg.edge.r92-quest-cairn","fromId":"quest.r92-snow-beacon","toId":"place.r92-north-cairn","relation":"rewards","summary":"完成雪燧传烽后得知北界碑的方位。"},
-    {"id":"kg.edge.r92-pass-terrace","fromId":"place.r92-north-pass","toId":"map.round-91-cloud-north-terrace","relation":"locatedAt","summary":"照雪关从雁回崖北境栈口进入。"}
+    {"id":"kg.edge.r92-pass-terrace","fromId":"place.r92-north-pass","toId":"map.round-91-cloud-north-terrace","relation":"locatedAt","summary":"照雪关从雁回崖北境栈口进入。"},
+    {"id":"kg.edge.r93-arrival-valley","fromId":"event.r93-arrival","toId":"place.r93-snow-pine-valley","relation":"triggers","summary":"初入霜松谷时发现北境·霜松谷。"},
+    {"id":"kg.edge.r93-valley-map","fromId":"place.r93-snow-pine-valley","toId":"map.round-93-snow-pine-valley","relation":"locatedAt","summary":"霜松谷由百格探索地图承载。"},
+    {"id":"kg.edge.r93-pine-sea-event","fromId":"event.r93-pine-sea","toId":"place.r93-pine-sea","relation":"triggers","summary":"渡口听涛后记下松海的方位。"},
+    {"id":"kg.edge.r93-old-mark-event","fromId":"event.r93-old-mark","toId":"place.r93-old-mark","relation":"triggers","summary":"拓文之后认清旧界标的刻文。"},
+    {"id":"kg.edge.r93-wind-gap-event","fromId":"event.r93-wind-gap","toId":"place.r93-wind-gap","relation":"triggers","summary":"崖脚望北之后记下风口崖的位置。"},
+    {"id":"kg.edge.r93-patroller-location","fromId":"char.r93-liu-xunjing","toId":"map.round-93-snow-pine-valley","relation":"locatedAt","summary":"柳寻径在霜松谷的巡路石屋驻脚。"},
+    {"id":"kg.edge.r93-patroller-quest","fromId":"char.r93-liu-xunjing","toId":"quest.r93-boundary-mark","relation":"participatesIn","summary":"柳寻径委托玩家拓回界标刻文。"},
+    {"id":"kg.edge.r93-quest-old-mark","fromId":"quest.r93-boundary-mark","toId":"place.r93-old-mark","relation":"requires","summary":"界标寻踪需要玩家在旧界标调查。"},
+    {"id":"kg.edge.r93-quest-wind-gap","fromId":"quest.r93-boundary-mark","toId":"place.r93-wind-gap","relation":"rewards","summary":"完成界标寻踪后得知风口崖的方位。"},
+    {"id":"kg.edge.r93-valley-pass","fromId":"place.r93-snow-pine-valley","toId":"map.round-92-north-pass","relation":"locatedAt","summary":"霜松谷从照雪关西缘冰桥进入。"}
   ]
 }

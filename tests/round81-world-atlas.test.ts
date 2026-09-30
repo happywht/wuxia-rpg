@@ -150,8 +150,8 @@ describe('Round 81–85 expanded movable atlas', () => {
     }
     expect(cells('world-r81-expanse-land').some((row, y) => y < 144 && row.slice(224).some((gid) => gid > 0))).toBe(true);
     expect(cells('world-r81-expanse-land').slice(144).some((row) => row.some((gid) => gid > 0))).toBe(true);
-    expect(data.regions).toHaveLength(12);
-    expect(data.transitions).toHaveLength(22);
+    expect(data.regions).toHaveLength(13);
+    expect(data.transitions).toHaveLength(24);
   });
 
   it('keeps the six Round 80 region centers plus every old gate, landmark and player projection in the same atlas pixels', () => {

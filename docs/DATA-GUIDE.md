@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：截至 Round 92；基础世界含 29 名 NPC、5 个门派、56 项任务、52 件物品、30 种武学、图谱汇总为 308 个图谱节点/413 条边，manifest 登记 75 项资源。十二张区域地图均为 100×100 格；全域舆图为 640×448、38 层并以 RLE 保存，其中前 33 层沿用 Round 91 基线，Round 92 五层绘制北部雪关。气候资源可声明轻雾粒子表现；航路人物、目的地发现门控、青帆埠调查事件、雪夜烽燧调查和跨区差事阶段由独立 JSON 声明，漫游奇遇可按 `trigger: regionArrival` 与 `transitionIds` 声明入境关口抵达触发，读档后 NPC 日程仍由时间派生，不新增存档字段。素材授权、MOD 和导航协议见 `REFERENCES.md`、`MOD-GUIDE.md`、`MAP-ATLAS.md`。
+- 状态：截至 Round 93；基础世界含 30 名 NPC、5 个门派、57 项任务、52 件物品、30 种武学、图谱汇总为 319 个图谱节点/423 条边，manifest 登记 79 项资源。十三张区域地图均为 100×100 格；全域舆图为 640×448、43 层并以 RLE 保存，其中前 38 层沿用 Round 92 基线，Round 93 五层绘制照雪关以西的霜松谷与冰桥。气候资源可声明轻雾粒子表现；航路人物、目的地发现门控、青帆埠调查事件、雪夜烽燧调查和跨区差事阶段由独立 JSON 声明，漫游奇遇可按 `trigger: regionArrival` 与 `transitionIds` 声明入境关口抵达触发，读档后 NPC 日程仍由时间派生，不新增存档字段。素材授权、MOD 和导航协议见 `REFERENCES.md`、`MOD-GUIDE.md`、`MAP-ATLAS.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---

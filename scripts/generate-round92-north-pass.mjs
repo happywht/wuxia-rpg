@@ -39,6 +39,25 @@ const extensionIds = [
   'world-r92-pass-snow', 'world-r92-pass-trees', 'world-r92-pass-walls',
   'world-r92-pass-detail', 'world-r92-pass-route',
 ];
+// Round 91 输出的 33 层基线 id 序列（world-ocean … world-r91-terrace-route）。
+// 后续轮次（Round 93 起）的图层追加在本生成器五层之后；重跑时这些后续层
+// 原位保留，本生成器只把自身五层重建回基线之后，任意时序逐字节稳定。
+const baselineLayerIds = [
+  'world-ocean', 'world-land', 'world-coast', 'world-forest', 'world-relief',
+  'world-roads', 'world-settlements',
+  'world-r79-shoal-water', 'world-r79-shoal-sand', 'world-r79-shoal-land',
+  'world-r79-shoal-pines', 'world-r79-gate-routes',
+  'world-r81-expanse-water', 'world-r81-expanse-sand', 'world-r81-expanse-land',
+  'world-r81-expanse-pines',
+  'world-r84-expanse-water', 'world-r84-expanse-sand', 'world-r84-expanse-land',
+  'world-r84-expanse-pines',
+  'world-r85-expanse-water', 'world-r85-expanse-sand', 'world-r85-expanse-land',
+  'world-r85-expanse-pines',
+  'world-r87-expanse-water', 'world-r87-expanse-sand', 'world-r87-expanse-land',
+  'world-r87-expanse-pines',
+  'world-r91-terrace-land', 'world-r91-terrace-cliffs', 'world-r91-terrace-walls',
+  'world-r91-terrace-detail', 'world-r91-terrace-route',
+];
 // 照雪关区域中心固定投影到 640×448 舆图的 (576,24) 格——雁回崖高原以北极
 // 空白带上的新增雪原，不与任何旧区域锚点或雁回崖地貌重叠。
 const passAtlasCell = { col: 576, row: 24 };
@@ -183,17 +202,23 @@ if (previous !== undefined) {
 }
 if (atlasReady) {
   // Round 92 图层由本脚本完全托管；重跑时先剔除自己的旧输出，再从受保护
-  // 的 Round 91 基线重建，使以后修订图块帧仍可通过同一生成器安全更新。
+  // 的基线重建，使以后修订图块帧仍可通过同一生成器安全更新。冬季图集
+  // 声明可能已被后续轮次共用，保留原位（下方按内容校验），避免图集
+  // 数组顺序随重跑时序漂移。
   previous.layers = previous.layers.filter((layer) => !extensionIds.includes(layer.id));
-  previous.tilesets = previous.tilesets.filter((tileset) => tileset.id !== 'opengameart.winter-tileset-zaph');
 }
 let extensionCount = null;
 if (previous !== undefined) {
   if (previous === undefined || previous.columns !== expectedOld.columns || previous.rows !== expectedOld.rows) {
     throw new Error(`预期 Round 91 舆图为 ${expectedOld.columns}×${expectedOld.rows}，实际为 ${previous?.columns}×${previous?.rows}。`);
   }
-  if (previous.layers.length !== 33) {
-    throw new Error(`预期 Round 91 舆图有 33 层，实际为 ${previous.layers.length} 层。`);
+  // 剔除本生成器管理的图层后，舆图必须是「Round 91 基线 33 层 + 后续轮次
+  // 图层」；后续轮次的层在本轮五层之后原位保留，不因重跑而丢失。
+  if (previous.layers.length < baselineLayerIds.length) {
+    throw new Error(`预期至少 ${baselineLayerIds.length} 层基线舆图，实际为 ${previous.layers.length} 层。`);
+  }
+  if (previous.layers.slice(0, baselineLayerIds.length).map((layer) => layer.id).join('\n') !== baselineLayerIds.join('\n')) {
+    throw new Error('舆图层基线与 Round 91 输出的 33 层序列不符，拒绝重建。');
   }
   if (previous.layers.some((layer) => extensionIds.includes(layer.id))) {
     throw new Error('舆图存在残缺的 Round 92 图层；请先恢复干净的 Round 91 状态。');
@@ -207,8 +232,13 @@ if (previous !== undefined) {
     spacing: 0,
     tileCount: 256,
   };
-  if (previous.tilesets.some((tileset) => tileset.id === winterTiles.id)) {
-    throw new Error('舆图已存在同名冬季图集声明；请核对其来源。');
+  const winterExisting = previous.tilesets.find((tileset) => tileset.id === winterTiles.id);
+  if (winterExisting !== undefined) {
+    if (JSON.stringify(winterExisting) !== JSON.stringify(winterTiles)) {
+      throw new Error('舆图的冬季图集声明与 Round 92 登记内容不一致。');
+    }
+  } else {
+    previous.tilesets.push(winterTiles);
   }
 
   // 照雪关雪原：北部空白带上的冰崖环缘 + 雪原铺地 + 雪松/关墙/灯点缀，
@@ -348,17 +378,19 @@ if (previous !== undefined) {
     }
   }
 
-  // 既有十一区的绝对像素中心保持不变；照雪关作为第十二区追加，不动旧锚点。
+  // 既有区域的绝对像素中心保持不变；照雪关照常追加，不动旧锚点。
   const regionFootprint = previous.regionFootprint ?? {
     columns: expectedOld.columns * 0.16,
     rows: expectedOld.rows * 0.16,
   };
-  const atlasTilesets = [...previous.tilesets, winterTiles];
+  // 本生成器五层插回基线之后、后续轮次图层之前，保持首次发布的层序。
+  const laterLayers = previous.layers.slice(baselineLayerIds.length);
+  const atlasTilesets = previous.tilesets;
   const atlasArt = {
     ...overview,
     regionFootprint,
     tilesets: atlasTilesets,
-    layers: [...previous.layers, ...addedLayers],
+    layers: [...previous.layers.slice(0, baselineLayerIds.length), ...addedLayers, ...laterLayers],
   };
   for (const layer of atlasArt.layers) {
     if (layer.cells.length !== overview.rows || layer.cells.some((row) => row.length !== overview.columns)) {
@@ -369,12 +401,12 @@ if (previous !== undefined) {
       throw new Error(`图层 ${layer.id} 使用了未声明或超出容量的素材帧。`);
     }
   }
-  if (atlasArt.layers.length !== 38) {
-    throw new Error(`扩展后舆图应为 38 层，实际为 ${atlasArt.layers.length} 层。`);
+  if (atlasArt.layers.length !== baselineLayerIds.length + extensionIds.length + laterLayers.length) {
+    throw new Error(`扩展后舆图应为 ${baselineLayerIds.length + extensionIds.length + laterLayers.length} 层，实际为 ${atlasArt.layers.length} 层。`);
   }
   const oldIds = new Set(previous.layers.map((layer) => layer.id));
   if (oldIds.size !== previous.layers.length) {
-    throw new Error('Round 91 旧图层 id 不唯一。');
+    throw new Error('舆图基线与后续图层 id 不唯一。');
   }
   world.atlasArt = atlasArt;
 }

@@ -49,9 +49,9 @@ describe('Round 82 eastern coastline and walkable world expansion', () => {
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
 
-    expect(parsed.data.regions).toHaveLength(12);
-    expect(parsed.data.transitions).toHaveLength(22);
-    expect(maps.size).toBe(12);
+    expect(parsed.data.regions).toHaveLength(13);
+    expect(parsed.data.transitions).toHaveLength(24);
+    expect(maps.size).toBe(13);
     expect(maps.has(COAST_ID)).toBe(true);
 
     const oldPositions = new Map([
