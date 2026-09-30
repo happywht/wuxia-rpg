@@ -38,6 +38,8 @@ describe('Round 52 data-driven map landmarks', () => {
       ['map.round-95-misty-pine-gate', loadMap('../data/base/maps/round-95-misty-pine-gate.json')],
       ['map.round-95-cedar-valley', loadMap('../data/base/maps/round-95-cedar-valley.json')],
       ['map.round-95-east-harbor', loadMap('../data/base/maps/round-95-east-harbor.json')],
+      ['map.round-96-stone-reef', loadMap('../data/base/maps/round-96-stone-reef.json')],
+      ['map.round-96-halfmoon-atoll', loadMap('../data/base/maps/round-96-halfmoon-atoll.json')],
     ]));
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
@@ -108,6 +110,12 @@ describe('Round 52 data-driven map landmarks', () => {
       'landmark.r95-tide-gauge',
       'landmark.r95-harbor-pier',
       'landmark.r95-lookout',
+      'landmark.r96-stone-gate',
+      'landmark.r96-lantern-stone',
+      'landmark.r96-verse-terrace',
+      'landmark.r96-atoll-sandbar',
+      'landmark.r96-tide-shrine',
+      'landmark.r96-east-pier',
     ]);
     // Legacy direct callers pass no reference ids, so the discovery gate on
     // the reedbank landing must not be validated (and not hide the landmark).
@@ -149,6 +157,8 @@ describe('Round 52 data-driven map landmarks', () => {
       ['map.round-95-misty-pine-gate', loadMap('../data/base/maps/round-95-misty-pine-gate.json')],
       ['map.round-95-cedar-valley', loadMap('../data/base/maps/round-95-cedar-valley.json')],
       ['map.round-95-east-harbor', loadMap('../data/base/maps/round-95-east-harbor.json')],
+      ['map.round-96-stone-reef', loadMap('../data/base/maps/round-96-stone-reef.json')],
+      ['map.round-96-halfmoon-atoll', loadMap('../data/base/maps/round-96-halfmoon-atoll.json')],
     ]));
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
@@ -195,6 +205,8 @@ describe('Round 53 landmark discovery gating', () => {
     ['map.round-95-misty-pine-gate', loadMap('../data/base/maps/round-95-misty-pine-gate.json')],
     ['map.round-95-cedar-valley', loadMap('../data/base/maps/round-95-cedar-valley.json')],
     ['map.round-95-east-harbor', loadMap('../data/base/maps/round-95-east-harbor.json')],
+    ['map.round-96-stone-reef', loadMap('../data/base/maps/round-96-stone-reef.json')],
+    ['map.round-96-halfmoon-atoll', loadMap('../data/base/maps/round-96-halfmoon-atoll.json')],
   ]);
 
   /** Reference ids covering every event/landmark gate in the shipped atlas. */
@@ -289,6 +301,11 @@ describe('Round 53 landmark discovery gating', () => {
       'place.r95-cedar-valley',
       'place.r95-old-tide-gauge',
       'place.r95-east-harbor',
+      'place.r96-stone-reef',
+      'place.r96-lantern-stone',
+      'place.r96-verse-terrace',
+      'place.r96-halfmoon-atoll',
+      'place.r96-tide-shrine',
     ]),
     periodIds: new Set(['period.dusk', 'period.night', 'period.midnight', 'period.dawn', 'period.morning', 'period.midday', 'period.afternoon']),
     weatherIds: new Set(['weather.clear', 'weather.drizzle', 'weather.rain', 'weather.storm', 'weather.snow', 'weather.mist', 'weather.cloudy', 'weather.overcast']),
@@ -321,7 +338,7 @@ describe('Round 53 landmark discovery gating', () => {
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
     expect(assembled.landmarks.map(({ id }) => id)).not.toContain('landmark.reedbank-landing');
-    expect(assembled.landmarks).toHaveLength(65);
+    expect(assembled.landmarks).toHaveLength(71);
     expect(assembled.events.map(({ id }) => id)).not.toContain('event.reedbank-traces');
     const joined = assembled.warnings.join('\n');
     expect(joined).toContain('landmark.reedbank-landing');

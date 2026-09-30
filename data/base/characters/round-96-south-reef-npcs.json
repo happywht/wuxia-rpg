@@ -1,0 +1,142 @@
+{
+  "npcs": [
+    {
+      "id": "char.r96-cen-xi",
+      "name": "岑汐",
+      "mapResourceId": "map.round-96-stone-reef",
+      "position": {
+        "col": 46,
+        "row": 47
+      },
+      "dialogueId": "dlg.r96-cen-xi",
+      "questGiver": true,
+      "spriteFrame": 192,
+      "spriteFrames": {
+        "down": 192,
+        "right": 200,
+        "up": 208,
+        "left": 216
+      },
+      "schedule": [
+        {
+          "periodId": "period.midnight",
+          "position": {
+            "col": 44,
+            "row": 48
+          }
+        },
+        {
+          "periodId": "period.dawn",
+          "position": {
+            "col": 45,
+            "row": 47
+          }
+        },
+        {
+          "periodId": "period.morning",
+          "position": {
+            "col": 47,
+            "row": 47
+          }
+        },
+        {
+          "periodId": "period.midday",
+          "position": {
+            "col": 49,
+            "row": 48
+          }
+        },
+        {
+          "periodId": "period.afternoon",
+          "position": {
+            "col": 50,
+            "row": 47
+          }
+        },
+        {
+          "periodId": "period.dusk",
+          "position": {
+            "col": 48,
+            "row": 47
+          }
+        },
+        {
+          "periodId": "period.night",
+          "position": {
+            "col": 44,
+            "row": 48
+          }
+        }
+      ]
+    },
+    {
+      "id": "char.r96-luo-yan",
+      "name": "洛盐",
+      "mapResourceId": "map.round-96-halfmoon-atoll",
+      "position": {
+        "col": 48,
+        "row": 50
+      },
+      "dialogueId": "dlg.r96-luo-yan",
+      "questGiver": true,
+      "spriteFrame": 224,
+      "spriteFrames": {
+        "down": 224,
+        "right": 232,
+        "up": 240,
+        "left": 248
+      },
+      "schedule": [
+        {
+          "periodId": "period.midnight",
+          "position": {
+            "col": 46,
+            "row": 52
+          }
+        },
+        {
+          "periodId": "period.dawn",
+          "position": {
+            "col": 47,
+            "row": 51
+          }
+        },
+        {
+          "periodId": "period.morning",
+          "position": {
+            "col": 49,
+            "row": 51
+          }
+        },
+        {
+          "periodId": "period.midday",
+          "position": {
+            "col": 51,
+            "row": 52
+          }
+        },
+        {
+          "periodId": "period.afternoon",
+          "position": {
+            "col": 52,
+            "row": 50
+          }
+        },
+        {
+          "periodId": "period.dusk",
+          "position": {
+            "col": 50,
+            "row": 51
+          }
+        },
+        {
+          "periodId": "period.night",
+          "position": {
+            "col": 46,
+            "row": 52
+          }
+        }
+      ]
+    }
+  ]
+}

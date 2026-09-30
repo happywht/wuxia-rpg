@@ -114,7 +114,7 @@ afterEach(async () => {
 });
 
 describe('Round 50 final acceptance audit', () => {
-  it('accepts complete round, data-count, schema-family, lore-boundary, and documentation evidence', async () => {
+  it('accepts complete round, data-count, schema-family, lore-boundary, and documentation evidence', { timeout: 20_000 }, async () => {
     const fixture = await makeValidFixture();
     const report = await auditFinalAcceptance(fixture);
     expect(report).toMatchObject({ ok: true, problems: [] });

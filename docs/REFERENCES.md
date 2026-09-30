@@ -106,3 +106,7 @@ Kenney 的许可 FAQ 明确说明 Kenney.nl 提供的素材可在 CC0 条款下�
 - **OpenGameArt Pav Creations Forest Tileset for 16 x 16**： [素材页](https://opengameart.org/content/forest-tileset-for-16-x-16)；[源 PNG](https://opengameart.org/sites/default/files/forest-level-4-sheet_0.png)。素材页明确标注 CC0；CC0 1.0 不要求署名，本项目仍记录作者和来源以便核查。
 - 实际使用 `data/assets/opengameart/forest-tileset-for-16x16/forest-level-4-sheet.png`（112×64 RGBA，7×4 个 16×16 格）。素材保持原图，使用经人工查看的透明树冠/灌木帧，渲染在东境三张探索地图与 768×576 世界舆图的林地层；图集随 `NOTICE.txt` 进入发行包，不含预览或源工程文件。
 - 新增地图人物继续引用 Shade Puny Characters 公开 CC0 精灵图集；玩家与 NPC 精灵不使用来源不明的图像。所有游戏运行时素材均本地打包，不依赖远程 URL。
+
+### Round 96 新增素材
+
+- 本轮未下载或新增任何第三方素材。中溟·千里石塘与南溟·半月环礁两张地图（地面、礁石、植被、点缀三层）以及 768×576 全域舆图新增的礁湖/沙礁/岛陆/海路四层，全部复用上文已登记的 Shade Puny World CC0 图集帧；两名新 NPC（岑汐、洛盐）复用 Puny Characters CC0 方向帧。来源条目、`NOTICE.txt` 与发行白名单沿用既有记录，运行时不依赖任何远程素材。

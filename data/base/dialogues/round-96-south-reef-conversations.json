@@ -1,0 +1,162 @@
+{
+  "conversations": [
+    {
+      "id": "dlg.r96-cen-xi",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "岑汐把一盏没点的铜灯推到礁石边：「石塘的船不认旗，只认灯。灯序看明白了，才好往南走。」",
+          "options": [
+            {
+              "text": "我来查一查。",
+              "nextNodeId": "accepted",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r96-reef-lantern",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r96-reef-lantern"
+                }
+              ]
+            },
+            {
+              "text": "事情已经办妥。",
+              "nextNodeId": "completed",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r96-reef-lantern",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "我还在路上。",
+              "nextNodeId": "active",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r96-reef-lantern",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "这条路怎么走？",
+              "nextNodeId": "route"
+            },
+            {
+              "text": "先告辞。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "accepted",
+          "text": "「沿礁路向东北，坡顶那块挂青绳的石头就是灯浮石。四道一组、七组一转，记全了回来找我。」"
+        },
+        {
+          "id": "active",
+          "text": "「沿礁路向东北，坡顶那块挂青绳的石头就是灯浮石。四道一组、七组一转，记全了回来找我。」"
+        },
+        {
+          "id": "completed",
+          "text": "岑汐点亮铜灯：「灯序既明，南边那弯缺月便看得见了。半月环礁的船娘洛盐若问起，就说石塘应了灯。」"
+        },
+        {
+          "id": "route",
+          "text": "「沿礁路向东北，坡顶那块挂青绳的石头就是灯浮石。四道一组、七组一转，记全了回来找我。」"
+        },
+        {
+          "id": "farewell",
+          "text": "对方望了望潮头，把缆绳重新绕紧了一圈。"
+        }
+      ]
+    },
+    {
+      "id": "dlg.r96-luo-yan",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "洛盐把手里的渔盐包好：「石塘应了灯，环礁这边还差一封回信——望序台背面的潮序，倒读才是归程。」",
+          "options": [
+            {
+              "text": "我来查一查。",
+              "nextNodeId": "accepted",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r96-atoll-reply",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r96-atoll-reply"
+                }
+              ]
+            },
+            {
+              "text": "事情已经办妥。",
+              "nextNodeId": "completed",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r96-atoll-reply",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "我还在路上。",
+              "nextNodeId": "active",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r96-atoll-reply",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "这条路怎么走？",
+              "nextNodeId": "route"
+            },
+            {
+              "text": "先告辞。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "accepted",
+          "text": "「仍从西北回千里石塘，下礁路向西南上望序台。潮序抄全了，再渡回来交到我手上。」"
+        },
+        {
+          "id": "active",
+          "text": "「仍从西北回千里石塘，下礁路向西南上望序台。潮序抄全了，再渡回来交到我手上。」"
+        },
+        {
+          "id": "completed",
+          "text": "洛盐把抄好的潮序压进盐包：「灯序对潮序，石塘到环礁便是一封信来回。往后这班船，替你留半个船位。」"
+        },
+        {
+          "id": "route",
+          "text": "「仍从西北回千里石塘，下礁路向西南上望序台。潮序抄全了，再渡回来交到我手上。」"
+        },
+        {
+          "id": "farewell",
+          "text": "对方望了望潮头，把缆绳重新绕紧了一圈。"
+        }
+      ]
+    }
+  ]
+}

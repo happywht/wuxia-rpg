@@ -26,8 +26,8 @@ describe('Round 94 eastern and southern frontier expansion', () => {
 
     const art = parsed.data.atlasArt;
     expect([art.columns, art.rows, art.tileSize]).toEqual([768, 576, 8]);
-    expect(art.layers).toHaveLength(57);
-    expect(parsed.data.regions).toHaveLength(18);
+    expect(art.layers).toHaveLength(61);
+    expect(parsed.data.regions).toHaveLength(20);
     expect(art.regionFootprint).toEqual({ columns: 35.84, rows: 23.04 });
 
     const layers = new Map(art.layers.map((layer) => [layer.id, layer]));
@@ -111,8 +111,8 @@ describe('Round 94 eastern and southern frontier expansion', () => {
     expect('ok' in assembled).toBe(false);
     if (!('ok' in assembled)) {
       expect(assembled.warnings).toEqual([]);
-      expect(assembled.regions).toHaveLength(18);
-      expect(assembled.transitions).toHaveLength(36);
+      expect(assembled.regions).toHaveLength(20);
+      expect(assembled.transitions).toHaveLength(42);
     }
   });
 

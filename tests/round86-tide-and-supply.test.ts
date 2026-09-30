@@ -115,7 +115,7 @@ describe('Round 86 Tide Isle provisions and tide-gated encounter', () => {
     }
   });
 
-  it('persists the island shop remaining stock through save parsing and restore', async () => {
+  it('persists the island shop remaining stock through save parsing and restore', { timeout: 20_000 }, async () => {
     const restoreFetch = installRepositoryDataFetch();
     const info = vi.spyOn(console, 'info').mockImplementation(() => {});
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});

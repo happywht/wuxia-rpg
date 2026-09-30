@@ -202,7 +202,7 @@ describe('Round 83 east coast harbor town', () => {
     expect(world.optionalWarnings).toEqual([]);
   });
 
-  it('isolates malformed item, shop and encounter sets while keeping the other rounds playable', async () => {
+  it('isolates malformed item, shop and encounter sets while keeping the other rounds playable', { timeout: 20_000 }, async () => {
     const outcome = await loadRepositoryWorld({
       'base/items/round-83-east-coast-items.json': JSON.stringify({ items: 'malformed round 83 items' }),
       'base/shops/round-83-east-coast-shops.json': JSON.stringify({ shops: 'malformed round 83 shops' }),

@@ -57,6 +57,8 @@ describe('Round 74 cloud-ridge playable region', () => {
     ['map.round-95-misty-pine-gate', loadMap('../data/base/maps/round-95-misty-pine-gate.json')],
     ['map.round-95-cedar-valley', loadMap('../data/base/maps/round-95-cedar-valley.json')],
     ['map.round-95-east-harbor', loadMap('../data/base/maps/round-95-east-harbor.json')],
+    ['map.round-96-stone-reef', loadMap('../data/base/maps/round-96-stone-reef.json')],
+    ['map.round-96-halfmoon-atoll', loadMap('../data/base/maps/round-96-halfmoon-atoll.json')],
   ]);
 
   it('ships a complete, layered 100×100 CC0 map with bounded atlas gids and walkable ridge trails', () => {
@@ -101,8 +103,8 @@ describe('Round 74 cloud-ridge playable region', () => {
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
     expect(assembled.warnings).toEqual([]);
-    expect(assembled.regions).toHaveLength(18);
-    expect(assembled.transitions).toHaveLength(36);
+    expect(assembled.regions).toHaveLength(20);
+    expect(assembled.transitions).toHaveLength(42);
 
     const ridge = maps.get(RIDGE_ID)!;
     const cloud = maps.get(CLOUD_ID)!;

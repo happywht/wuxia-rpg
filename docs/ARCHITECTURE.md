@@ -1,6 +1,6 @@
 # 架构说明（ARCHITECTURE）
 
-- 状态：截至 Round 95；基础资料含 34 名 NPC、5 个门派、61 项差事、52 件物品、30 种武学、353 个图谱节点/459 条关系及十八张互通百格地图。基础 manifest 有 90 项资源，覆盖 24 个资源 Schema 家族；仓库含 26 份 draft-07 JSON Schema。768×576、57 层可移动舆图以行 RLE 保存，输出图素为 8 源像素/格；Round 95 新增雾杉关、听杉谷、照叶港、四层东境林谷总图图素及 16×16 CC0 森林素材，旧 53 层和十五处旧区域锚点保持不变。所有区域/任务/人物仍通过资料装配；整个产品目标仍在推进。
+- 状态：截至 Round 96；基础资料含 36 名 NPC、5 个门派、63 项差事、52 件物品、30 种武学、370 个图谱节点/479 条关系及二十张互通百格地图。基础 manifest 有 95 项资源，覆盖 24 个资源 Schema 家族；仓库含 26 份 draft-07 JSON Schema。768×576、61 层可移动舆图以行 RLE 保存，输出图素为 8 源像素/格；Round 96 新增中溟·千里石塘、南溟·半月环礁及四层南海礁岛总图图素（复用已登记的 Puny World/Puny Characters CC0 素材），旧 57 层和十八处旧区域锚点保持不变，雾航湾至归帆洲海路缩短为三段。所有区域/任务/人物仍通过资料装配；整个产品目标仍在推进。
 - 关联：`docs/ADR.md`（技术选型依据）、`docs/DATA-GUIDE.md`（数据面细节）
 
 ---
@@ -73,7 +73,7 @@ Round 22 在上述流程中可选登记武学创制组件资源；它按 JSON Sc
 
 ## 3. JSON Schema 校验（Ajv，Round 02 已接入）
 
-- 当前 `data/schema/` 有 26 份 draft-07 JSON Schema：`manifest`、`grid-map`、`world-map`、`game-calendar`、`climate`、`knowledge-nodes`、`knowledge-edges`、`npc-set`、`dialogue-set`、`character-profiles`、`faction-set`、`martial-arts-set`、`battle-encounters`、`items-set`、`shops-set`、`quest-set`、`companion-set`、`arena-set`、`faction-war-set`、`martial-art-components`、`meridian-set`、`equipment-forge-set`、`alchemy-set`、`ending-set`、`achievement-set` 与 `content-package`。当前基础 manifest 登记 34 项资源、覆盖 24 个资源 Schema 家族；`manifest` 与 `content-package` 是独立契约，不计入这 24 个世界资源家族。
+- 当前 `data/schema/` 有 26 份 draft-07 JSON Schema：`manifest`、`grid-map`、`world-map`、`game-calendar`、`climate`、`knowledge-nodes`、`knowledge-edges`、`npc-set`、`dialogue-set`、`character-profiles`、`faction-set`、`martial-arts-set`、`battle-encounters`、`items-set`、`shops-set`、`quest-set`、`companion-set`、`arena-set`、`faction-war-set`、`martial-art-components`、`meridian-set`、`equipment-forge-set`、`alchemy-set`、`ending-set`、`achievement-set` 与 `content-package`。当前基础 manifest 登记 95 项资源、覆盖 24 个资源 Schema 家族；`manifest` 与 `content-package` 是独立契约，不计入这 24 个世界资源家族。
 - Ajv 8.x 在加载期校验 manifest、基础资源和每份 MOD 覆盖（开发/生产相同），不在游戏循环内反复校验。
 - 跨字段规则分层完成：地图尺寸/出生点、世界图地图/区域/关口/事件引用、关口坐标和可走性、历法 id/时段起点唯一性与零点时段存在性、气候季节对历法月份的完整分区及天气权重引用等由语义解析补足；世界图跨地图装配后还会排除与 NPC/战斗遭遇重叠的关口或区域事件。角色成长、武学、物品/商店、任务与对话引用仍按原有模块逐项校验；对话范围顺序由防御解析器隔离。失败时只禁用受影响的最小条目，世界图起始地图、历法与气候等关键资料无效则提供可读启动错误。
 - 错误输出为结构化诊断（来源、资源、消息和字段路径），可被事件总线订阅并显示在场景。

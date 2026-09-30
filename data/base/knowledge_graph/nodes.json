@@ -2470,6 +2470,125 @@
       "title": "照叶港南栈",
       "summary": "在南栈尽头确认前往归帆洲的潮船。",
       "knownByDefault": false
+    },
+    {
+      "id": "place.r96-stone-reef",
+      "kind": "place",
+      "title": "千里石塘",
+      "summary": "雾航湾以东的青黑石礁群，灯序指引往来船只。",
+      "knownByDefault": false
+    },
+    {
+      "id": "map.round-96-stone-reef",
+      "kind": "place",
+      "title": "千里石塘探索地图",
+      "summary": "自雾航湾东渡、南通半月环礁的百格礁岛。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.r96-lantern-stone",
+      "kind": "place",
+      "title": "灯浮石",
+      "summary": "石塘最高礁，刻着四道一组的通行灯序。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.r96-verse-terrace",
+      "kind": "place",
+      "title": "望序台",
+      "summary": "灯序倒读之处，记着自环礁返回石塘的潮时。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.r96-halfmoon-atoll",
+      "kind": "place",
+      "title": "半月环礁",
+      "summary": "环抱浅湖的白色缺月形环礁，沙脊直贯湖心。",
+      "knownByDefault": false
+    },
+    {
+      "id": "map.round-96-halfmoon-atoll",
+      "kind": "place",
+      "title": "半月环礁探索地图",
+      "summary": "石塘以南、东泊归帆洲的百格环礁。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.r96-tide-shrine",
+      "kind": "place",
+      "title": "半月潮祠",
+      "summary": "立在浅湖中的潮位祠柱，灯影即罗盘。",
+      "knownByDefault": false
+    },
+    {
+      "id": "char.r96-cen-xi",
+      "kind": "character",
+      "title": "岑汐",
+      "summary": "千里石塘望潮人，守灯序与系缆孔。",
+      "knownByDefault": false
+    },
+    {
+      "id": "char.r96-luo-yan",
+      "kind": "character",
+      "title": "洛盐",
+      "summary": "半月环礁船娘，往返石塘与归帆洲之间。",
+      "knownByDefault": false
+    },
+    {
+      "id": "quest.r96-reef-lantern",
+      "kind": "quest",
+      "title": "石塘灯浮记",
+      "summary": "辨认灯浮石灯序并向岑汐复命。",
+      "knownByDefault": false
+    },
+    {
+      "id": "quest.r96-atoll-reply",
+      "kind": "quest",
+      "title": "半月的回信",
+      "summary": "抄录望序台潮序并交还洛盐。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r96-stone-arrival",
+      "kind": "event",
+      "title": "抵达千里石塘",
+      "summary": "登礁发现系缆孔与西岬礁路。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r96-lantern-stone",
+      "kind": "event",
+      "title": "辨认灯浮石",
+      "summary": "读出四道一组的通行灯序。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r96-verse-terrace",
+      "kind": "event",
+      "title": "抄录望序台",
+      "summary": "倒读灯序得到归程潮时。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r96-atoll-arrival",
+      "kind": "event",
+      "title": "抵达半月环礁",
+      "summary": "踏上贯通湖心的白色沙脊。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r96-tide-shrine",
+      "kind": "event",
+      "title": "查看半月潮祠",
+      "summary": "读到今日潮位与守祠灯影。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r96-east-pier",
+      "kind": "event",
+      "title": "环礁东栈",
+      "summary": "在东栈确认前往归帆洲的渡船。",
+      "knownByDefault": false
     }
   ]
 }

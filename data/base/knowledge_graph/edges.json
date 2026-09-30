@@ -3217,6 +3217,146 @@
       "toId": "place.r95-east-harbor",
       "relation": "triggers",
       "summary": "走到照叶南栈时查看渡船时刻。"
+    },
+    {
+      "id": "kg.edge.r96-stone-located",
+      "fromId": "map.round-96-stone-reef",
+      "toId": "place.r96-stone-reef",
+      "relation": "locatedAt",
+      "summary": "千里石塘地图承载西岬礁路。"
+    },
+    {
+      "id": "kg.edge.r96-lantern-located",
+      "fromId": "place.r96-lantern-stone",
+      "toId": "map.round-96-stone-reef",
+      "relation": "locatedAt",
+      "summary": "灯浮石立于千里石塘坡顶。"
+    },
+    {
+      "id": "kg.edge.r96-terrace-located",
+      "fromId": "place.r96-verse-terrace",
+      "toId": "map.round-96-stone-reef",
+      "relation": "locatedAt",
+      "summary": "望序台位于石塘西南礁台。"
+    },
+    {
+      "id": "kg.edge.r96-atoll-located",
+      "fromId": "map.round-96-halfmoon-atoll",
+      "toId": "place.r96-halfmoon-atoll",
+      "relation": "locatedAt",
+      "summary": "半月环礁地图承载沙脊与浅湖。"
+    },
+    {
+      "id": "kg.edge.r96-shrine-located",
+      "fromId": "place.r96-tide-shrine",
+      "toId": "map.round-96-halfmoon-atoll",
+      "relation": "locatedAt",
+      "summary": "半月潮祠立在环礁浅湖中。"
+    },
+    {
+      "id": "kg.edge.r96-cen-located",
+      "fromId": "char.r96-cen-xi",
+      "toId": "map.round-96-stone-reef",
+      "relation": "locatedAt",
+      "summary": "岑汐每日在石塘西岬望潮。"
+    },
+    {
+      "id": "kg.edge.r96-luo-located",
+      "fromId": "char.r96-luo-yan",
+      "toId": "map.round-96-halfmoon-atoll",
+      "relation": "locatedAt",
+      "summary": "洛盐在半月沙脊旁泊船候客。"
+    },
+    {
+      "id": "kg.edge.r96-cen-participates",
+      "fromId": "char.r96-cen-xi",
+      "toId": "quest.r96-reef-lantern",
+      "relation": "participatesIn",
+      "summary": "岑汐委托玩家辨认灯浮石。"
+    },
+    {
+      "id": "kg.edge.r96-lantern-needs",
+      "fromId": "quest.r96-reef-lantern",
+      "toId": "place.r96-lantern-stone",
+      "relation": "requires",
+      "summary": "石塘灯浮记需要辨认灯序。"
+    },
+    {
+      "id": "kg.edge.r96-lantern-rewards",
+      "fromId": "quest.r96-reef-lantern",
+      "toId": "place.r96-halfmoon-atoll",
+      "relation": "rewards",
+      "summary": "复命后望见南方的半月环礁。"
+    },
+    {
+      "id": "kg.edge.r96-luo-participates",
+      "fromId": "char.r96-luo-yan",
+      "toId": "quest.r96-atoll-reply",
+      "relation": "participatesIn",
+      "summary": "洛盐托玩家抄录潮序回信。"
+    },
+    {
+      "id": "kg.edge.r96-reply-needs",
+      "fromId": "quest.r96-atoll-reply",
+      "toId": "place.r96-verse-terrace",
+      "relation": "requires",
+      "summary": "半月的回信需要望序台的潮序。"
+    },
+    {
+      "id": "kg.edge.r96-reply-prerequisite",
+      "fromId": "quest.r96-atoll-reply",
+      "toId": "quest.r96-reef-lantern",
+      "relation": "requires",
+      "summary": "先复命灯浮记，洛盐才托付回信。"
+    },
+    {
+      "id": "kg.edge.r96-reply-rewards",
+      "fromId": "quest.r96-atoll-reply",
+      "toId": "place.r96-tide-shrine",
+      "relation": "rewards",
+      "summary": "交还回信后记录半月潮祠潮位。"
+    },
+    {
+      "id": "kg.edge.r96-arrival-triggers",
+      "fromId": "event.r96-stone-arrival",
+      "toId": "place.r96-stone-reef",
+      "relation": "triggers",
+      "summary": "登礁时发现千里石塘。"
+    },
+    {
+      "id": "kg.edge.r96-lantern-triggers",
+      "fromId": "event.r96-lantern-stone",
+      "toId": "place.r96-lantern-stone",
+      "relation": "triggers",
+      "summary": "辨认灯浮石时发现灯序。"
+    },
+    {
+      "id": "kg.edge.r96-terrace-triggers",
+      "fromId": "event.r96-verse-terrace",
+      "toId": "place.r96-verse-terrace",
+      "relation": "triggers",
+      "summary": "抄录望序台时得到归程潮时。"
+    },
+    {
+      "id": "kg.edge.r96-atoll-triggers",
+      "fromId": "event.r96-atoll-arrival",
+      "toId": "place.r96-halfmoon-atoll",
+      "relation": "triggers",
+      "summary": "踏上沙脊时发现半月环礁。"
+    },
+    {
+      "id": "kg.edge.r96-shrine-triggers",
+      "fromId": "event.r96-tide-shrine",
+      "toId": "place.r96-tide-shrine",
+      "relation": "triggers",
+      "summary": "查看潮祠时读到潮位。"
+    },
+    {
+      "id": "kg.edge.r96-pier-triggers",
+      "fromId": "event.r96-east-pier",
+      "toId": "place.r96-halfmoon-atoll",
+      "relation": "triggers",
+      "summary": "走到东栈时确认渡船。"
     }
   ]
 }

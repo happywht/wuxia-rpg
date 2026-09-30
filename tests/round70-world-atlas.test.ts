@@ -83,6 +83,11 @@ describe('Round 70 continental world atlas', () => {
       } else if (region.mapResourceId.startsWith('map.round-95-')) {
         const eastLand = art.layers.find(({ id }) => id === 'world-r95-eastland')!.cells;
         expect(eastLand[row]?.[col]).toBeGreaterThan(0);
+      } else if (region.mapResourceId.startsWith('map.round-96-')) {
+        // The halfmoon-atoll anchor rests on its declared lagoon layer, not bare ocean.
+        const painted = ['world-r96-reef-land', 'world-r96-reef-sand', 'world-r96-reef-water']
+          .some((layerId) => (art.layers.find(({ id }) => id === layerId)?.cells[row]?.[col] ?? 0) > 0);
+        expect(painted, `${region.mapResourceId} anchor on bare atlas`).toBe(true);
       } else if (region.mapResourceId === 'map.round-79-isles') {
         const shoalLand = art.layers.find(({ id }) => id === 'world-r79-shoal-land')!.cells;
         expect(shoalLand[row]?.[col]).toBeGreaterThan(0);
@@ -129,6 +134,10 @@ describe('Round 70 continental world atlas', () => {
         } else if (endpoint.mapResourceId.startsWith('map.round-95-')) {
           expect(art.layers.find(({ id }) => id === 'world-r95-eastland')?.cells[cell.row]?.[cell.col])
             .toBeGreaterThan(0);
+        } else if (endpoint.mapResourceId.startsWith('map.round-96-')) {
+          const painted = ['world-r96-reef-land', 'world-r96-reef-sand', 'world-r96-reef-water', 'world-r96-reef-lane']
+            .some((layerId) => (art.layers.find(({ id }) => id === layerId)?.cells[cell.row]?.[cell.col] ?? 0) > 0);
+          expect(painted, `${transition.id} endpoint on bare atlas`).toBe(true);
         } else if (endpoint.mapResourceId === 'map.round-79-isles') {
           // Round 87 fog-pilot gates leave from the western reef shallows
           // instead of the old official ferry route.

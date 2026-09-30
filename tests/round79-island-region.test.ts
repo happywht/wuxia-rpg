@@ -92,8 +92,8 @@ describe('Round 79 sixth coastal region and movable world atlas', () => {
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
     expect(assembled.warnings).toEqual([]);
-    expect(assembled.regions).toHaveLength(18);
-    expect(assembled.transitions).toHaveLength(36);
+    expect(assembled.regions).toHaveLength(20);
+    expect(assembled.transitions).toHaveLength(42);
     expect(parsed.data.atlasArt).toMatchObject({ columns: 768, rows: 576, tileSize: 8 });
 
     const ferry = maps.get('map.round-10-mist-ferry')!;

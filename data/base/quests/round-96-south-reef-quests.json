@@ -1,0 +1,65 @@
+{
+  "quests": [
+    {
+      "id": "quest.r96-reef-lantern",
+      "name": "石塘灯浮记",
+      "description": "石塘望潮人岑汐请你登礁辨认灯浮石的灯序，把往来石塘的通行记号带回西岬。",
+      "giverNpcId": "char.r96-cen-xi",
+      "objectives": [
+        {
+          "id": "objective.r96-read-lantern",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r96-lantern-stone",
+          "requiredCount": 1,
+          "text": "在千里石塘辨认灯浮石的灯序"
+        },
+        {
+          "id": "objective.r96-report-lantern",
+          "kind": "talkToNpc",
+          "targetId": "char.r96-cen-xi",
+          "requiredCount": 1,
+          "text": "回石塘西岬向岑汐复命"
+        }
+      ],
+      "rewards": {
+        "experience": 42,
+        "currency": 34,
+        "discoverKnowledgeNodeIds": [
+          "place.r96-halfmoon-atoll"
+        ]
+      }
+    },
+    {
+      "id": "quest.r96-atoll-reply",
+      "name": "半月的回信",
+      "description": "灯序复命之后，环礁船娘洛盐托你回千里石塘抄录望序台的潮序，再把这封「回信」带回半月环礁。",
+      "giverNpcId": "char.r96-luo-yan",
+      "prerequisiteQuestIds": [
+        "quest.r96-reef-lantern"
+      ],
+      "objectives": [
+        {
+          "id": "objective.r96-copy-verse",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r96-verse-terrace",
+          "requiredCount": 1,
+          "text": "回千里石塘抄录望序台的潮序"
+        },
+        {
+          "id": "objective.r96-deliver-reply",
+          "kind": "talkToNpc",
+          "targetId": "char.r96-luo-yan",
+          "requiredCount": 1,
+          "text": "把潮序带回半月环礁交给洛盐"
+        }
+      ],
+      "rewards": {
+        "experience": 54,
+        "currency": 46,
+        "discoverKnowledgeNodeIds": [
+          "place.r96-tide-shrine"
+        ]
+      }
+    }
+  ]
+}

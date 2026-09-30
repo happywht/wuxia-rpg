@@ -347,6 +347,7 @@ describe('Round 80 region interaction protocol', () => {
       'event.r93-old-mark',
       'event.r94-east-beacon', 'event.r94-south-lantern',
       'event.r95-windbell-stone', 'event.r95-old-tide-gauge',
+      'event.r96-lantern-stone', 'event.r96-verse-terrace', 'event.r96-tide-shrine',
     ]);
 
     const bridge = interactive.find(({ id }) => id === 'event.r74-cloud-bridge')!;

@@ -34,6 +34,8 @@ describe('large walkable regions and later atlas extensions', () => {
   const mistyPineGate = parseMap('../data/base/maps/round-95-misty-pine-gate.json');
   const cedarValley = parseMap('../data/base/maps/round-95-cedar-valley.json');
   const eastHarbor = parseMap('../data/base/maps/round-95-east-harbor.json');
+  const stoneReef = parseMap('../data/base/maps/round-96-stone-reef.json');
+  const halfmoonAtoll = parseMap('../data/base/maps/round-96-halfmoon-atoll.json');
   const worldData = readJson('../data/base/world/world-map.json') as {
     transitions: Array<{ id: string; from: { mapResourceId: string; col: number; row: number }; to: { mapResourceId: string; col: number; row: number } }>;
     landmarks: Array<{ id: string; mapResourceId: string; col: number; row: number }>;
@@ -141,6 +143,8 @@ describe('large walkable regions and later atlas extensions', () => {
       [mistyPineGate.data.id, mistyPineGate],
       [cedarValley.data.id, cedarValley],
       [eastHarbor.data.id, eastHarbor],
+      [stoneReef.data.id, stoneReef],
+      [halfmoonAtoll.data.id, halfmoonAtoll],
     ]), {
       knowledgeNodeIds: new Set(nodes.nodes.map(({ id }) => id)),
       periodIds: new Set(calendar.periods.map(({ id }) => id)),
@@ -150,8 +154,8 @@ describe('large walkable regions and later atlas extensions', () => {
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
     expect(assembled.warnings).toEqual([]);
-    expect(assembled.regions).toHaveLength(18);
-    expect(assembled.transitions).toHaveLength(36);
+    expect(assembled.regions).toHaveLength(20);
+    expect(assembled.transitions).toHaveLength(42);
     expect(assembled.landmarks.some(({ id }) => id === 'landmark.mist-willow-market')).toBe(true);
     expect(assembled.landmarks.some(({ id }) => id === 'landmark.mist-old-sluice' && id !== undefined)).toBe(true);
     expect(assembled.events.some(({ id }) => id === 'event.r55-sluice-inscription')).toBe(true);

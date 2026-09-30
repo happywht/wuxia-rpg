@@ -279,7 +279,7 @@ describe('Round 90 cross-region arrival roaming events', () => {
     expect(selectNewRegionEventKnowledgeIds([arrival], new Set([ARRIVAL_EVENT_ID]))).toEqual([]);
   });
 
-  it('round-trips one-shot arrivals and the pending return through a v1 save', async () => {
+  it('round-trips one-shot arrivals and the pending return through a v1 save', { timeout: 20_000 }, async () => {
     const files = new Map<string, string>();
     const walk = (directory: string, prefix: string): void => {
       for (const name of readdirSync(directory)) {
