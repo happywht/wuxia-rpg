@@ -1339,7 +1339,9 @@ function assembleOptionalContent(
       companionSet = parsed.set;
     }
   }
-  const companionAssembly = assembleCompanions(companionSet, placedNpcIds);
+  const companionAssembly = assembleCompanions(companionSet, placedNpcIds, {
+    knowledgeNodeIds, mapResourceIds: new Set(maps.keys()),
+  });
   for (const message of companionAssembly.warnings) {
     warnings.push({
       resource: COMPANION_RESOURCE_ID,

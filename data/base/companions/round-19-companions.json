@@ -3,12 +3,130 @@
     {
       "id": "companion.gu-yechen",
       "npcId": "char.gu-yechen",
-      "description": "雾路刀客。每两次成功的玩家行动后，以精准的一击援护队友。",
+      "description": "默认每两次成功行动以9力援护；当面听过大陆/北境/海路的决定后，按当前代表地区改为正面援护或疗伤。未告知的事不替你判断。",
       "combatSupport": {
         "kind": "attack",
         "power": 9,
         "everyPlayerActions": 2
-      }
+      },
+      "stanceRules": [
+        {
+          "id": "stance.r105-main-open",
+          "label": "正面护路",
+          "description": "你已转述公开署名；在大陆五处正面援护，报信风险仍在。",
+          "mapResourceIds": [
+            "map.round-01-grid",
+            "map.round-10-mist-ferry",
+            "map.round-62-iron-ridge",
+            "map.round-67-salt-road",
+            "map.round-74-cloud-ridge"
+          ],
+          "requiredSharedKnowledgeNodeIds": [
+            "event.r100-record-open"
+          ],
+          "combatSupport": {
+            "kind": "attack",
+            "power": 9,
+            "everyPlayerActions": 2
+          }
+        },
+        {
+          "id": "stance.r105-main-guard",
+          "label": "顾人护路",
+          "description": "你已转述保护姓名；在大陆五处改为疗伤援护，不补内力。",
+          "mapResourceIds": [
+            "map.round-01-grid",
+            "map.round-10-mist-ferry",
+            "map.round-62-iron-ridge",
+            "map.round-67-salt-road",
+            "map.round-74-cloud-ridge"
+          ],
+          "requiredSharedKnowledgeNodeIds": [
+            "event.r100-record-guard"
+          ],
+          "combatSupport": {
+            "kind": "heal",
+            "power": 7,
+            "everyPlayerActions": 2
+          }
+        },
+        {
+          "id": "stance.r105-north-open",
+          "label": "迎风应对",
+          "description": "你已转述公开番号；在北境三处正面援护，不保证号码不会被冒用。",
+          "mapResourceIds": [
+            "map.round-91-cloud-north-terrace",
+            "map.round-92-north-pass",
+            "map.round-93-snow-pine-valley"
+          ],
+          "requiredSharedKnowledgeNodeIds": [
+            "event.r101-code-open"
+          ],
+          "combatSupport": {
+            "kind": "attack",
+            "power": 9,
+            "everyPlayerActions": 2
+          }
+        },
+        {
+          "id": "stance.r105-north-limited",
+          "label": "护住伤者",
+          "description": "你已转述限定报码；在北境三处疗伤援护，散客等待仍在。",
+          "mapResourceIds": [
+            "map.round-91-cloud-north-terrace",
+            "map.round-92-north-pass",
+            "map.round-93-snow-pine-valley"
+          ],
+          "requiredSharedKnowledgeNodeIds": [
+            "event.r101-code-limited"
+          ],
+          "combatSupport": {
+            "kind": "heal",
+            "power": 7,
+            "everyPlayerActions": 2
+          }
+        },
+        {
+          "id": "stance.r105-sea-public",
+          "label": "护散船路",
+          "description": "你已转述公开潮时；在五处代表海路正面援护，辨假号负担仍在。",
+          "mapResourceIds": [
+            "map.round-82-east-coast",
+            "map.round-84-windward-isle",
+            "map.round-85-tide-isle",
+            "map.round-97-lanxin-isle",
+            "map.round-97-pilot-reef"
+          ],
+          "requiredSharedKnowledgeNodeIds": [
+            "event.r102-pilot-public"
+          ],
+          "combatSupport": {
+            "kind": "attack",
+            "power": 9,
+            "everyPlayerActions": 2
+          }
+        },
+        {
+          "id": "stance.r105-sea-crew",
+          "label": "照看同行",
+          "description": "你已转述熟船传示；在五处代表海路疗伤援护，不替未传示者作答。",
+          "mapResourceIds": [
+            "map.round-82-east-coast",
+            "map.round-84-windward-isle",
+            "map.round-85-tide-isle",
+            "map.round-97-lanxin-isle",
+            "map.round-97-pilot-reef"
+          ],
+          "requiredSharedKnowledgeNodeIds": [
+            "event.r102-pilot-crew"
+          ],
+          "combatSupport": {
+            "kind": "heal",
+            "power": 7,
+            "everyPlayerActions": 2
+          }
+        }
+      ]
     }
   ]
 }

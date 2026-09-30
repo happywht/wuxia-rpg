@@ -147,6 +147,101 @@
               ]
             },
             {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-before",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r62-post-ledger",
+                  "status": "locked"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-before",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r62-post-ledger",
+                  "status": "offered"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-active",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r62-post-ledger",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-after",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r62-post-ledger",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "能把你的判断转述给另一处的记录人吗？",
+              "nextNodeId": "r105-ledger-source",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-settled"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-ledger-message",
+                  "isKnown": false
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r62-post-ledger",
+                  "status": "completed"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r105-ledger-message"
+                }
+              ]
+            },
+            {
+              "text": "那番转述现在怎样了？",
+              "nextNodeId": "r105-ledger-waiting",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-ledger-message"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-ledger-delivered",
+                  "isKnown": false
+                }
+              ]
+            },
+            {
+              "text": "对方听过后，这层关系怎样看？",
+              "nextNodeId": "r105-ledger-closed",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-ledger-delivered"
+                }
+              ]
+            },
+            {
               "text": "先不打扰你。",
               "nextNodeId": "farewell"
             }
@@ -251,6 +346,30 @@
         {
           "id": "r100-record-guard",
           "text": "她遮住姓名：「药留给他救急，我替他记这份情。没有公开证词，旁人不会把功劳都算给你。到青岩驿核井壁水线，那里能把货担秤刻与更牌记法分开。」"
+        },
+        {
+          "id": "r105-before",
+          "text": "秦素砚压住簿角：「我抄更次，也要让报信的人明日还敢出门。先核更簿，不急着把姓名写满纸；路客要证词，人也要避处，这两件事会相互牵扯。」"
+        },
+        {
+          "id": "r105-active",
+          "text": "秦素砚把笔尖悬在纸上：「核更次这一趟，邵长庚的当值与你见过的路标都要分别记。证人没说的不要替他补。我还在等你核对，署名与保护的事得等证据齐。」"
+        },
+        {
+          "id": "r105-after",
+          "text": "秦素砚合上更簿：「这一页核过了。公开署名便于查牌，也会把人推到争执前；隐名让人继续走路，却留下证词缺口。定过立场后，把我这层顾虑转述给北台聂栖雁，让她按自己的雁候记录判断。」"
+        },
+        {
+          "id": "r105-ledger-source",
+          "text": "秦素砚把笔搁下：「给聂栖雁转述：证词便于路客核查，报信人也要避处。你定过署名或隐名，原样说明，不替她先答。这是口头转述，不另给你一封实体信。」"
+        },
+        {
+          "id": "r105-ledger-waiting",
+          "text": "话已由你记下，须到对方所在地区亲口说明；没回来前，我不会说对方已经听见。"
+        },
+        {
+          "id": "r105-ledger-closed",
+          "text": "你已经亲口转述并得到回应。这一回关系后果已经记过，不能重复领认同；原判断和对方的取舍仍各自成立。"
         }
       ]
     }

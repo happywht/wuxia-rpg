@@ -40,6 +40,7 @@ import {
 import {
   createCompanionState,
   resolveCompanionFollowCell,
+  resolveCompanionStance,
   type CompanionState,
 } from '../engine/companion-system';
 import { createFactionMembershipState, type FactionMembershipState } from '../engine/faction-system';
@@ -1658,7 +1659,7 @@ export class GridScene extends Phaser.Scene {
       martialArts: this.combatMartialArts(),
       ...(this.meridianSet !== null ? { meridianResourceRules: this.meridianSet.resource } : {}),
       ...(activeCompanion !== undefined && companionNpc !== undefined
-        ? { companion: { name: companionNpc.record.name, support: activeCompanion.combatSupport } }
+        ? { companion: { name: companionNpc.record.name, support: resolveCompanionStance(activeCompanion, { mapResourceId: this.currentMapResourceId, sharedKnowledgeNodeIds: this.social.npcKnowledge.get(activeCompanion.npcId) ?? new Set() }).combatSupport } }
         : {}),
     });
     this.activeSession = session;
@@ -1764,7 +1765,7 @@ export class GridScene extends Phaser.Scene {
       martialArts: this.combatMartialArts(),
       ...(this.meridianSet !== null ? { meridianResourceRules: this.meridianSet.resource } : {}),
       ...(activeCompanion !== undefined && companionNpc !== undefined
-        ? { companion: { name: companionNpc.record.name, support: activeCompanion.combatSupport } }
+        ? { companion: { name: companionNpc.record.name, support: resolveCompanionStance(activeCompanion, { mapResourceId: this.currentMapResourceId, sharedKnowledgeNodeIds: this.social.npcKnowledge.get(activeCompanion.npcId) ?? new Set() }).combatSupport } }
         : {}),
     });
     this.activeEncounter = null;
@@ -2947,11 +2948,16 @@ export class GridScene extends Phaser.Scene {
     panel.open({
       companions: this.companions,
       activeCompanionId: this.companionState.activeCompanionId,
+      mapResourceId: this.currentMapResourceId,
       npcNames: new Map((this.world?.assembly.npcs ?? []).map((npc) => [npc.record.id, npc.record.name])),
       social: this.social,
       onDismiss: () => {
         this.companionState.activeCompanionId = null;
         this.refreshNpcPlacements();
+      },
+      onTalk: () => {
+        const npc = this.activeCompanionNpc();
+        if (npc !== undefined) this.openDialogueWith({ ...npc, col: this.playerCol, row: this.playerRow });
       },
     });
     this.updateInteractHint();
@@ -3852,7 +3858,7 @@ export class GridScene extends Phaser.Scene {
       martialArts: this.combatMartialArts(),
       ...(this.meridianSet !== null ? { meridianResourceRules: this.meridianSet.resource } : {}),
       ...(activeCompanion !== undefined && companionNpc !== undefined
-        ? { companion: { name: companionNpc.record.name, support: activeCompanion.combatSupport } }
+        ? { companion: { name: companionNpc.record.name, support: resolveCompanionStance(activeCompanion, { mapResourceId: this.currentMapResourceId, sharedKnowledgeNodeIds: this.social.npcKnowledge.get(activeCompanion.npcId) ?? new Set() }).combatSupport } }
         : {}),
     });
     this.activeSession = session;

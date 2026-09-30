@@ -92,6 +92,50 @@
               ]
             },
             {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-before",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r92-snow-beacon",
+                  "status": "locked"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-before",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r92-snow-beacon",
+                  "status": "offered"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-active",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r92-snow-beacon",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-after",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r92-snow-beacon",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
               "text": "改日再谈。",
               "nextNodeId": "farewell"
             }
@@ -236,6 +280,18 @@
         {
           "id": "r101-private-echo",
           "text": "「谷里留了内部旧刻记录。」她点头，「少惹争执是好事，可关外来的人看不到注记，问疆界时仍要有人解释。没有公开文字，不代表旧碑成了现行界。」"
+        },
+        {
+          "id": "r105-before",
+          "text": "谷照雪拍掉号台积雪：「这里当值的人要让三烽传得准，也要防冒号的人学得快。先查烽记，再谈怎样传给别人；清心丸与回春膏带够，雪里没有替你生出来的补给。」"
+        },
+        {
+          "id": "r105-active",
+          "text": "谷照雪把号册挡在风里：「你正查传烽，核号、应对冒号客、回关报告各走一步。人愿不愿公开号码有各自代价，不要在事情还没核完时替北台答应。」"
+        },
+        {
+          "id": "r105-after",
+          "text": "谷照雪给号册扣上木夹：「现行火号这一处已核清。公开让路客便于识火，也让我多防假号；限定便于报码队查验，却让散客多等。哪一面是你亲自定的，原样告诉同行者，别只报好处。」"
         }
       ]
     }

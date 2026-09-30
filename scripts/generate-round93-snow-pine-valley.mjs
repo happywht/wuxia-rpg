@@ -1,3 +1,4 @@
+import { deepenPeopleDialogues } from './lib/round105-people-content.mjs';
 import { deepenNorthQuests, deepenNorthDialogues } from './lib/round101-north-content.mjs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
@@ -1075,7 +1076,7 @@ world.atlasArt.layers = world.atlasArt.layers.map((layer) => ({
 await Promise.all([
   writeManagedJson(paths.map, mapData, '霜松谷地图'),
   writeManagedJson(paths.npcs, npcs, '霜松谷人物'),
-  writeManagedJson(paths.dialogues, deepenNorthDialogues(dialogues), '霜松谷对白'),
+  writeManagedJson(paths.dialogues, deepenPeopleDialogues(deepenNorthDialogues(dialogues)), '霜松谷对白'),
   writeManagedJson(paths.quests, deepenNorthQuests(quests), '霜松谷任务'),
   writeJson(paths.world, world),
   writeJson(paths.manifest, manifest),

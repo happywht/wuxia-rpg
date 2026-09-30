@@ -294,7 +294,7 @@ describe('Round 97 east-mid-sea lanes and the Lanxin Isle / Pilot Reef relay', (
     ] as const) {
       const conversation = dialogueParse.set.conversations.find(({ id }) => id === dialogueId)!;
       const greet = conversation.nodes.find(({ id }) => id === 'greet')!;
-      const conditioned = greet.options!.filter((option) => option.conditions?.length === 1 && option.conditions[0]?.kind === 'questStatus');
+      const conditioned = greet.options!.filter((option) => !option.nextNodeId?.startsWith('r105-') && option.conditions?.length === 1 && option.conditions[0]?.kind === 'questStatus');
       expect(conditioned.map((option) => option.conditions![0]), dialogueId).toEqual([
         { kind: 'questStatus', questId, status: 'offered' },
         { kind: 'questStatus', questId, status: 'completed' },

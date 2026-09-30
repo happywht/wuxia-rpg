@@ -124,6 +124,50 @@
               ]
             },
             {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-before",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r85-low-tide-channel",
+                  "status": "locked"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-before",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r85-low-tide-channel",
+                  "status": "offered"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-active",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r85-low-tide-channel",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-after",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r85-low-tide-channel",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
               "text": "打扰了。",
               "nextNodeId": "farewell"
             }
@@ -148,6 +192,18 @@
         {
           "id": "r102-echo-keeper-aid",
           "text": "「留的回春膏已记作守礁应急份额，我领这份情；岸上的伤者不是因此就都安稳了。」"
+        },
+        {
+          "id": "r105-before",
+          "text": "岑隐礁眯眼看退潮的沙脊：「守礁的人吃亏在无人在岸上看见。低潮礁道先查实，不要把守灯与照顾渔户说成互不相干；东西却只有一份，援谁都得承认另一边没拿到。」"
+        },
+        {
+          "id": "r105-active",
+          "text": "岑隐礁指向沙脊：「你在查低潮礁道，潮位、归途与夺货客都要分开看。盐风伤膏是渔户要用，回春膏是守灯人要用；我能说急处，不能替你从空包里变出药。」"
+        },
+        {
+          "id": "r105-after",
+          "text": "岑隐礁望着远灯：「礁道这一趟核过了，灯与人仍得有人照看。你既决定补给给哪边，就把未顾到的一边也说清；季无潮讨论传航时，别把药的取舍说成只要好心便两头都能满足。」"
         }
       ]
     }

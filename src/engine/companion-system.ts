@@ -22,6 +22,28 @@ export interface CompanionData {
   npcId: string;
   description: string;
   combatSupport: CompanionSupportData;
+  /** First matching rule wins; knowledge means what this NPC was told. */
+  stanceRules?: CompanionStanceRuleData[];
+}
+
+export interface CompanionStanceRuleData {
+  id: string;
+  label: string;
+  description: string;
+  mapResourceIds?: string[];
+  requiredSharedKnowledgeNodeIds: string[];
+  combatSupport: CompanionSupportData;
+}
+
+export function resolveCompanionStance(companion: CompanionData, context: {
+  mapResourceId: string;
+  sharedKnowledgeNodeIds: ReadonlySet<string>;
+}): { stanceId: string | null; label: string; description: string; combatSupport: CompanionSupportData } {
+  const rule = companion.stanceRules?.find(candidate =>
+    (candidate.mapResourceIds === undefined || candidate.mapResourceIds.includes(context.mapResourceId)) &&
+    candidate.requiredSharedKnowledgeNodeIds.every(id => context.sharedKnowledgeNodeIds.has(id)));
+  return rule ? { stanceId: rule.id, label: rule.label, description: rule.description, combatSupport: rule.combatSupport }
+    : { stanceId: null, label: '基础援护', description: companion.description, combatSupport: companion.combatSupport };
 }
 
 export interface CompanionSetData {
@@ -46,6 +68,35 @@ function requireInteger(value: unknown, min: number, max: number): number | null
     : null;
 }
 
+function parseStanceRules(value: unknown, label: string, errors: string[]): CompanionStanceRuleData[] | undefined {
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value) || value.length > 32) {
+    errors.push(`${label}：应为最多32条立场规则`); return [];
+  }
+  const result: CompanionStanceRuleData[] = [];
+  const ids = new Set<string>();
+  const list = (v: unknown, min: number): v is string[] => Array.isArray(v) && v.length >= min && v.length <= 64 &&
+    v.every(id => requireString(id) !== null) && new Set(v).size === v.length;
+  for (const raw of value) {
+    if (!isPlainObject(raw) || requireString(raw.id) === null || ids.has(raw.id as string) ||
+      requireString(raw.label) === null || requireString(raw.description) === null ||
+      !list(raw.requiredSharedKnowledgeNodeIds, 1) ||
+      (raw.mapResourceIds !== undefined && !list(raw.mapResourceIds, 1)) ||
+      !isPlainObject(raw.combatSupport) || !['attack', 'heal'].includes(raw.combatSupport.kind as string) ||
+      requireInteger(raw.combatSupport.power, 1, 999) === null ||
+      requireInteger(raw.combatSupport.everyPlayerActions, 1, 20) === null) {
+      errors.push(`${label}：规则ID/条件/支援结构无效或重复`); continue;
+    }
+    ids.add(raw.id as string);
+    result.push({ id: raw.id as string, label: raw.label as string, description: raw.description as string,
+      requiredSharedKnowledgeNodeIds: [...raw.requiredSharedKnowledgeNodeIds],
+      ...(raw.mapResourceIds === undefined ? {} : { mapResourceIds: [...raw.mapResourceIds] }),
+      combatSupport: { kind: raw.combatSupport.kind as CompanionSupportKind, power: raw.combatSupport.power as number,
+        everyPlayerActions: raw.combatSupport.everyPlayerActions as number } });
+  }
+  return result;
+}
+
 /** Defensive parser paired with data/schema/companion-set.schema.json. */
 export function parseCompanionSet(raw: unknown): CompanionSetParseResult {
   if (!isPlainObject(raw) || !Array.isArray(raw.companions)) {
@@ -56,6 +107,7 @@ export function parseCompanionSet(raw: unknown): CompanionSetParseResult {
   raw.companions.forEach((entry, index) => {
     const label = `companions[${index}]`;
     const source = isPlainObject(entry) ? entry : null;
+    const stanceRules = parseStanceRules(source?.stanceRules, `${label}.stanceRules`, errors);
     const id = source === null ? null : requireString(source.id);
     const npcId = source === null ? null : requireString(source.npcId);
     const description = source === null ? null : requireString(source.description);
@@ -81,6 +133,7 @@ export function parseCompanionSet(raw: unknown): CompanionSetParseResult {
       npcId: npcId!,
       description: description!,
       combatSupport: { kind: kind!, power: power!, everyPlayerActions: everyPlayerActions! },
+      ...(stanceRules === undefined ? {} : { stanceRules }),
     });
   });
   return errors.length > 0 ? { ok: false, errors } : { ok: true, set: { companions } };
@@ -90,6 +143,7 @@ export function parseCompanionSet(raw: unknown): CompanionSetParseResult {
 export function assembleCompanions(
   set: CompanionSetData | null,
   placedNpcIds: ReadonlySet<string>,
+  references?: { knowledgeNodeIds: ReadonlySet<string>; mapResourceIds: ReadonlySet<string> },
 ): { companions: ReadonlyMap<string, CompanionData>; warnings: string[] } {
   const companions = new Map<string, CompanionData>();
   const warnings: string[] = [];
@@ -102,7 +156,14 @@ export function assembleCompanions(
       warnings.push(`伙伴 "${companion.id}" 引用的 NPC "${companion.npcId}" 不存在或未通过地图校验，已禁用`);
       continue;
     }
-    companions.set(companion.id, companion);
+    const stanceRules = companion.stanceRules?.filter(rule => {
+      if (references !== undefined && (rule.requiredSharedKnowledgeNodeIds.some(id => !references.knowledgeNodeIds.has(id)) ||
+        rule.mapResourceIds?.some(id => !references.mapResourceIds.has(id)))) {
+        warnings.push(`伙伴立场 "${rule.id}" 引用无效见闻或地图，已隔离此规则`); return false;
+      }
+      return true;
+    });
+    companions.set(companion.id, { ...companion, ...(stanceRules === undefined ? {} : { stanceRules }) });
   }
   return { companions, warnings };
 }

@@ -1,0 +1,1 @@
+PASS: all quests/maps/NPCs/skills/shops unchanged; all old dialogue nodes and options preserved; six new graph nodes and nine edges only; original companion identity and support preserved.

@@ -3721,6 +3721,69 @@
       "toId": "event.r104-forge-practice",
       "relation": "knows",
       "summary": "制作与用途完整结案后的复核记录；静态边不代替玩家实践。"
+    },
+    {
+      "id": "kg.edge.r105-ledger-people",
+      "fromId": "char.qin-suyan",
+      "toId": "char.r91-nie-qiyan",
+      "relation": "influences",
+      "summary": "通过玩家亲口转述产生后续判断；静态关系不代表已经送达。"
+    },
+    {
+      "id": "kg.edge.r105-ledger-source",
+      "fromId": "char.qin-suyan",
+      "toId": "event.r105-ledger-message",
+      "relation": "knows",
+      "summary": "来源判断，不代表接收人已听见。"
+    },
+    {
+      "id": "kg.edge.r105-ledger-target",
+      "fromId": "char.r91-nie-qiyan",
+      "toId": "event.r105-ledger-delivered",
+      "relation": "knows",
+      "summary": "接收回应，运行时仍须实际分享。"
+    },
+    {
+      "id": "kg.edge.r105-carving-people",
+      "fromId": "char.r74-shen-yuji",
+      "toId": "char.r93-liu-xunjing",
+      "relation": "influences",
+      "summary": "通过玩家亲口转述产生后续判断；静态关系不代表已经送达。"
+    },
+    {
+      "id": "kg.edge.r105-carving-source",
+      "fromId": "char.r74-shen-yuji",
+      "toId": "event.r105-carving-message",
+      "relation": "knows",
+      "summary": "来源判断，不代表接收人已听见。"
+    },
+    {
+      "id": "kg.edge.r105-carving-target",
+      "fromId": "char.r93-liu-xunjing",
+      "toId": "event.r105-carving-delivered",
+      "relation": "knows",
+      "summary": "接收回应，运行时仍须实际分享。"
+    },
+    {
+      "id": "kg.edge.r105-road-sea-people",
+      "fromId": "char.gu-yechen",
+      "toId": "char.r97-ji-wuchao",
+      "relation": "influences",
+      "summary": "通过玩家亲口转述产生后续判断；静态关系不代表已经送达。"
+    },
+    {
+      "id": "kg.edge.r105-road-sea-source",
+      "fromId": "char.gu-yechen",
+      "toId": "event.r105-road-sea-message",
+      "relation": "knows",
+      "summary": "来源判断，不代表接收人已听见。"
+    },
+    {
+      "id": "kg.edge.r105-road-sea-target",
+      "fromId": "char.r97-ji-wuchao",
+      "toId": "event.r105-road-sea-delivered",
+      "relation": "knows",
+      "summary": "接收回应，运行时仍须实际分享。"
     }
   ]
 }

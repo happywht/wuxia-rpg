@@ -393,6 +393,7 @@ describe('Round 92 North Pass (Snowlit Pass)', () => {
       'scripts/generate-round93-snow-pine-valley.mjs',
       'scripts/lib/atlas-rle.mjs',
       'scripts/lib/round101-north-content.mjs',
+      'scripts/lib/round105-people-content.mjs',
       'data/base/world/world-map.json',
       'data/base/manifest.json',
       'data/base/maps/round-79-isles.json',

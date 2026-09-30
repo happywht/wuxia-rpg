@@ -1,3 +1,4 @@
+import { deepenPeopleDialogues } from './lib/round105-people-content.mjs';
 import { createHash } from 'node:crypto';
 import { deepenSeaQuests, deepenSeaDialogues } from './lib/round102-sea-content.mjs';
 import { readFileSync } from 'node:fs';
@@ -162,7 +163,7 @@ await Promise.all([
   writeJson(files.world, world), writeJson(files.manifest, manifest),
   writeJson(files.nodes, nodes), writeJson(files.edges, edges),
   writeJson(files.npcs, { npcs }),
-  writeJson(files.dialogues, deepenSeaDialogues({ conversations: dialogues })),
+  writeJson(files.dialogues, deepenPeopleDialogues(deepenSeaDialogues({ conversations: dialogues }))),
   writeJson(files.quests, deepenSeaQuests({ quests })),
 ]);
 

@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
+import { wrapDialogueText } from './dialogue-layout';
 
-import type { CompanionData } from '../engine/companion-system';
+import { resolveCompanionStance, type CompanionData } from '../engine/companion-system';
 import type { SocialState } from '../engine/social-state';
 import { getRelationship } from '../engine/social-state';
 import { uiFontSize } from './settings';
@@ -11,7 +12,9 @@ export interface CompanionPanelModel {
   activeCompanionId: string | null;
   npcNames: ReadonlyMap<string, string>;
   social: Readonly<SocialState>;
+  mapResourceId: string;
   onDismiss: () => void;
+  onTalk: () => void;
 }
 
 type PanelBinding = { key: Phaser.Input.Keyboard.Key; handler: () => void };
@@ -73,6 +76,15 @@ export class CompanionPanel {
     };
     dismissKey.on('down', dismissHandler);
     this.bindings.push({ key: dismissKey, handler: dismissHandler });
+    const talkKey = keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.T);
+    const talkHandler = (): void => {
+      const model = this.model;
+      if (!model?.activeCompanionId) return;
+      this.close();
+      model.onTalk();
+    };
+    talkKey.on('down', talkHandler);
+    this.bindings.push({ key: talkKey, handler: talkHandler });
   }
 
   private unbindKeys(): void {
@@ -90,7 +102,7 @@ export class CompanionPanel {
     const top = (this.scene.scale.height - height) / 2;
     addPixelPanelChrome(this.scene, this.container, { x: left, y: top, width, height }, 0.88);
     this.addText(left + 26, top + 20, '同行伙伴', 20, UI_PALETTE.accent);
-    this.addText(left + 28, top + 54, 'P / Esc 收起；有伙伴同行时按 Enter 让其暂离。', 12, UI_PALETTE.muted);
+    this.addText(left + 28, top + 54, 'T 与同行者交谈 · Enter 暂离 · P / Esc 收起', 12, UI_PALETTE.muted);
 
     const entries = [...model.companions.values()];
     if (entries.length === 0) {
@@ -101,22 +113,25 @@ export class CompanionPanel {
     for (const companion of entries) {
       const npcName = model.npcNames.get(companion.npcId) ?? companion.npcId;
       const active = model.activeCompanionId === companion.id;
-      const support = companion.combatSupport.kind === 'attack'
-        ? `每 ${companion.combatSupport.everyPlayerActions} 次成功行动造成 ${companion.combatSupport.power} 点援护伤害`
-        : `每 ${companion.combatSupport.everyPlayerActions} 次成功行动恢复 ${companion.combatSupport.power} 点生命`;
+      const stance = resolveCompanionStance(companion, { mapResourceId: model.mapResourceId,
+        sharedKnowledgeNodeIds: model.social.npcKnowledge.get(companion.npcId) ?? new Set() });
+      const support = stance.combatSupport.kind === 'attack'
+        ? `每 ${stance.combatSupport.everyPlayerActions} 次成功行动造成 ${stance.combatSupport.power} 点援护伤害`
+        : `每 ${stance.combatSupport.everyPlayerActions} 次成功行动恢复 ${stance.combatSupport.power} 点生命`;
       this.addText(left + 32, y, `${active ? '◆ 同行　' : '◇ 可邀　'}${npcName}　·　关系 ${getRelationship(model.social, companion.npcId)}`, 14, active ? UI_PALETTE.jade : UI_PALETTE.text);
       y += 24;
-      const detail = this.scene.add.text(left + 50, y, `${companion.description} ${support}。`, {
+      const detail = this.scene.add.text(left + 50, y, `【${stance.label}】${stance.description} ${support}。`, {
         fontFamily: UI_FONT_FAMILY,
         fontSize: uiFontSize(12),
         color: UI_PALETTE.muted,
         wordWrap: { width: width - 92 },
       }).setOrigin(0, 0);
+      detail.setText(wrapDialogueText(detail.text, width - 92, value => detail.context.measureText(value).width).join('\n'));
       this.container.add(detail);
       y += Math.max(28, detail.height) + 18;
     }
     if (model.activeCompanionId !== null) {
-      this.addText(left + width - 28, top + height - 25, 'Enter 暂离　·　P / Esc 收起', 11, UI_PALETTE.accent, 'right');
+      this.addText(left + width - 28, top + height - 25, 'T 交谈 · Enter 暂离 · P / Esc 收起', 11, UI_PALETTE.accent, 'right');
     }
   }
 

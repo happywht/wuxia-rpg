@@ -146,3 +146,7 @@
 - 伙伴资料字段、支援数值、跨资源隔离和存档规则见 `docs/COMPANIONS.md`。
 
 Round 19 以后，引用装配覆盖任务、物品、NPC、见闻、门派、武学、时段与伙伴 id；Round 26 的人物私有见闻条件和分享效果也参与同一对话选项隔离。
+
+## Round 105 更新
+
+先从来源discoverKnowledgeNode记录判断，再在接收人现场shareKnowledgeNode；分享与关系/送达由同事务处理。仅玩家已知不表示npcKnows成立，重复送达须以knowledgeKnown.isKnown:false封门。

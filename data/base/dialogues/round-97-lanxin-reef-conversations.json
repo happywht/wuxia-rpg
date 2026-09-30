@@ -98,6 +98,148 @@
               ]
             },
             {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-before",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r97-tide-ledger",
+                  "status": "locked"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-before",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r97-tide-ledger",
+                  "status": "offered"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-active",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r97-tide-ledger",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-after",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r97-tide-ledger",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "转述另一处的判断（关系+2，仅一次）。",
+              "nextNodeId": "r105-road-sea-receive-0",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-road-sea-message"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-road-sea-delivered",
+                  "isKnown": false
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r97-tide-ledger",
+                  "status": "completed"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-public"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "shareKnowledgeNode",
+                  "nodeId": "event.r105-road-sea-message"
+                },
+                {
+                  "kind": "shareKnowledgeNode",
+                  "nodeId": "event.r102-pilot-public"
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "delta": 2
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r105-road-sea-delivered"
+                }
+              ]
+            },
+            {
+              "text": "转述另一处的判断（关系-1，仅一次）。",
+              "nextNodeId": "r105-road-sea-receive-1",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-road-sea-message"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-road-sea-delivered",
+                  "isKnown": false
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r97-tide-ledger",
+                  "status": "completed"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-crew"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "shareKnowledgeNode",
+                  "nodeId": "event.r105-road-sea-message"
+                },
+                {
+                  "kind": "shareKnowledgeNode",
+                  "nodeId": "event.r102-pilot-crew"
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "delta": -1
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r105-road-sea-delivered"
+                }
+              ]
+            },
+            {
+              "text": "此前转述还记得吗？",
+              "nextNodeId": "r105-road-sea-received",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-road-sea-delivered"
+                },
+                {
+                  "kind": "npcKnows",
+                  "nodeId": "event.r105-road-sea-message"
+                }
+              ]
+            },
+            {
               "text": "先告辞。",
               "nextNodeId": "farewell"
             }
@@ -242,6 +384,30 @@
         {
           "id": "r102-north-link",
           "text": "「北境火号报当下，旧驿刻记从前；海上潮痕记水位，灯谱记报码节律，都不是残篇密钥。别把相似短线当同一个东西。到引航礁复核，我们才有资格说海路这一段核清了。」"
+        },
+        {
+          "id": "r105-before",
+          "text": "季无潮按住潮簿：「我想让散船也认得潮，虞星槎先要让灯号少被冒用。先把澜心潮痕核准；好心把错号传得更远，同样会误人。」"
+        },
+        {
+          "id": "r105-active",
+          "text": "季无潮翻开还空着的簿页：「这一趟还在查潮簿，潮痕到手、回来说明才是下一步。熟船和散船各有难处，尚未核灯谱前不要替我们保证一条永远畅通的航道。」"
+        },
+        {
+          "id": "r105-after",
+          "text": "季无潮把簿页夹稳：「澜心这一页已核。传示潮时的范围定过后，若顾夜尘有同行护人的话，你当面带来；我想知道岸上护路与海上护船怎样相通，但不会替没听过的话作答。」"
+        },
+        {
+          "id": "r105-road-sea-receive-0",
+          "text": "季无潮听完：「顾夜尘把护路说到熟人圈外，这和你公开传示潮时的取舍相通。我记下这番话，也记下辨假号的负担仍在虞星槎那里，没替他免去。」"
+        },
+        {
+          "id": "r105-road-sea-receive-1",
+          "text": "季无潮皱眉：「顾夜尘提醒别只顾熟人，你却把潮时限定在熟船。辨号固然容易，散船仍要等。我记下话与选择的这层张力，不把未得照顾的人说成已经安置。」"
+        },
+        {
+          "id": "r105-road-sea-received",
+          "text": "这番转述和你说明的取舍已记下。关系后果不会重付；若查原处事实，仍应回原处核对，不拿口头转述替代实地记录。"
         }
       ]
     },

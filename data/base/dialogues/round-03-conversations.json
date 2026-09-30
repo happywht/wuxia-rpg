@@ -250,30 +250,75 @@
           "id": "greet",
           "text": "站住——别再近了。刀还没归鞘，我这手不听使唤。",
           "options": [
-            { "text": "阁下好身手。方才那是……", "nextNodeId": "blade" },
-            { "text": "在下无意冒犯，这就绕道。", "nextNodeId": "leave" },
+            {
+              "text": "阁下好身手。方才那是……",
+              "nextNodeId": "blade"
+            },
+            {
+              "text": "在下无意冒犯，这就绕道。",
+              "nextNodeId": "leave"
+            },
             {
               "text": "顾兄，旧渡籍那夜的潮时，你还记得么？",
               "nextNodeId": "r42-gu-tide-account",
-              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-two-witnesses", "status": "active" }],
-              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.r42-gu-tide-account" }]
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r42-two-witnesses",
+                  "status": "active"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r42-gu-tide-account"
+                }
+              ]
             },
             {
               "text": "顾兄，潮时已经对上，我把你的口述记进副页。",
               "nextNodeId": "r42-gu-tide-account",
-              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-two-witnesses", "status": "completed" }],
-              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.r42-gu-tide-account" }]
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r42-two-witnesses",
+                  "status": "completed"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r42-gu-tide-account"
+                }
+              ]
             },
             {
               "text": "我来取一张渡籍水痕的拓本。",
               "nextNodeId": "r42-rubbing-offer",
-              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-seal-rubbing", "status": "active" }]
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r42-seal-rubbing",
+                  "status": "active"
+                }
+              ]
             },
             {
               "text": "请顾兄带我把旧印拓下来。",
               "nextNodeId": "r42-rubbing-offer",
-              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-seal-rubbing", "status": "offered" }],
-              "effects": [{ "kind": "acceptQuest", "questId": "quest.r42-seal-rubbing" }]
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r42-seal-rubbing",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r42-seal-rubbing"
+                }
+              ]
             },
             {
               "text": "我已核实「tiezhang-stone-post」所托之事。",
@@ -296,21 +341,248 @@
               "text": "顾兄，东野池塘那伙冒牌护队，我正要去查。",
               "nextNodeId": "r58-pond-active",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r58-pond-bandit-camp", "status": "active" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r58-pond-bandit-camp",
+                  "status": "active"
+                }
               ]
             },
             {
               "text": "桩脚问清了，碎岭那边还要做什么？",
               "nextNodeId": "r103-tiezhang-field-brief",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r43-tiezhang-stone-post", "status": "active" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r43-tiezhang-stone-post",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-before",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r58-pond-bandit-camp",
+                  "status": "locked"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-before",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r58-pond-bandit-camp",
+                  "status": "offered"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-active",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r58-pond-bandit-camp",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-after",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r58-pond-bandit-camp",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "把更簿公开署名的决定告诉你。",
+              "nextNodeId": "r105-shared-0",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-open"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "shareKnowledgeNode",
+                  "nodeId": "event.r100-record-open"
+                }
+              ]
+            },
+            {
+              "text": "把更簿保护姓名的决定告诉你。",
+              "nextNodeId": "r105-shared-1",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-guard"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "shareKnowledgeNode",
+                  "nodeId": "event.r100-record-guard"
+                }
+              ]
+            },
+            {
+              "text": "把北境公开番号的决定告诉你。",
+              "nextNodeId": "r105-shared-2",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-code-open"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "shareKnowledgeNode",
+                  "nodeId": "event.r101-code-open"
+                }
+              ]
+            },
+            {
+              "text": "把北境限定报码的决定告诉你。",
+              "nextNodeId": "r105-shared-3",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-code-limited"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "shareKnowledgeNode",
+                  "nodeId": "event.r101-code-limited"
+                }
+              ]
+            },
+            {
+              "text": "把海路公开传示潮时的决定告诉你。",
+              "nextNodeId": "r105-shared-4",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-public"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "shareKnowledgeNode",
+                  "nodeId": "event.r102-pilot-public"
+                }
+              ]
+            },
+            {
+              "text": "把海路仅熟船传示潮时的决定告诉你。",
+              "nextNodeId": "r105-shared-5",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-crew"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "shareKnowledgeNode",
+                  "nodeId": "event.r102-pilot-crew"
+                }
+              ]
+            },
+            {
+              "text": "把这番护路顾虑转述给季无潮，可以吗？",
+              "nextNodeId": "r105-road-sea-source-0",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-settled"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-road-sea-message",
+                  "isKnown": false
+                },
+                {
+                  "kind": "npcKnows",
+                  "nodeId": "event.r100-record-open"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r105-road-sea-message"
+                }
+              ]
+            },
+            {
+              "text": "把这番护路顾虑转述给季无潮，可以吗？",
+              "nextNodeId": "r105-road-sea-source-1",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-settled"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-road-sea-message",
+                  "isKnown": false
+                },
+                {
+                  "kind": "npcKnows",
+                  "nodeId": "event.r100-record-guard"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r105-road-sea-message"
+                }
+              ]
+            },
+            {
+              "text": "那番转述现在怎样了？",
+              "nextNodeId": "r105-road-sea-waiting",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-road-sea-message"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-road-sea-delivered",
+                  "isKnown": false
+                }
+              ]
+            },
+            {
+              "text": "对方听过后，这层关系怎样看？",
+              "nextNodeId": "r105-road-sea-closed",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-road-sea-delivered"
+                }
               ]
             },
             {
               "text": "顾兄，冒牌护队已经击退，特来告知。",
               "nextNodeId": "r58-pond-done",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r58-pond-bandit-camp", "status": "completed" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r58-pond-bandit-camp",
+                  "status": "completed"
+                }
               ]
             }
           ]
@@ -319,26 +591,50 @@
           "id": "blade",
           "text": "三流剪径的毛贼，也敢挡路？……你身上有墨味，是镇上书铺的学徒？",
           "options": [
-            { "text": "正是。阁下找的，可是书铺的人？", "nextNodeId": "search" },
+            {
+              "text": "正是。阁下找的，可是书铺的人？",
+              "nextNodeId": "search"
+            },
             {
               "text": "阁下为何守在这条路上？",
               "nextNodeId": "why-here",
-              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "char.gu-yechen" }]
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "char.gu-yechen"
+                }
+              ]
             },
             {
               "text": "上回听你提起旧账，后来可有新消息？",
               "nextNodeId": "debt",
-              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "char.gu-yechen" }]
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "char.gu-yechen"
+                }
+              ]
             },
             {
               "text": "顾兄，上回带的话，掌柜的已经收到了。",
               "nextNodeId": "ally",
               "conditions": [
-                { "kind": "npcRelationship", "npcId": "char.gu-yechen", "minValue": 10 }
+                {
+                  "kind": "npcRelationship",
+                  "npcId": "char.gu-yechen",
+                  "minValue": 10
+                }
               ],
               "effects": [
-                { "kind": "adjustRelationship", "npcId": "char.gu-yechen", "delta": 5 },
-                { "kind": "adjustRenown", "delta": 2 }
+                {
+                  "kind": "adjustRelationship",
+                  "npcId": "char.gu-yechen",
+                  "delta": 5
+                },
+                {
+                  "kind": "adjustRenown",
+                  "delta": 2
+                }
               ]
             }
           ]
@@ -347,11 +643,19 @@
           "id": "search",
           "text": "算你机灵。听着，替我带句话给你家掌柜：「旧账，过了今夜子时便要收了。」一个字都不许错。",
           "options": [
-            { "text": "他到底欠了谁的账？", "nextNodeId": "debt" },
+            {
+              "text": "他到底欠了谁的账？",
+              "nextNodeId": "debt"
+            },
             {
               "text": "……我一定带到。",
               "nextNodeId": "deliver",
-              "effects": [{ "kind": "adjustRelationship", "delta": 10 }]
+              "effects": [
+                {
+                  "kind": "adjustRelationship",
+                  "delta": 10
+                }
+              ]
             }
           ]
         },
@@ -370,8 +674,19 @@
             {
               "text": "顾兄若愿同行，往后的路也好彼此照应。",
               "nextNodeId": "companion-joined",
-              "conditions": [{ "kind": "npcRelationship", "npcId": "char.gu-yechen", "minValue": 15 }],
-              "effects": [{ "kind": "recruitCompanion", "companionId": "companion.gu-yechen" }]
+              "conditions": [
+                {
+                  "kind": "npcRelationship",
+                  "npcId": "char.gu-yechen",
+                  "minValue": 15
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "recruitCompanion",
+                  "companionId": "companion.gu-yechen"
+                }
+              ]
             }
           ]
         },
@@ -390,7 +705,12 @@
         {
           "id": "r42-gu-tide-account",
           "text": "顾夜尘用刀鞘在桌上划出两道水线：「那夜落潮比渡籍写的早了一刻。药船按旧时辰来，桥边的泥印却是回水时才压下的。一个人的记性不算凭据，我只把时辰说清。」",
-              "options": [{ "text": "我再把这句话与船印对照。", "nextNodeId": "leave" }]
+          "options": [
+            {
+              "text": "我再把这句话与船印对照。",
+              "nextNodeId": "leave"
+            }
+          ]
         },
         {
           "id": "r42-rubbing-offer",
@@ -399,9 +719,18 @@
             {
               "text": "请顾兄照旧印拓下一份。",
               "nextNodeId": "r42-rubbing-made",
-              "effects": [{ "kind": "giveItem", "itemId": "item.r42-ferry-seal-rubbing", "quantity": 1 }]
+              "effects": [
+                {
+                  "kind": "giveItem",
+                  "itemId": "item.r42-ferry-seal-rubbing",
+                  "quantity": 1
+                }
+              ]
             },
-            { "text": "先不拓了。", "nextNodeId": "leave" }
+            {
+              "text": "先不拓了。",
+              "nextNodeId": "leave"
+            }
           ]
         },
         {
@@ -419,6 +748,58 @@
         {
           "id": "r58-pond-done",
           "text": "顾夜尘抱刀点了点头：「凭据对不上，人散了，这条路便算清了。挑夫夜里敢走东野，比什么谢礼都实在。」"
+        },
+        {
+          "id": "r105-before",
+          "text": "顾夜尘抹了抹刀背：「塘边断道的事，光有拳脚不够。我担心的是挑担的人再没第二条路。你没接差事前先查补给，别把逞强当护送。」"
+        },
+        {
+          "id": "r105-active",
+          "text": "顾夜尘望着塘路：「正查这一趟，就把假护送和真路客分开。交手前包里留药，赢一场也不等于一路永远太平；我肯同行，是帮人过路，不是替人发号施令。」"
+        },
+        {
+          "id": "r105-after",
+          "text": "顾夜尘把刀收了半寸：「断道那一场我记得。以后到了北境或海路，你的公开、保人和传号决定都当面告诉我；没听过的事我不会替你下判断。同行时按P再T也能谈。」"
+        },
+        {
+          "id": "r105-shared-0",
+          "text": "顾夜尘听完：「查牌便于路客，报信人却要避处。这条路上若同行，我先帮你正面应对；别把公开的好处说成人人都没有风险。」"
+        },
+        {
+          "id": "r105-shared-1",
+          "text": "顾夜尘听完：「人还能走路，证词却留缺口。这一带若同行，我把援护更多留作照顾伤者；承认代价，比替所有人编一个满意结局强。」"
+        },
+        {
+          "id": "r105-shared-2",
+          "text": "顾夜尘听完：「路客便于识火，冒号客也便于学。北境若同行，我替你正面应对，不能替谷照雪免去辨假号的担子。」"
+        },
+        {
+          "id": "r105-shared-3",
+          "text": "顾夜尘听完：「报码队容易查验，散客多等。北境若同行，我先照顾挨冻受伤的人，但援护不能把等待的代价抹掉。」"
+        },
+        {
+          "id": "r105-shared-4",
+          "text": "顾夜尘听完：「散船能查潮时，辨假号的人更累。海路若同行，我正面帮你护路；不是替季无潮保证所有船都能安稳过去。」"
+        },
+        {
+          "id": "r105-shared-5",
+          "text": "顾夜尘听完：「少些错号，却把散船留在等候处。海路若同行，我多照顾受伤的人；这一招不会把未被传示的潮时变成人人都知道。」"
+        },
+        {
+          "id": "r105-road-sea-source-0",
+          "text": "顾夜尘把刀柄递正：「给季无潮转述：护路不是让自己的熟人都顺当就完事，也得承認暂时照顾不到谁。你告诉过我的更簿选择我听了；到了澜心洲，由你亲口说明，别说我已替海路作了决定。」"
+        },
+        {
+          "id": "r105-road-sea-source-1",
+          "text": "顾夜尘把刀柄递正：「给季无潮转述：护路不是让自己的熟人都顺当就完事，也得承認暂时照顾不到谁。你告诉过我的更簿选择我听了；到了澜心洲，由你亲口说明，别说我已替海路作了决定。」"
+        },
+        {
+          "id": "r105-road-sea-waiting",
+          "text": "话已由你记下，须到对方所在地区亲口说明；没回来前，我不会说对方已经听见。"
+        },
+        {
+          "id": "r105-road-sea-closed",
+          "text": "你已经亲口转述并得到回应。这一回关系后果已经记过，不能重复领认同；原判断和对方的取舍仍各自成立。"
         }
       ]
     },

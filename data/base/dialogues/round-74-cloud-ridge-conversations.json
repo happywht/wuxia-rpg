@@ -146,6 +146,101 @@
               ]
             },
             {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-before",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r74-cloud-marks",
+                  "status": "locked"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-before",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r74-cloud-marks",
+                  "status": "offered"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-active",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r74-cloud-marks",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-after",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r74-cloud-marks",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "能把你的判断转述给另一处的记录人吗？",
+              "nextNodeId": "r105-carving-source",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-paper-crosscheck"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-carving-message",
+                  "isKnown": false
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r74-cloud-marks",
+                  "status": "completed"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r105-carving-message"
+                }
+              ]
+            },
+            {
+              "text": "那番转述现在怎样了？",
+              "nextNodeId": "r105-carving-waiting",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-carving-message"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-carving-delivered",
+                  "isKnown": false
+                }
+              ]
+            },
+            {
+              "text": "对方听过后，这层关系怎样看？",
+              "nextNodeId": "r105-carving-closed",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-carving-delivered"
+                }
+              ]
+            },
+            {
               "text": "先歇一会儿。",
               "nextNodeId": "farewell"
             }
@@ -186,6 +281,30 @@
         {
           "id": "r100-mainland-close",
           "text": "沈雨霁把清道与清桥两笔划在图上：「路障已清，不等于护索已修复，更不等于幕后查明。你对更簿和补给的选择，各处人都记着。大陆这一程已弄清三处刻痕分工；要继续追纸墨，东行问船货，北行核旧界标。」"
+        },
+        {
+          "id": "r105-before",
+          "text": "沈雨霁按着石阶旁的旧索：「我守的不是一个神秘答案，是后人还能看清的记法。先看云阶刻痕，分清索孔与步记；不能因一句剑鸣传闻就把所有刻纹串成暗码。」"
+        },
+        {
+          "id": "r105-active",
+          "text": "沈雨霁把两道刻纹分开指给你：「正在核云阶，先写所见再写解释。旧索孔有旧索孔的用处，山路步记有山路步记的用处；别替尚未去过的北境下年代结论。」"
+        },
+        {
+          "id": "r105-after",
+          "text": "沈雨霁收好记簿：「云阶这一处已有着落。三地对照后若去霜松谷，把索孔与步记各自成立的判断告诉柳寻径；前朝界标仍须当地核证，山中记录不能替它作证。」"
+        },
+        {
+          "id": "r105-carving-source",
+          "text": "沈雨霁交代：「给柳寻径转述：云阶刻纹是旧索与步记的记法，各自成立。界标年代须他在霜松谷亲核；不能拿云阶的结论给前朝字样背书。不送拓片，只转述判断边界。」"
+        },
+        {
+          "id": "r105-carving-waiting",
+          "text": "话已由你记下，须到对方所在地区亲口说明；没回来前，我不会说对方已经听见。"
+        },
+        {
+          "id": "r105-carving-closed",
+          "text": "你已经亲口转述并得到回应。这一回关系后果已经记过，不能重复领认同；原判断和对方的取舍仍各自成立。"
         }
       ]
     }

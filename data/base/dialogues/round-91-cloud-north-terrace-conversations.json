@@ -86,6 +86,148 @@
               ]
             },
             {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-before",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r91-goose-vigil",
+                  "status": "locked"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-before",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r91-goose-vigil",
+                  "status": "offered"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-active",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r91-goose-vigil",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-after",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r91-goose-vigil",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "转述另一处的判断（关系+2，仅一次）。",
+              "nextNodeId": "r105-ledger-receive-0",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-ledger-message"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-ledger-delivered",
+                  "isKnown": false
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r91-goose-vigil",
+                  "status": "completed"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-open"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "shareKnowledgeNode",
+                  "nodeId": "event.r105-ledger-message"
+                },
+                {
+                  "kind": "shareKnowledgeNode",
+                  "nodeId": "event.r100-record-open"
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "delta": 2
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r105-ledger-delivered"
+                }
+              ]
+            },
+            {
+              "text": "转述另一处的判断（关系-1，仅一次）。",
+              "nextNodeId": "r105-ledger-receive-1",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-ledger-message"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-ledger-delivered",
+                  "isKnown": false
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r91-goose-vigil",
+                  "status": "completed"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-guard"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "shareKnowledgeNode",
+                  "nodeId": "event.r105-ledger-message"
+                },
+                {
+                  "kind": "shareKnowledgeNode",
+                  "nodeId": "event.r100-record-guard"
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "delta": -1
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r105-ledger-delivered"
+                }
+              ]
+            },
+            {
+              "text": "此前转述还记得吗？",
+              "nextNodeId": "r105-ledger-received",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-ledger-delivered"
+                },
+                {
+                  "kind": "npcKnows",
+                  "nodeId": "event.r105-ledger-message"
+                }
+              ]
+            },
+            {
               "text": "改日再谈。",
               "nextNodeId": "farewell"
             }
@@ -126,6 +268,30 @@
         {
           "id": "r101-limited-echo",
           "text": "「号码只留在报码队。」她望向山下，「真假好查了，可赶路的人见三烽仍要再找人问，雪夜里的迟疑由他们来担。」"
+        },
+        {
+          "id": "r105-before",
+          "text": "聂栖雁隔着风数雁：「候雁的人最怕把愿望看成信号。崖台这一趟先看火与雁各自的记法，没核雪关前不拿雁阵补成一段暗号。」"
+        },
+        {
+          "id": "r105-active",
+          "text": "聂栖雁往雪关指了指：「你在查雁候，雁来去只说明雁来去；火号真假仍要问谷照雪。路上若有人谈更簿，我想知道证词是否让所有路客都能查，而不是只听一个漂亮结论。」"
+        },
+        {
+          "id": "r105-after",
+          "text": "聂栖雁把记录压进石缝：「雁候核过，这不替番号公开或限定作决定。若从铁嶂带来秦素砚的顾虑，就亲口转述给我；少了署名的证词，我会另留问号，不会装作人人都已明白。」"
+        },
+        {
+          "id": "r105-ledger-receive-0",
+          "text": "聂栖雁听完：「秦素砚怕人受累，我怕路客无从查牌。你确实公开了署名，我按有证可查记下，但不替报信人承诺无风险。」"
+        },
+        {
+          "id": "r105-ledger-receive-1",
+          "text": "聂栖雁听完：「保护姓名的顾虑我记下了，可没有公开证人，路客仍要再问。我不会把照顾人说成证词已经齐全；往后核验还留一道问号。」"
+        },
+        {
+          "id": "r105-ledger-received",
+          "text": "这番转述和你说明的取舍已记下。关系后果不会重付；若查原处事实，仍应回原处核对，不拿口头转述替代实地记录。"
         }
       ]
     }

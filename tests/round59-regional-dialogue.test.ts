@@ -272,7 +272,7 @@ function visibleStartTargets(conversation: DialogueData, context: DialogueRuntim
 describe('Round 59 regional dialogue echoes', () => {
   it('parses real base data and assembles quests and dialogue references without warnings', () => {
     expect(graph.warnings).toEqual([]);
-    expect(graph.nodes.size).toBe(419); // 417 + two Round 104 practice insights
+    expect(graph.nodes.size).toBe(425); // 419 + six Round105 relay insights
     expect(questAssembly.warnings).toEqual([]);
     expect(questAssembly.quests.size).toBe(44);
     expect(dialogueAssembly.warnings).toEqual([]);
@@ -340,7 +340,7 @@ describe('Round 59 regional dialogue echoes', () => {
       'dlg.ma-shangyi-notice-board': 5, // 3 pre-existing + 2 echoes
       'dlg.lu-zhenniang-teastall': 9, // 7 pre-existing + 2 echoes
       'dlg.jiang-baiwei-peddler': 7, // 2 pre-existing + 2 echoes + 3 Round 98 journey entries
-      'dlg.gu-yechen-roadside': 10, // 7 pre-existing + 2 echoes + 1 Round 103 field brief
+      'dlg.gu-yechen-roadside': 24, // 10 prior options + 14 Round105 stage/share/relay responses
     };
     for (const [dialogueId, expectedCount] of Object.entries(expectedBaseline)) {
       const conversation = dialogueAssembly.conversations.get(dialogueId)!;

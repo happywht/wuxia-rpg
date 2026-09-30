@@ -39,3 +39,9 @@
 ## 存档
 
 v1 顶层 `activeCompanionId` 保存当前同行伙伴 id 或 `null`。旧 v1 缺少该字段时解析为 `null`；恢复时若当前集合已删除该伙伴，队伍清空并给出 warning。跟随坐标不入档，由地图、玩家位置和当前占位在载入/跨区时安全重算。
+
+## Round 105：已分享见闻与当前地区立场
+
+可选stanceRules由当前mapResourceId及social.npcKnowledge中同行NPC已知道的见闻解析，绝不从玩家knownKnowledgeNodeIds推断NPC知情。第一个匹配规则覆盖combatSupport；无匹配保留原值。每条需非空ID、label、description、至少一个requiredSharedKnowledgeNodeIds，可选非空mapResourceIds；详见Schema。坏跨资源引用仅移除该条规则。
+
+P册显示当前实际立场、解释与支援。T在有真实同行者时收起面板并打开其对白；Enter暂离不变。世界普通/擂台/门派战使用同一解析器，读档保留NPC记忆。当前八人物、三组转述和六规则详见[人物转述与同行立场](PEOPLE-RELAYS.md)。真实UI与旅程验收仍待后续。

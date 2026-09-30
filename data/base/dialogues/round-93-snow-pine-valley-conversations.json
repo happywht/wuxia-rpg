@@ -99,6 +99,148 @@
               ]
             },
             {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-before",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r93-boundary-mark",
+                  "status": "locked"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-before",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r93-boundary-mark",
+                  "status": "offered"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-active",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r93-boundary-mark",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "这件差事对你意味着什么？",
+              "nextNodeId": "r105-after",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r93-boundary-mark",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "转述另一处的判断（关系+2，仅一次）。",
+              "nextNodeId": "r105-carving-receive-0",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-carving-message"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-carving-delivered",
+                  "isKnown": false
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r93-boundary-mark",
+                  "status": "completed"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-mark-public"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "shareKnowledgeNode",
+                  "nodeId": "event.r105-carving-message"
+                },
+                {
+                  "kind": "shareKnowledgeNode",
+                  "nodeId": "event.r101-mark-public"
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "delta": 2
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r105-carving-delivered"
+                }
+              ]
+            },
+            {
+              "text": "转述另一处的判断（关系+1，仅一次）。",
+              "nextNodeId": "r105-carving-receive-1",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-carving-message"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-carving-delivered",
+                  "isKnown": false
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r93-boundary-mark",
+                  "status": "completed"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-mark-private"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "shareKnowledgeNode",
+                  "nodeId": "event.r105-carving-message"
+                },
+                {
+                  "kind": "shareKnowledgeNode",
+                  "nodeId": "event.r101-mark-private"
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "delta": 1
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r105-carving-delivered"
+                }
+              ]
+            },
+            {
+              "text": "此前转述还记得吗？",
+              "nextNodeId": "r105-carving-received",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-carving-delivered"
+                },
+                {
+                  "kind": "npcKnows",
+                  "nodeId": "event.r105-carving-message"
+                }
+              ]
+            },
+            {
               "text": "改日再谈。",
               "nextNodeId": "farewell"
             }
@@ -234,6 +376,30 @@
         {
           "id": "r101-north-check",
           "text": "柳寻径分开三笔：「雁候记活物，照雪烽号报当下，谷界文记前朝屯垦。北界碑的大梁刻字也是旧刻，不可外推为大雍今界。它们只让我们分清记录用途，不能替残篇断纸龄。要追水纹纸药墨，得问天门关旧驿线怎样通海路。」"
+        },
+        {
+          "id": "r105-before",
+          "text": "柳寻径抚去界标上的霜：「前朝的刻字留在当朝的路上，最容易被人拿来生新账。先查界标年代，我要护的是今天巡路的人，不是把旧字当今天的疆令。」"
+        },
+        {
+          "id": "r105-active",
+          "text": "柳寻径沿林边走了两步：「你正在核界标，旧刻、清场、回来说明得分开。刻过大梁两字不等于今日还属大梁；年代没说清，公开与私记都可能误伤人。」"
+        },
+        {
+          "id": "r105-after",
+          "text": "柳寻径把界标记下：「前朝屯界与当朝巡路分清了。公开注记让人能查，也引旧账争执；留在巡簿保护眼下的人，却不便外人核看。若沈雨霁谈山中刻痕，带来我再分项记，不能拿一处替另一处断代。」"
+        },
+        {
+          "id": "r105-carving-receive-0",
+          "text": "柳寻径点头：「沈雨霁分开证据，我就能把前朝说明公开而不混成今朝疆令。你公开注记的选择与这份分项说明我都记下；巡路人的争执不会因此凭空消失。」"
+        },
+        {
+          "id": "r105-carving-receive-1",
+          "text": "柳寻径合上巡簿：「这份分项判断适合与我保留的巡路记录并记。你选择私记，我先护巡路人；外人仍不能像查公开碑解那样方便核看，这个代价也留在案里。」"
+        },
+        {
+          "id": "r105-carving-received",
+          "text": "这番转述和你说明的取舍已记下。关系后果不会重付；若查原处事实，仍应回原处核对，不拿口头转述替代实地记录。"
         }
       ]
     }
