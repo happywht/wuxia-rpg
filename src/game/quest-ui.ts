@@ -13,6 +13,7 @@ import {
   toggleTrackedQuest,
 } from '../engine/quest-system';
 import { uiFontSize } from './settings';
+import { orderQuestRows } from './quest-presentation';
 import { addPixelPanelChrome, UI_FONT_FAMILY, addPixelSelection } from './ui-theme';
 
 /** Generic data-driven quest board and journal overlay. */
@@ -192,13 +193,14 @@ export class QuestPanel {
   private get rows(): QuestData[] {
     const model = this.model;
     if (model === null) return [];
-    return [...model.quests.values()].filter((quest) => {
+    const rows = [...model.quests.values()].filter((quest) => {
       if (model.giverNpcId !== undefined && quest.giverNpcId !== model.giverNpcId) return false;
       const status = model.journal.states.get(quest.id)?.status;
       if (status !== 'offered') return true; // Keep accepted tasks visible after leaving a faction.
-        if (!hasQuestAccess(quest, model.access)) return false;
+      if (!hasQuestAccess(quest, model.access)) return false;
       return true;
     });
+    return orderQuestRows(rows, model.journal);
   }
 
   private moveSelection(delta: number): void {
@@ -240,6 +242,7 @@ export class QuestPanel {
     } else {
       this.status = state?.status === 'completed' ? '这项差事已完成' : '这项差事已结束';
     }
+    this.selection = Math.max(0, this.rows.findIndex(row => row.id === quest.id));
     this.render();
   }
 
@@ -265,6 +268,7 @@ export class QuestPanel {
     const result = abandonQuest(model.journal, quest.id);
     this.status = result.ok ? `已放弃「${quest.name}」` : '只能放弃进行中的差事';
     if (result.ok) this.onUpdate?.(result.update);
+    this.selection = Math.max(0, this.rows.findIndex(row => row.id === quest.id));
     this.render();
   }
 

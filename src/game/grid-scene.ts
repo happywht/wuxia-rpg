@@ -1,3 +1,4 @@
+import { nearestGuideNpc } from './quest-presentation';
 import Phaser from 'phaser';
 
 import type { Diagnostic } from '../engine/data-loader';
@@ -2140,6 +2141,8 @@ export class GridScene extends Phaser.Scene {
     // HUD text lives above the daylight wash (depth 50) so every period's
     // tint keeps the interface fully legible. The leading movement segment
     // follows the live layout setting (refreshed on overlay close).
+    this.add.rectangle(VIEW_WIDTH / 2, 46, VIEW_WIDTH, 92, 0x10141d, 0.94).setScrollFactor(0).setDepth(HUD_TEXT_DEPTH - 1);
+    this.add.rectangle(VIEW_WIDTH / 2, VIEW_HEIGHT - 16, VIEW_WIDTH, 32, 0x10141d, 0.94).setScrollFactor(0).setDepth(HUD_TEXT_DEPTH - 1);
     this.movementHintText = this.registerScaledText(this.add
       .text(16, 12, `${currentMovementHelpText()} · E 交互 · P 伙伴 · F2 MOD · H 帮助`, {
         fontFamily: UI.fontFamily,
@@ -2154,7 +2157,7 @@ export class GridScene extends Phaser.Scene {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(11),
         color: UI.textMuted,
-        wordWrap: { width: 360 },
+        wordWrap: { width: 360, useAdvancedWrap: true },
       })
       .setOrigin(0, 0)
       .setDepth(HUD_TEXT_DEPTH), 11);
@@ -2164,7 +2167,7 @@ export class GridScene extends Phaser.Scene {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(10),
         color: UI.textWarn,
-        wordWrap: { width: VIEW_WIDTH - 32 },
+        wordWrap: { width: VIEW_WIDTH - 32, useAdvancedWrap: true },
       })
       .setOrigin(0, 0)
       .setDepth(HUD_TEXT_DEPTH), 10);
@@ -3295,7 +3298,8 @@ export class GridScene extends Phaser.Scene {
     const quest = trackedId === null ? undefined : this.quests.get(trackedId);
     const state = trackedId === null ? undefined : this.questJournal.states.get(trackedId);
     if (quest === undefined || state?.status !== 'active') {
-      text.setText('');
+      const guide = nearestGuideNpc(this.placedNpcs, { col: this.playerCol, row: this.playerRow });
+      text.setText(guide === undefined ? 'Q 查看差事 · H 查看操作' : `附近：${guide.record.name} (${guide.col},${guide.row}) · 相邻按 F 打听 / E 看托付 · Q 查差事`).setColor(UI.textPrimary);
       this.positionNavigationHint();
       return;
     }

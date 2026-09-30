@@ -7,6 +7,7 @@ import {
 } from '../engine/dialogue-graph';
 import type { VisibleDialogueOption } from '../engine/dialogue-runtime';
 import { uiFontSize } from './settings';
+import { wrapDialogueText, paginateDialogueLines, dialogueConfirmAction } from './dialogue-layout';
 import { addPixelPanelChrome, addPixelSelection, UI_FONT_FAMILY } from './ui-theme';
 
 /**
@@ -48,11 +49,7 @@ const UI = {
 
 const PADDING = 22;
 const NAME_LINE_HEIGHT = 24;
-const OPTION_LINE_HEIGHT = 26;
-const FEEDBACK_LINE_HEIGHT = 18;
-const HINT_GAP = 12;
 const CURSOR_ACTIVE = '▸ ';
-const CURSOR_IDLE = '  ';
 
 /** Keyboard bindings shared with scene movement (W/S) by design. */
 type PanelKeyBinding = {
@@ -95,6 +92,10 @@ export class DialoguePanel {
   private feedback: string | null = null;
   private feedbackWarn = false;
   private openState = false;
+  private bodyPage = 0;
+  private optionPage = 0;
+  private bodyPages: string[] = [''];
+  private optionPages: string[] = [''];
 
   constructor(scene: Phaser.Scene, options: DialoguePanelOptions = {}) {
     this.scene = scene;
@@ -123,6 +124,8 @@ export class DialoguePanel {
     this.controller = controller;
     this.speakerName = speakerName;
     this.selection = 0;
+    this.bodyPage = 0;
+    this.optionPage = 0;
     this.feedback = null;
     this.feedbackWarn = false;
     this.openState = true;
@@ -164,6 +167,10 @@ export class DialoguePanel {
       [KeyCodes.DOWN, () => this.moveSelection(1)],
       [KeyCodes.S, () => this.moveSelection(1)],
       [KeyCodes.ENTER, () => this.confirm()],
+      [KeyCodes.PAGE_UP, () => this.changePage(-1, false)],
+      [KeyCodes.PAGE_DOWN, () => this.changePage(1, false)],
+      [KeyCodes.LEFT, () => this.changePage(-1, true)],
+      [KeyCodes.RIGHT, () => this.changePage(1, true)],
       [KeyCodes.ESC, () => this.close()],
     ];
     for (const [code, handler] of pairs) {
@@ -198,7 +205,8 @@ export class DialoguePanel {
       return;
     }
     this.selection = (this.selection + delta + count) % count;
-    this.updateOptionStyles();
+    this.optionPage = 0;
+    this.renderNode();
   }
 
   private confirm(): void {
@@ -206,6 +214,8 @@ export class DialoguePanel {
     if (session === null) {
       return;
     }
+    const action = dialogueConfirmAction(this.bodyPage, this.bodyPages.length, this.optionPage, this.optionPages.length);
+    if (action !== 'confirm') { this.changePage(1, action === 'option'); return; }
     const visible = this.visibleOptions();
     if (visible.length === 0) {
       this.close(); // Enter on an (effectively) option-less node ends the talk.
@@ -216,6 +226,8 @@ export class DialoguePanel {
       this.feedback = outcome.feedback;
       this.feedbackWarn = !outcome.advanced;
       this.selection = outcome.advanced ? 0 : this.selection;
+      this.bodyPage = 0;
+      this.optionPage = 0;
       this.renderNode();
       return;
     }
@@ -224,118 +236,65 @@ export class DialoguePanel {
       session.choose(choice.index);
     }
     this.selection = 0;
+    this.bodyPage = 0;
+    this.optionPage = 0;
     this.feedback = null;
     this.renderNode();
   }
 
-  /** Rebuilds every panel element for the session's current node. */
+  private changePage(delta: number, option: boolean): void {
+    if (option) this.optionPage = Math.max(0, Math.min(this.optionPages.length - 1, this.optionPage + delta));
+    else this.bodyPage = Math.max(0, Math.min(this.bodyPages.length - 1, this.bodyPage + delta));
+    this.renderNode();
+  }
+
+  /** Bounded panel: all body, feedback and option text remains keyboard-readable. */
   private renderNode(): void {
     const session = this.session;
-    if (session === null) {
-      return;
-    }
+    if (session === null) return;
     this.container.removeAll(true);
-
     const width = this.scene.scale.width;
     const height = this.scene.scale.height;
-    const panelWidth = Math.min(760, width - 96);
+    const panelWidth = Math.min(760, width - 48);
+    const panelHeight = Math.min(420, height - 48);
+    const left = (width - panelWidth) / 2;
+    const top = height - 24 - panelHeight;
     const contentWidth = panelWidth - PADDING * 2;
     const visible = this.visibleOptions();
     this.selection = Math.min(this.selection, Math.max(0, visible.length - 1));
-
-    const nodeText = this.scene.add
-      .text(0, 0, session.currentNode.text, {
-        fontFamily: UI.fontFamily,
-        fontSize: uiFontSize(14),
-        color: UI.textPrimary,
-        lineSpacing: 6,
-        wordWrap: { width: contentWidth },
-      })
-      .setOrigin(0, 0);
-
-    const optionCount = visible.length;
-    const feedbackHeight = this.feedback === null ? 0 : FEEDBACK_LINE_HEIGHT + HINT_GAP / 2;
-    const panelHeight =
-      PADDING * 2 +
-      NAME_LINE_HEIGHT +
-      6 +
-      nodeText.height +
-      feedbackHeight +
-      (optionCount > 0 ? HINT_GAP + optionCount * OPTION_LINE_HEIGHT : 0) +
-      HINT_GAP +
-      18;
-
-    const left = (width - panelWidth) / 2;
-    const top = height - 24 - panelHeight;
-
-    addPixelPanelChrome(this.scene, this.container, {
-      x: left,
-      y: top,
-      width: panelWidth,
-      height: panelHeight,
-    });
-    this.container.add(nodeText);
-
-    const nameText = this.scene.add
-      .text(left + PADDING, top + PADDING, this.speakerName, {
-        fontFamily: UI.fontFamily,
-        fontSize: uiFontSize(15),
-        color: UI.speaker,
-      })
-      .setOrigin(0, 0);
-    this.container.add(nameText);
-
-    nodeText.setPosition(left + PADDING, top + PADDING + NAME_LINE_HEIGHT);
-
-    let cursorY = top + PADDING + NAME_LINE_HEIGHT + 6 + nodeText.height;
-    if (this.feedback !== null) {
-      const feedbackText = this.scene.add
-        .text(left + PADDING, cursorY + HINT_GAP / 2, `—— ${this.feedback}`, {
-          fontFamily: UI.fontFamily,
-          fontSize: uiFontSize(12),
-          color: this.feedbackWarn ? UI.feedbackWarn : UI.feedback,
-          wordWrap: { width: contentWidth },
-        })
-        .setOrigin(0, 0);
-      this.container.add(feedbackText);
-      cursorY += feedbackHeight;
+    const bodyFont = Number.parseInt(uiFontSize(14), 10);
+    const optionFont = Number.parseInt(uiFontSize(13), 10);
+    const bodyLineHeight = bodyFont + 6;
+    const optionLineHeight = optionFont + 6;
+    const optionHeight = visible.length > 0 ? Math.max(80, optionLineHeight * 3) : 0;
+    const hintHeight = 44;
+    const bodyHeight = panelHeight - PADDING * 2 - NAME_LINE_HEIGHT - hintHeight - optionHeight - 16;
+    addPixelPanelChrome(this.scene, this.container, { x: left, y: top, width: panelWidth, height: panelHeight }, 0.35);
+    const makeText = (x: number, y: number, text: string, size: string, color: string) => {
+      const label = this.scene.add.text(x, y, text, { fontFamily: UI.fontFamily, fontSize: size, color, lineSpacing: 6 }).setOrigin(0, 0);
+      this.container.add(label);
+      return label;
+    };
+    makeText(left + PADDING, top + PADDING, this.speakerName, uiFontSize(15), UI.speaker);
+    const body = makeText(left + PADDING, top + PADDING + NAME_LINE_HEIGHT, '', uiFontSize(14), UI.textPrimary);
+    body.setText('测'); // Initialize canvas font metrics before measuring mixed scripts.
+    const source = session.currentNode.text + (this.feedback === null ? '' : `\n\n—— ${this.feedback}`);
+    this.bodyPages = paginateDialogueLines(wrapDialogueText(source, contentWidth - 8, value => body.context.measureText(value).width), Math.floor(bodyHeight / bodyLineHeight));
+    this.bodyPage = Math.min(this.bodyPage, this.bodyPages.length - 1);
+    body.setText(this.bodyPages[this.bodyPage]!);
+    if (this.feedbackWarn) body.setColor(UI.feedbackWarn);
+    const choice = visible[this.selection];
+    this.optionPages = [''];
+    if (choice !== undefined) {
+      const optionY = top + panelHeight - PADDING - hintHeight - optionHeight;
+      addPixelSelection(this.scene, this.container, { x: left + PADDING, y: optionY, width: contentWidth, height: optionHeight });
+      const label = makeText(left + PADDING + 8, optionY + 4, '测', uiFontSize(13), UI.optionActive);
+      this.optionPages = paginateDialogueLines(wrapDialogueText(CURSOR_ACTIVE + choice.option.text, contentWidth - 24, value => label.context.measureText(value).width), Math.floor((optionHeight - 12) / optionLineHeight));
+      this.optionPage = Math.min(this.optionPage, this.optionPages.length - 1);
+      label.setText(this.optionPages[this.optionPage]!);
     }
-
-    cursorY += HINT_GAP;
-    visible.forEach(({ option }, index) => {
-      if (index === this.selection) {
-        addPixelSelection(this.scene, this.container, {
-          x: left + PADDING,
-          y: cursorY - 2,
-          width: contentWidth,
-          height: OPTION_LINE_HEIGHT,
-        });
-      }
-      const optionText = this.scene.add
-        .text(left + PADDING + 8, cursorY, `${index === this.selection ? CURSOR_ACTIVE : CURSOR_IDLE}${option.text}`, {
-          fontFamily: UI.fontFamily,
-          fontSize: uiFontSize(13),
-          color: index === this.selection ? UI.optionActive : UI.optionIdle,
-        })
-        .setOrigin(0, 0);
-      this.container.add(optionText);
-      cursorY += OPTION_LINE_HEIGHT;
-    });
-
-    const hintText =
-      optionCount > 0 ? '↑/↓ 选择 · Enter 确认 · Esc 关闭' : 'Enter / Esc 结束对话';
-    const hint = this.scene.add
-      .text(left + panelWidth - PADDING, top + panelHeight - PADDING - 4, hintText, {
-        fontFamily: UI.fontFamily,
-        fontSize: uiFontSize(10),
-        color: UI.textMuted,
-      })
-      .setOrigin(1, 1);
-    this.container.add(hint);
-  }
-
-  /** Rebuilds the option rows so the focus band follows the current choice. */
-  private updateOptionStyles(): void {
-    this.renderNode();
+    const status = `正文 ${this.bodyPage + 1}/${this.bodyPages.length}` + (choice === undefined ? '' : ` · 选项 ${this.selection + 1}/${visible.length} · 选项页 ${this.optionPage + 1}/${this.optionPages.length}`);
+    makeText(left + PADDING, top + panelHeight - PADDING - hintHeight + 4, status, uiFontSize(10), UI.textMuted);
+    makeText(left + PADDING, top + panelHeight - PADDING - 18, '↑/↓ 选项 · PgUp/PgDn 正文 · ←/→ 选项页 · Enter 翻页/确认 · Esc 关闭', uiFontSize(10), UI.textMuted);
   }
 }
