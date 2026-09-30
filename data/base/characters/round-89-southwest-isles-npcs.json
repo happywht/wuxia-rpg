@@ -1,0 +1,28 @@
+{
+  "npcs": [
+    {
+      "id": "char.r89-cheng-wenzhou",
+      "name": "程问舟",
+      "mapResourceId": "map.round-87-southwest-isles",
+      "position": { "col": 44, "row": 46 },
+      "dialogueId": "dlg.r89-cheng-wenzhou-route",
+      "questGiver": true,
+      "spriteFrame": 176,
+      "spriteFrames": {
+        "down": 160,
+        "right": 168,
+        "up": 176,
+        "left": 184
+      },
+      "schedule": [
+        { "periodId": "period.midnight", "position": { "col": 44, "row": 51 } },
+        { "periodId": "period.dawn", "position": { "col": 46, "row": 45 } },
+        { "periodId": "period.morning", "position": { "col": 52, "row": 46 } },
+        { "periodId": "period.midday", "position": { "col": 55, "row": 48 } },
+        { "periodId": "period.afternoon", "position": { "col": 55, "row": 51 } },
+        { "periodId": "period.dusk", "position": { "col": 45, "row": 54 } },
+        { "periodId": "period.night", "position": { "col": 61, "row": 46 } }
+      ]
+    }
+  ]
+}

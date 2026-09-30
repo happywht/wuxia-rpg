@@ -1,0 +1,31 @@
+{
+  "quests": [
+    {
+      "id": "quest.r89-east-channel-echo",
+      "name": "东汊回声",
+      "description": "程问舟请你沿现有步行关口前往青帆埠，核对旧水槽旁的三道潮刻，再回雾航湾补全潮图。",
+      "giverNpcId": "char.r89-cheng-wenzhou",
+      "objectives": [
+        {
+          "id": "objective.r89-check-channel-mark",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r89-east-channel-mark",
+          "requiredCount": 1,
+          "text": "到青帆埠旧水槽旁按 E 核对三道潮刻"
+        },
+        {
+          "id": "objective.r89-report-channel-echo",
+          "kind": "talkToNpc",
+          "targetId": "char.r89-cheng-wenzhou",
+          "requiredCount": 1,
+          "text": "沿已开放的关口返回雾航湾，向程问舟复命"
+        }
+      ],
+      "rewards": {
+        "experience": 44,
+        "currency": 32,
+        "discoverKnowledgeNodeIds": ["place.r89-safe-return-current"]
+      }
+    }
+  ]
+}

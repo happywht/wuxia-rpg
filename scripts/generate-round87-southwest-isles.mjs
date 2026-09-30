@@ -89,6 +89,26 @@ async function appendGraphEntries(path, field, additions) {
   await writeFile(path, raw.slice(0, closing) + ',\n' + lines + raw.slice(closing));
 }
 
+/** Replaces this generator's rows in place, preserving later-round additions;
+ * missing managed rows are inserted before `anchorKey`, or appended when no
+ * anchor is supplied. This keeps regeneration additive after subsequent rounds. */
+function mergeManagedEntries(current, additions, keyOf, anchorKey) {
+  const byKey = new Map(additions.map((entry) => [keyOf(entry), entry]));
+  const found = new Set();
+  const merged = current.map((entry) => {
+    const key = keyOf(entry);
+    const addition = byKey.get(key);
+    if (addition === undefined) return entry;
+    found.add(key);
+    return addition;
+  });
+  const missing = additions.filter((entry) => !found.has(keyOf(entry)));
+  if (missing.length === 0) return merged;
+  const anchor = anchorKey === undefined ? -1 : merged.findIndex((entry) => keyOf(entry) === anchorKey);
+  merged.splice(anchor < 0 ? merged.length : anchor, 0, ...missing);
+  return merged;
+}
+
 const [world, manifest, islesMap, nodes, edges] = await Promise.all([
   readJson(paths.world), readJson(paths.manifest), readJson(paths.islesMap),
   readJson(paths.nodes), readJson(paths.edges),
@@ -766,24 +786,16 @@ const resourceEntries = [
   { id: 'quest.round-87-southwest-isle-set', path: 'quests/round-87-southwest-isle-quests.json', schema: 'quest-set' },
 ];
 
-world.regions = (world.regions ?? []).filter((entry) => entry.mapResourceId !== mapId);
-world.regions.push(region);
-world.landmarks = [
-  ...(world.landmarks ?? []).filter((entry) => !entry.id.startsWith('landmark.r87-')),
-  ...landmarks,
-];
-world.transitions = [
-  ...(world.transitions ?? []).filter((entry) => !entry.id.startsWith('gate.r87-')),
-  ...transitions,
-];
-world.events = [
-  ...(world.events ?? []).filter((entry) => !entry.id.startsWith('event.r87-')),
-  ...events,
-];
-manifest.resources = (manifest.resources ?? []).filter((entry) => !resourceEntries.some((addition) => addition.id === entry.id));
-const atlasIndex = manifest.resources.findIndex((entry) => entry.id === 'world.atlas');
-if (atlasIndex < 0) throw new Error('manifest 缺少 world.atlas，拒绝孤立新增区域。');
-manifest.resources.splice(atlasIndex, 0, ...resourceEntries);
+world.regions = mergeManagedEntries(world.regions ?? [], [region], (entry) => entry.mapResourceId);
+world.landmarks = mergeManagedEntries(world.landmarks ?? [], landmarks, (entry) => entry.id);
+world.transitions = mergeManagedEntries(world.transitions ?? [], transitions, (entry) => entry.id);
+world.events = mergeManagedEntries(world.events ?? [], events, (entry) => entry.id);
+if (!(manifest.resources ?? []).some((entry) => entry.id === 'world.atlas')) {
+  throw new Error('manifest 缺少 world.atlas，拒绝孤立新增区域。');
+}
+manifest.resources = mergeManagedEntries(
+  manifest.resources ?? [], resourceEntries, (entry) => entry.id, 'world.atlas',
+);
 
 // 全部舆图图层以紧凑行 RLE 线格式落盘；区域、地标、关口、事件及其余
 // 舆图字段保持不变。

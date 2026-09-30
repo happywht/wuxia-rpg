@@ -793,6 +793,12 @@
     {"id":"event.r87-arrival","kind":"event","title":"初入雾航","summary":"渡过西南雾海首次踏上雾航湾北滩。","knownByDefault":false},
     {"id":"event.r87-fog-harbor","kind":"event","title":"渔村雾灯","summary":"在雾泊渔村檐下看清成串的雾灯。","knownByDefault":false},
     {"id":"event.r87-mist-signal","kind":"event","title":"崖顶烽信","summary":"在雾哨崖勘明三刻烽信号的规矩。","knownByDefault":false},
-    {"id":"event.r87-spring-hollow","kind":"event","title":"石涧得泉","summary":"在岛西石缝间寻得列岛的淡水泉。","knownByDefault":false}
+    {"id":"event.r87-spring-hollow","kind":"event","title":"石涧得泉","summary":"在岛西石缝间寻得列岛的淡水泉。","knownByDefault":false},
+    {"id":"char.r89-cheng-wenzhou","kind":"character","title":"程问舟","summary":"往来雾航湾与落潮湾之间的潮图修补人，按日程沿湾巡查。","knownByDefault":false},
+    {"id":"quest.r89-east-channel-echo","kind":"quest","title":"东汊回声","summary":"前往青帆埠核实三道潮刻，再返回雾航湾补全回汐图。","knownByDefault":true},
+    {"id":"event.r89-chart-clue","kind":"event","title":"残缺潮图线索","summary":"程问舟从旧航图辨认出青帆埠东岸水槽的三道潮刻。","knownByDefault":false},
+    {"id":"event.r89-east-channel-mark","kind":"event","title":"旧水槽潮刻","summary":"在东溟海岸调查盐霜覆盖的石槽，辨明三道刻痕的潮序。","knownByDefault":false},
+    {"id":"place.r89-east-channel-mark","kind":"place","title":"东汊旧水槽","summary":"青帆埠东岸的废弃石槽，三道潮刻能辨出回汐浅湾的走向。","knownByDefault":false},
+    {"id":"place.r89-safe-return-current","kind":"place","title":"回汐缓流","summary":"按三道潮刻的次序行船，可避开雾夜里横切主汊的急流。","knownByDefault":false}
   ]
 }

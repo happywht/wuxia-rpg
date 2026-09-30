@@ -1,0 +1,63 @@
+{
+  "conversations": [
+    {
+      "id": "dlg.r89-cheng-wenzhou-route",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "程问舟把一张被海风吹卷的潮图压在礁石上：「雾航湾与青帆埠之间的水路，老图只画到一半。东溟海岸旧水槽旁有三道刻痕，若还辨得出，我想把回汐的走法补全。」",
+          "options": [
+            {
+              "text": "我去青帆埠核一核潮刻。",
+              "nextNodeId": "accepted",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r89-east-channel-echo", "status": "offered" }
+              ],
+              "effects": [
+                { "kind": "acceptQuest", "questId": "quest.r89-east-channel-echo" },
+                { "kind": "discoverKnowledgeNode", "nodeId": "event.r89-chart-clue" }
+              ]
+            },
+            {
+              "text": "东汊潮刻已经核过了。",
+              "nextNodeId": "completed",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r89-east-channel-echo", "status": "completed" }
+              ]
+            },
+            {
+              "text": "我还在核那处旧水槽。",
+              "nextNodeId": "active",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r89-east-channel-echo", "status": "active" }
+              ]
+            },
+            { "text": "老图为何只画了一半？", "nextNodeId": "history" },
+            { "text": "改日再谈。", "nextNodeId": "farewell" }
+          ]
+        },
+        {
+          "id": "accepted",
+          "text": "「从雾航湾回落潮湾，沿旧渡道转上云岭古道，再经东汊下到青帆埠。沿海岸向北找废弃水槽，三道刻痕若还在，就把回汐的次序记进图里。差事簿会把路标到第一道关口，关口仍得一步步走过去。」"
+        },
+        {
+          "id": "active",
+          "text": "「先到青帆埠旧水槽旁核三道潮刻，再沿差事簿的关口提示走回来。每一段都要自己走到关口，潮图不会替人渡海。」"
+        },
+        {
+          "id": "completed",
+          "text": "程问舟把新记的潮序添进图边：「北汊先缓、东汊后回——往后雾散得晚些，渔舟也知道该在哪片水面等潮。」"
+        },
+        {
+          "id": "history",
+          "text": "「旧年两边的渔队各认一套水尺。一次浓雾里船队走散，老图便被撕成两份，谁也没再敢把未核实的水路画全。」"
+        },
+        {
+          "id": "farewell",
+          "text": "程问舟用一块小石压住潮图，沿着湾岸继续巡看礁脊。"
+        }
+      ]
+    }
+  ]
+}

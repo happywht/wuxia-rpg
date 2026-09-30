@@ -156,6 +156,21 @@
       "schema": "quest-set"
     },
     {
+      "id": "npc.round-89-southwest-isles-set",
+      "path": "characters/round-89-southwest-isles-npcs.json",
+      "schema": "npc-set"
+    },
+    {
+      "id": "dialogue.round-89-southwest-isle-set",
+      "path": "dialogues/round-89-southwest-isle-conversations.json",
+      "schema": "dialogue-set"
+    },
+    {
+      "id": "quest.round-89-cross-region-set",
+      "path": "quests/round-89-cross-region-quests.json",
+      "schema": "quest-set"
+    },
+    {
       "id": "world.atlas",
       "path": "world/world-map.json",
       "schema": "world-map"

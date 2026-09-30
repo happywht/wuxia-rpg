@@ -464,6 +464,15 @@
       "name": "石涧淡泉",
       "category": "water",
       "discoveryNodeId": "place.r87-spring-hollow"
+    },
+    {
+      "id": "landmark.r89-east-channel-mark",
+      "mapResourceId": "map.round-82-east-coast",
+      "col": 66,
+      "row": 35,
+      "name": "东汊旧水槽",
+      "category": "route",
+      "discoveryNodeId": "place.r89-east-channel-mark"
     }
   ],
   "transitions": [
@@ -1160,6 +1169,29 @@
       "approachText": "松林深处有水声，雾在此处格外清凉。",
       "once": true,
       "discoverKnowledgeNodeId": "place.r87-spring-hollow"
+    },
+    {
+      "id": "event.r89-east-channel-mark",
+      "mapResourceId": "map.round-82-east-coast",
+      "col": 66,
+      "row": 35,
+      "text": "废水槽侧壁留着三道被盐霜磨浅的刻痕。最外一道朝北，第二道折向东汊，末一道指向一片回流缓慢的浅湾；你把潮序誊进了程问舟的旧图。",
+      "approachText": "海风掠过岸边的石槽，槽沿露出几道被盐霜磨浅的刻痕。",
+      "once": true,
+      "conditions": {
+        "knowledgeNodeIds": [
+          "event.r89-chart-clue"
+        ]
+      },
+      "discoverKnowledgeNodeId": "place.r89-east-channel-mark",
+      "interaction": {
+        "prompt": "核对旧水槽的三道潮刻",
+        "range": 1,
+        "approachDirections": [
+          "left",
+          "up"
+        ]
+      }
     }
   ],
   "randomEvents": [

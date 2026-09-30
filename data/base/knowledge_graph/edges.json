@@ -379,6 +379,15 @@
     {"id":"kg.edge.r87-keeper-location","fromId":"char.r87-ao-wanqing","toId":"map.round-87-southwest-isles","relation":"locatedAt","summary":"敖晚晴在雾航湾雾哨崖守烽。"},
     {"id":"kg.edge.r87-pilot-quest","fromId":"char.r87-meng-haizhou","toId":"quest.r87-fog-pilot-ledger","relation":"participatesIn","summary":"孟海洲委托玩家勘明雾航烽信。"},
     {"id":"kg.edge.r87-quest-signal","fromId":"quest.r87-fog-pilot-ledger","toId":"place.r87-mist-signal","relation":"requires","summary":"雾航引水需要玩家调查雾哨崖烽台。"},
-    {"id":"kg.edge.r87-quest-spring","fromId":"quest.r87-fog-pilot-ledger","toId":"place.r87-spring-hollow","relation":"rewards","summary":"完成雾航引水后得知石涧淡泉的方位。"}
+    {"id":"kg.edge.r87-quest-spring","fromId":"quest.r87-fog-pilot-ledger","toId":"place.r87-spring-hollow","relation":"rewards","summary":"完成雾航引水后得知石涧淡泉的方位。"},
+    {"id":"kg.edge.r89-pilot-location","fromId":"char.r89-cheng-wenzhou","toId":"map.round-87-southwest-isles","relation":"locatedAt","summary":"程问舟在雾航湾周边巡查潮路，并按时段更换停留地点。"},
+    {"id":"kg.edge.r89-pilot-knows-chart","fromId":"char.r89-cheng-wenzhou","toId":"event.r89-chart-clue","relation":"knows","summary":"程问舟从残缺潮图辨出了旧水槽潮刻的位置。"},
+    {"id":"kg.edge.r89-pilot-quest","fromId":"char.r89-cheng-wenzhou","toId":"quest.r89-east-channel-echo","relation":"participatesIn","summary":"程问舟请玩家核实青帆埠旧水槽旁的三道潮刻。"},
+    {"id":"kg.edge.r89-clue-map","fromId":"event.r89-chart-clue","toId":"map.round-82-east-coast","relation":"locatedAt","summary":"残缺潮图线索指向东溟海岸的青帆埠。"},
+    {"id":"kg.edge.r89-mark-event-place","fromId":"event.r89-east-channel-mark","toId":"place.r89-east-channel-mark","relation":"triggers","summary":"调查旧水槽的三道潮刻后发现东汊旧水槽。"},
+    {"id":"kg.edge.r89-mark-location","fromId":"event.r89-east-channel-mark","toId":"map.round-82-east-coast","relation":"locatedAt","summary":"旧水槽潮刻位于青帆埠东岸。"},
+    {"id":"kg.edge.r89-place-location","fromId":"place.r89-east-channel-mark","toId":"map.round-82-east-coast","relation":"locatedAt","summary":"东汊旧水槽由青帆埠百格地图承载。"},
+    {"id":"kg.edge.r89-quest-mark","fromId":"quest.r89-east-channel-echo","toId":"place.r89-east-channel-mark","relation":"requires","summary":"东汊回声要求玩家亲自核实三道潮刻。"},
+    {"id":"kg.edge.r89-quest-return","fromId":"quest.r89-east-channel-echo","toId":"place.r89-safe-return-current","relation":"rewards","summary":"完成东汊回声后得知避开横流的回汐次序。"}
   ]
 }
