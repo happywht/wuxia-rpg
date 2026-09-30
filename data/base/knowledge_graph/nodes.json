@@ -2589,6 +2589,132 @@
       "title": "环礁东栈",
       "summary": "在东栈确认前往归帆洲的渡船。",
       "knownByDefault": false
+    },
+    {
+      "id": "place.r97-lanxin-isle",
+      "kind": "place",
+      "title": "澜心洲",
+      "summary": "东溟中部大岛，退潮沙脊三岔分接三面航路。",
+      "knownByDefault": false
+    },
+    {
+      "id": "map.round-97-lanxin-isle",
+      "kind": "place",
+      "title": "澜心洲探索地图",
+      "summary": "西连风回、南通潮生、北接引航礁的百格岛洲。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.r97-tide-mark-stone",
+      "kind": "place",
+      "title": "潮痕碑",
+      "summary": "北沙脊尽头的礁台碑，横刻历次大潮水线。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.r97-lantern-terrace",
+      "kind": "place",
+      "title": "观汐台",
+      "summary": "南脊弯处的灯谱台，灯位与潮时一一相对。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.r97-pilot-reef",
+      "kind": "place",
+      "title": "引航礁",
+      "summary": "澜心洲东北的礁盘，潮落方显，航标引北去船。",
+      "knownByDefault": false
+    },
+    {
+      "id": "map.round-97-pilot-reef",
+      "kind": "place",
+      "title": "引航礁探索地图",
+      "summary": "南渡澜心洲、东泊天门关的百格礁盘。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.r97-beacon-tower",
+      "kind": "place",
+      "title": "星槎航标",
+      "summary": "三足木塔悬琉璃灯，灯位刻度对潮时而转。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.r97-goose-window",
+      "kind": "place",
+      "title": "望雁口",
+      "summary": "礁盘裂开的石窗，北去候鸟穿窗为灯校向。",
+      "knownByDefault": false
+    },
+    {
+      "id": "char.r97-ji-wuchao",
+      "kind": "character",
+      "title": "季无潮",
+      "summary": "澜心湾老船师，守三岔沙脊与潮簿。",
+      "knownByDefault": false
+    },
+    {
+      "id": "char.r97-yu-xingcha",
+      "kind": "character",
+      "title": "虞星槎",
+      "summary": "引航礁守标人，管星槎航标灯。",
+      "knownByDefault": false
+    },
+    {
+      "id": "quest.r97-tide-ledger",
+      "kind": "quest",
+      "title": "澜心潮簿",
+      "summary": "读潮痕碑新刻痕并向季无潮复命。",
+      "knownByDefault": false
+    },
+    {
+      "id": "quest.r97-beacon-relight",
+      "kind": "quest",
+      "title": "重燃星槎灯",
+      "summary": "抄录观汐台灯谱并回礁燃标。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r97-lanxin-arrival",
+      "kind": "event",
+      "title": "踏上澜心洲",
+      "summary": "登上退潮方显的三岔沙脊。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r97-tide-mark-stone",
+      "kind": "event",
+      "title": "描读潮痕碑",
+      "summary": "读到最新一道大潮水线。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r97-lantern-terrace",
+      "kind": "event",
+      "title": "抄录观汐台",
+      "summary": "得到与潮时相对的灯谱。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r97-pilot-arrival",
+      "kind": "event",
+      "title": "登上引航礁",
+      "summary": "踏上直贯礁心的黑礁栈道。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r97-beacon-tower",
+      "kind": "event",
+      "title": "查看星槎航标",
+      "summary": "记下航标的灯位刻度。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r97-goose-window",
+      "kind": "event",
+      "title": "眺望望雁口",
+      "summary": "望见北去海天与雁阵航路。",
+      "knownByDefault": false
     }
   ]
 }

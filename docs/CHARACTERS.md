@@ -1,6 +1,6 @@
 # 人物志（CHARACTERS）
 
-- 状态：Round 96 已完成，基础世界共有 **36 名可交互 NPC**；全部为原创人物，七时段人物使用独立日程和对话资源。Round 94 的沈问秋、赵千帆、Round 95 的林越、裴杭与 Round 96 的岑汐、洛盐负责东境雪关、南溟归帆、林谷海港与南海礁岛差事。Round 96 人物、对白和任务位于 `data/base/characters/round-96-south-reef-npcs.json`、`data/base/dialogues/round-96-south-reef-conversations.json` 与 `data/base/quests/round-96-south-reef-quests.json`。
+- 状态：Round 97 已完成，基础世界共有 **38 名可交互 NPC**；全部为原创人物，七时段人物使用独立日程和对话资源。季无潮、虞星槎负责澜心洲—引航礁航路差事；本轮人物、对白和任务位于 `data/base/characters/round-97-lanxin-reef-npcs.json`、`data/base/dialogues/round-97-lanxin-reef-conversations.json` 与 `data/base/quests/round-97-lanxin-reef-quests.json`。
 - 关联：`docs/NPC-SCHEDULES.md`（时段日程）、`docs/FACTIONS.md`（门派与师承）、`docs/KNOWLEDGE-GRAPH.md`（人物词条与关系边）、`docs/DIALOGUE-GUIDE.md`（对话写法）。
 
 ## 总表
@@ -140,6 +140,13 @@
 
 - **林越**（东境·雾杉关，基础位置 `(46,47)`）：巡林向导，按七时段走访关道与风铃石附近；发布「风铃石上的路」，请玩家沿林谷调查风铃石并返回复命。
 - **裴杭**（东溟·照叶港，基础位置 `(52,48)`）：潮路抄手，按七时段巡查码头与旧潮尺；前置差事完成后发布「照叶港的潮时」，引导玩家核对潮尺记录并返回报信。两人都复用既有 Puny Characters CC0 方向帧，日程、对白和任务引用由 Round 95 独立 JSON 声明。
+
+## Round 97 新增人物
+
+### 季无潮与虞星槎
+
+- **季无潮**（东溟·澜心洲，基础位置 `(50,50)`）：澜心湾船师，按七时段在湾口、沙脊和观潮处活动，发布「澜心潮簿」，请玩家调查北沙脊潮痕碑并回三岔口复命。
+- **虞星槎**（东溟·引航礁，基础位置 `(52,54)`）：引航礁守标人，按七时段巡视礁盘与北去航标；完成「澜心潮簿」后发布「重燃星槎灯」，托玩家跨区抄录观汐台灯谱并回来重燃航标。两人使用已登记 Puny Characters CC0 朝向帧，位置、日程、对白和任务均来自独立 JSON 数据。
 
 ## Round 96 新增人物
 

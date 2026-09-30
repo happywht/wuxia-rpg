@@ -59,6 +59,7 @@ describe('Round 81 global world atlas art and projection', () => {
     ]);
     expect(art.layers.slice(57).map(({ id }) => id)).toEqual([
       'world-r96-reef-water', 'world-r96-reef-sand', 'world-r96-reef-land', 'world-r96-reef-lane',
+      'world-r97-lanxin-water', 'world-r97-lanxin-sand', 'world-r97-lanxin-land', 'world-r97-lanxin-lane',
     ]);
     const tilesets = new Map(art.tilesets.map((tileset) => [tileset.id, tileset]));
     expect(tilesets.has('kenney.roguelike-rpg')).toBe(true);

@@ -132,7 +132,7 @@ describe('Round 93 Snow Pine Valley (Frostpine Valley)', () => {
 
     const art = parsed.data.atlasArt!;
     expect([art.columns, art.rows, art.tileSize]).toEqual([768, 576, 8]);
-    expect(art.layers).toHaveLength(61);
+    expect(art.layers).toHaveLength(65);
     const layers = new Map(art.layers.map((layer) => [layer.id, layer]));
     for (const [id, expectedHash] of Object.entries(baseline.layers)) {
       const layer = layers.get(id);
@@ -154,6 +154,7 @@ describe('Round 93 Snow Pine Valley (Frostpine Valley)', () => {
     ]);
     expect(art.layers.slice(57).map(({ id }) => id)).toEqual([
       'world-r96-reef-water', 'world-r96-reef-sand', 'world-r96-reef-land', 'world-r96-reef-lane',
+      'world-r97-lanxin-water', 'world-r97-lanxin-sand', 'world-r97-lanxin-land', 'world-r97-lanxin-lane',
     ]);
 
     for (const [mapResourceId, oldAnchor] of Object.entries(baseline.regions)) {
@@ -164,7 +165,7 @@ describe('Round 93 Snow Pine Valley (Frostpine Valley)', () => {
       expect(after.x / art.tileSize, `${mapResourceId} x`).toBeCloseTo(before.x / art.tileSize, 4);
       expect(after.y / art.tileSize, `${mapResourceId} y`).toBeCloseTo(before.y / art.tileSize, 4);
     }
-    expect(parsed.data.regions).toHaveLength(20);
+    expect(parsed.data.regions).toHaveLength(22);
 
     const valley = parsed.data.regions.find(({ mapResourceId }) => mapResourceId === MAP_ID)!;
     const point = projectAtlasPosition(valley.atlasPosition, art);

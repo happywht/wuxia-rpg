@@ -4,6 +4,26 @@
 
 ---
 
+## Round 97 — 东溟中部航路与澜心洲（2026-09-30，已完成）
+
+### 计划与实现
+
+- 计划先写于 [`iterations/round-97/plan.md`](iterations/round-97/plan.md)：在东溟中部增建澜心洲、引航礁两张可探索百格地图，以四组双向海路连接风回岛、潮生屿、天门关，并将后者到潮生屿路线从五段缩短为三段。
+- `scripts/generate-round97-lanxin-isle.mjs` 新增四层舆图像素与两张地图；`iterations/round-97/round96-atlas-baseline.json` 冻结 Round 96 的 61 层哈希和 20 个区域中心。生成器检查许可海水叠层、旧陆/植被/道路不覆盖、两座新岛的航线像素不穿岛，并校验八处航线端点靠近对应岸线。
+- 新增季无潮、虞星槎两名七时段 NPC、「澜心潮簿」→「重燃星槎灯」两段前置差事、六处地标、六个区域事件及 18 个知识节点/21 条关系；任务、对白、人物、地图和图谱均登记为独立数据资源，素材继续复用已登记 CC0 Puny World/Puny Characters 图集。
+- 世界资料现有 22 个区域、50 个有向关口、78 个地标、70 个固定事件；manifest 100 项资源，含 38 名 NPC、65 项任务、388 个图谱节点/500 条边。为当前世界同步历史测试夹具，并扩展总图标签避让，使 22 个区域标签在拟合视图内保持可读且不重叠。
+
+### 验证记录
+
+- `npm run smoke:round-97`：通过；65 层舆图、22 区域、50 关口、天门关⇄潮生屿双向三段路线、8 处岸线接驳、叠层与生成器两遍幂等检查通过。
+- `npx vitest run tests/round52-map-landmarks.test.ts tests/round70-world-atlas.test.ts tests/round86-world-atlas-labels.test.ts tests/round97-lanxin-isle.test.ts`：4 个文件、17 项通过。
+- `npm run check`：通过；100 项基础资源 Schema、100 项 MOD 资源检查且问题 0、TypeScript、71 个测试文件/457 项测试、Round 34 与 Round 48 文档审计均通过。
+- `npm run build`：完整检查再次通过，Vite 构建 139 个模块成功。`index` JS 为 591.63 kB，Phaser runtime 为 1,374.54 kB（gzip 357.49 kB）；Vite 对超过默认 500 kB 的 Phaser chunk 发出非阻断提示。
+- 历史生成器依次执行 `generate:round-95-east-woodland`、`generate:round-94-frontiers`、`generate:round-93-snow-pine-valley`、`generate:round-92-north-pass`、`generate:round-91-cloud-north-terrace`、`generate:round-87-southwest-isles`、`generate:round-96-south-reef`、`generate:round-97-lanxin-isle`，均成功。随后再次运行 `npm run smoke:round-97`：102 个 JSON 快照确认只写入登记生成器管理的输出，旧 61 层哈希及新内容均保持通过。
+- `npm run audit:round-34` 与 `npm run audit:round-48-docs` 均通过；`git diff --check` 退出码为 0。未做浏览器手动全景操作，不把自动测试当作手测结果。
+
+---
+
 ## Round 96 — 中溟环礁海路（2026-09-30，已完成）
 
 ### 计划与实现

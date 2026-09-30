@@ -41,6 +41,24 @@ function projectCell(
   };
 }
 
+function hasNearbyPaintedCell(
+  layers: readonly { id: string; cells: number[][] }[],
+  layerIds: readonly string[],
+  cell: { col: number; row: number },
+  radius: number,
+): boolean {
+  return layerIds.some((id) => {
+    const layer = layers.find((entry) => entry.id === id);
+    if (layer === undefined) return false;
+    for (let row = Math.max(0, cell.row - radius); row <= Math.min(layer.cells.length - 1, cell.row + radius); row += 1) {
+      for (let col = Math.max(0, cell.col - radius); col <= Math.min(layer.cells[row]!.length - 1, cell.col + radius); col += 1) {
+        if (Math.hypot(col - cell.col, row - cell.row) <= radius && layer.cells[row]![col]! > 0) return true;
+      }
+    }
+    return false;
+  });
+}
+
 describe('Round 70 continental world atlas', () => {
   it('keeps every region anchor and projected gate endpoint on dry atlas cells', () => {
     const { data, maps } = loadWorld();
@@ -86,6 +104,10 @@ describe('Round 70 continental world atlas', () => {
       } else if (region.mapResourceId.startsWith('map.round-96-')) {
         // The halfmoon-atoll anchor rests on its declared lagoon layer, not bare ocean.
         const painted = ['world-r96-reef-land', 'world-r96-reef-sand', 'world-r96-reef-water']
+          .some((layerId) => (art.layers.find(({ id }) => id === layerId)?.cells[row]?.[col] ?? 0) > 0);
+        expect(painted, `${region.mapResourceId} anchor on bare atlas`).toBe(true);
+      } else if (region.mapResourceId.startsWith('map.round-97-')) {
+        const painted = ['world-r97-lanxin-land', 'world-r97-lanxin-sand', 'world-r97-lanxin-water']
           .some((layerId) => (art.layers.find(({ id }) => id === layerId)?.cells[row]?.[col] ?? 0) > 0);
         expect(painted, `${region.mapResourceId} anchor on bare atlas`).toBe(true);
       } else if (region.mapResourceId === 'map.round-79-isles') {
@@ -138,6 +160,12 @@ describe('Round 70 continental world atlas', () => {
           const painted = ['world-r96-reef-land', 'world-r96-reef-sand', 'world-r96-reef-water', 'world-r96-reef-lane']
             .some((layerId) => (art.layers.find(({ id }) => id === layerId)?.cells[cell.row]?.[cell.col] ?? 0) > 0);
           expect(painted, `${transition.id} endpoint on bare atlas`).toBe(true);
+        } else if (endpoint.mapResourceId.startsWith('map.round-97-')) {
+          // R97 gates reach the island shore; their world-map projection may
+          // sit a few overview cells off the coast at this compressed scale.
+          expect(hasNearbyPaintedCell(art.layers, [
+            'world-r97-lanxin-land', 'world-r97-lanxin-sand', 'world-r97-lanxin-lane',
+          ], cell, 6), `${transition.id} endpoint detached from island art`).toBe(true);
         } else if (endpoint.mapResourceId === 'map.round-79-isles') {
           // Round 87 fog-pilot gates leave from the western reef shallows
           // instead of the old official ferry route.

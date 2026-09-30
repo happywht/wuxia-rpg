@@ -1,0 +1,162 @@
+{
+  "conversations": [
+    {
+      "id": "dlg.r97-ji-wuchao",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "季无潮把一册翻卷了角的潮簿按在膝上：「澜心湾里船候潮、人候簿。沙脊三岔口，潮退才走船——北口那块潮痕碑，新一道的刻痕该描了。」",
+          "options": [
+            {
+              "text": "我替你跑一趟。",
+              "nextNodeId": "accepted",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r97-tide-ledger",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r97-tide-ledger"
+                }
+              ]
+            },
+            {
+              "text": "差事已经办妥。",
+              "nextNodeId": "completed",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r97-tide-ledger",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "还在半路上。",
+              "nextNodeId": "active",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r97-tide-ledger",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "路怎么走？",
+              "nextNodeId": "route"
+            },
+            {
+              "text": "先告辞。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "accepted",
+          "text": "「沿西沙脊向东北到三岔口，再往北直上脊尽头。碑上横痕层层，最新一道还带着湿沙，描下来便是最眼下的潮时。」"
+        },
+        {
+          "id": "active",
+          "text": "「沿西沙脊向东北到三岔口，再往北直上脊尽头。碑上横痕层层，最新一道还带着湿沙，描下来便是最眼下的潮时。」"
+        },
+        {
+          "id": "completed",
+          "text": "季无潮把新潮时誊进潮簿：「三朝一转，刻痕不欺人。东北那片礁盘叫引航礁，守标的虞星槎若问起，就说澜心洲应了簿。」"
+        },
+        {
+          "id": "route",
+          "text": "「沿西沙脊向东北到三岔口，再往北直上脊尽头。碑上横痕层层，最新一道还带着湿沙，描下来便是最眼下的潮时。」"
+        },
+        {
+          "id": "farewell",
+          "text": "季无潮把潮簿揣回怀里，目光仍落在湾口的潮头上。"
+        }
+      ]
+    },
+    {
+      "id": "dlg.r97-yu-xingcha",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "虞星槎擦拭着航标的琉璃罩：「北去的船认我这盏灯。可灯何时点、点多久，得按澜心洲的潮簿来——洲上观汐台刻着一份灯谱，替我抄来。」",
+          "options": [
+            {
+              "text": "我替你跑一趟。",
+              "nextNodeId": "accepted",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r97-beacon-relight",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r97-beacon-relight"
+                }
+              ]
+            },
+            {
+              "text": "差事已经办妥。",
+              "nextNodeId": "completed",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r97-beacon-relight",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "还在半路上。",
+              "nextNodeId": "active",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r97-beacon-relight",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "路怎么走？",
+              "nextNodeId": "route"
+            },
+            {
+              "text": "先告辞。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "accepted",
+          "text": "「先南渡回澜心洲，下船沿南沙脊向西南，观汐台就在脊弯处。灯谱抄全了再渡回来，灯油我已经备好了。」"
+        },
+        {
+          "id": "active",
+          "text": "「先南渡回澜心洲，下船沿南沙脊向西南，观汐台就在脊弯处。灯谱抄全了再渡回来，灯油我已经备好了。」"
+        },
+        {
+          "id": "completed",
+          "text": "虞星槎对着灯谱拨正灯芯，航标次第亮起：「潮簿对灯谱，澜心洲到天门关的夜路就亮了。往后北去的船，我替你留一盏。」"
+        },
+        {
+          "id": "route",
+          "text": "「先南渡回澜心洲，下船沿南沙脊向西南，观汐台就在脊弯处。灯谱抄全了再渡回来，灯油我已经备好了。」"
+        },
+        {
+          "id": "farewell",
+          "text": "虞星槎拍了拍塔柱，转身去添灯油。"
+        }
+      ]
+    }
+  ]
+}

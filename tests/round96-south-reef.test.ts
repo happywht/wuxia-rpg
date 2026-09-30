@@ -72,8 +72,8 @@ describe('Round 96 south-sea reef islands and the 3-segment sea route', () => {
     const art = parsedWorld.data.atlasArt;
     const baseline = readJson('iterations/round-96/round95-atlas-baseline.json');
     expect([art.columns, art.rows, art.tileSize]).toEqual([768, 576, 8]);
-    expect(art.layers).toHaveLength(61);
-    expect(parsedWorld.data.regions).toHaveLength(20);
+    expect(art.layers).toHaveLength(65);
+    expect(parsedWorld.data.regions).toHaveLength(22);
     expect(Object.keys(baseline.layers)).toHaveLength(57);
     expect(Object.keys(baseline.regions)).toHaveLength(18);
     const layers = new Map(art.layers.map((layer) => [layer.id, layer]));
@@ -146,8 +146,8 @@ describe('Round 96 south-sea reef islands and the 3-segment sea route', () => {
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
     expect(assembled.warnings).toEqual([]);
-    expect(assembled.regions).toHaveLength(20);
-    expect(assembled.transitions).toHaveLength(42);
+    expect(assembled.regions).toHaveLength(22);
+    expect(assembled.transitions).toHaveLength(50);
 
     for (const id of [STONE_ID, ATOLL_ID]) {
       const map = maps.get(id);
@@ -214,8 +214,8 @@ describe('Round 96 south-sea reef islands and the 3-segment sea route', () => {
       };
     });
     const placements = layoutWorldAtlasRegionLabels(labels, { width: 616, height: 340 }, 'map.round-85-tide-isle');
-    expect(labels).toHaveLength(20);
-    expect(placements.size).toBe(20);
+    expect(labels).toHaveLength(22);
+    expect(placements.size).toBe(22);
   });
 
   it('validates the NPC schedules and the cross-region quest chain from lock to reward', () => {

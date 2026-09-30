@@ -114,7 +114,7 @@ describe('Round 92 North Pass (Snowlit Pass)', () => {
 
     const art = parsed.data.atlasArt!;
     expect([art.columns, art.rows, art.tileSize]).toEqual([768, 576, 8]);
-    expect(art.layers).toHaveLength(61);
+    expect(art.layers).toHaveLength(65);
     const layers = new Map(art.layers.map((layer) => [layer.id, layer]));
     for (const [id, expectedHash] of Object.entries(baseline.layers)) {
       const layer = layers.get(id);
@@ -134,7 +134,7 @@ describe('Round 92 North Pass (Snowlit Pass)', () => {
       expect(after.x / art.tileSize, `${mapResourceId} x`).toBeCloseTo(before.x / art.tileSize, 4);
       expect(after.y / art.tileSize, `${mapResourceId} y`).toBeCloseTo(before.y / art.tileSize, 4);
     }
-    expect(parsed.data.regions).toHaveLength(20);
+    expect(parsed.data.regions).toHaveLength(22);
 
     const pass = parsed.data.regions.find(({ mapResourceId }) => mapResourceId === MAP_ID)!;
     const point = projectAtlasPosition(pass.atlasPosition, art);

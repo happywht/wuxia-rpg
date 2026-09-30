@@ -239,6 +239,8 @@ function loadJourneyWorld(): JourneyWorld {
     ['map.round-95-east-harbor', 'round-95-east-harbor.json'],
     ['map.round-96-stone-reef', 'round-96-stone-reef.json'],
     ['map.round-96-halfmoon-atoll', 'round-96-halfmoon-atoll.json'],
+    ['map.round-97-lanxin-isle', 'round-97-lanxin-isle.json'],
+    ['map.round-97-pilot-reef', 'round-97-pilot-reef.json'],
   ] as const) {
     const parsed = requireParsed(parseGridMap(readJson(`../data/base/maps/${file}`)), file);
     expect(parsed.map.data.id, `${file} stable id`).toBe(id);
@@ -269,7 +271,7 @@ function loadJourneyWorld(): JourneyWorld {
   if ('ok' in worldResult) throw new Error(worldResult.errors.join('\n'));
   expect(worldResult.warnings, '全域/关口/事件装配').toEqual([]);
   expect(worldResult.regions.map(({ mapResourceId }) => mapResourceId).sort())
-    .toEqual([JIANGNAN_ID, FERRY_ID, IRON_RIDGE_ID, SALT_ROAD_ID, CLOUD_RIDGE_ID, 'map.round-79-isles', 'map.round-82-east-coast', 'map.round-84-windward-isle', 'map.round-85-tide-isle', 'map.round-87-southwest-isles', 'map.round-91-cloud-north-terrace', 'map.round-92-north-pass', 'map.round-93-snow-pine-valley', 'map.round-94-east-gate', 'map.round-94-returning-sails', 'map.round-95-misty-pine-gate', 'map.round-95-cedar-valley', 'map.round-95-east-harbor', 'map.round-96-stone-reef', 'map.round-96-halfmoon-atoll'].sort());
+    .toEqual([JIANGNAN_ID, FERRY_ID, IRON_RIDGE_ID, SALT_ROAD_ID, CLOUD_RIDGE_ID, 'map.round-79-isles', 'map.round-82-east-coast', 'map.round-84-windward-isle', 'map.round-85-tide-isle', 'map.round-87-southwest-isles', 'map.round-91-cloud-north-terrace', 'map.round-92-north-pass', 'map.round-93-snow-pine-valley', 'map.round-94-east-gate', 'map.round-94-returning-sails', 'map.round-95-misty-pine-gate', 'map.round-95-cedar-valley', 'map.round-95-east-harbor', 'map.round-96-stone-reef', 'map.round-96-halfmoon-atoll', 'map.round-97-lanxin-isle', 'map.round-97-pilot-reef'].sort());
 
   const npcIds = new Set(npcSet.npcs.map(({ id }) => id));
   const itemIndex = indexItems(itemSet);

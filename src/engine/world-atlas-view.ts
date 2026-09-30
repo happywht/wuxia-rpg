@@ -70,16 +70,39 @@ export function layoutWorldAtlasRegionLabels(
 ): ReadonlyMap<string, WorldAtlasRegionLabelPlacement> {
   const placed: Array<{ mapResourceId: string; left: number; top: number; right: number; bottom: number }> = [];
   const result = new Map<string, WorldAtlasRegionLabelPlacement>();
-  const candidates = (label: WorldAtlasRegionLabelMeasurement): WorldAtlasRegionLabelPlacement[] => [
-    { x: label.x, y: label.y - 10, originX: 0.5, originY: 1 },
-    { x: label.x + label.width / 2 + 6, y: label.y, originX: 0, originY: 0.5 },
-    { x: label.x - label.width / 2 - 6, y: label.y, originX: 1, originY: 0.5 },
-    { x: label.x, y: label.y + 6, originX: 0.5, originY: 0 },
-    { x: label.x + label.width / 2 + 6, y: label.y - label.height / 2 - 4, originX: 0, originY: 1 },
-    { x: label.x - label.width / 2 - 6, y: label.y - label.height / 2 - 4, originX: 1, originY: 1 },
-    { x: label.x + label.width / 2 + 6, y: label.y + label.height / 2 + 4, originX: 0, originY: 0 },
-    { x: label.x - label.width / 2 - 6, y: label.y + label.height / 2 + 4, originX: 1, originY: 0 },
-  ];
+  const candidates = (label: WorldAtlasRegionLabelMeasurement): WorldAtlasRegionLabelPlacement[] => {
+    const preferred: WorldAtlasRegionLabelPlacement[] = [
+      { x: label.x, y: label.y - 10, originX: 0.5, originY: 1 },
+      { x: label.x + label.width / 2 + 6, y: label.y, originX: 0, originY: 0.5 },
+      { x: label.x - label.width / 2 - 6, y: label.y, originX: 1, originY: 0.5 },
+      { x: label.x, y: label.y + 6, originX: 0.5, originY: 0 },
+      { x: label.x + label.width / 2 + 6, y: label.y - label.height / 2 - 4, originX: 0, originY: 1 },
+      { x: label.x - label.width / 2 - 6, y: label.y - label.height / 2 - 4, originX: 1, originY: 1 },
+      { x: label.x + label.width / 2 + 6, y: label.y + label.height / 2 + 4, originX: 0, originY: 0 },
+      { x: label.x - label.width / 2 - 6, y: label.y + label.height / 2 + 4, originX: 1, originY: 0 },
+    ];
+
+    // Dense atlases can have more names than the eight immediate callout slots.
+    // Expand in stable square rings so labels stay in view and remain readable
+    // instead of silently overlapping after every nearby slot has been used.
+    const stepX = Math.max(12, Math.ceil((label.width + gap) / 2));
+    const stepY = Math.max(12, Math.ceil((label.height + gap) / 2));
+    const maxRing = Math.ceil(Math.max(bounds.width / stepX, bounds.height / stepY)) + 1;
+    for (let ring = 1; ring <= maxRing; ring += 1) {
+      for (let dx = -ring; dx <= ring; dx += 1) {
+        for (let dy = -ring; dy <= ring; dy += 1) {
+          if (Math.max(Math.abs(dx), Math.abs(dy)) !== ring) continue;
+          preferred.push({
+            x: label.x + dx * stepX,
+            y: label.y + dy * stepY,
+            originX: 0.5,
+            originY: 0.5,
+          });
+        }
+      }
+    }
+    return preferred;
+  };
   const ordered = [...labels].sort((a, b) => {
     if (a.mapResourceId === b.mapResourceId) return 0;
     if (a.mapResourceId === primaryMapResourceId) return -1;

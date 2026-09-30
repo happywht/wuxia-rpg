@@ -1,0 +1,65 @@
+{
+  "quests": [
+    {
+      "id": "quest.r97-tide-ledger",
+      "name": "澜心潮簿",
+      "description": "澜心湾船师季无潮请你趁退潮登上北沙脊，读潮痕碑上最新一道大潮的水线刻痕，把潮时带回三岔口。",
+      "giverNpcId": "char.r97-ji-wuchao",
+      "objectives": [
+        {
+          "id": "objective.r97-read-tide-mark",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r97-tide-mark-stone",
+          "requiredCount": 1,
+          "text": "趁退潮读潮痕碑的新刻痕"
+        },
+        {
+          "id": "objective.r97-report-tide-ledger",
+          "kind": "talkToNpc",
+          "targetId": "char.r97-ji-wuchao",
+          "requiredCount": 1,
+          "text": "回三岔口向季无潮复命"
+        }
+      ],
+      "rewards": {
+        "experience": 44,
+        "currency": 36,
+        "discoverKnowledgeNodeIds": [
+          "place.r97-pilot-reef"
+        ]
+      }
+    },
+    {
+      "id": "quest.r97-beacon-relight",
+      "name": "重燃星槎灯",
+      "description": "潮簿复命之后，引航礁守标人虞星槎托你回澜心洲抄录观汐台的灯谱，再渡回礁盘，按潮时重燃北去的星槎航标。",
+      "giverNpcId": "char.r97-yu-xingcha",
+      "prerequisiteQuestIds": [
+        "quest.r97-tide-ledger"
+      ],
+      "objectives": [
+        {
+          "id": "objective.r97-copy-lantern-verse",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r97-lantern-terrace",
+          "requiredCount": 1,
+          "text": "回澜心洲抄录观汐台的灯谱"
+        },
+        {
+          "id": "objective.r97-relight-beacon",
+          "kind": "talkToNpc",
+          "targetId": "char.r97-yu-xingcha",
+          "requiredCount": 1,
+          "text": "渡回引航礁为虞星槎燃标"
+        }
+      ],
+      "rewards": {
+        "experience": 56,
+        "currency": 48,
+        "discoverKnowledgeNodeIds": [
+          "place.r97-beacon-tower"
+        ]
+      }
+    }
+  ]
+}

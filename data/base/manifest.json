@@ -261,6 +261,31 @@
       "schema": "world-map"
     },
     {
+      "id": "map.round-97-lanxin-isle",
+      "path": "maps/round-97-lanxin-isle.json",
+      "schema": "grid-map"
+    },
+    {
+      "id": "map.round-97-pilot-reef",
+      "path": "maps/round-97-pilot-reef.json",
+      "schema": "grid-map"
+    },
+    {
+      "id": "npc.round-97-lanxin-reef-set",
+      "path": "characters/round-97-lanxin-reef-npcs.json",
+      "schema": "npc-set"
+    },
+    {
+      "id": "dialogue.round-97-lanxin-reef-set",
+      "path": "dialogues/round-97-lanxin-reef-conversations.json",
+      "schema": "dialogue-set"
+    },
+    {
+      "id": "quest.round-97-lanxin-reef-set",
+      "path": "quests/round-97-lanxin-reef-quests.json",
+      "schema": "quest-set"
+    },
+    {
       "id": "map.round-96-stone-reef",
       "path": "maps/round-96-stone-reef.json",
       "schema": "grid-map"

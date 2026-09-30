@@ -3357,6 +3357,153 @@
       "toId": "place.r96-halfmoon-atoll",
       "relation": "triggers",
       "summary": "走到东栈时确认渡船。"
+    },
+    {
+      "id": "kg.edge.r97-lanxin-map-located",
+      "fromId": "map.round-97-lanxin-isle",
+      "toId": "place.r97-lanxin-isle",
+      "relation": "locatedAt",
+      "summary": "澜心洲地图承载三岔沙脊。"
+    },
+    {
+      "id": "kg.edge.r97-tide-mark-located",
+      "fromId": "place.r97-tide-mark-stone",
+      "toId": "map.round-97-lanxin-isle",
+      "relation": "locatedAt",
+      "summary": "潮痕碑立于北沙脊尽头。"
+    },
+    {
+      "id": "kg.edge.r97-lantern-terrace-located",
+      "fromId": "place.r97-lantern-terrace",
+      "toId": "map.round-97-lanxin-isle",
+      "relation": "locatedAt",
+      "summary": "观汐台位于南脊弯处。"
+    },
+    {
+      "id": "kg.edge.r97-pilot-map-located",
+      "fromId": "map.round-97-pilot-reef",
+      "toId": "place.r97-pilot-reef",
+      "relation": "locatedAt",
+      "summary": "引航礁地图承载礁心栈道。"
+    },
+    {
+      "id": "kg.edge.r97-beacon-tower-located",
+      "fromId": "place.r97-beacon-tower",
+      "toId": "map.round-97-pilot-reef",
+      "relation": "locatedAt",
+      "summary": "星槎航标立在东南礁脊。"
+    },
+    {
+      "id": "kg.edge.r97-goose-window-located",
+      "fromId": "place.r97-goose-window",
+      "toId": "map.round-97-pilot-reef",
+      "relation": "locatedAt",
+      "summary": "望雁口开在礁盘北缘。"
+    },
+    {
+      "id": "kg.edge.r97-ji-located",
+      "fromId": "char.r97-ji-wuchao",
+      "toId": "map.round-97-lanxin-isle",
+      "relation": "locatedAt",
+      "summary": "季无潮每日在澜心湾候潮。"
+    },
+    {
+      "id": "kg.edge.r97-yu-located",
+      "fromId": "char.r97-yu-xingcha",
+      "toId": "map.round-97-pilot-reef",
+      "relation": "locatedAt",
+      "summary": "虞星槎在礁心栈口守标。"
+    },
+    {
+      "id": "kg.edge.r97-ji-participates",
+      "fromId": "char.r97-ji-wuchao",
+      "toId": "quest.r97-tide-ledger",
+      "relation": "participatesIn",
+      "summary": "季无潮委托玩家描读潮痕。"
+    },
+    {
+      "id": "kg.edge.r97-tide-ledger-needs",
+      "fromId": "quest.r97-tide-ledger",
+      "toId": "place.r97-tide-mark-stone",
+      "relation": "requires",
+      "summary": "澜心潮簿需要潮痕碑的新刻痕。"
+    },
+    {
+      "id": "kg.edge.r97-tide-ledger-rewards",
+      "fromId": "quest.r97-tide-ledger",
+      "toId": "place.r97-pilot-reef",
+      "relation": "rewards",
+      "summary": "复命后望见东北的引航礁。"
+    },
+    {
+      "id": "kg.edge.r97-yu-participates",
+      "fromId": "char.r97-yu-xingcha",
+      "toId": "quest.r97-beacon-relight",
+      "relation": "participatesIn",
+      "summary": "虞星槎托玩家抄谱燃标。"
+    },
+    {
+      "id": "kg.edge.r97-beacon-needs",
+      "fromId": "quest.r97-beacon-relight",
+      "toId": "place.r97-lantern-terrace",
+      "relation": "requires",
+      "summary": "重燃星槎灯需要观汐台灯谱。"
+    },
+    {
+      "id": "kg.edge.r97-beacon-prerequisite",
+      "fromId": "quest.r97-beacon-relight",
+      "toId": "quest.r97-tide-ledger",
+      "relation": "requires",
+      "summary": "先复命潮簿，守标人才托付灯谱。"
+    },
+    {
+      "id": "kg.edge.r97-beacon-rewards",
+      "fromId": "quest.r97-beacon-relight",
+      "toId": "place.r97-beacon-tower",
+      "relation": "rewards",
+      "summary": "燃标后记录星槎航标灯位。"
+    },
+    {
+      "id": "kg.edge.r97-lanxin-arrival-triggers",
+      "fromId": "event.r97-lanxin-arrival",
+      "toId": "place.r97-lanxin-isle",
+      "relation": "triggers",
+      "summary": "踏上沙脊时发现澜心洲。"
+    },
+    {
+      "id": "kg.edge.r97-tide-mark-triggers",
+      "fromId": "event.r97-tide-mark-stone",
+      "toId": "place.r97-tide-mark-stone",
+      "relation": "triggers",
+      "summary": "描读碑刻时发现大潮水线。"
+    },
+    {
+      "id": "kg.edge.r97-lantern-terrace-triggers",
+      "fromId": "event.r97-lantern-terrace",
+      "toId": "place.r97-lantern-terrace",
+      "relation": "triggers",
+      "summary": "抄录台刻时得到灯谱。"
+    },
+    {
+      "id": "kg.edge.r97-pilot-arrival-triggers",
+      "fromId": "event.r97-pilot-arrival",
+      "toId": "place.r97-pilot-reef",
+      "relation": "triggers",
+      "summary": "登上栈道时发现引航礁。"
+    },
+    {
+      "id": "kg.edge.r97-beacon-tower-triggers",
+      "fromId": "event.r97-beacon-tower",
+      "toId": "place.r97-beacon-tower",
+      "relation": "triggers",
+      "summary": "查看木塔时读到灯位。"
+    },
+    {
+      "id": "kg.edge.r97-goose-window-triggers",
+      "fromId": "event.r97-goose-window",
+      "toId": "place.r97-goose-window",
+      "relation": "triggers",
+      "summary": "眺望石窗时望见雁路。"
     }
   ]
 }

@@ -116,7 +116,7 @@ describe('Round 86 world-atlas row-RLE wire protocol', () => {
     expect(validate(rawWorld), JSON.stringify(validate.errors)).toBe(true);
 
     const art = rawWorld.atlasArt;
-    expect(art.layers).toHaveLength(61);
+    expect(art.layers).toHaveLength(65);
     for (const layer of art.layers) {
       expect(layer.cells, layer.id).toBeUndefined();
       expect(layer.cellsRle, layer.id).toHaveLength(art.rows);
@@ -133,7 +133,7 @@ describe('Round 86 world-atlas row-RLE wire protocol', () => {
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
     const art = parsed.data.atlasArt!;
-    expect(art.layers).toHaveLength(61);
+    expect(art.layers).toHaveLength(65);
     expect(Object.keys(denseLayerHashes)).toHaveLength(43);
     for (const layer of art.layers) {
       expect(layer.cells, layer.id).toHaveLength(art.rows);

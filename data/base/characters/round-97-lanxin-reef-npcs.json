@@ -1,0 +1,142 @@
+{
+  "npcs": [
+    {
+      "id": "char.r97-ji-wuchao",
+      "name": "季无潮",
+      "mapResourceId": "map.round-97-lanxin-isle",
+      "position": {
+        "col": 50,
+        "row": 50
+      },
+      "dialogueId": "dlg.r97-ji-wuchao",
+      "questGiver": true,
+      "spriteFrame": 224,
+      "spriteFrames": {
+        "down": 224,
+        "right": 232,
+        "up": 240,
+        "left": 248
+      },
+      "schedule": [
+        {
+          "periodId": "period.midnight",
+          "position": {
+            "col": 42,
+            "row": 48
+          }
+        },
+        {
+          "periodId": "period.dawn",
+          "position": {
+            "col": 46,
+            "row": 46
+          }
+        },
+        {
+          "periodId": "period.morning",
+          "position": {
+            "col": 50,
+            "row": 44
+          }
+        },
+        {
+          "periodId": "period.midday",
+          "position": {
+            "col": 54,
+            "row": 50
+          }
+        },
+        {
+          "periodId": "period.afternoon",
+          "position": {
+            "col": 58,
+            "row": 46
+          }
+        },
+        {
+          "periodId": "period.dusk",
+          "position": {
+            "col": 52,
+            "row": 52
+          }
+        },
+        {
+          "periodId": "period.night",
+          "position": {
+            "col": 42,
+            "row": 48
+          }
+        }
+      ]
+    },
+    {
+      "id": "char.r97-yu-xingcha",
+      "name": "虞星槎",
+      "mapResourceId": "map.round-97-pilot-reef",
+      "position": {
+        "col": 52,
+        "row": 54
+      },
+      "dialogueId": "dlg.r97-yu-xingcha",
+      "questGiver": true,
+      "spriteFrame": 192,
+      "spriteFrames": {
+        "down": 192,
+        "right": 200,
+        "up": 208,
+        "left": 216
+      },
+      "schedule": [
+        {
+          "periodId": "period.midnight",
+          "position": {
+            "col": 44,
+            "row": 50
+          }
+        },
+        {
+          "periodId": "period.dawn",
+          "position": {
+            "col": 46,
+            "row": 48
+          }
+        },
+        {
+          "periodId": "period.morning",
+          "position": {
+            "col": 48,
+            "row": 50
+          }
+        },
+        {
+          "periodId": "period.midday",
+          "position": {
+            "col": 52,
+            "row": 50
+          }
+        },
+        {
+          "periodId": "period.afternoon",
+          "position": {
+            "col": 56,
+            "row": 48
+          }
+        },
+        {
+          "periodId": "period.dusk",
+          "position": {
+            "col": 52,
+            "row": 58
+          }
+        },
+        {
+          "periodId": "period.night",
+          "position": {
+            "col": 44,
+            "row": 50
+          }
+        }
+      ]
+    }
+  ]
+}

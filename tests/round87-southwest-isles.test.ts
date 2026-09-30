@@ -215,7 +215,7 @@ describe('Round 87 Southwest Isles within the expanded world atlas', () => {
       columns: ATLAS_COLUMNS, rows: ATLAS_ROWS, tileSize: 8,
       regionFootprint: { columns: 35.84, rows: 23.04 },
     });
-    expect(art.layers).toHaveLength(61);
+    expect(art.layers).toHaveLength(65);
     expect(art.layers.map(({ id }: { id: string }) => id).filter((id: string) => id.startsWith('world-r87-'))).toEqual([
       'world-r87-expanse-water', 'world-r87-expanse-sand',
       'world-r87-expanse-land', 'world-r87-expanse-pines',
@@ -290,8 +290,8 @@ describe('Round 87 Southwest Isles within the expanded world atlas', () => {
 
   it('keeps the nine Round 86 centers fixed and pins the isle in its original atlas cell', () => {
     const world = readJson('../data/base/world/world-map.json');
-    expect(world.regions).toHaveLength(20);
-    expect(world.transitions).toHaveLength(42);
+    expect(world.regions).toHaveLength(22);
+    expect(world.transitions).toHaveLength(50);
     for (const [mapResourceId, anchor] of Object.entries(round86RegionAnchors)) {
       const region = world.regions.find((entry: any) => entry.mapResourceId === mapResourceId);
       expect(region, mapResourceId).toBeDefined();
@@ -504,7 +504,7 @@ describe('Round 87 Southwest Isles within the expanded world atlas', () => {
 
     // Every declared region joins the directed travel graph from the start map,
     // and the new isles pair is exactly one hop in both directions.
-    expect(assembled.regions).toHaveLength(20);
+    expect(assembled.regions).toHaveLength(22);
     for (const region of assembled.regions) {
       const route = findWorldTravelRoute(assembled, parsedWorld.data.startingMapResourceId, region.mapResourceId);
       expect(route, `${region.mapResourceId} reachable from start`).not.toBeNull();

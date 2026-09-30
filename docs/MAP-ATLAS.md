@@ -1,6 +1,6 @@
 # 世界舆图与区域旅行
 
-Round 10 将单张网格地图扩展为资料驱动的区域集合；Round 79 新增东海群岛·落潮湾；Round 81–87 扩展东岸与列岛；Round 91–94 建设北境、东境与南溟；Round 95 将可移动总图维持在 **768×576 格**、扩至 57 个 RLE 图层并新增雾杉关、听杉谷和照叶港；Round 96 扩至 **61 个 RLE 图层**，在中南海域新增中溟·千里石塘与南溟·半月环礁。当前共有二十处 100×100 区域，总图输出为 8 源像素/格。玩家可在总览与当前区域细图间切换，拖动、缩放和方向键平移；M 打开舆图，Home 回到总览。Round 96 前 57 层像素逐格不变，原十八处区域中心保持稳定。地图尺寸、碰撞、分层贴图、区域命名、地标、关口端点和区域事件仍由 `data/` 声明；引擎只执行通用协议。
+Round 10 将单张网格地图扩展为资料驱动的区域集合；Round 79 新增东海群岛·落潮湾；Round 81–87 扩展东岸与列岛；Round 91–94 建设北境、东境与南溟；Round 95 将可移动总图维持在 **768×576 格**、扩至 57 个 RLE 图层并新增雾杉关、听杉谷和照叶港；Round 96 扩至 **61 个 RLE 图层**，新增中溟·千里石塘与南溟·半月环礁；Round 97 增至 **65 个 RLE 图层**，新增东溟·澜心洲与东溟·引航礁。当前共有二十二个区域，其中二十张为 100×100 百格地图；总图输出为 8 源像素/格。玩家可在总览与当前区域细图间切换，拖动、缩放和方向键平移；M 打开舆图，Home 回到总览。Round 97 的 61 层旧图像素与 20 个旧区域中心由基线逐项守护。地图尺寸、碰撞、分层贴图、区域命名、地标、关口端点和区域事件仍由 `data/` 声明；引擎只执行通用协议。
 
 ## Round 89：雾航湾至东汊旧水槽
 
@@ -118,10 +118,12 @@ Round 10 将单张网格地图扩展为资料驱动的区域集合；Round 79 �
 | `map.round-95-east-harbor` | 东溟·照叶港 | (75.61929595827901, 81.73913043478261) | 100×100 | (3, 50) | `.`、`,`、`=` 可走；`#`、`^`、`~` 林石/海水阻挡 |
 | `map.round-96-stone-reef` | 中溟·千里石塘 | (24.771838331160364, 74.78260869565217) | 100×100 | (3, 50) | `.`、`,`、`=` 可走；`#`、`~` 礁石/海水阻挡 |
 | `map.round-96-halfmoon-atoll` | 南溟·半月环礁 | (38.46153846153847, 87.82608695652175) | 100×100 | (3, 50) | `.`、`,`、`=` 可走；`#`、`~` 灌木/海水阻挡 |
+| `map.round-97-lanxin-isle` | 东溟·澜心洲 | (62.58148631029987, 33.04347826086956) | 100×100 | (3, 40) | `.`、`,`、`=` 可走；`#`、`~` 礁石/海水阻挡 |
+| `map.round-97-pilot-reef` | 东溟·引航礁 | (67.79661016949152, 19.130434782608695) | 100×100 | (50, 96) | `.`、`,`、`=` 可走；`#`、`~` 黑礁/海水阻挡 |
 
-- 世界图 `world.atlas` 的 `startingMapResourceId` 为 `map.round-01-grid`；二十张地图的 `id` 均与 manifest 资源 id 一致，区域地图格尺寸均为 48 世界像素。
-- 十八张百格区域图均将 16×16 素材格最近邻放大至 48×48 世界像素；舆图总览使用独立 8 像素/格烘焙图层，移动碰撞始终只看区域地图的 `grid`，不会根据美术像素推断阻挡。
-- 玩家行走在十八张百格大地图时镜头均跟随并限制在地图范围内；地图视觉对象显式采用世界滚动系数，不继承场景为 HUD 设定的固定坐标。HUD、面板与天气覆盖层固定在画面上。
+- 世界图 `world.atlas` 的 `startingMapResourceId` 为 `map.round-01-grid`；二十二张地图的 `id` 均与 manifest 资源 id 一致，区域地图格尺寸均为 48 世界像素。
+- 二十张百格区域图均将 16×16 素材格最近邻放大至 48×48 世界像素；舆图总览使用独立 8 像素/格烘焙图层，移动碰撞始终只看区域地图的 `grid`，不会根据美术像素推断阻挡。
+- 玩家行走在二十张百格大地图时镜头均跟随并限制在地图范围内；地图视觉对象显式采用世界滚动系数，不继承场景为 HUD 设定的固定坐标。HUD、面板与天气覆盖层固定在画面上。
 - 芦苇河滩（`place.reedbank`）仍是知识图谱地点词条而非地图资源：第三张 `grid-map` 是铁嶂北道，河滩不可旅行，详见 [`WORLD-SETTING.md`](WORLD-SETTING.md) §2。
 
 ## 关口端点
@@ -172,6 +174,14 @@ Round 10 将单张网格地图扩展为资料驱动的区域集合；Round 79 �
 | `gate.r96-atoll-to-stone` | 北返千里石塘 | `map.round-96-halfmoon-atoll` · (4, 50) | `map.round-96-stone-reef` · (95, 50) |
 | `gate.r96-atoll-to-south` | 东泊归帆洲 | `map.round-96-halfmoon-atoll` · (96, 50) | `map.round-94-returning-sails` · (4, 50) |
 | `gate.r96-south-to-atoll` | 西返半月环礁 | `map.round-94-returning-sails` · (5, 50) | `map.round-96-halfmoon-atoll` · (95, 50) |
+| `gate.r97-windward-to-lanxin` | 东渡澜心洲 | `map.round-84-windward-isle` · (93, 55) | `map.round-97-lanxin-isle` · (3, 40) |
+| `gate.r97-lanxin-to-windward` | 西返风回岛 | `map.round-97-lanxin-isle` · (4, 40) | `map.round-84-windward-isle` · (92, 55) |
+| `gate.r97-tide-to-lanxin` | 东北赴澜心洲 | `map.round-85-tide-isle` · (86, 54) | `map.round-97-lanxin-isle` · (48, 96) |
+| `gate.r97-lanxin-to-tide` | 西南返潮生屿 | `map.round-97-lanxin-isle` · (48, 95) | `map.round-85-tide-isle` · (85, 54) |
+| `gate.r97-lanxin-to-pilot` | 北探引航礁 | `map.round-97-lanxin-isle` · (64, 4) | `map.round-97-pilot-reef` · (50, 96) |
+| `gate.r97-pilot-to-lanxin` | 南返澜心洲 | `map.round-97-pilot-reef` · (50, 95) | `map.round-97-lanxin-isle` · (64, 3) |
+| `gate.r97-pilot-to-east` | 东泊天门关 | `map.round-97-pilot-reef` · (89, 89) | `map.round-94-east-gate` · (50, 94) |
+| `gate.r97-east-to-pilot` | 西南出引航礁 | `map.round-94-east-gate` · (50, 93) | `map.round-97-pilot-reef` · (90, 90) |
 
 引擎装配规则（`src/engine/world-map.ts` 的 `assembleWorldMap`）：`from` 端点必须可走**且不得位于该图玩家出生格**；`to` 落点必须可走；两端地图必须都已登记进 `regions`。任一不满足即整条关口禁用并给出警告，不影响其他关口。协议不自动推断双向旅行——往返必须像上表一样显式声明两条记录。
 
@@ -244,6 +254,12 @@ Round 10 将单张网格地图扩展为资料驱动的区域集合；Round 79 �
 | `event.r96-atoll-arrival` | `map.round-96-halfmoon-atoll` · (7, 50) | 踏入 | 是 | 无 | `place.r96-halfmoon-atoll`（南溟·半月环礁） |
 | `event.r96-tide-shrine` | `map.round-96-halfmoon-atoll` · (66, 62) | 邻近按 E 调查 | 是 | 无 | `place.r96-tide-shrine`（半月潮祠） |
 | `event.r96-east-pier` | `map.round-96-halfmoon-atoll` · (92, 50) | 踏入 | 是 | 无 | `place.r96-halfmoon-atoll`（南溟·半月环礁） |
+| `event.r97-lanxin-arrival` | `map.round-97-lanxin-isle` · (7, 40) | 踏入 | 是 | 无 | `place.r97-lanxin-isle`（澜心洲） |
+| `event.r97-tide-mark-stone` | `map.round-97-lanxin-isle` · (58, 22) | 邻近按 E 调查 | 是 | 无 | `place.r97-tide-mark-stone`（潮痕碑） |
+| `event.r97-lantern-terrace` | `map.round-97-lanxin-isle` · (46, 76) | 邻近按 E 调查 | 是 | 无 | `place.r97-lantern-terrace`（观汐台） |
+| `event.r97-pilot-arrival` | `map.round-97-pilot-reef` · (50, 92) | 踏入 | 是 | 无 | `place.r97-pilot-reef`（引航礁） |
+| `event.r97-beacon-tower` | `map.round-97-pilot-reef` · (72, 68) | 邻近按 E 调查 | 是 | 无 | `place.r97-beacon-tower`（星槎航标） |
+| `event.r97-goose-window` | `map.round-97-pilot-reef` · (50, 30) | 邻近按 E 调查 | 是 | 无 | `place.r97-goose-window`（望雁口） |
 
 `interaction` 声明 `prompt`、可选曼哈顿距离 `range`（1–4，省略按 1 格）和可选 `approachDirections`（从玩家格朝向目标格的 `down/left/right/up`；省略表示四向均可）。调查目标必须与玩家同一行或同一列；两格以上时，中间地形必须可走且不能被 NPC/遭遇占用。交互只在提示、方向/距离、事件条件和一次性状态同时允许时出现，并在按 E 后复用固定事件文本、一次性完成记账及知识发现。含 `interaction` 的事件不会因走上目标格而自动结算。未声明该字段的旧世界图事件仍按原有踏入触发路径工作。
 
@@ -452,6 +468,12 @@ Round 79 新增第六块 100×100 海岛地图「东海群岛·落潮湾」，�
 - 海路叠层按公示政策执行：岛陆/沙礁/潟湖只落在 `world-ocean` 与 `world-r94-south-shallows` 之上；海路胶囊另可横跨 `world-r87-expanse-water`（雾航湾环礁水纹）。除此之外与任何旧图层相交都是生成器与专项测试的硬失败；海路也不与本期岛陆重叠。
 - 千里石塘为青黑礁石群（主岛椭圆加四处卫星沙礁、潮池与礁路），半月环礁为缺月形环带抱一泓浅湖（沙脊直贯湖心、潮祠立柱没入浅水）。两图碰撞独立于贴图，入口、地标、事件、NPC 日程与返程路线全部经 BFS 专项验证；生成器两遍输出逐文件一致。
 - 新增岑汐、洛盐七时段日程、六处调查地标、六个区域事件和「石塘灯浮记」→「半月的回信」跨区连续差事（灯序辨认→望序台跨图抄录→环礁交付）。详细地图碰撞、门口坐标和任务发现条件以两张独立 `grid-map` 与 Round 96 世界/任务资料为准。
+
+## Round 97：东溟·澜心洲与引航礁
+
+- 768×576 舆图保持 8 源像素/格，新增 `world-r97-lanxin-water`、`world-r97-lanxin-land`、`world-r97-pilot-water`、`world-r97-pilot-land` 四层。两岛分别落在约 `(480,190)` 与 `(520,110)`；新岛陆只覆盖许可海水层，航线端点贴近对应岸线，海路线像素不穿过本轮岛陆。Round 96 的 61 层哈希与 20 个既有区域中心保持不变。
+- 新增两张完整 100×100 可步行地图：`map.round-97-lanxin-isle`（东溟·澜心洲）与 `map.round-97-pilot-reef`（东溟·引航礁）。四组双向关口把风回岛、潮生屿、澜心洲、引航礁和天门关接入同一航路；天门关至潮生屿最短世界路线由 5 段减为 3 段。
+- 季无潮与虞星槎各有七时段日程；「澜心潮簿」→「重燃星槎灯」两段连续差事分别调查潮痕碑、抄录观汐台灯谱并重燃航标。地图、事件、地标、对话、人物与知识图谱都由独立数据资源声明，专项验证覆盖地图内可达性和世界关口端点。
 - 新增第十三张 100×100 地图「北境·霜松谷」。自照雪关西缘 `(3,64)` 经西行冰桥进入谷内东口 `(96,50)`，返程从霜松谷 `(95,50)` 走东归雪道回到照雪关 `(4,64)`；冰溪冰缝、风口崖、雪松林海与边界的阻挡都在独立 `grid`，贴图不承担碰撞。生成器统计 6,426 个可行格且 6,418 格可由入口到达。
 - 雪原、冰溪与雪松全部复用 Round 92 已目检的 OpenGameArt zaphgames Winter Tileset 18 个唯一 0 基许可帧，不引入任何新素材；角色继续使用既有 CC0 Puny Characters 图集。来源、许可文本和发行白名单见 [`REFERENCES.md`](REFERENCES.md)。
 - 新增巡路人柳寻径（七时段日程）、「界标寻踪」和 4 个区域发现事件；任务要求先从照雪关西缘冰桥进入霜松谷，越过冰溪在旧界标下按 E 拓下前朝刻文，再回到柳寻径处复命。角色、任务、对白、触发条件和图谱见独立资料，测试命令为 `npm run smoke:round-93`。
