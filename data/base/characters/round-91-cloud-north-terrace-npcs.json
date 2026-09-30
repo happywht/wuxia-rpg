@@ -1,0 +1,73 @@
+{
+  "npcs": [
+    {
+      "id": "char.r91-nie-qiyan",
+      "name": "聂栖雁",
+      "mapResourceId": "map.round-91-cloud-north-terrace",
+      "position": {
+        "col": 50,
+        "row": 20
+      },
+      "dialogueId": "dlg.r91-nie-qiyan-vigil",
+      "questGiver": true,
+      "spriteFrame": 240,
+      "spriteFrames": {
+        "down": 224,
+        "right": 232,
+        "up": 240,
+        "left": 248
+      },
+      "schedule": [
+        {
+          "periodId": "period.midnight",
+          "position": {
+            "col": 51,
+            "row": 21
+          }
+        },
+        {
+          "periodId": "period.dawn",
+          "position": {
+            "col": 50,
+            "row": 15
+          }
+        },
+        {
+          "periodId": "period.morning",
+          "position": {
+            "col": 50,
+            "row": 20
+          }
+        },
+        {
+          "periodId": "period.midday",
+          "position": {
+            "col": 50,
+            "row": 20
+          }
+        },
+        {
+          "periodId": "period.afternoon",
+          "position": {
+            "col": 52,
+            "row": 24
+          }
+        },
+        {
+          "periodId": "period.dusk",
+          "position": {
+            "col": 50,
+            "row": 15
+          }
+        },
+        {
+          "periodId": "period.night",
+          "position": {
+            "col": 51,
+            "row": 22
+          }
+        }
+      ]
+    }
+  ]
+}

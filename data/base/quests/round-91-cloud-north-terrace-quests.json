@@ -1,0 +1,40 @@
+{
+  "quests": [
+    {
+      "id": "quest.r91-goose-vigil",
+      "name": "崖台雁候",
+      "description": "守雁人聂栖雁请你越过悬空雁桥登上观雁台，在晨光、日中或午后的雁阵回翔时记下头雁的阵形，把这份雁书带回给她。",
+      "giverNpcId": "char.r91-nie-qiyan",
+      "objectives": [
+        {
+          "id": "objective.r91-arrive-cloud-north-terrace",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r91-cloud-north-terrace",
+          "requiredCount": 1,
+          "text": "从断云栈道北端栈口登上云岭北台"
+        },
+        {
+          "id": "objective.r91-watch-goose-terrace",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r91-goose-terrace",
+          "requiredCount": 1,
+          "text": "白日越过雁桥，登观雁台记下头雁阵形"
+        },
+        {
+          "id": "objective.r91-report-nie-qiyan",
+          "kind": "talkToNpc",
+          "targetId": "char.r91-nie-qiyan",
+          "requiredCount": 1,
+          "text": "把雁书带回给聂栖雁"
+        }
+      ],
+      "rewards": {
+        "experience": 32,
+        "currency": 24,
+        "discoverKnowledgeNodeIds": [
+          "place.r91-goose-stone"
+        ]
+      }
+    }
+  ]
+}

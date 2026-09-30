@@ -4,6 +4,17 @@
 
 ## [Unreleased]
 
+### Added (Round 91)
+
+- 可移动全域舆图扩至 640×448 格、33 个 RLE 图层，以哈希基线保留旧 512×384 图层像素和十个旧区绝对中心。
+- 新增雁回崖山地图、双向步行关口、聂栖雁、时段门控调查与「崖台雁候」差事；地貌/桥梁使用 OpenGameArt Ansimuz Tiny RPG Mountain CC0 PNG。
+- 增加确定性生成器、资产/路线/图谱/旧投影专项回归，并修复 Round 87 生成器重跑时可能按旧画布回退区域锚点的问题。
+
+### Verification (Round 91)
+
+- `npm run smoke:round-91`：6 个测试文件/37 项通过；`npm run check`：65 个测试文件/426 项及两项文档审计通过；`npm run build`：Vite 139 个模块构建通过。
+- 浏览器确认 M 舆图的全图、缩放、拖动、Home 复位和选点界面；双向关口可达性由自动化验证，未在浏览器实走跨区。细节见 `DEVLOG.md`。
+
 ### Added (Round 90)
 
 - 漫游奇遇协议新增 `trigger: "step" | "regionArrival"` 与可选 `transitionIds` 入境关口声明：旧资料省略 `trigger` 时按走格兼容解析，装配阶段校验关口引用存在且目的地图与事件地图一致，无效行单独隔离并给出可读警告。

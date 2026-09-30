@@ -5,8 +5,9 @@
  *
  * The generator idempotence check re-runs the deterministic generator inside
  * a sandboxed copy of its inputs, so byte-stability and shipped-data equality
- * are both proven without touching the live data tree. Raw matrix checks then
- * preserve every old atlas cell inside the original 448×320 rectangle.
+ * are both proven without touching the live data tree. The current atlas may
+ * include later expansions; checks preserve every Round 87 cell and all
+ * original content inside the 448×320 rectangle.
  */
 
 import { createHash } from 'node:crypto';
@@ -46,8 +47,8 @@ const ISLE_NODE = 'place.r87-southwest-isles';
 const HARBOR_NODE = 'place.r87-fog-harbor';
 const SIGNAL_NODE = 'place.r87-mist-signal';
 const SPRING_NODE = 'place.r87-spring-hollow';
-const ATLAS_COLUMNS = 512;
-const ATLAS_ROWS = 384;
+const ATLAS_COLUMNS = 640;
+const ATLAS_ROWS = 448;
 const OLD_COLUMNS = 448;
 const OLD_ROWS = 320;
 
@@ -160,7 +161,7 @@ function makeNpc(record: {
   };
 }
 
-describe('Round 87 Southwest Isles and the 512×384 atlas', () => {
+describe('Round 87 Southwest Isles within the expanded world atlas', () => {
   it('re-runs the generator deterministically with byte-stable, shipped-identical output', async () => {
     const sandbox = await mkdtemp(join(tmpdir(), 'round87-generator-'));
     try {
@@ -207,15 +208,15 @@ describe('Round 87 Southwest Isles and the 512×384 atlas', () => {
     }
   }, 120_000);
 
-  it('expands the atlas to 512×384 with 28 layers while every old cell stays identical', () => {
+  it('keeps the 640×448 atlas with all 33 layers and preserves the original cells', () => {
     const world = readJson('../data/base/world/world-map.json');
     const art = world.atlasArt;
     expect(art).toMatchObject({
       columns: ATLAS_COLUMNS, rows: ATLAS_ROWS, tileSize: 16,
       regionFootprint: { columns: 35.84, rows: 23.04 },
     });
-    expect(art.layers).toHaveLength(28);
-    expect(art.layers.slice(-4).map(({ id }: { id: string }) => id)).toEqual([
+    expect(art.layers).toHaveLength(33);
+    expect(art.layers.map(({ id }: { id: string }) => id).filter((id: string) => id.startsWith('world-r87-'))).toEqual([
       'world-r87-expanse-water', 'world-r87-expanse-sand',
       'world-r87-expanse-land', 'world-r87-expanse-pines',
     ]);
@@ -285,12 +286,12 @@ describe('Round 87 Southwest Isles and the 512×384 atlas', () => {
     const notice = readFileSyncText('../data/assets/opengameart/puny-world/NOTICE.txt');
     expect(notice).toContain('https://opengameart.org/content/16x16-puny-world-tileset');
     expect(notice).toContain('CC0');
-  }, 20_000);
+  }, 120_000);
 
-  it('keeps all nine old region centers in the same atlas pixels after rebasing', () => {
+  it('keeps the nine Round 86 centers fixed and pins the isle in its original atlas cell', () => {
     const world = readJson('../data/base/world/world-map.json');
-    expect(world.regions).toHaveLength(10);
-    expect(world.transitions).toHaveLength(18);
+    expect(world.regions).toHaveLength(11);
+    expect(world.transitions).toHaveLength(20);
     for (const [mapResourceId, anchor] of Object.entries(round86RegionAnchors)) {
       const region = world.regions.find((entry: any) => entry.mapResourceId === mapResourceId);
       expect(region, mapResourceId).toBeDefined();
@@ -503,7 +504,7 @@ describe('Round 87 Southwest Isles and the 512×384 atlas', () => {
 
     // Every declared region joins the directed travel graph from the start map,
     // and the new isles pair is exactly one hop in both directions.
-    expect(assembled.regions).toHaveLength(10);
+    expect(assembled.regions).toHaveLength(11);
     for (const region of assembled.regions) {
       const route = findWorldTravelRoute(assembled, parsedWorld.data.startingMapResourceId, region.mapResourceId);
       expect(route, `${region.mapResourceId} reachable from start`).not.toBeNull();

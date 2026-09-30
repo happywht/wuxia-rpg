@@ -1,6 +1,6 @@
 # 参考来源与使用边界（REFERENCES）
 
-核验日期：2026-09-29。历史/回忆类来源统一编号 **#1–#5**，官方技术来源统一编号 **#6–#22**；软件包元数据在独立表格中按精确包版本记录，不参与原作对照编号。来源授权状态只在核验到明确许可时标为已知；没有核验页面许可时，仅作事实性查阅，不复制内容。
+核验日期：2026-09-30。历史/回忆类来源统一编号 **#1–#5**，官方技术来源统一编号 **#6–#22**；软件包元数据在独立表格中按精确包版本记录，不参与原作对照编号。来源授权状态只在核验到明确许可时标为已知；没有核验页面许可时，仅作事实性查阅，不复制内容。
 
 ---
 
@@ -84,3 +84,9 @@
 | OpenGameArt：Shade 的 16x16 Puny World Tileset | [素材页](https://opengameart.org/content/16x16-puny-world-tileset)；[源 PNG](https://opengameart.org/sites/default/files/punyworld-overworld-tileset_0.png)；页面标明 CC0 | `data/assets/opengameart/puny-world/tileset.png`（432×1040 RGBA、27×65 格、16px、0 间距）：Round 79 东海群岛、Round 82 东溟海岸、Round 84 风回岛、Round 85 潮生屿和 Round 87 雾航湾地图使用海水、沙滩、草地、树林图素；用于 512×384 全域舆图的东岸/南部/西南海域和岛链；地图 JSON 按 tile id 引用 | 作者 Shade；OGA 页面说明全图素以 16×16 格绘制，并许可商业/非商业使用与修改、无需署名。随图集保留项目来源通知 `NOTICE.txt`；发行只带被地图直接引用的同一张打包图集和通知 |
 
 Kenney 的许可 FAQ 明确说明 Kenney.nl 提供的素材可在 CC0 条款下用于个人、教育及商业项目，署名并非强制。为保留来源并方便后续核验，本项目仍链接官方素材页并随素材包保存原许可文件。仅加入运行实际需要的图集及各自许可文件；Round 77 将 Puny Characters 接入人物图集；其他检查过但未使用的素材仍不打包。全域舆图另外使用 `scripts/generate-round70-atlas.mjs` 生成的纯色调色板 `data/assets/generated/world-palette.png`，它只承载低分辨率地貌底色，不含外部绘画素材。该素材来源独立于原作研究资料，不含《白金英雄坛说》的美术资源。
+
+
+### Round 91 新增素材
+
+- **OpenGameArt Ansimuz Tiny RPG Mountain Tileset**： [素材页](https://opengameart.org/content/tiny-rpg-mountain-tileset)，[源压缩包](https://opengameart.org/sites/default/files/tiny_rpg_mountain_files.zip)。页面标记 CC0；包内原始 `public-license.txt` 允许个人/商业使用、修改、再分发且不要求署名。
+- 实际使用 `data/assets/opengameart/tiny-rpg-mountain/tileset.png`（368×128，23×8 个 16px 格）与 `bridge.png`（160×80，10×5 个 16px 格），为雁回崖地图地貌/桥梁层和 640×448 舆图扩展提供山崖、石阶与木桥图素。发行只包含运行时引用 PNG、原许可和 NOTICE；未带入预览图或 Aseprite 源。

@@ -27,12 +27,12 @@ function loadWorld() {
 }
 
 describe('Round 81 global world atlas art and projection', () => {
-  it('loads the 512×384 continental and island atlas with per-layer tileset validation', () => {
+  it('loads the 640×448 continental and island atlas with per-layer tileset validation', () => {
     const { parsed } = loadWorld();
     const art = parsed.atlasArt;
     expect(art).toBeDefined();
     if (art === undefined) return;
-    expect({ columns: art.columns, rows: art.rows, tileSize: art.tileSize }).toEqual({ columns: 512, rows: 384, tileSize: 16 });
+    expect({ columns: art.columns, rows: art.rows, tileSize: art.tileSize }).toEqual({ columns: 640, rows: 448, tileSize: 16 });
     expect(art.layers.map(({ id }) => id)).toEqual([
       'world-ocean', 'world-land', 'world-coast', 'world-forest', 'world-relief', 'world-roads', 'world-settlements',
       'world-r79-shoal-water', 'world-r79-shoal-sand', 'world-r79-shoal-land', 'world-r79-shoal-pines',
@@ -42,12 +42,15 @@ describe('Round 81 global world atlas art and projection', () => {
       'world-r85-expanse-water', 'world-r85-expanse-sand', 'world-r85-expanse-land', 'world-r85-expanse-pines',
       'world-r87-expanse-water', 'world-r87-expanse-sand',
       'world-r87-expanse-land', 'world-r87-expanse-pines',
+      'world-r91-terrace-land', 'world-r91-terrace-cliffs', 'world-r91-terrace-walls',
+      'world-r91-terrace-detail', 'world-r91-terrace-route',
     ]);
     const tilesets = new Map(art.tilesets.map((tileset) => [tileset.id, tileset]));
     expect(tilesets.has('kenney.roguelike-rpg')).toBe(true);
     expect(tilesets.has('kenney.tiny-town')).toBe(true);
     expect(tilesets.has('wuxia.world-palette')).toBe(true);
     expect(tilesets.has('opengameart.puny-world')).toBe(true);
+    expect(tilesets.has('opengameart.tiny-rpg-mountain')).toBe(true);
     for (const layer of art.layers) {
       expect(layer.cells).toHaveLength(art.rows);
       expect(layer.cells.every((row) => row.length === art.columns)).toBe(true);
@@ -127,7 +130,7 @@ describe('Round 81 global world atlas art and projection', () => {
   it('uses edge-safe atlas coordinates and does not reveal undiscovered landmark names', () => {
     const { world, maps, parsed } = loadWorld();
     const art = parsed.atlasArt!;
-    expect(projectAtlasPosition({ x: 0, y: 100 }, art)).toEqual({ x: 8, y: 6136 });
+    expect(projectAtlasPosition({ x: 0, y: 100 }, art)).toEqual({ x: 8, y: 7160 });
     const undiscovered = buildWorldAtlasOverlays(world, maps, parsed.startingMapResourceId, { col: 43, row: 37 }, new Set());
     const undiscoveredJson = JSON.stringify(undiscovered);
     expect(undiscoveredJson).not.toContain('landmark.reedbank-landing');

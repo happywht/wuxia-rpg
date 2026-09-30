@@ -28,34 +28,39 @@ const rawWorld = readJson('../data/base/world/world-map.json');
  * back to these exact matrices, cell for cell.
  */
 const denseLayerHashes: Record<string, string> = {
-  'world-ocean': 'be918b7fe0aee1dfcb256a0474165ec8394ed0457abda1f850141c40572560bf',
-  'world-land': '6e466696ce376361b5b0d376a95800f78b91c9a2b168ba74c639ac9e12303d1e',
-  'world-coast': 'c06b1c9bcd49af8cbcdb4ad335d982b5c772c5c6dd22355656ff982a179aba22',
-  'world-forest': 'acaa78160d359ef0d3b8994fe503d98579a243cb26f2c364c48e3f12788f7e1f',
-  'world-relief': '78fa5a7bee220645702c6adb274c3c20773d5d8907f3967ca14be85ae1bc26af',
-  'world-roads': '11048172346d2a0fde60431ccfe118584c934cd55ee613b2e6cfcf654f79c561',
-  'world-settlements': '8cb492e5a6efb027e46df1ccea6e656cf3f01c4c1e65f94d6fb6eb1f928523bc',
-  'world-r79-shoal-water': '7bab9dae8ad0e298222278b5143fde838b742e68dfe28959380726509bfbfc78',
-  'world-r79-shoal-sand': '9c5d4690f2f5b3de3e482c635c6422ff1e5226ba6fb362d5f67055d4c7f63697',
-  'world-r79-shoal-land': 'c949b0ff55f5f7dc2d536fb386e2ab752a44ee2da13949fcec995bfb4691c650',
-  'world-r79-shoal-pines': '9bdb02f82aa2b68057ebd835d1162617689fc32627c469dca45f3a86d4523610',
-  'world-r79-gate-routes': '40d0d6f85e1bb30d1984e64f7805a705b88afb306dfa530c3a548c5e32f63615',
-  'world-r81-expanse-water': '8f0f9c907fd7f68f8e4e16acc7139ee85e828e292186e9eb60c2118fd45a44b8',
-  'world-r81-expanse-sand': 'c9875c542d10d2673935bbf1f6744e4d884d376593a0ebc5cccf7d1ab755b2ec',
-  'world-r81-expanse-land': 'c1308f60716d52c9cb2402146f87c99285c3b28054f4935a8436ae8b50f09bcc',
-  'world-r81-expanse-pines': '0b498e66efb00738f0369b2492080bbaad7e1aed600bf6fddbf509e123c1b140',
-  'world-r84-expanse-water': 'a0dca5222f86cd2410f446899c926720f5f23ce6d3e619ec31d0ac21e0b22b84',
-  'world-r84-expanse-sand': 'ee0b774cb4385ce77a05b813a5ed7571c52b592488260b0862dd01c903f5f0a8',
-  'world-r84-expanse-land': 'd4e34faad0167138a00ed5e525f37d6f83dc99c952ac83b11a24f9fb9537a286',
-  'world-r84-expanse-pines': '00347e59eb041774ea8f07a1f947672a0ab66c5255bfc18badb7b8b954dee45d',
-  'world-r85-expanse-water': '2d7b1e2310a8329a9e46e02a57c27b26013c881d79c372855136ff3a9a89c1f9',
-  'world-r85-expanse-sand': 'a732dad1c2eecb5a94b1d8ed64a98a2416e28c95fa5a40dc32680737ec4f6ecb',
-  'world-r85-expanse-land': 'd34d09b657693bf51754f82f0a1f4fb0cefc2fe500a256ffa0c33021e37a57e0',
-  'world-r85-expanse-pines': '874478e6d039ebca21a65995c6f4b6961cdba67709e8718887a30493b0dbd39e',
-  'world-r87-expanse-water': '7826963dd3ea7da37a0ce2d7e614c1116775094b44aaafc7193cbeaf63905062',
-  'world-r87-expanse-sand': '7bfdc677cf0dc51d9b0bdf0d687abe2afb9f2c169605aef9e9172952445b1864',
-  'world-r87-expanse-land': '7b0ddd7adfc89d10442958794988f24849fa78f3cd0959775a08cf6ffc6534c3',
-  'world-r87-expanse-pines': 'b29f61de8dd4966e8df942a3554115f6da76b340c47aee48000e213c03a834d1',
+"world-ocean": "8db1c12c69c2bf1cc350c299ebd71952e4aab1bcee7d13d5f57785c0a72429d3",
+  "world-land": "d1cdbb3d91c3e859ee507aa258645cf1d1a67db350c977292fe85e0cfeb5aa40",
+  "world-coast": "53e329f6773b47cf070b99daf8ce50cf40bde3faee09f0999705709bc7dfee43",
+  "world-forest": "c3c25c030e14138dbf379153c9724dbc3f144bab3292509872d163288be7caf1",
+  "world-relief": "edcfe615af63481da1a284a46e42a75043f4c3dd395dd49bc136cf3e5e62f1f3",
+  "world-roads": "907987b87e0835878fce09fcd402b6eb7f3a5c841d036691cd9762167538feb4",
+  "world-settlements": "b6b7bce13edec0aa13700e97ea18981de103e0b790ae7d0e2ce9b26aa7d4d631",
+  "world-r79-shoal-water": "55e95b7eb57edd311ede603bf731d7548826717749d874a31c3981f029706353",
+  "world-r79-shoal-sand": "e936174a1e947b0686d932d738d9a73fd8ef76c363163c75d917c88f627de7ca",
+  "world-r79-shoal-land": "21a1dcdd270779887192f9782163ef300538a027d4b68b0c635fc5c82e316070",
+  "world-r79-shoal-pines": "36424f70e5c36d053e9bad9b9db098f3c04a873b390d03dae84a92f5e29007b3",
+  "world-r79-gate-routes": "137b2b8238f64995b5ce6b547dc3e74b07dc45b9692e6700f52302265977411e",
+  "world-r81-expanse-water": "99265a2bedfabc272153031edfc5e397d7d96711ffd3474cb1b2ea03720ec1a5",
+  "world-r81-expanse-sand": "58d86f4927e89679c4c740583098833b60c08c201b780374a4439ca15345f9d2",
+  "world-r81-expanse-land": "8297855cca75c5f8c77a905de6bd3260321082f3627305a47d1154500f55e166",
+  "world-r81-expanse-pines": "84a1b9422b643afe0c2c7ebf4eaa6ee68df6e74e8c2bf0e2f6ec83c5491ac6fc",
+  "world-r84-expanse-water": "f3e7047cf15b0d51bb7c063efca8b7c340466c0cb858cc2a0f8d5a4562278762",
+  "world-r84-expanse-sand": "0a4b180347b4d8638d3e881080a2148783f929cb65c4fcf4a8a8aa4e6082d047",
+  "world-r84-expanse-land": "958a2ef0e9dc0913dc6586e5ac03f6ce29bd5c17550e7e86a56edbb09350b056",
+  "world-r84-expanse-pines": "f29368463137484f3d624e2fec7a9d57f7a3d5950aed63812d9637fa535ce484",
+  "world-r85-expanse-water": "6a747acca1dbf7150b19c68156d5c4106381b4cf119cff67b026c98be3607400",
+  "world-r85-expanse-sand": "2a3e634ad3839d3f0aca91bd4a0c10a41288707fdfb9f7d9637e6a5f220564d7",
+  "world-r85-expanse-land": "129aededc309b6b13220fc01b5122fb18f6b9905877abc4c2da58c3e2adeb699",
+  "world-r85-expanse-pines": "b46ded2a166377936edefceca953ccbcc7f6474e5053210403e66c53b6ed34e8",
+  "world-r87-expanse-water": "6b823cd955df71841828f286ad21ef4c3a07fc5fd0fa9de1ff38202c8a661747",
+  "world-r87-expanse-sand": "6932b1f8ccc67faf55c00837e0e83e77396f73000aab588026e2685a98c53e70",
+  "world-r87-expanse-land": "d7e4b9a1626c7dc60f239e0b011533043fcf6460885901d4fdd9bd647f4d9230",
+  "world-r87-expanse-pines": "ba38f2470186ad4019bacd03d56ef4bca8458880f8e1b198f3054711ae0597e3",
+  "world-r91-terrace-land": "c7849ddacb6d456371cb93d40c01f19e64052e8359ffcc2aae23c743a6898914",
+  "world-r91-terrace-cliffs": "02fa6f75e185a6f194af84924f6b126f32b69eeab436b7eb9789113274b0b9de",
+  "world-r91-terrace-walls": "04458ab4711364524af78eaa43130f94bf63d1775999eb146c387ebccbae3f49",
+  "world-r91-terrace-detail": "b6052cb8366fbdbc7ce13e521bb729bb8672ce6a847c0bc7cf22bdcf5ad69064",
+  "world-r91-terrace-route": "0834aa69e253f6cc24cecc0db01f234d708ee880ad1053c70d8edc5c019df89a",
 };
 
 const CANONICAL_ROW = /^[1-9][0-9]*:(0|[1-9][0-9]*)(,[1-9][0-9]*:(0|[1-9][0-9]*))*$/;
@@ -95,13 +100,13 @@ function parseErrors(raw: unknown): string {
 }
 
 describe('Round 86 world-atlas row-RLE wire protocol', () => {
-  it('ships the 512×384 atlas as canonical row-RLE that passes the JSON schema', () => {
+  it('ships the 640×448 atlas as canonical row-RLE that passes the JSON schema', () => {
     const ajv = new Ajv({ allErrors: true, strict: false });
     const validate = ajv.compile(readJson('../data/schema/world-map.schema.json') as AnySchema);
     expect(validate(rawWorld), JSON.stringify(validate.errors)).toBe(true);
 
     const art = rawWorld.atlasArt;
-    expect(art.layers).toHaveLength(28);
+    expect(art.layers).toHaveLength(33);
     for (const layer of art.layers) {
       expect(layer.cells, layer.id).toBeUndefined();
       expect(layer.cellsRle, layer.id).toHaveLength(art.rows);
@@ -197,7 +202,7 @@ describe('Round 86 world-atlas row-RLE wire protocol', () => {
     }]));
     expect(emptyRow).toContain('不应为空行');
 
-    const overflows = ['513:0', '1:4294967296'];
+    const overflows = ['641:0', '1:4294967296'];
     for (const row of overflows) {
       const errors = parseErrors(syntheticWorld([{
         id: 'r86-limit', tilesetId: 'r86.fixture', cellsRle: [row, '4:0', '4:0'],

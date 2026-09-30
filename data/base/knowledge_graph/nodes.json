@@ -801,6 +801,17 @@
     {"id":"place.r89-east-channel-mark","kind":"place","title":"东汊旧水槽","summary":"青帆埠东岸的废弃石槽，三道潮刻能辨出回汐浅湾的走向。","knownByDefault":false},
     {"id":"place.r89-safe-return-current","kind":"place","title":"回汐缓流","summary":"按三道潮刻的次序行船，可避开雾夜里横切主汊的急流。","knownByDefault":false},
     {"id":"event.r90-arrival-blue-sail","kind":"event","title":"潮序对汊","summary":"沿越岭东行抵达青帆埠时，按回汐次序认出汊口水路的走向。","knownByDefault":false},
-    {"id":"event.r90-return-cloud-ridge","kind":"event","title":"云海收汊","summary":"经回望云岭返抵古道时默记潮序回望东汊，云海漫过岭脊。","knownByDefault":false}
+    {"id":"event.r90-return-cloud-ridge","kind":"event","title":"云海收汊","summary":"经回望云岭返抵古道时默记潮序回望东汊，云海漫过岭脊。","knownByDefault":false},
+    {"id":"map.round-91-cloud-north-terrace","kind":"place","title":"云岭北台探索地图","summary":"从断云栈道北端栈口可登的北台百格地图。","knownByDefault":false},
+    {"id":"place.r91-cloud-north-terrace","kind":"place","title":"云岭北台·雁回崖","summary":"断云栈道以北的高台山地，深涧、木桥与观雁台连成雁群哨线。","knownByDefault":false},
+    {"id":"place.r91-goose-bridge","kind":"place","title":"悬空雁桥","summary":"横过崖腰深涧的中路木桥，桥板悬空、绳索承风。","knownByDefault":false},
+    {"id":"place.r91-goose-terrace","kind":"place","title":"观雁台","summary":"北台高地上的石砌高台，守雁人代代在此记录雁阵。","knownByDefault":false},
+    {"id":"place.r91-goose-stone","kind":"place","title":"雁栖石","summary":"高地东缘的歇雁大石，石下埋着守雁人的清水旧约。","knownByDefault":false},
+    {"id":"char.r91-nie-qiyan","kind":"character","title":"聂栖雁","summary":"聂家第三代守雁人，在观雁台下记了十一年雁书。","knownByDefault":false},
+    {"id":"quest.r91-goose-vigil","kind":"quest","title":"崖台雁候","summary":"越过雁桥登上观雁台记下头雁阵形，把雁书带回给聂栖雁。","knownByDefault":false},
+    {"id":"event.r91-arrival","kind":"event","title":"初登北台","summary":"从断云栈道北端栈口首次踏上云岭北台。","knownByDefault":false},
+    {"id":"event.r91-goose-bridge","kind":"event","title":"雁桥听风","summary":"在悬空雁桥上听清守雁人数雁的旧路。","knownByDefault":false},
+    {"id":"event.r91-goose-terrace","kind":"event","title":"台心记雁","summary":"白日在观雁台心记下头雁的一字阵形。","knownByDefault":false},
+    {"id":"event.r91-goose-stone","kind":"event","title":"雁石旧约","summary":"在雁栖石下发现守雁人的清水旧约。","knownByDefault":false}
   ]
 }

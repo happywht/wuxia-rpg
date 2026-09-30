@@ -4,6 +4,25 @@
 
 ---
 
+## Round 91 — 640×448 可移动舆图与雁回崖（2026-09-30，已完成）
+
+### 计划与实现
+
+- 计划先写于 [`iterations/round-91/plan.md`](iterations/round-91/plan.md)：全域舆图从 512×384 扩至 640×448，新增雁回崖可玩山地图与双向关口，使用 Ansimuz Tiny RPG Mountain CC0 图素，添加守雁人、时段调查差事和知识图谱链条；保留旧区域像素和绝对格中心。
+- 新增生成器、地图/人物/对白/任务资源及 11 个图谱节点、10 条关系；总资源增至 71，基础世界有 28 名 NPC、55 项任务、297 个图谱节点/403 条关系。
+- Round 87 生成器曾在保留扩展画布的同时，用 512×384 旧尺寸重算雾航湾锚点；现按活动画布尺寸归一化，已实跑 R87→R91 生成器验证。
+
+### 验证
+
+- `npm run generate:round-91-cloud-north-terrace`：通过；重复执行稳定，统计 7,101 个可走/可达格、2,023 个崖壁格、99 个桥面格与 874 个山体格，双向关口与四个区域事件锚点均成立。
+- `npm run generate:round-87-southwest-isles`：通过；在 640×448 活动画布下重复生成保持新区舆图坐标与雾航湾图层稳定。
+- `npm run validate:data`：通过，manifest 与 71 个基础资源 Schema 校验成功；`npm run typecheck`：通过。
+- `npm run smoke:round-91`：通过，6 个专项文件、37 项测试。
+- `npm run check`：通过；71 项基础资源无 MOD 冲突，65 个测试文件/426 项测试通过，Round 34 文档审计与 Round 48 文档审计通过。
+- `npm run build`：通过；复跑完整质量门槛后由 Vite 构建 139 个模块。Phaser runtime chunk 为 1,374.54 kB（gzip 357.49 kB），Vite 的 500 kB 体积提示仍存在但不阻断构建。
+- `git diff --check`：通过。
+- 浏览器：在 `http://127.0.0.1:5178/` 打开 M 舆图，目视确认 640×448 总图及雁回崖标记，并检查缩放、拖动、Home 复位及 W/S + Enter 选点面板；证据为 [`iterations/round-91/world-atlas-browser.jpg`](iterations/round-91/world-atlas-browser.jpg)。这次没有在浏览器中实走云岭古道与雁回崖的双向关口；入口、目标和返程可达由 Round 91 自动化专项覆盖。
+
 ## Round 90 — 跨区抵达奇遇与潮路回访（2026-09-30，已完成）
 
 ### 计划与实现

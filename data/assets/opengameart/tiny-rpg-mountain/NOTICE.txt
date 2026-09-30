@@ -1,0 +1,17 @@
+Tiny RPG Mountain Tileset by Luis Zuno (@ansimuz) (OpenGameArt.org)
+Source page: https://opengameart.org/content/tiny-rpg-mountain-tileset
+Source package: https://opengameart.org/sites/default/files/tiny_rpg_mountain_files.zip
+License: public-domain style permission in the bundled public-license.txt
+(the OpenGameArt page lists the set as CC0; the bundled public-license.txt
+allows use in personal and commercial projects, modification, and re-distribution)
+
+This directory ships the unmodified transparent PNGs actually referenced by the
+game data plus the original public-license.txt:
+- tileset.png (368x128, 23x8 cells of 16px, RGBA) — cliff faces, stone bricks,
+  dirt ground, stone steps, boulders and grass tufts used by the Round 91
+  "Cloud Ridge North Terrace - Wild Goose Cliff" map layers and the expanded
+  640x448 world overview.
+- bridge.png (160x80, 10x5 cells of 16px, RGBA) — wooden plank deck, side rails
+  and hanging ropes used by the Round 91 bridge landmark layers.
+
+Aseprite sources and preview images from the download package are NOT shipped.

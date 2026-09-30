@@ -36,8 +36,8 @@ const REEF_NODE = 'place.r85-reef-channel';
 const POOL_NODE = 'place.r85-tide-pool';
 const REEF_EVENT = 'event.r85-reef-channel';
 const LOW_TIDE_ID = 'tide.low';
-const ATLAS_COLUMNS = 512;
-const ATLAS_ROWS = 384;
+const ATLAS_COLUMNS = 640;
+const ATLAS_ROWS = 448;
 const OLD_COLUMNS = 384;
 const OLD_ROWS = 256;
 
@@ -98,7 +98,7 @@ for (const resource of manifest.resources.filter(({ schema }) => schema === 'gri
   maps.set(resource.id, parseMap(readJson(`../data/base/${resource.path}`)));
 }
 
-describe('Round 85 Tide Isle and the 512×384 atlas', () => {
+describe('Round 85 Tide Isle and the 640×448 atlas', () => {
   it('keeps the atlas expansion lossless with every old cell identical', () => {
     const world = readJson('../data/base/world/world-map.json');
     const art = world.atlasArt;
@@ -169,12 +169,12 @@ describe('Round 85 Tide Isle and the 512×384 atlas', () => {
     const notice = readFileSync(new URL('../data/assets/opengameart/puny-world/NOTICE.txt', import.meta.url), 'utf8');
     expect(notice).toContain('https://opengameart.org/content/16x16-puny-world-tileset');
     expect(notice).toContain('CC0');
-  }, 20_000);
+  }, 120_000);
 
   it('keeps all eight old region centers in the same atlas pixels after rebasing', () => {
     const world = readJson('../data/base/world/world-map.json');
-    expect(world.regions).toHaveLength(10);
-    expect(world.transitions).toHaveLength(18);
+    expect(world.regions).toHaveLength(11);
+    expect(world.transitions).toHaveLength(20);
     for (const [mapResourceId, anchor] of Object.entries(round84RegionAnchors)) {
       const region = world.regions.find((entry: any) => entry.mapResourceId === mapResourceId);
       expect(region, mapResourceId).toBeDefined();

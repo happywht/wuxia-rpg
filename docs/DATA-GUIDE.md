@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：截至 Round 90；基础世界含 27 名 NPC、5 个门派、54 项任务、52 件物品、30 种武学、图谱汇总为 286 个图谱节点/393 条边，manifest 登记 67 项资源。十张区域地图均为 100×100 格；全域舆图为 512×384、28 层并以 RLE 保存。气候资源可声明轻雾粒子表现；航路人物、目的地发现门控、青帆埠调查事件和返程任务阶段由独立 JSON 声明，漫游奇遇可按 `trigger: regionArrival` 与 `transitionIds` 声明入境关口抵达触发，读档后 NPC 日程仍由时间派生，不新增存档字段。素材授权、MOD 和导航协议见 `REFERENCES.md`、`MOD-GUIDE.md`、`MAP-ATLAS.md`。
+- 状态：截至 Round 91；基础世界含 28 名 NPC、5 个门派、55 项任务、52 件物品、30 种武学、图谱汇总为 297 个图谱节点/403 条边，manifest 登记 71 项资源。十一张区域地图均为 100×100 格；全域舆图为 640×448、33 层并以 RLE 保存。气候资源可声明轻雾粒子表现；航路人物、目的地发现门控、青帆埠调查事件和返程任务阶段由独立 JSON 声明，漫游奇遇可按 `trigger: regionArrival` 与 `transitionIds` 声明入境关口抵达触发，读档后 NPC 日程仍由时间派生，不新增存档字段。素材授权、MOD 和导航协议见 `REFERENCES.md`、`MOD-GUIDE.md`、`MAP-ATLAS.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -269,7 +269,7 @@ NPC 条目可选声明 `spriteFrames`，键固定为 `down`、`left`、`right`�
 
 ## Round 81：全域舆图扩展
 
-`atlasArt.columns` 和 `rows` 描述全域图底图尺寸；Schema 和运行时解析器都限制为 1–512 格。Round 87 的默认总图为 512×384 格、28 个图层压缩后仍逐格还原；图层与碰撞无关，真实地图、地标、关口仍按已有资源和世界地图协议声明。
+`atlasArt.columns` 和 `rows` 描述全域图底图尺寸；Schema 和运行时解析器都限制为 1–640 格。Round 91 的默认总图为 640×448 格、33 个图层压缩后仍逐格还原；图层与碰撞无关，真实地图、地标、关口仍按已有资源和世界地图协议声明。
 
 可选 `atlasArt.regionFootprint` 以舆图格表示区域投影所覆盖的旧宽高。投影器在画布尺寸变化后仍使用该跨度定位区域内玩家、地标和关口。省略字段的历史资源沿用 `atlasArt.columns/rows × 0.16` 的原推导，保持旧 MOD 的投影兼容。Home 只重置视口缩放与偏移，不改变玩家位置或旅行数据。
 
@@ -355,3 +355,8 @@ Round 85 将全域舆图扩为 448×320 格和 24 个渲染层，在保持原 38
 | 2026-09-28 | Round 54 | 用有向区域 BFS 组合多段关口行程；远区地标必须先通过见闻过滤，当前地图只规划到首段关口，未直接公开的深层区域不进入舆图候选 |
 | 2026-09-28 | Round 55 | 雾雨渡口地图资源扩为 100×100 十层数据，由确定性脚本 `generate:round-55-ferry` 生成并保护全部玩法锚点；世界图新增四个渡口地标与碑记事件 `event.r55-sluice-inscription`（发现 `place.mist-sluice`）；旧 R51 导入器不再覆盖渡口地图 |
 | 2026-09-29 | Round 56 | 扩展 `discoverKnowledge` 任务目标与一次性见闻信号；旧存档恢复/新任务接取回填已知节点，石北新增雾岬/南湾巡标任务链，新增区域事件、知识图谱关系和发现门控地标 |
+
+
+## Round 91：雁回崖与大图扩展
+
+世界舆图 `atlasArt` 的尺寸上限提升为 640×448 格，图层扩至 33 层；生成器以旧舆图基线逐格保护 512×384 旧区域，并重新计算归一化投影以保持旧地图绝对格中心。新增 `map.round-91-cloud-north-terrace` 为独立 100×100 `grid-map`，8 个山地/桥梁图素层引用 OpenGameArt Ansimuz Tiny RPG Mountain CC0 图集，碰撞只读 `grid`。雁回崖与云岭古道有两向显式 `transition`；人物日程、时段调查门控、任务目标/奖励和图谱关系均由独立资源声明。运行 `npm run generate:round-91-cloud-north-terrace` 重建，`npm run smoke:round-91` 检查引用、路径、旧投影与幂等。

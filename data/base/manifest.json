@@ -171,6 +171,26 @@
       "schema": "quest-set"
     },
     {
+      "id": "map.round-91-cloud-north-terrace",
+      "path": "maps/round-91-cloud-north-terrace.json",
+      "schema": "grid-map"
+    },
+    {
+      "id": "npc.round-91-cloud-north-terrace-set",
+      "path": "characters/round-91-cloud-north-terrace-npcs.json",
+      "schema": "npc-set"
+    },
+    {
+      "id": "dialogue.round-91-cloud-north-terrace-set",
+      "path": "dialogues/round-91-cloud-north-terrace-conversations.json",
+      "schema": "dialogue-set"
+    },
+    {
+      "id": "quest.round-91-cloud-north-terrace-set",
+      "path": "quests/round-91-cloud-north-terrace-quests.json",
+      "schema": "quest-set"
+    },
+    {
       "id": "world.atlas",
       "path": "world/world-map.json",
       "schema": "world-map"

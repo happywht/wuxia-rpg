@@ -63,6 +63,10 @@ async function ensureBuildIsPresent() {
     'assets/opengameart/puny-characters/NOTICE.txt',
     'assets/opengameart/puny-world/tileset.png',
     'assets/opengameart/puny-world/NOTICE.txt',
+    'assets/opengameart/tiny-rpg-mountain/tileset.png',
+    'assets/opengameart/tiny-rpg-mountain/bridge.png',
+    'assets/opengameart/tiny-rpg-mountain/public-license.txt',
+    'assets/opengameart/tiny-rpg-mountain/NOTICE.txt',
     'assets/generated/world-palette.png',
   ];
   for (const relative of required) {

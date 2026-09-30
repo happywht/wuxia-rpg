@@ -392,6 +392,16 @@
     {"id":"kg.edge.r90-arrival-location","fromId":"event.r90-arrival-blue-sail","toId":"map.round-82-east-coast","relation":"locatedAt","summary":"潮序对汊的见闻发生在青帆埠海岸。"},
     {"id":"kg.edge.r90-arrival-tide","fromId":"event.r90-arrival-blue-sail","toId":"place.r89-safe-return-current","relation":"requires","summary":"潮序对汊需要先从东汊回声学得回汐缓流。"},
     {"id":"kg.edge.r90-return-location","fromId":"event.r90-return-cloud-ridge","toId":"map.round-74-cloud-ridge","relation":"locatedAt","summary":"云海收汊的见闻发生在云岭古道东口。"},
-    {"id":"kg.edge.r90-return-tide","fromId":"event.r90-return-cloud-ridge","toId":"place.r89-safe-return-current","relation":"requires","summary":"云海收汊同样循回汐缓流的记忆回望东汊。"}
+    {"id":"kg.edge.r90-return-tide","fromId":"event.r90-return-cloud-ridge","toId":"place.r89-safe-return-current","relation":"requires","summary":"云海收汊同样循回汐缓流的记忆回望东汊。"},
+    {"id":"kg.edge.r91-arrival-terrace","fromId":"event.r91-arrival","toId":"place.r91-cloud-north-terrace","relation":"triggers","summary":"初登北台时发现云岭北台·雁回崖。"},
+    {"id":"kg.edge.r91-terrace-map","fromId":"place.r91-cloud-north-terrace","toId":"map.round-91-cloud-north-terrace","relation":"locatedAt","summary":"雁回崖由百格探索地图承载。"},
+    {"id":"kg.edge.r91-bridge-event","fromId":"event.r91-goose-bridge","toId":"place.r91-goose-bridge","relation":"triggers","summary":"过桥听风后认清悬空雁桥的位置。"},
+    {"id":"kg.edge.r91-platform-event","fromId":"event.r91-goose-terrace","toId":"place.r91-goose-terrace","relation":"triggers","summary":"台心记雁后记下观雁台的方位。"},
+    {"id":"kg.edge.r91-stone-event","fromId":"event.r91-goose-stone","toId":"place.r91-goose-stone","relation":"triggers","summary":"寻得大石后发现雁栖石的旧约。"},
+    {"id":"kg.edge.r91-keeper-location","fromId":"char.r91-nie-qiyan","toId":"map.round-91-cloud-north-terrace","relation":"locatedAt","summary":"聂栖雁在雁回崖观雁台下守雁。"},
+    {"id":"kg.edge.r91-keeper-quest","fromId":"char.r91-nie-qiyan","toId":"quest.r91-goose-vigil","relation":"participatesIn","summary":"聂栖雁委托玩家记回台心雁书。"},
+    {"id":"kg.edge.r91-quest-platform","fromId":"quest.r91-goose-vigil","toId":"place.r91-goose-terrace","relation":"requires","summary":"崖台雁候需要玩家登观雁台调查。"},
+    {"id":"kg.edge.r91-quest-stone","fromId":"quest.r91-goose-vigil","toId":"place.r91-goose-stone","relation":"rewards","summary":"完成崖台雁候后得知雁栖石的方位。"},
+    {"id":"kg.edge.r91-terrace-ridge","fromId":"place.r91-cloud-north-terrace","toId":"map.round-74-cloud-ridge","relation":"locatedAt","summary":"雁回崖从云岭古道断云栈道北端栈口进入。"}
   ]
 }

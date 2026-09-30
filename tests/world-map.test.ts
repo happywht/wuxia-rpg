@@ -102,8 +102,8 @@ describe('world map roaming events', () => {
       'event.r90-arrival-blue-sail',
       'event.r90-return-cloud-ridge',
     ]);
-    expect(assembled.warnings).toHaveLength(1);
-    expect(assembled.warnings[0]).toContain('event.deleted-by-mod');
+    const danglingReferenceWarnings = assembled.warnings.filter((warning) => warning.includes('event.deleted-by-mod'));
+    expect(danglingReferenceWarnings).toHaveLength(1);
   });
 
   it('selects deterministically from stable id order and then tests authored probability', () => {

@@ -1,0 +1,91 @@
+{
+  "conversations": [
+    {
+      "id": "dlg.r91-nie-qiyan-vigil",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "观雁台南的石阶上，守雁人聂栖雁正仰头望着云缝里一线掠过的雁阵，见你从栈口上来，把一只蒙皮的竹筒从肩上卸下：「北台多年没生人上来。你若肯替雁群当一次眼睛，把台上的雁书记回来，我这筒里的崖茶分你一半。」",
+          "options": [
+            {
+              "text": "雁书我记。",
+              "nextNodeId": "accepted",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r91-goose-vigil",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r91-goose-vigil"
+                }
+              ]
+            },
+            {
+              "text": "雁书已经记回来了。",
+              "nextNodeId": "completed",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r91-goose-vigil",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "我正要去台上记雁。",
+              "nextNodeId": "active",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r91-goose-vigil",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "观雁台怎么走？",
+              "nextNodeId": "route"
+            },
+            {
+              "text": "你在崖上守什么？",
+              "nextNodeId": "keeper"
+            },
+            {
+              "text": "改日再谈。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "accepted",
+          "text": "「过了崖口那道悬空雁桥，一路石阶直上便是观雁台。趁晨光、日中或午后雁阵回翔时上台，在台心按 E 记下头雁的阵形——人字、一字还是孤雁当先，一样都不能错。记完回来找我。」"
+        },
+        {
+          "id": "active",
+          "text": "「桥板上有霜就贴着栏杆走。上台记雁要挑晨光、日中或午后，别的时辰雁群不落形。记完就回来，崖茶给你温着。」"
+        },
+        {
+          "id": "completed",
+          "text": "聂栖雁接过竹筒，抽出你记的雁书对着天光看了半晌，眉头渐渐松开：「头雁换了一只新雁，阵形却比去年齐整——这群雁，熬过今年了。」她把温好的崖茶推到你手边。"
+        },
+        {
+          "id": "route",
+          "text": "「下涧只有三座木桥，中路那座叫悬空雁桥，最宽。过桥后石阶直上，台的南墙留了门。台心那块平石就是记雁的地方。东边涧岸上有块雁栖石，雁群歇脚的老地方，顺路可以看看。」"
+        },
+        {
+          "id": "keeper",
+          "text": "「聂家三代守这群雁。祖父说雁是云岭的信使——雁阵乱一年，山下就乱一年。我记了十一年雁书，笔都换七支了，眼睛还算够用。」"
+        },
+        {
+          "id": "farewell",
+          "text": "聂栖雁重新背起竹筒，目光越过深涧投向观雁台的方向，风把她的斗篷吹得猎猎作响。"
+        }
+      ]
+    }
+  ]
+}

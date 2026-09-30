@@ -122,8 +122,12 @@ if (islesMap.id !== islesId || islesMap.grid.length !== 100) {
 // 用已登记的 CC0 Puny World 图素绘制列岛地貌；旧矩形逐格保持原样。
 // ---------------------------------------------------------------------------
 const previous = world.atlasArt;
-const atlasReady = previous?.columns === overview.columns && previous?.rows === overview.rows &&
+// 后续轮次（Round 91 起）可能已把舆图扩到更大的画布；只要本生成器管理的
+// 四个图层仍完整存在，扩图部分就已完成，重跑保持确定性 no-op。
+const atlasReady = previous !== undefined && previous.columns >= overview.columns && previous.rows >= overview.rows &&
   extensionIds.every((id) => previous.layers.some((layer) => layer.id === id));
+const activeAtlasColumns = atlasReady ? previous.columns : overview.columns;
+const activeAtlasRows = atlasReady ? previous.rows : overview.rows;
 // 先解码全部图层——旧密集层保持密集、RLE 层展开——之后生成器统一在密集
 // 矩阵上工作，最终写入时再确定性重编码。`previous` 是 `world.atlasArt` 的别名。
 if (previous !== undefined) {
@@ -687,8 +691,8 @@ const region = {
   name: '西南列岛·雾航湾',
   description: '雾航湾藏在西南雾海，北滩锚地、雾泊渔村与雾哨崖连成一线雾中航路。',
   atlasPosition: {
-    x: Number(((isleAtlasCell.col / (overview.columns - 1)) * 100).toFixed(8)),
-    y: Number(((isleAtlasCell.row / (overview.rows - 1)) * 100).toFixed(8)),
+    x: Number(((isleAtlasCell.col / (activeAtlasColumns - 1)) * 100).toFixed(8)),
+    y: Number(((isleAtlasCell.row / (activeAtlasRows - 1)) * 100).toFixed(8)),
   },
 };
 const transitions = [
@@ -816,7 +820,7 @@ await Promise.all([
   appendGraphEntries(paths.edges, 'edges', newEdges),
 ]);
 if (atlasReady) {
-  console.log(`Round 87 atlas is already ${overview.columns}×${overview.rows}; deterministic generation is a no-op.`);
+  console.log(`Round 87 atlas extension is already present in the ${activeAtlasColumns}×${activeAtlasRows} atlas; deterministic generation is a no-op.`);
 } else {
   console.log(`Generated ${overview.columns}×${overview.rows} atlas (${world.atlasArt.layers.length} layers; ${world.regions.length} regions retained).`);
   console.log(`Round 87 CC0 extension: ${extensionCount.cells} grass, ${extensionCount.shore} shore, ${extensionCount.trees} pines, ${extensionCount.water} sea cells.`);
