@@ -27,13 +27,13 @@ function loadWorld() {
 }
 
 describe('Round 81 global world atlas art and projection', () => {
-  it('loads the 640×448 continental and island atlas with per-layer tileset validation', () => {
+  it('loads the 768×576 continental atlas with per-layer tileset validation', () => {
     const { parsed } = loadWorld();
     const art = parsed.atlasArt;
     expect(art).toBeDefined();
     if (art === undefined) return;
-    expect({ columns: art.columns, rows: art.rows, tileSize: art.tileSize }).toEqual({ columns: 640, rows: 448, tileSize: 16 });
-    expect(art.layers.map(({ id }) => id)).toEqual([
+    expect({ columns: art.columns, rows: art.rows, tileSize: art.tileSize }).toEqual({ columns: 768, rows: 576, tileSize: 8 });
+    expect(art.layers.slice(0, 43).map(({ id }) => id)).toEqual([
       'world-ocean', 'world-land', 'world-coast', 'world-forest', 'world-relief', 'world-roads', 'world-settlements',
       'world-r79-shoal-water', 'world-r79-shoal-sand', 'world-r79-shoal-land', 'world-r79-shoal-pines',
       'world-r79-gate-routes', 'world-r81-expanse-water', 'world-r81-expanse-sand',
@@ -48,6 +48,11 @@ describe('Round 81 global world atlas art and projection', () => {
       'world-r92-pass-detail', 'world-r92-pass-route',
       'world-r93-valley-snow', 'world-r93-valley-trees', 'world-r93-valley-walls',
       'world-r93-valley-detail', 'world-r93-valley-route',
+    ]);
+    expect(art.layers.slice(43).map(({ id }) => id)).toEqual([
+      'world-r94-east-snow', 'world-r94-east-cliffs', 'world-r94-east-pines',
+      'world-r94-east-route', 'world-r94-east-settlement', 'world-r94-south-shallows',
+      'world-r94-south-sand', 'world-r94-south-land', 'world-r94-south-pines', 'world-r94-south-lane',
     ]);
     const tilesets = new Map(art.tilesets.map((tileset) => [tileset.id, tileset]));
     expect(tilesets.has('kenney.roguelike-rpg')).toBe(true);
@@ -134,7 +139,7 @@ describe('Round 81 global world atlas art and projection', () => {
   it('uses edge-safe atlas coordinates and does not reveal undiscovered landmark names', () => {
     const { world, maps, parsed } = loadWorld();
     const art = parsed.atlasArt!;
-    expect(projectAtlasPosition({ x: 0, y: 100 }, art)).toEqual({ x: 8, y: 7160 });
+    expect(projectAtlasPosition({ x: 0, y: 100 }, art)).toEqual({ x: 4, y: 4604 });
     const undiscovered = buildWorldAtlasOverlays(world, maps, parsed.startingMapResourceId, { col: 43, row: 37 }, new Set());
     const undiscoveredJson = JSON.stringify(undiscovered);
     expect(undiscoveredJson).not.toContain('landmark.reedbank-landing');

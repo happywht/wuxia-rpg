@@ -47,6 +47,8 @@ describe('Round 62 iron-ridge playable region', () => {
     ['map.round-91-cloud-north-terrace', loadMap('../data/base/maps/round-91-cloud-north-terrace.json')],
     ['map.round-92-north-pass', loadMap('../data/base/maps/round-92-north-pass.json')],
     ['map.round-93-snow-pine-valley', loadMap('../data/base/maps/round-93-snow-pine-valley.json')],
+    ['map.round-94-east-gate', loadMap('../data/base/maps/round-94-east-gate.json')],
+    ['map.round-94-returning-sails', loadMap('../data/base/maps/round-94-returning-sails.json')],
   ]);
 
   it('uses a complete, layered 100×100 CC0 map with bounded atlas gids and a clear route spine', () => {
@@ -91,8 +93,8 @@ describe('Round 62 iron-ridge playable region', () => {
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
     expect(assembled.warnings).toEqual([]);
-    expect(assembled.regions).toHaveLength(13);
-    expect(assembled.transitions).toHaveLength(24);
+    expect(assembled.regions).toHaveLength(15);
+    expect(assembled.transitions).toHaveLength(28);
 
     const ferry = maps.get('map.round-10-mist-ferry')!;
     const ridge = maps.get(RIDGE_ID)!;

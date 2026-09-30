@@ -1,0 +1,162 @@
+{
+  "conversations": [
+    {
+      "id": "dlg.r94-shen-wenqiu",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "沈问秋把一叠被风雪磨卷的旧驿牒压在石桌上：「东脊新开的天门关，如今只剩烽台石刻能告诉我们山外的旧路。你沿路去拓一份回来，我便敢给关门添上一笔新记。」",
+          "options": [
+            {
+              "text": "我去看看烽台。",
+              "nextNodeId": "accepted",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r94-snowline-signal",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r94-snowline-signal"
+                }
+              ]
+            },
+            {
+              "text": "烽台的拓记已带回。",
+              "nextNodeId": "completed",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r94-snowline-signal",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "我这就上东脊。",
+              "nextNodeId": "active",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r94-snowline-signal",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "东脊怎么走？",
+              "nextNodeId": "route"
+            },
+            {
+              "text": "先告辞。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "accepted",
+          "text": "「沿雪脊向东过石门，烽台在两排寒松后面。石刻别全拓，正对山口那三道短线才是旧驿记号。」"
+        },
+        {
+          "id": "active",
+          "text": "「风从北谷灌下来时，烽台东侧背风。石缝里有冻水，别用刀硬撬，拓纸沾湿就糊了。」"
+        },
+        {
+          "id": "completed",
+          "text": "沈问秋把拓本举到窗前：「三道短线，一道向海，两道回山。老路不是直出去的，是照着海雾绕。」他把一枚暖石递给你，指向关门外延伸的白脊。"
+        },
+        {
+          "id": "route",
+          "text": "「出门向东，过石门沿脊道走，见到三株并生的矮松后转南，石台就在崖边。」"
+        },
+        {
+          "id": "farewell",
+          "text": "沈问秋收起驿牒，继续在关门旁听风辨雪。"
+        }
+      ]
+    },
+    {
+      "id": "dlg.r94-zhao-qianfan",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "赵千帆蹲在归帆洲南码头，把一盏裂了边的旧灯罩转了半圈：「岛东那盏灯近来照得不对，浪高时看不出回港的方向。你去礁岸按刻线核一下，回来告诉我该往哪边偏舵。」",
+          "options": [
+            {
+              "text": "我去礁岸核灯。",
+              "nextNodeId": "accepted",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r94-homeward-lantern",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r94-homeward-lantern"
+                }
+              ]
+            },
+            {
+              "text": "刻线已经核过。",
+              "nextNodeId": "completed",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r94-homeward-lantern",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "我正在找灯标。",
+              "nextNodeId": "active",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r94-homeward-lantern",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "灯标怎么走？",
+              "nextNodeId": "route"
+            },
+            {
+              "text": "改日再谈。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "accepted",
+          "text": "「沿岛心石道往东，看到一道像半月的浅礁就下到滩上。灯柱下面有三圈刻线，数一数哪圈朝北缺口最深。」"
+        },
+        {
+          "id": "active",
+          "text": "「不必把灯拆开，看礁上的潮痕就知道灯该往哪边转。东南风起来前回来，渡船还赶得上。」"
+        },
+        {
+          "id": "completed",
+          "text": "赵千帆听完点头：「原来旧灯向西偏了半掌，难怪雾里总把人引到外礁。今夜我就改灯。你替这一带的船省了半夜绕路。」"
+        },
+        {
+          "id": "route",
+          "text": "「离开码头后沿石道向东，过岛心松坡再下南滩；礁岸的灯柱在小湾北头。」"
+        },
+        {
+          "id": "farewell",
+          "text": "赵千帆把灯罩放回木箱，转身去检查靠岸的缆绳。"
+        }
+      ]
+    }
+  ]
+}

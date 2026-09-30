@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 import { parseGridMap, type GridMap } from '../src/engine/grid-map';
 import { findGridPath } from '../src/engine/grid-path';
+import { projectAtlasPosition } from '../src/engine/world-atlas-view';
 import { parseKnowledgeNodeSet } from '../src/engine/knowledge-graph';
 import { parseNpcSet } from '../src/engine/npc-placement';
 import {
@@ -49,9 +50,9 @@ describe('Round 82 eastern coastline and walkable world expansion', () => {
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
 
-    expect(parsed.data.regions).toHaveLength(13);
-    expect(parsed.data.transitions).toHaveLength(24);
-    expect(maps.size).toBe(13);
+    expect(parsed.data.regions).toHaveLength(15);
+    expect(parsed.data.transitions).toHaveLength(28);
+    expect(maps.size).toBe(15);
     expect(maps.has(COAST_ID)).toBe(true);
 
     const oldPositions = new Map([
@@ -62,12 +63,20 @@ describe('Round 82 eastern coastline and walkable world expansion', () => {
       ['map.round-74-cloud-ridge', { x: 27.85915479, y: 14.48993279 }],
       ['map.round-79-isles', { x: 17.44913928, y: 28.47203579 }],
     ]);
+    const priorArt = { ...parsed.data.atlasArt!, columns: 640, rows: 448 };
     for (const [id, position] of oldPositions) {
-      expect(parsed.data.regions.find(({ mapResourceId }) => mapResourceId === id)?.atlasPosition).toEqual(position);
+      const region = parsed.data.regions.find(({ mapResourceId }) => mapResourceId === id);
+      const current = projectAtlasPosition(region!.atlasPosition, parsed.data.atlasArt!);
+      const previous = projectAtlasPosition(position, priorArt);
+      expect(current.x, `${id} atlas x`).toBeCloseTo(previous.x, 3);
+      expect(current.y, `${id} atlas y`).toBeCloseTo(previous.y, 3);
     }
-    expect(parsed.data.atlasArt).toMatchObject({ columns: 640, rows: 448, tileSize: 16 });
+    expect(parsed.data.atlasArt).toMatchObject({ columns: 768, rows: 576, tileSize: 8 });
     const newRegion = parsed.data.regions.find(({ mapResourceId }) => mapResourceId === COAST_ID)!;
-    expect(newRegion).toMatchObject({ name: '东溟海岸·青帆埠', atlasPosition: { x: 44.56181534, y: 21.950783 } });
+    expect(newRegion.name).toBe('东溟海岸·青帆埠');
+    const coastCenter = projectAtlasPosition(newRegion.atlasPosition, parsed.data.atlasArt!);
+    expect(coastCenter.x / parsed.data.atlasArt!.tileSize).toBeCloseTo(285.25, 3);
+    expect(coastCenter.y / parsed.data.atlasArt!.tileSize).toBeCloseTo(98.62, 3);
     const atlasColumn = Math.round(newRegion.atlasPosition.x / 100 * (parsed.data.atlasArt!.columns - 1));
     const atlasRow = Math.round(newRegion.atlasPosition.y / 100 * (parsed.data.atlasArt!.rows - 1));
     const eastLand = parsed.data.atlasArt!.layers.find(({ id }) => id === 'world-r81-expanse-land')!;

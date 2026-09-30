@@ -231,6 +231,31 @@
       "schema": "quest-set"
     },
     {
+      "id": "map.round-94-east-gate",
+      "path": "maps/round-94-east-gate.json",
+      "schema": "grid-map"
+    },
+    {
+      "id": "map.round-94-returning-sails",
+      "path": "maps/round-94-returning-sails.json",
+      "schema": "grid-map"
+    },
+    {
+      "id": "npc.round-94-frontiers-set",
+      "path": "characters/round-94-frontiers-npcs.json",
+      "schema": "npc-set"
+    },
+    {
+      "id": "dialogue.round-94-frontiers-set",
+      "path": "dialogues/round-94-frontiers-conversations.json",
+      "schema": "dialogue-set"
+    },
+    {
+      "id": "quest.round-94-frontiers-set",
+      "path": "quests/round-94-frontiers-quests.json",
+      "schema": "quest-set"
+    },
+    {
       "id": "world.atlas",
       "path": "world/world-map.json",
       "schema": "world-map"

@@ -89,8 +89,8 @@ describe('Round 91 Cloud Ridge North Terrace', () => {
     if (!parsed.ok) return;
 
     const art = parsed.data.atlasArt!;
-    expect([art.columns, art.rows, art.tileSize]).toEqual([640, 448, 16]);
-    expect(art.layers).toHaveLength(43);
+    expect([art.columns, art.rows, art.tileSize]).toEqual([768, 576, 8]);
+    expect(art.layers).toHaveLength(53);
     const layers = new Map(art.layers.map((layer) => [layer.id, layer]));
     for (const [id, expectedHash] of Object.entries(baseline.layers)) {
       const layer = layers.get(id);
@@ -112,8 +112,8 @@ describe('Round 91 Cloud Ridge North Terrace', () => {
 
     const terrace = parsed.data.regions.find(({ mapResourceId }) => mapResourceId === MAP_ID)!;
     const point = projectAtlasPosition(terrace.atlasPosition, art);
-    expect(point.x).toBeCloseTo((576.5) * 16, 5);
-    expect(point.y).toBeCloseTo((96.5) * 16, 5);
+    expect(point.x).toBeCloseTo((576.5) * 8, 5);
+    expect(point.y).toBeCloseTo((96.5) * 8, 5);
   });
 
   it('connects the new 100×100 district by walkable gates and reachable landmarks', () => {

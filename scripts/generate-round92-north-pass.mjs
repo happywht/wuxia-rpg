@@ -181,6 +181,12 @@ const [world, manifest, terraceMap, nodes, edges] = await Promise.all([
 if (terraceMap.id !== terraceId || terraceMap.grid.length !== 100) {
   throw new Error('Round 92 需要 Round 91 的雁回崖百格地图作为入关关口。');
 }
+if (world.atlasArt !== undefined &&
+  world.atlasArt.columns > overview.columns && world.atlasArt.rows > overview.rows) {
+  overview.columns = world.atlasArt.columns;
+  overview.rows = world.atlasArt.rows;
+  overview.tileSize = world.atlasArt.tileSize;
+}
 
 // ---------------------------------------------------------------------------
 // 第一部分：在 640×448 舆图北部的既有空白带上，用 OpenGameArt zaphgames
@@ -209,7 +215,7 @@ if (atlasReady) {
 }
 let extensionCount = null;
 if (previous !== undefined) {
-  if (previous === undefined || previous.columns !== expectedOld.columns || previous.rows !== expectedOld.rows) {
+  if (previous === undefined || previous.columns < expectedOld.columns || previous.rows < expectedOld.rows) {
     throw new Error(`预期 Round 91 舆图为 ${expectedOld.columns}×${expectedOld.rows}，实际为 ${previous?.columns}×${previous?.rows}。`);
   }
   // 剔除本生成器管理的图层后，舆图必须是「Round 91 基线 33 层 + 后续轮次
@@ -958,6 +964,8 @@ const resourceEntries = [
   { id: 'quest.round-92-north-pass-set', path: 'quests/round-92-north-pass-quests.json', schema: 'quest-set' },
 ];
 
+const existingAtlasRegion = world.regions.find((entry) => entry.mapResourceId === mapId);
+if (atlasReady && existingAtlasRegion !== undefined) region.atlasPosition = existingAtlasRegion.atlasPosition;
 world.regions = mergeManagedEntries(world.regions ?? [], [region], (entry) => entry.mapResourceId);
 world.landmarks = mergeManagedEntries(world.landmarks ?? [], landmarks, (entry) => entry.id);
 world.transitions = mergeManagedEntries(world.transitions ?? [], transitions, (entry) => entry.id);

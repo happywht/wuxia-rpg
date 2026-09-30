@@ -140,6 +140,13 @@ if (ridgeMap.id !== ridgeId || ridgeMap.grid.length !== 100) {
 // OpenGameArt Tiny RPG Mountain CC0 图素绘制雁回崖高原；旧矩形逐格不变。
 // ---------------------------------------------------------------------------
 const previous = world.atlasArt;
+// Later rounds may preserve this map at a larger extent and bake it at a
+// smaller output tile size. Rebuilding Round 91 must keep that active canvas.
+if (previous !== undefined && previous.columns > overview.columns && previous.rows > overview.rows) {
+  overview.columns = previous.columns;
+  overview.rows = previous.rows;
+  overview.tileSize = previous.tileSize;
+}
 const atlasReady = previous?.columns === overview.columns && previous?.rows === overview.rows &&
   extensionIds.every((id) => previous.layers.some((layer) => layer.id === id));
 if (previous !== undefined) {
@@ -915,6 +922,8 @@ const resourceEntries = [
   { id: 'quest.round-91-cloud-north-terrace-set', path: 'quests/round-91-cloud-north-terrace-quests.json', schema: 'quest-set' },
 ];
 
+const existingAtlasRegion = world.regions.find((entry) => entry.mapResourceId === mapId);
+if (atlasReady && existingAtlasRegion !== undefined) region.atlasPosition = existingAtlasRegion.atlasPosition;
 world.regions = mergeManagedEntries(world.regions ?? [], [region], (entry) => entry.mapResourceId);
 world.landmarks = mergeManagedEntries(world.landmarks ?? [], landmarks, (entry) => entry.id);
 world.transitions = mergeManagedEntries(world.transitions ?? [], transitions, (entry) => entry.id);

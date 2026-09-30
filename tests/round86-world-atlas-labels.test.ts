@@ -10,7 +10,7 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 const bounds = { width: 616, height: 340 };
 
 describe('Round 86 atlas overview callouts', () => {
-  it('keeps all twelve region names readable at the fitted 640×448 panorama view', () => {
+  it('keeps all fifteen region names readable at the fitted 768×576 panorama view', () => {
     const raw = JSON.parse(readFileSync(path.join(repoRoot, 'data/base/world/world-map.json'), 'utf8')) as unknown;
     const parsed = parseWorldMap(raw);
     expect(parsed.ok).toBe(true);
@@ -34,8 +34,8 @@ describe('Round 86 atlas overview callouts', () => {
     });
     const placements = layoutWorldAtlasRegionLabels(labels, bounds, 'map.round-85-tide-isle');
 
-    expect(labels).toHaveLength(13);
-    expect(placements.size).toBe(13);
+    expect(labels).toHaveLength(15);
+    expect(placements.size).toBe(15);
     const boxes = labels.map((label) => {
       const placement = placements.get(label.mapResourceId);
       expect(placement).toBeDefined();

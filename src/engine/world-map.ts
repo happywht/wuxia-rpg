@@ -366,7 +366,7 @@ function parseRleAtlasLayer(
       }
       const runLength = Number(match[1]);
       const gid = Number(match[2]);
-      if (runLength > 640 || gid > 0xffffffff) {
+      if (runLength > 768 || gid > 0xffffffff) {
         errors.push(`${rowPath}：第 ${tokenIndex + 1} 段 "${token}" 超出游程或 GID 上限`);
         rowValid = false;
         return;
@@ -405,8 +405,8 @@ function parseAtlasArt(value: unknown, errors: string[]): WorldAtlasArtData | nu
   for (const key of Object.keys(value)) if (!allowed.has(key)) errors.push(`${label}.${key}：不是受支持的字段`);
   const dimension = (field: 'columns' | 'rows'): number | null => {
     const candidate = value[field];
-    if (!integer(candidate) || candidate < 1 || candidate > 640) {
-      errors.push(`${label}.${field}：应为 1–640 之间的整数`);
+    if (!integer(candidate) || candidate < 1 || candidate > 768) {
+      errors.push(`${label}.${field}：应为 1–768 之间的整数`);
       return null;
     }
     return candidate;
@@ -421,9 +421,9 @@ function parseAtlasArt(value: unknown, errors: string[]): WorldAtlasArtData | nu
   if (value.regionFootprint !== undefined) {
     if (!isObject(value.regionFootprint) ||
       typeof value.regionFootprint.columns !== 'number' || !Number.isFinite(value.regionFootprint.columns) ||
-      value.regionFootprint.columns <= 0 || value.regionFootprint.columns > 640 ||
+      value.regionFootprint.columns <= 0 || value.regionFootprint.columns > 768 ||
       typeof value.regionFootprint.rows !== 'number' || !Number.isFinite(value.regionFootprint.rows) ||
-      value.regionFootprint.rows <= 0 || value.regionFootprint.rows > 640 ||
+      value.regionFootprint.rows <= 0 || value.regionFootprint.rows > 768 ||
       Object.keys(value.regionFootprint).some((key) => key !== 'columns' && key !== 'rows')) {
       errors.push(`${label}.regionFootprint：应为含正数 columns/rows 的对象`);
     } else {

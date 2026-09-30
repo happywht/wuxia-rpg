@@ -201,6 +201,12 @@ const [world, manifest, passMap, nodes, edges] = await Promise.all([
 if (passMap.id !== passId || passMap.grid.length !== 100) {
   throw new Error('Round 93 需要 Round 92 的照雪关百格地图作为入谷关口。');
 }
+if (world.atlasArt !== undefined &&
+  world.atlasArt.columns > overview.columns && world.atlasArt.rows > overview.rows) {
+  overview.columns = world.atlasArt.columns;
+  overview.rows = world.atlasArt.rows;
+  overview.tileSize = world.atlasArt.tileSize;
+}
 
 // ---------------------------------------------------------------------------
 // 第一部分：在 640×448 舆图北部空白带上，用已登记的 zaphgames Winter CC0
@@ -227,7 +233,7 @@ if (atlasReady) {
 }
 let extensionCount = null;
 if (previous !== undefined) {
-  if (previous === undefined || previous.columns !== expectedOld.columns || previous.rows !== expectedOld.rows) {
+  if (previous === undefined || previous.columns < expectedOld.columns || previous.rows < expectedOld.rows) {
     throw new Error(`预期 Round 92 舆图为 ${expectedOld.columns}×${expectedOld.rows}，实际为 ${previous?.columns}×${previous?.rows}。`);
   }
   // 剔除本生成器管理的图层后，舆图必须是「Round 92 基线 38 层 + 后续轮次
@@ -434,8 +440,8 @@ if (previous !== undefined) {
       col: (region.atlasPosition.x / 100) * (overview.columns - 1),
       row: (region.atlasPosition.y / 100) * (overview.rows - 1),
     }));
-  if (oldAnchors.length !== 12) {
-    throw new Error(`预期十二个既有区域锚点，实际为 ${oldAnchors.length}。`);
+  if (oldAnchors.length < 12) {
+    throw new Error(`预期至少十二个既有区域锚点，实际为 ${oldAnchors.length}。`);
   }
   for (const anchor of oldAnchors) {
     const dx = (anchor.col - valleyAtlasCell.col) / (regionFootprint.columns / 100 * overview.columns / 2);
@@ -1041,6 +1047,8 @@ const resourceEntries = [
   { id: 'quest.round-93-snow-pine-valley-set', path: 'quests/round-93-snow-pine-valley-quests.json', schema: 'quest-set' },
 ];
 
+const existingAtlasRegion = world.regions.find((entry) => entry.mapResourceId === mapId);
+if (atlasReady && existingAtlasRegion !== undefined) region.atlasPosition = existingAtlasRegion.atlasPosition;
 world.regions = mergeManagedEntries(world.regions ?? [], [region], (entry) => entry.mapResourceId);
 world.landmarks = mergeManagedEntries(world.landmarks ?? [], landmarks, (entry) => entry.id);
 world.transitions = mergeManagedEntries(world.transitions ?? [], transitions, (entry) => entry.id);
@@ -1051,8 +1059,8 @@ if (!(manifest.resources ?? []).some((entry) => entry.id === 'world.atlas')) {
 manifest.resources = mergeManagedEntries(
   manifest.resources ?? [], resourceEntries, (entry) => entry.id, 'world.atlas',
 );
-if (world.regions.length !== 13) {
-  throw new Error(`扩展后全域应为 13 个区域，实际为 ${world.regions.length}。`);
+if (world.regions.length < 13) {
+  throw new Error(`Round 93 及后续区域丢失，扩展后仅有 ${world.regions.length} 个区域。`);
 }
 
 // 全部舆图图层以紧凑行 RLE 线格式落盘；区域、地标、关口、事件及其余

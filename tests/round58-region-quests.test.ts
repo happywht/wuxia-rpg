@@ -86,8 +86,8 @@ describe('Round 58 regional quest chains', () => {
     expect(assembly.warnings).toEqual([]);
     expect(assembly.quests.size).toBe(44);
     expect(graph.warnings).toEqual([]);
-    expect(nodeParse.data.nodes).toHaveLength(319);
-    expect(edgeParse.data.edges).toHaveLength(423);
+    expect(nodeParse.data.nodes).toHaveLength(335);
+    expect(edgeParse.data.edges).toHaveLength(439);
 
     const newQuestIds = [
       'quest.r58-market-discovery',

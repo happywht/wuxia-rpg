@@ -47,8 +47,8 @@ const ISLE_NODE = 'place.r87-southwest-isles';
 const HARBOR_NODE = 'place.r87-fog-harbor';
 const SIGNAL_NODE = 'place.r87-mist-signal';
 const SPRING_NODE = 'place.r87-spring-hollow';
-const ATLAS_COLUMNS = 640;
-const ATLAS_ROWS = 448;
+const ATLAS_COLUMNS = 768;
+const ATLAS_ROWS = 576;
 const OLD_COLUMNS = 448;
 const OLD_ROWS = 320;
 
@@ -208,14 +208,14 @@ describe('Round 87 Southwest Isles within the expanded world atlas', () => {
     }
   }, 120_000);
 
-  it('keeps the 640×448 atlas with all 33 layers and preserves the original cells', () => {
+  it('keeps the 768×576 atlas and preserves the original cells', () => {
     const world = readJson('../data/base/world/world-map.json');
     const art = world.atlasArt;
     expect(art).toMatchObject({
-      columns: ATLAS_COLUMNS, rows: ATLAS_ROWS, tileSize: 16,
+      columns: ATLAS_COLUMNS, rows: ATLAS_ROWS, tileSize: 8,
       regionFootprint: { columns: 35.84, rows: 23.04 },
     });
-    expect(art.layers).toHaveLength(43);
+    expect(art.layers).toHaveLength(53);
     expect(art.layers.map(({ id }: { id: string }) => id).filter((id: string) => id.startsWith('world-r87-'))).toEqual([
       'world-r87-expanse-water', 'world-r87-expanse-sand',
       'world-r87-expanse-land', 'world-r87-expanse-pines',
@@ -290,8 +290,8 @@ describe('Round 87 Southwest Isles within the expanded world atlas', () => {
 
   it('keeps the nine Round 86 centers fixed and pins the isle in its original atlas cell', () => {
     const world = readJson('../data/base/world/world-map.json');
-    expect(world.regions).toHaveLength(13);
-    expect(world.transitions).toHaveLength(24);
+    expect(world.regions).toHaveLength(15);
+    expect(world.transitions).toHaveLength(28);
     for (const [mapResourceId, anchor] of Object.entries(round86RegionAnchors)) {
       const region = world.regions.find((entry: any) => entry.mapResourceId === mapResourceId);
       expect(region, mapResourceId).toBeDefined();
@@ -504,7 +504,7 @@ describe('Round 87 Southwest Isles within the expanded world atlas', () => {
 
     // Every declared region joins the directed travel graph from the start map,
     // and the new isles pair is exactly one hop in both directions.
-    expect(assembled.regions).toHaveLength(13);
+    expect(assembled.regions).toHaveLength(15);
     for (const region of assembled.regions) {
       const route = findWorldTravelRoute(assembled, parsedWorld.data.startingMapResourceId, region.mapResourceId);
       expect(route, `${region.mapResourceId} reachable from start`).not.toBeNull();

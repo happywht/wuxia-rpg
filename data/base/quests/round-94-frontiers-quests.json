@@ -1,0 +1,76 @@
+{
+  "quests": [
+    {
+      "id": "quest.r94-snowline-signal",
+      "name": "雪脊传书",
+      "description": "守关人沈问秋请你沿东脊检查旧烽台的石刻，再把记录带回天门关。",
+      "giverNpcId": "char.r94-shen-wenqiu",
+      "objectives": [
+        {
+          "id": "objective.r94-enter-east-gate",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r94-east-gate",
+          "requiredCount": 1,
+          "text": "从雁回崖东脊进入天门关"
+        },
+        {
+          "id": "objective.r94-read-east-beacon",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r94-east-beacon",
+          "requiredCount": 1,
+          "text": "在东望烽台拓下旧石刻"
+        },
+        {
+          "id": "objective.r94-report-east-beacon",
+          "kind": "talkToNpc",
+          "targetId": "char.r94-shen-wenqiu",
+          "requiredCount": 1,
+          "text": "带着拓记回关向沈问秋复命"
+        }
+      ],
+      "rewards": {
+        "experience": 36,
+        "currency": 28,
+        "discoverKnowledgeNodeIds": [
+          "place.r94-cloud-window"
+        ]
+      }
+    },
+    {
+      "id": "quest.r94-homeward-lantern",
+      "name": "归帆灯火",
+      "description": "舟师赵千帆请你到岛东礁岸辨认归帆灯标的旧信号，再回南码头报信。",
+      "giverNpcId": "char.r94-zhao-qianfan",
+      "objectives": [
+        {
+          "id": "objective.r94-enter-sails",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r94-returning-sails",
+          "requiredCount": 1,
+          "text": "乘渡到达南溟归帆洲"
+        },
+        {
+          "id": "objective.r94-survey-lantern",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r94-homeward-lantern",
+          "requiredCount": 1,
+          "text": "在东岸灯标下核对潮汐刻线"
+        },
+        {
+          "id": "objective.r94-report-lantern",
+          "kind": "talkToNpc",
+          "targetId": "char.r94-zhao-qianfan",
+          "requiredCount": 1,
+          "text": "回南码头向赵千帆报信"
+        }
+      ],
+      "rewards": {
+        "experience": 34,
+        "currency": 30,
+        "discoverKnowledgeNodeIds": [
+          "place.r94-moon-reef"
+        ]
+      }
+    }
+  ]
+}

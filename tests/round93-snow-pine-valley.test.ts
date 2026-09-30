@@ -131,33 +131,39 @@ describe('Round 93 Snow Pine Valley (Frostpine Valley)', () => {
     if (!parsed.ok) return;
 
     const art = parsed.data.atlasArt!;
-    expect([art.columns, art.rows, art.tileSize]).toEqual([640, 448, 16]);
-    expect(art.layers).toHaveLength(43);
+    expect([art.columns, art.rows, art.tileSize]).toEqual([768, 576, 8]);
+    expect(art.layers).toHaveLength(53);
     const layers = new Map(art.layers.map((layer) => [layer.id, layer]));
     for (const [id, expectedHash] of Object.entries(baseline.layers)) {
       const layer = layers.get(id);
       expect(layer, id).toBeDefined();
-      expect(sha256(JSON.stringify(layer!.cells)), id).toBe(expectedHash);
+      const prefix = layer!.cells.slice(0, baseline.rows).map((row) => row.slice(0, baseline.columns));
+      expect(sha256(JSON.stringify(prefix)), id).toBe(expectedHash);
     }
     // The five new layers are appended after the preserved 38 baseline layers.
     expect(art.layers.slice(0, 38).map(({ id }) => id))
       .toEqual(Object.keys(baseline.layers));
-    expect(art.layers.slice(38).map(({ id }) => id)).toEqual(EXTENSION_LAYER_IDS);
+    expect(art.layers.slice(38, 43).map(({ id }) => id)).toEqual(EXTENSION_LAYER_IDS);
+    expect(art.layers.slice(43).map(({ id }) => id)).toEqual([
+      'world-r94-east-snow', 'world-r94-east-cliffs', 'world-r94-east-pines',
+      'world-r94-east-route', 'world-r94-east-settlement', 'world-r94-south-shallows',
+      'world-r94-south-sand', 'world-r94-south-land', 'world-r94-south-pines', 'world-r94-south-lane',
+    ]);
 
     for (const [mapResourceId, oldAnchor] of Object.entries(baseline.regions)) {
       const current = parsed.data.regions.find((region) => region.mapResourceId === mapResourceId);
       expect(current, mapResourceId).toBeDefined();
-      expect(current!.atlasPosition.x, `${mapResourceId} x`)
-        .toBeCloseTo(oldAnchor.percent.x, 8);
-      expect(current!.atlasPosition.y, `${mapResourceId} y`)
-        .toBeCloseTo(oldAnchor.percent.y, 8);
+      const before = projectAtlasPosition(oldAnchor.percent, { ...art, columns: baseline.columns, rows: baseline.rows });
+      const after = projectAtlasPosition(current!.atlasPosition, art);
+      expect(after.x / art.tileSize, `${mapResourceId} x`).toBeCloseTo(before.x / art.tileSize, 4);
+      expect(after.y / art.tileSize, `${mapResourceId} y`).toBeCloseTo(before.y / art.tileSize, 4);
     }
-    expect(parsed.data.regions).toHaveLength(13);
+    expect(parsed.data.regions).toHaveLength(15);
 
     const valley = parsed.data.regions.find(({ mapResourceId }) => mapResourceId === MAP_ID)!;
     const point = projectAtlasPosition(valley.atlasPosition, art);
-    expect(point.x).toBeCloseTo((432.5) * 16, 5);
-    expect(point.y).toBeCloseTo((24.5) * 16, 5);
+    expect(point.x).toBeCloseTo((432.5) * 8, 5);
+    expect(point.y).toBeCloseTo((24.5) * 8, 5);
   });
 
   it('paints the new winter layers only inside the vacant north-west band', () => {

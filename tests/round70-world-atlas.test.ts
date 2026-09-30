@@ -74,6 +74,12 @@ describe('Round 70 continental world atlas', () => {
       } else if (region.mapResourceId === 'map.round-93-snow-pine-valley') {
         const valleySnow = art.layers.find(({ id }) => id === 'world-r93-valley-snow')!.cells;
         expect(valleySnow[row]?.[col]).toBeGreaterThan(0);
+      } else if (region.mapResourceId === 'map.round-94-east-gate') {
+        const eastSnow = art.layers.find(({ id }) => id === 'world-r94-east-snow')!.cells;
+        expect(eastSnow[row]?.[col]).toBeGreaterThan(0);
+      } else if (region.mapResourceId === 'map.round-94-returning-sails') {
+        const southLand = art.layers.find(({ id }) => id === 'world-r94-south-land')!.cells;
+        expect(southLand[row]?.[col]).toBeGreaterThan(0);
       } else if (region.mapResourceId === 'map.round-79-isles') {
         const shoalLand = art.layers.find(({ id }) => id === 'world-r79-shoal-land')!.cells;
         expect(shoalLand[row]?.[col]).toBeGreaterThan(0);
@@ -109,6 +115,14 @@ describe('Round 70 continental world atlas', () => {
           const painted = ['world-r93-valley-snow', 'world-r93-valley-route', 'world-r93-valley-detail']
             .some((layerId) => (art.layers.find(({ id }) => id === layerId)?.cells[cell.row]?.[cell.col] ?? 0) > 0);
           expect(painted, `${transition.id} endpoint on bare atlas`).toBe(true);
+        } else if (endpoint.mapResourceId === 'map.round-94-east-gate') {
+          const painted = ['world-r94-east-snow', 'world-r94-east-route', 'world-r94-east-cliffs']
+            .some((layerId) => (art.layers.find(({ id }) => id === layerId)?.cells[cell.row]?.[cell.col] ?? 0) > 0);
+          expect(painted, `${transition.id} endpoint on bare atlas`).toBe(true);
+        } else if (endpoint.mapResourceId === 'map.round-94-returning-sails') {
+          const painted = ['world-r94-south-land', 'world-r94-south-lane', 'world-r94-south-sand']
+            .some((layerId) => (art.layers.find(({ id }) => id === layerId)?.cells[cell.row]?.[cell.col] ?? 0) > 0);
+          expect(painted, `${transition.id} endpoint on bare atlas`).toBe(true);
         } else if (endpoint.mapResourceId === 'map.round-79-isles') {
           // Round 87 fog-pilot gates leave from the western reef shallows
           // instead of the old official ferry route.
@@ -127,7 +141,9 @@ describe('Round 70 continental world atlas', () => {
     const { data } = loadWorld();
     const art = data.atlasArt!;
     const tinyTownLayers = art.layers.filter(({ tilesetId }) => tilesetId === 'kenney.tiny-town');
-    expect(tinyTownLayers.map(({ id }) => id)).toEqual(['world-relief', 'world-settlements']);
+    expect(tinyTownLayers.map(({ id }) => id)).toEqual([
+      'world-relief', 'world-settlements', 'world-r94-east-settlement',
+    ]);
     expect(tinyTownLayers.every(({ cells }) => cells.flat().every((gid) => gid <= 132))).toBe(true);
     expect(tinyTownLayers.flatMap(({ cells }) => cells.flat()).filter((gid) => gid > 0).length).toBeGreaterThan(100);
     expect(JSON.stringify(art)).not.toContain('landmark.reedbank-landing');

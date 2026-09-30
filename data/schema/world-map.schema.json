@@ -103,15 +103,15 @@
       "type": "object", "additionalProperties": false,
       "required": ["columns", "rows", "tileSize", "tilesets", "layers"],
       "properties": {
-        "columns": { "type": "integer", "minimum": 1, "maximum": 640 },
-        "rows": { "type": "integer", "minimum": 1, "maximum": 640 },
+        "columns": { "type": "integer", "minimum": 1, "maximum": 768 },
+        "rows": { "type": "integer", "minimum": 1, "maximum": 768 },
         "tileSize": { "type": "integer", "minimum": 1, "maximum": 256 },
         "regionFootprint": {
           "type": "object", "additionalProperties": false,
           "required": ["columns", "rows"],
           "properties": {
-            "columns": { "type": "number", "exclusiveMinimum": 0, "maximum": 640 },
-            "rows": { "type": "number", "exclusiveMinimum": 0, "maximum": 640 }
+            "columns": { "type": "number", "exclusiveMinimum": 0, "maximum": 768 },
+            "rows": { "type": "number", "exclusiveMinimum": 0, "maximum": 768 }
           }
         },
         "tilesets": {
@@ -139,14 +139,14 @@
               "id": { "type": "string", "minLength": 1 },
               "tilesetId": { "type": "string", "minLength": 1 },
               "cells": {
-                "type": "array", "minItems": 1, "maxItems": 640,
+                "type": "array", "minItems": 1, "maxItems": 768,
                 "items": {
-                  "type": "array", "minItems": 1, "maxItems": 640,
+                  "type": "array", "minItems": 1, "maxItems": 768,
                   "items": { "type": "integer", "minimum": 0, "maximum": 4294967295 }
                 }
               },
               "cellsRle": {
-                "type": "array", "minItems": 1, "maxItems": 640,
+                "type": "array", "minItems": 1, "maxItems": 768,
                 "items": {
                   "type": "string",
                   "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)(,[1-9][0-9]*:(0|[1-9][0-9]*))*$"

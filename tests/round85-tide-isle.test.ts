@@ -36,8 +36,8 @@ const REEF_NODE = 'place.r85-reef-channel';
 const POOL_NODE = 'place.r85-tide-pool';
 const REEF_EVENT = 'event.r85-reef-channel';
 const LOW_TIDE_ID = 'tide.low';
-const ATLAS_COLUMNS = 640;
-const ATLAS_ROWS = 448;
+const ATLAS_COLUMNS = 768;
+const ATLAS_ROWS = 576;
 const OLD_COLUMNS = 384;
 const OLD_ROWS = 256;
 
@@ -98,12 +98,12 @@ for (const resource of manifest.resources.filter(({ schema }) => schema === 'gri
   maps.set(resource.id, parseMap(readJson(`../data/base/${resource.path}`)));
 }
 
-describe('Round 85 Tide Isle and the 640×448 atlas', () => {
+describe('Round 85 Tide Isle and the expanded 768×576 atlas', () => {
   it('keeps the atlas expansion lossless with every old cell identical', () => {
     const world = readJson('../data/base/world/world-map.json');
     const art = world.atlasArt;
     expect(art).toMatchObject({
-      columns: ATLAS_COLUMNS, rows: ATLAS_ROWS, tileSize: 16,
+      columns: ATLAS_COLUMNS, rows: ATLAS_ROWS, tileSize: 8,
       regionFootprint: { columns: 35.84, rows: 23.04 },
     });
     expect(art.layers.map(({ id }: { id: string }) => id)).toEqual(expect.arrayContaining([
@@ -173,8 +173,8 @@ describe('Round 85 Tide Isle and the 640×448 atlas', () => {
 
   it('keeps all eight old region centers in the same atlas pixels after rebasing', () => {
     const world = readJson('../data/base/world/world-map.json');
-    expect(world.regions).toHaveLength(13);
-    expect(world.transitions).toHaveLength(24);
+    expect(world.regions).toHaveLength(15);
+    expect(world.transitions).toHaveLength(28);
     for (const [mapResourceId, anchor] of Object.entries(round84RegionAnchors)) {
       const region = world.regions.find((entry: any) => entry.mapResourceId === mapResourceId);
       expect(region, mapResourceId).toBeDefined();

@@ -72,7 +72,7 @@ describe('Round 75 region-event approach clues', () => {
       expect(event.approachText, `${event.id} 需要临近线索`).toBeTruthy();
       mapsWithClues.add(event.mapResourceId);
     }
-    expect(mapsWithClues.size).toBe(13);
+    expect(mapsWithClues.size).toBe(15);
     // Arrival and non-arrival landmarks both carry clues in shipped data.
     expect(parsed.data.events.some(({ id }) => id.endsWith('-arrival'))).toBe(true);
     expect(parsed.data.events.some(({ id }) => !id.endsWith('-arrival'))).toBe(true);

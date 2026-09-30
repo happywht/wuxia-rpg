@@ -110,13 +110,13 @@ function parseErrors(raw: unknown): string {
 }
 
 describe('Round 86 world-atlas row-RLE wire protocol', () => {
-  it('ships the 640×448 atlas as canonical row-RLE that passes the JSON schema', () => {
+  it('ships the 768×576 atlas as canonical row-RLE that passes the JSON schema', () => {
     const ajv = new Ajv({ allErrors: true, strict: false });
     const validate = ajv.compile(readJson('../data/schema/world-map.schema.json') as AnySchema);
     expect(validate(rawWorld), JSON.stringify(validate.errors)).toBe(true);
 
     const art = rawWorld.atlasArt;
-    expect(art.layers).toHaveLength(43);
+    expect(art.layers).toHaveLength(53);
     for (const layer of art.layers) {
       expect(layer.cells, layer.id).toBeUndefined();
       expect(layer.cellsRle, layer.id).toHaveLength(art.rows);
@@ -125,7 +125,7 @@ describe('Round 86 world-atlas row-RLE wire protocol', () => {
       }
     }
     const size = statSync(new URL('../data/base/world/world-map.json', import.meta.url)).size;
-    expect(size).toBeLessThanOrEqual(1_048_576);
+    expect(size).toBeLessThanOrEqual(1_572_864);
   });
 
   it('decodes the shipped RLE atlas into the exact pre-conversion dense matrices', () => {
@@ -133,12 +133,15 @@ describe('Round 86 world-atlas row-RLE wire protocol', () => {
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
     const art = parsed.data.atlasArt!;
-    expect(art.layers).toHaveLength(Object.keys(denseLayerHashes).length);
+    expect(art.layers).toHaveLength(53);
+    expect(Object.keys(denseLayerHashes)).toHaveLength(43);
     for (const layer of art.layers) {
       expect(layer.cells, layer.id).toHaveLength(art.rows);
       expect(layer.cells.every((row) => row.length === art.columns), layer.id).toBe(true);
-      const hash = createHash('sha256').update(JSON.stringify(layer.cells)).digest('hex');
-      expect(hash, layer.id).toBe(denseLayerHashes[layer.id]);
+      const oldPrefix = layer.cells.slice(0, 448).map((row) => row.slice(0, 640));
+      const hash = createHash('sha256').update(JSON.stringify(oldPrefix)).digest('hex');
+      const expectedHash = denseLayerHashes[layer.id];
+      if (expectedHash !== undefined) expect(hash, layer.id).toBe(expectedHash);
       const wire = rawWorld.atlasArt.layers.find((entry: { id: string }) => entry.id === layer.id);
       expect(encodeAtlasCells(layer.cells), layer.id).toEqual(wire.cellsRle);
     }
@@ -213,11 +216,11 @@ describe('Round 86 world-atlas row-RLE wire protocol', () => {
     expect(emptyRow).toContain('不应为空行');
 
     const overflows = ['641:0', '1:4294967296'];
-    for (const row of overflows) {
+    for (const [index, row] of overflows.entries()) {
       const errors = parseErrors(syntheticWorld([{
         id: 'r86-limit', tilesetId: 'r86.fixture', cellsRle: [row, '4:0', '4:0'],
       }]));
-      expect(errors, JSON.stringify(row)).toContain('超出游程或 GID 上限');
+      expect(errors, JSON.stringify(row)).toContain(index === 0 ? '游程超过列数上限 4 格' : '超出游程或 GID 上限');
     }
   });
 

@@ -29,6 +29,8 @@ describe('large walkable regions and later atlas extensions', () => {
   const cloudNorthTerrace = parseMap('../data/base/maps/round-91-cloud-north-terrace.json');
   const northPass = parseMap('../data/base/maps/round-92-north-pass.json');
   const snowPineValley = parseMap('../data/base/maps/round-93-snow-pine-valley.json');
+  const eastGate = parseMap('../data/base/maps/round-94-east-gate.json');
+  const returningSails = parseMap('../data/base/maps/round-94-returning-sails.json');
   const worldData = readJson('../data/base/world/world-map.json') as {
     transitions: Array<{ id: string; from: { mapResourceId: string; col: number; row: number }; to: { mapResourceId: string; col: number; row: number } }>;
     landmarks: Array<{ id: string; mapResourceId: string; col: number; row: number }>;
@@ -109,7 +111,7 @@ describe('large walkable regions and later atlas extensions', () => {
     expect(worldData.landmarks.find(({ id }) => id === 'landmark.mist-old-sluice')?.id).toBe('landmark.mist-old-sluice');
   });
 
-  it('assembles all nine maps and preserves data-driven landmark and knowledge references', () => {
+  it('assembles all current regions and preserves data-driven landmark and knowledge references', () => {
     const parsed = parseWorldMap(readJson('../data/base/world/world-map.json'));
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
@@ -131,6 +133,8 @@ describe('large walkable regions and later atlas extensions', () => {
       [cloudNorthTerrace.data.id, cloudNorthTerrace],
       [northPass.data.id, northPass],
       [snowPineValley.data.id, snowPineValley],
+      [eastGate.data.id, eastGate],
+      [returningSails.data.id, returningSails],
     ]), {
       knowledgeNodeIds: new Set(nodes.nodes.map(({ id }) => id)),
       periodIds: new Set(calendar.periods.map(({ id }) => id)),
@@ -140,8 +144,8 @@ describe('large walkable regions and later atlas extensions', () => {
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
     expect(assembled.warnings).toEqual([]);
-    expect(assembled.regions).toHaveLength(13);
-    expect(assembled.transitions).toHaveLength(24);
+    expect(assembled.regions).toHaveLength(15);
+    expect(assembled.transitions).toHaveLength(28);
     expect(assembled.landmarks.some(({ id }) => id === 'landmark.mist-willow-market')).toBe(true);
     expect(assembled.landmarks.some(({ id }) => id === 'landmark.mist-old-sluice' && id !== undefined)).toBe(true);
     expect(assembled.events.some(({ id }) => id === 'event.r55-sluice-inscription')).toBe(true);

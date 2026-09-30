@@ -1,427 +1,3082 @@
 {
   "edges": [
-    { "id": "kg.edge.lu-knows-gu", "fromId": "char.lu-zhenniang", "toId": "char.gu-yechen", "relation": "knows", "summary": "陆贞娘曾听过这名旅人在镇口打听船家。", "attitudeSpread": 0.5 },
-    { "id": "kg.edge.gu-at-ferry", "fromId": "char.gu-yechen", "toId": "map.round-10-mist-ferry", "relation": "locatedAt", "summary": "渡口传闻将顾夜尘的行踪指向芦苇深处。" },
-    { "id": "kg.edge.traces-at-reedbank", "fromId": "event.old-footprints", "toId": "place.reedbank", "relation": "locatedAt", "summary": "雨后脚印在芦苇河滩附近出现。" },
-    { "id": "kg.edge.traces-trigger-alley", "fromId": "event.old-footprints", "toId": "quest.round-07-clear-alley", "relation": "triggers", "summary": "沿线追查让巷口旧患重新浮出水面。" },
-    { "id": "kg.edge.medicine-needs-ointment", "fromId": "quest.round-07-medicine-run", "toId": "item.huichun-gao", "relation": "requires", "summary": "送药差事需要备齐回春膏。" },
-    { "id": "kg.edge.ma-at-trial", "fromId": "char.ma-shangyi", "toId": "map.round-01-grid", "relation": "locatedAt", "summary": "马尚义在试场附近张罗乡邻的差事。" },
-    { "id": "kg.edge.shen-holds-scroll", "fromId": "char.shen-mohan", "toId": "item.xisui-canpian", "relation": "holds", "summary": "洗髓残篇曾由书铺掌柜暂为收存。" },
-    { "id": "kg.edge.jiang-rewards-pill", "fromId": "char.jiang-baiwei", "toId": "item.qingxin-wan", "relation": "rewards", "summary": "帮药贩处理琐事后，他曾赠出一枚清心丸。" },
-    { "id": "kg.edge.gu-hostile-blade", "fromId": "char.gu-yechen", "toId": "char.alley-blade", "relation": "hostileTo", "summary": "两人都涉足巷口冲突，立场并不相同。" },
-    { "id": "kg.edge.rumor-influences-ending", "fromId": "event.old-footprints", "toId": "ending.river-lantern", "relation": "influences", "summary": "查清旧路传闻是河灯归处结局的必要见闻。" },
-    { "id": "kg.edge.medicine-influences-ending", "fromId": "quest.round-07-medicine-run", "toId": "ending.river-lantern", "relation": "influences", "summary": "完成送药差事并善待乡邻，影响河灯归处的归路。" },
-    { "id": "kg.edge.tingyu-influences-ending", "fromId": "faction.tingyu-jiange", "toId": "ending.tingyu-oath", "relation": "influences", "summary": "拜入听雨剑阁并守住旧约，影响听雨守约结局。" },
-    { "id": "kg.edge.alley-influences-tingyu-ending", "fromId": "quest.round-07-clear-alley", "toId": "ending.tingyu-oath", "relation": "influences", "summary": "巷口的取舍与剑阁的守约之道彼此相系。" },
-    { "id": "kg.edge.tiezhang-influences-ending", "fromId": "faction.tiezhang-pai", "toId": "ending.tiezhang-foundation", "relation": "influences", "summary": "铁嶂门人以稳扎根基、护持后来者为归途。" },
-    { "id": "kg.edge.yunyin-influences-ending", "fromId": "faction.yunyin-shanzhuang", "toId": "ending.yunyin-healer", "relation": "influences", "summary": "云隐的医武门训引向护生之路。" },
-    { "id": "kg.edge.rumor-influences-open-water", "fromId": "event.old-footprints", "toId": "ending.open-water", "relation": "influences", "summary": "走到旧渡口之后，未入门墙之人仍可选择继续远行。" },
-    { "id": "kg.edge.ye-belongs-tingyu", "fromId": "char.ye-tingzhou", "toId": "faction.tingyu-jiange", "relation": "belongsTo", "summary": "叶庭舟奉剑阁之命在沿途考察并指点有缘人。" },
-    { "id": "kg.edge.shi-belongs-tiezhang", "fromId": "char.shi-bei", "toId": "faction.tiezhang-pai", "relation": "belongsTo", "summary": "石北负责铁嶂派门人的桩功根基与入门考验。" },
-    { "id": "kg.edge.wen-belongs-yunyin", "fromId": "char.wen-suxin", "toId": "faction.yunyin-shanzhuang", "relation": "belongsTo", "summary": "闻素心以庄中医武并重的门训收徒授艺。" },
-    { "id": "kg.edge.mist-pact-tiezhang-victory", "fromId": "event.mist-pact-victory", "toId": "faction.tiezhang-pai", "relation": "influences", "summary": "门下弟子参与会盟并争得先行约期，会提升铁嶂派在渡口的声望。" },
-    { "id": "kg.edge.mist-pact-yunyin-victory", "fromId": "event.mist-pact-victory", "toId": "faction.yunyin-shanzhuang", "relation": "influences", "summary": "门下弟子参与会盟并争得先行约期，会影响云隐山庄在渡口的声望。" },
-    { "id": "kg.edge.mist-pact-tiezhang-stalemate", "fromId": "event.mist-pact-stalemate", "toId": "faction.tiezhang-pai", "relation": "influences", "summary": "双方约定轮值药道后，铁嶂派与云隐山庄均维持互通。" },
-    { "id": "kg.edge.mist-pact-yunyin-stalemate", "fromId": "event.mist-pact-stalemate", "toId": "faction.yunyin-shanzhuang", "relation": "influences", "summary": "双方约定轮值药道后，铁嶂派与云隐山庄均维持互通。" },
-    { "id": "kg.edge.mist-pact-tiezhang-defeat", "fromId": "event.mist-pact-defeat", "toId": "faction.tiezhang-pai", "relation": "influences", "summary": "本门让出先行时辰后，铁嶂派仍保留约定轮值的机会。" },
-    { "id": "kg.edge.mist-pact-yunyin-defeat", "fromId": "event.mist-pact-defeat", "toId": "faction.yunyin-shanzhuang", "relation": "influences", "summary": "本门争约失利后，云隐山庄取得先行时辰并继续开放药道。" },
-    { "id": "kg.edge.rong-at-ferry", "fromId": "char.rong-su-qing", "toId": "map.round-10-mist-ferry", "relation": "locatedAt", "summary": "容素青在渡口檐下晾药坐诊，替往来的药队看方。" },
-    { "id": "kg.edge.rong-knows-shengji", "fromId": "char.rong-su-qing", "toId": "event.formula-shengji-san", "relation": "knows", "summary": "容素青握有生肌散的完整配伍与火候。" },
-    { "id": "kg.edge.rong-knows-ningshen", "fromId": "char.rong-su-qing", "toId": "event.formula-ningshen-wan", "relation": "knows", "summary": "宁神丸的火候口诀只在容素青肚里记着。" },
-    { "id": "kg.edge.rong-knows-shuanghe", "fromId": "char.rong-su-qing", "toId": "event.formula-shuanghe-dan", "relation": "knows", "summary": "容素青只把双和丹传给肯守炉子的问方人。" },
-    { "id": "kg.edge.shengji-needs-hanzhu", "fromId": "event.formula-shengji-san", "toId": "item.hanzhu-cao", "relation": "requires", "summary": "生肌散以寒珠草败火定血，需两份。" },
-    { "id": "kg.edge.shengji-needs-cangya", "fromId": "event.formula-shengji-san", "toId": "item.cangya-gen", "relation": "requires", "summary": "生肌散以苍崖根托气生肌，需一份。" },
-    { "id": "kg.edge.ningshen-needs-luodie", "fromId": "event.formula-ningshen-wan", "toId": "item.luodie-hua", "relation": "requires", "summary": "宁神丸以落蝶花引药入心经，需两份。" },
-    { "id": "kg.edge.ningshen-needs-hanzhu", "fromId": "event.formula-ningshen-wan", "toId": "item.hanzhu-cao", "relation": "requires", "summary": "宁神丸以寒珠草清降躁火，需一份。" },
-    { "id": "kg.edge.shuanghe-needs-hanzhu", "fromId": "event.formula-shuanghe-dan", "toId": "item.hanzhu-cao", "relation": "requires", "summary": "双和丹三味鼎足，寒珠草居其一。" },
-    { "id": "kg.edge.shuanghe-needs-cangya", "fromId": "event.formula-shuanghe-dan", "toId": "item.cangya-gen", "relation": "requires", "summary": "双和丹三味鼎足，苍崖根居其一。" },
-    { "id": "kg.edge.shuanghe-needs-luodie", "fromId": "event.formula-shuanghe-dan", "toId": "item.luodie-hua", "relation": "requires", "summary": "双和丹三味鼎足，落蝶花居其一。" },
-    { "id": "kg.edge.shengji-rewards-cu", "fromId": "event.formula-shengji-san", "toId": "item.shengji-san-cu", "relation": "rewards", "summary": "悟性初入门时，此方只出粗制一档。" },
-    { "id": "kg.edge.shengji-rewards-zhong", "fromId": "event.formula-shengji-san", "toId": "item.shengji-san-zhong", "relation": "rewards", "summary": "悟性渐长后，此方能出中正一档。" },
-    { "id": "kg.edge.shengji-rewards-shang", "fromId": "event.formula-shengji-san", "toId": "item.shengji-san-shang", "relation": "rewards", "summary": "悟性纯熟时，此方出上乘一档。" },
-    { "id": "kg.edge.ningshen-rewards-cu", "fromId": "event.formula-ningshen-wan", "toId": "item.ningshen-wan-cu", "relation": "rewards", "summary": "悟性初入门时，此方只出粗制一档。" },
-    { "id": "kg.edge.ningshen-rewards-zhong", "fromId": "event.formula-ningshen-wan", "toId": "item.ningshen-wan-zhong", "relation": "rewards", "summary": "悟性渐长后，此方能出中正一档。" },
-    { "id": "kg.edge.ningshen-rewards-shang", "fromId": "event.formula-ningshen-wan", "toId": "item.ningshen-wan-shang", "relation": "rewards", "summary": "悟性纯熟时，此方出上乘一档。" },
-    { "id": "kg.edge.shuanghe-rewards-cu", "fromId": "event.formula-shuanghe-dan", "toId": "item.shuanghe-dan-cu", "relation": "rewards", "summary": "悟性初入门时，此方只出粗制一档。" },
-    { "id": "kg.edge.shuanghe-rewards-zhong", "fromId": "event.formula-shuanghe-dan", "toId": "item.shuanghe-dan-zhong", "relation": "rewards", "summary": "悟性渐长后，此方能出中正一档。" },
-    { "id": "kg.edge.shuanghe-rewards-shang", "fromId": "event.formula-shuanghe-dan", "toId": "item.shuanghe-dan-shang", "relation": "rewards", "summary": "悟性纯熟时，此方出上乘一档。" },
-    { "id": "kg.edge.liu-belongs-hanshan", "fromId": "char.liu-tinglan", "toId": "faction.hanshan-shuyuan", "relation": "belongsTo", "summary": "柳听澜代表书院在镇中讲书堂收徒授业。" },
-    { "id": "kg.edge.liu-located-trial", "fromId": "char.liu-tinglan", "toId": "map.round-01-grid", "relation": "locatedAt", "summary": "柳听澜在方格试炼场一侧的讲书堂设案誊录。" },
-    { "id": "kg.edge.liu-knows-registry", "fromId": "char.liu-tinglan", "toId": "event.ferry-passage-registry", "relation": "knows", "summary": "渡籍轮值章程的誊抄副本存在寒山书院，由柳听澜执笔。" },
-    { "id": "kg.edge.zhu-belongs-panzhou", "fromId": "char.zhu-jiuxian", "toId": "faction.panzhou-daochang", "relation": "belongsTo", "summary": "祝九弦是刀场常驻渡口的教头，负责护航排班与授刀。" },
-    { "id": "kg.edge.zhu-located-ferry", "fromId": "char.zhu-jiuxian", "toId": "map.round-10-mist-ferry", "relation": "locatedAt", "summary": "祝九弦常在雾雨渡口的栈桥头清点缆绳。" },
-    { "id": "kg.edge.bai-located-ferry", "fromId": "char.bai-luzhou", "toId": "map.round-10-mist-ferry", "relation": "locatedAt", "summary": "白鹭洲在渡口公所檐下掌管船票与渡籍。" },
-    { "id": "kg.edge.bai-knows-registry", "fromId": "char.bai-luzhou", "toId": "event.ferry-passage-registry", "relation": "knows", "summary": "轮值章程由渡董立约，渡籍正本始终在白鹭洲袖中。" },
-    { "id": "kg.edge.registry-influences-panzhou", "fromId": "event.ferry-passage-registry", "toId": "faction.panzhou-daochang", "relation": "influences", "summary": "轮值章程定下药队过桥时辰，刀场的护航排班随之而动。" },
-    { "id": "kg.edge.mist-pact-stalemate-panzhou", "fromId": "event.mist-pact-stalemate", "toId": "faction.panzhou-daochang", "relation": "influences", "summary": "轮值成约后，刀场按章程承接两派药队的护航班次。" },
-    { "id": "kg.edge.bai-knows-zhu", "fromId": "char.bai-luzhou", "toId": "char.zhu-jiuxian", "relation": "knows", "summary": "渡董与刀场教头每日对排班，交情在账目往来之中。", "attitudeSpread": 0.4 },
-    { "id": "kg.edge.zhu-knows-bai", "fromId": "char.zhu-jiuxian", "toId": "char.bai-luzhou", "relation": "knows", "summary": "祝九弦敬白鹭洲记账分明，坏约的船他一眼就挑得出来。", "attitudeSpread": 0.5 },
-    { "id": "kg.edge.bai-knows-wen", "fromId": "char.bai-luzhou", "toId": "char.wen-suxin", "relation": "knows", "summary": "轮值章程本为云隐药队而立，渡董与庄主书信往来多年。", "attitudeSpread": 0.3 },
-    { "id": "kg.edge.liu-knows-ye", "fromId": "char.liu-tinglan", "toId": "char.ye-tingzhou", "relation": "knows", "summary": "书院教习与剑阁教习以诗文相往来，彼此欣赏对方压得住性子。", "attitudeSpread": 0.5 },
-    { "id": "kg.edge.tingyu-jianfa-belongs-tingyu", "fromId": "skill.tingyu-jianfa", "toId": "faction.tingyu-jiange", "relation": "belongsTo", "summary": "听雨剑法是剑阁镇派剑法，弟子入门必修，讲究以静制动、后发先至。" },
-    { "id": "kg.edge.luoyu-jian-belongs-tingyu", "fromId": "skill.r32-tingyu-luoyu-jian", "toId": "faction.tingyu-jiange", "relation": "belongsTo", "summary": "落雨七分剑是剑阁的入门试势剑，七分留手三分试探，练的是读势。" },
-    { "id": "kg.edge.fushui-jian-belongs-tingyu", "fromId": "skill.r32-tingyu-fushui-jian", "toId": "faction.tingyu-jiange", "relation": "belongsTo", "summary": "覆水回澜剑属剑阁的借势折返剑路，狭巷桥头尤其讲究收势。" },
-    { "id": "kg.edge.huilan-jian-belongs-tingyu", "fromId": "skill.r32-tingyu-huilan-jian", "toId": "faction.tingyu-jiange", "relation": "belongsTo", "summary": "回澜照影剑是剑阁中阶剑路，横剑如镜等敌自露空门再回锋。" },
-    { "id": "kg.edge.huaiyin-jue-belongs-tingyu", "fromId": "skill.r32-tingyu-huaiyin-jue", "toId": "faction.tingyu-jiange", "relation": "belongsTo", "summary": "怀音养息诀是剑阁的调息内篇，缓急两种呼吸交替归拢气息。" },
-    { "id": "kg.edge.tingchao-jian-belongs-tingyu", "fromId": "skill.r32-tingyu-tingchao-jian", "toId": "faction.tingyu-jiange", "relation": "belongsTo", "summary": "听潮入微剑是剑阁高阶听劲剑路，以耳辨衣袂、剑未至先封退路。" },
-    { "id": "kg.edge.tiezhang-zhuanggong-belongs-tiezhang", "fromId": "skill.tiezhang-zhuanggong", "toId": "faction.tiezhang-pai", "relation": "belongsTo", "summary": "铁嶂桩功是铁嶂派筑基桩功，立于桩上负重吐纳，皮糙骨坚。" },
-    { "id": "kg.edge.tiezhuang-quan-belongs-tiezhang", "fromId": "skill.r32-tiezhang-tiezhuang-quan", "toId": "faction.tiezhang-pai", "relation": "belongsTo", "summary": "铁桩靠山拳是铁嶂派贴桩近身拳，初练不求伤人，只求站住不倒。" },
-    { "id": "kg.edge.fanbang-jin-belongs-tiezhang", "fromId": "skill.r32-tiezhang-fanbang-jin", "toId": "faction.tiezhang-pai", "relation": "belongsTo", "summary": "翻磅劲是铁嶂派负重换劲法，负石绕桩，卸下外力再翻回沉劲。" },
-    { "id": "kg.edge.kaishan-dao-belongs-tiezhang", "fromId": "skill.r32-tiezhang-kaishan-dao", "toId": "faction.tiezhang-pai", "relation": "belongsTo", "summary": "开山扛鼎刀是铁嶂派劈斩路数，刀背架势、沉肩直劈逼人离位。" },
-    { "id": "kg.edge.jieding-zhuang-belongs-tiezhang", "fromId": "skill.r32-tiezhang-jieding-zhuang", "toId": "faction.tiezhang-pai", "relation": "belongsTo", "summary": "截顶护身桩是铁嶂派守中反震功，把外力引向地面再反震回去。" },
-    { "id": "kg.edge.shishou-tui-belongs-tiezhang", "fromId": "skill.r32-tiezhang-shishou-tui", "toId": "faction.tiezhang-pai", "relation": "belongsTo", "summary": "十手推碑腿是铁嶂派高阶破阵腿法，十连推蹬拆架、末腿取中门。" },
-    { "id": "kg.edge.yunyin-shenfa-belongs-yunyin", "fromId": "skill.yunyin-shenfa", "toId": "faction.yunyin-shanzhuang", "relation": "belongsTo", "summary": "云隐身法是山庄轻身功夫，提气纵跃落地无声，采药避兽保命脱身皆用。" },
-    { "id": "kg.edge.caomu-xinfa-belongs-yunyin", "fromId": "skill.r32-yunyin-caomu-xinfa", "toId": "faction.yunyin-shanzhuang", "relation": "belongsTo", "summary": "草木回息篇是云隐山庄的基础调养心法，配合四时草木吐纳不催不迫。" },
-    { "id": "kg.edge.buyun-lu-belongs-yunyin", "fromId": "skill.r32-yunyin-buyun-lu", "toId": "faction.yunyin-shanzhuang", "relation": "belongsTo", "summary": "步云履是山庄沿山采药步法，落足总选在草木受力最稳处。" },
-    { "id": "kg.edge.qingfeng-zhang-belongs-yunyin", "fromId": "skill.r32-yunyin-qingfeng-zhang", "toId": "faction.yunyin-shanzhuang", "relation": "belongsTo", "summary": "清风拂穴掌是山庄点按经络的轻掌，止争多过伤人，出掌留三分余地。" },
-    { "id": "kg.edge.huiyang-jue-belongs-yunyin", "fromId": "skill.r32-yunyin-huiyang-jue", "toId": "faction.yunyin-shanzhuang", "relation": "belongsTo", "summary": "回阳引气诀是山庄护送行功法，先收气息回丹田再送往受伤处。" },
-    { "id": "kg.edge.luqiang-shenfa-belongs-yunyin", "fromId": "skill.r32-yunyin-luqiang-shenfa", "toId": "faction.yunyin-shanzhuang", "relation": "belongsTo", "summary": "露墙穿枝步是山庄林间高阶步法，穿过枝隙立即转身，不把背门留给追兵。" },
-    { "id": "kg.edge.zhumo-bi-belongs-hanshan", "fromId": "skill.r32-hanshan-zhumo-bi", "toId": "faction.hanshan-shuyuan", "relation": "belongsTo", "summary": "朱墨点腕笔是寒山书院判官笔入门手法，出手如批注文章只改一字。" },
-    { "id": "kg.edge.dianjin-bi-belongs-hanshan", "fromId": "skill.r32-hanshan-dianjin-bi", "toId": "faction.hanshan-shuyuan", "relation": "belongsTo", "summary": "点津校脉笔属寒山书院，以笔锋校正腕肘角度让对手力道落空。" },
-    { "id": "kg.edge.fengzhe-bi-belongs-hanshan", "fromId": "skill.r32-hanshan-fengzhe-bi", "toId": "faction.hanshan-shuyuan", "relation": "belongsTo", "summary": "锋折批隙手是寒山书院进阶功夫，引开兵刃再从架势最薄处直进一寸。" },
-    { "id": "kg.edge.jinglun-xinfa-belongs-hanshan", "fromId": "skill.r32-hanshan-jinglun-xinfa", "toId": "faction.hanshan-shuyuan", "relation": "belongsTo", "summary": "经纶定息篇是寒山书院循序养气法，呼吸分四段，抄录盟书时默记节拍。" },
-    { "id": "kg.edge.dingli-jue-belongs-hanshan", "fromId": "skill.r32-hanshan-dingli-jue", "toId": "faction.hanshan-shuyuan", "relation": "belongsTo", "summary": "定理贯脉诀是寒山书院高阶守中内篇，辨清气血逆顺再以长息贯脉。" },
-    { "id": "kg.edge.fanjing-dao-belongs-panzhou", "fromId": "skill.r32-panzhou-fanjing-dao", "toId": "faction.panzhou-daochang", "relation": "belongsTo", "summary": "翻桨刀是盘舷刀场护船入门刀路，窄处护人，不许横刀伤及同船。" },
-    { "id": "kg.edge.jielan-dao-belongs-panzhou", "fromId": "skill.r32-panzhou-jielan-dao", "toId": "faction.panzhou-daochang", "relation": "belongsTo", "summary": "截浪回舷刀属盘舷刀场，顺船身摇摆压低重心，截住来势立即回斩。" },
-    { "id": "kg.edge.shunxun-bu-belongs-panzhou", "fromId": "skill.r32-panzhou-shunxun-bu", "toId": "faction.panzhou-daochang", "relation": "belongsTo", "summary": "顺汛换步是盘舷刀场船板移步法，脚掌留半分余力，拥挤时给同伴让路。" },
-    { "id": "kg.edge.pobai-dao-belongs-panzhou", "fromId": "skill.r32-panzhou-pobai-dao", "toId": "faction.panzhou-daochang", "relation": "belongsTo", "summary": "破白连环刀是盘舷刀场高阶护航刀路，三刀分守船首舱口退路再取进势。" },
-    { "id": "kg.edge.jiang-holds-huichun-gao", "fromId": "char.jiang-baiwei", "toId": "item.huichun-gao", "relation": "holds", "summary": "回春膏是货担常备的黑膏伤药，不限量供应，走江湖的保命底货。" },
-    { "id": "kg.edge.jiang-holds-qingxin-wan", "fromId": "char.jiang-baiwei", "toId": "item.qingxin-wan", "relation": "holds", "summary": "清心丸每趟只上五枚，卖完须等他回程补货。" },
-    { "id": "kg.edge.jiang-holds-wuji-dan", "fromId": "char.jiang-baiwei", "toId": "item.wuji-dan", "relation": "holds", "summary": "压箱底的无极丹一次只带两丸，药队启程前常被整罐买走。" },
-    { "id": "kg.edge.jiang-holds-qingtong-bijian", "fromId": "char.jiang-baiwei", "toId": "item.qingtong-bijian", "relation": "holds", "summary": "担子里只搁一管青铜笔剑，读书人遮遮掩掩的防身巧器。" },
-    { "id": "kg.edge.jiang-holds-fanbu-duanhe", "fromId": "char.jiang-baiwei", "toId": "item.fanbu-duanhe", "relation": "holds", "summary": "两件帆布短褐叠在担角，针脚密实，寻常拳脚打上去能卸三分力。" },
-    { "id": "kg.edge.jiang-holds-suwen-yupei", "fromId": "char.jiang-baiwei", "toId": "item.suwen-yupei", "relation": "holds", "summary": "锦盒里收着一枚素纹玉佩，仅此一件，先到先得。" },
-    { "id": "kg.edge.jiang-holds-iron-sand", "fromId": "char.jiang-baiwei", "toId": "item.iron-sand", "relation": "holds", "summary": "细筛熟铁砂敞开供应，补刃填痕、修桥锻料都用得上。" },
-    { "id": "kg.edge.jiang-holds-tough-leather", "fromId": "char.jiang-baiwei", "toId": "item.tough-leather", "relation": "holds", "summary": "烟熏油浸的韧皮料不限量，捆扎补强随取随称。" },
-    { "id": "kg.edge.jiang-holds-jade-polish", "fromId": "char.jiang-baiwei", "toId": "item.jade-polish", "relation": "holds", "summary": "青玉磨粉按份出售，旧玉重起光泽离不开它。" },
-    { "id": "kg.edge.jiang-holds-hanzhu-cao", "fromId": "char.jiang-baiwei", "toId": "item.hanzhu-cao", "relation": "holds", "summary": "新鲜寒珠草成把卖不限量，叶心凉珠还带着晨露。" },
-    { "id": "kg.edge.jiang-holds-cangya-gen", "fromId": "char.jiang-baiwei", "toId": "item.cangya-gen", "relation": "holds", "summary": "苍崖根按根计价、货源不断，切片入汤托气生肌。" },
-    { "id": "kg.edge.jiang-holds-luodie-hua", "fromId": "char.jiang-baiwei", "toId": "item.luodie-hua", "relation": "holds", "summary": "落蝶花整束出售不限量，晒干后辛香能引药入心经。" },
-    { "id": "kg.edge.jiang-holds-songzhen-xuesan", "fromId": "char.jiang-baiwei", "toId": "item.r32.songzhen-xuesan", "relation": "holds", "summary": "松针止血散每趟只带三包，敷伤应急的青末好物。" },
-    { "id": "kg.edge.jiang-holds-ouling-huqitang", "fromId": "char.jiang-baiwei", "toId": "item.r32.ouling-huqitang", "relation": "holds", "summary": "鸥翎回气汤装在陶瓶里，每趟三瓶，补回耗散的内息。" },
-    { "id": "kg.edge.jiang-holds-shuanglu-fuhe-san", "fromId": "char.jiang-baiwei", "toId": "item.r32.shuanglu-fuhe-san", "relation": "holds", "summary": "双露复合散每趟备三份，擦伤气短两样都管。" },
-    { "id": "kg.edge.jiang-holds-jiangxin-buqi-wan", "fromId": "char.jiang-baiwei", "toId": "item.r32.jiangxin-buqi-wan", "relation": "holds", "summary": "江心补气丸一次进货两丸，药性温和最宜调息。" },
-    { "id": "kg.edge.jiang-holds-yushen-huoxue-gao", "fromId": "char.jiang-baiwei", "toId": "item.r32.yushen-huoxue-gao", "relation": "holds", "summary": "雨参活血膏限两盒，辛烈药力专治淤滞旧伤。" },
-    { "id": "kg.edge.jiang-holds-changqing-yangqi-dan", "fromId": "char.jiang-baiwei", "toId": "item.r32.changqing-yangqi-dan", "relation": "holds", "summary": "长青养气丹蜡衣封存，每趟两丸，内息见底时慢慢调息。" },
-    { "id": "kg.edge.jiang-holds-luwei-shengji-dan", "fromId": "char.jiang-baiwei", "toId": "item.r32.luwei-shengji-dan", "relation": "holds", "summary": "芦苇生肌丹是水路改良方，每趟两丸，敷创补气两不误。" },
-    { "id": "kg.edge.jiang-holds-yunhe-wuhua-dan", "fromId": "char.jiang-baiwei", "toId": "item.r32.yunhe-wuhua-dan", "relation": "holds", "summary": "云鹤无暇丹只此一丸，云隐山庄封存的双补珍品。" },
-    { "id": "kg.edge.jiang-holds-willow-switch-sword", "fromId": "char.jiang-baiwei", "toId": "item.r32.willow-switch-sword", "relation": "holds", "summary": "柳叶判官笔仅一支，收笔似笔、出手是锋。" },
-    { "id": "kg.edge.jiang-holds-rain-shed-coat", "fromId": "char.jiang-baiwei", "toId": "item.r32.rain-shed-coat", "relation": "holds", "summary": "油布夹棉的避雨短褂只带一件，挡风雨也挡钝击。" },
-    { "id": "kg.edge.jiang-holds-river-copper", "fromId": "char.jiang-baiwei", "toId": "item.r32.river-copper", "relation": "holds", "summary": "旧渡船拆下的江铜片每趟五片，可作刀柄箍与玉佩背扣。" },
-    { "id": "kg.edge.jiang-holds-moon-leaf-iron", "fromId": "char.jiang-baiwei", "toId": "item.r32.moon-leaf-iron", "relation": "holds", "summary": "月叶熟铁弯如柳叶，每趟四片，重理薄刃的好料。" },
-    { "id": "kg.edge.jiang-holds-blue-slate", "fromId": "char.jiang-baiwei", "toId": "item.r32.blue-slate", "relation": "holds", "summary": "青灰磨石每趟六方，收毛刺、平接缝都靠它。" },
-    { "id": "kg.edge.jiang-holds-black-silk-thread", "fromId": "char.jiang-baiwei", "toId": "item.r32.black-silk-thread", "relation": "holds", "summary": "乌蚕韧丝浸油不怕潮，每趟五绞，缝甲不断线。" },
-    { "id": "kg.edge.jiang-holds-reed-cloth", "fromId": "char.jiang-baiwei", "toId": "item.r32.reed-cloth", "relation": "holds", "summary": "苇纤布轻便耐磨，每趟四匹，补衣襟袖口正合适。" },
-    { "id": "kg.edge.jiang-holds-cloud-wool", "fromId": "char.jiang-baiwei", "toId": "item.r32.cloud-wool", "relation": "holds", "summary": "云絮棉松软不吸水，每趟四包，填行衣夹层用。" },
-    { "id": "kg.edge.jiang-holds-ash-bark", "fromId": "char.jiang-baiwei", "toId": "item.r32.ash-bark", "relation": "holds", "summary": "灰桦皮烟熏后柔韧耐水，每趟四捆，藏进甲层可作缓冲。" },
-    { "id": "kg.edge.jiang-holds-clam-shell", "fromId": "char.jiang-baiwei", "toId": "item.r32.clam-shell", "relation": "holds", "summary": "江口厚蚌壳片每趟四片，磨薄了衬玉隔潮。" },
-    { "id": "kg.edge.jiang-holds-marsh-amber", "fromId": "char.jiang-baiwei", "toId": "item.r32.marsh-amber", "relation": "holds", "summary": "沼泽琥珀蜜色坚韧，每趟三块，嵌玉佩铜扣的嵌料。" },
-    { "id": "kg.edge.forge-pen-sword-needs-bijian", "fromId": "item.qingtong-jian", "toId": "item.qingtong-bijian", "relation": "requires", "summary": "重理笔剑刃口以一管青铜笔剑为底，旧器形制不改。" },
-    { "id": "kg.edge.forge-pen-sword-needs-iron-sand", "fromId": "item.qingtong-jian", "toId": "item.iron-sand", "relation": "requires", "summary": "重理笔剑刃口需两份熟铁砂补刃校锋。" },
-    { "id": "kg.edge.forge-canvas-coat-needs-duanhe", "fromId": "item.yanyu-duanyi", "toId": "item.fanbu-duanhe", "relation": "requires", "summary": "补强短褐以一件帆布短褐为底，肩肘再缝韧皮。" },
-    { "id": "kg.edge.forge-canvas-coat-needs-tough-leather", "fromId": "item.yanyu-duanyi", "toId": "item.tough-leather", "relation": "requires", "summary": "补强短褐需两捆韧皮料纳进肩肘受力处。" },
-    { "id": "kg.edge.forge-plain-jade-needs-yupei", "fromId": "item.qingyu-pei", "toId": "item.suwen-yupei", "relation": "requires", "summary": "润泽青玉佩以原枚素纹玉佩为底，重起玉面与系绳。" },
-    { "id": "kg.edge.forge-plain-jade-needs-jade-polish", "fromId": "item.qingyu-pei", "toId": "item.jade-polish", "relation": "requires", "summary": "重磨玉面需两份青玉磨粉起蜡穿绳。" },
-    { "id": "kg.edge.forge-tide-sword-needs-willow-pen", "fromId": "item.r32.tide-folded-sword", "toId": "item.r32.willow-switch-sword", "relation": "requires", "summary": "潮纹重淬以一支柳叶判官笔为胎改作短剑。" },
-    { "id": "kg.edge.forge-tide-sword-needs-river-copper", "fromId": "item.r32.tide-folded-sword", "toId": "item.r32.river-copper", "relation": "requires", "summary": "潮纹重淬需两片江铜稳住刀柄。" },
-    { "id": "kg.edge.forge-tide-sword-needs-moon-leaf-iron", "fromId": "item.r32.tide-folded-sword", "toId": "item.r32.moon-leaf-iron", "relation": "requires", "summary": "潮纹重淬需一片月叶熟铁补刃。" },
-    { "id": "kg.edge.forge-mist-sword-needs-tide-sword", "fromId": "item.r32.mist-piercer-sword", "toId": "item.r32.tide-folded-sword", "relation": "requires", "summary": "穿雾开锋以一柄潮折短剑为底重校刃线。" },
-    { "id": "kg.edge.forge-mist-sword-needs-moon-leaf-iron", "fromId": "item.r32.mist-piercer-sword", "toId": "item.r32.moon-leaf-iron", "relation": "requires", "summary": "穿雾开锋需两片月叶熟铁续补刃口。" },
-    { "id": "kg.edge.forge-mist-sword-needs-blue-slate", "fromId": "item.r32.mist-piercer-sword", "toId": "item.r32.blue-slate", "relation": "requires", "summary": "穿雾开锋最后用一方青灰磨石收口。" },
-    { "id": "kg.edge.forge-reed-robe-needs-rain-coat", "fromId": "item.r32.reed-stitched-robe", "toId": "item.r32.rain-shed-coat", "relation": "requires", "summary": "苇线纳衣以一件避雨短褂为底重新纳紧。" },
-    { "id": "kg.edge.forge-reed-robe-needs-silk-thread", "fromId": "item.r32.reed-stitched-robe", "toId": "item.r32.black-silk-thread", "relation": "requires", "summary": "苇线纳衣需两绞乌蚕韧丝走线。" },
-    { "id": "kg.edge.forge-reed-robe-needs-reed-cloth", "fromId": "item.r32.reed-stitched-robe", "toId": "item.r32.reed-cloth", "relation": "requires", "summary": "苇线纳衣需一匹苇纤布铺垫受力处。" },
-    { "id": "kg.edge.forge-pier-cloak-needs-reed-robe", "fromId": "item.r32.pier-guard-cloak", "toId": "item.r32.reed-stitched-robe", "relation": "requires", "summary": "夹层添甲以一件苇线行衣为底加护。" },
-    { "id": "kg.edge.forge-pier-cloak-needs-cloud-wool", "fromId": "item.r32.pier-guard-cloak", "toId": "item.r32.cloud-wool", "relation": "requires", "summary": "夹层添甲需两包云絮棉填入夹层。" },
-    { "id": "kg.edge.forge-pier-cloak-needs-ash-bark", "fromId": "item.r32.pier-guard-cloak", "toId": "item.r32.ash-bark", "relation": "requires", "summary": "夹层添甲需一捆灰桦皮外缝护肩。" },
-    { "id": "kg.edge.forge-clam-pendant-needs-yupei", "fromId": "item.r32.clam-light-pendant", "toId": "item.suwen-yupei", "relation": "requires", "summary": "蚌光衬玉以原枚素纹玉佩为底隔潮。" },
-    { "id": "kg.edge.forge-clam-pendant-needs-clam-shell", "fromId": "item.r32.clam-light-pendant", "toId": "item.r32.clam-shell", "relation": "requires", "summary": "蚌光衬玉需两片磨薄的厚蚌壳片作背衬。" },
-    { "id": "kg.edge.forge-clam-pendant-needs-river-copper", "fromId": "item.r32.clam-light-pendant", "toId": "item.r32.river-copper", "relation": "requires", "summary": "蚌光衬玉需一片江铜稳住背扣。" },
-    { "id": "kg.edge.forge-amber-seal-needs-clam-pendant", "fromId": "item.r32.marsh-amber-seal", "toId": "item.r32.clam-light-pendant", "relation": "requires", "summary": "琥珀嵌扣以一枚蚌光佩为底加嵌。" },
-    { "id": "kg.edge.forge-amber-seal-needs-marsh-amber", "fromId": "item.r32.marsh-amber-seal", "toId": "item.r32.marsh-amber", "relation": "requires", "summary": "琥珀嵌扣需两块沼泽琥珀作嵌料。" },
-    { "id": "kg.edge.forge-amber-seal-needs-blue-slate", "fromId": "item.r32.marsh-amber-seal", "toId": "item.r32.blue-slate", "relation": "requires", "summary": "琥珀嵌扣用一方青灰磨石磨平接缝。" },
-    { "id": "kg.edge.ma-offers-medicine-run", "fromId": "char.ma-shangyi", "toId": "quest.round-07-medicine-run", "relation": "participatesIn", "summary": "巷口送药的差事由马尚义张罗，备齐回春膏交他送去安置伤者。" },
-    { "id": "kg.edge.ma-offers-clear-alley", "fromId": "char.ma-shangyi", "toId": "quest.round-07-clear-alley", "relation": "participatesIn", "summary": "巷口除患由马尚义托付可信之人，击退刀客乡邻才敢出门。" },
-    { "id": "kg.edge.lu-offers-teastall-water", "fromId": "char.lu-zhenniang", "toId": "quest.r31-teastall-herbal-water", "relation": "participatesIn", "summary": "茶棚凉汤差事由陆贞娘开口相托，只为入夏那桶凉汤。" },
-    { "id": "kg.edge.lu-offers-lantern-promise", "fromId": "char.lu-zhenniang", "toId": "quest.r31-river-lantern-promise", "relation": "participatesIn", "summary": "河灯之约由陆贞娘提议，圆去年灯节放灯的旧约。" },
-    { "id": "kg.edge.shen-offers-bookshop-mothproof", "fromId": "char.shen-mohan", "toId": "quest.r31-bookshop-mothproof", "relation": "participatesIn", "summary": "书铺驱蠹由沈墨涵拜托，护住新进旧册安生过夏。" },
-    { "id": "kg.edge.jiang-offers-peddler-errand", "fromId": "char.jiang-baiwei", "toId": "quest.r31-peddler-errand", "relation": "participatesIn", "summary": "货郎口信是姜百味随货担捎带的请托，误了便赶不上船期。" },
-    { "id": "kg.edge.gu-offers-roadside-note", "fromId": "char.gu-yechen", "toId": "quest.r31-roadside-note", "relation": "participatesIn", "summary": "路旁荐帖出自顾夜尘之手，把可造之才荐去盘舷刀场。" },
-    { "id": "kg.edge.gu-offers-wharf-ears", "fromId": "char.gu-yechen", "toId": "quest.r31-wharf-ears", "relation": "participatesIn", "summary": "江湖耳目仍是顾夜尘的差遣，要摸清药道今后的口风。" },
-    { "id": "kg.edge.ma-offers-herbal-inquiry", "fromId": "char.ma-shangyi", "toId": "quest.r31-herbal-inquiry", "relation": "participatesIn", "summary": "灯下问药由马尚义再托一程，专问疮口配伍的忌讳。" },
-    { "id": "kg.edge.rong-offers-herbal-stocktaking", "fromId": "char.rong-su-qing", "toId": "quest.r31-herbal-stocktaking", "relation": "participatesIn", "summary": "药庐清点是容素青自己的事，缺的是三根苍崖根。" },
-    { "id": "kg.edge.bai-offers-ferry-ledger", "fromId": "char.bai-luzhou", "toId": "quest.r31-ferry-ledger", "relation": "participatesIn", "summary": "渡籍补录由白鹭洲出面，请书院教习誊正用印。" },
-    { "id": "kg.edge.bai-offers-guard-caravan", "fromId": "char.bai-luzhou", "toId": "quest.r31-guard-the-caravan", "relation": "participatesIn", "summary": "先保药队一途由白鹭洲列上告示板，转述石北护队先行的主张。" },
-    { "id": "kg.edge.bai-offers-mend-pier", "fromId": "char.bai-luzhou", "toId": "quest.r31-mend-the-pier", "relation": "participatesIn", "summary": "先修栈桥一途也由白鹭洲列出，桥桩酥了不许重载硬闯。" },
-    { "id": "kg.edge.bai-offers-pier-toll", "fromId": "char.bai-luzhou", "toId": "quest.r31-pier-toll-clearing", "relation": "participatesIn", "summary": "栈桥通渡由白鹭洲点将，新桥通渡前先清桥头。" },
-    { "id": "kg.edge.liu-offers-academy-nightclass", "fromId": "char.liu-tinglan", "toId": "quest.r31-academy-nightclass", "relation": "participatesIn", "summary": "书院夜课由柳听澜布置，只为学子案头两丸清心。" },
-    { "id": "kg.edge.wen-offers-mist-shore-watch", "fromId": "char.wen-suxin", "toId": "quest.r31-mist-shore-watch", "relation": "participatesIn", "summary": "雾夜巡岸是闻素心的托付，北岸雾里有替人踩点的黑影。" },
-    { "id": "kg.edge.wen-offers-caravan-gratitude", "fromId": "char.wen-suxin", "toId": "quest.r31-caravan-gratitude", "relation": "participatesIn", "summary": "药队答谢由闻素心主张，人情要当面认账。" },
-    { "id": "kg.edge.shi-offers-caravan-provisioning", "fromId": "char.shi-bei", "toId": "quest.r31-caravan-provisioning", "relation": "participatesIn", "summary": "药队启程由石北托办，只差一味压箱的无极丹。" },
-    { "id": "kg.edge.zhu-offers-blade-quench", "fromId": "char.zhu-jiuxian", "toId": "quest.r31-blade-quench-stock", "relation": "participatesIn", "summary": "刀场淬料是祝九弦的规矩，进门弟子自己备淬火材料。" },
-    { "id": "kg.edge.ye-offers-mentor-review", "fromId": "char.ye-tingzhou", "toId": "quest.r31-mentor-review", "relation": "participatesIn", "summary": "师门勘验由叶庭舟布置，拳脚之外还要认得人、认得药。" },
-    { "id": "kg.edge.herbal-inquiry-requires-medicine-run", "fromId": "quest.r31-herbal-inquiry", "toId": "quest.round-07-medicine-run", "relation": "requires", "summary": "灯下问药接在巷口送药之后，疮口收得慢才问得出这句话。" },
-    { "id": "kg.edge.stocktaking-requires-inquiry", "fromId": "quest.r31-herbal-stocktaking", "toId": "quest.r31-herbal-inquiry", "relation": "requires", "summary": "药庐清点须先了结灯下问药，忌讳记进药案才好清点。" },
-    { "id": "kg.edge.ferry-ledger-requires-peddler-errand", "fromId": "quest.r31-ferry-ledger", "toId": "quest.r31-peddler-errand", "relation": "requires", "summary": "渡籍补录接在货郎口信之后，改走水路的口信引出半页轮值。" },
-    { "id": "kg.edge.nightclass-requires-ferry-ledger", "fromId": "quest.r31-academy-nightclass", "toId": "quest.r31-ferry-ledger", "relation": "requires", "summary": "书院夜课接在渡籍补录之后，誊正的渡籍引出连夜赶抄。" },
-    { "id": "kg.edge.mist-watch-requires-stocktaking", "fromId": "quest.r31-mist-shore-watch", "toId": "quest.r31-herbal-stocktaking", "relation": "requires", "summary": "雾夜巡岸接在药庐清点之后，药队起运前夜才要巡岸。" },
-    { "id": "kg.edge.provisioning-requires-stocktaking", "fromId": "quest.r31-caravan-provisioning", "toId": "quest.r31-herbal-stocktaking", "relation": "requires", "summary": "药队启程接在药庐清点之后，药材齐了才谈封箱。" },
-    { "id": "kg.edge.provisioning-requires-mist-watch", "fromId": "quest.r31-caravan-provisioning", "toId": "quest.r31-mist-shore-watch", "relation": "requires", "summary": "药队启程还须巡岸无虞，探子拿下方可定起运时辰。" },
-    { "id": "kg.edge.guard-caravan-requires-provisioning", "fromId": "quest.r31-guard-the-caravan", "toId": "quest.r31-caravan-provisioning", "relation": "requires", "summary": "先保药队接在药队启程之后，封箱完才有护送一说。" },
-    { "id": "kg.edge.mend-pier-requires-provisioning", "fromId": "quest.r31-mend-the-pier", "toId": "quest.r31-caravan-provisioning", "relation": "requires", "summary": "先修栈桥同样接在药队启程之后，是同一岔路的另一边。" },
-    { "id": "kg.edge.gratitude-requires-guard-caravan", "fromId": "quest.r31-caravan-gratitude", "toId": "quest.r31-guard-the-caravan", "relation": "requires", "summary": "药队答谢接在先保药队之后，平安过桥才有人情可谢。" },
-    { "id": "kg.edge.pier-toll-requires-mend-pier", "fromId": "quest.r31-pier-toll-clearing", "toId": "quest.r31-mend-the-pier", "relation": "requires", "summary": "栈桥通渡接在先修栈桥之后，修到最后一截才遇上索银人。" },
-    { "id": "kg.edge.lantern-promise-requires-teastall-water", "fromId": "quest.r31-river-lantern-promise", "toId": "quest.r31-teastall-herbal-water", "relation": "requires", "summary": "河灯之约接在茶棚凉汤之后，熟络了才提去年旧约。" },
-    { "id": "kg.edge.wharf-ears-requires-roadside-note", "fromId": "quest.r31-wharf-ears", "toId": "quest.r31-roadside-note", "relation": "requires", "summary": "江湖耳目接在路旁荐帖之后，荐帖递出才谈口风。" },
-    { "id": "kg.edge.quench-stock-requires-roadside-note", "fromId": "quest.r31-blade-quench-stock", "toId": "quest.r31-roadside-note", "relation": "requires", "summary": "刀场淬料接在路旁荐帖之后，祝九弦收帖才立规矩。" },
-    { "id": "kg.edge.mentor-review-requires-provisioning", "fromId": "quest.r31-mentor-review", "toId": "quest.r31-caravan-provisioning", "relation": "requires", "summary": "师门勘验接在药队启程之后，能在药道走动才够资格受验。" },
-    { "id": "kg.edge.teastall-water-needs-hanzhu", "fromId": "quest.r31-teastall-herbal-water", "toId": "item.hanzhu-cao", "relation": "requires", "summary": "茶棚凉汤要备四株寒珠草，补回被夜雨打烂的那片。" },
-    { "id": "kg.edge.bookshop-needs-luodie", "fromId": "quest.r31-bookshop-mothproof", "toId": "item.luodie-hua", "relation": "requires", "summary": "书铺驱蠹要采三束落蝶花，干瓣铺架底防蠹。" },
-    { "id": "kg.edge.stocktaking-needs-cangya", "fromId": "quest.r31-herbal-stocktaking", "toId": "item.cangya-gen", "relation": "requires", "summary": "药庐清点要抠来三根苍崖根，够再配两剂生肌散。" },
-    { "id": "kg.edge.nightclass-needs-qingxin", "fromId": "quest.r31-academy-nightclass", "toId": "item.qingxin-wan", "relation": "requires", "summary": "书院夜课要备两丸清心丸，学子含一丸抄书手才稳。" },
-    { "id": "kg.edge.provisioning-needs-wuji-dan", "fromId": "quest.r31-caravan-provisioning", "toId": "item.wuji-dan", "relation": "requires", "summary": "药队启程要购一丸无极丹压箱，路上伤了才撑得到镇上。" },
-    { "id": "kg.edge.mend-pier-needs-iron-sand", "fromId": "quest.r31-mend-the-pier", "toId": "item.iron-sand", "relation": "requires", "summary": "先修栈桥要备三份熟铁砂，补酥了的桩脚。" },
-    { "id": "kg.edge.mend-pier-needs-tough-leather", "fromId": "quest.r31-mend-the-pier", "toId": "item.tough-leather", "relation": "requires", "summary": "先修栈桥要备两捆韧皮料，捆扎新旧桥板。" },
-    { "id": "kg.edge.lantern-needs-luodie", "fromId": "quest.r31-river-lantern-promise", "toId": "item.luodie-hua", "relation": "requires", "summary": "河灯之约要采三束落蝶花，扎三盏蝶形花灯。" },
-    { "id": "kg.edge.quench-needs-iron-sand", "fromId": "quest.r31-blade-quench-stock", "toId": "item.iron-sand", "relation": "requires", "summary": "刀场淬料要挑两份细筛熟铁砂，炉火一起便开课。" },
-    { "id": "kg.edge.bai-joins-peddler-errand", "fromId": "char.bai-luzhou", "toId": "quest.r31-peddler-errand", "relation": "participatesIn", "summary": "货郎的口信须当面递到渡董白鹭洲耳中。" },
-    { "id": "kg.edge.zhu-joins-roadside-note", "fromId": "char.zhu-jiuxian", "toId": "quest.r31-roadside-note", "relation": "participatesIn", "summary": "路旁荐帖的收件人是盘舷刀场的祝九弦。" },
-    { "id": "kg.edge.rong-joins-herbal-inquiry", "fromId": "char.rong-su-qing", "toId": "quest.r31-herbal-inquiry", "relation": "participatesIn", "summary": "灯下问药要向容素青当面请教配伍忌讳。" },
-    { "id": "kg.edge.liu-joins-ferry-ledger", "fromId": "char.liu-tinglan", "toId": "quest.r31-ferry-ledger", "relation": "participatesIn", "summary": "渡籍补录要请柳听澜誊正并加盖书院印。" },
-    { "id": "kg.edge.bai-joins-provisioning", "fromId": "char.bai-luzhou", "toId": "quest.r31-caravan-provisioning", "relation": "participatesIn", "summary": "药队启程的时辰要与白鹭洲当面敲定。" },
-    { "id": "kg.edge.shi-joins-gratitude", "fromId": "char.shi-bei", "toId": "quest.r31-caravan-gratitude", "relation": "participatesIn", "summary": "药队答谢要先向石北当面致谢。" },
-    { "id": "kg.edge.bai-joins-gratitude", "fromId": "char.bai-luzhou", "toId": "quest.r31-caravan-gratitude", "relation": "participatesIn", "summary": "药队答谢也要向白鹭洲当面致谢。" },
-    { "id": "kg.edge.bai-joins-lantern", "fromId": "char.bai-luzhou", "toId": "quest.r31-river-lantern-promise", "relation": "participatesIn", "summary": "放灯的船位时辰要与白鹭洲当面约下。" },
-    { "id": "kg.edge.zhu-joins-wharf-ears", "fromId": "char.zhu-jiuxian", "toId": "quest.r31-wharf-ears", "relation": "participatesIn", "summary": "江湖耳目要向祝九弦打听刀场对药道的口风。" },
-    { "id": "kg.edge.shen-joins-wharf-ears", "fromId": "char.shen-mohan", "toId": "quest.r31-wharf-ears", "relation": "participatesIn", "summary": "江湖耳目也要向沈墨涵打听书铺里的传抄消息。" },
-    { "id": "kg.edge.rong-joins-mentor-review", "fromId": "char.rong-su-qing", "toId": "quest.r31-mentor-review", "relation": "participatesIn", "summary": "师门勘验要向容素青记一页药性。" },
-    { "id": "kg.edge.wen-joins-mentor-review", "fromId": "char.wen-suxin", "toId": "quest.r31-mentor-review", "relation": "participatesIn", "summary": "师门勘验要向闻素心记一页护送门道。" },
-    { "id": "kg.edge.lu-influences-river-lantern", "fromId": "char.lu-zhenniang", "toId": "ending.river-lantern", "relation": "influences", "summary": "与陆贞娘结下足够信任，是河灯归处认定的归路之一。" },
-    { "id": "kg.edge.ye-influences-tingyu-oath", "fromId": "char.ye-tingzhou", "toId": "ending.tingyu-oath", "relation": "influences", "summary": "叶庭舟的信任与剑阁旧约相系，引向听雨守约的归宿。" },
-    { "id": "kg.edge.alley-influences-tiezhang-ending", "fromId": "quest.round-07-clear-alley", "toId": "ending.tiezhang-foundation", "relation": "influences", "summary": "守住巷路的经历被铁嶂派看重，是砺心之路的起点。" },
-    { "id": "kg.edge.shi-influences-tiezhang", "fromId": "char.shi-bei", "toId": "ending.tiezhang-foundation", "relation": "influences", "summary": "与石北不因失信交恶，铁嶂的桩功才肯传下去。" },
-    { "id": "kg.edge.medicine-influences-yunyin-ending", "fromId": "quest.round-07-medicine-run", "toId": "ending.yunyin-healer", "relation": "influences", "summary": "送药差事的善举与云隐的护生门训同路。" },
-    { "id": "kg.edge.wen-influences-yunyin", "fromId": "char.wen-suxin", "toId": "ending.yunyin-healer", "relation": "influences", "summary": "闻素心的认可，让护生之法传给愿意守夜的人。" },
-    {"id":"kg.edge.r42-bai-offers-audit","fromId":"char.bai-luzhou","toId":"quest.r42-ledger-audit","relation":"participatesIn","summary":"白鹭洲在渡籍补录后托人核对不合潮时的旧簿水痕。"},
-    {"id":"kg.edge.r42-audit-requires-r31-ledger","fromId":"quest.r42-ledger-audit","toId":"quest.r31-ferry-ledger","relation":"requires","summary":"旧簿验痕承接渡籍补录，须先完成书院副本的誊正。"},
-    {"id":"kg.edge.r42-liu-participates-audit","fromId":"char.liu-tinglan","toId":"quest.r42-ledger-audit","relation":"participatesIn","summary":"柳听澜以书院副本与正本对页，辨认纸上水痕。"},
-    {"id":"kg.edge.r42-audit-triggers-faded","fromId":"quest.r42-ledger-audit","toId":"event.r42-faded-register","relation":"triggers","summary":"对照旧簿和副本后，玩家得知誊写前就已存在的水痕疑点。"},
-    {"id":"kg.edge.r42-liu-offers-witnesses","fromId":"char.liu-tinglan","toId":"quest.r42-two-witnesses","relation":"participatesIn","summary":"柳听澜请玩家把潮时与旧船印的两家口述分别记下。"},
-    {"id":"kg.edge.r42-witnesses-require-audit","fromId":"quest.r42-two-witnesses","toId":"quest.r42-ledger-audit","relation":"requires","summary":"两家对页接在旧簿验痕之后，先有疑点才知道该核对什么。"},
-    {"id":"kg.edge.r42-gu-participates-witnesses","fromId":"char.gu-yechen","toId":"quest.r42-two-witnesses","relation":"participatesIn","summary":"顾夜尘提供当晚药船到岸时的潮时口述。"},
-    {"id":"kg.edge.r42-zhu-participates-witnesses","fromId":"char.zhu-jiuxian","toId":"quest.r42-two-witnesses","relation":"participatesIn","summary":"祝九弦核对旧船印所在的位置与时序。"},
-    {"id":"kg.edge.r42-witnesses-triggers-gu","fromId":"quest.r42-two-witnesses","toId":"event.r42-gu-tide-account","relation":"triggers","summary":"核对潮时的途中记录下顾夜尘关于落潮的口述。"},
-    {"id":"kg.edge.r42-witnesses-triggers-zhu","fromId":"quest.r42-two-witnesses","toId":"event.r42-zhu-ferry-seal","relation":"triggers","summary":"核对旧印的途中记录下祝九弦谨慎区分印迹与人名的证词。"},
-    {"id":"kg.edge.r42-gu-offers-rubbing","fromId":"char.gu-yechen","toId":"quest.r42-seal-rubbing","relation":"participatesIn","summary":"顾夜尘从护船旧账中取出薄纸，让玩家拓取一份水线印痕。"},
-    {"id":"kg.edge.r42-rubbing-requires-witnesses","fromId":"quest.r42-seal-rubbing","toId":"quest.r42-two-witnesses","relation":"requires","summary":"封存水痕在两家口述互相核对后才有足够背景。"},
-    {"id":"kg.edge.r42-rubbing-requires-paper","fromId":"quest.r42-seal-rubbing","toId":"item.r42-ferry-seal-rubbing","relation":"requires","summary":"封存水痕的目标是从旧印取得并持有一份拓本。"},
-    {"id":"kg.edge.r42-gu-holds-rubbing","fromId":"char.gu-yechen","toId":"item.r42-ferry-seal-rubbing","relation":"holds","summary":"拓本由顾夜尘从护船旧账里取出并交予玩家。"},
-    {"id":"kg.edge.r42-bai-offers-public","fromId":"char.bai-luzhou","toId":"quest.r42-open-register","relation":"participatesIn","summary":"白鹭洲提出公开誊录的选择，交由柳听澜将证据列入副册。"},
-    {"id":"kg.edge.r42-public-requires-rubbing","fromId":"quest.r42-open-register","toId":"quest.r42-seal-rubbing","relation":"requires","summary":"公开立册须先取得并留存水痕拓本。"},
-    {"id":"kg.edge.r42-liu-participates-public","fromId":"char.liu-tinglan","toId":"quest.r42-open-register","relation":"participatesIn","summary":"柳听澜将拓本和证词誊入可供复核的公开副册。"},
-    {"id":"kg.edge.r42-public-triggers-vow","fromId":"quest.r42-open-register","toId":"event.r42-public-record-vow","relation":"triggers","summary":"选择明册立约时，玩家发现公开复核之约。"},
-    {"id":"kg.edge.r42-bai-offers-protect","fromId":"char.bai-luzhou","toId":"quest.r42-protect-witness","relation":"participatesIn","summary":"白鹭洲提出暂护证人的选择，交由祝九弦收存拓本。"},
-    {"id":"kg.edge.r42-protect-requires-rubbing","fromId":"quest.r42-protect-witness","toId":"quest.r42-seal-rubbing","relation":"requires","summary":"护证留印须先取得并留存水痕拓本。"},
-    {"id":"kg.edge.r42-zhu-participates-protect","fromId":"char.zhu-jiuxian","toId":"quest.r42-protect-witness","relation":"participatesIn","summary":"祝九弦暂时收存拓本，不公开证人身份。"},
-    {"id":"kg.edge.r42-protect-triggers-vow","fromId":"quest.r42-protect-witness","toId":"event.r42-protected-witness-vow","relation":"triggers","summary":"选择护证留印时，玩家发现保护证人与留存凭据的约定。"},
-    {"id":"kg.edge.r42-public-influences-ending","fromId":"quest.r42-open-register","toId":"ending.r42-open-register","relation":"influences","summary":"完成公开立册路线，是公簿昭潮结局的必要条件。"},
-    {"id":"kg.edge.r42-public-vow-influences-ending","fromId":"event.r42-public-record-vow","toId":"ending.r42-open-register","relation":"influences","summary":"作出公开复核之约，才能抵达公簿昭潮结局。"},
-    {"id":"kg.edge.r42-protect-influences-ending","fromId":"quest.r42-protect-witness","toId":"ending.r42-sheltered-witness","relation":"influences","summary":"完成护证留印路线，是灯下留痕结局的必要条件。"},
-    {"id":"kg.edge.r42-protect-vow-influences-ending","fromId":"event.r42-protected-witness-vow","toId":"ending.r42-sheltered-witness","relation":"influences","summary":"作出保护证人的约定，才能抵达灯下留痕结局。"},
-    {"id":"kg.edge.r43-footprints-triggers-letter","fromId":"event.old-footprints","toId":"event.r43-wayfarer-letter","relation":"triggers","summary":"循雨后脚印抵达雾雨渡口后，黄昏或夜雨中的行走可能遇上带信人。"},
-    {"id":"kg.edge.r43-tingyu-requires-letter","fromId":"quest.r43-tingyu-eave-rain","toId":"event.r43-wayfarer-letter","relation":"requires","summary":"檐雨听锋须先收到匿名传函，并由听雨剑阁门人接下。"},
-    {"id":"kg.edge.r43-ye-offers-tingyu","fromId":"char.ye-tingzhou","toId":"quest.r43-tingyu-eave-rain","relation":"participatesIn","summary":"叶庭舟托听雨剑阁门人向柳听澜核实芦苇岸的剑鸣传闻。"},
-    {"id":"kg.edge.r43-tingyu-triggers-outcome","fromId":"quest.r43-tingyu-eave-rain","toId":"event.r43-tingyu-eave-rain","relation":"triggers","summary":"柳听澜核对潮时后发现，传闻中的剑鸣实为索环回弹。"},
-    {"id":"kg.edge.r43-tiezhang-requires-letter","fromId":"quest.r43-tiezhang-stone-post","toId":"event.r43-wayfarer-letter","relation":"requires","summary":"石桩回声须先收到匿名传函，并由铁嶂派门人接下。"},
-    {"id":"kg.edge.r43-shi-offers-tiezhang","fromId":"char.shi-bei","toId":"quest.r43-tiezhang-stone-post","relation":"participatesIn","summary":"石北请铁嶂派门人向顾夜尘问清旧系缆桩的空响。"},
-    {"id":"kg.edge.r43-tiezhang-triggers-outcome","fromId":"quest.r43-tiezhang-stone-post","toId":"event.r43-tiezhang-stone-post","relation":"triggers","summary":"顾夜尘查明桩底空槽遇涨潮便响，并给出铁楔加固法。"},
-    {"id":"kg.edge.r43-yunyin-requires-letter","fromId":"quest.r43-yunyin-herb-road","toId":"event.r43-wayfarer-letter","relation":"requires","summary":"药路余香须先收到匿名传函，并由云隐山庄门人接下。"},
-    {"id":"kg.edge.r43-wen-offers-yunyin","fromId":"char.wen-suxin","toId":"quest.r43-yunyin-herb-road","relation":"participatesIn","summary":"闻素心请云隐山庄门人向容素青辨认封蜡苦香。"},
-    {"id":"kg.edge.r43-yunyin-triggers-outcome","fromId":"quest.r43-yunyin-herb-road","toId":"event.r43-yunyin-herb-road","relation":"triggers","summary":"容素青辨出受潮陈艾气味，排除毒香猜疑。"},
-    {"id":"kg.edge.r43-hanshan-requires-letter","fromId":"quest.r43-hanshan-copybook","toId":"event.r43-wayfarer-letter","relation":"requires","summary":"副页留白须先收到匿名传函，并由寒山书院门人接下。"},
-    {"id":"kg.edge.r43-liu-offers-hanshan","fromId":"char.liu-tinglan","toId":"quest.r43-hanshan-copybook","relation":"participatesIn","summary":"柳听澜请寒山书院门人向沈墨涵核验旧抄纸墨。"},
-    {"id":"kg.edge.r43-hanshan-triggers-outcome","fromId":"quest.r43-hanshan-copybook","toId":"event.r43-hanshan-copybook","relation":"triggers","summary":"沈墨涵确认船名原本缺抄，应标明缺页而不猜姓名。"},
-    {"id":"kg.edge.r43-panzhou-requires-letter","fromId":"quest.r43-panzhou-return-tide","toId":"event.r43-wayfarer-letter","relation":"requires","summary":"回潮验缆须先收到匿名传函，并由盘舷刀场门人接下。"},
-    {"id":"kg.edge.r43-zhu-offers-panzhou","fromId":"char.zhu-jiuxian","toId":"quest.r43-panzhou-return-tide","relation":"participatesIn","summary":"祝九弦托盘舷刀场门人请白鹭洲核对渡船缆痕。"},
-    {"id":"kg.edge.r43-panzhou-triggers-outcome","fromId":"quest.r43-panzhou-return-tide","toId":"event.r43-panzhou-return-tide","relation":"triggers","summary":"白鹭洲核明三道缆痕来自按序靠岸的运盐船。"},
-    {"id":"kg.edge.r43-liu-participates-tingyu","fromId":"char.liu-tinglan","toId":"quest.r43-tingyu-eave-rain","relation":"participatesIn","summary":"柳听澜核对信中时辰，辨认所谓剑鸣是涨潮时索环回弹。"},
-    {"id":"kg.edge.r43-gu-participates-tiezhang","fromId":"char.gu-yechen","toId":"quest.r43-tiezhang-stone-post","relation":"participatesIn","summary":"顾夜尘检查旧系缆桩底脚，找出涨潮空响的来由。"},
-    {"id":"kg.edge.r43-rong-participates-yunyin","fromId":"char.rong-su-qing","toId":"quest.r43-yunyin-herb-road","relation":"participatesIn","summary":"容素青辨认封蜡残留的药香，确认是受潮陈艾。"},
-    {"id":"kg.edge.r43-shen-participates-hanshan","fromId":"char.shen-mohan","toId":"quest.r43-hanshan-copybook","relation":"participatesIn","summary":"沈墨涵对照书铺旧抄的纸龄与墨色，确认缺页早于争执。"},
-    {"id":"kg.edge.r43-bai-participates-panzhou","fromId":"char.bai-luzhou","toId":"quest.r43-panzhou-return-tide","relation":"participatesIn","summary":"白鹭洲核对三道缆痕与渡船旧簿，确认来自运盐船。"},
-    {"id":"kg.edge.r44-letter-triggers-dispute","fromId":"event.r43-wayfarer-letter","toId":"event.r44-dock-claim","relation":"triggers","summary":"风雨传函将玩家引到雾雨渡口，随后可能遇见旧系缆桩争执。"},
-    {"id":"kg.edge.r44-post-requires-dispute","fromId":"quest.r44-post-first","toId":"event.r44-dock-claim","relation":"requires","summary":"先固旧桩须先亲历石北与白鹭洲的争执。"},
-    {"id":"kg.edge.r44-ledger-requires-dispute","fromId":"quest.r44-ledger-first","toId":"event.r44-dock-claim","relation":"requires","summary":"先核渡簿须先亲历石北与白鹭洲的争执。"},
-    {"id":"kg.edge.r44-bai-participates-post","fromId":"char.bai-luzhou","toId":"quest.r44-post-first","relation":"participatesIn","summary":"白鹭洲提供互斥的处置选择，玩家可先采纳加固方案。"},
-    {"id":"kg.edge.r44-bai-participates-ledger","fromId":"char.bai-luzhou","toId":"quest.r44-ledger-first","relation":"participatesIn","summary":"白鹭洲提供互斥的处置选择，玩家可先采纳核簿方案。"},
-    {"id":"kg.edge.r44-shi-participates-post","fromId":"char.shi-bei","toId":"quest.r44-post-first","relation":"participatesIn","summary":"石北确认旧系缆桩的加固办法。"},
-    {"id":"kg.edge.r44-liu-participates-ledger","fromId":"char.liu-tinglan","toId":"quest.r44-ledger-first","relation":"participatesIn","summary":"柳听澜以书院抄本复核渡簿上的潮时。"},
-    {"id":"kg.edge.r44-post-triggers-outcome","fromId":"quest.r44-post-first","toId":"event.r44-pier-reinforced","relation":"triggers","summary":"铁嶂派按潮痕补入铁楔并记录固桩结果。"},
-    {"id":"kg.edge.r44-ledger-triggers-outcome","fromId":"quest.r44-ledger-first","toId":"event.r44-ledger-verified","relation":"triggers","summary":"寒山书院用抄本核验潮时并记录渡簿结果。"},
-    {"id":"kg.edge.r55-sluice-located","fromId":"event.r55-sluice-inscription","toId":"place.mist-sluice","relation":"locatedAt","summary":"河湾石闸的潮尺与旧船号指向南湾古渠。"},
-    {"id":"kg.edge.r56-shibei-offers-north-watch","fromId":"char.shi-bei","toId":"quest.r56-north-water-gauge","relation":"participatesIn","summary":"石北托玩家前往雾岬北岸核验潮尺。"},
-    {"id":"kg.edge.r56-north-watch-requires-sluice","fromId":"quest.r56-north-water-gauge","toId":"place.mist-sluice","relation":"requires","summary":"雾岬巡标从旧渠石闸的潮刻线索开始。"},
-    {"id":"kg.edge.r56-north-watch-triggers-gauge","fromId":"quest.r56-north-water-gauge","toId":"event.r56-north-water-gauge","relation":"triggers","summary":"巡查将玩家带到北岸潮尺位置。"},
-    {"id":"kg.edge.r56-north-gauge-located","fromId":"event.r56-north-water-gauge","toId":"place.mist-north-cap","relation":"locatedAt","summary":"雾岬林地北岸石桩即为潮尺所在。"},
-    {"id":"kg.edge.r56-shibei-offers-south-survey","fromId":"char.shi-bei","toId":"quest.r56-south-waterway-survey","relation":"participatesIn","summary":"石北在北岸潮尺确认后，续托南湾水路测绘。"},
-    {"id":"kg.edge.r56-south-survey-requires-north-cap","fromId":"quest.r56-south-waterway-survey","toId":"place.mist-north-cap","relation":"requires","summary":"南湾测绘以前一程查明的北岸水尺为起点。"},
-    {"id":"kg.edge.r56-south-survey-triggers-mark","fromId":"quest.r56-south-waterway-survey","toId":"event.r56-south-waterway-mark","relation":"triggers","summary":"测绘路线延伸至南湾浅槽的旧水标。"},
-    {"id":"kg.edge.r56-south-mark-located","fromId":"event.r56-south-waterway-mark","toId":"place.mist-south-pool","relation":"locatedAt","summary":"苇根下的水标标记南湾苇池旧航道。"},
-    {"id":"kg.edge.r58-shibei-offers-market","fromId":"char.shi-bei","toId":"quest.r58-market-discovery","relation":"participatesIn","summary":"石北请玩家沿南湾浅槽与旧船号找到芦桥集。"},
-    {"id":"kg.edge.r58-market-requires-south-pool","fromId":"quest.r58-market-discovery","toId":"place.mist-south-pool","relation":"requires","summary":"芦桥寻集以前一轮查明的南湾浅槽与旧水标为线索。"},
-    {"id":"kg.edge.r58-market-requires-survey","fromId":"quest.r58-market-discovery","toId":"quest.r56-south-waterway-survey","relation":"requires","summary":"芦桥寻集接续南湾水路测绘。"},
-    {"id":"kg.edge.r58-market-triggers-old-sign","fromId":"quest.r58-market-discovery","toId":"event.r58-market-first-visit","relation":"triggers","summary":"循线抵达河湾后认出芦桥集旧幌与船号。"},
-    {"id":"kg.edge.r58-market-event-located","fromId":"event.r58-market-first-visit","toId":"place.mist-willow-market","relation":"locatedAt","summary":"河湾旧幌与旧渠碑船号相合，确认芦桥集旧址。"},
-    {"id":"kg.edge.r58-bai-offers-stall","fromId":"char.bai-luzhou","toId":"quest.r58-market-stall-pact","relation":"participatesIn","summary":"白鹭洲托玩家备好绳带并与石北商定芦桥集通路。"},
-    {"id":"kg.edge.r58-shi-participates-stall","fromId":"char.shi-bei","toId":"quest.r58-market-stall-pact","relation":"participatesIn","summary":"石北与玩家约定集市摊棚和药担的行路位置。"},
-    {"id":"kg.edge.r58-stall-requires-market","fromId":"quest.r58-market-stall-pact","toId":"quest.r58-market-discovery","relation":"requires","summary":"集期赶办在寻得芦桥集之后解锁。"},
-    {"id":"kg.edge.r58-stall-requires-leather","fromId":"quest.r58-market-stall-pact","toId":"item.tough-leather","relation":"requires","summary":"复开摊棚需要韧皮料补回绳带。"},
-    {"id":"kg.edge.r58-zhu-offers-toll-squabble","fromId":"char.zhu-jiuxian","toId":"quest.r58-market-toll-squabble","relation":"participatesIn","summary":"祝九弦托玩家赶走向商贩索取过集钱的旧例管事。"},
-    {"id":"kg.edge.r58-toll-squabble-requires-stall","fromId":"quest.r58-market-toll-squabble","toId":"quest.r58-market-stall-pact","relation":"requires","summary":"集口拦贩在集市通路与摊棚安排落实后解锁。"},
-    {"id":"kg.edge.r58-ma-offers-hamlet","fromId":"char.ma-shangyi","toId":"quest.r58-south-hamlet-survey","relation":"participatesIn","summary":"马尚义请玩家向南送药讯并查明南麓旧路。"},
-    {"id":"kg.edge.r58-hamlet-requires-medicine","fromId":"quest.r58-south-hamlet-survey","toId":"quest.round-07-medicine-run","relation":"requires","summary":"巷口伤者安置妥当后才有余力向南麓村落送讯。"},
-    {"id":"kg.edge.r58-hamlet-triggers-arrival","fromId":"quest.r58-south-hamlet-survey","toId":"event.r58-south-hamlet-arrival","relation":"triggers","summary":"沿山脚茶匾走到南麓聚落并认出村口旧路。"},
-    {"id":"kg.edge.r58-hamlet-event-located","fromId":"event.r58-south-hamlet-arrival","toId":"place.south-hamlet","relation":"locatedAt","summary":"山脚茶匾旁的旧石阶标出南麓聚落位置。"},
-    {"id":"kg.edge.r58-lu-offers-supply","fromId":"char.lu-zhenniang","toId":"quest.r58-south-hamlet-supply","relation":"participatesIn","summary":"陆贞娘请玩家备苍崖根并托货担沿旧路送药。"},
-    {"id":"kg.edge.r58-jiang-participates-supply","fromId":"char.jiang-baiwei","toId":"quest.r58-south-hamlet-supply","relation":"participatesIn","summary":"姜百味按旧驿道向南麓村落捎送药材。"},
-    {"id":"kg.edge.r58-supply-requires-survey","fromId":"quest.r58-south-hamlet-supply","toId":"quest.r58-south-hamlet-survey","relation":"requires","summary":"先查明南麓聚落和旧路，才能安排送药。"},
-    {"id":"kg.edge.r58-supply-requires-root","fromId":"quest.r58-south-hamlet-supply","toId":"item.cangya-gen","relation":"requires","summary":"南麓药队需要苍崖根配散。"},
-    {"id":"kg.edge.r58-gu-offers-bandit","fromId":"char.gu-yechen","toId":"quest.r58-pond-bandit-camp","relation":"participatesIn","summary":"顾夜尘请玩家查清东野池塘冒牌护药队并打通旧路。"},
-    {"id":"kg.edge.r58-bandit-requires-supply","fromId":"quest.r58-pond-bandit-camp","toId":"quest.r58-south-hamlet-supply","relation":"requires","summary":"南麓药材交由货担捎送后，才进一步查办冒牌护队。"},
-    {"id":"kg.edge.r62-region-arrival-event","fromId":"event.r62-ridge-arrival","toId":"map.round-62-iron-ridge","relation":"locatedAt","summary":"雾岬北口初行标出铁嶂北道的区域入口。"},
-    {"id":"kg.edge.r62-region-north-gate","fromId":"place.iron-ridge-north-gate","toId":"map.round-62-iron-ridge","relation":"locatedAt","summary":"铁嶂南隘是北道地图的渡口入口。"},
-    {"id":"kg.edge.r62-north-gate-arrival","fromId":"event.r62-ridge-arrival","toId":"place.iron-ridge-north-gate","relation":"triggers","summary":"穿过雾岬北口时首次认识铁嶂南隘。"},
-    {"id":"kg.edge.r62-pass-event-place","fromId":"event.r62-pass-marks","toId":"place.iron-ridge-pass","relation":"triggers","summary":"检查碎岭凿痕后确认旧道仍可通行。"},
-    {"id":"kg.edge.r62-post-event-place","fromId":"event.r62-post-ledger","toId":"place.iron-ridge-post","relation":"triggers","summary":"比对更簿与水尺印记后认出岩关驿镇。"},
-    {"id":"kg.edge.r62-beacon-event-place","fromId":"event.r62-beacon-code","toId":"place.iron-ridge-beacon","relation":"triggers","summary":"烽台残页揭出北脊旧烽台的巡山暗号。"},
-    {"id":"kg.edge.r62-shao-located","fromId":"char.shao-changgeng","toId":"map.round-62-iron-ridge","relation":"locatedAt","summary":"邵长庚在铁嶂北道岩关驿镇值事。"},
-    {"id":"kg.edge.r62-qin-located","fromId":"char.qin-suyan","toId":"place.iron-ridge-post","relation":"locatedAt","summary":"秦素砚在岩关驿镇整理北道更簿。"},
-    {"id":"kg.edge.r62-shao-tiezhang","fromId":"char.shao-changgeng","toId":"faction.tiezhang-pai","relation":"belongsTo","summary":"邵长庚出身铁嶂派，兼管北道驿务。"},
-    {"id":"kg.edge.r62-shao-offers-pass","fromId":"char.shao-changgeng","toId":"quest.r62-north-pass-marks","relation":"participatesIn","summary":"邵长庚请玩家核对碎岭旧道界石。"},
-    {"id":"kg.edge.r62-pass-requires-gauge","fromId":"quest.r62-north-pass-marks","toId":"place.mist-north-cap","relation":"requires","summary":"北隘校标须以雾岬北岸水尺作为线索。"},
-    {"id":"kg.edge.r62-pass-triggers-marks","fromId":"quest.r62-north-pass-marks","toId":"event.r62-pass-marks","relation":"triggers","summary":"北隘校标把玩家引到碎岭界石核验凿痕。"},
-    {"id":"kg.edge.r62-shao-offers-ledger","fromId":"char.shao-changgeng","toId":"quest.r62-post-ledger","relation":"participatesIn","summary":"邵长庚请玩家与秦素砚核对巡山更次。"},
-    {"id":"kg.edge.r62-qin-ledger","fromId":"char.qin-suyan","toId":"quest.r62-post-ledger","relation":"participatesIn","summary":"秦素砚按驿镇旧簿校出烽台换班暗号。"},
-    {"id":"kg.edge.r62-ledger-requires-pass","fromId":"quest.r62-post-ledger","toId":"quest.r62-north-pass-marks","relation":"requires","summary":"先校准碎岭界石，再核对北道更次。"},
-    {"id":"kg.edge.r62-shao-offers-clear-road","fromId":"char.shao-changgeng","toId":"quest.r62-clear-ridge-road","relation":"participatesIn","summary":"邵长庚请玩家驱散占据碎岭路的拦路客。"},
-    {"id":"kg.edge.r62-clear-road-requires-ledger","fromId":"quest.r62-clear-ridge-road","toId":"quest.r62-post-ledger","relation":"requires","summary":"巡山更次核实后再清理碎岭拦路客。"},
-    {"id":"kg.edge.r67-salt-arrival-located","fromId":"event.r67-salt-road-arrival","toId":"map.round-67-salt-road","relation":"locatedAt","summary":"青岩东关的首次行旅标出西陲盐道入口。"},
-    {"id":"kg.edge.r67-well-event-place","fromId":"event.r67-well-reading","toId":"place.r67-brine-well","relation":"triggers","summary":"核对井壁刻痕后记下回声苦井的位置和水线。"},
-    {"id":"kg.edge.r67-luo-located","fromId":"char.luo-jinzi","toId":"map.round-67-salt-road","relation":"locatedAt","summary":"罗金子在青岩驿管理过路秤与盐货记录。"},
-    {"id":"kg.edge.r67-luo-knows-well","fromId":"char.luo-jinzi","toId":"place.r67-brine-well","relation":"knows","summary":"罗金子知道回声苦井的旧秤刻和汲水规矩。"},
-    {"id":"kg.edge.r67-luo-offers-waterline","fromId":"char.luo-jinzi","toId":"quest.r67-well-waterline","relation":"participatesIn","summary":"罗金子请玩家查明井水发苦是否与水线下降有关。"},
-    {"id":"kg.edge.r67-waterline-requires-well","fromId":"quest.r67-well-waterline","toId":"place.r67-brine-well","relation":"requires","summary":"苦井辨线须亲自核对回声苦井的水线与刻痕。"},
-    {"id":"kg.edge.r74-arrival-map","fromId":"event.r74-cloud-arrival","toId":"map.round-74-cloud-ridge","relation":"locatedAt","summary":"初入云岭的首次行旅标出断云栈道入口。"},
-    {"id":"kg.edge.r74-arrival-place","fromId":"event.r74-cloud-arrival","toId":"place.r74-cloud-ridge","relation":"triggers","summary":"越过断云南隘后发现云岭古道。"},
-    {"id":"kg.edge.r74-inscription-place","fromId":"event.r74-cloud-inscription","toId":"place.r74-cloud-markers","relation":"triggers","summary":"检查石阶刻痕后记下云纹石阶位置。"},
-    {"id":"kg.edge.r74-bridge-place","fromId":"event.r74-cloud-bridge","toId":"place.r74-cloud-bridge","relation":"triggers","summary":"查看断索与靴印后记下悬桥位置。"},
-    {"id":"kg.edge.r74-shen-located","fromId":"char.r74-shen-yuji","toId":"map.round-74-cloud-ridge","relation":"locatedAt","summary":"沈雨霁在云栈客舍记录山道走向。"},
-    {"id":"kg.edge.r74-shen-knows-markers","fromId":"char.r74-shen-yuji","toId":"place.r74-cloud-markers","relation":"knows","summary":"沈雨霁知道云纹石阶的旧索孔记号。"},
-    {"id":"kg.edge.r74-shen-offers-marks","fromId":"char.r74-shen-yuji","toId":"quest.r74-cloud-marks","relation":"participatesIn","summary":"沈雨霁请玩家拓录石阶上的旧刻痕。"},
-    {"id":"kg.edge.r74-marks-requires-place","fromId":"quest.r74-cloud-marks","toId":"place.r74-cloud-markers","relation":"requires","summary":"云阶辨刻须找到云纹石阶的旧索孔。"},
-    {"id":"kg.edge.r74-shen-offers-bridge","fromId":"char.r74-shen-yuji","toId":"quest.r74-cloud-bridge","relation":"participatesIn","summary":"沈雨霁请玩家清出被拦路客占据的悬桥。"},
-    {"id":"kg.edge.r74-bridge-requires-marks","fromId":"quest.r74-cloud-bridge","toId":"quest.r74-cloud-marks","relation":"requires","summary":"先核对云阶刻痕，再依旧路向清理断索悬桥。"},
-    {"id":"kg.edge.r79-arrival-place","fromId":"event.r79-arrival","toId":"place.r79-isles","relation":"triggers","summary":"初次踏上落潮湾时发现东海群岛。"},
-    {"id":"kg.edge.r79-isles-located","fromId":"place.r79-isles","toId":"map.round-79-isles","relation":"locatedAt","summary":"落潮湾位于东海群岛的百格海岛区域。"},
-    {"id":"kg.edge.r79-reef-event-place","fromId":"event.r79-west-reef","toId":"place.r79-west-reef","relation":"triggers","summary":"检查退潮后的绳结后记下双礁浅滩。"},
-    {"id":"kg.edge.r79-beacon-event-place","fromId":"event.r79-white-beacon","toId":"place.r79-white-beacon","relation":"triggers","summary":"读取灯标底座潮痕后发现白沙灯标。"},
-    {"id":"kg.edge.r79-shao-located","fromId":"char.r79-shao-tinglan","toId":"map.round-79-isles","relation":"locatedAt","summary":"邵听澜在潮声驿整理海路记录。"},
-    {"id":"kg.edge.r79-shao-offers-chart","fromId":"char.r79-shao-tinglan","toId":"quest.r79-tide-chart","relation":"participatesIn","summary":"邵听澜请玩家辨认白沙灯标的旧潮痕。"},
-    {"id":"kg.edge.r79-chart-requires-beacon","fromId":"quest.r79-tide-chart","toId":"place.r79-white-beacon","relation":"requires","summary":"灯痕避礁需要亲自查看白沙灯标。"},
-    {"id":"kg.edge.r79-chart-rewards-reef","fromId":"quest.r79-tide-chart","toId":"place.r79-west-reef","relation":"rewards","summary":"完成潮痕辨认后把双礁浅滩列入航路记录。"},
-    {"id":"kg.edge.r82-arrival-coast","fromId":"event.r82-arrival","toId":"place.r82-east-coast","relation":"triggers","summary":"初抵青帆埠时发现东溟海岸。"},
-    {"id":"kg.edge.r82-coast-map","fromId":"place.r82-east-coast","toId":"map.round-82-east-coast","relation":"locatedAt","summary":"东溟海岸由青帆埠的百格探索地图承载。"},
-    {"id":"kg.edge.r82-market-place","fromId":"event.r82-blue-sail-market","toId":"place.r82-blue-sail-market","relation":"triggers","summary":"翻看旧簿后得知青帆埠的潮路记载。"},
-    {"id":"kg.edge.r82-gauge-place","fromId":"event.r82-tide-gauge","toId":"place.r82-east-tide-gauge","relation":"triggers","summary":"抄录东汊潮尺后发现旧水位刻痕。"},
-    {"id":"kg.edge.r82-npc-location","fromId":"char.r82-wen-chaozhi","toId":"map.round-82-east-coast","relation":"locatedAt","summary":"温朝之在青帆埠保管渡潮簿。"},
-    {"id":"kg.edge.r82-npc-quest","fromId":"char.r82-wen-chaozhi","toId":"quest.r82-follow-the-tide","relation":"participatesIn","summary":"温朝之委托玩家补全东汊潮尺记录。"},
-    {"id":"kg.edge.r82-quest-gauge","fromId":"quest.r82-follow-the-tide","toId":"place.r82-east-tide-gauge","relation":"requires","summary":"潮尺旧记需要玩家调查东汊石潮尺。"},
-    {"id":"kg.edge.r82-quest-cove","fromId":"quest.r82-follow-the-tide","toId":"place.r82-fog-cove","relation":"rewards","summary":"完成潮尺旧记后，温朝之补绘雾隐湾的安全水路。"},
-    {"id":"kg.edge.r83-merchant-location","fromId":"char.r83-jin-yunfan","toId":"place.r82-east-coast","relation":"locatedAt","summary":"金云帆在青帆埠经营潮行补给摊。"},
-    {"id":"kg.edge.r83-merchant-stock","fromId":"char.r83-jin-yunfan","toId":"item.r83-sea-salt-ointment","relation":"holds","summary":"金云帆的补给摊售有海盐敷膏。"},
-    {"id":"kg.edge.r83-fisher-location","fromId":"char.r83-gu-chaosheng","toId":"place.r82-east-coast","relation":"locatedAt","summary":"顾潮生在青帆埠附近巡潮。"},
-    {"id":"kg.edge.r83-fisher-recovery","fromId":"char.r83-gu-chaosheng","toId":"quest.r83-net-recovery","relation":"participatesIn","summary":"顾潮生委托玩家找回潮沟网具。"},
-    {"id":"kg.edge.r83-fisher-channel","fromId":"char.r83-gu-chaosheng","toId":"quest.r83-night-channel","relation":"participatesIn","summary":"顾潮生请玩家辨认暮潮回湾线。"},
-    {"id":"kg.edge.r83-raiders-location","fromId":"char.r83-tide-wake-leader","toId":"place.r82-east-coast","relation":"locatedAt","summary":"夺网客头目出没在东汊潮沟浅滩。"},
-    {"id":"kg.edge.r83-encounter-raider","fromId":"event.r83-tide-wake-looters","toId":"char.r83-tide-wake-leader","relation":"triggers","summary":"在潮沟浅滩遭遇夺网头目。"},
-    {"id":"kg.edge.r83-recovery-encounter","fromId":"quest.r83-net-recovery","toId":"event.r83-tide-wake-looters","relation":"requires","summary":"潮沟夺网要求击退夺网客。"},
-    {"id":"kg.edge.r83-recovery-shoals","fromId":"quest.r83-net-recovery","toId":"place.r83-net-shoals","relation":"rewards","summary":"找回浮标后重新得知回标浅滩。"},
-    {"id":"kg.edge.r83-night-event-place","fromId":"event.r83-night-channel","toId":"place.r83-night-channel","relation":"triggers","summary":"夜潮灯影照亮回湾石标后发现安全航线。"},
-    {"id":"kg.edge.r83-channel-quest-place","fromId":"quest.r83-night-channel","toId":"place.r83-night-channel","relation":"requires","summary":"暮潮牵标要求玩家调查夜间石标。"},
-    {"id":"kg.edge.r84-arrival-isle","fromId":"event.r84-arrival","toId":"place.r84-windward-isle","relation":"triggers","summary":"初登西滩时发现风回岛。"},
-    {"id":"kg.edge.r84-isle-map","fromId":"place.r84-windward-isle","toId":"map.round-84-windward-isle","relation":"locatedAt","summary":"风回岛由百格探索地图承载。"},
-    {"id":"kg.edge.r84-hamlet-event","fromId":"event.r84-hamlet-ledger","toId":"place.r84-stone-hamlet","relation":"triggers","summary":"翻看檐下旧簿后得知石厝小村的来历。"},
-    {"id":"kg.edge.r84-beacon-event","fromId":"event.r84-beacon-watch","toId":"place.r84-windward-beacon","relation":"triggers","summary":"观察灯影后发现风候变化的痕迹。"},
-    {"id":"kg.edge.r84-npc-location","fromId":"char.r84-ruan-huilan","toId":"map.round-84-windward-isle","relation":"locatedAt","summary":"阮回澜在风回岛石厝守灯。"},
-    {"id":"kg.edge.r84-npc-quest","fromId":"char.r84-ruan-huilan","toId":"quest.r84-lantern-ledger","relation":"participatesIn","summary":"阮回澜委托玩家记录灯影方位。"},
-    {"id":"kg.edge.r84-quest-beacon","fromId":"quest.r84-lantern-ledger","toId":"place.r84-windward-beacon","relation":"requires","summary":"风回灯影需要玩家调查东坡灯标。"},
-    {"id":"kg.edge.r84-quest-spring","fromId":"quest.r84-lantern-ledger","toId":"place.r84-spring-hollow","relation":"rewards","summary":"完成风回灯影后，阮回澜带你认下岛心淡泉。"},
-    {"id":"kg.edge.r85-arrival-isle","fromId":"event.r85-arrival","toId":"place.r85-tide-isle","relation":"triggers","summary":"初登西滩时发现潮生屿。"},
-    {"id":"kg.edge.r85-isle-map","fromId":"place.r85-tide-isle","toId":"map.round-85-tide-isle","relation":"locatedAt","summary":"潮生屿由百格探索地图承载。"},
-    {"id":"kg.edge.r85-reef-event","fromId":"event.r85-reef-channel","toId":"place.r85-reef-channel","relation":"triggers","summary":"低潮勘碑后发现礁道水则的方位。"},
-    {"id":"kg.edge.r85-camp-event","fromId":"event.r85-camp-hearth","toId":"place.r85-camp","relation":"triggers","summary":"探访营地后得知守礁人的来历。"},
-    {"id":"kg.edge.r85-pool-event","fromId":"event.r85-tide-pool","toId":"place.r85-tide-pool","relation":"triggers","summary":"退潮后看见礁盘内侧的潮池。"},
-    {"id":"kg.edge.r85-surveyor-location","fromId":"char.r85-xie-zhaoting","toId":"map.round-84-windward-isle","relation":"locatedAt","summary":"谢照汀在风回岛西滩守着水则碑。"},
-    {"id":"kg.edge.r85-keeper-location","fromId":"char.r85-cen-yinjiao","toId":"map.round-85-tide-isle","relation":"locatedAt","summary":"岑隐礁在潮生屿松林边守礁。"},
-    {"id":"kg.edge.r85-surveyor-quest","fromId":"char.r85-xie-zhaoting","toId":"quest.r85-low-tide-channel","relation":"participatesIn","summary":"谢照汀委托玩家勘测低潮礁道。"},
-    {"id":"kg.edge.r85-quest-reef","fromId":"quest.r85-low-tide-channel","toId":"place.r85-reef-channel","relation":"requires","summary":"低潮礁道需要玩家趁低潮调查礁道。"},
-    {"id":"kg.edge.r85-quest-pool","fromId":"quest.r85-low-tide-channel","toId":"place.r85-tide-pool","relation":"rewards","summary":"完成低潮礁道后得知退潮石窝的方位。"},
-    {"id":"edge.r86-lu-yubai-supply","fromId":"char.r86-lu-yubai","toId":"place.r86-tide-isle-supply","relation":"locatedAt","summary":"陆余白在潮线药囊摊售卖有限补给。"},
-    {"id":"edge.r86-supply-isle","fromId":"place.r86-tide-isle-supply","toId":"place.r85-tide-isle","relation":"locatedAt","summary":"潮线药囊摊位于南溟·潮生屿内岸。"},
-    {"id":"edge.r86-raider-participates","fromId":"char.r86-heiqi-qi","toId":"event.r86-reef-raiders","relation":"participatesIn","summary":"黑鳍七在低潮时带人拦截礁道旅客。"},
-    {"id":"edge.r86-event-isle","fromId":"event.r86-reef-raiders","toId":"place.r85-tide-isle","relation":"locatedAt","summary":"低潮夺货发生在南溟·潮生屿东侧礁道。"},
-    {"id":"kg.edge.r87-arrival-isle","fromId":"event.r87-arrival","toId":"place.r87-southwest-isles","relation":"triggers","summary":"初入北滩时发现西南列岛。"},
-    {"id":"kg.edge.r87-isle-map","fromId":"place.r87-southwest-isles","toId":"map.round-87-southwest-isles","relation":"locatedAt","summary":"西南列岛由百格探索地图承载。"},
-    {"id":"kg.edge.r87-harbor-event","fromId":"event.r87-fog-harbor","toId":"place.r87-fog-harbor","relation":"triggers","summary":"探访渔村后得知雾泊渔村的来历。"},
-    {"id":"kg.edge.r87-signal-event","fromId":"event.r87-mist-signal","toId":"place.r87-mist-signal","relation":"triggers","summary":"勘明烽信后认清雾哨崖的方位。"},
-    {"id":"kg.edge.r87-spring-event","fromId":"event.r87-spring-hollow","toId":"place.r87-spring-hollow","relation":"triggers","summary":"寻得石缝清泉后发现石涧淡泉。"},
-    {"id":"kg.edge.r87-pilot-location","fromId":"char.r87-meng-haizhou","toId":"map.round-79-isles","relation":"locatedAt","summary":"孟海洲在落潮湾西礁守着雾图。"},
-    {"id":"kg.edge.r87-keeper-location","fromId":"char.r87-ao-wanqing","toId":"map.round-87-southwest-isles","relation":"locatedAt","summary":"敖晚晴在雾航湾雾哨崖守烽。"},
-    {"id":"kg.edge.r87-pilot-quest","fromId":"char.r87-meng-haizhou","toId":"quest.r87-fog-pilot-ledger","relation":"participatesIn","summary":"孟海洲委托玩家勘明雾航烽信。"},
-    {"id":"kg.edge.r87-quest-signal","fromId":"quest.r87-fog-pilot-ledger","toId":"place.r87-mist-signal","relation":"requires","summary":"雾航引水需要玩家调查雾哨崖烽台。"},
-    {"id":"kg.edge.r87-quest-spring","fromId":"quest.r87-fog-pilot-ledger","toId":"place.r87-spring-hollow","relation":"rewards","summary":"完成雾航引水后得知石涧淡泉的方位。"},
-    {"id":"kg.edge.r89-pilot-location","fromId":"char.r89-cheng-wenzhou","toId":"map.round-87-southwest-isles","relation":"locatedAt","summary":"程问舟在雾航湾周边巡查潮路，并按时段更换停留地点。"},
-    {"id":"kg.edge.r89-pilot-knows-chart","fromId":"char.r89-cheng-wenzhou","toId":"event.r89-chart-clue","relation":"knows","summary":"程问舟从残缺潮图辨出了旧水槽潮刻的位置。"},
-    {"id":"kg.edge.r89-pilot-quest","fromId":"char.r89-cheng-wenzhou","toId":"quest.r89-east-channel-echo","relation":"participatesIn","summary":"程问舟请玩家核实青帆埠旧水槽旁的三道潮刻。"},
-    {"id":"kg.edge.r89-clue-map","fromId":"event.r89-chart-clue","toId":"map.round-82-east-coast","relation":"locatedAt","summary":"残缺潮图线索指向东溟海岸的青帆埠。"},
-    {"id":"kg.edge.r89-mark-event-place","fromId":"event.r89-east-channel-mark","toId":"place.r89-east-channel-mark","relation":"triggers","summary":"调查旧水槽的三道潮刻后发现东汊旧水槽。"},
-    {"id":"kg.edge.r89-mark-location","fromId":"event.r89-east-channel-mark","toId":"map.round-82-east-coast","relation":"locatedAt","summary":"旧水槽潮刻位于青帆埠东岸。"},
-    {"id":"kg.edge.r89-place-location","fromId":"place.r89-east-channel-mark","toId":"map.round-82-east-coast","relation":"locatedAt","summary":"东汊旧水槽由青帆埠百格地图承载。"},
-    {"id":"kg.edge.r89-quest-mark","fromId":"quest.r89-east-channel-echo","toId":"place.r89-east-channel-mark","relation":"requires","summary":"东汊回声要求玩家亲自核实三道潮刻。"},
-    {"id":"kg.edge.r89-quest-return","fromId":"quest.r89-east-channel-echo","toId":"place.r89-safe-return-current","relation":"rewards","summary":"完成东汊回声后得知避开横流的回汐次序。"},
-    {"id":"kg.edge.r90-arrival-location","fromId":"event.r90-arrival-blue-sail","toId":"map.round-82-east-coast","relation":"locatedAt","summary":"潮序对汊的见闻发生在青帆埠海岸。"},
-    {"id":"kg.edge.r90-arrival-tide","fromId":"event.r90-arrival-blue-sail","toId":"place.r89-safe-return-current","relation":"requires","summary":"潮序对汊需要先从东汊回声学得回汐缓流。"},
-    {"id":"kg.edge.r90-return-location","fromId":"event.r90-return-cloud-ridge","toId":"map.round-74-cloud-ridge","relation":"locatedAt","summary":"云海收汊的见闻发生在云岭古道东口。"},
-    {"id":"kg.edge.r90-return-tide","fromId":"event.r90-return-cloud-ridge","toId":"place.r89-safe-return-current","relation":"requires","summary":"云海收汊同样循回汐缓流的记忆回望东汊。"},
-    {"id":"kg.edge.r91-arrival-terrace","fromId":"event.r91-arrival","toId":"place.r91-cloud-north-terrace","relation":"triggers","summary":"初登北台时发现云岭北台·雁回崖。"},
-    {"id":"kg.edge.r91-terrace-map","fromId":"place.r91-cloud-north-terrace","toId":"map.round-91-cloud-north-terrace","relation":"locatedAt","summary":"雁回崖由百格探索地图承载。"},
-    {"id":"kg.edge.r91-bridge-event","fromId":"event.r91-goose-bridge","toId":"place.r91-goose-bridge","relation":"triggers","summary":"过桥听风后认清悬空雁桥的位置。"},
-    {"id":"kg.edge.r91-platform-event","fromId":"event.r91-goose-terrace","toId":"place.r91-goose-terrace","relation":"triggers","summary":"台心记雁后记下观雁台的方位。"},
-    {"id":"kg.edge.r91-stone-event","fromId":"event.r91-goose-stone","toId":"place.r91-goose-stone","relation":"triggers","summary":"寻得大石后发现雁栖石的旧约。"},
-    {"id":"kg.edge.r91-keeper-location","fromId":"char.r91-nie-qiyan","toId":"map.round-91-cloud-north-terrace","relation":"locatedAt","summary":"聂栖雁在雁回崖观雁台下守雁。"},
-    {"id":"kg.edge.r91-keeper-quest","fromId":"char.r91-nie-qiyan","toId":"quest.r91-goose-vigil","relation":"participatesIn","summary":"聂栖雁委托玩家记回台心雁书。"},
-    {"id":"kg.edge.r91-quest-platform","fromId":"quest.r91-goose-vigil","toId":"place.r91-goose-terrace","relation":"requires","summary":"崖台雁候需要玩家登观雁台调查。"},
-    {"id":"kg.edge.r91-quest-stone","fromId":"quest.r91-goose-vigil","toId":"place.r91-goose-stone","relation":"rewards","summary":"完成崖台雁候后得知雁栖石的方位。"},
-    {"id":"kg.edge.r91-terrace-ridge","fromId":"place.r91-cloud-north-terrace","toId":"map.round-74-cloud-ridge","relation":"locatedAt","summary":"雁回崖从云岭古道断云栈道北端栈口进入。"},
-    {"id":"kg.edge.r92-arrival-pass","fromId":"event.r92-arrival","toId":"place.r92-north-pass","relation":"triggers","summary":"初入照雪关时发现北境·照雪关。"},
-    {"id":"kg.edge.r92-pass-map","fromId":"place.r92-north-pass","toId":"map.round-92-north-pass","relation":"locatedAt","summary":"照雪关由百格探索地图承载。"},
-    {"id":"kg.edge.r92-river-event","fromId":"event.r92-mirror-river","toId":"place.r92-mirror-river","relation":"triggers","summary":"过河中渡后认清镜面冰河的走向。"},
-    {"id":"kg.edge.r92-beacon-event","fromId":"event.r92-snow-beacon","toId":"place.r92-snow-beacon","relation":"triggers","summary":"雪夜点燧后记下照雪烽燧的位置。"},
-    {"id":"kg.edge.r92-cairn-event","fromId":"event.r92-north-cairn","toId":"place.r92-north-cairn","relation":"triggers","summary":"寻得界碑后读出北界碑的刻文。"},
-    {"id":"kg.edge.r92-keeper-location","fromId":"char.r92-gu-zhaoxue","toId":"map.round-92-north-pass","relation":"locatedAt","summary":"谷照雪在照雪关墙内守燧。"},
-    {"id":"kg.edge.r92-keeper-quest","fromId":"char.r92-gu-zhaoxue","toId":"quest.r92-snow-beacon","relation":"participatesIn","summary":"谷照雪委托玩家点验本季烽号。"},
-    {"id":"kg.edge.r92-quest-beacon","fromId":"quest.r92-snow-beacon","toId":"place.r92-snow-beacon","relation":"requires","summary":"雪燧传烽需要玩家上照雪烽燧调查。"},
-    {"id":"kg.edge.r92-quest-cairn","fromId":"quest.r92-snow-beacon","toId":"place.r92-north-cairn","relation":"rewards","summary":"完成雪燧传烽后得知北界碑的方位。"},
-    {"id":"kg.edge.r92-pass-terrace","fromId":"place.r92-north-pass","toId":"map.round-91-cloud-north-terrace","relation":"locatedAt","summary":"照雪关从雁回崖北境栈口进入。"},
-    {"id":"kg.edge.r93-arrival-valley","fromId":"event.r93-arrival","toId":"place.r93-snow-pine-valley","relation":"triggers","summary":"初入霜松谷时发现北境·霜松谷。"},
-    {"id":"kg.edge.r93-valley-map","fromId":"place.r93-snow-pine-valley","toId":"map.round-93-snow-pine-valley","relation":"locatedAt","summary":"霜松谷由百格探索地图承载。"},
-    {"id":"kg.edge.r93-pine-sea-event","fromId":"event.r93-pine-sea","toId":"place.r93-pine-sea","relation":"triggers","summary":"渡口听涛后记下松海的方位。"},
-    {"id":"kg.edge.r93-old-mark-event","fromId":"event.r93-old-mark","toId":"place.r93-old-mark","relation":"triggers","summary":"拓文之后认清旧界标的刻文。"},
-    {"id":"kg.edge.r93-wind-gap-event","fromId":"event.r93-wind-gap","toId":"place.r93-wind-gap","relation":"triggers","summary":"崖脚望北之后记下风口崖的位置。"},
-    {"id":"kg.edge.r93-patroller-location","fromId":"char.r93-liu-xunjing","toId":"map.round-93-snow-pine-valley","relation":"locatedAt","summary":"柳寻径在霜松谷的巡路石屋驻脚。"},
-    {"id":"kg.edge.r93-patroller-quest","fromId":"char.r93-liu-xunjing","toId":"quest.r93-boundary-mark","relation":"participatesIn","summary":"柳寻径委托玩家拓回界标刻文。"},
-    {"id":"kg.edge.r93-quest-old-mark","fromId":"quest.r93-boundary-mark","toId":"place.r93-old-mark","relation":"requires","summary":"界标寻踪需要玩家在旧界标调查。"},
-    {"id":"kg.edge.r93-quest-wind-gap","fromId":"quest.r93-boundary-mark","toId":"place.r93-wind-gap","relation":"rewards","summary":"完成界标寻踪后得知风口崖的方位。"},
-    {"id":"kg.edge.r93-valley-pass","fromId":"place.r93-snow-pine-valley","toId":"map.round-92-north-pass","relation":"locatedAt","summary":"霜松谷从照雪关西缘冰桥进入。"}
+    {
+      "id": "kg.edge.lu-knows-gu",
+      "fromId": "char.lu-zhenniang",
+      "toId": "char.gu-yechen",
+      "relation": "knows",
+      "summary": "陆贞娘曾听过这名旅人在镇口打听船家。",
+      "attitudeSpread": 0.5
+    },
+    {
+      "id": "kg.edge.gu-at-ferry",
+      "fromId": "char.gu-yechen",
+      "toId": "map.round-10-mist-ferry",
+      "relation": "locatedAt",
+      "summary": "渡口传闻将顾夜尘的行踪指向芦苇深处。"
+    },
+    {
+      "id": "kg.edge.traces-at-reedbank",
+      "fromId": "event.old-footprints",
+      "toId": "place.reedbank",
+      "relation": "locatedAt",
+      "summary": "雨后脚印在芦苇河滩附近出现。"
+    },
+    {
+      "id": "kg.edge.traces-trigger-alley",
+      "fromId": "event.old-footprints",
+      "toId": "quest.round-07-clear-alley",
+      "relation": "triggers",
+      "summary": "沿线追查让巷口旧患重新浮出水面。"
+    },
+    {
+      "id": "kg.edge.medicine-needs-ointment",
+      "fromId": "quest.round-07-medicine-run",
+      "toId": "item.huichun-gao",
+      "relation": "requires",
+      "summary": "送药差事需要备齐回春膏。"
+    },
+    {
+      "id": "kg.edge.ma-at-trial",
+      "fromId": "char.ma-shangyi",
+      "toId": "map.round-01-grid",
+      "relation": "locatedAt",
+      "summary": "马尚义在试场附近张罗乡邻的差事。"
+    },
+    {
+      "id": "kg.edge.shen-holds-scroll",
+      "fromId": "char.shen-mohan",
+      "toId": "item.xisui-canpian",
+      "relation": "holds",
+      "summary": "洗髓残篇曾由书铺掌柜暂为收存。"
+    },
+    {
+      "id": "kg.edge.jiang-rewards-pill",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.qingxin-wan",
+      "relation": "rewards",
+      "summary": "帮药贩处理琐事后，他曾赠出一枚清心丸。"
+    },
+    {
+      "id": "kg.edge.gu-hostile-blade",
+      "fromId": "char.gu-yechen",
+      "toId": "char.alley-blade",
+      "relation": "hostileTo",
+      "summary": "两人都涉足巷口冲突，立场并不相同。"
+    },
+    {
+      "id": "kg.edge.rumor-influences-ending",
+      "fromId": "event.old-footprints",
+      "toId": "ending.river-lantern",
+      "relation": "influences",
+      "summary": "查清旧路传闻是河灯归处结局的必要见闻。"
+    },
+    {
+      "id": "kg.edge.medicine-influences-ending",
+      "fromId": "quest.round-07-medicine-run",
+      "toId": "ending.river-lantern",
+      "relation": "influences",
+      "summary": "完成送药差事并善待乡邻，影响河灯归处的归路。"
+    },
+    {
+      "id": "kg.edge.tingyu-influences-ending",
+      "fromId": "faction.tingyu-jiange",
+      "toId": "ending.tingyu-oath",
+      "relation": "influences",
+      "summary": "拜入听雨剑阁并守住旧约，影响听雨守约结局。"
+    },
+    {
+      "id": "kg.edge.alley-influences-tingyu-ending",
+      "fromId": "quest.round-07-clear-alley",
+      "toId": "ending.tingyu-oath",
+      "relation": "influences",
+      "summary": "巷口的取舍与剑阁的守约之道彼此相系。"
+    },
+    {
+      "id": "kg.edge.tiezhang-influences-ending",
+      "fromId": "faction.tiezhang-pai",
+      "toId": "ending.tiezhang-foundation",
+      "relation": "influences",
+      "summary": "铁嶂门人以稳扎根基、护持后来者为归途。"
+    },
+    {
+      "id": "kg.edge.yunyin-influences-ending",
+      "fromId": "faction.yunyin-shanzhuang",
+      "toId": "ending.yunyin-healer",
+      "relation": "influences",
+      "summary": "云隐的医武门训引向护生之路。"
+    },
+    {
+      "id": "kg.edge.rumor-influences-open-water",
+      "fromId": "event.old-footprints",
+      "toId": "ending.open-water",
+      "relation": "influences",
+      "summary": "走到旧渡口之后，未入门墙之人仍可选择继续远行。"
+    },
+    {
+      "id": "kg.edge.ye-belongs-tingyu",
+      "fromId": "char.ye-tingzhou",
+      "toId": "faction.tingyu-jiange",
+      "relation": "belongsTo",
+      "summary": "叶庭舟奉剑阁之命在沿途考察并指点有缘人。"
+    },
+    {
+      "id": "kg.edge.shi-belongs-tiezhang",
+      "fromId": "char.shi-bei",
+      "toId": "faction.tiezhang-pai",
+      "relation": "belongsTo",
+      "summary": "石北负责铁嶂派门人的桩功根基与入门考验。"
+    },
+    {
+      "id": "kg.edge.wen-belongs-yunyin",
+      "fromId": "char.wen-suxin",
+      "toId": "faction.yunyin-shanzhuang",
+      "relation": "belongsTo",
+      "summary": "闻素心以庄中医武并重的门训收徒授艺。"
+    },
+    {
+      "id": "kg.edge.mist-pact-tiezhang-victory",
+      "fromId": "event.mist-pact-victory",
+      "toId": "faction.tiezhang-pai",
+      "relation": "influences",
+      "summary": "门下弟子参与会盟并争得先行约期，会提升铁嶂派在渡口的声望。"
+    },
+    {
+      "id": "kg.edge.mist-pact-yunyin-victory",
+      "fromId": "event.mist-pact-victory",
+      "toId": "faction.yunyin-shanzhuang",
+      "relation": "influences",
+      "summary": "门下弟子参与会盟并争得先行约期，会影响云隐山庄在渡口的声望。"
+    },
+    {
+      "id": "kg.edge.mist-pact-tiezhang-stalemate",
+      "fromId": "event.mist-pact-stalemate",
+      "toId": "faction.tiezhang-pai",
+      "relation": "influences",
+      "summary": "双方约定轮值药道后，铁嶂派与云隐山庄均维持互通。"
+    },
+    {
+      "id": "kg.edge.mist-pact-yunyin-stalemate",
+      "fromId": "event.mist-pact-stalemate",
+      "toId": "faction.yunyin-shanzhuang",
+      "relation": "influences",
+      "summary": "双方约定轮值药道后，铁嶂派与云隐山庄均维持互通。"
+    },
+    {
+      "id": "kg.edge.mist-pact-tiezhang-defeat",
+      "fromId": "event.mist-pact-defeat",
+      "toId": "faction.tiezhang-pai",
+      "relation": "influences",
+      "summary": "本门让出先行时辰后，铁嶂派仍保留约定轮值的机会。"
+    },
+    {
+      "id": "kg.edge.mist-pact-yunyin-defeat",
+      "fromId": "event.mist-pact-defeat",
+      "toId": "faction.yunyin-shanzhuang",
+      "relation": "influences",
+      "summary": "本门争约失利后，云隐山庄取得先行时辰并继续开放药道。"
+    },
+    {
+      "id": "kg.edge.rong-at-ferry",
+      "fromId": "char.rong-su-qing",
+      "toId": "map.round-10-mist-ferry",
+      "relation": "locatedAt",
+      "summary": "容素青在渡口檐下晾药坐诊，替往来的药队看方。"
+    },
+    {
+      "id": "kg.edge.rong-knows-shengji",
+      "fromId": "char.rong-su-qing",
+      "toId": "event.formula-shengji-san",
+      "relation": "knows",
+      "summary": "容素青握有生肌散的完整配伍与火候。"
+    },
+    {
+      "id": "kg.edge.rong-knows-ningshen",
+      "fromId": "char.rong-su-qing",
+      "toId": "event.formula-ningshen-wan",
+      "relation": "knows",
+      "summary": "宁神丸的火候口诀只在容素青肚里记着。"
+    },
+    {
+      "id": "kg.edge.rong-knows-shuanghe",
+      "fromId": "char.rong-su-qing",
+      "toId": "event.formula-shuanghe-dan",
+      "relation": "knows",
+      "summary": "容素青只把双和丹传给肯守炉子的问方人。"
+    },
+    {
+      "id": "kg.edge.shengji-needs-hanzhu",
+      "fromId": "event.formula-shengji-san",
+      "toId": "item.hanzhu-cao",
+      "relation": "requires",
+      "summary": "生肌散以寒珠草败火定血，需两份。"
+    },
+    {
+      "id": "kg.edge.shengji-needs-cangya",
+      "fromId": "event.formula-shengji-san",
+      "toId": "item.cangya-gen",
+      "relation": "requires",
+      "summary": "生肌散以苍崖根托气生肌，需一份。"
+    },
+    {
+      "id": "kg.edge.ningshen-needs-luodie",
+      "fromId": "event.formula-ningshen-wan",
+      "toId": "item.luodie-hua",
+      "relation": "requires",
+      "summary": "宁神丸以落蝶花引药入心经，需两份。"
+    },
+    {
+      "id": "kg.edge.ningshen-needs-hanzhu",
+      "fromId": "event.formula-ningshen-wan",
+      "toId": "item.hanzhu-cao",
+      "relation": "requires",
+      "summary": "宁神丸以寒珠草清降躁火，需一份。"
+    },
+    {
+      "id": "kg.edge.shuanghe-needs-hanzhu",
+      "fromId": "event.formula-shuanghe-dan",
+      "toId": "item.hanzhu-cao",
+      "relation": "requires",
+      "summary": "双和丹三味鼎足，寒珠草居其一。"
+    },
+    {
+      "id": "kg.edge.shuanghe-needs-cangya",
+      "fromId": "event.formula-shuanghe-dan",
+      "toId": "item.cangya-gen",
+      "relation": "requires",
+      "summary": "双和丹三味鼎足，苍崖根居其一。"
+    },
+    {
+      "id": "kg.edge.shuanghe-needs-luodie",
+      "fromId": "event.formula-shuanghe-dan",
+      "toId": "item.luodie-hua",
+      "relation": "requires",
+      "summary": "双和丹三味鼎足，落蝶花居其一。"
+    },
+    {
+      "id": "kg.edge.shengji-rewards-cu",
+      "fromId": "event.formula-shengji-san",
+      "toId": "item.shengji-san-cu",
+      "relation": "rewards",
+      "summary": "悟性初入门时，此方只出粗制一档。"
+    },
+    {
+      "id": "kg.edge.shengji-rewards-zhong",
+      "fromId": "event.formula-shengji-san",
+      "toId": "item.shengji-san-zhong",
+      "relation": "rewards",
+      "summary": "悟性渐长后，此方能出中正一档。"
+    },
+    {
+      "id": "kg.edge.shengji-rewards-shang",
+      "fromId": "event.formula-shengji-san",
+      "toId": "item.shengji-san-shang",
+      "relation": "rewards",
+      "summary": "悟性纯熟时，此方出上乘一档。"
+    },
+    {
+      "id": "kg.edge.ningshen-rewards-cu",
+      "fromId": "event.formula-ningshen-wan",
+      "toId": "item.ningshen-wan-cu",
+      "relation": "rewards",
+      "summary": "悟性初入门时，此方只出粗制一档。"
+    },
+    {
+      "id": "kg.edge.ningshen-rewards-zhong",
+      "fromId": "event.formula-ningshen-wan",
+      "toId": "item.ningshen-wan-zhong",
+      "relation": "rewards",
+      "summary": "悟性渐长后，此方能出中正一档。"
+    },
+    {
+      "id": "kg.edge.ningshen-rewards-shang",
+      "fromId": "event.formula-ningshen-wan",
+      "toId": "item.ningshen-wan-shang",
+      "relation": "rewards",
+      "summary": "悟性纯熟时，此方出上乘一档。"
+    },
+    {
+      "id": "kg.edge.shuanghe-rewards-cu",
+      "fromId": "event.formula-shuanghe-dan",
+      "toId": "item.shuanghe-dan-cu",
+      "relation": "rewards",
+      "summary": "悟性初入门时，此方只出粗制一档。"
+    },
+    {
+      "id": "kg.edge.shuanghe-rewards-zhong",
+      "fromId": "event.formula-shuanghe-dan",
+      "toId": "item.shuanghe-dan-zhong",
+      "relation": "rewards",
+      "summary": "悟性渐长后，此方能出中正一档。"
+    },
+    {
+      "id": "kg.edge.shuanghe-rewards-shang",
+      "fromId": "event.formula-shuanghe-dan",
+      "toId": "item.shuanghe-dan-shang",
+      "relation": "rewards",
+      "summary": "悟性纯熟时，此方出上乘一档。"
+    },
+    {
+      "id": "kg.edge.liu-belongs-hanshan",
+      "fromId": "char.liu-tinglan",
+      "toId": "faction.hanshan-shuyuan",
+      "relation": "belongsTo",
+      "summary": "柳听澜代表书院在镇中讲书堂收徒授业。"
+    },
+    {
+      "id": "kg.edge.liu-located-trial",
+      "fromId": "char.liu-tinglan",
+      "toId": "map.round-01-grid",
+      "relation": "locatedAt",
+      "summary": "柳听澜在方格试炼场一侧的讲书堂设案誊录。"
+    },
+    {
+      "id": "kg.edge.liu-knows-registry",
+      "fromId": "char.liu-tinglan",
+      "toId": "event.ferry-passage-registry",
+      "relation": "knows",
+      "summary": "渡籍轮值章程的誊抄副本存在寒山书院，由柳听澜执笔。"
+    },
+    {
+      "id": "kg.edge.zhu-belongs-panzhou",
+      "fromId": "char.zhu-jiuxian",
+      "toId": "faction.panzhou-daochang",
+      "relation": "belongsTo",
+      "summary": "祝九弦是刀场常驻渡口的教头，负责护航排班与授刀。"
+    },
+    {
+      "id": "kg.edge.zhu-located-ferry",
+      "fromId": "char.zhu-jiuxian",
+      "toId": "map.round-10-mist-ferry",
+      "relation": "locatedAt",
+      "summary": "祝九弦常在雾雨渡口的栈桥头清点缆绳。"
+    },
+    {
+      "id": "kg.edge.bai-located-ferry",
+      "fromId": "char.bai-luzhou",
+      "toId": "map.round-10-mist-ferry",
+      "relation": "locatedAt",
+      "summary": "白鹭洲在渡口公所檐下掌管船票与渡籍。"
+    },
+    {
+      "id": "kg.edge.bai-knows-registry",
+      "fromId": "char.bai-luzhou",
+      "toId": "event.ferry-passage-registry",
+      "relation": "knows",
+      "summary": "轮值章程由渡董立约，渡籍正本始终在白鹭洲袖中。"
+    },
+    {
+      "id": "kg.edge.registry-influences-panzhou",
+      "fromId": "event.ferry-passage-registry",
+      "toId": "faction.panzhou-daochang",
+      "relation": "influences",
+      "summary": "轮值章程定下药队过桥时辰，刀场的护航排班随之而动。"
+    },
+    {
+      "id": "kg.edge.mist-pact-stalemate-panzhou",
+      "fromId": "event.mist-pact-stalemate",
+      "toId": "faction.panzhou-daochang",
+      "relation": "influences",
+      "summary": "轮值成约后，刀场按章程承接两派药队的护航班次。"
+    },
+    {
+      "id": "kg.edge.bai-knows-zhu",
+      "fromId": "char.bai-luzhou",
+      "toId": "char.zhu-jiuxian",
+      "relation": "knows",
+      "summary": "渡董与刀场教头每日对排班，交情在账目往来之中。",
+      "attitudeSpread": 0.4
+    },
+    {
+      "id": "kg.edge.zhu-knows-bai",
+      "fromId": "char.zhu-jiuxian",
+      "toId": "char.bai-luzhou",
+      "relation": "knows",
+      "summary": "祝九弦敬白鹭洲记账分明，坏约的船他一眼就挑得出来。",
+      "attitudeSpread": 0.5
+    },
+    {
+      "id": "kg.edge.bai-knows-wen",
+      "fromId": "char.bai-luzhou",
+      "toId": "char.wen-suxin",
+      "relation": "knows",
+      "summary": "轮值章程本为云隐药队而立，渡董与庄主书信往来多年。",
+      "attitudeSpread": 0.3
+    },
+    {
+      "id": "kg.edge.liu-knows-ye",
+      "fromId": "char.liu-tinglan",
+      "toId": "char.ye-tingzhou",
+      "relation": "knows",
+      "summary": "书院教习与剑阁教习以诗文相往来，彼此欣赏对方压得住性子。",
+      "attitudeSpread": 0.5
+    },
+    {
+      "id": "kg.edge.tingyu-jianfa-belongs-tingyu",
+      "fromId": "skill.tingyu-jianfa",
+      "toId": "faction.tingyu-jiange",
+      "relation": "belongsTo",
+      "summary": "听雨剑法是剑阁镇派剑法，弟子入门必修，讲究以静制动、后发先至。"
+    },
+    {
+      "id": "kg.edge.luoyu-jian-belongs-tingyu",
+      "fromId": "skill.r32-tingyu-luoyu-jian",
+      "toId": "faction.tingyu-jiange",
+      "relation": "belongsTo",
+      "summary": "落雨七分剑是剑阁的入门试势剑，七分留手三分试探，练的是读势。"
+    },
+    {
+      "id": "kg.edge.fushui-jian-belongs-tingyu",
+      "fromId": "skill.r32-tingyu-fushui-jian",
+      "toId": "faction.tingyu-jiange",
+      "relation": "belongsTo",
+      "summary": "覆水回澜剑属剑阁的借势折返剑路，狭巷桥头尤其讲究收势。"
+    },
+    {
+      "id": "kg.edge.huilan-jian-belongs-tingyu",
+      "fromId": "skill.r32-tingyu-huilan-jian",
+      "toId": "faction.tingyu-jiange",
+      "relation": "belongsTo",
+      "summary": "回澜照影剑是剑阁中阶剑路，横剑如镜等敌自露空门再回锋。"
+    },
+    {
+      "id": "kg.edge.huaiyin-jue-belongs-tingyu",
+      "fromId": "skill.r32-tingyu-huaiyin-jue",
+      "toId": "faction.tingyu-jiange",
+      "relation": "belongsTo",
+      "summary": "怀音养息诀是剑阁的调息内篇，缓急两种呼吸交替归拢气息。"
+    },
+    {
+      "id": "kg.edge.tingchao-jian-belongs-tingyu",
+      "fromId": "skill.r32-tingyu-tingchao-jian",
+      "toId": "faction.tingyu-jiange",
+      "relation": "belongsTo",
+      "summary": "听潮入微剑是剑阁高阶听劲剑路，以耳辨衣袂、剑未至先封退路。"
+    },
+    {
+      "id": "kg.edge.tiezhang-zhuanggong-belongs-tiezhang",
+      "fromId": "skill.tiezhang-zhuanggong",
+      "toId": "faction.tiezhang-pai",
+      "relation": "belongsTo",
+      "summary": "铁嶂桩功是铁嶂派筑基桩功，立于桩上负重吐纳，皮糙骨坚。"
+    },
+    {
+      "id": "kg.edge.tiezhuang-quan-belongs-tiezhang",
+      "fromId": "skill.r32-tiezhang-tiezhuang-quan",
+      "toId": "faction.tiezhang-pai",
+      "relation": "belongsTo",
+      "summary": "铁桩靠山拳是铁嶂派贴桩近身拳，初练不求伤人，只求站住不倒。"
+    },
+    {
+      "id": "kg.edge.fanbang-jin-belongs-tiezhang",
+      "fromId": "skill.r32-tiezhang-fanbang-jin",
+      "toId": "faction.tiezhang-pai",
+      "relation": "belongsTo",
+      "summary": "翻磅劲是铁嶂派负重换劲法，负石绕桩，卸下外力再翻回沉劲。"
+    },
+    {
+      "id": "kg.edge.kaishan-dao-belongs-tiezhang",
+      "fromId": "skill.r32-tiezhang-kaishan-dao",
+      "toId": "faction.tiezhang-pai",
+      "relation": "belongsTo",
+      "summary": "开山扛鼎刀是铁嶂派劈斩路数，刀背架势、沉肩直劈逼人离位。"
+    },
+    {
+      "id": "kg.edge.jieding-zhuang-belongs-tiezhang",
+      "fromId": "skill.r32-tiezhang-jieding-zhuang",
+      "toId": "faction.tiezhang-pai",
+      "relation": "belongsTo",
+      "summary": "截顶护身桩是铁嶂派守中反震功，把外力引向地面再反震回去。"
+    },
+    {
+      "id": "kg.edge.shishou-tui-belongs-tiezhang",
+      "fromId": "skill.r32-tiezhang-shishou-tui",
+      "toId": "faction.tiezhang-pai",
+      "relation": "belongsTo",
+      "summary": "十手推碑腿是铁嶂派高阶破阵腿法，十连推蹬拆架、末腿取中门。"
+    },
+    {
+      "id": "kg.edge.yunyin-shenfa-belongs-yunyin",
+      "fromId": "skill.yunyin-shenfa",
+      "toId": "faction.yunyin-shanzhuang",
+      "relation": "belongsTo",
+      "summary": "云隐身法是山庄轻身功夫，提气纵跃落地无声，采药避兽保命脱身皆用。"
+    },
+    {
+      "id": "kg.edge.caomu-xinfa-belongs-yunyin",
+      "fromId": "skill.r32-yunyin-caomu-xinfa",
+      "toId": "faction.yunyin-shanzhuang",
+      "relation": "belongsTo",
+      "summary": "草木回息篇是云隐山庄的基础调养心法，配合四时草木吐纳不催不迫。"
+    },
+    {
+      "id": "kg.edge.buyun-lu-belongs-yunyin",
+      "fromId": "skill.r32-yunyin-buyun-lu",
+      "toId": "faction.yunyin-shanzhuang",
+      "relation": "belongsTo",
+      "summary": "步云履是山庄沿山采药步法，落足总选在草木受力最稳处。"
+    },
+    {
+      "id": "kg.edge.qingfeng-zhang-belongs-yunyin",
+      "fromId": "skill.r32-yunyin-qingfeng-zhang",
+      "toId": "faction.yunyin-shanzhuang",
+      "relation": "belongsTo",
+      "summary": "清风拂穴掌是山庄点按经络的轻掌，止争多过伤人，出掌留三分余地。"
+    },
+    {
+      "id": "kg.edge.huiyang-jue-belongs-yunyin",
+      "fromId": "skill.r32-yunyin-huiyang-jue",
+      "toId": "faction.yunyin-shanzhuang",
+      "relation": "belongsTo",
+      "summary": "回阳引气诀是山庄护送行功法，先收气息回丹田再送往受伤处。"
+    },
+    {
+      "id": "kg.edge.luqiang-shenfa-belongs-yunyin",
+      "fromId": "skill.r32-yunyin-luqiang-shenfa",
+      "toId": "faction.yunyin-shanzhuang",
+      "relation": "belongsTo",
+      "summary": "露墙穿枝步是山庄林间高阶步法，穿过枝隙立即转身，不把背门留给追兵。"
+    },
+    {
+      "id": "kg.edge.zhumo-bi-belongs-hanshan",
+      "fromId": "skill.r32-hanshan-zhumo-bi",
+      "toId": "faction.hanshan-shuyuan",
+      "relation": "belongsTo",
+      "summary": "朱墨点腕笔是寒山书院判官笔入门手法，出手如批注文章只改一字。"
+    },
+    {
+      "id": "kg.edge.dianjin-bi-belongs-hanshan",
+      "fromId": "skill.r32-hanshan-dianjin-bi",
+      "toId": "faction.hanshan-shuyuan",
+      "relation": "belongsTo",
+      "summary": "点津校脉笔属寒山书院，以笔锋校正腕肘角度让对手力道落空。"
+    },
+    {
+      "id": "kg.edge.fengzhe-bi-belongs-hanshan",
+      "fromId": "skill.r32-hanshan-fengzhe-bi",
+      "toId": "faction.hanshan-shuyuan",
+      "relation": "belongsTo",
+      "summary": "锋折批隙手是寒山书院进阶功夫，引开兵刃再从架势最薄处直进一寸。"
+    },
+    {
+      "id": "kg.edge.jinglun-xinfa-belongs-hanshan",
+      "fromId": "skill.r32-hanshan-jinglun-xinfa",
+      "toId": "faction.hanshan-shuyuan",
+      "relation": "belongsTo",
+      "summary": "经纶定息篇是寒山书院循序养气法，呼吸分四段，抄录盟书时默记节拍。"
+    },
+    {
+      "id": "kg.edge.dingli-jue-belongs-hanshan",
+      "fromId": "skill.r32-hanshan-dingli-jue",
+      "toId": "faction.hanshan-shuyuan",
+      "relation": "belongsTo",
+      "summary": "定理贯脉诀是寒山书院高阶守中内篇，辨清气血逆顺再以长息贯脉。"
+    },
+    {
+      "id": "kg.edge.fanjing-dao-belongs-panzhou",
+      "fromId": "skill.r32-panzhou-fanjing-dao",
+      "toId": "faction.panzhou-daochang",
+      "relation": "belongsTo",
+      "summary": "翻桨刀是盘舷刀场护船入门刀路，窄处护人，不许横刀伤及同船。"
+    },
+    {
+      "id": "kg.edge.jielan-dao-belongs-panzhou",
+      "fromId": "skill.r32-panzhou-jielan-dao",
+      "toId": "faction.panzhou-daochang",
+      "relation": "belongsTo",
+      "summary": "截浪回舷刀属盘舷刀场，顺船身摇摆压低重心，截住来势立即回斩。"
+    },
+    {
+      "id": "kg.edge.shunxun-bu-belongs-panzhou",
+      "fromId": "skill.r32-panzhou-shunxun-bu",
+      "toId": "faction.panzhou-daochang",
+      "relation": "belongsTo",
+      "summary": "顺汛换步是盘舷刀场船板移步法，脚掌留半分余力，拥挤时给同伴让路。"
+    },
+    {
+      "id": "kg.edge.pobai-dao-belongs-panzhou",
+      "fromId": "skill.r32-panzhou-pobai-dao",
+      "toId": "faction.panzhou-daochang",
+      "relation": "belongsTo",
+      "summary": "破白连环刀是盘舷刀场高阶护航刀路，三刀分守船首舱口退路再取进势。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-huichun-gao",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.huichun-gao",
+      "relation": "holds",
+      "summary": "回春膏是货担常备的黑膏伤药，不限量供应，走江湖的保命底货。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-qingxin-wan",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.qingxin-wan",
+      "relation": "holds",
+      "summary": "清心丸每趟只上五枚，卖完须等他回程补货。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-wuji-dan",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.wuji-dan",
+      "relation": "holds",
+      "summary": "压箱底的无极丹一次只带两丸，药队启程前常被整罐买走。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-qingtong-bijian",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.qingtong-bijian",
+      "relation": "holds",
+      "summary": "担子里只搁一管青铜笔剑，读书人遮遮掩掩的防身巧器。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-fanbu-duanhe",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.fanbu-duanhe",
+      "relation": "holds",
+      "summary": "两件帆布短褐叠在担角，针脚密实，寻常拳脚打上去能卸三分力。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-suwen-yupei",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.suwen-yupei",
+      "relation": "holds",
+      "summary": "锦盒里收着一枚素纹玉佩，仅此一件，先到先得。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-iron-sand",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.iron-sand",
+      "relation": "holds",
+      "summary": "细筛熟铁砂敞开供应，补刃填痕、修桥锻料都用得上。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-tough-leather",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.tough-leather",
+      "relation": "holds",
+      "summary": "烟熏油浸的韧皮料不限量，捆扎补强随取随称。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-jade-polish",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.jade-polish",
+      "relation": "holds",
+      "summary": "青玉磨粉按份出售，旧玉重起光泽离不开它。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-hanzhu-cao",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.hanzhu-cao",
+      "relation": "holds",
+      "summary": "新鲜寒珠草成把卖不限量，叶心凉珠还带着晨露。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-cangya-gen",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.cangya-gen",
+      "relation": "holds",
+      "summary": "苍崖根按根计价、货源不断，切片入汤托气生肌。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-luodie-hua",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.luodie-hua",
+      "relation": "holds",
+      "summary": "落蝶花整束出售不限量，晒干后辛香能引药入心经。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-songzhen-xuesan",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.r32.songzhen-xuesan",
+      "relation": "holds",
+      "summary": "松针止血散每趟只带三包，敷伤应急的青末好物。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-ouling-huqitang",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.r32.ouling-huqitang",
+      "relation": "holds",
+      "summary": "鸥翎回气汤装在陶瓶里，每趟三瓶，补回耗散的内息。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-shuanglu-fuhe-san",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.r32.shuanglu-fuhe-san",
+      "relation": "holds",
+      "summary": "双露复合散每趟备三份，擦伤气短两样都管。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-jiangxin-buqi-wan",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.r32.jiangxin-buqi-wan",
+      "relation": "holds",
+      "summary": "江心补气丸一次进货两丸，药性温和最宜调息。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-yushen-huoxue-gao",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.r32.yushen-huoxue-gao",
+      "relation": "holds",
+      "summary": "雨参活血膏限两盒，辛烈药力专治淤滞旧伤。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-changqing-yangqi-dan",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.r32.changqing-yangqi-dan",
+      "relation": "holds",
+      "summary": "长青养气丹蜡衣封存，每趟两丸，内息见底时慢慢调息。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-luwei-shengji-dan",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.r32.luwei-shengji-dan",
+      "relation": "holds",
+      "summary": "芦苇生肌丹是水路改良方，每趟两丸，敷创补气两不误。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-yunhe-wuhua-dan",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.r32.yunhe-wuhua-dan",
+      "relation": "holds",
+      "summary": "云鹤无暇丹只此一丸，云隐山庄封存的双补珍品。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-willow-switch-sword",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.r32.willow-switch-sword",
+      "relation": "holds",
+      "summary": "柳叶判官笔仅一支，收笔似笔、出手是锋。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-rain-shed-coat",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.r32.rain-shed-coat",
+      "relation": "holds",
+      "summary": "油布夹棉的避雨短褂只带一件，挡风雨也挡钝击。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-river-copper",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.r32.river-copper",
+      "relation": "holds",
+      "summary": "旧渡船拆下的江铜片每趟五片，可作刀柄箍与玉佩背扣。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-moon-leaf-iron",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.r32.moon-leaf-iron",
+      "relation": "holds",
+      "summary": "月叶熟铁弯如柳叶，每趟四片，重理薄刃的好料。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-blue-slate",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.r32.blue-slate",
+      "relation": "holds",
+      "summary": "青灰磨石每趟六方，收毛刺、平接缝都靠它。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-black-silk-thread",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.r32.black-silk-thread",
+      "relation": "holds",
+      "summary": "乌蚕韧丝浸油不怕潮，每趟五绞，缝甲不断线。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-reed-cloth",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.r32.reed-cloth",
+      "relation": "holds",
+      "summary": "苇纤布轻便耐磨，每趟四匹，补衣襟袖口正合适。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-cloud-wool",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.r32.cloud-wool",
+      "relation": "holds",
+      "summary": "云絮棉松软不吸水，每趟四包，填行衣夹层用。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-ash-bark",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.r32.ash-bark",
+      "relation": "holds",
+      "summary": "灰桦皮烟熏后柔韧耐水，每趟四捆，藏进甲层可作缓冲。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-clam-shell",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.r32.clam-shell",
+      "relation": "holds",
+      "summary": "江口厚蚌壳片每趟四片，磨薄了衬玉隔潮。"
+    },
+    {
+      "id": "kg.edge.jiang-holds-marsh-amber",
+      "fromId": "char.jiang-baiwei",
+      "toId": "item.r32.marsh-amber",
+      "relation": "holds",
+      "summary": "沼泽琥珀蜜色坚韧，每趟三块，嵌玉佩铜扣的嵌料。"
+    },
+    {
+      "id": "kg.edge.forge-pen-sword-needs-bijian",
+      "fromId": "item.qingtong-jian",
+      "toId": "item.qingtong-bijian",
+      "relation": "requires",
+      "summary": "重理笔剑刃口以一管青铜笔剑为底，旧器形制不改。"
+    },
+    {
+      "id": "kg.edge.forge-pen-sword-needs-iron-sand",
+      "fromId": "item.qingtong-jian",
+      "toId": "item.iron-sand",
+      "relation": "requires",
+      "summary": "重理笔剑刃口需两份熟铁砂补刃校锋。"
+    },
+    {
+      "id": "kg.edge.forge-canvas-coat-needs-duanhe",
+      "fromId": "item.yanyu-duanyi",
+      "toId": "item.fanbu-duanhe",
+      "relation": "requires",
+      "summary": "补强短褐以一件帆布短褐为底，肩肘再缝韧皮。"
+    },
+    {
+      "id": "kg.edge.forge-canvas-coat-needs-tough-leather",
+      "fromId": "item.yanyu-duanyi",
+      "toId": "item.tough-leather",
+      "relation": "requires",
+      "summary": "补强短褐需两捆韧皮料纳进肩肘受力处。"
+    },
+    {
+      "id": "kg.edge.forge-plain-jade-needs-yupei",
+      "fromId": "item.qingyu-pei",
+      "toId": "item.suwen-yupei",
+      "relation": "requires",
+      "summary": "润泽青玉佩以原枚素纹玉佩为底，重起玉面与系绳。"
+    },
+    {
+      "id": "kg.edge.forge-plain-jade-needs-jade-polish",
+      "fromId": "item.qingyu-pei",
+      "toId": "item.jade-polish",
+      "relation": "requires",
+      "summary": "重磨玉面需两份青玉磨粉起蜡穿绳。"
+    },
+    {
+      "id": "kg.edge.forge-tide-sword-needs-willow-pen",
+      "fromId": "item.r32.tide-folded-sword",
+      "toId": "item.r32.willow-switch-sword",
+      "relation": "requires",
+      "summary": "潮纹重淬以一支柳叶判官笔为胎改作短剑。"
+    },
+    {
+      "id": "kg.edge.forge-tide-sword-needs-river-copper",
+      "fromId": "item.r32.tide-folded-sword",
+      "toId": "item.r32.river-copper",
+      "relation": "requires",
+      "summary": "潮纹重淬需两片江铜稳住刀柄。"
+    },
+    {
+      "id": "kg.edge.forge-tide-sword-needs-moon-leaf-iron",
+      "fromId": "item.r32.tide-folded-sword",
+      "toId": "item.r32.moon-leaf-iron",
+      "relation": "requires",
+      "summary": "潮纹重淬需一片月叶熟铁补刃。"
+    },
+    {
+      "id": "kg.edge.forge-mist-sword-needs-tide-sword",
+      "fromId": "item.r32.mist-piercer-sword",
+      "toId": "item.r32.tide-folded-sword",
+      "relation": "requires",
+      "summary": "穿雾开锋以一柄潮折短剑为底重校刃线。"
+    },
+    {
+      "id": "kg.edge.forge-mist-sword-needs-moon-leaf-iron",
+      "fromId": "item.r32.mist-piercer-sword",
+      "toId": "item.r32.moon-leaf-iron",
+      "relation": "requires",
+      "summary": "穿雾开锋需两片月叶熟铁续补刃口。"
+    },
+    {
+      "id": "kg.edge.forge-mist-sword-needs-blue-slate",
+      "fromId": "item.r32.mist-piercer-sword",
+      "toId": "item.r32.blue-slate",
+      "relation": "requires",
+      "summary": "穿雾开锋最后用一方青灰磨石收口。"
+    },
+    {
+      "id": "kg.edge.forge-reed-robe-needs-rain-coat",
+      "fromId": "item.r32.reed-stitched-robe",
+      "toId": "item.r32.rain-shed-coat",
+      "relation": "requires",
+      "summary": "苇线纳衣以一件避雨短褂为底重新纳紧。"
+    },
+    {
+      "id": "kg.edge.forge-reed-robe-needs-silk-thread",
+      "fromId": "item.r32.reed-stitched-robe",
+      "toId": "item.r32.black-silk-thread",
+      "relation": "requires",
+      "summary": "苇线纳衣需两绞乌蚕韧丝走线。"
+    },
+    {
+      "id": "kg.edge.forge-reed-robe-needs-reed-cloth",
+      "fromId": "item.r32.reed-stitched-robe",
+      "toId": "item.r32.reed-cloth",
+      "relation": "requires",
+      "summary": "苇线纳衣需一匹苇纤布铺垫受力处。"
+    },
+    {
+      "id": "kg.edge.forge-pier-cloak-needs-reed-robe",
+      "fromId": "item.r32.pier-guard-cloak",
+      "toId": "item.r32.reed-stitched-robe",
+      "relation": "requires",
+      "summary": "夹层添甲以一件苇线行衣为底加护。"
+    },
+    {
+      "id": "kg.edge.forge-pier-cloak-needs-cloud-wool",
+      "fromId": "item.r32.pier-guard-cloak",
+      "toId": "item.r32.cloud-wool",
+      "relation": "requires",
+      "summary": "夹层添甲需两包云絮棉填入夹层。"
+    },
+    {
+      "id": "kg.edge.forge-pier-cloak-needs-ash-bark",
+      "fromId": "item.r32.pier-guard-cloak",
+      "toId": "item.r32.ash-bark",
+      "relation": "requires",
+      "summary": "夹层添甲需一捆灰桦皮外缝护肩。"
+    },
+    {
+      "id": "kg.edge.forge-clam-pendant-needs-yupei",
+      "fromId": "item.r32.clam-light-pendant",
+      "toId": "item.suwen-yupei",
+      "relation": "requires",
+      "summary": "蚌光衬玉以原枚素纹玉佩为底隔潮。"
+    },
+    {
+      "id": "kg.edge.forge-clam-pendant-needs-clam-shell",
+      "fromId": "item.r32.clam-light-pendant",
+      "toId": "item.r32.clam-shell",
+      "relation": "requires",
+      "summary": "蚌光衬玉需两片磨薄的厚蚌壳片作背衬。"
+    },
+    {
+      "id": "kg.edge.forge-clam-pendant-needs-river-copper",
+      "fromId": "item.r32.clam-light-pendant",
+      "toId": "item.r32.river-copper",
+      "relation": "requires",
+      "summary": "蚌光衬玉需一片江铜稳住背扣。"
+    },
+    {
+      "id": "kg.edge.forge-amber-seal-needs-clam-pendant",
+      "fromId": "item.r32.marsh-amber-seal",
+      "toId": "item.r32.clam-light-pendant",
+      "relation": "requires",
+      "summary": "琥珀嵌扣以一枚蚌光佩为底加嵌。"
+    },
+    {
+      "id": "kg.edge.forge-amber-seal-needs-marsh-amber",
+      "fromId": "item.r32.marsh-amber-seal",
+      "toId": "item.r32.marsh-amber",
+      "relation": "requires",
+      "summary": "琥珀嵌扣需两块沼泽琥珀作嵌料。"
+    },
+    {
+      "id": "kg.edge.forge-amber-seal-needs-blue-slate",
+      "fromId": "item.r32.marsh-amber-seal",
+      "toId": "item.r32.blue-slate",
+      "relation": "requires",
+      "summary": "琥珀嵌扣用一方青灰磨石磨平接缝。"
+    },
+    {
+      "id": "kg.edge.ma-offers-medicine-run",
+      "fromId": "char.ma-shangyi",
+      "toId": "quest.round-07-medicine-run",
+      "relation": "participatesIn",
+      "summary": "巷口送药的差事由马尚义张罗，备齐回春膏交他送去安置伤者。"
+    },
+    {
+      "id": "kg.edge.ma-offers-clear-alley",
+      "fromId": "char.ma-shangyi",
+      "toId": "quest.round-07-clear-alley",
+      "relation": "participatesIn",
+      "summary": "巷口除患由马尚义托付可信之人，击退刀客乡邻才敢出门。"
+    },
+    {
+      "id": "kg.edge.lu-offers-teastall-water",
+      "fromId": "char.lu-zhenniang",
+      "toId": "quest.r31-teastall-herbal-water",
+      "relation": "participatesIn",
+      "summary": "茶棚凉汤差事由陆贞娘开口相托，只为入夏那桶凉汤。"
+    },
+    {
+      "id": "kg.edge.lu-offers-lantern-promise",
+      "fromId": "char.lu-zhenniang",
+      "toId": "quest.r31-river-lantern-promise",
+      "relation": "participatesIn",
+      "summary": "河灯之约由陆贞娘提议，圆去年灯节放灯的旧约。"
+    },
+    {
+      "id": "kg.edge.shen-offers-bookshop-mothproof",
+      "fromId": "char.shen-mohan",
+      "toId": "quest.r31-bookshop-mothproof",
+      "relation": "participatesIn",
+      "summary": "书铺驱蠹由沈墨涵拜托，护住新进旧册安生过夏。"
+    },
+    {
+      "id": "kg.edge.jiang-offers-peddler-errand",
+      "fromId": "char.jiang-baiwei",
+      "toId": "quest.r31-peddler-errand",
+      "relation": "participatesIn",
+      "summary": "货郎口信是姜百味随货担捎带的请托，误了便赶不上船期。"
+    },
+    {
+      "id": "kg.edge.gu-offers-roadside-note",
+      "fromId": "char.gu-yechen",
+      "toId": "quest.r31-roadside-note",
+      "relation": "participatesIn",
+      "summary": "路旁荐帖出自顾夜尘之手，把可造之才荐去盘舷刀场。"
+    },
+    {
+      "id": "kg.edge.gu-offers-wharf-ears",
+      "fromId": "char.gu-yechen",
+      "toId": "quest.r31-wharf-ears",
+      "relation": "participatesIn",
+      "summary": "江湖耳目仍是顾夜尘的差遣，要摸清药道今后的口风。"
+    },
+    {
+      "id": "kg.edge.ma-offers-herbal-inquiry",
+      "fromId": "char.ma-shangyi",
+      "toId": "quest.r31-herbal-inquiry",
+      "relation": "participatesIn",
+      "summary": "灯下问药由马尚义再托一程，专问疮口配伍的忌讳。"
+    },
+    {
+      "id": "kg.edge.rong-offers-herbal-stocktaking",
+      "fromId": "char.rong-su-qing",
+      "toId": "quest.r31-herbal-stocktaking",
+      "relation": "participatesIn",
+      "summary": "药庐清点是容素青自己的事，缺的是三根苍崖根。"
+    },
+    {
+      "id": "kg.edge.bai-offers-ferry-ledger",
+      "fromId": "char.bai-luzhou",
+      "toId": "quest.r31-ferry-ledger",
+      "relation": "participatesIn",
+      "summary": "渡籍补录由白鹭洲出面，请书院教习誊正用印。"
+    },
+    {
+      "id": "kg.edge.bai-offers-guard-caravan",
+      "fromId": "char.bai-luzhou",
+      "toId": "quest.r31-guard-the-caravan",
+      "relation": "participatesIn",
+      "summary": "先保药队一途由白鹭洲列上告示板，转述石北护队先行的主张。"
+    },
+    {
+      "id": "kg.edge.bai-offers-mend-pier",
+      "fromId": "char.bai-luzhou",
+      "toId": "quest.r31-mend-the-pier",
+      "relation": "participatesIn",
+      "summary": "先修栈桥一途也由白鹭洲列出，桥桩酥了不许重载硬闯。"
+    },
+    {
+      "id": "kg.edge.bai-offers-pier-toll",
+      "fromId": "char.bai-luzhou",
+      "toId": "quest.r31-pier-toll-clearing",
+      "relation": "participatesIn",
+      "summary": "栈桥通渡由白鹭洲点将，新桥通渡前先清桥头。"
+    },
+    {
+      "id": "kg.edge.liu-offers-academy-nightclass",
+      "fromId": "char.liu-tinglan",
+      "toId": "quest.r31-academy-nightclass",
+      "relation": "participatesIn",
+      "summary": "书院夜课由柳听澜布置，只为学子案头两丸清心。"
+    },
+    {
+      "id": "kg.edge.wen-offers-mist-shore-watch",
+      "fromId": "char.wen-suxin",
+      "toId": "quest.r31-mist-shore-watch",
+      "relation": "participatesIn",
+      "summary": "雾夜巡岸是闻素心的托付，北岸雾里有替人踩点的黑影。"
+    },
+    {
+      "id": "kg.edge.wen-offers-caravan-gratitude",
+      "fromId": "char.wen-suxin",
+      "toId": "quest.r31-caravan-gratitude",
+      "relation": "participatesIn",
+      "summary": "药队答谢由闻素心主张，人情要当面认账。"
+    },
+    {
+      "id": "kg.edge.shi-offers-caravan-provisioning",
+      "fromId": "char.shi-bei",
+      "toId": "quest.r31-caravan-provisioning",
+      "relation": "participatesIn",
+      "summary": "药队启程由石北托办，只差一味压箱的无极丹。"
+    },
+    {
+      "id": "kg.edge.zhu-offers-blade-quench",
+      "fromId": "char.zhu-jiuxian",
+      "toId": "quest.r31-blade-quench-stock",
+      "relation": "participatesIn",
+      "summary": "刀场淬料是祝九弦的规矩，进门弟子自己备淬火材料。"
+    },
+    {
+      "id": "kg.edge.ye-offers-mentor-review",
+      "fromId": "char.ye-tingzhou",
+      "toId": "quest.r31-mentor-review",
+      "relation": "participatesIn",
+      "summary": "师门勘验由叶庭舟布置，拳脚之外还要认得人、认得药。"
+    },
+    {
+      "id": "kg.edge.herbal-inquiry-requires-medicine-run",
+      "fromId": "quest.r31-herbal-inquiry",
+      "toId": "quest.round-07-medicine-run",
+      "relation": "requires",
+      "summary": "灯下问药接在巷口送药之后，疮口收得慢才问得出这句话。"
+    },
+    {
+      "id": "kg.edge.stocktaking-requires-inquiry",
+      "fromId": "quest.r31-herbal-stocktaking",
+      "toId": "quest.r31-herbal-inquiry",
+      "relation": "requires",
+      "summary": "药庐清点须先了结灯下问药，忌讳记进药案才好清点。"
+    },
+    {
+      "id": "kg.edge.ferry-ledger-requires-peddler-errand",
+      "fromId": "quest.r31-ferry-ledger",
+      "toId": "quest.r31-peddler-errand",
+      "relation": "requires",
+      "summary": "渡籍补录接在货郎口信之后，改走水路的口信引出半页轮值。"
+    },
+    {
+      "id": "kg.edge.nightclass-requires-ferry-ledger",
+      "fromId": "quest.r31-academy-nightclass",
+      "toId": "quest.r31-ferry-ledger",
+      "relation": "requires",
+      "summary": "书院夜课接在渡籍补录之后，誊正的渡籍引出连夜赶抄。"
+    },
+    {
+      "id": "kg.edge.mist-watch-requires-stocktaking",
+      "fromId": "quest.r31-mist-shore-watch",
+      "toId": "quest.r31-herbal-stocktaking",
+      "relation": "requires",
+      "summary": "雾夜巡岸接在药庐清点之后，药队起运前夜才要巡岸。"
+    },
+    {
+      "id": "kg.edge.provisioning-requires-stocktaking",
+      "fromId": "quest.r31-caravan-provisioning",
+      "toId": "quest.r31-herbal-stocktaking",
+      "relation": "requires",
+      "summary": "药队启程接在药庐清点之后，药材齐了才谈封箱。"
+    },
+    {
+      "id": "kg.edge.provisioning-requires-mist-watch",
+      "fromId": "quest.r31-caravan-provisioning",
+      "toId": "quest.r31-mist-shore-watch",
+      "relation": "requires",
+      "summary": "药队启程还须巡岸无虞，探子拿下方可定起运时辰。"
+    },
+    {
+      "id": "kg.edge.guard-caravan-requires-provisioning",
+      "fromId": "quest.r31-guard-the-caravan",
+      "toId": "quest.r31-caravan-provisioning",
+      "relation": "requires",
+      "summary": "先保药队接在药队启程之后，封箱完才有护送一说。"
+    },
+    {
+      "id": "kg.edge.mend-pier-requires-provisioning",
+      "fromId": "quest.r31-mend-the-pier",
+      "toId": "quest.r31-caravan-provisioning",
+      "relation": "requires",
+      "summary": "先修栈桥同样接在药队启程之后，是同一岔路的另一边。"
+    },
+    {
+      "id": "kg.edge.gratitude-requires-guard-caravan",
+      "fromId": "quest.r31-caravan-gratitude",
+      "toId": "quest.r31-guard-the-caravan",
+      "relation": "requires",
+      "summary": "药队答谢接在先保药队之后，平安过桥才有人情可谢。"
+    },
+    {
+      "id": "kg.edge.pier-toll-requires-mend-pier",
+      "fromId": "quest.r31-pier-toll-clearing",
+      "toId": "quest.r31-mend-the-pier",
+      "relation": "requires",
+      "summary": "栈桥通渡接在先修栈桥之后，修到最后一截才遇上索银人。"
+    },
+    {
+      "id": "kg.edge.lantern-promise-requires-teastall-water",
+      "fromId": "quest.r31-river-lantern-promise",
+      "toId": "quest.r31-teastall-herbal-water",
+      "relation": "requires",
+      "summary": "河灯之约接在茶棚凉汤之后，熟络了才提去年旧约。"
+    },
+    {
+      "id": "kg.edge.wharf-ears-requires-roadside-note",
+      "fromId": "quest.r31-wharf-ears",
+      "toId": "quest.r31-roadside-note",
+      "relation": "requires",
+      "summary": "江湖耳目接在路旁荐帖之后，荐帖递出才谈口风。"
+    },
+    {
+      "id": "kg.edge.quench-stock-requires-roadside-note",
+      "fromId": "quest.r31-blade-quench-stock",
+      "toId": "quest.r31-roadside-note",
+      "relation": "requires",
+      "summary": "刀场淬料接在路旁荐帖之后，祝九弦收帖才立规矩。"
+    },
+    {
+      "id": "kg.edge.mentor-review-requires-provisioning",
+      "fromId": "quest.r31-mentor-review",
+      "toId": "quest.r31-caravan-provisioning",
+      "relation": "requires",
+      "summary": "师门勘验接在药队启程之后，能在药道走动才够资格受验。"
+    },
+    {
+      "id": "kg.edge.teastall-water-needs-hanzhu",
+      "fromId": "quest.r31-teastall-herbal-water",
+      "toId": "item.hanzhu-cao",
+      "relation": "requires",
+      "summary": "茶棚凉汤要备四株寒珠草，补回被夜雨打烂的那片。"
+    },
+    {
+      "id": "kg.edge.bookshop-needs-luodie",
+      "fromId": "quest.r31-bookshop-mothproof",
+      "toId": "item.luodie-hua",
+      "relation": "requires",
+      "summary": "书铺驱蠹要采三束落蝶花，干瓣铺架底防蠹。"
+    },
+    {
+      "id": "kg.edge.stocktaking-needs-cangya",
+      "fromId": "quest.r31-herbal-stocktaking",
+      "toId": "item.cangya-gen",
+      "relation": "requires",
+      "summary": "药庐清点要抠来三根苍崖根，够再配两剂生肌散。"
+    },
+    {
+      "id": "kg.edge.nightclass-needs-qingxin",
+      "fromId": "quest.r31-academy-nightclass",
+      "toId": "item.qingxin-wan",
+      "relation": "requires",
+      "summary": "书院夜课要备两丸清心丸，学子含一丸抄书手才稳。"
+    },
+    {
+      "id": "kg.edge.provisioning-needs-wuji-dan",
+      "fromId": "quest.r31-caravan-provisioning",
+      "toId": "item.wuji-dan",
+      "relation": "requires",
+      "summary": "药队启程要购一丸无极丹压箱，路上伤了才撑得到镇上。"
+    },
+    {
+      "id": "kg.edge.mend-pier-needs-iron-sand",
+      "fromId": "quest.r31-mend-the-pier",
+      "toId": "item.iron-sand",
+      "relation": "requires",
+      "summary": "先修栈桥要备三份熟铁砂，补酥了的桩脚。"
+    },
+    {
+      "id": "kg.edge.mend-pier-needs-tough-leather",
+      "fromId": "quest.r31-mend-the-pier",
+      "toId": "item.tough-leather",
+      "relation": "requires",
+      "summary": "先修栈桥要备两捆韧皮料，捆扎新旧桥板。"
+    },
+    {
+      "id": "kg.edge.lantern-needs-luodie",
+      "fromId": "quest.r31-river-lantern-promise",
+      "toId": "item.luodie-hua",
+      "relation": "requires",
+      "summary": "河灯之约要采三束落蝶花，扎三盏蝶形花灯。"
+    },
+    {
+      "id": "kg.edge.quench-needs-iron-sand",
+      "fromId": "quest.r31-blade-quench-stock",
+      "toId": "item.iron-sand",
+      "relation": "requires",
+      "summary": "刀场淬料要挑两份细筛熟铁砂，炉火一起便开课。"
+    },
+    {
+      "id": "kg.edge.bai-joins-peddler-errand",
+      "fromId": "char.bai-luzhou",
+      "toId": "quest.r31-peddler-errand",
+      "relation": "participatesIn",
+      "summary": "货郎的口信须当面递到渡董白鹭洲耳中。"
+    },
+    {
+      "id": "kg.edge.zhu-joins-roadside-note",
+      "fromId": "char.zhu-jiuxian",
+      "toId": "quest.r31-roadside-note",
+      "relation": "participatesIn",
+      "summary": "路旁荐帖的收件人是盘舷刀场的祝九弦。"
+    },
+    {
+      "id": "kg.edge.rong-joins-herbal-inquiry",
+      "fromId": "char.rong-su-qing",
+      "toId": "quest.r31-herbal-inquiry",
+      "relation": "participatesIn",
+      "summary": "灯下问药要向容素青当面请教配伍忌讳。"
+    },
+    {
+      "id": "kg.edge.liu-joins-ferry-ledger",
+      "fromId": "char.liu-tinglan",
+      "toId": "quest.r31-ferry-ledger",
+      "relation": "participatesIn",
+      "summary": "渡籍补录要请柳听澜誊正并加盖书院印。"
+    },
+    {
+      "id": "kg.edge.bai-joins-provisioning",
+      "fromId": "char.bai-luzhou",
+      "toId": "quest.r31-caravan-provisioning",
+      "relation": "participatesIn",
+      "summary": "药队启程的时辰要与白鹭洲当面敲定。"
+    },
+    {
+      "id": "kg.edge.shi-joins-gratitude",
+      "fromId": "char.shi-bei",
+      "toId": "quest.r31-caravan-gratitude",
+      "relation": "participatesIn",
+      "summary": "药队答谢要先向石北当面致谢。"
+    },
+    {
+      "id": "kg.edge.bai-joins-gratitude",
+      "fromId": "char.bai-luzhou",
+      "toId": "quest.r31-caravan-gratitude",
+      "relation": "participatesIn",
+      "summary": "药队答谢也要向白鹭洲当面致谢。"
+    },
+    {
+      "id": "kg.edge.bai-joins-lantern",
+      "fromId": "char.bai-luzhou",
+      "toId": "quest.r31-river-lantern-promise",
+      "relation": "participatesIn",
+      "summary": "放灯的船位时辰要与白鹭洲当面约下。"
+    },
+    {
+      "id": "kg.edge.zhu-joins-wharf-ears",
+      "fromId": "char.zhu-jiuxian",
+      "toId": "quest.r31-wharf-ears",
+      "relation": "participatesIn",
+      "summary": "江湖耳目要向祝九弦打听刀场对药道的口风。"
+    },
+    {
+      "id": "kg.edge.shen-joins-wharf-ears",
+      "fromId": "char.shen-mohan",
+      "toId": "quest.r31-wharf-ears",
+      "relation": "participatesIn",
+      "summary": "江湖耳目也要向沈墨涵打听书铺里的传抄消息。"
+    },
+    {
+      "id": "kg.edge.rong-joins-mentor-review",
+      "fromId": "char.rong-su-qing",
+      "toId": "quest.r31-mentor-review",
+      "relation": "participatesIn",
+      "summary": "师门勘验要向容素青记一页药性。"
+    },
+    {
+      "id": "kg.edge.wen-joins-mentor-review",
+      "fromId": "char.wen-suxin",
+      "toId": "quest.r31-mentor-review",
+      "relation": "participatesIn",
+      "summary": "师门勘验要向闻素心记一页护送门道。"
+    },
+    {
+      "id": "kg.edge.lu-influences-river-lantern",
+      "fromId": "char.lu-zhenniang",
+      "toId": "ending.river-lantern",
+      "relation": "influences",
+      "summary": "与陆贞娘结下足够信任，是河灯归处认定的归路之一。"
+    },
+    {
+      "id": "kg.edge.ye-influences-tingyu-oath",
+      "fromId": "char.ye-tingzhou",
+      "toId": "ending.tingyu-oath",
+      "relation": "influences",
+      "summary": "叶庭舟的信任与剑阁旧约相系，引向听雨守约的归宿。"
+    },
+    {
+      "id": "kg.edge.alley-influences-tiezhang-ending",
+      "fromId": "quest.round-07-clear-alley",
+      "toId": "ending.tiezhang-foundation",
+      "relation": "influences",
+      "summary": "守住巷路的经历被铁嶂派看重，是砺心之路的起点。"
+    },
+    {
+      "id": "kg.edge.shi-influences-tiezhang",
+      "fromId": "char.shi-bei",
+      "toId": "ending.tiezhang-foundation",
+      "relation": "influences",
+      "summary": "与石北不因失信交恶，铁嶂的桩功才肯传下去。"
+    },
+    {
+      "id": "kg.edge.medicine-influences-yunyin-ending",
+      "fromId": "quest.round-07-medicine-run",
+      "toId": "ending.yunyin-healer",
+      "relation": "influences",
+      "summary": "送药差事的善举与云隐的护生门训同路。"
+    },
+    {
+      "id": "kg.edge.wen-influences-yunyin",
+      "fromId": "char.wen-suxin",
+      "toId": "ending.yunyin-healer",
+      "relation": "influences",
+      "summary": "闻素心的认可，让护生之法传给愿意守夜的人。"
+    },
+    {
+      "id": "kg.edge.r42-bai-offers-audit",
+      "fromId": "char.bai-luzhou",
+      "toId": "quest.r42-ledger-audit",
+      "relation": "participatesIn",
+      "summary": "白鹭洲在渡籍补录后托人核对不合潮时的旧簿水痕。"
+    },
+    {
+      "id": "kg.edge.r42-audit-requires-r31-ledger",
+      "fromId": "quest.r42-ledger-audit",
+      "toId": "quest.r31-ferry-ledger",
+      "relation": "requires",
+      "summary": "旧簿验痕承接渡籍补录，须先完成书院副本的誊正。"
+    },
+    {
+      "id": "kg.edge.r42-liu-participates-audit",
+      "fromId": "char.liu-tinglan",
+      "toId": "quest.r42-ledger-audit",
+      "relation": "participatesIn",
+      "summary": "柳听澜以书院副本与正本对页，辨认纸上水痕。"
+    },
+    {
+      "id": "kg.edge.r42-audit-triggers-faded",
+      "fromId": "quest.r42-ledger-audit",
+      "toId": "event.r42-faded-register",
+      "relation": "triggers",
+      "summary": "对照旧簿和副本后，玩家得知誊写前就已存在的水痕疑点。"
+    },
+    {
+      "id": "kg.edge.r42-liu-offers-witnesses",
+      "fromId": "char.liu-tinglan",
+      "toId": "quest.r42-two-witnesses",
+      "relation": "participatesIn",
+      "summary": "柳听澜请玩家把潮时与旧船印的两家口述分别记下。"
+    },
+    {
+      "id": "kg.edge.r42-witnesses-require-audit",
+      "fromId": "quest.r42-two-witnesses",
+      "toId": "quest.r42-ledger-audit",
+      "relation": "requires",
+      "summary": "两家对页接在旧簿验痕之后，先有疑点才知道该核对什么。"
+    },
+    {
+      "id": "kg.edge.r42-gu-participates-witnesses",
+      "fromId": "char.gu-yechen",
+      "toId": "quest.r42-two-witnesses",
+      "relation": "participatesIn",
+      "summary": "顾夜尘提供当晚药船到岸时的潮时口述。"
+    },
+    {
+      "id": "kg.edge.r42-zhu-participates-witnesses",
+      "fromId": "char.zhu-jiuxian",
+      "toId": "quest.r42-two-witnesses",
+      "relation": "participatesIn",
+      "summary": "祝九弦核对旧船印所在的位置与时序。"
+    },
+    {
+      "id": "kg.edge.r42-witnesses-triggers-gu",
+      "fromId": "quest.r42-two-witnesses",
+      "toId": "event.r42-gu-tide-account",
+      "relation": "triggers",
+      "summary": "核对潮时的途中记录下顾夜尘关于落潮的口述。"
+    },
+    {
+      "id": "kg.edge.r42-witnesses-triggers-zhu",
+      "fromId": "quest.r42-two-witnesses",
+      "toId": "event.r42-zhu-ferry-seal",
+      "relation": "triggers",
+      "summary": "核对旧印的途中记录下祝九弦谨慎区分印迹与人名的证词。"
+    },
+    {
+      "id": "kg.edge.r42-gu-offers-rubbing",
+      "fromId": "char.gu-yechen",
+      "toId": "quest.r42-seal-rubbing",
+      "relation": "participatesIn",
+      "summary": "顾夜尘从护船旧账中取出薄纸，让玩家拓取一份水线印痕。"
+    },
+    {
+      "id": "kg.edge.r42-rubbing-requires-witnesses",
+      "fromId": "quest.r42-seal-rubbing",
+      "toId": "quest.r42-two-witnesses",
+      "relation": "requires",
+      "summary": "封存水痕在两家口述互相核对后才有足够背景。"
+    },
+    {
+      "id": "kg.edge.r42-rubbing-requires-paper",
+      "fromId": "quest.r42-seal-rubbing",
+      "toId": "item.r42-ferry-seal-rubbing",
+      "relation": "requires",
+      "summary": "封存水痕的目标是从旧印取得并持有一份拓本。"
+    },
+    {
+      "id": "kg.edge.r42-gu-holds-rubbing",
+      "fromId": "char.gu-yechen",
+      "toId": "item.r42-ferry-seal-rubbing",
+      "relation": "holds",
+      "summary": "拓本由顾夜尘从护船旧账里取出并交予玩家。"
+    },
+    {
+      "id": "kg.edge.r42-bai-offers-public",
+      "fromId": "char.bai-luzhou",
+      "toId": "quest.r42-open-register",
+      "relation": "participatesIn",
+      "summary": "白鹭洲提出公开誊录的选择，交由柳听澜将证据列入副册。"
+    },
+    {
+      "id": "kg.edge.r42-public-requires-rubbing",
+      "fromId": "quest.r42-open-register",
+      "toId": "quest.r42-seal-rubbing",
+      "relation": "requires",
+      "summary": "公开立册须先取得并留存水痕拓本。"
+    },
+    {
+      "id": "kg.edge.r42-liu-participates-public",
+      "fromId": "char.liu-tinglan",
+      "toId": "quest.r42-open-register",
+      "relation": "participatesIn",
+      "summary": "柳听澜将拓本和证词誊入可供复核的公开副册。"
+    },
+    {
+      "id": "kg.edge.r42-public-triggers-vow",
+      "fromId": "quest.r42-open-register",
+      "toId": "event.r42-public-record-vow",
+      "relation": "triggers",
+      "summary": "选择明册立约时，玩家发现公开复核之约。"
+    },
+    {
+      "id": "kg.edge.r42-bai-offers-protect",
+      "fromId": "char.bai-luzhou",
+      "toId": "quest.r42-protect-witness",
+      "relation": "participatesIn",
+      "summary": "白鹭洲提出暂护证人的选择，交由祝九弦收存拓本。"
+    },
+    {
+      "id": "kg.edge.r42-protect-requires-rubbing",
+      "fromId": "quest.r42-protect-witness",
+      "toId": "quest.r42-seal-rubbing",
+      "relation": "requires",
+      "summary": "护证留印须先取得并留存水痕拓本。"
+    },
+    {
+      "id": "kg.edge.r42-zhu-participates-protect",
+      "fromId": "char.zhu-jiuxian",
+      "toId": "quest.r42-protect-witness",
+      "relation": "participatesIn",
+      "summary": "祝九弦暂时收存拓本，不公开证人身份。"
+    },
+    {
+      "id": "kg.edge.r42-protect-triggers-vow",
+      "fromId": "quest.r42-protect-witness",
+      "toId": "event.r42-protected-witness-vow",
+      "relation": "triggers",
+      "summary": "选择护证留印时，玩家发现保护证人与留存凭据的约定。"
+    },
+    {
+      "id": "kg.edge.r42-public-influences-ending",
+      "fromId": "quest.r42-open-register",
+      "toId": "ending.r42-open-register",
+      "relation": "influences",
+      "summary": "完成公开立册路线，是公簿昭潮结局的必要条件。"
+    },
+    {
+      "id": "kg.edge.r42-public-vow-influences-ending",
+      "fromId": "event.r42-public-record-vow",
+      "toId": "ending.r42-open-register",
+      "relation": "influences",
+      "summary": "作出公开复核之约，才能抵达公簿昭潮结局。"
+    },
+    {
+      "id": "kg.edge.r42-protect-influences-ending",
+      "fromId": "quest.r42-protect-witness",
+      "toId": "ending.r42-sheltered-witness",
+      "relation": "influences",
+      "summary": "完成护证留印路线，是灯下留痕结局的必要条件。"
+    },
+    {
+      "id": "kg.edge.r42-protect-vow-influences-ending",
+      "fromId": "event.r42-protected-witness-vow",
+      "toId": "ending.r42-sheltered-witness",
+      "relation": "influences",
+      "summary": "作出保护证人的约定，才能抵达灯下留痕结局。"
+    },
+    {
+      "id": "kg.edge.r43-footprints-triggers-letter",
+      "fromId": "event.old-footprints",
+      "toId": "event.r43-wayfarer-letter",
+      "relation": "triggers",
+      "summary": "循雨后脚印抵达雾雨渡口后，黄昏或夜雨中的行走可能遇上带信人。"
+    },
+    {
+      "id": "kg.edge.r43-tingyu-requires-letter",
+      "fromId": "quest.r43-tingyu-eave-rain",
+      "toId": "event.r43-wayfarer-letter",
+      "relation": "requires",
+      "summary": "檐雨听锋须先收到匿名传函，并由听雨剑阁门人接下。"
+    },
+    {
+      "id": "kg.edge.r43-ye-offers-tingyu",
+      "fromId": "char.ye-tingzhou",
+      "toId": "quest.r43-tingyu-eave-rain",
+      "relation": "participatesIn",
+      "summary": "叶庭舟托听雨剑阁门人向柳听澜核实芦苇岸的剑鸣传闻。"
+    },
+    {
+      "id": "kg.edge.r43-tingyu-triggers-outcome",
+      "fromId": "quest.r43-tingyu-eave-rain",
+      "toId": "event.r43-tingyu-eave-rain",
+      "relation": "triggers",
+      "summary": "柳听澜核对潮时后发现，传闻中的剑鸣实为索环回弹。"
+    },
+    {
+      "id": "kg.edge.r43-tiezhang-requires-letter",
+      "fromId": "quest.r43-tiezhang-stone-post",
+      "toId": "event.r43-wayfarer-letter",
+      "relation": "requires",
+      "summary": "石桩回声须先收到匿名传函，并由铁嶂派门人接下。"
+    },
+    {
+      "id": "kg.edge.r43-shi-offers-tiezhang",
+      "fromId": "char.shi-bei",
+      "toId": "quest.r43-tiezhang-stone-post",
+      "relation": "participatesIn",
+      "summary": "石北请铁嶂派门人向顾夜尘问清旧系缆桩的空响。"
+    },
+    {
+      "id": "kg.edge.r43-tiezhang-triggers-outcome",
+      "fromId": "quest.r43-tiezhang-stone-post",
+      "toId": "event.r43-tiezhang-stone-post",
+      "relation": "triggers",
+      "summary": "顾夜尘查明桩底空槽遇涨潮便响，并给出铁楔加固法。"
+    },
+    {
+      "id": "kg.edge.r43-yunyin-requires-letter",
+      "fromId": "quest.r43-yunyin-herb-road",
+      "toId": "event.r43-wayfarer-letter",
+      "relation": "requires",
+      "summary": "药路余香须先收到匿名传函，并由云隐山庄门人接下。"
+    },
+    {
+      "id": "kg.edge.r43-wen-offers-yunyin",
+      "fromId": "char.wen-suxin",
+      "toId": "quest.r43-yunyin-herb-road",
+      "relation": "participatesIn",
+      "summary": "闻素心请云隐山庄门人向容素青辨认封蜡苦香。"
+    },
+    {
+      "id": "kg.edge.r43-yunyin-triggers-outcome",
+      "fromId": "quest.r43-yunyin-herb-road",
+      "toId": "event.r43-yunyin-herb-road",
+      "relation": "triggers",
+      "summary": "容素青辨出受潮陈艾气味，排除毒香猜疑。"
+    },
+    {
+      "id": "kg.edge.r43-hanshan-requires-letter",
+      "fromId": "quest.r43-hanshan-copybook",
+      "toId": "event.r43-wayfarer-letter",
+      "relation": "requires",
+      "summary": "副页留白须先收到匿名传函，并由寒山书院门人接下。"
+    },
+    {
+      "id": "kg.edge.r43-liu-offers-hanshan",
+      "fromId": "char.liu-tinglan",
+      "toId": "quest.r43-hanshan-copybook",
+      "relation": "participatesIn",
+      "summary": "柳听澜请寒山书院门人向沈墨涵核验旧抄纸墨。"
+    },
+    {
+      "id": "kg.edge.r43-hanshan-triggers-outcome",
+      "fromId": "quest.r43-hanshan-copybook",
+      "toId": "event.r43-hanshan-copybook",
+      "relation": "triggers",
+      "summary": "沈墨涵确认船名原本缺抄，应标明缺页而不猜姓名。"
+    },
+    {
+      "id": "kg.edge.r43-panzhou-requires-letter",
+      "fromId": "quest.r43-panzhou-return-tide",
+      "toId": "event.r43-wayfarer-letter",
+      "relation": "requires",
+      "summary": "回潮验缆须先收到匿名传函，并由盘舷刀场门人接下。"
+    },
+    {
+      "id": "kg.edge.r43-zhu-offers-panzhou",
+      "fromId": "char.zhu-jiuxian",
+      "toId": "quest.r43-panzhou-return-tide",
+      "relation": "participatesIn",
+      "summary": "祝九弦托盘舷刀场门人请白鹭洲核对渡船缆痕。"
+    },
+    {
+      "id": "kg.edge.r43-panzhou-triggers-outcome",
+      "fromId": "quest.r43-panzhou-return-tide",
+      "toId": "event.r43-panzhou-return-tide",
+      "relation": "triggers",
+      "summary": "白鹭洲核明三道缆痕来自按序靠岸的运盐船。"
+    },
+    {
+      "id": "kg.edge.r43-liu-participates-tingyu",
+      "fromId": "char.liu-tinglan",
+      "toId": "quest.r43-tingyu-eave-rain",
+      "relation": "participatesIn",
+      "summary": "柳听澜核对信中时辰，辨认所谓剑鸣是涨潮时索环回弹。"
+    },
+    {
+      "id": "kg.edge.r43-gu-participates-tiezhang",
+      "fromId": "char.gu-yechen",
+      "toId": "quest.r43-tiezhang-stone-post",
+      "relation": "participatesIn",
+      "summary": "顾夜尘检查旧系缆桩底脚，找出涨潮空响的来由。"
+    },
+    {
+      "id": "kg.edge.r43-rong-participates-yunyin",
+      "fromId": "char.rong-su-qing",
+      "toId": "quest.r43-yunyin-herb-road",
+      "relation": "participatesIn",
+      "summary": "容素青辨认封蜡残留的药香，确认是受潮陈艾。"
+    },
+    {
+      "id": "kg.edge.r43-shen-participates-hanshan",
+      "fromId": "char.shen-mohan",
+      "toId": "quest.r43-hanshan-copybook",
+      "relation": "participatesIn",
+      "summary": "沈墨涵对照书铺旧抄的纸龄与墨色，确认缺页早于争执。"
+    },
+    {
+      "id": "kg.edge.r43-bai-participates-panzhou",
+      "fromId": "char.bai-luzhou",
+      "toId": "quest.r43-panzhou-return-tide",
+      "relation": "participatesIn",
+      "summary": "白鹭洲核对三道缆痕与渡船旧簿，确认来自运盐船。"
+    },
+    {
+      "id": "kg.edge.r44-letter-triggers-dispute",
+      "fromId": "event.r43-wayfarer-letter",
+      "toId": "event.r44-dock-claim",
+      "relation": "triggers",
+      "summary": "风雨传函将玩家引到雾雨渡口，随后可能遇见旧系缆桩争执。"
+    },
+    {
+      "id": "kg.edge.r44-post-requires-dispute",
+      "fromId": "quest.r44-post-first",
+      "toId": "event.r44-dock-claim",
+      "relation": "requires",
+      "summary": "先固旧桩须先亲历石北与白鹭洲的争执。"
+    },
+    {
+      "id": "kg.edge.r44-ledger-requires-dispute",
+      "fromId": "quest.r44-ledger-first",
+      "toId": "event.r44-dock-claim",
+      "relation": "requires",
+      "summary": "先核渡簿须先亲历石北与白鹭洲的争执。"
+    },
+    {
+      "id": "kg.edge.r44-bai-participates-post",
+      "fromId": "char.bai-luzhou",
+      "toId": "quest.r44-post-first",
+      "relation": "participatesIn",
+      "summary": "白鹭洲提供互斥的处置选择，玩家可先采纳加固方案。"
+    },
+    {
+      "id": "kg.edge.r44-bai-participates-ledger",
+      "fromId": "char.bai-luzhou",
+      "toId": "quest.r44-ledger-first",
+      "relation": "participatesIn",
+      "summary": "白鹭洲提供互斥的处置选择，玩家可先采纳核簿方案。"
+    },
+    {
+      "id": "kg.edge.r44-shi-participates-post",
+      "fromId": "char.shi-bei",
+      "toId": "quest.r44-post-first",
+      "relation": "participatesIn",
+      "summary": "石北确认旧系缆桩的加固办法。"
+    },
+    {
+      "id": "kg.edge.r44-liu-participates-ledger",
+      "fromId": "char.liu-tinglan",
+      "toId": "quest.r44-ledger-first",
+      "relation": "participatesIn",
+      "summary": "柳听澜以书院抄本复核渡簿上的潮时。"
+    },
+    {
+      "id": "kg.edge.r44-post-triggers-outcome",
+      "fromId": "quest.r44-post-first",
+      "toId": "event.r44-pier-reinforced",
+      "relation": "triggers",
+      "summary": "铁嶂派按潮痕补入铁楔并记录固桩结果。"
+    },
+    {
+      "id": "kg.edge.r44-ledger-triggers-outcome",
+      "fromId": "quest.r44-ledger-first",
+      "toId": "event.r44-ledger-verified",
+      "relation": "triggers",
+      "summary": "寒山书院用抄本核验潮时并记录渡簿结果。"
+    },
+    {
+      "id": "kg.edge.r55-sluice-located",
+      "fromId": "event.r55-sluice-inscription",
+      "toId": "place.mist-sluice",
+      "relation": "locatedAt",
+      "summary": "河湾石闸的潮尺与旧船号指向南湾古渠。"
+    },
+    {
+      "id": "kg.edge.r56-shibei-offers-north-watch",
+      "fromId": "char.shi-bei",
+      "toId": "quest.r56-north-water-gauge",
+      "relation": "participatesIn",
+      "summary": "石北托玩家前往雾岬北岸核验潮尺。"
+    },
+    {
+      "id": "kg.edge.r56-north-watch-requires-sluice",
+      "fromId": "quest.r56-north-water-gauge",
+      "toId": "place.mist-sluice",
+      "relation": "requires",
+      "summary": "雾岬巡标从旧渠石闸的潮刻线索开始。"
+    },
+    {
+      "id": "kg.edge.r56-north-watch-triggers-gauge",
+      "fromId": "quest.r56-north-water-gauge",
+      "toId": "event.r56-north-water-gauge",
+      "relation": "triggers",
+      "summary": "巡查将玩家带到北岸潮尺位置。"
+    },
+    {
+      "id": "kg.edge.r56-north-gauge-located",
+      "fromId": "event.r56-north-water-gauge",
+      "toId": "place.mist-north-cap",
+      "relation": "locatedAt",
+      "summary": "雾岬林地北岸石桩即为潮尺所在。"
+    },
+    {
+      "id": "kg.edge.r56-shibei-offers-south-survey",
+      "fromId": "char.shi-bei",
+      "toId": "quest.r56-south-waterway-survey",
+      "relation": "participatesIn",
+      "summary": "石北在北岸潮尺确认后，续托南湾水路测绘。"
+    },
+    {
+      "id": "kg.edge.r56-south-survey-requires-north-cap",
+      "fromId": "quest.r56-south-waterway-survey",
+      "toId": "place.mist-north-cap",
+      "relation": "requires",
+      "summary": "南湾测绘以前一程查明的北岸水尺为起点。"
+    },
+    {
+      "id": "kg.edge.r56-south-survey-triggers-mark",
+      "fromId": "quest.r56-south-waterway-survey",
+      "toId": "event.r56-south-waterway-mark",
+      "relation": "triggers",
+      "summary": "测绘路线延伸至南湾浅槽的旧水标。"
+    },
+    {
+      "id": "kg.edge.r56-south-mark-located",
+      "fromId": "event.r56-south-waterway-mark",
+      "toId": "place.mist-south-pool",
+      "relation": "locatedAt",
+      "summary": "苇根下的水标标记南湾苇池旧航道。"
+    },
+    {
+      "id": "kg.edge.r58-shibei-offers-market",
+      "fromId": "char.shi-bei",
+      "toId": "quest.r58-market-discovery",
+      "relation": "participatesIn",
+      "summary": "石北请玩家沿南湾浅槽与旧船号找到芦桥集。"
+    },
+    {
+      "id": "kg.edge.r58-market-requires-south-pool",
+      "fromId": "quest.r58-market-discovery",
+      "toId": "place.mist-south-pool",
+      "relation": "requires",
+      "summary": "芦桥寻集以前一轮查明的南湾浅槽与旧水标为线索。"
+    },
+    {
+      "id": "kg.edge.r58-market-requires-survey",
+      "fromId": "quest.r58-market-discovery",
+      "toId": "quest.r56-south-waterway-survey",
+      "relation": "requires",
+      "summary": "芦桥寻集接续南湾水路测绘。"
+    },
+    {
+      "id": "kg.edge.r58-market-triggers-old-sign",
+      "fromId": "quest.r58-market-discovery",
+      "toId": "event.r58-market-first-visit",
+      "relation": "triggers",
+      "summary": "循线抵达河湾后认出芦桥集旧幌与船号。"
+    },
+    {
+      "id": "kg.edge.r58-market-event-located",
+      "fromId": "event.r58-market-first-visit",
+      "toId": "place.mist-willow-market",
+      "relation": "locatedAt",
+      "summary": "河湾旧幌与旧渠碑船号相合，确认芦桥集旧址。"
+    },
+    {
+      "id": "kg.edge.r58-bai-offers-stall",
+      "fromId": "char.bai-luzhou",
+      "toId": "quest.r58-market-stall-pact",
+      "relation": "participatesIn",
+      "summary": "白鹭洲托玩家备好绳带并与石北商定芦桥集通路。"
+    },
+    {
+      "id": "kg.edge.r58-shi-participates-stall",
+      "fromId": "char.shi-bei",
+      "toId": "quest.r58-market-stall-pact",
+      "relation": "participatesIn",
+      "summary": "石北与玩家约定集市摊棚和药担的行路位置。"
+    },
+    {
+      "id": "kg.edge.r58-stall-requires-market",
+      "fromId": "quest.r58-market-stall-pact",
+      "toId": "quest.r58-market-discovery",
+      "relation": "requires",
+      "summary": "集期赶办在寻得芦桥集之后解锁。"
+    },
+    {
+      "id": "kg.edge.r58-stall-requires-leather",
+      "fromId": "quest.r58-market-stall-pact",
+      "toId": "item.tough-leather",
+      "relation": "requires",
+      "summary": "复开摊棚需要韧皮料补回绳带。"
+    },
+    {
+      "id": "kg.edge.r58-zhu-offers-toll-squabble",
+      "fromId": "char.zhu-jiuxian",
+      "toId": "quest.r58-market-toll-squabble",
+      "relation": "participatesIn",
+      "summary": "祝九弦托玩家赶走向商贩索取过集钱的旧例管事。"
+    },
+    {
+      "id": "kg.edge.r58-toll-squabble-requires-stall",
+      "fromId": "quest.r58-market-toll-squabble",
+      "toId": "quest.r58-market-stall-pact",
+      "relation": "requires",
+      "summary": "集口拦贩在集市通路与摊棚安排落实后解锁。"
+    },
+    {
+      "id": "kg.edge.r58-ma-offers-hamlet",
+      "fromId": "char.ma-shangyi",
+      "toId": "quest.r58-south-hamlet-survey",
+      "relation": "participatesIn",
+      "summary": "马尚义请玩家向南送药讯并查明南麓旧路。"
+    },
+    {
+      "id": "kg.edge.r58-hamlet-requires-medicine",
+      "fromId": "quest.r58-south-hamlet-survey",
+      "toId": "quest.round-07-medicine-run",
+      "relation": "requires",
+      "summary": "巷口伤者安置妥当后才有余力向南麓村落送讯。"
+    },
+    {
+      "id": "kg.edge.r58-hamlet-triggers-arrival",
+      "fromId": "quest.r58-south-hamlet-survey",
+      "toId": "event.r58-south-hamlet-arrival",
+      "relation": "triggers",
+      "summary": "沿山脚茶匾走到南麓聚落并认出村口旧路。"
+    },
+    {
+      "id": "kg.edge.r58-hamlet-event-located",
+      "fromId": "event.r58-south-hamlet-arrival",
+      "toId": "place.south-hamlet",
+      "relation": "locatedAt",
+      "summary": "山脚茶匾旁的旧石阶标出南麓聚落位置。"
+    },
+    {
+      "id": "kg.edge.r58-lu-offers-supply",
+      "fromId": "char.lu-zhenniang",
+      "toId": "quest.r58-south-hamlet-supply",
+      "relation": "participatesIn",
+      "summary": "陆贞娘请玩家备苍崖根并托货担沿旧路送药。"
+    },
+    {
+      "id": "kg.edge.r58-jiang-participates-supply",
+      "fromId": "char.jiang-baiwei",
+      "toId": "quest.r58-south-hamlet-supply",
+      "relation": "participatesIn",
+      "summary": "姜百味按旧驿道向南麓村落捎送药材。"
+    },
+    {
+      "id": "kg.edge.r58-supply-requires-survey",
+      "fromId": "quest.r58-south-hamlet-supply",
+      "toId": "quest.r58-south-hamlet-survey",
+      "relation": "requires",
+      "summary": "先查明南麓聚落和旧路，才能安排送药。"
+    },
+    {
+      "id": "kg.edge.r58-supply-requires-root",
+      "fromId": "quest.r58-south-hamlet-supply",
+      "toId": "item.cangya-gen",
+      "relation": "requires",
+      "summary": "南麓药队需要苍崖根配散。"
+    },
+    {
+      "id": "kg.edge.r58-gu-offers-bandit",
+      "fromId": "char.gu-yechen",
+      "toId": "quest.r58-pond-bandit-camp",
+      "relation": "participatesIn",
+      "summary": "顾夜尘请玩家查清东野池塘冒牌护药队并打通旧路。"
+    },
+    {
+      "id": "kg.edge.r58-bandit-requires-supply",
+      "fromId": "quest.r58-pond-bandit-camp",
+      "toId": "quest.r58-south-hamlet-supply",
+      "relation": "requires",
+      "summary": "南麓药材交由货担捎送后，才进一步查办冒牌护队。"
+    },
+    {
+      "id": "kg.edge.r62-region-arrival-event",
+      "fromId": "event.r62-ridge-arrival",
+      "toId": "map.round-62-iron-ridge",
+      "relation": "locatedAt",
+      "summary": "雾岬北口初行标出铁嶂北道的区域入口。"
+    },
+    {
+      "id": "kg.edge.r62-region-north-gate",
+      "fromId": "place.iron-ridge-north-gate",
+      "toId": "map.round-62-iron-ridge",
+      "relation": "locatedAt",
+      "summary": "铁嶂南隘是北道地图的渡口入口。"
+    },
+    {
+      "id": "kg.edge.r62-north-gate-arrival",
+      "fromId": "event.r62-ridge-arrival",
+      "toId": "place.iron-ridge-north-gate",
+      "relation": "triggers",
+      "summary": "穿过雾岬北口时首次认识铁嶂南隘。"
+    },
+    {
+      "id": "kg.edge.r62-pass-event-place",
+      "fromId": "event.r62-pass-marks",
+      "toId": "place.iron-ridge-pass",
+      "relation": "triggers",
+      "summary": "检查碎岭凿痕后确认旧道仍可通行。"
+    },
+    {
+      "id": "kg.edge.r62-post-event-place",
+      "fromId": "event.r62-post-ledger",
+      "toId": "place.iron-ridge-post",
+      "relation": "triggers",
+      "summary": "比对更簿与水尺印记后认出岩关驿镇。"
+    },
+    {
+      "id": "kg.edge.r62-beacon-event-place",
+      "fromId": "event.r62-beacon-code",
+      "toId": "place.iron-ridge-beacon",
+      "relation": "triggers",
+      "summary": "烽台残页揭出北脊旧烽台的巡山暗号。"
+    },
+    {
+      "id": "kg.edge.r62-shao-located",
+      "fromId": "char.shao-changgeng",
+      "toId": "map.round-62-iron-ridge",
+      "relation": "locatedAt",
+      "summary": "邵长庚在铁嶂北道岩关驿镇值事。"
+    },
+    {
+      "id": "kg.edge.r62-qin-located",
+      "fromId": "char.qin-suyan",
+      "toId": "place.iron-ridge-post",
+      "relation": "locatedAt",
+      "summary": "秦素砚在岩关驿镇整理北道更簿。"
+    },
+    {
+      "id": "kg.edge.r62-shao-tiezhang",
+      "fromId": "char.shao-changgeng",
+      "toId": "faction.tiezhang-pai",
+      "relation": "belongsTo",
+      "summary": "邵长庚出身铁嶂派，兼管北道驿务。"
+    },
+    {
+      "id": "kg.edge.r62-shao-offers-pass",
+      "fromId": "char.shao-changgeng",
+      "toId": "quest.r62-north-pass-marks",
+      "relation": "participatesIn",
+      "summary": "邵长庚请玩家核对碎岭旧道界石。"
+    },
+    {
+      "id": "kg.edge.r62-pass-requires-gauge",
+      "fromId": "quest.r62-north-pass-marks",
+      "toId": "place.mist-north-cap",
+      "relation": "requires",
+      "summary": "北隘校标须以雾岬北岸水尺作为线索。"
+    },
+    {
+      "id": "kg.edge.r62-pass-triggers-marks",
+      "fromId": "quest.r62-north-pass-marks",
+      "toId": "event.r62-pass-marks",
+      "relation": "triggers",
+      "summary": "北隘校标把玩家引到碎岭界石核验凿痕。"
+    },
+    {
+      "id": "kg.edge.r62-shao-offers-ledger",
+      "fromId": "char.shao-changgeng",
+      "toId": "quest.r62-post-ledger",
+      "relation": "participatesIn",
+      "summary": "邵长庚请玩家与秦素砚核对巡山更次。"
+    },
+    {
+      "id": "kg.edge.r62-qin-ledger",
+      "fromId": "char.qin-suyan",
+      "toId": "quest.r62-post-ledger",
+      "relation": "participatesIn",
+      "summary": "秦素砚按驿镇旧簿校出烽台换班暗号。"
+    },
+    {
+      "id": "kg.edge.r62-ledger-requires-pass",
+      "fromId": "quest.r62-post-ledger",
+      "toId": "quest.r62-north-pass-marks",
+      "relation": "requires",
+      "summary": "先校准碎岭界石，再核对北道更次。"
+    },
+    {
+      "id": "kg.edge.r62-shao-offers-clear-road",
+      "fromId": "char.shao-changgeng",
+      "toId": "quest.r62-clear-ridge-road",
+      "relation": "participatesIn",
+      "summary": "邵长庚请玩家驱散占据碎岭路的拦路客。"
+    },
+    {
+      "id": "kg.edge.r62-clear-road-requires-ledger",
+      "fromId": "quest.r62-clear-ridge-road",
+      "toId": "quest.r62-post-ledger",
+      "relation": "requires",
+      "summary": "巡山更次核实后再清理碎岭拦路客。"
+    },
+    {
+      "id": "kg.edge.r67-salt-arrival-located",
+      "fromId": "event.r67-salt-road-arrival",
+      "toId": "map.round-67-salt-road",
+      "relation": "locatedAt",
+      "summary": "青岩东关的首次行旅标出西陲盐道入口。"
+    },
+    {
+      "id": "kg.edge.r67-well-event-place",
+      "fromId": "event.r67-well-reading",
+      "toId": "place.r67-brine-well",
+      "relation": "triggers",
+      "summary": "核对井壁刻痕后记下回声苦井的位置和水线。"
+    },
+    {
+      "id": "kg.edge.r67-luo-located",
+      "fromId": "char.luo-jinzi",
+      "toId": "map.round-67-salt-road",
+      "relation": "locatedAt",
+      "summary": "罗金子在青岩驿管理过路秤与盐货记录。"
+    },
+    {
+      "id": "kg.edge.r67-luo-knows-well",
+      "fromId": "char.luo-jinzi",
+      "toId": "place.r67-brine-well",
+      "relation": "knows",
+      "summary": "罗金子知道回声苦井的旧秤刻和汲水规矩。"
+    },
+    {
+      "id": "kg.edge.r67-luo-offers-waterline",
+      "fromId": "char.luo-jinzi",
+      "toId": "quest.r67-well-waterline",
+      "relation": "participatesIn",
+      "summary": "罗金子请玩家查明井水发苦是否与水线下降有关。"
+    },
+    {
+      "id": "kg.edge.r67-waterline-requires-well",
+      "fromId": "quest.r67-well-waterline",
+      "toId": "place.r67-brine-well",
+      "relation": "requires",
+      "summary": "苦井辨线须亲自核对回声苦井的水线与刻痕。"
+    },
+    {
+      "id": "kg.edge.r74-arrival-map",
+      "fromId": "event.r74-cloud-arrival",
+      "toId": "map.round-74-cloud-ridge",
+      "relation": "locatedAt",
+      "summary": "初入云岭的首次行旅标出断云栈道入口。"
+    },
+    {
+      "id": "kg.edge.r74-arrival-place",
+      "fromId": "event.r74-cloud-arrival",
+      "toId": "place.r74-cloud-ridge",
+      "relation": "triggers",
+      "summary": "越过断云南隘后发现云岭古道。"
+    },
+    {
+      "id": "kg.edge.r74-inscription-place",
+      "fromId": "event.r74-cloud-inscription",
+      "toId": "place.r74-cloud-markers",
+      "relation": "triggers",
+      "summary": "检查石阶刻痕后记下云纹石阶位置。"
+    },
+    {
+      "id": "kg.edge.r74-bridge-place",
+      "fromId": "event.r74-cloud-bridge",
+      "toId": "place.r74-cloud-bridge",
+      "relation": "triggers",
+      "summary": "查看断索与靴印后记下悬桥位置。"
+    },
+    {
+      "id": "kg.edge.r74-shen-located",
+      "fromId": "char.r74-shen-yuji",
+      "toId": "map.round-74-cloud-ridge",
+      "relation": "locatedAt",
+      "summary": "沈雨霁在云栈客舍记录山道走向。"
+    },
+    {
+      "id": "kg.edge.r74-shen-knows-markers",
+      "fromId": "char.r74-shen-yuji",
+      "toId": "place.r74-cloud-markers",
+      "relation": "knows",
+      "summary": "沈雨霁知道云纹石阶的旧索孔记号。"
+    },
+    {
+      "id": "kg.edge.r74-shen-offers-marks",
+      "fromId": "char.r74-shen-yuji",
+      "toId": "quest.r74-cloud-marks",
+      "relation": "participatesIn",
+      "summary": "沈雨霁请玩家拓录石阶上的旧刻痕。"
+    },
+    {
+      "id": "kg.edge.r74-marks-requires-place",
+      "fromId": "quest.r74-cloud-marks",
+      "toId": "place.r74-cloud-markers",
+      "relation": "requires",
+      "summary": "云阶辨刻须找到云纹石阶的旧索孔。"
+    },
+    {
+      "id": "kg.edge.r74-shen-offers-bridge",
+      "fromId": "char.r74-shen-yuji",
+      "toId": "quest.r74-cloud-bridge",
+      "relation": "participatesIn",
+      "summary": "沈雨霁请玩家清出被拦路客占据的悬桥。"
+    },
+    {
+      "id": "kg.edge.r74-bridge-requires-marks",
+      "fromId": "quest.r74-cloud-bridge",
+      "toId": "quest.r74-cloud-marks",
+      "relation": "requires",
+      "summary": "先核对云阶刻痕，再依旧路向清理断索悬桥。"
+    },
+    {
+      "id": "kg.edge.r79-arrival-place",
+      "fromId": "event.r79-arrival",
+      "toId": "place.r79-isles",
+      "relation": "triggers",
+      "summary": "初次踏上落潮湾时发现东海群岛。"
+    },
+    {
+      "id": "kg.edge.r79-isles-located",
+      "fromId": "place.r79-isles",
+      "toId": "map.round-79-isles",
+      "relation": "locatedAt",
+      "summary": "落潮湾位于东海群岛的百格海岛区域。"
+    },
+    {
+      "id": "kg.edge.r79-reef-event-place",
+      "fromId": "event.r79-west-reef",
+      "toId": "place.r79-west-reef",
+      "relation": "triggers",
+      "summary": "检查退潮后的绳结后记下双礁浅滩。"
+    },
+    {
+      "id": "kg.edge.r79-beacon-event-place",
+      "fromId": "event.r79-white-beacon",
+      "toId": "place.r79-white-beacon",
+      "relation": "triggers",
+      "summary": "读取灯标底座潮痕后发现白沙灯标。"
+    },
+    {
+      "id": "kg.edge.r79-shao-located",
+      "fromId": "char.r79-shao-tinglan",
+      "toId": "map.round-79-isles",
+      "relation": "locatedAt",
+      "summary": "邵听澜在潮声驿整理海路记录。"
+    },
+    {
+      "id": "kg.edge.r79-shao-offers-chart",
+      "fromId": "char.r79-shao-tinglan",
+      "toId": "quest.r79-tide-chart",
+      "relation": "participatesIn",
+      "summary": "邵听澜请玩家辨认白沙灯标的旧潮痕。"
+    },
+    {
+      "id": "kg.edge.r79-chart-requires-beacon",
+      "fromId": "quest.r79-tide-chart",
+      "toId": "place.r79-white-beacon",
+      "relation": "requires",
+      "summary": "灯痕避礁需要亲自查看白沙灯标。"
+    },
+    {
+      "id": "kg.edge.r79-chart-rewards-reef",
+      "fromId": "quest.r79-tide-chart",
+      "toId": "place.r79-west-reef",
+      "relation": "rewards",
+      "summary": "完成潮痕辨认后把双礁浅滩列入航路记录。"
+    },
+    {
+      "id": "kg.edge.r82-arrival-coast",
+      "fromId": "event.r82-arrival",
+      "toId": "place.r82-east-coast",
+      "relation": "triggers",
+      "summary": "初抵青帆埠时发现东溟海岸。"
+    },
+    {
+      "id": "kg.edge.r82-coast-map",
+      "fromId": "place.r82-east-coast",
+      "toId": "map.round-82-east-coast",
+      "relation": "locatedAt",
+      "summary": "东溟海岸由青帆埠的百格探索地图承载。"
+    },
+    {
+      "id": "kg.edge.r82-market-place",
+      "fromId": "event.r82-blue-sail-market",
+      "toId": "place.r82-blue-sail-market",
+      "relation": "triggers",
+      "summary": "翻看旧簿后得知青帆埠的潮路记载。"
+    },
+    {
+      "id": "kg.edge.r82-gauge-place",
+      "fromId": "event.r82-tide-gauge",
+      "toId": "place.r82-east-tide-gauge",
+      "relation": "triggers",
+      "summary": "抄录东汊潮尺后发现旧水位刻痕。"
+    },
+    {
+      "id": "kg.edge.r82-npc-location",
+      "fromId": "char.r82-wen-chaozhi",
+      "toId": "map.round-82-east-coast",
+      "relation": "locatedAt",
+      "summary": "温朝之在青帆埠保管渡潮簿。"
+    },
+    {
+      "id": "kg.edge.r82-npc-quest",
+      "fromId": "char.r82-wen-chaozhi",
+      "toId": "quest.r82-follow-the-tide",
+      "relation": "participatesIn",
+      "summary": "温朝之委托玩家补全东汊潮尺记录。"
+    },
+    {
+      "id": "kg.edge.r82-quest-gauge",
+      "fromId": "quest.r82-follow-the-tide",
+      "toId": "place.r82-east-tide-gauge",
+      "relation": "requires",
+      "summary": "潮尺旧记需要玩家调查东汊石潮尺。"
+    },
+    {
+      "id": "kg.edge.r82-quest-cove",
+      "fromId": "quest.r82-follow-the-tide",
+      "toId": "place.r82-fog-cove",
+      "relation": "rewards",
+      "summary": "完成潮尺旧记后，温朝之补绘雾隐湾的安全水路。"
+    },
+    {
+      "id": "kg.edge.r83-merchant-location",
+      "fromId": "char.r83-jin-yunfan",
+      "toId": "place.r82-east-coast",
+      "relation": "locatedAt",
+      "summary": "金云帆在青帆埠经营潮行补给摊。"
+    },
+    {
+      "id": "kg.edge.r83-merchant-stock",
+      "fromId": "char.r83-jin-yunfan",
+      "toId": "item.r83-sea-salt-ointment",
+      "relation": "holds",
+      "summary": "金云帆的补给摊售有海盐敷膏。"
+    },
+    {
+      "id": "kg.edge.r83-fisher-location",
+      "fromId": "char.r83-gu-chaosheng",
+      "toId": "place.r82-east-coast",
+      "relation": "locatedAt",
+      "summary": "顾潮生在青帆埠附近巡潮。"
+    },
+    {
+      "id": "kg.edge.r83-fisher-recovery",
+      "fromId": "char.r83-gu-chaosheng",
+      "toId": "quest.r83-net-recovery",
+      "relation": "participatesIn",
+      "summary": "顾潮生委托玩家找回潮沟网具。"
+    },
+    {
+      "id": "kg.edge.r83-fisher-channel",
+      "fromId": "char.r83-gu-chaosheng",
+      "toId": "quest.r83-night-channel",
+      "relation": "participatesIn",
+      "summary": "顾潮生请玩家辨认暮潮回湾线。"
+    },
+    {
+      "id": "kg.edge.r83-raiders-location",
+      "fromId": "char.r83-tide-wake-leader",
+      "toId": "place.r82-east-coast",
+      "relation": "locatedAt",
+      "summary": "夺网客头目出没在东汊潮沟浅滩。"
+    },
+    {
+      "id": "kg.edge.r83-encounter-raider",
+      "fromId": "event.r83-tide-wake-looters",
+      "toId": "char.r83-tide-wake-leader",
+      "relation": "triggers",
+      "summary": "在潮沟浅滩遭遇夺网头目。"
+    },
+    {
+      "id": "kg.edge.r83-recovery-encounter",
+      "fromId": "quest.r83-net-recovery",
+      "toId": "event.r83-tide-wake-looters",
+      "relation": "requires",
+      "summary": "潮沟夺网要求击退夺网客。"
+    },
+    {
+      "id": "kg.edge.r83-recovery-shoals",
+      "fromId": "quest.r83-net-recovery",
+      "toId": "place.r83-net-shoals",
+      "relation": "rewards",
+      "summary": "找回浮标后重新得知回标浅滩。"
+    },
+    {
+      "id": "kg.edge.r83-night-event-place",
+      "fromId": "event.r83-night-channel",
+      "toId": "place.r83-night-channel",
+      "relation": "triggers",
+      "summary": "夜潮灯影照亮回湾石标后发现安全航线。"
+    },
+    {
+      "id": "kg.edge.r83-channel-quest-place",
+      "fromId": "quest.r83-night-channel",
+      "toId": "place.r83-night-channel",
+      "relation": "requires",
+      "summary": "暮潮牵标要求玩家调查夜间石标。"
+    },
+    {
+      "id": "kg.edge.r84-arrival-isle",
+      "fromId": "event.r84-arrival",
+      "toId": "place.r84-windward-isle",
+      "relation": "triggers",
+      "summary": "初登西滩时发现风回岛。"
+    },
+    {
+      "id": "kg.edge.r84-isle-map",
+      "fromId": "place.r84-windward-isle",
+      "toId": "map.round-84-windward-isle",
+      "relation": "locatedAt",
+      "summary": "风回岛由百格探索地图承载。"
+    },
+    {
+      "id": "kg.edge.r84-hamlet-event",
+      "fromId": "event.r84-hamlet-ledger",
+      "toId": "place.r84-stone-hamlet",
+      "relation": "triggers",
+      "summary": "翻看檐下旧簿后得知石厝小村的来历。"
+    },
+    {
+      "id": "kg.edge.r84-beacon-event",
+      "fromId": "event.r84-beacon-watch",
+      "toId": "place.r84-windward-beacon",
+      "relation": "triggers",
+      "summary": "观察灯影后发现风候变化的痕迹。"
+    },
+    {
+      "id": "kg.edge.r84-npc-location",
+      "fromId": "char.r84-ruan-huilan",
+      "toId": "map.round-84-windward-isle",
+      "relation": "locatedAt",
+      "summary": "阮回澜在风回岛石厝守灯。"
+    },
+    {
+      "id": "kg.edge.r84-npc-quest",
+      "fromId": "char.r84-ruan-huilan",
+      "toId": "quest.r84-lantern-ledger",
+      "relation": "participatesIn",
+      "summary": "阮回澜委托玩家记录灯影方位。"
+    },
+    {
+      "id": "kg.edge.r84-quest-beacon",
+      "fromId": "quest.r84-lantern-ledger",
+      "toId": "place.r84-windward-beacon",
+      "relation": "requires",
+      "summary": "风回灯影需要玩家调查东坡灯标。"
+    },
+    {
+      "id": "kg.edge.r84-quest-spring",
+      "fromId": "quest.r84-lantern-ledger",
+      "toId": "place.r84-spring-hollow",
+      "relation": "rewards",
+      "summary": "完成风回灯影后，阮回澜带你认下岛心淡泉。"
+    },
+    {
+      "id": "kg.edge.r85-arrival-isle",
+      "fromId": "event.r85-arrival",
+      "toId": "place.r85-tide-isle",
+      "relation": "triggers",
+      "summary": "初登西滩时发现潮生屿。"
+    },
+    {
+      "id": "kg.edge.r85-isle-map",
+      "fromId": "place.r85-tide-isle",
+      "toId": "map.round-85-tide-isle",
+      "relation": "locatedAt",
+      "summary": "潮生屿由百格探索地图承载。"
+    },
+    {
+      "id": "kg.edge.r85-reef-event",
+      "fromId": "event.r85-reef-channel",
+      "toId": "place.r85-reef-channel",
+      "relation": "triggers",
+      "summary": "低潮勘碑后发现礁道水则的方位。"
+    },
+    {
+      "id": "kg.edge.r85-camp-event",
+      "fromId": "event.r85-camp-hearth",
+      "toId": "place.r85-camp",
+      "relation": "triggers",
+      "summary": "探访营地后得知守礁人的来历。"
+    },
+    {
+      "id": "kg.edge.r85-pool-event",
+      "fromId": "event.r85-tide-pool",
+      "toId": "place.r85-tide-pool",
+      "relation": "triggers",
+      "summary": "退潮后看见礁盘内侧的潮池。"
+    },
+    {
+      "id": "kg.edge.r85-surveyor-location",
+      "fromId": "char.r85-xie-zhaoting",
+      "toId": "map.round-84-windward-isle",
+      "relation": "locatedAt",
+      "summary": "谢照汀在风回岛西滩守着水则碑。"
+    },
+    {
+      "id": "kg.edge.r85-keeper-location",
+      "fromId": "char.r85-cen-yinjiao",
+      "toId": "map.round-85-tide-isle",
+      "relation": "locatedAt",
+      "summary": "岑隐礁在潮生屿松林边守礁。"
+    },
+    {
+      "id": "kg.edge.r85-surveyor-quest",
+      "fromId": "char.r85-xie-zhaoting",
+      "toId": "quest.r85-low-tide-channel",
+      "relation": "participatesIn",
+      "summary": "谢照汀委托玩家勘测低潮礁道。"
+    },
+    {
+      "id": "kg.edge.r85-quest-reef",
+      "fromId": "quest.r85-low-tide-channel",
+      "toId": "place.r85-reef-channel",
+      "relation": "requires",
+      "summary": "低潮礁道需要玩家趁低潮调查礁道。"
+    },
+    {
+      "id": "kg.edge.r85-quest-pool",
+      "fromId": "quest.r85-low-tide-channel",
+      "toId": "place.r85-tide-pool",
+      "relation": "rewards",
+      "summary": "完成低潮礁道后得知退潮石窝的方位。"
+    },
+    {
+      "id": "edge.r86-lu-yubai-supply",
+      "fromId": "char.r86-lu-yubai",
+      "toId": "place.r86-tide-isle-supply",
+      "relation": "locatedAt",
+      "summary": "陆余白在潮线药囊摊售卖有限补给。"
+    },
+    {
+      "id": "edge.r86-supply-isle",
+      "fromId": "place.r86-tide-isle-supply",
+      "toId": "place.r85-tide-isle",
+      "relation": "locatedAt",
+      "summary": "潮线药囊摊位于南溟·潮生屿内岸。"
+    },
+    {
+      "id": "edge.r86-raider-participates",
+      "fromId": "char.r86-heiqi-qi",
+      "toId": "event.r86-reef-raiders",
+      "relation": "participatesIn",
+      "summary": "黑鳍七在低潮时带人拦截礁道旅客。"
+    },
+    {
+      "id": "edge.r86-event-isle",
+      "fromId": "event.r86-reef-raiders",
+      "toId": "place.r85-tide-isle",
+      "relation": "locatedAt",
+      "summary": "低潮夺货发生在南溟·潮生屿东侧礁道。"
+    },
+    {
+      "id": "kg.edge.r87-arrival-isle",
+      "fromId": "event.r87-arrival",
+      "toId": "place.r87-southwest-isles",
+      "relation": "triggers",
+      "summary": "初入北滩时发现西南列岛。"
+    },
+    {
+      "id": "kg.edge.r87-isle-map",
+      "fromId": "place.r87-southwest-isles",
+      "toId": "map.round-87-southwest-isles",
+      "relation": "locatedAt",
+      "summary": "西南列岛由百格探索地图承载。"
+    },
+    {
+      "id": "kg.edge.r87-harbor-event",
+      "fromId": "event.r87-fog-harbor",
+      "toId": "place.r87-fog-harbor",
+      "relation": "triggers",
+      "summary": "探访渔村后得知雾泊渔村的来历。"
+    },
+    {
+      "id": "kg.edge.r87-signal-event",
+      "fromId": "event.r87-mist-signal",
+      "toId": "place.r87-mist-signal",
+      "relation": "triggers",
+      "summary": "勘明烽信后认清雾哨崖的方位。"
+    },
+    {
+      "id": "kg.edge.r87-spring-event",
+      "fromId": "event.r87-spring-hollow",
+      "toId": "place.r87-spring-hollow",
+      "relation": "triggers",
+      "summary": "寻得石缝清泉后发现石涧淡泉。"
+    },
+    {
+      "id": "kg.edge.r87-pilot-location",
+      "fromId": "char.r87-meng-haizhou",
+      "toId": "map.round-79-isles",
+      "relation": "locatedAt",
+      "summary": "孟海洲在落潮湾西礁守着雾图。"
+    },
+    {
+      "id": "kg.edge.r87-keeper-location",
+      "fromId": "char.r87-ao-wanqing",
+      "toId": "map.round-87-southwest-isles",
+      "relation": "locatedAt",
+      "summary": "敖晚晴在雾航湾雾哨崖守烽。"
+    },
+    {
+      "id": "kg.edge.r87-pilot-quest",
+      "fromId": "char.r87-meng-haizhou",
+      "toId": "quest.r87-fog-pilot-ledger",
+      "relation": "participatesIn",
+      "summary": "孟海洲委托玩家勘明雾航烽信。"
+    },
+    {
+      "id": "kg.edge.r87-quest-signal",
+      "fromId": "quest.r87-fog-pilot-ledger",
+      "toId": "place.r87-mist-signal",
+      "relation": "requires",
+      "summary": "雾航引水需要玩家调查雾哨崖烽台。"
+    },
+    {
+      "id": "kg.edge.r87-quest-spring",
+      "fromId": "quest.r87-fog-pilot-ledger",
+      "toId": "place.r87-spring-hollow",
+      "relation": "rewards",
+      "summary": "完成雾航引水后得知石涧淡泉的方位。"
+    },
+    {
+      "id": "kg.edge.r89-pilot-location",
+      "fromId": "char.r89-cheng-wenzhou",
+      "toId": "map.round-87-southwest-isles",
+      "relation": "locatedAt",
+      "summary": "程问舟在雾航湾周边巡查潮路，并按时段更换停留地点。"
+    },
+    {
+      "id": "kg.edge.r89-pilot-knows-chart",
+      "fromId": "char.r89-cheng-wenzhou",
+      "toId": "event.r89-chart-clue",
+      "relation": "knows",
+      "summary": "程问舟从残缺潮图辨出了旧水槽潮刻的位置。"
+    },
+    {
+      "id": "kg.edge.r89-pilot-quest",
+      "fromId": "char.r89-cheng-wenzhou",
+      "toId": "quest.r89-east-channel-echo",
+      "relation": "participatesIn",
+      "summary": "程问舟请玩家核实青帆埠旧水槽旁的三道潮刻。"
+    },
+    {
+      "id": "kg.edge.r89-clue-map",
+      "fromId": "event.r89-chart-clue",
+      "toId": "map.round-82-east-coast",
+      "relation": "locatedAt",
+      "summary": "残缺潮图线索指向东溟海岸的青帆埠。"
+    },
+    {
+      "id": "kg.edge.r89-mark-event-place",
+      "fromId": "event.r89-east-channel-mark",
+      "toId": "place.r89-east-channel-mark",
+      "relation": "triggers",
+      "summary": "调查旧水槽的三道潮刻后发现东汊旧水槽。"
+    },
+    {
+      "id": "kg.edge.r89-mark-location",
+      "fromId": "event.r89-east-channel-mark",
+      "toId": "map.round-82-east-coast",
+      "relation": "locatedAt",
+      "summary": "旧水槽潮刻位于青帆埠东岸。"
+    },
+    {
+      "id": "kg.edge.r89-place-location",
+      "fromId": "place.r89-east-channel-mark",
+      "toId": "map.round-82-east-coast",
+      "relation": "locatedAt",
+      "summary": "东汊旧水槽由青帆埠百格地图承载。"
+    },
+    {
+      "id": "kg.edge.r89-quest-mark",
+      "fromId": "quest.r89-east-channel-echo",
+      "toId": "place.r89-east-channel-mark",
+      "relation": "requires",
+      "summary": "东汊回声要求玩家亲自核实三道潮刻。"
+    },
+    {
+      "id": "kg.edge.r89-quest-return",
+      "fromId": "quest.r89-east-channel-echo",
+      "toId": "place.r89-safe-return-current",
+      "relation": "rewards",
+      "summary": "完成东汊回声后得知避开横流的回汐次序。"
+    },
+    {
+      "id": "kg.edge.r90-arrival-location",
+      "fromId": "event.r90-arrival-blue-sail",
+      "toId": "map.round-82-east-coast",
+      "relation": "locatedAt",
+      "summary": "潮序对汊的见闻发生在青帆埠海岸。"
+    },
+    {
+      "id": "kg.edge.r90-arrival-tide",
+      "fromId": "event.r90-arrival-blue-sail",
+      "toId": "place.r89-safe-return-current",
+      "relation": "requires",
+      "summary": "潮序对汊需要先从东汊回声学得回汐缓流。"
+    },
+    {
+      "id": "kg.edge.r90-return-location",
+      "fromId": "event.r90-return-cloud-ridge",
+      "toId": "map.round-74-cloud-ridge",
+      "relation": "locatedAt",
+      "summary": "云海收汊的见闻发生在云岭古道东口。"
+    },
+    {
+      "id": "kg.edge.r90-return-tide",
+      "fromId": "event.r90-return-cloud-ridge",
+      "toId": "place.r89-safe-return-current",
+      "relation": "requires",
+      "summary": "云海收汊同样循回汐缓流的记忆回望东汊。"
+    },
+    {
+      "id": "kg.edge.r91-arrival-terrace",
+      "fromId": "event.r91-arrival",
+      "toId": "place.r91-cloud-north-terrace",
+      "relation": "triggers",
+      "summary": "初登北台时发现云岭北台·雁回崖。"
+    },
+    {
+      "id": "kg.edge.r91-terrace-map",
+      "fromId": "place.r91-cloud-north-terrace",
+      "toId": "map.round-91-cloud-north-terrace",
+      "relation": "locatedAt",
+      "summary": "雁回崖由百格探索地图承载。"
+    },
+    {
+      "id": "kg.edge.r91-bridge-event",
+      "fromId": "event.r91-goose-bridge",
+      "toId": "place.r91-goose-bridge",
+      "relation": "triggers",
+      "summary": "过桥听风后认清悬空雁桥的位置。"
+    },
+    {
+      "id": "kg.edge.r91-platform-event",
+      "fromId": "event.r91-goose-terrace",
+      "toId": "place.r91-goose-terrace",
+      "relation": "triggers",
+      "summary": "台心记雁后记下观雁台的方位。"
+    },
+    {
+      "id": "kg.edge.r91-stone-event",
+      "fromId": "event.r91-goose-stone",
+      "toId": "place.r91-goose-stone",
+      "relation": "triggers",
+      "summary": "寻得大石后发现雁栖石的旧约。"
+    },
+    {
+      "id": "kg.edge.r91-keeper-location",
+      "fromId": "char.r91-nie-qiyan",
+      "toId": "map.round-91-cloud-north-terrace",
+      "relation": "locatedAt",
+      "summary": "聂栖雁在雁回崖观雁台下守雁。"
+    },
+    {
+      "id": "kg.edge.r91-keeper-quest",
+      "fromId": "char.r91-nie-qiyan",
+      "toId": "quest.r91-goose-vigil",
+      "relation": "participatesIn",
+      "summary": "聂栖雁委托玩家记回台心雁书。"
+    },
+    {
+      "id": "kg.edge.r91-quest-platform",
+      "fromId": "quest.r91-goose-vigil",
+      "toId": "place.r91-goose-terrace",
+      "relation": "requires",
+      "summary": "崖台雁候需要玩家登观雁台调查。"
+    },
+    {
+      "id": "kg.edge.r91-quest-stone",
+      "fromId": "quest.r91-goose-vigil",
+      "toId": "place.r91-goose-stone",
+      "relation": "rewards",
+      "summary": "完成崖台雁候后得知雁栖石的方位。"
+    },
+    {
+      "id": "kg.edge.r91-terrace-ridge",
+      "fromId": "place.r91-cloud-north-terrace",
+      "toId": "map.round-74-cloud-ridge",
+      "relation": "locatedAt",
+      "summary": "雁回崖从云岭古道断云栈道北端栈口进入。"
+    },
+    {
+      "id": "kg.edge.r92-arrival-pass",
+      "fromId": "event.r92-arrival",
+      "toId": "place.r92-north-pass",
+      "relation": "triggers",
+      "summary": "初入照雪关时发现北境·照雪关。"
+    },
+    {
+      "id": "kg.edge.r92-pass-map",
+      "fromId": "place.r92-north-pass",
+      "toId": "map.round-92-north-pass",
+      "relation": "locatedAt",
+      "summary": "照雪关由百格探索地图承载。"
+    },
+    {
+      "id": "kg.edge.r92-river-event",
+      "fromId": "event.r92-mirror-river",
+      "toId": "place.r92-mirror-river",
+      "relation": "triggers",
+      "summary": "过河中渡后认清镜面冰河的走向。"
+    },
+    {
+      "id": "kg.edge.r92-beacon-event",
+      "fromId": "event.r92-snow-beacon",
+      "toId": "place.r92-snow-beacon",
+      "relation": "triggers",
+      "summary": "雪夜点燧后记下照雪烽燧的位置。"
+    },
+    {
+      "id": "kg.edge.r92-cairn-event",
+      "fromId": "event.r92-north-cairn",
+      "toId": "place.r92-north-cairn",
+      "relation": "triggers",
+      "summary": "寻得界碑后读出北界碑的刻文。"
+    },
+    {
+      "id": "kg.edge.r92-keeper-location",
+      "fromId": "char.r92-gu-zhaoxue",
+      "toId": "map.round-92-north-pass",
+      "relation": "locatedAt",
+      "summary": "谷照雪在照雪关墙内守燧。"
+    },
+    {
+      "id": "kg.edge.r92-keeper-quest",
+      "fromId": "char.r92-gu-zhaoxue",
+      "toId": "quest.r92-snow-beacon",
+      "relation": "participatesIn",
+      "summary": "谷照雪委托玩家点验本季烽号。"
+    },
+    {
+      "id": "kg.edge.r92-quest-beacon",
+      "fromId": "quest.r92-snow-beacon",
+      "toId": "place.r92-snow-beacon",
+      "relation": "requires",
+      "summary": "雪燧传烽需要玩家上照雪烽燧调查。"
+    },
+    {
+      "id": "kg.edge.r92-quest-cairn",
+      "fromId": "quest.r92-snow-beacon",
+      "toId": "place.r92-north-cairn",
+      "relation": "rewards",
+      "summary": "完成雪燧传烽后得知北界碑的方位。"
+    },
+    {
+      "id": "kg.edge.r92-pass-terrace",
+      "fromId": "place.r92-north-pass",
+      "toId": "map.round-91-cloud-north-terrace",
+      "relation": "locatedAt",
+      "summary": "照雪关从雁回崖北境栈口进入。"
+    },
+    {
+      "id": "kg.edge.r93-arrival-valley",
+      "fromId": "event.r93-arrival",
+      "toId": "place.r93-snow-pine-valley",
+      "relation": "triggers",
+      "summary": "初入霜松谷时发现北境·霜松谷。"
+    },
+    {
+      "id": "kg.edge.r93-valley-map",
+      "fromId": "place.r93-snow-pine-valley",
+      "toId": "map.round-93-snow-pine-valley",
+      "relation": "locatedAt",
+      "summary": "霜松谷由百格探索地图承载。"
+    },
+    {
+      "id": "kg.edge.r93-pine-sea-event",
+      "fromId": "event.r93-pine-sea",
+      "toId": "place.r93-pine-sea",
+      "relation": "triggers",
+      "summary": "渡口听涛后记下松海的方位。"
+    },
+    {
+      "id": "kg.edge.r93-old-mark-event",
+      "fromId": "event.r93-old-mark",
+      "toId": "place.r93-old-mark",
+      "relation": "triggers",
+      "summary": "拓文之后认清旧界标的刻文。"
+    },
+    {
+      "id": "kg.edge.r93-wind-gap-event",
+      "fromId": "event.r93-wind-gap",
+      "toId": "place.r93-wind-gap",
+      "relation": "triggers",
+      "summary": "崖脚望北之后记下风口崖的位置。"
+    },
+    {
+      "id": "kg.edge.r93-patroller-location",
+      "fromId": "char.r93-liu-xunjing",
+      "toId": "map.round-93-snow-pine-valley",
+      "relation": "locatedAt",
+      "summary": "柳寻径在霜松谷的巡路石屋驻脚。"
+    },
+    {
+      "id": "kg.edge.r93-patroller-quest",
+      "fromId": "char.r93-liu-xunjing",
+      "toId": "quest.r93-boundary-mark",
+      "relation": "participatesIn",
+      "summary": "柳寻径委托玩家拓回界标刻文。"
+    },
+    {
+      "id": "kg.edge.r93-quest-old-mark",
+      "fromId": "quest.r93-boundary-mark",
+      "toId": "place.r93-old-mark",
+      "relation": "requires",
+      "summary": "界标寻踪需要玩家在旧界标调查。"
+    },
+    {
+      "id": "kg.edge.r93-quest-wind-gap",
+      "fromId": "quest.r93-boundary-mark",
+      "toId": "place.r93-wind-gap",
+      "relation": "rewards",
+      "summary": "完成界标寻踪后得知风口崖的方位。"
+    },
+    {
+      "id": "kg.edge.r93-valley-pass",
+      "fromId": "place.r93-snow-pine-valley",
+      "toId": "map.round-92-north-pass",
+      "relation": "locatedAt",
+      "summary": "霜松谷从照雪关西缘冰桥进入。"
+    },
+    {
+      "id": "kg.edge.r94-east-arrival-place",
+      "fromId": "event.r94-east-arrival",
+      "toId": "place.r94-east-gate",
+      "relation": "triggers",
+      "summary": "穿过东脊石门时发现天门关。"
+    },
+    {
+      "id": "kg.edge.r94-east-map-place",
+      "fromId": "map.round-94-east-gate",
+      "toId": "place.r94-east-gate",
+      "relation": "locatedAt",
+      "summary": "天门关由独立百格地图承载。"
+    },
+    {
+      "id": "kg.edge.r94-east-beacon-place",
+      "fromId": "event.r94-east-beacon",
+      "toId": "place.r94-east-beacon",
+      "relation": "triggers",
+      "summary": "拓录烽台石刻后记录东望烽台。"
+    },
+    {
+      "id": "kg.edge.r94-east-beacon-map",
+      "fromId": "place.r94-east-beacon",
+      "toId": "map.round-94-east-gate",
+      "relation": "locatedAt",
+      "summary": "东望烽台位于天门关探索地图。"
+    },
+    {
+      "id": "kg.edge.r94-east-npc-map",
+      "fromId": "char.r94-shen-wenqiu",
+      "toId": "map.round-94-east-gate",
+      "relation": "locatedAt",
+      "summary": "沈问秋驻守天门关。"
+    },
+    {
+      "id": "kg.edge.r94-east-npc-quest",
+      "fromId": "char.r94-shen-wenqiu",
+      "toId": "quest.r94-snowline-signal",
+      "relation": "participatesIn",
+      "summary": "沈问秋委托雪脊传书。"
+    },
+    {
+      "id": "kg.edge.r94-east-quest-beacon",
+      "fromId": "quest.r94-snowline-signal",
+      "toId": "place.r94-east-beacon",
+      "relation": "requires",
+      "summary": "雪脊传书需要调查东望烽台。"
+    },
+    {
+      "id": "kg.edge.r94-east-quest-reward",
+      "fromId": "quest.r94-snowline-signal",
+      "toId": "place.r94-cloud-window",
+      "relation": "rewards",
+      "summary": "复命后解锁云外望海窗见闻。"
+    },
+    {
+      "id": "kg.edge.r94-south-arrival-place",
+      "fromId": "event.r94-south-arrival",
+      "toId": "place.r94-returning-sails",
+      "relation": "triggers",
+      "summary": "乘渡抵达归帆洲时发现南海新洲。"
+    },
+    {
+      "id": "kg.edge.r94-south-map-place",
+      "fromId": "map.round-94-returning-sails",
+      "toId": "place.r94-returning-sails",
+      "relation": "locatedAt",
+      "summary": "归帆洲由独立百格地图承载。"
+    },
+    {
+      "id": "kg.edge.r94-south-lantern-place",
+      "fromId": "event.r94-south-lantern",
+      "toId": "place.r94-homeward-lantern",
+      "relation": "triggers",
+      "summary": "核对旧灯刻后认出归帆灯标。"
+    },
+    {
+      "id": "kg.edge.r94-south-lantern-map",
+      "fromId": "place.r94-homeward-lantern",
+      "toId": "map.round-94-returning-sails",
+      "relation": "locatedAt",
+      "summary": "归帆灯标位于归帆洲东岸。"
+    },
+    {
+      "id": "kg.edge.r94-south-npc-map",
+      "fromId": "char.r94-zhao-qianfan",
+      "toId": "map.round-94-returning-sails",
+      "relation": "locatedAt",
+      "summary": "赵千帆在归帆洲南码头掌渡。"
+    },
+    {
+      "id": "kg.edge.r94-south-npc-quest",
+      "fromId": "char.r94-zhao-qianfan",
+      "toId": "quest.r94-homeward-lantern",
+      "relation": "participatesIn",
+      "summary": "赵千帆委托核对归帆灯火。"
+    },
+    {
+      "id": "kg.edge.r94-south-quest-lantern",
+      "fromId": "quest.r94-homeward-lantern",
+      "toId": "place.r94-homeward-lantern",
+      "relation": "requires",
+      "summary": "归帆灯火需要调查半月礁旧灯刻。"
+    },
+    {
+      "id": "kg.edge.r94-south-quest-reward",
+      "fromId": "quest.r94-homeward-lantern",
+      "toId": "place.r94-moon-reef",
+      "relation": "rewards",
+      "summary": "复命后解锁半月浅礁见闻。"
+    }
   ]
 }
