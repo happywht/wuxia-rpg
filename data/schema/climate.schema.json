@@ -138,12 +138,12 @@
             "required": ["kind", "density"],
             "properties": {
               "kind": {
-                "description": "降水类型：rain 雨丝（细长快速下落）、snow 雪片（缓慢飘落）。",
+                "description": "天气粒子类型：rain 雨丝、snow 雪片、fog 低对比慢速雾团。",
                 "type": "string",
-                "enum": ["rain", "snow"]
+                "enum": ["rain", "snow", "fog"]
               },
               "density": {
-                "description": "降水密度（0–1），控制程序化粒子数量，0 表示不显示粒子。",
+                "description": "天气粒子密度（0–1），控制程序化粒子数量；0 表示不显示粒子。",
                 "type": "number",
                 "minimum": 0,
                 "maximum": 1

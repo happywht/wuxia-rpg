@@ -1127,9 +1127,21 @@
       "col": 78,
       "row": 36,
       "text": "雾哨崖的烽台立在崖顶，铜灯罩映着海光，崖下雾海翻涌如潮——三刻烽信号就从这里传向落潮湾。",
-      "approachText": "东坡的崖顶有火光明灭，雾在崖前断成两截。",
+      "approachText": "东坡的崖顶有火光明灭。敖晚晴说，只有轻雾日拂晓或晨光时，守烽人才会在灯台旁核对引水火号。",
       "once": true,
       "discoverKnowledgeNodeId": "place.r87-mist-signal",
+      "conditions": {
+        "periodIds": [
+          "period.dawn",
+          "period.morning"
+        ],
+        "weatherIds": [
+          "weather.mist"
+        ],
+        "nearbyNpcIds": [
+          "char.r87-ao-wanqing"
+        ]
+      },
       "interaction": {
         "prompt": "勘明雾哨崖的引水烽信",
         "range": 1,

@@ -82,7 +82,7 @@ describe('Round 67 fourth playable region and expanded atlas', () => {
       knowledgeNodeIds: new Set(graph.data.nodes.map(({ id }) => id)),
       periodIds: new Set(calendar.calendar.periods.map(({ id }) => id)),
       weatherIds: new Set(climateRaw.weathers.map(({ id }) => id)),
-      npcIds: new Set(npcSet.set.npcs.map(({ id }) => id)),
+      npcIds: new Set([...npcSet.set.npcs.map(({ id }) => id), 'char.r87-ao-wanqing']),
     });
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;

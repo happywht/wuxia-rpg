@@ -192,9 +192,9 @@ describe('Round 53 landmark discovery gating', () => {
       'place.r87-mist-signal',
       'place.r87-spring-hollow',
     ]),
-    periodIds: new Set(['period.dusk', 'period.night']),
-    weatherIds: new Set(['weather.drizzle', 'weather.rain', 'weather.storm']),
-    npcIds: new Set(['char.shi-bei', 'char.bai-luzhou']),
+    periodIds: new Set(['period.dusk', 'period.night', 'period.dawn', 'period.morning']),
+    weatherIds: new Set(['weather.drizzle', 'weather.rain', 'weather.storm', 'weather.mist']),
+    npcIds: new Set(['char.shi-bei', 'char.bai-luzhou', 'char.r87-ao-wanqing']),
   });
 
   const parseAssembled = () => {

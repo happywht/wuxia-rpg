@@ -254,7 +254,7 @@ function loadJourneyWorld(): JourneyWorld {
     knowledgeNodeIds: new Set(graph.nodes.keys()),
     periodIds: new Set(calendar.periods.map(({ id }) => id)),
     weatherIds: new Set(climateData.weathers.map(({ id }) => id)),
-    npcIds: new Set(npcSet.npcs.map(({ id }) => id)),
+    npcIds: new Set([...npcSet.npcs.map(({ id }) => id), 'char.r87-ao-wanqing']),
   });
   if ('ok' in worldResult) throw new Error(worldResult.errors.join('\n'));
   expect(worldResult.warnings, '全域/关口/事件装配').toEqual([]);

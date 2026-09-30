@@ -75,9 +75,9 @@ export interface ClimateSeasonData {
   weatherWeights: { weatherId: string; weight: number }[];
 }
 
-/** How a weather paints precipitation over the world layer. */
+/** How a weather paints precipitation or atmospheric particles over the world layer. */
 export interface ClimatePrecipitationData {
-  kind: 'rain' | 'snow';
+  kind: 'rain' | 'snow' | 'fog';
   /** 0–1; controls the procedural particle count. */
   density: number;
 }
@@ -274,12 +274,14 @@ export function parseClimate(
       if (source !== null && source.precipitation !== undefined && source.precipitation !== null) {
         const precipSource = isPlainObject(source.precipitation) ? source.precipitation : null;
         const kind =
-          precipSource?.kind === 'rain' || precipSource?.kind === 'snow' ? precipSource.kind : null;
+          precipSource?.kind === 'rain' || precipSource?.kind === 'snow' || precipSource?.kind === 'fog'
+            ? precipSource.kind
+            : null;
         const density =
           precipSource === null ? null : requireNumberInRange(precipSource.density, 0, 1);
         if (kind === null || density === null) {
           errors.push(
-            `${label}.precipitation：应含 kind（rain/snow）与 density（0–1 数值）`,
+            `${label}.precipitation：应含 kind（rain/snow/fog）与 density（0–1 数值）`,
           );
         } else {
           precipitation = { kind, density };

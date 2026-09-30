@@ -129,7 +129,7 @@ describe('large walkable regions and later atlas extensions', () => {
       knowledgeNodeIds: new Set(nodes.nodes.map(({ id }) => id)),
       periodIds: new Set(calendar.periods.map(({ id }) => id)),
       weatherIds: new Set(climate.weathers.map(({ id }) => id)),
-      npcIds: new Set(npcSet.npcs.map(({ id }) => id)),
+      npcIds: new Set([...npcSet.npcs.map(({ id }) => id), 'char.r87-ao-wanqing']),
     });
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;

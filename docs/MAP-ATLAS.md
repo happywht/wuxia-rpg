@@ -173,7 +173,7 @@ Round 10 将单张网格地图扩展为资料驱动的区域集合；Round 79 �
 | `event.r85-tide-pool` | `map.round-85-tide-isle` · (46, 66) | 踏入 | 是 | 无 | `place.r85-tide-pool`（退潮石窝） |
 | `event.r87-arrival` | `map.round-87-southwest-isles` · (2, 50) | 踏入 | 是 | 无 | `place.r87-southwest-isles`（西南列岛·雾航湾） |
 | `event.r87-fog-harbor` | `map.round-87-southwest-isles` · (48, 46) | 踏入 | 是 | 无 | `place.r87-fog-harbor`（雾泊渔村） |
-| `event.r87-mist-signal` | `map.round-87-southwest-isles` · (78, 36) | 邻近按 E 调查 | 是 | 无 | `place.r87-mist-signal`（雾哨崖） |
+| `event.r87-mist-signal` | `map.round-87-southwest-isles` · (78, 36) | 轻雾日拂晓/晨光、敖晚晴邻近时按 E 调查 | 是 | 时段 拂晓/晨光；天气 轻雾；附近 NPC 敖晚晴 | `place.r87-mist-signal`（雾哨崖） |
 | `event.r87-spring-hollow` | `map.round-87-southwest-isles` · (38, 62) | 踏入 | 是 | 无 | `place.r87-spring-hollow`（石涧淡泉） |
 
 `interaction` 声明 `prompt`、可选曼哈顿距离 `range`（1–4，省略按 1 格）和可选 `approachDirections`（从玩家格朝向目标格的 `down/left/right/up`；省略表示四向均可）。调查目标必须与玩家同一行或同一列；两格以上时，中间地形必须可走且不能被 NPC/遭遇占用。交互只在提示、方向/距离、事件条件和一次性状态同时允许时出现，并在按 E 后复用固定事件文本、一次性完成记账及知识发现。含 `interaction` 的事件不会因走上目标格而自动结算。未声明该字段的旧世界图事件仍按原有踏入触发路径工作。
@@ -301,6 +301,8 @@ M 默认打开宽幅全域总览：`regions[].atlasPosition` 决定区域落点�
 Round 43 的「风雨传函」是漫游奇遇：玩家已发现雨后脚印后，在雾雨渡口黄昏或夜间的细雨、降雨、骤雨中行走，每成功走一步有 12% 概率遇到赶路人。该奇遇只发出一次，记录同名百科见闻；此后五派导师才会分别展示本门限定的求助支线。概率由可注入随机数的纯选择器执行，自动化测试不依赖实际运气。
 
 Round 44 的「雨夜旧桩之争」沿用相同的一次性漫游事件状态：收到风雨传函后，只有黄昏雨天走格，并且石北、白鹭洲按该时段日程落位后同时与玩家四向相邻，才会参与概率抽取。事件触发后在白鹭洲处选择「先固旧桩」或「先核渡簿」之一；任务完成时一次性结算铁嶂派/寒山书院声望与对应百科见闻。事件条件里声明的是 NPC id，装配期对照 NPC 资料校验，运行期使用实际地图和时段落位，不看动画插值坐标。
+
+Round 88 的雾哨崖信号是固定 E 键调查：`weatherIds: [weather.mist]`、`periodIds: [period.dawn, period.morning]` 和 `nearbyNpcIds: [char.r87-ao-wanqing]` 三组条件同时满足才显示调查提示并能发现信号节点。敖晚晴的日程让她在轻雾日拂晓/晨光守在烽台旁；玩家站到允许的接近格、与她四向相邻后调查。天气为每日确定性结果，等候/移动后固定事件会按新时间重新求值；未满足时不会消耗一次性事件或推进差事。
 
 ```json
 {

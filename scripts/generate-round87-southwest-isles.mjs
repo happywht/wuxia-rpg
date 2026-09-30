@@ -292,6 +292,7 @@ const islesArrival = at(6, 31);
 const pilotPosition = at(7, 35);
 const harbor = at(48, 46);
 const keeperPosition = at(49, 48);
+const keeperSignalPosition = at(80, 36);
 const signal = at(78, 36);
 const spring = at(38, 62);
 const roads = new Set();
@@ -429,7 +430,7 @@ function reachableFrom(origin, mapGrid, mapColumns, mapRows, label) {
   return reached;
 }
 const reachable = reachableFrom(start, grid, columns, rows, '西南列岛');
-for (const point of [isleReturn, harbor, keeperPosition, signal, spring]) {
+for (const point of [isleReturn, harbor, keeperPosition, keeperSignalPosition, signal, spring]) {
   if (!reachable.has(key(point.col, point.row))) throw new Error('西南列岛锚点不可达：' + key(point.col, point.row));
 }
 // 雾哨崖是 E 键调查点，目标至少要有一个可通行且从入口可达的正交邻格。
@@ -556,6 +557,15 @@ const npcs = {
     dialogueId: 'dlg.r87-ao-wanqing-signal',
     spriteFrame: 112,
     spriteFrames: { down: 96, right: 104, up: 112, left: 120 },
+    schedule: [
+      { periodId: 'period.midnight', position: { col: 49, row: 50 } },
+      { periodId: 'period.dawn', position: { col: 80, row: 36 } },
+      { periodId: 'period.morning', position: { col: 80, row: 36 } },
+      { periodId: 'period.midday', position: { col: 50, row: 48 } },
+      { periodId: 'period.afternoon', position: { col: 51, row: 48 } },
+      { periodId: 'period.dusk', position: { col: 80, row: 36 } },
+      { periodId: 'period.night', position: { col: 49, row: 49 } },
+    ],
   }],
 };
 for (const npc of npcs.npcs) {
@@ -568,7 +578,7 @@ const quests = {
   quests: [{
     id: questId,
     name: '雾航引水',
-    description: '孟海洲托你航向西南雾海，登上雾航湾点燃雾哨崖的引水烽信号，把新航路的雾信带回落潮湾。',
+    description: '孟海洲托你航向西南雾海，登上雾航湾，在轻雾日拂晓或晨光时与守烽人一同核准雾哨崖的引水信号，再把新航路的雾信带回落潮湾。',
     giverNpcId: npcIds.pilot,
     objectives: [{
       id: 'objective.r87-land-on-southwest-isles',
@@ -581,7 +591,7 @@ const quests = {
       kind: 'discoverKnowledge',
       targetId: nodeIds.signal,
       requiredCount: 1,
-      text: '登上雾哨崖勘明引水烽信',
+      text: '轻雾日拂晓或晨光时，敖晚晴守烽在旁；与她相邻并调查雾哨崖引水烽',
     }, {
       id: 'objective.r87-return-fog-pilot-ledger',
       kind: 'talkToNpc',
@@ -626,10 +636,10 @@ const dialogues = {
           { text: '改日再谈。', nextNodeId: 'farewell' },
         ],
       },
-      { id: 'accepted', text: '「从西礁外趁平潮下桨，认准雾头三道白浪。湾北是一片黑沙滩，滩后渔村，村东坡顶立着雾哨崖——把崖上烽信号的雾信记全，一式三刻，缺一刻都算不准。」' },
-      { id: 'active', text: '「先登雾航湾北滩，再上雾哨崖记烽信，最后回落潮湾交给我。雾里别贪快，宁可慢半炷香。」' },
+      { id: 'accepted', text: '「从西礁外趁平潮下桨，认准雾头三道白浪。湾北是一片黑沙滩，滩后渔村，村东坡顶立着雾哨崖。记住，要等轻雾日的拂晓或晨光，找敖晚晴守烽；与她相邻时从崖侧按 E 调查，把三刻烽信记全，缺一刻都算不准。」' },
+      { id: 'active', text: '「先登雾航湾北滩，再等轻雾日拂晓或晨光，敖晚晴守烽时与她相邻，从崖侧按 E 记下烽信；最后回落潮湾交给我。雾里别贪快，宁可慢半炷香。」' },
       { id: 'completed', text: '孟海洲对着你记回的雾信核了半晌，忽然笑出声：「三刻烽信，西汊可通——这片雾海三十年没换过图，往后渔队夜航能少折两条船。」' },
-      { id: 'route', text: '「西南四十里雾海，岛影成串。北滩水缓可以泊船，滩后有人家；东崖高百丈，是天然的烽台。守望人姓敖，报我的名字，她会借你灯。」' },
+      { id: 'route', text: '「西南四十里雾海，岛影成串。北滩水缓可以泊船，滩后有人家；东崖高百丈，是天然的烽台。守望人姓敖，报我的名字，她会借你灯。她每天拂晓和晨光守崖，但只有轻雾日才开引水信号给人核验。」' },
       { id: 'signal', text: '「烽信是雾里的钟。雾浓时看不见岛，只看得见崖上的火。火号准，船就活得下来——我这双眼睛老了，验不动了，才要求人。」' },
       { id: 'farewell', text: '孟海洲重新把雾图折好塞回油布袋，望着西南方向的雾线出神。' },
     ],
@@ -639,14 +649,14 @@ const dialogues = {
     nodes: [
       {
         id: 'greet',
-        text: '雾哨崖顶的烽台边，守望人敖晚晴放下手里的铜灯罩：「这雾天还有人摸上崖来——若是为看烽信，得先懂它的规矩。」',
+        text: '雾哨崖顶的烽台边，守望人敖晚晴放下手里的铜灯罩：「若为核对引水烽信，得等轻雾日的拂晓或晨光；靠近些，我再把灯号规矩说给你。」',
         options: [
           { text: '烽信号怎么记？', nextNodeId: 'signal' },
           { text: '你怎么守在这崖上？', nextNodeId: 'keeper' },
           { text: '打扰了。', nextNodeId: 'farewell' },
         ],
       },
-      { id: 'signal', text: '「雾起三刻点一次，雾散即止。灯罩开三分是缓行，开满是禁航，连闪三下是换汊——你把这三样记回去，落潮湾的船就都认得了。」' },
+      { id: 'signal', text: '「我每天拂晓、晨光都来守烽，可只有轻雾压海时才核引水号。雾起三刻点一次，雾散即止；灯罩开三分是缓行，开满是禁航，连闪三下是换汊。轻雾日与我相邻，在崖侧按 E 调查，才算把这三样记全。」' },
       { id: 'keeper', text: '「敖家守雾三代。祖父说，雾不是墙，是帘子——帘子后头的路，得有人一年一年用灯去量。我量了十七年，还差着祖父的火候。」' },
       { id: 'farewell', text: '敖晚晴重新拾起铜灯罩，往烽台内侧走去，雾气在她身后合拢。' },
     ],
@@ -699,9 +709,14 @@ const events = [
     mapResourceId: mapId,
     ...signal,
     text: '雾哨崖的烽台立在崖顶，铜灯罩映着海光，崖下雾海翻涌如潮——三刻烽信号就从这里传向落潮湾。',
-    approachText: '东坡的崖顶有火光明灭，雾在崖前断成两截。',
+    approachText: '东坡的崖顶有火光明灭。敖晚晴说，只有轻雾日拂晓或晨光时，守烽人才会在灯台旁核对引水火号。',
     once: true,
     discoverKnowledgeNodeId: nodeIds.signal,
+    conditions: {
+      periodIds: ['period.dawn', 'period.morning'],
+      weatherIds: ['weather.mist'],
+      nearbyNpcIds: [npcIds.keeper],
+    },
     interaction: {
       prompt: '勘明雾哨崖的引水烽信',
       range: 1,

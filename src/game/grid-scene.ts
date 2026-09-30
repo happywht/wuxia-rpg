@@ -408,6 +408,7 @@ export class GridScene extends Phaser.Scene {
   private readonly weatherTextureKeys = {
     rain: 'wuxia-weather-rain-drop',
     snow: 'wuxia-weather-snow-flake',
+    fog: 'wuxia-weather-fog-bank',
   } as const;
 
   private dialoguePanel: DialoguePanel | null = null;
@@ -2625,25 +2626,41 @@ export class GridScene extends Phaser.Scene {
       if (precipitation.kind === 'rain') {
         graphics.fillRect(1, 0, 2, 9);
         graphics.generateTexture(textureKey, 4, 10);
-      } else {
+      } else if (precipitation.kind === 'snow') {
         graphics.fillCircle(3, 3, 2.5);
         graphics.generateTexture(textureKey, 6, 6);
+      } else {
+        // Soft overlapping ellipses form a CC0-free procedural fog bank.
+        // Low texture alpha plus the emitter fade keeps actors legible.
+        graphics.fillStyle(0xe1e9e9, 0.34);
+        graphics.fillEllipse(21, 19, 38, 22);
+        graphics.fillEllipse(44, 15, 47, 25);
+        graphics.fillEllipse(67, 20, 42, 20);
+        graphics.fillEllipse(47, 24, 79, 15);
+        graphics.generateTexture(textureKey, 90, 38);
       }
       graphics.destroy();
     }
 
     const isRain = precipitation.kind === 'rain';
+    const isFog = precipitation.kind === 'fog';
     const emitter = this.add.particles(0, 0, textureKey, {
       x: { min: 0, max: VIEW_WIDTH },
       y: { min: HUD_HEIGHT, max: VIEW_HEIGHT },
-      lifespan: isRain ? { min: 1400, max: 2200 } : { min: 3200, max: 5200 },
-      speedX: isRain ? { min: -18, max: 18 } : { min: -26, max: 26 },
-      speedY: isRain ? { min: 200, max: 310 } : { min: 24, max: 68 },
-      frequency: Math.max(35, Math.round(260 - precipitation.density * 220)),
+      lifespan: isFog
+        ? { min: 9000, max: 15000 }
+        : isRain ? { min: 1400, max: 2200 } : { min: 3200, max: 5200 },
+      speedX: isFog
+        ? { min: -10, max: 10 }
+        : isRain ? { min: -18, max: 18 } : { min: -26, max: 26 },
+      speedY: isFog
+        ? { min: -1, max: 2 }
+        : isRain ? { min: 200, max: 310 } : { min: 24, max: 68 },
+      frequency: Math.max(isFog ? 180 : 35, Math.round((isFog ? 760 : 260) - precipitation.density * (isFog ? 560 : 220))),
       quantity: 1,
-      tint: isRain ? 0xcbd9ed : 0xf4f8ff,
-      alpha: { start: 0.86, end: 0.16 },
-      scale: isRain ? 0.82 : 0.8,
+      tint: isFog ? 0xc7d7da : isRain ? 0xcbd9ed : 0xf4f8ff,
+      alpha: isFog ? { start: 0.34, end: 0.04 } : { start: 0.86, end: 0.16 },
+      scale: isFog ? { start: 1.25, end: 2.15 } : isRain ? 0.82 : 0.8,
     });
     this.weatherEmitter = emitter.setDepth(WEATHER_PARTICLE_DEPTH);
   }

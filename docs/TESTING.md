@@ -190,6 +190,7 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 | `tests/round86-world-atlas-labels.test.ts` | 全景区域标题排布 | 用真实 448×320 总图的九区坐标与视口缩放，检查完整标注处于 616×340 视口内且互不重叠，并让当前区域保留原始锚点；纳入 `npm run smoke:round-86`。 |
 | `tests/round86-tide-and-supply.test.ts` | 潮生屿低潮战斗、NPC 与有限药囊 | 检查遭遇只在 `tide.low` 存在且可重复、不奖励经验，气候相位引用有效；整世界装配、补给 NPC/商店库存、物品引用和知识图谱无告警；纳入 `npm run smoke:round-86`。 |
 | `tests/round87-southwest-isles.test.ts` | 西南列岛、舆图扩展、CC0 素材、跨区关口和「雾航引水」 | 校验旧 448×320 舆图 24 层哈希、九区投影不漂移、512×384/28 层新海域、新地图碰撞与可达性、CC0 图集帧、双向过图、任务目标顺序/导航/奖励及历史夹具兼容；纳入 `npm run smoke:round-87`。 |
+| `tests/round88-mist-schedule.test.ts` | 轻雾天气协议、敖晚晴七时段日程与雾哨崖调查窗口 | 校验旧雨雪格式兼容、雾粒子参数解析/无效值、种子日期确定性、七个日程位置可达无告警、天气/时段/NPC 邻接 AND 门控、一次性调查与原跨区差事顺序；纳入 `npm run smoke:round-88`。 |
 - 2026-09-29（Round 79）：新增海岛区域专项与可重复生成命令；世界图夹具升级为六区/十向关口，覆盖 Puny World CC0 图集网格、任务发现奖励、舆图保留旧大陆图层及旧区域锚点稳定。专项命令 `npm run smoke:round-79`。
 - 2026-09-30（Round 80）：新增固定区域事件环境调查专项，覆盖 interaction Schema/解析、默认踏入事件、方向/距离/视线、条件/一次性与云岭悬桥/落潮湾灯标真实格位；`npm run smoke:round-80`。
 - 2026-09-30（Round 81）：新增 336×224 超大舆图专项，锁定旧 12 层历史像素、六区及全部关口/地标/玩家投影，验证新拓展图素、Schema 最大尺寸、Puny World CC0 来源与适配视口；`npm run smoke:round-81`。
@@ -197,3 +198,4 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 - 2026-09-30（Round 85）：舆图当前扩至 448×320；SHA-256 锁定旧 384×256 二十层像素和八个旧区域中心；新增潮生屿、低潮门控、跨岛任务及历史装配夹具，复用已登记 CC0 素材；`npm run smoke:round-85`。
 - 2026-09-30（Round 86）：新增逐行 RLE Schema/解码、密集 MOD 兼容、448×320 九区全景标签避让、潮生屿低潮遭遇与限量药囊/存档测试；`npm run smoke:round-86`（专项 6 文件/34 项）。
 - 2026-09-30（Round 87）：新增 512×384、28 层舆图扩展与旧像素/投影守护；西南列岛可达性、CC0 图素帧、双向关口、跨区三阶段任务和目的地导航回归；`npm run smoke:round-87`（18 个测试文件，104 项）。完整质量门槛结果记录于 `DEVLOG.md`。
+- 2026-09-30（Round 88）：新增可选 `fog` 天气粒子解析、气候兼容/确定性、七时段 NPC 可达性、雾哨崖 AND 条件与旧任务顺序专项；`npm run smoke:round-88`（5 个测试文件，33 项）。完整质量门槛与浏览器走查边界记录于 `DEVLOG.md`。

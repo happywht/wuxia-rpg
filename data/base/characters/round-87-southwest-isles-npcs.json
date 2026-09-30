@@ -33,7 +33,58 @@
         "right": 104,
         "up": 112,
         "left": 120
-      }
+      },
+      "schedule": [
+        {
+          "periodId": "period.midnight",
+          "position": {
+            "col": 49,
+            "row": 50
+          }
+        },
+        {
+          "periodId": "period.dawn",
+          "position": {
+            "col": 80,
+            "row": 36
+          }
+        },
+        {
+          "periodId": "period.morning",
+          "position": {
+            "col": 80,
+            "row": 36
+          }
+        },
+        {
+          "periodId": "period.midday",
+          "position": {
+            "col": 50,
+            "row": 48
+          }
+        },
+        {
+          "periodId": "period.afternoon",
+          "position": {
+            "col": 51,
+            "row": 48
+          }
+        },
+        {
+          "periodId": "period.dusk",
+          "position": {
+            "col": 80,
+            "row": 36
+          }
+        },
+        {
+          "periodId": "period.night",
+          "position": {
+            "col": 49,
+            "row": 49
+          }
+        }
+      ]
     }
   ]
 }

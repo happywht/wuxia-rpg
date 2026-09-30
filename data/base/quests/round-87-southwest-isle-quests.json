@@ -3,7 +3,7 @@
     {
       "id": "quest.r87-fog-pilot-ledger",
       "name": "雾航引水",
-      "description": "孟海洲托你航向西南雾海，登上雾航湾点燃雾哨崖的引水烽信号，把新航路的雾信带回落潮湾。",
+      "description": "孟海洲托你航向西南雾海，登上雾航湾，在轻雾日拂晓或晨光时与守烽人一同核准雾哨崖的引水信号，再把新航路的雾信带回落潮湾。",
       "giverNpcId": "char.r87-meng-haizhou",
       "objectives": [
         {
@@ -18,7 +18,7 @@
           "kind": "discoverKnowledge",
           "targetId": "place.r87-mist-signal",
           "requiredCount": 1,
-          "text": "登上雾哨崖勘明引水烽信"
+          "text": "轻雾日拂晓或晨光时，敖晚晴守烽在旁；与她相邻并调查雾哨崖引水烽"
         },
         {
           "id": "objective.r87-return-fog-pilot-ledger",

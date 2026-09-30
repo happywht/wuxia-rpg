@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：截至 Round 87；基础世界含 26 名 NPC、5 个门派、53 项任务、52 件物品、30 种武学、278 个图谱节点/380 条边，manifest 登记 64 项资源。十张区域地图均为 100×100 格；东溟海岸、外海岛与西南列岛复用已登记 Shade Puny World、ansimuz RPG Town 与 Puny Characters CC0 图素，全域舆图为 512×384、28 层。舆图 JSON 以 RLE 保存；运行时解码为密集格矩阵。地图碰撞、剧情与跨区连接仍由独立 JSON 声明，生成器保护旧图层和玩法锚点；素材授权、MOD 和导航协议见 `REFERENCES.md`、`MOD-GUIDE.md`、`MAP-ATLAS.md`。
+- 状态：截至 Round 88；基础世界含 26 名 NPC、5 个门派、53 项任务、52 件物品、30 种武学、278 个图谱节点/380 条边，manifest 登记 64 项资源。十张区域地图均为 100×100 格；全域舆图为 512×384、28 层并以 RLE 保存。气候资源现可声明轻雾粒子表现；西南列岛事件将天气、时段、附近人物条件组合使用，NPC 日程和事件继续由独立 JSON 声明，读档后由种子/时间派生，不新增存档字段。素材授权、MOD 和导航协议见 `REFERENCES.md`、`MOD-GUIDE.md`、`MAP-ATLAS.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -198,7 +198,7 @@ npm run content:import -- example.wuxia.json --apply    # 预检全过后安装�
 - 新增商店：在 shops-set JSON 中声明稳定 shop id、`npcId`（指向可放置 NPC）、原创 `name`/`greeting`、`sellRate` 及 `stock`（`itemId` 必须存在，quantity 为 -1 无限或非负余量）；在 NPC 条目加 `shopId` 后，玩家四方向相邻按 E 开店，否则仍走其对话。货币与背包起点在角色模板的 `startingCurrency`、`inventoryCapacity` 和 `startingItems` 中配置。
 - 新增任务：在 quest-set JSON 的 `quests` 数组新增任务（`id` 建议 `quest.` 前缀；`giverNpcId` 必须指向有效 NPC，并在 NPC 条目声明 `questGiver: true`；`prerequisiteQuestIds` 只能引用无环任务；目标 `kind` 选 `collectItem`/`defeatEncounter`/`talkToNpc`/`discoverKnowledge`，`targetId` 分别引用有效物品/遭遇/已放置 NPC/知识图谱节点；`requiredCount` 为正整数，见闻目标必须为 1；可选 `exclusiveGroupId` 把若干前置完全一致的任务编成一组玩家分支——装配时整组校验，有效成员不足 2 或前置不一致即整组禁用，接取其一会把同组其余已解锁成员记为失败；`failOnEncounterIds` 声明败北失败的遭遇；`rewards` 声明非负 experience/currency，也可选声明 `factionRenown`（有效 faction id 与 ±1–1000 的非零 delta）和 `discoverKnowledgeNodeIds`。声望与见闻奖励跟任务状态首次进入 completed 同步发放；声望经通用规则钳制至 0–1000。收集目标接取时以当前背包数量为起点，物品变化后同步目标数量；击败目标在战斗胜利后推进；谈话目标只由玩家实际打开 NPC 对话（F 键交谈，或 E 键对无名录/商店 NPC 的交谈回落）推进，按 E 打开任务告示板不算谈话，接取差事的同一次交互也不自动完成谈话目标；见闻目标在首次发现相应图谱节点时推进，已知节点于接取/兼容存档恢复时回填；任务奖励新发现的见闻也会推进其他活动任务。E 打开发布人名录（商店 NPC 的 E 优先开店，其差事经 Q 日志接取），Q 打开日志，A 放弃活动任务；Round 09 起任务阶段和进度随本地存档持久化（v1 协议不变，新增目标类型按目标 id 存计数）。40 项基础差事与分支路线见 `docs/QUESTS.md`。
 - 修改历法：直接编辑 `data/base/worldview/calendar.json`（或用 MOD 同路径覆盖）。调整月份天数/时段表/耗时都会即时反映到新开局与读档折算（存档只存分钟数）；删除对话正在引用的时段 id 只会剔除相应选项并警告。时段 id 建议 `period.` 前缀、月份 id 建议 `month.` 前缀；照度 0–1 控制夜幕深度（场景按 `1 − 照度` 叠加至多约 0.55 透明度的冷色层，UI 始终保持清晰）。
-- 修改季节/天气：编辑 `data/base/worldview/climate.json`（或用 MOD 同路径覆盖），必须保留至少一种天气并确保各季节恰好覆盖历法的每个月份。季节 `monthIds` 引用 `calendar.json` 的稳定月份 id；`weatherWeights` 引用同文件的天气 id，权重为相对非负整数且每季总和需大于 0；天气声明 `#RRGGBB` 色调、0–0.45 透明度、0–1440 步耗时，以及可选的雨/雪粒子类型和 0–1 密度。相同世界种子/历日会稳定抽得相同天气。雨雪步耗时只叠加到成功单格行走；改动示例和扩展边界见 `docs/CLIMATE.md`。
+- 修改季节/天气：编辑 `data/base/worldview/climate.json`（或用 MOD 同路径覆盖），必须保留至少一种天气并确保各季节恰好覆盖历法的每个月份。季节 `monthIds` 引用 `calendar.json` 的稳定月份 id；`weatherWeights` 引用同文件的天气 id，权重为相对非负整数且每季总和需大于 0；天气声明 `#RRGGBB` 色调、0–0.45 透明度、0–1440 步耗时，以及可选的 `rain`/`snow`/`fog` 天气粒子类型和 0–1 密度。`precipitation` 是兼容沿用的字段名，也可声明轻雾；相同世界种子/历日会稳定抽得相同天气。额外步耗时只叠加到成功单格行走；改动示例和扩展边界见 `docs/CLIMATE.md`。
 - 新增成就：在 achievement-set JSON 的 `achievements` 数组追加条目（`id` 建议 `achievement.` 前缀且保持历史稳定——解锁状态按 id 记入存档，改名等同于新成就；`title`/`description` 原创；`priority` 控制面板排序；`conditions` 选封闭 14 类并各带 `hint`，全部满足才解锁；`reward` 声明 1–100000 经验和/或 1–1000000 银两，至少一项）。坏条目或悬空人物/门派/知识引用只禁用该成就并警告。Schema 校验结构与字段类型，数值范围由解析器逐条执行。完整条件表、进度展示与领奖规则见 `docs/ACHIEVEMENTS.md`。
 - 所有内容必须原创（红线见 `docs/ORIGINAL-FIDELITY.md`）；命名避开任何原作专有名称。
 
@@ -296,6 +296,10 @@ Round 85 将全域舆图扩为 448×320 格和 24 个渲染层，在保持原 38
 ## Round 87：西南列岛与跨区雾航差事
 
 舆图扩至 512×384 格、28 层；旧 448×320 矩形中的 24 层逐行 RLE 解码后逐格不变，原九区投影保持原像素位置。新增 `map.round-87-southwest-isles` 100×100 地图、区域角色/对白/任务集合，分别以 manifest 资源登记。东海群岛·落潮湾 `(5,31)` 与雾航湾 `(1,50)` 建立双向步行关口，地图装饰层不推导碰撞。使用已登记 Puny World、RPG Town 和 Puny Characters CC0 图集；生成器以哈希基线和玩法锚点检查保护旧内容。`npm run generate:round-87-southwest-isles` 幂等重建，`npm run smoke:round-87` 覆盖素材、岛图可达性、关口、任务阶段/导航和旧资料兼容。
+
+## Round 88：轻雾天气与守烽条件
+
+气候 `precipitation.kind` 允许 `fog`，旧雨雪格式不变；密度与色调来自气候 JSON，探索场景使用程序雾纹理。`weather.mist` 被季节权重表引用，由种子与历日确定，轻雾不作为特定地区的引擎常量。雾哨崖事件在既有区域事件条件中声明 `periodIds`、`weatherIds` 和 `nearbyNpcIds`，NPC 的七时段位置留在人物资源；无存档字段新增。运行 `npm run smoke:round-88` 可验证旧气候兼容、气候解析、时段落位、调查门控和原任务阶段/奖励。
 
 战斗遭遇也可选声明 `tideIds`，数组中每个 id 必须引用 `climate.json` 的潮位相位。潮生屿 `encounter.r86-reef-raiders` 只在 `tide.low` 活跃：涨潮会移除遭遇标记并释放占格，低潮则恢复阻挡与战斗入口。该遭遇可重复且胜利经验为 0。陆余白的限量药囊商店与人物对白位于独立资源；有限货架复用既有商店库存及存档恢复规则。
 

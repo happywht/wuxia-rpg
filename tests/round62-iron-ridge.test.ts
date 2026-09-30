@@ -83,7 +83,7 @@ describe('Round 62 iron-ridge playable region', () => {
       knowledgeNodeIds: new Set(nodes.nodes.map(({ id }) => id)),
       periodIds: new Set(calendar.calendar.periods.map(({ id }) => id)),
       weatherIds: new Set(climate.weathers.map(({ id }) => id)),
-      npcIds: new Set(npcData.npcs.map(({ id }) => id)),
+      npcIds: new Set([...npcData.npcs.map(({ id }) => id), 'char.r87-ao-wanqing']),
     });
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;

@@ -20,7 +20,8 @@
         { "weatherId": "weather.cloudy", "weight": 25 },
         { "weatherId": "weather.drizzle", "weight": 20 },
         { "weatherId": "weather.overcast", "weight": 10 },
-        { "weatherId": "weather.rain", "weight": 5 }
+        { "weatherId": "weather.rain", "weight": 5 },
+        { "weatherId": "weather.mist", "weight": 15 }
       ]
     },
     {
@@ -32,7 +33,8 @@
         { "weatherId": "weather.storm", "weight": 25 },
         { "weatherId": "weather.rain", "weight": 20 },
         { "weatherId": "weather.cloudy", "weight": 15 },
-        { "weatherId": "weather.overcast", "weight": 10 }
+        { "weatherId": "weather.overcast", "weight": 10 },
+        { "weatherId": "weather.mist", "weight": 10 }
       ]
     },
     {
@@ -44,7 +46,8 @@
         { "weatherId": "weather.cloudy", "weight": 25 },
         { "weatherId": "weather.overcast", "weight": 15 },
         { "weatherId": "weather.drizzle", "weight": 10 },
-        { "weatherId": "weather.snow", "weight": 5 }
+        { "weatherId": "weather.snow", "weight": 5 },
+        { "weatherId": "weather.mist", "weight": 15 }
       ]
     },
     {
@@ -55,7 +58,8 @@
         { "weatherId": "weather.snow", "weight": 30 },
         { "weatherId": "weather.clear", "weight": 30 },
         { "weatherId": "weather.overcast", "weight": 20 },
-        { "weatherId": "weather.cloudy", "weight": 20 }
+        { "weatherId": "weather.cloudy", "weight": 20 },
+        { "weatherId": "weather.mist", "weight": 8 }
       ]
     }
   ],
@@ -112,6 +116,14 @@
       "tintAlpha": 0.24,
       "stepMinutes": 2,
       "precipitation": { "kind": "snow", "density": 0.5 }
+    },
+    {
+      "id": "weather.mist",
+      "name": "轻雾",
+      "tintColor": "#c6d3d8",
+      "tintAlpha": 0.16,
+      "stepMinutes": 1,
+      "precipitation": { "kind": "fog", "density": 0.38 }
     }
   ]
 }

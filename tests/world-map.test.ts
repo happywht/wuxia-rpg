@@ -88,9 +88,9 @@ describe('world map roaming events', () => {
         'map.round-87-southwest-isles', 'place.r87-southwest-isles', 'place.r87-fog-harbor',
         'place.r87-mist-signal', 'place.r87-spring-hollow',
       ]),
-      periodIds: new Set(['period.dusk', 'period.night']),
-      weatherIds: new Set(['weather.drizzle', 'weather.rain', 'weather.storm']),
-      npcIds: new Set(['char.shi-bei', 'char.bai-luzhou']),
+      periodIds: new Set(['period.dusk', 'period.night', 'period.dawn', 'period.morning']),
+      weatherIds: new Set(['weather.drizzle', 'weather.rain', 'weather.storm', 'weather.mist']),
+      npcIds: new Set(['char.shi-bei', 'char.bai-luzhou', 'char.r87-ao-wanqing']),
     });
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
@@ -200,9 +200,9 @@ describe('world map roaming events', () => {
         'place.mist-north-cap', 'place.mist-south-pool',
         'place.mist-willow-market', 'place.south-hamlet',
       ]),
-      periodIds: new Set(['period.dusk', 'period.night']),
-      weatherIds: new Set(['weather.drizzle', 'weather.rain', 'weather.storm']),
-      npcIds: new Set(['char.shi-bei', 'char.bai-luzhou']),
+      periodIds: new Set(['period.dusk', 'period.night', 'period.dawn', 'period.morning']),
+      weatherIds: new Set(['weather.drizzle', 'weather.rain', 'weather.storm', 'weather.mist']),
+      npcIds: new Set(['char.shi-bei', 'char.bai-luzhou', 'char.r87-ao-wanqing']),
     });
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
