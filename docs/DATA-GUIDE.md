@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：截至 Round 89；基础世界含 27 名 NPC、5 个门派、54 项任务、52 件物品、30 种武学、284 个图谱节点/389 条边，manifest 登记 67 项资源。十张区域地图均为 100×100 格；全域舆图为 512×384、28 层并以 RLE 保存。气候资源可声明轻雾粒子表现；航路人物、目的地发现门控、青帆埠调查事件和返程任务阶段由独立 JSON 声明，读档后 NPC 日程仍由时间派生，不新增存档字段。素材授权、MOD 和导航协议见 `REFERENCES.md`、`MOD-GUIDE.md`、`MAP-ATLAS.md`。
+- 状态：截至 Round 90；基础世界含 27 名 NPC、5 个门派、54 项任务、52 件物品、30 种武学、图谱汇总为 286 个图谱节点/393 条边，manifest 登记 67 项资源。十张区域地图均为 100×100 格；全域舆图为 512×384、28 层并以 RLE 保存。气候资源可声明轻雾粒子表现；航路人物、目的地发现门控、青帆埠调查事件和返程任务阶段由独立 JSON 声明，漫游奇遇可按 `trigger: regionArrival` 与 `transitionIds` 声明入境关口抵达触发，读档后 NPC 日程仍由时间派生，不新增存档字段。素材授权、MOD 和导航协议见 `REFERENCES.md`、`MOD-GUIDE.md`、`MAP-ATLAS.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -306,6 +306,10 @@ Round 85 将全域舆图扩为 448×320 格和 24 个渲染层，在保持原 38
 ## Round 89：跨区航路人物、舆图地标与发现事件
 
 程问舟的七时段位置、对白效果、任务目标和图谱关系分别来自角色、对话、任务与知识图谱 JSON。接取差事时依次执行 `acceptQuest` 与 `discoverKnowledgeNode`，用线索节点解锁东溟海岸事件；事件发现地点节点后，舆图地标随之可见。任务以 `discoverKnowledge` 和 `talkToNpc` 目标串联调查与返程，不需要引擎专用逻辑、传送或存档字段。`npm run smoke:round-89` 覆盖资源装配、目标导航、双向关口步行路径及旧地图兼容。
+
+## Round 90：跨区抵达奇遇
+
+`world-map` 的 `randomEvents` 行可选声明 `trigger`（`step` 或 `regionArrival`，省略按 `step` 兼容）和 `transitionIds`（仅抵达触发可用的非空关口 id 列表，省略表示响应抵达该地图的任意关口）。装配阶段要求 `transitionIds` 引用的关口已启用且其目的地图与事件 `mapResourceId` 一致，无效行按资源隔离并给出可读警告；`step` 事件声明 `transitionIds` 属于解析错误。场景只在跨区切换真正完成（占位复核通过、新地图与玩家落位生效）后，把实际通行的 `RegionTransitionData.id` 交给抽取器；开局、原地等待、被阻挡的关口和普通走格维持各自原有语义，走格抽取的概率与时机不变。一次性完成状态沿用 `completedRegionalEvents`，不新增存档字段。基础资料以 `place.r89-safe-return-current` 为条件，在青帆埠与云岭古道之间加入两条一次性往返潮路见闻（`event.r90-arrival-blue-sail`、`event.r90-return-cloud-ridge`），分别绑定「越岭东行」与「回望云岭」两向关口；`npm run smoke:round-90` 覆盖真实地图关口方向、无效引用隔离、成功抵达、来源过滤、条件门控、一次性状态、知识发现与 v1 存档恢复。
 
 ## Round 80：地图环境对象调查
 

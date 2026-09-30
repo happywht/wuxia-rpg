@@ -87,7 +87,8 @@ describe('world map roaming events', () => {
         'place.r85-tide-isle', 'place.r85-reef-channel', 'place.r85-camp', 'place.r85-tide-pool',
         'map.round-87-southwest-isles', 'place.r87-southwest-isles', 'place.r87-fog-harbor',
         'place.r87-mist-signal', 'place.r87-spring-hollow',
-        'event.r89-chart-clue', 'place.r89-east-channel-mark',
+        'event.r89-chart-clue', 'place.r89-east-channel-mark', 'place.r89-safe-return-current',
+        'event.r90-arrival-blue-sail', 'event.r90-return-cloud-ridge',
       ]),
       periodIds: new Set(['period.dusk', 'period.night', 'period.dawn', 'period.morning']),
       weatherIds: new Set(['weather.drizzle', 'weather.rain', 'weather.storm', 'weather.mist']),
@@ -98,6 +99,8 @@ describe('world map roaming events', () => {
     expect(assembled.randomEvents.map((event) => event.id)).toEqual([
       'event.r43-wayfarer-letter',
       'event.r44-dock-claim',
+      'event.r90-arrival-blue-sail',
+      'event.r90-return-cloud-ridge',
     ]);
     expect(assembled.warnings).toHaveLength(1);
     expect(assembled.warnings[0]).toContain('event.deleted-by-mod');

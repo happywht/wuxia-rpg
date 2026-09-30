@@ -799,6 +799,8 @@
     {"id":"event.r89-chart-clue","kind":"event","title":"残缺潮图线索","summary":"程问舟从旧航图辨认出青帆埠东岸水槽的三道潮刻。","knownByDefault":false},
     {"id":"event.r89-east-channel-mark","kind":"event","title":"旧水槽潮刻","summary":"在东溟海岸调查盐霜覆盖的石槽，辨明三道刻痕的潮序。","knownByDefault":false},
     {"id":"place.r89-east-channel-mark","kind":"place","title":"东汊旧水槽","summary":"青帆埠东岸的废弃石槽，三道潮刻能辨出回汐浅湾的走向。","knownByDefault":false},
-    {"id":"place.r89-safe-return-current","kind":"place","title":"回汐缓流","summary":"按三道潮刻的次序行船，可避开雾夜里横切主汊的急流。","knownByDefault":false}
+    {"id":"place.r89-safe-return-current","kind":"place","title":"回汐缓流","summary":"按三道潮刻的次序行船，可避开雾夜里横切主汊的急流。","knownByDefault":false},
+    {"id":"event.r90-arrival-blue-sail","kind":"event","title":"潮序对汊","summary":"沿越岭东行抵达青帆埠时，按回汐次序认出汊口水路的走向。","knownByDefault":false},
+    {"id":"event.r90-return-cloud-ridge","kind":"event","title":"云海收汊","summary":"经回望云岭返抵古道时默记潮序回望东汊，云海漫过岭脊。","knownByDefault":false}
   ]
 }

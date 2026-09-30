@@ -388,6 +388,10 @@
     {"id":"kg.edge.r89-mark-location","fromId":"event.r89-east-channel-mark","toId":"map.round-82-east-coast","relation":"locatedAt","summary":"旧水槽潮刻位于青帆埠东岸。"},
     {"id":"kg.edge.r89-place-location","fromId":"place.r89-east-channel-mark","toId":"map.round-82-east-coast","relation":"locatedAt","summary":"东汊旧水槽由青帆埠百格地图承载。"},
     {"id":"kg.edge.r89-quest-mark","fromId":"quest.r89-east-channel-echo","toId":"place.r89-east-channel-mark","relation":"requires","summary":"东汊回声要求玩家亲自核实三道潮刻。"},
-    {"id":"kg.edge.r89-quest-return","fromId":"quest.r89-east-channel-echo","toId":"place.r89-safe-return-current","relation":"rewards","summary":"完成东汊回声后得知避开横流的回汐次序。"}
+    {"id":"kg.edge.r89-quest-return","fromId":"quest.r89-east-channel-echo","toId":"place.r89-safe-return-current","relation":"rewards","summary":"完成东汊回声后得知避开横流的回汐次序。"},
+    {"id":"kg.edge.r90-arrival-location","fromId":"event.r90-arrival-blue-sail","toId":"map.round-82-east-coast","relation":"locatedAt","summary":"潮序对汊的见闻发生在青帆埠海岸。"},
+    {"id":"kg.edge.r90-arrival-tide","fromId":"event.r90-arrival-blue-sail","toId":"place.r89-safe-return-current","relation":"requires","summary":"潮序对汊需要先从东汊回声学得回汐缓流。"},
+    {"id":"kg.edge.r90-return-location","fromId":"event.r90-return-cloud-ridge","toId":"map.round-74-cloud-ridge","relation":"locatedAt","summary":"云海收汊的见闻发生在云岭古道东口。"},
+    {"id":"kg.edge.r90-return-tide","fromId":"event.r90-return-cloud-ridge","toId":"place.r89-safe-return-current","relation":"requires","summary":"云海收汊同样循回汐缓流的记忆回望东汊。"}
   ]
 }

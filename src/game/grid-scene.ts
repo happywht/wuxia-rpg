@@ -4017,7 +4017,10 @@ export class GridScene extends Phaser.Scene {
     this.refreshCompanionFollower(null);
     this.refreshNavigationGuide();
     this.showRegionNotice(`已抵达「${destinationMap.data.name}」。`);
-    this.triggerRegionEvents();
+    // Round 90: the arrival cause is handed over only here — every blocked or
+    // refused gate above has already returned, so arrival roaming events see
+    // the actual travelled transition id after the switch truly completed.
+    this.triggerRegionEvents('', false, transition.id);
   }
 
   /** Fires ready events authored for the exact current cell. */
@@ -4054,7 +4057,7 @@ export class GridScene extends Phaser.Scene {
     );
   }
 
-  private triggerRegionEvents(prefix = '', afterPlayerStep = false): void {
+  private triggerRegionEvents(prefix = '', afterPlayerStep = false, arrivalTransitionId: string | null = null): void {
     const world = this.world;
     if (world === null) {
       if (prefix.length > 0) this.showRegionNotice(prefix);
@@ -4067,6 +4070,10 @@ export class GridScene extends Phaser.Scene {
       this.completedRegionalEvents,
       eventContext,
     );
+    // Round 90: the roaming draw keeps its two causes strictly separate — a
+    // finished grid step samples step rows only, while a completed map switch
+    // samples arrival rows through the gate actually travelled. Startup,
+    // waiting and refused transitions pass neither and never roll.
     const randomEvent = afterPlayerStep
       ? selectTriggeredRandomRegionEvent(
           world.worldMap.randomEvents,
@@ -4074,7 +4081,16 @@ export class GridScene extends Phaser.Scene {
           this.completedRegionalEvents,
           eventContext,
         )
-      : null;
+      : arrivalTransitionId !== null
+        ? selectTriggeredRandomRegionEvent(
+            world.worldMap.randomEvents,
+            this.currentMapResourceId,
+            this.completedRegionalEvents,
+            eventContext,
+            undefined,
+            arrivalTransitionId,
+          )
+        : null;
     const allEvents = randomEvent === null ? events : [...events, randomEvent];
     this.presentRegionEvents(allEvents, prefix);
   }

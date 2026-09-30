@@ -4,6 +4,29 @@
 
 ---
 
+## Round 90 — 跨区抵达奇遇与潮路回访（2026-09-30，已完成）
+
+### 计划与实现
+
+- 计划先写于 [`iterations/round-90/plan.md`](iterations/round-90/plan.md)：扩展数据驱动漫游奇遇协议，支持成功走格与跨区关口抵达两类触发，沿 R89 学到的回汐潮序加入青帆埠—云岭古道往返一次性见闻；不改旧地图、旧关口、碰撞、舆图像素或存档版本。
+- `RandomRegionEventData` 新增可选 `trigger`（`step`/`regionArrival`，旧资料省略按 `step` 兼容解析为缺省字段）与 `transitionIds`（仅抵达触发可声明的非空关口 id 列表）；JSON Schema 与解析器均拒绝缺省/`step` 事件携带关口列表，解析器也拒绝显式 `null` 触发类型；装配阶段要求引用关口已启用且其目的地图与事件地图一致，无效行单独隔离并给出可读警告。
+- `selectTriggeredRandomRegionEvent` 保持既有第五参数随机源注入兼容，新增可选抵达关口 id：走格候选只看 step 行（含省略 trigger 的旧数据），抵达候选只看声明了该关口（或未声明关口列表）的 `regionArrival` 行；沿用稳定 id 排序、单次抽取与「无候选不消耗随机数」语义。
+- `GridScene.switchRegion` 只在占位复核通过、新地图渲染与玩家落位全部生效后，把实际 `RegionTransitionData.id` 传入事件触发；开局装配、V 键原地等待、被 NPC/遭遇挡住或落点不可行的关口以及普通走格都不触发抵达事件，旧走格抽取概率与时机不变。一次性完成状态沿用 `completedRegionalEvents`，读写档与 v1 存档恢复路径未增加字段。
+- 基础资料新增 `event.r90-arrival-blue-sail`（经「越岭东行」`gate.r82-cloud-ridge-to-east-coast` 抵达青帆埠）与 `event.r90-return-cloud-ridge`（经「回望云岭」`gate.r82-east-coast-to-cloud-ridge` 返回云岭古道）两条 chance 1 的一次性见闻，条件均为已知回汐缓流 `place.r89-safe-return-current`；知识图谱补「潮序对汊」「云海收汊」两个事件节点与四条 locatedAt/requires 关系（现 286 节点/393 关系）。同步更新地图集协议、资料指南、图谱、世界设定、玩家手册、测试说明、README、ROADMAP 与 CHANGELOG，并更新三处历史测试夹具的图谱计数/引用基线。
+- 新增 `tests/round90-region-arrivals.test.ts` 与 `npm run smoke:round-90`：真实基础地图上验证两向关口的实际方向与两端落点可走、JSON Schema/解析器拒绝缺省或 `step` 事件声明关口列表及 `null` 触发类型、缺失/错向关口引用逐行隔离、按实际关口成功抽取抵达见闻、反向关口与外岛关口进入同一地图不误触发、走格与抵达两种触发互不越界且无候选不消耗随机源、条件未知或一次性已完成时不抽取、知识发现去重、v1 存档 JSON 往返后已见抵达不重播且未走返程仍可触发，以及旧 `step` 事件抽样语义不变。
+
+### 验证
+
+- `npm run validate:data`：通过，manifest 及 67 个基础资源 Schema 校验成功。
+- `npm run typecheck`：通过。
+- `npm run smoke:round-90`：5 个测试文件、25 项通过（round90/round89/round82/round74/world-map）。
+- `npm run check`：通过；manifest/67 项基础资源 Schema、67 项 MOD 扫描（零问题）、类型检查、64 个测试文件/421 项、Round 34 地图/任务/人物审计及 Round 48 进度/资料审计全部通过。
+- `npm run build`：通过；完整质量门槛再次通过，Vite 8.3.1 构建 139 个模块。Phaser runtime chunk 约 1,374.54 kB（gzip 357.49 kB），Vite 默认 500 kB 体积建议仍显示但不阻断构建。
+- `git diff --check`：通过。本轮未执行浏览器实走：抵达抽取时序（切图成功后、挡格拒绝时不触发）与存档往返由基于真实地图、关口与 v1 存档解析/恢复管线的专项自动化验证；交互路径沿用的 `switchRegion` 装配流程未改动。
+- 提交：`round-90: 接入跨区抵达奇遇与潮路回访`。
+
+---
+
 ## Round 89 — 雾航湾至东溟海岸「东汊回声」（2026-09-30，已完成）
 
 ### 计划与实现

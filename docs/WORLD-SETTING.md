@@ -78,6 +78,7 @@
 - 关口「断云北隘」`gate.iron-ridge-to-cloud-ridge`：从铁嶂北道 (50,2) 抵达云岭 (50,97)；「云栈回关」`gate.cloud-ridge-to-iron-ridge` 从云岭 (49,97) 返回铁嶂北道 (50,3)。
 - 关口「南渡海路」`gate.r79-ferry-to-isles`：从雾雨渡口 (97,90) 步行抵达落潮湾 (50,12)；「归帆渡口」`gate.r79-isles-to-ferry` 从岛上 (49,12) 返回雾雨渡口 (96,90)。全世界区域往来均需玩家步行并按 E 通行。
 - 关口「越岭东行」`gate.r82-cloud-ridge-to-east-coast`：从云岭 (96,50) 抵达青帆埠 (6,50)；「回望云岭」`gate.r82-east-coast-to-cloud-ridge` 从青帆埠 (5,50) 返回云岭 (95,50)。全世界区域往来均需玩家步行并按 E 通行。
+- Round 90 潮路回访：完成「东汊回声」学到回汐缓流（`place.r89-safe-return-current`）后，再走这两向关口会各出现一则一次性抵达见闻——经「越岭东行」抵达青帆埠时「潮序对汊」（`event.r90-arrival-blue-sail`），按刻痕潮序认出汊口水路；经「回望云岭」返抵古道时「云海收汊」（`event.r90-return-cloud-ridge`），默记潮序回望被云海收拢的东汊。两则见闻只播报一次，读档后不重播。
 - 入渡口即触发一次性事件 `event.ferry-first-arrival`（1,4）：「渡口边留着一行新鲜脚印」，并记下「雨后的脚印」见闻——这是渡口叙事链的起点。
 
 ## 3. 五派格局

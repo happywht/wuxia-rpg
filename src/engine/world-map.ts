@@ -95,13 +95,24 @@ export interface RegionEventInteractionData {
   approachDirections?: RegionEventApproachDirection[];
 }
 
-/** A roaming event attempted after a successful player grid step. */
+/** When a roaming event may be sampled: after a step or after a map switch. */
+export const RANDOM_REGION_EVENT_TRIGGERS = ['step', 'regionArrival'] as const;
+export type RandomRegionEventTrigger = typeof RANDOM_REGION_EVENT_TRIGGERS[number];
+
+/** A roaming event attempted after a successful step or region arrival. */
 export interface RandomRegionEventData {
   id: string;
   mapResourceId: string;
   text: string;
   once: boolean;
   chance: number;
+  /** Omitted legacy rows keep the step-only behaviour. */
+  trigger?: RandomRegionEventTrigger;
+  /**
+   * Arrival gates a `regionArrival` event responds to; omitted lists respond
+   * to any gate whose destination is this event's map.
+   */
+  transitionIds?: string[];
   conditions?: RegionEventConditionsData;
   discoverKnowledgeNodeId?: string;
 }
@@ -632,6 +643,15 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
     const once = typeof entry.once === 'boolean' ? entry.once : null;
     const chance = typeof entry.chance === 'number' && Number.isFinite(entry.chance) &&
       entry.chance >= 0 && entry.chance <= 1 ? entry.chance : null;
+    const rawTrigger: unknown = entry.trigger === undefined ? 'step' : entry.trigger;
+    const trigger = typeof rawTrigger === 'string' &&
+      (RANDOM_REGION_EVENT_TRIGGERS as readonly string[]).includes(rawTrigger)
+      ? rawTrigger as RandomRegionEventTrigger
+      : null;
+    const transitionIds = entry.transitionIds === undefined
+      ? undefined
+      : parseUniqueStringArray(entry.transitionIds, `${label}.transitionIds`, errors);
+    const transitionMisdeclared = trigger === 'step' && transitionIds !== undefined;
     const conditions = entry.conditions === undefined
       ? undefined
       : parseRegionEventConditions(entry.conditions, `${label}.conditions`, errors);
@@ -643,11 +663,18 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
     if (text === null) errors.push(`${label}.text：应为非空字符串`);
     if (once === null) errors.push(`${label}.once：应为布尔值`);
     if (chance === null) errors.push(`${label}.chance：应为 0–1 之间的有限数值`);
+    if (trigger === null) errors.push(`${label}.trigger：应为 step 或 regionArrival`);
+    if (transitionMisdeclared) {
+      errors.push(`${label}.transitionIds：仅 regionArrival 触发可声明入境关口`);
+    }
     if (discoverKnowledgeNodeId === null) errors.push(`${label}.discoverKnowledgeNodeId：应为非空字符串`);
     if (id !== null && mapResourceId !== null && text !== null && once !== null && chance !== null &&
-      conditions !== null && discoverKnowledgeNodeId !== null) {
+      trigger !== null && !transitionMisdeclared && transitionIds !== null && conditions !== null &&
+      discoverKnowledgeNodeId !== null) {
       randomEvents.push({
         id, mapResourceId, text, once, chance,
+        ...(trigger === 'step' ? {} : { trigger }),
+        ...(transitionIds === undefined ? {} : { transitionIds }),
         ...(conditions === undefined ? {} : { conditions }),
         ...(discoverKnowledgeNodeId === undefined ? {} : { discoverKnowledgeNodeId }),
       });
@@ -747,6 +774,8 @@ export function assembleWorldMap(
     if (problems.length > 0) warnings.push(`关口 "${transition.id}" 已禁用：${problems.join('；')}`);
     else transitions.push(transition);
   }
+  /** Assembled (enabled) gates only, so arrival events never match a disabled transition. */
+  const transitionsById = new Map(transitions.map((transition) => [transition.id, transition]));
   const landmarks: WorldLandmarkData[] = [];
   const seenLandmarkIds = new Set<string>();
   for (const landmark of data.landmarks) {
@@ -812,6 +841,15 @@ export function assembleWorldMap(
     if (seenEvents.has(event.id)) problems.push('id 与其他区域事件重复');
     if (!regions.some((region) => region.mapResourceId === event.mapResourceId)) {
       problems.push('地图不在世界图区域中');
+    }
+    if (event.trigger === 'regionArrival') {
+      for (const transitionId of event.transitionIds ?? []) {
+        const transition = transitionsById.get(transitionId);
+        if (transition === undefined) problems.push(`入境关口未登记：${transitionId}`);
+        else if (transition.to.mapResourceId !== event.mapResourceId) {
+          problems.push(`入境关口 "${transitionId}" 通向的地图与事件地图不一致`);
+        }
+      }
     }
     if (eventReferences !== undefined) {
       if (event.discoverKnowledgeNodeId !== undefined &&
@@ -1016,9 +1054,14 @@ export function selectNewRegionEventKnowledgeIds(
 }
 
 /**
- * Picks at most one eligible roaming event for a successful step. The first
- * random sample selects uniformly from stable id order; the second tests its
- * authored chance. No candidate means the random source is never consulted.
+ * Picks at most one eligible roaming event for a successful step (no arrival
+ * gate passed) or for a completed map switch (`arrivalTransitionId` names the
+ * gate actually travelled). Step sampling only sees step rows — legacy rows
+ * without an explicit trigger included — while arrival sampling only sees
+ * `regionArrival` rows whose declared gates (or any gate, when none are
+ * declared) include the travelled one. The first random sample selects
+ * uniformly from stable id order; the second tests its authored chance. No
+ * candidate means the random source is never consulted.
  */
 export function selectTriggeredRandomRegionEvent(
   events: readonly RandomRegionEventData[],
@@ -1026,9 +1069,15 @@ export function selectTriggeredRandomRegionEvent(
   completedEventIds: ReadonlySet<string>,
   context: RegionEventContext,
   random: () => number = Math.random,
+  /** The gate id of a completed map switch; omitted for a step cause. */
+  arrivalTransitionId?: string,
 ): RandomRegionEventData | null {
   const candidates = events.filter((event) =>
     event.mapResourceId === mapResourceId && event.chance > 0 &&
+    (arrivalTransitionId === undefined
+      ? (event.trigger ?? 'step') === 'step'
+      : event.trigger === 'regionArrival' &&
+        (event.transitionIds === undefined || event.transitionIds.includes(arrivalTransitionId))) &&
     (!event.once || !completedEventIds.has(event.id)) &&
     regionEventConditionsMet(event, context),
   ).sort((a, b) => a.id.localeCompare(b.id));

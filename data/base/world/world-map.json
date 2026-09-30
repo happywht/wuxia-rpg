@@ -1241,6 +1241,40 @@
         ]
       },
       "discoverKnowledgeNodeId": "event.r44-dock-claim"
+    },
+    {
+      "id": "event.r90-arrival-blue-sail",
+      "mapResourceId": "map.round-82-east-coast",
+      "text": "踏下云岭最后一级石阶，栈桥下的潮水正沿旧水槽的三道刻痕依次退让。你按新记熟的回汐次序望向汊口，横流果然绕开浅湾——程问舟补全的潮图，第一次与眼前的水路对上了。",
+      "once": true,
+      "chance": 1,
+      "trigger": "regionArrival",
+      "transitionIds": [
+        "gate.r82-cloud-ridge-to-east-coast"
+      ],
+      "conditions": {
+        "knowledgeNodeIds": [
+          "place.r89-safe-return-current"
+        ]
+      },
+      "discoverKnowledgeNodeId": "event.r90-arrival-blue-sail"
+    },
+    {
+      "id": "event.r90-return-cloud-ridge",
+      "mapResourceId": "map.round-74-cloud-ridge",
+      "text": "回望云岭的关口在身后合上，山风换掉了海风的咸涩。你默了一遍潮序，此刻汊口该走第二道刻痕——回头望去，云海正从岭脊漫下来，把整条东汊收进白茫茫里，只余潮声。",
+      "once": true,
+      "chance": 1,
+      "trigger": "regionArrival",
+      "transitionIds": [
+        "gate.r82-east-coast-to-cloud-ridge"
+      ],
+      "conditions": {
+        "knowledgeNodeIds": [
+          "place.r89-safe-return-current"
+        ]
+      },
+      "discoverKnowledgeNodeId": "event.r90-return-cloud-ridge"
     }
   ],
   "atlasArt": {

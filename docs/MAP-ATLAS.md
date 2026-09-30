@@ -185,14 +185,16 @@ Round 10 将单张网格地图扩展为资料驱动的区域集合；Round 79 �
 
 `interaction` 声明 `prompt`、可选曼哈顿距离 `range`（1–4，省略按 1 格）和可选 `approachDirections`（从玩家格朝向目标格的 `down/left/right/up`；省略表示四向均可）。调查目标必须与玩家同一行或同一列；两格以上时，中间地形必须可走且不能被 NPC/遭遇占用。交互只在提示、方向/距离、事件条件和一次性状态同时允许时出现，并在按 E 后复用固定事件文本、一次性完成记账及知识发现。含 `interaction` 的事件不会因走上目标格而自动结算。未声明该字段的旧世界图事件仍按原有踏入触发路径工作。
 
-### 随机漫游奇遇（Round 43–44）
+### 随机漫游奇遇（Round 43–44、Round 90）
 
-`randomEvents` 不需要固定坐标，在当前地图完成一次成功走格后才尝试一次。引擎先筛选地图、线索、时段、天气都符合且尚未完成的一次性事件，再按 id 排序均匀选一个候选并掷其 `chance`；每步最多出现一则漫游奇遇。没有候选时不消耗随机数。读档沿用区域事件完成 id 保存已触发的一次性漫游奇遇；旧世界图可以省略 `randomEvents`，会按空数组解析。
+`randomEvents` 不需要固定坐标，按可选 `trigger` 决定抽取时机：省略或 `step` 的旧式事件只在当前地图完成一次成功走格后尝试；`regionArrival` 事件只在真正完成跨区切换后尝试，且可选用 `transitionIds` 声明允许的入境关口（省略则响应抵达该地图的任意关口）。引擎先筛选地图、线索、时段、天气都符合且尚未完成的一次性事件，再按 id 排序均匀选一个候选并掷其 `chance`；每次走格或每次切图最多出现一则漫游奇遇。没有候选时不消耗随机数。走格与抵达两种触发互不越界：走格看不到抵达事件，被阻挡/拒绝的关口、开局、原地等待和读档也不触发抵达事件；切图只有在占位复核通过、新地图真正生效后才把实际关口 id 交给抽取器。装配阶段校验 `transitionIds` 引用的关口存在且其目的地图与事件地图一致，无效行单独隔离并给出可读警告；`step` 事件声明 `transitionIds` 会被解析器拒绝。读档沿用区域事件完成 id 保存已触发的一次性漫游奇遇；旧世界图可以省略 `randomEvents` 或 `trigger`，分别按空数组和 `step` 解析。
 
 | 奇遇 id | 地图 | 尝试概率 | 一次性 | 条件 | 成功发现 |
 |---|---|---:|---|---|---|
 | `event.r43-wayfarer-letter` | 雾雨渡口 (`map.round-10-mist-ferry`) · 成功走格时 | 12% | 是 | 已知 `event.old-footprints`；黄昏/入夜；细雨/降雨/骤雨 | `event.r43-wayfarer-letter`（风雨传函） |
 | `event.r44-dock-claim` | 雾雨渡口 (`map.round-10-mist-ferry`) · 成功走格时 | 35% | 是 | 已知 `event.r43-wayfarer-letter`；黄昏；细雨/降雨/骤雨；邻近石北 (`char.shi-bei`) 与白鹭洲 (`char.bai-luzhou`) | `event.r44-dock-claim`（雨夜旧桩之争） |
+| `event.r90-arrival-blue-sail` | 东溟海岸·青帆埠 (`map.round-82-east-coast`) · 经「越岭东行」关口抵达时 | 100% | 是 | 已知 `place.r89-safe-return-current`（回汐缓流） | `event.r90-arrival-blue-sail`（潮序对汊） |
+| `event.r90-return-cloud-ridge` | 云岭古道·断云栈道 (`map.round-74-cloud-ridge`) · 经「回望云岭」关口抵达时 | 100% | 是 | 已知 `place.r89-safe-return-current`（回汐缓流） | `event.r90-return-cloud-ridge`（云海收汊） |
 
 玩家按 **M** 打开舆图，当前大地图底图和金色玩家位置标记随地图资料绘制。鼠标/触屏拖动可平移，滚轮可缩放，方向键小幅平移；缩放后地图边缘受视窗约束，不会漏出边框。按 **M** 或 **Esc** 收起，打开时探索输入锁定。相邻关口按 **E** 旅行。
 
