@@ -52,7 +52,7 @@ export class ControlsPanel {
     this.addText('F　与相邻人物直接交谈', left + 44, top + 151, 14, UI_PALETTE.text);
     this.addText('V　原地等候片刻（面板打开时无效）', left + 44, top + 180, 14, UI_PALETTE.text);
     this.addText('B 背包　N 经脉　C 自创武学　P 伙伴　J 师门　G 成就', left + 44, top + 209, 12, UI_PALETTE.text);
-    this.addText('Q 差事　M 舆图　K 百科　L 图鉴　F2 MOD 状态　Esc 暂停', left + 44, top + 231, 12, UI_PALETTE.text);
+    this.addText('R 行旅　Q 差事　M 舆图　K 百科　L 图鉴　F2 MOD 状态　Esc 暂停', left + 44, top + 231, 12, UI_PALETTE.text);
     this.addText('内修消耗修为和背包材料；图鉴进度随人物、地点、物品与武学发现更新', left + 44, top + 253, 10, UI_PALETTE.muted);
 
     this.addText('面板', left + 28, top + 278, 13, UI_PALETTE.jade);

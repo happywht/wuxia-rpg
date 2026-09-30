@@ -13,6 +13,8 @@ export interface WorldMapData {
   id: string;
   startingMapResourceId: string;
   regions: WorldRegionData[];
+  /** Optional practical region roles; absent in old atlases. */
+  regionGuides?: WorldRegionGuideData[];
   /** Optional CC0 pixel-art overview; absent in legacy atlases and MODs. */
   atlasArt?: WorldAtlasArtData;
   /** Optional map-local presentation pins; absent in older world maps. */
@@ -34,6 +36,9 @@ export interface WorldLandmarkData extends RegionEndpoint {
   /** Knowledge node required before the landmark may be revealed to the player. */
   discoveryNodeId?: string;
 }
+
+export const REGION_ROLES = ['hub', 'investigation', 'challenge', 'transit'] as const;
+export interface WorldRegionGuideData { mapResourceId: string; role: typeof REGION_ROLES[number]; advice: string }
 
 export interface WorldRegionData {
   mapResourceId: string;
@@ -156,6 +161,7 @@ export interface RegionEventReferenceIds {
 export interface WorldMapAssembly {
   data: WorldMapData;
   regions: WorldRegionData[];
+  regionGuides?: WorldRegionGuideData[];
   landmarks: WorldLandmarkData[];
   transitions: RegionTransitionData[];
   events: RegionEventData[];
@@ -550,6 +556,17 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
     if (mapResourceId !== null && name !== null && description !== null && atlasPosition !== null)
       regions.push({ mapResourceId, name, description, atlasPosition });
   });
+  const regionGuides: WorldRegionGuideData[] = [];
+  if (raw.regionGuides !== undefined) {
+    if (!Array.isArray(raw.regionGuides) || raw.regionGuides.length > 256) errors.push('regionGuides：应为最多256条的区域指南数组');
+    else for (const [index, entry] of raw.regionGuides.entries()) {
+      if (!isObject(entry) || !nonEmpty(entry.mapResourceId) || !REGION_ROLES.includes(entry.role as typeof REGION_ROLES[number]) ||
+          !nonEmpty(entry.advice) || entry.advice.length > 240 || Object.keys(entry).some(key => !['mapResourceId', 'role', 'advice'].includes(key))) {
+        errors.push('regionGuides[' + index + ']：地图、角色或行旅建议无效'); continue;
+      }
+      regionGuides.push({ mapResourceId: entry.mapResourceId, role: entry.role as typeof REGION_ROLES[number], advice: entry.advice });
+    }
+  }
   const landmarks: WorldLandmarkData[] = [];
   const rawLandmarks = raw.landmarks === undefined ? [] : raw.landmarks;
   if (!Array.isArray(rawLandmarks)) errors.push('landmarks：应为数组');
@@ -686,6 +703,7 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
       id: raw.id as string,
       startingMapResourceId: raw.startingMapResourceId as string,
       regions,
+      ...(raw.regionGuides === undefined ? {} : { regionGuides }),
       ...(atlasArt === undefined ? {} : { atlasArt }),
       landmarks,
       transitions,
@@ -880,7 +898,14 @@ export function assembleWorldMap(
     if (problems.length > 0) warnings.push(`漫游奇遇「${event.id}」已禁用：${problems.join('；')}`);
     else randomEvents.push(event);
   }
-  return { data, regions, landmarks, transitions, events, randomEvents, warnings };
+  const seenGuides = new Set<string>();
+  const regionGuides = (data.regionGuides ?? []).filter(guide => {
+    if (seenGuides.has(guide.mapResourceId) || !regions.some(region => region.mapResourceId === guide.mapResourceId)) {
+      warnings.push('区域指南引用无效或重复地图：' + guide.mapResourceId); return false;
+    }
+    seenGuides.add(guide.mapResourceId); return true;
+  });
+  return { data, regions, regionGuides, landmarks, transitions, events, randomEvents, warnings };
 }
 
 /** Returns only map pins that are currently public to the player's knowledge state. */

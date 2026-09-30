@@ -1,0 +1,251 @@
+{
+  "scope": "Six authored playerStart positions, morning NPC and all assembled battle blockers; static first local segments. Not a real journey, not minutes and not longest no-decision road.",
+  "regions": [
+    {
+      "mapResourceId": "map.round-01-grid",
+      "name": "江南道·七镇行旅",
+      "role": "hub",
+      "start": {
+        "col": 43,
+        "row": 37
+      },
+      "rows": [
+        {
+          "category": "supply",
+          "title": "姜百味百宝担",
+          "destinationMapResourceId": "map.round-01-grid",
+          "transitionCount": 0,
+          "firstLocalSegmentCells": 3,
+          "status": "en-route",
+          "detail": "江南道·七镇行旅 · 本地 · 姜百味 (45,39)\n回春膏 15两常备（命+25/气+0）；清心丸 12两余5（命+0/气+15）；无极丹 25两余2（命+15/气+15）；松针止血散 20两余3（命+30/气+0）；鸥翎回气汤 18两余3（命+0/气+26）；双露复合散 34两余3（命+18/气+18）；江心补气丸 40两余2（命+0/气+42）；雨参活血膏 48两余2（命+56/气+0）；长青养气丹 54两余2（命+0/气+60）；芦苇生肌丹 62两余2（命+44/气+25）；云鹤无暇丹 96两余1（命+72/气+52）。价格不代表已有银两；有限库存可耗尽。"
+        },
+        {
+          "category": "exit",
+          "title": "石阶渡口",
+          "destinationMapResourceId": "map.round-01-grid",
+          "transitionCount": 0,
+          "firstLocalSegmentCells": 67,
+          "status": "en-route",
+          "detail": "(90,50) → 雾雨渡口。走到旁边按E；这里不会自动通过或传送。"
+        }
+      ]
+    },
+    {
+      "mapResourceId": "map.round-10-mist-ferry",
+      "name": "雾雨渡口",
+      "role": "hub",
+      "start": {
+        "col": 7,
+        "row": 7
+      },
+      "rows": [
+        {
+          "category": "supply",
+          "title": "姜百味百宝担",
+          "destinationMapResourceId": "map.round-01-grid",
+          "transitionCount": 1,
+          "firstLocalSegmentCells": 7,
+          "status": "en-route",
+          "detail": "江南道·七镇行旅 · 跨1处关口 · 姜百味 (45,39)\n回春膏 15两常备（命+25/气+0）；清心丸 12两余5（命+0/气+15）；无极丹 25两余2（命+15/气+15）；松针止血散 20两余3（命+30/气+0）；鸥翎回气汤 18两余3（命+0/气+26）；双露复合散 34两余3（命+18/气+18）；江心补气丸 40两余2（命+0/气+42）；雨参活血膏 48两余2（命+56/气+0）；长青养气丹 54两余2（命+0/气+60）；芦苇生肌丹 62两余2（命+44/气+25）；云鹤无暇丹 96两余1（命+72/气+52）。价格不代表已有银两；有限库存可耗尽。"
+        },
+        {
+          "category": "exit",
+          "title": "回望石阶",
+          "destinationMapResourceId": "map.round-10-mist-ferry",
+          "transitionCount": 0,
+          "firstLocalSegmentCells": 7,
+          "status": "en-route",
+          "detail": "(2,4) → 江南道·七镇行旅。走到旁边按E；这里不会自动通过或传送。"
+        },
+        {
+          "category": "exit",
+          "title": "雾岬北口",
+          "destinationMapResourceId": "map.round-10-mist-ferry",
+          "transitionCount": 0,
+          "firstLocalSegmentCells": 89,
+          "status": "en-route",
+          "detail": "(89,15) → 铁嶂北道·岩关驿镇。走到旁边按E；这里不会自动通过或传送。"
+        },
+        {
+          "category": "exit",
+          "title": "南渡海路",
+          "destinationMapResourceId": "map.round-10-mist-ferry",
+          "transitionCount": 0,
+          "firstLocalSegmentCells": 172,
+          "status": "en-route",
+          "detail": "(97,90) → 东海群岛·落潮湾。走到旁边按E；这里不会自动通过或传送。"
+        }
+      ]
+    },
+    {
+      "mapResourceId": "map.round-74-cloud-ridge",
+      "name": "云岭古道·断云栈道",
+      "role": "investigation",
+      "start": {
+        "col": 50,
+        "row": 97
+      },
+      "rows": [
+        {
+          "category": "supply",
+          "title": "青帆埠潮行补给摊",
+          "destinationMapResourceId": "map.round-82-east-coast",
+          "transitionCount": 1,
+          "firstLocalSegmentCells": 92,
+          "status": "en-route",
+          "detail": "东溟海岸·青帆埠 · 跨1处关口 · 金云帆 (43,50)\n海盐敷膏 26两余6（命+22/气+0）；回春膏 15两常备（命+25/气+0）；清心丸 12两余5（命+0/气+15）。价格不代表已有银两；有限库存可耗尽。"
+        },
+        {
+          "category": "exit",
+          "title": "云栈回关",
+          "destinationMapResourceId": "map.round-74-cloud-ridge",
+          "transitionCount": 0,
+          "firstLocalSegmentCells": 0,
+          "status": "arrived",
+          "detail": "(49,97) → 铁嶂北道·岩关驿镇。走到旁边按E；这里不会自动通过或传送。"
+        },
+        {
+          "category": "exit",
+          "title": "越岭东行",
+          "destinationMapResourceId": "map.round-74-cloud-ridge",
+          "transitionCount": 0,
+          "firstLocalSegmentCells": 92,
+          "status": "en-route",
+          "detail": "(96,50) → 东溟海岸·青帆埠。走到旁边按E；这里不会自动通过或传送。"
+        },
+        {
+          "category": "exit",
+          "title": "北台栈道",
+          "destinationMapResourceId": "map.round-74-cloud-ridge",
+          "transitionCount": 0,
+          "firstLocalSegmentCells": 106,
+          "status": "en-route",
+          "detail": "(62,2) → 云岭北台·雁回崖。走到旁边按E；这里不会自动通过或传送。"
+        }
+      ]
+    },
+    {
+      "mapResourceId": "map.round-82-east-coast",
+      "name": "东溟海岸·青帆埠",
+      "role": "hub",
+      "start": {
+        "col": 6,
+        "row": 50
+      },
+      "rows": [
+        {
+          "category": "supply",
+          "title": "青帆埠潮行补给摊",
+          "destinationMapResourceId": "map.round-82-east-coast",
+          "transitionCount": 0,
+          "firstLocalSegmentCells": 36,
+          "status": "en-route",
+          "detail": "东溟海岸·青帆埠 · 本地 · 金云帆 (43,50)\n海盐敷膏 26两余6（命+22/气+0）；回春膏 15两常备（命+25/气+0）；清心丸 12两余5（命+0/气+15）。价格不代表已有银两；有限库存可耗尽。"
+        },
+        {
+          "category": "exit",
+          "title": "回望云岭",
+          "destinationMapResourceId": "map.round-82-east-coast",
+          "transitionCount": 0,
+          "firstLocalSegmentCells": 0,
+          "status": "arrived",
+          "detail": "(5,50) → 云岭古道·断云栈道。走到旁边按E；这里不会自动通过或传送。"
+        },
+        {
+          "category": "exit",
+          "title": "涉潮登岛",
+          "destinationMapResourceId": "map.round-82-east-coast",
+          "transitionCount": 0,
+          "firstLocalSegmentCells": 105,
+          "status": "en-route",
+          "detail": "(91,71) → 东溟外海·风回岛。走到旁边按E；这里不会自动通过或传送。"
+        }
+      ]
+    },
+    {
+      "mapResourceId": "map.round-92-north-pass",
+      "name": "北境·照雪关",
+      "role": "challenge",
+      "start": {
+        "col": 50,
+        "row": 97
+      },
+      "rows": [
+        {
+          "category": "supply",
+          "title": "青帆埠潮行补给摊",
+          "destinationMapResourceId": "map.round-82-east-coast",
+          "transitionCount": 3,
+          "firstLocalSegmentCells": 0,
+          "status": "at-gate",
+          "detail": "东溟海岸·青帆埠 · 跨3处关口 · 金云帆 (43,50)\n海盐敷膏 26两余6（命+22/气+0）；回春膏 15两常备（命+25/气+0）；清心丸 12两余5（命+0/气+15）。价格不代表已有银两；有限库存可耗尽。"
+        },
+        {
+          "category": "exit",
+          "title": "南归雪道",
+          "destinationMapResourceId": "map.round-92-north-pass",
+          "transitionCount": 0,
+          "firstLocalSegmentCells": 0,
+          "status": "arrived",
+          "detail": "(49,97) → 云岭北台·雁回崖。走到旁边按E；这里不会自动通过或传送。"
+        },
+        {
+          "category": "exit",
+          "title": "西行冰桥",
+          "destinationMapResourceId": "map.round-92-north-pass",
+          "transitionCount": 0,
+          "firstLocalSegmentCells": 79,
+          "status": "en-route",
+          "detail": "(3,64) → 北境·霜松谷。走到旁边按E；这里不会自动通过或传送。"
+        }
+      ]
+    },
+    {
+      "mapResourceId": "map.round-97-lanxin-isle",
+      "name": "东溟·澜心洲",
+      "role": "investigation",
+      "start": {
+        "col": 3,
+        "row": 40
+      },
+      "rows": [
+        {
+          "category": "supply",
+          "title": "潮线药囊",
+          "destinationMapResourceId": "map.round-85-tide-isle",
+          "transitionCount": 1,
+          "firstLocalSegmentCells": 99,
+          "status": "en-route",
+          "detail": "南溟·潮生屿 · 跨1处关口 · 陆余白 (18,54)\n回春膏 15两余3（命+25/气+0）；清心丸 12两余3（命+0/气+15）；松针止血散 20两余2（命+30/气+0）；鸥翎回气汤 18两余2（命+0/气+26）。价格不代表已有银两；有限库存可耗尽。"
+        },
+        {
+          "category": "exit",
+          "title": "西返风回岛",
+          "destinationMapResourceId": "map.round-97-lanxin-isle",
+          "transitionCount": 0,
+          "firstLocalSegmentCells": 0,
+          "status": "arrived",
+          "detail": "(4,40) → 东溟外海·风回岛。走到旁边按E；这里不会自动通过或传送。"
+        },
+        {
+          "category": "exit",
+          "title": "西南返潮生屿",
+          "destinationMapResourceId": "map.round-97-lanxin-isle",
+          "transitionCount": 0,
+          "firstLocalSegmentCells": 99,
+          "status": "en-route",
+          "detail": "(48,95) → 南溟·潮生屿。走到旁边按E；这里不会自动通过或传送。"
+        },
+        {
+          "category": "exit",
+          "title": "北探引航礁",
+          "destinationMapResourceId": "map.round-97-lanxin-isle",
+          "transitionCount": 0,
+          "firstLocalSegmentCells": 96,
+          "status": "en-route",
+          "detail": "(64,4) → 东溟·引航礁。走到旁边按E；这里不会自动通过或传送。"
+        }
+      ]
+    }
+  ]
+}

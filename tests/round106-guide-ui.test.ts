@@ -1,0 +1,17 @@
+import {describe,it,expect,vi} from 'vitest';
+import type Phaser from 'phaser';
+vi.mock('phaser',()=>({default:{Input:{Keyboard:{KeyCodes:{ESC:1,ENTER:2,LEFT:3,RIGHT:4,UP:5,DOWN:6,SPACE:7}}}}}));
+vi.mock('../src/game/ui-theme',()=>({addPixelPanelChrome:()=>{},UI_FONT_FAMILY:'monospace',UI_PALETTE:{accent:'#fff',muted:'#aaa',text:'#eee',jade:'#afa'}}));
+vi.mock('../src/game/settings',()=>({uiFontSize:(n:number)=>`${n}px`}));
+import {RegionalGuidePanel} from '../src/game/regional-guide-ui';
+import type {RegionGuideEntry} from '../src/engine/regional-guide';
+function setup(entries:RegionGuideEntry[]){const keys=new Map<number,Set<()=>void>>(),texts:string[]=[],events:string[]=[];const container={setDepth(){return this},setVisible(){return this},removeAll(){return this},add(){return this},destroy(){}};const scene={scale:{width:960,height:540},input:{keyboard:{addKey(code:number){if(!keys.has(code))keys.set(code,new Set());return{on(_event:string,fn:()=>void){keys.get(code)!.add(fn)},off(_event:string,fn:()=>void){keys.get(code)!.delete(fn)}};}}},add:{container:()=>container,text:(_x:number,_y:number,text:string)=>{expect(Number.isFinite(_x)&&Number.isFinite(_y)).toBe(true);return ({text,height:24,context:{measureText:(t:string)=>({width:t.length*12})},setText(t:string){this.text=t;texts.push(t);return this},setOrigin(){texts.push(this.text);return this}});}}} as unknown as Phaser.Scene;const panel=new RegionalGuidePanel(scene,()=>events.push('closed'));panel.open({name:'测试地区',role:'调查',advice:'测试建议'.repeat(50),entries,onNavigate:id=>{expect(panel.isOpen).toBe(false);events.push(id);}});return{panel,texts,events,press:(key:number)=>{for(const fn of [...keys.get(key)??[]])fn();}};}
+const entry=(id:string,category:RegionGuideEntry['category']='supply',destinationId:string|null='region-guide:npc:'+id):RegionGuideEntry=>({id,category,title:'条目'+id,detail:'价格与库存长说明'.repeat(100),destinationId});
+describe('Round106 actual panel callbacks with mock scene',()=>{
+ it('selects a destination only after closing and does not navigate twice',()=>{const r=setup([entry('1')]);r.press(2);r.press(2);expect(r.events).toEqual(['closed','region-guide:npc:1']);});
+ it('cycles categories and cannot act from an empty list',()=>{const r=setup([entry('1')]);r.press(4);r.press(2);expect(r.events).toEqual([]);r.press(1);expect(r.events).toEqual(['closed']);});
+ it('paginates more than five entries without losing later selectable entries',()=>{const r=setup(Array.from({length:8},(_,i)=>entry(String(i))));for(let i=0;i<6;i++)r.press(6);expect(r.texts).toContain('▶ 条目6');r.press(2);expect(r.events).toEqual(['closed','region-guide:npc:6']);});
+ it('wraps long Chinese details and allows reading every detail page',()=>{const r=setup([entry('1')]);const before=r.texts.at(-2);r.press(7);expect(r.texts.at(-2)).not.toBe(before);expect(r.texts.some(t=>t.includes('详情2/'))).toBe(true);r.panel.close();});
+ it('retains full long authored advice in the overview instead of hiding overflow',()=>{const r=setup([]);for(let i=0;i<5;i++)r.press(4);expect(r.texts).toContain('▶ 地区角色与行旅建议');expect(r.texts.some(t=>t.includes('完整行旅建议见「说明」分类'))).toBe(true);r.press(2);expect(r.panel.isOpen).toBe(true);r.press(1);});
+ it('nonspatial quest information can be read but cannot fabricate a destination',()=>{const r=setup([entry('q','quest',null)]);r.press(4);r.press(2);expect(r.events).toEqual([]);r.panel.destroy();expect(r.events).toEqual(['closed']);});
+});

@@ -78,6 +78,8 @@ export interface QuestNavigationInput {
   periodNpcs: readonly PlacedNpc[];
   /** Live placements on the current map; preferred for same-map NPC targets. */
   currentMapNpcs?: readonly PlacedNpc[];
+  /** Real active follower; interaction uses the companion panel. */
+  currentFollower?: PlacedNpc;
   /** Validated encounters across every map, as assembled by the loader. */
   encounters: readonly PlacedEncounter[];
   /** Knowledge node titles for readable discovery-target names. */
@@ -125,7 +127,8 @@ function resolveNpcPosition(
   input: QuestNavigationInput,
   npcId: string,
 ): NpcPosition | null {
-  const live = input.currentMapNpcs?.find((npc) => npc.record.id === npcId);
+  const follower = input.currentFollower;
+  const live = follower?.record.id === npcId ? follower : input.currentMapNpcs?.find((npc) => npc.record.id === npcId);
   if (live !== undefined) {
     return {
       mapResourceId: live.record.mapResourceId,
@@ -332,7 +335,7 @@ export function resolveQuestNavigationTarget(input: QuestNavigationInput): Quest
         col: npc.col,
         row: npc.row,
         approachRadius: 1,
-        arrivalAction: questObjectiveArrivalAction(objective.kind),
+        arrivalAction: input.currentFollower?.record.id === objective.targetId ? 'companion' : questObjectiveArrivalAction(objective.kind),
       },
     };
   }

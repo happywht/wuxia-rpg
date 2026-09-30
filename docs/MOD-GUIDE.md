@@ -63,3 +63,7 @@ npm run package:release
 - **MOD 没有生效**：确认其一级 id 已按预期顺序写入 `enabledMods`；导入内容包不会代替启用步骤。
 - **内容包安装目标已存在**：导入器不会覆盖目录；人工备份并移动冲突目录后再预检/安装。
 - **浏览器版无法加载新 MOD**：静态包没有浏览器安装能力；更新仓库资料、重新打包并部署。
+
+## Round 106 更新
+
+world-map可省略regionGuides；每条mapResourceId/role(hub/investigation/challenge/transit)/advice(≤240字)闭合Schema，结构失败拒绝该资料，重复/坏地图引用隔离单条指南。R目录从实际NPC、有效商店、库存、任务与关口导出，MOD不必手抄坐标；不推断隐藏地标。

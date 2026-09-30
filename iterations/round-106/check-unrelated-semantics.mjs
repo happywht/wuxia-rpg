@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import {execFileSync} from 'node:child_process';
+import {isDeepStrictEqual} from 'node:util';
+const baseline='e3743e8350f3c107757b11b1f078298fdcda3d98',path='data/base/world/world-map.json';
+const old=JSON.parse(execFileSync('git',['show',baseline+':'+path],{encoding:'utf8',maxBuffer:64*1024*1024}));
+const current=JSON.parse(fs.readFileSync(path,'utf8'));const guides=current.regionGuides;delete current.regionGuides;
+if(!isDeepStrictEqual(old,current))throw Error('world rules/art/routes/events changed beyond region guide metadata');
+const changed=execFileSync('git',['diff','--name-only',baseline,'--','data/base'],{encoding:'utf8'}).trim().split('\n');
+if(changed.some(p=>p!==path))throw Error('unexpected base data changes: '+changed);
+if(guides.length!==22||new Set(guides.map(g=>g.mapResourceId)).size!==22)throw Error('guide coverage invalid');
+const result='PASS: all original world regions/landmarks/gates/events/random events/atlas pixel data preserved; only 22 optional region guide rows added. No other base data file changed.\n';
+fs.writeFileSync('iterations/round-106/unrelated-semantics.txt',result);console.log(result);

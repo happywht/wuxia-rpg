@@ -1,3 +1,5 @@
+import {RegionalGuidePanel} from './regional-guide-ui';
+import {buildRegionalGuideEntries,resolveRegionalGuideDestination,REGION_GUIDE_PREFIX,REGION_ROLE_LABELS,type RegionalGuideInput,type RegionGuideEntry} from '../engine/regional-guide';
 import { nearestGuideNpc } from './quest-presentation';
 import Phaser from 'phaser';
 
@@ -427,6 +429,7 @@ export class GridScene extends Phaser.Scene {
   private modStatusPanel: ModStatusPanel | null = null;
   private collectionPanel: CollectionPanel | null = null;
   private companionPanel: CompanionPanel | null = null;
+  private regionalGuidePanel: RegionalGuidePanel | null = null;
   private arenaPanel: ArenaPanel | null = null;
   private factionWarPanel: FactionWarPanel | null = null;
   private martialArtForgePanel: MartialArtForgePanel | null = null;
@@ -833,6 +836,7 @@ export class GridScene extends Phaser.Scene {
     this.controlsPanel = new ControlsPanel(this);
     this.factionPanel = new FactionPanel(this, () => this.noteOverlayClosed());
     this.companionPanel = new CompanionPanel(this, () => this.noteOverlayClosed());
+    this.regionalGuidePanel = new RegionalGuidePanel(this, () => this.noteOverlayClosed());
     this.arenaPanel = new ArenaPanel(this, () => this.noteOverlayClosed());
     this.factionWarPanel = new FactionWarPanel(this, () => this.noteOverlayClosed());
     this.martialArtForgePanel = new MartialArtForgePanel(this, () => this.noteOverlayClosed());
@@ -1258,7 +1262,7 @@ export class GridScene extends Phaser.Scene {
     // The pause/settings pages may have just changed the movement layout,
     // text scale, or reduced-motion preference — reflect them immediately.
     this.movementHintText?.setText(
-      `${currentMovementHelpText()} · E 交互 · P 伙伴 · F2 MOD · H 帮助`,
+      `${currentMovementHelpText()} · E 交互 · R 行旅 · H 帮助`,
     );
     this.refreshScaledTextTargets();
     this.syncReducedMotionPresentation();
@@ -2148,7 +2152,7 @@ export class GridScene extends Phaser.Scene {
     this.add.rectangle(VIEW_WIDTH / 2, 46, VIEW_WIDTH, 92, 0x10141d, 0.94).setScrollFactor(0).setDepth(HUD_TEXT_DEPTH - 1);
     this.add.rectangle(VIEW_WIDTH / 2, VIEW_HEIGHT - 16, VIEW_WIDTH, 32, 0x10141d, 0.94).setScrollFactor(0).setDepth(HUD_TEXT_DEPTH - 1);
     this.movementHintText = this.registerScaledText(this.add
-      .text(16, 12, `${currentMovementHelpText()} · E 交互 · P 伙伴 · F2 MOD · H 帮助`, {
+      .text(16, 12, `${currentMovementHelpText()} · E 交互 · R 行旅 · H 帮助`, {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(13),
         color: UI.textMuted,
@@ -2354,6 +2358,12 @@ export class GridScene extends Phaser.Scene {
         blockedCells,
       );
     }
+    if (destinationId.startsWith(REGION_GUIDE_PREFIX)) {
+      const input = this.regionalGuideInput();
+      const destination = input === null ? null : resolveRegionalGuideDestination(input, destinationId);
+      return destination === null ? { status: 'target-lost' } : resolveCellNavigationGuide(world.worldMap, this.currentMapResourceId, destination, map,
+        { col: this.playerCol, row: this.playerRow }, blockedCells);
+    }
     if (!destinationId.startsWith(QUEST_NAVIGATION_ID_PREFIX)) return { status: 'target-lost' };
 
     const questId = destinationId.slice(QUEST_NAVIGATION_ID_PREFIX.length);
@@ -2393,6 +2403,7 @@ export class GridScene extends Phaser.Scene {
     const world = this.world;
     if (world === null) return { status: 'no-target', reason: 'unknown-quest' };
     const periodId = this.clock?.currentPeriod().id;
+    const follower=this.regionalGuideInput()?.follower;
     return resolveQuestNavigationTarget({
       quests: this.quests,
       journal: this.questJournal,
@@ -2403,6 +2414,7 @@ export class GridScene extends Phaser.Scene {
         ? world.assembly.npcs
         : world.assembly.npcsByPeriod.get(periodId) ?? world.assembly.npcs,
       currentMapNpcs: this.placedNpcs,
+      ...(follower===undefined?{}:{currentFollower:{...follower.npc,col:follower.col,row:follower.row,record:{...follower.npc.record,mapResourceId:follower.mapResourceId}}}),
       encounters: world.assembly.encounters,
       craftingStations: [...world.assembly.equipmentForges, ...world.assembly.alchemyStations],
       knowledgeNodeTitles: new Map([...world.knowledgeGraph.nodes]
@@ -2821,6 +2833,7 @@ export class GridScene extends Phaser.Scene {
       (this.collectionPanel !== null && this.collectionPanel.isOpen) ||
       (this.factionPanel !== null && this.factionPanel.isOpen) ||
       (this.companionPanel !== null && this.companionPanel.isOpen) ||
+      (this.regionalGuidePanel !== null && this.regionalGuidePanel.isOpen) ||
       (this.arenaPanel !== null && this.arenaPanel.isOpen) ||
       (this.factionWarPanel !== null && this.factionWarPanel.isOpen) ||
       (this.martialArtForgePanel !== null && this.martialArtForgePanel.isOpen) ||
@@ -2831,6 +2844,35 @@ export class GridScene extends Phaser.Scene {
       (this.meridianPanel !== null && this.meridianPanel.isOpen) ||
       (this.controlsPanel !== null && this.controlsPanel.isOpen)
     );
+  }
+
+  private regionalGuideInput(): RegionalGuideInput | null {
+    const world=this.world;if(world===null)return null;
+    const period=this.clock?.currentPeriod().id;
+    const npc=this.activeCompanionNpc(),marker=this.companionFollower?.marker,map=this.map;
+    const follower=npc!==undefined&&marker?.visible&&map!==null ? {npc,mapResourceId:this.currentMapResourceId,
+      col:Math.floor((marker.x-this.mapOrigin.x)/map.tileSize),row:Math.floor((marker.y-this.mapOrigin.y)/map.tileSize)}:undefined;
+    return {worldMap:world.worldMap,currentMapResourceId:this.currentMapResourceId,baseNpcs:world.assembly.npcs,
+      periodNpcs:period===undefined?world.assembly.npcs:world.assembly.npcsByPeriod.get(period)??world.assembly.npcs,
+      currentMapNpcs:this.placedNpcs,...(follower===undefined?{}:{follower}),activeFollowerNpcId:this.companions.get(this.companionState.activeCompanionId??'')?.npcId,shops:world.assembly.shops,items:world.assembly.items,
+      shopStocks:this.shopStocks,knownKnowledgeNodeIds:this.knownKnowledgeNodeIds};
+  }
+
+  private toggleRegionalGuide(): void {
+    const panel=this.regionalGuidePanel;if(panel===null)return;
+    if(panel.isOpen){panel.close();return;}if(this.anyOverlayOpen()||this.moving||this.activeSession!==null)return;
+    const input=this.regionalGuideInput();if(input===null)return;
+    const world=input.worldMap,region=world.regions.find(r=>r.mapResourceId===this.currentMapResourceId),guide=world.regionGuides?.find(g=>g.mapResourceId===this.currentMapResourceId);
+    const entries:RegionGuideEntry[]=buildRegionalGuideEntries(input);
+    for(const state of this.questJournal.states.values())if(state.status==='active'){
+      const quest=this.quests.get(state.questId);if(!quest)continue;const resolution=this.resolveQuestNavigation(quest.id);
+      entries.push({id:'quest:'+quest.id,category:'quest',title:quest.name,detail:resolution.status==='no-target'?'下一步暂不是空间目标或相关资料不可用；Q日志可查看操作与资格。':resolution.target.objectiveText+' · '+resolution.target.name,
+        destinationId:resolution.status==='no-target'?null:resolution.target.id});
+    }
+    panel.open({name:region?.name??this.currentMapResourceId,role:guide?REGION_ROLE_LABELS[guide.role]:'区域',
+      advice:guide?.advice??'此资料未声明区域角色；以下入口从当前装配、库存和差事推导，导航只带路。',entries,
+      onNavigate:id=>{this.navigationDestinationId=id;this.refreshNavigationGuide();this.updateInteractHint();}});
+    this.updateInteractHint();
   }
 
   /** J key: inspect all faction rules and the current recorded lineage. */
@@ -3415,6 +3457,9 @@ export class GridScene extends Phaser.Scene {
     const onPause = (): void => this.togglePauseMenu();
     pauseKey.on('down', onPause);
 
+    const regionalGuideKey = keyboard.addKey(KeyCodes.R);
+    const onRegionalGuide = (): void => this.toggleRegionalGuide();
+    regionalGuideKey.on('down', onRegionalGuide);
     const worldMapKey = keyboard.addKey(KeyCodes.M);
     const onWorldMap = (): void => this.toggleWorldMap();
     worldMapKey.on('down', onWorldMap);
@@ -3471,6 +3516,7 @@ export class GridScene extends Phaser.Scene {
       talkKey.off('down', onTalk);
       pauseKey.off('down', onPause);
       worldMapKey.off('down', onWorldMap);
+      regionalGuideKey.off('down', onRegionalGuide);
       encyclopediaKey.off('down', onEncyclopedia);
       modStatusKey.off('down', onModStatus);
       collectionKey.off('down', onCollection);
@@ -3503,6 +3549,8 @@ export class GridScene extends Phaser.Scene {
       this.collectionPanel = null;
       this.factionPanel?.destroy();
       this.factionPanel = null;
+      this.regionalGuidePanel?.destroy();
+      this.regionalGuidePanel = null;
       this.companionPanel?.destroy();
       this.companionPanel = null;
       this.arenaPanel?.destroy();

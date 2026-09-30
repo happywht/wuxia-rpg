@@ -4,149 +4,436 @@
   "title": "世界地图、地标与区域事件",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "startingMapResourceId", "regions", "transitions", "events"],
+  "required": [
+    "id",
+    "startingMapResourceId",
+    "regions",
+    "transitions",
+    "events"
+  ],
   "properties": {
-    "id": { "type": "string", "minLength": 1 },
-    "startingMapResourceId": { "type": "string", "minLength": 1 },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "startingMapResourceId": {
+      "type": "string",
+      "minLength": 1
+    },
     "regions": {
-      "type": "array", "minItems": 1,
+      "type": "array",
+      "minItems": 1,
       "items": {
-        "type": "object", "additionalProperties": false,
-        "required": ["mapResourceId", "name", "description", "atlasPosition"],
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "mapResourceId",
+          "name",
+          "description",
+          "atlasPosition"
+        ],
         "properties": {
-          "mapResourceId": { "type": "string", "minLength": 1 },
-          "name": { "type": "string", "minLength": 1 },
-          "description": { "type": "string" },
-          "atlasPosition": { "$ref": "#/definitions/atlasPosition" }
+          "mapResourceId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "atlasPosition": {
+            "$ref": "#/definitions/atlasPosition"
+          }
         }
       }
     },
-    "atlasArt": { "$ref": "#/definitions/atlasArt" },
+    "atlasArt": {
+      "$ref": "#/definitions/atlasArt"
+    },
     "landmarks": {
       "type": "array",
       "items": {
-        "type": "object", "additionalProperties": false,
-        "required": ["id", "mapResourceId", "col", "row", "name", "category"],
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "mapResourceId",
+          "col",
+          "row",
+          "name",
+          "category"
+        ],
         "properties": {
-          "id": { "type": "string", "minLength": 1 },
-          "mapResourceId": { "type": "string", "minLength": 1 },
-          "col": { "type": "integer", "minimum": 0, "maximum": 255 },
-          "row": { "type": "integer", "minimum": 0, "maximum": 255 },
-          "name": { "type": "string", "minLength": 1 },
-          "category": { "enum": ["settlement", "water", "crossing", "route", "other"] },
-          "discoveryNodeId": { "type": "string", "minLength": 1 }
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "mapResourceId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "col": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255
+          },
+          "row": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "category": {
+            "enum": [
+              "settlement",
+              "water",
+              "crossing",
+              "route",
+              "other"
+            ]
+          },
+          "discoveryNodeId": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       }
     },
     "transitions": {
       "type": "array",
       "items": {
-        "type": "object", "additionalProperties": false,
-        "required": ["id", "name", "from", "to"],
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "from",
+          "to"
+        ],
         "properties": {
-          "id": { "type": "string", "minLength": 1 },
-          "name": { "type": "string", "minLength": 1 },
-          "from": { "$ref": "#/definitions/endpoint" },
-          "to": { "$ref": "#/definitions/endpoint" }
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "from": {
+            "$ref": "#/definitions/endpoint"
+          },
+          "to": {
+            "$ref": "#/definitions/endpoint"
+          }
         }
       }
     },
     "events": {
       "type": "array",
       "items": {
-        "type": "object", "additionalProperties": false,
-        "required": ["id", "mapResourceId", "col", "row", "text", "once"],
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "mapResourceId",
+          "col",
+          "row",
+          "text",
+          "once"
+        ],
         "properties": {
-          "id": { "type": "string", "minLength": 1 },
-          "mapResourceId": { "type": "string", "minLength": 1 },
-          "col": { "type": "integer", "minimum": 0, "maximum": 255 },
-          "row": { "type": "integer", "minimum": 0, "maximum": 255 },
-          "text": { "type": "string", "minLength": 1 },
-          "approachText": { "type": "string", "minLength": 1 },
-          "once": { "type": "boolean" },
-          "conditions": { "$ref": "#/definitions/regionEventConditions" },
-          "discoverKnowledgeNodeId": { "type": "string", "minLength": 1 },
-          "interaction": { "$ref": "#/definitions/regionEventInteraction" }
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "mapResourceId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "col": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255
+          },
+          "row": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 255
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "approachText": {
+            "type": "string",
+            "minLength": 1
+          },
+          "once": {
+            "type": "boolean"
+          },
+          "conditions": {
+            "$ref": "#/definitions/regionEventConditions"
+          },
+          "discoverKnowledgeNodeId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "interaction": {
+            "$ref": "#/definitions/regionEventInteraction"
+          }
         }
       }
     },
     "randomEvents": {
       "type": "array",
       "items": {
-        "type": "object", "additionalProperties": false,
-        "required": ["id", "mapResourceId", "text", "once", "chance"],
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "mapResourceId",
+          "text",
+          "once",
+          "chance"
+        ],
         "properties": {
-          "id": { "type": "string", "minLength": 1 },
-          "mapResourceId": { "type": "string", "minLength": 1 },
-          "text": { "type": "string", "minLength": 1 },
-          "once": { "type": "boolean" },
-          "chance": { "type": "number", "minimum": 0, "maximum": 1 },
-          "trigger": { "enum": ["step", "regionArrival"] },
-          "transitionIds": { "$ref": "#/definitions/nonEmptyIdList" },
-          "conditions": { "$ref": "#/definitions/regionEventConditions" },
-          "discoverKnowledgeNodeId": { "type": "string", "minLength": 1 }
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "mapResourceId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "once": {
+            "type": "boolean"
+          },
+          "chance": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "trigger": {
+            "enum": [
+              "step",
+              "regionArrival"
+            ]
+          },
+          "transitionIds": {
+            "$ref": "#/definitions/nonEmptyIdList"
+          },
+          "conditions": {
+            "$ref": "#/definitions/regionEventConditions"
+          },
+          "discoverKnowledgeNodeId": {
+            "type": "string",
+            "minLength": 1
+          }
         },
         "allOf": [
           {
             "if": {
-              "properties": { "trigger": { "const": "regionArrival" } },
-              "required": ["trigger"]
+              "properties": {
+                "trigger": {
+                  "const": "regionArrival"
+                }
+              },
+              "required": [
+                "trigger"
+              ]
             },
-            "else": { "not": { "required": ["transitionIds"] } }
+            "else": {
+              "not": {
+                "required": [
+                  "transitionIds"
+                ]
+              }
+            }
           }
         ]
+      }
+    },
+    "regionGuides": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "mapResourceId",
+          "role",
+          "advice"
+        ],
+        "properties": {
+          "mapResourceId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "role": {
+            "enum": [
+              "hub",
+              "investigation",
+              "challenge",
+              "transit"
+            ]
+          },
+          "advice": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240
+          }
+        }
       }
     }
   },
   "definitions": {
     "atlasArt": {
-      "type": "object", "additionalProperties": false,
-      "required": ["columns", "rows", "tileSize", "tilesets", "layers"],
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "columns",
+        "rows",
+        "tileSize",
+        "tilesets",
+        "layers"
+      ],
       "properties": {
-        "columns": { "type": "integer", "minimum": 1, "maximum": 768 },
-        "rows": { "type": "integer", "minimum": 1, "maximum": 768 },
-        "tileSize": { "type": "integer", "minimum": 1, "maximum": 256 },
+        "columns": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 768
+        },
+        "rows": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 768
+        },
+        "tileSize": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 256
+        },
         "regionFootprint": {
-          "type": "object", "additionalProperties": false,
-          "required": ["columns", "rows"],
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "columns",
+            "rows"
+          ],
           "properties": {
-            "columns": { "type": "number", "exclusiveMinimum": 0, "maximum": 768 },
-            "rows": { "type": "number", "exclusiveMinimum": 0, "maximum": 768 }
+            "columns": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 768
+            },
+            "rows": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 768
+            }
           }
         },
         "tilesets": {
-          "type": "array", "minItems": 1,
+          "type": "array",
+          "minItems": 1,
           "items": {
-            "type": "object", "additionalProperties": false,
-            "required": ["id", "image", "tileSize", "columns", "rows", "spacing", "tileCount"],
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "image",
+              "tileSize",
+              "columns",
+              "rows",
+              "spacing",
+              "tileCount"
+            ],
             "properties": {
-              "id": { "type": "string", "minLength": 1 },
-              "image": { "type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$" },
-              "tileSize": { "type": "integer", "minimum": 1, "maximum": 256 },
-              "columns": { "type": "integer", "minimum": 1, "maximum": 1024 },
-              "rows": { "type": "integer", "minimum": 1, "maximum": 1024 },
-              "spacing": { "type": "integer", "minimum": 0, "maximum": 32 },
-              "tileCount": { "type": "integer", "minimum": 1, "maximum": 1048576 }
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "image": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+              },
+              "tileSize": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 256
+              },
+              "columns": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1024
+              },
+              "rows": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1024
+              },
+              "spacing": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 32
+              },
+              "tileCount": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1048576
+              }
             }
           }
         },
         "layers": {
-          "type": "array", "minItems": 1,
+          "type": "array",
+          "minItems": 1,
           "items": {
-            "type": "object", "additionalProperties": false,
-            "required": ["id", "tilesetId"],
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "tilesetId"
+            ],
             "properties": {
-              "id": { "type": "string", "minLength": 1 },
-              "tilesetId": { "type": "string", "minLength": 1 },
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "tilesetId": {
+                "type": "string",
+                "minLength": 1
+              },
               "cells": {
-                "type": "array", "minItems": 1, "maxItems": 768,
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 768,
                 "items": {
-                  "type": "array", "minItems": 1, "maxItems": 768,
-                  "items": { "type": "integer", "minimum": 0, "maximum": 4294967295 }
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 768,
+                  "items": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 4294967295
+                  }
                 }
               },
               "cellsRle": {
-                "type": "array", "minItems": 1, "maxItems": 768,
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 768,
                 "items": {
                   "type": "string",
                   "pattern": "^[1-9][0-9]*:(0|[1-9][0-9]*)(,[1-9][0-9]*:(0|[1-9][0-9]*))*$"
@@ -154,61 +441,155 @@
               }
             },
             "oneOf": [
-              { "required": ["cells"], "not": { "required": ["cellsRle"] } },
-              { "required": ["cellsRle"], "not": { "required": ["cells"] } }
+              {
+                "required": [
+                  "cells"
+                ],
+                "not": {
+                  "required": [
+                    "cellsRle"
+                  ]
+                }
+              },
+              {
+                "required": [
+                  "cellsRle"
+                ],
+                "not": {
+                  "required": [
+                    "cells"
+                  ]
+                }
+              }
             ]
           }
         }
       }
     },
     "cell": {
-      "type": "object", "additionalProperties": false,
-      "required": ["col", "row"],
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "col",
+        "row"
+      ],
       "properties": {
-        "col": { "type": "integer", "minimum": 0, "maximum": 255 },
-        "row": { "type": "integer", "minimum": 0, "maximum": 255 }
+        "col": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "row": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        }
       }
     },
     "endpoint": {
-      "type": "object", "additionalProperties": false,
-      "required": ["mapResourceId", "col", "row"],
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mapResourceId",
+        "col",
+        "row"
+      ],
       "properties": {
-        "mapResourceId": { "type": "string", "minLength": 1 },
-        "col": { "type": "integer", "minimum": 0, "maximum": 255 },
-        "row": { "type": "integer", "minimum": 0, "maximum": 255 }
+        "mapResourceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "col": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "row": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        }
       }
     },
     "atlasPosition": {
-      "type": "object", "additionalProperties": false,
-      "required": ["x", "y"],
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x",
+        "y"
+      ],
       "properties": {
-        "x": { "type": "number", "minimum": 0, "maximum": 100 },
-        "y": { "type": "number", "minimum": 0, "maximum": 100 }
+        "x": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "y": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        }
       }
     },
     "regionEventConditions": {
-      "type": "object", "additionalProperties": false, "minProperties": 1,
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
       "properties": {
-        "knowledgeNodeIds": { "$ref": "#/definitions/nonEmptyIdList" },
-        "periodIds": { "$ref": "#/definitions/nonEmptyIdList" },
-        "weatherIds": { "$ref": "#/definitions/nonEmptyIdList" },
-        "tideIds": { "$ref": "#/definitions/nonEmptyIdList" },
-        "nearbyNpcIds": { "$ref": "#/definitions/nonEmptyIdList" }
+        "knowledgeNodeIds": {
+          "$ref": "#/definitions/nonEmptyIdList"
+        },
+        "periodIds": {
+          "$ref": "#/definitions/nonEmptyIdList"
+        },
+        "weatherIds": {
+          "$ref": "#/definitions/nonEmptyIdList"
+        },
+        "tideIds": {
+          "$ref": "#/definitions/nonEmptyIdList"
+        },
+        "nearbyNpcIds": {
+          "$ref": "#/definitions/nonEmptyIdList"
+        }
       }
     },
     "nonEmptyIdList": {
-      "type": "array", "minItems": 1, "uniqueItems": true,
-      "items": { "type": "string", "minLength": 1 }
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
     },
     "regionEventInteraction": {
-      "type": "object", "additionalProperties": false,
-      "required": ["prompt"],
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "prompt"
+      ],
       "properties": {
-        "prompt": { "type": "string", "minLength": 1 },
-        "range": { "type": "integer", "minimum": 1, "maximum": 4 },
+        "prompt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "range": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
         "approachDirections": {
-          "type": "array", "minItems": 1, "uniqueItems": true,
-          "items": { "enum": ["down", "left", "right", "up"] }
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "down",
+              "left",
+              "right",
+              "up"
+            ]
+          }
         }
       }
     }

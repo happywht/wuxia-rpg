@@ -1,0 +1,1 @@
+PASS: all original world regions/landmarks/gates/events/random events/atlas pixel data preserved; only 22 optional region guide rows added. No other base data file changed.
