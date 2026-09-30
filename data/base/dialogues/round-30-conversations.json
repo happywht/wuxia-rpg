@@ -310,7 +310,7 @@
           "id": "r103-panzhou-next",
           "text": "祝九弦把缆绳往桩上一套：「三步走：白鹭洲对旧簿、潮沟赶散夺网客、回来复命。船上规矩——先认人，再出手。」"
         },
- {
+        {
           "id": "r103-panzhou-echo",
           "text": "祝九弦听罢，指节在缆桩上一叩：「夺网客这一趟散了，浮标也重新露了头——缆痕的账、滩上的事，一并了清。这类人退了还来，护船的就再赶一场。刀场记你一功。修习照刀谱的门槛来。」"
         },
@@ -322,7 +322,7 @@
           "id": "r103-panzhou-letter",
           "text": "祝九弦从缆桩下抽出一张油纸包着的纸：「那封匿名信刀场也在查，与缆痕相关的一段我抄下来了。写信人没露名，抄本上我也不替他落款。」"
         },
- {
+        {
           "id": "r103-panzhou-training",
           "text": "祝九弦把刀谱压平在膝上：「翻桨刀，等级2、体魄11/身法11，攻击14、耗气4；顺汛换步，等级3、身法12/体魄10，守御9、耗气3；截浪回舷刀，等级4、体魄13/身法13，攻击18、耗气6；破白连环刀，等级9、体魄17/身法16，攻击26、耗气11。刀路只分攻、养、守：攻是伤敌，养是疗伤回复生命、要耗内力却不补内力，守只挡得住下一击。窄板上护住同船的人，比一刀劈得响要紧。」"
         },
@@ -333,48 +333,91 @@
             {
               "text": "我愿拜入盘舷刀场。",
               "nextNodeId": "accepted",
-              "conditions": [{ "kind": "factionMembership", "isMember": false }],
+              "conditions": [
+                {
+                  "kind": "factionMembership",
+                  "isMember": false
+                }
+              ],
               "effects": [
-                { "kind": "joinFaction", "factionId": "faction.panzhou-daochang" },
-                { "kind": "adjustFactionRenown", "factionId": "faction.panzhou-daochang", "delta": 10 }
+                {
+                  "kind": "joinFaction",
+                  "factionId": "faction.panzhou-daochang"
+                },
+                {
+                  "kind": "adjustFactionRenown",
+                  "factionId": "faction.panzhou-daochang",
+                  "delta": 10
+                }
               ]
             },
             {
               "text": "不求入门，想学一式市井拦门刀法。",
               "nextNodeId": "r32-open-lessons",
               "conditions": [
-                { "kind": "factionMembership", "factionId": "faction.panzhou-daochang", "isMember": false }
+                {
+                  "kind": "factionMembership",
+                  "factionId": "faction.panzhou-daochang",
+                  "isMember": false
+                }
               ]
             },
             {
               "text": "请师父指点护船与刀场功夫。",
               "nextNodeId": "r32-lessons",
               "conditions": [
-                { "kind": "factionMembership", "factionId": "faction.panzhou-daochang", "isMember": true }
+                {
+                  "kind": "factionMembership",
+                  "factionId": "faction.panzhou-daochang",
+                  "isMember": true
+                }
               ]
             },
             {
               "text": "我想退出盘舷刀场。",
               "nextNodeId": "departed",
               "conditions": [
-                { "kind": "factionMembership", "factionId": "faction.panzhou-daochang", "isMember": true }
+                {
+                  "kind": "factionMembership",
+                  "factionId": "faction.panzhou-daochang",
+                  "isMember": true
+                }
               ],
-              "effects": [{ "kind": "leaveFaction" }]
+              "effects": [
+                {
+                  "kind": "leaveFaction"
+                }
+              ]
             },
             {
               "text": "雾渡药道会盟争得先约，特来告知。",
               "nextNodeId": "war-victory",
-              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-victory" }]
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.mist-pact-victory"
+                }
+              ]
             },
             {
               "text": "药道按轮值成约了，来报个信。",
               "nextNodeId": "war-stalemate",
-              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-stalemate" }]
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.mist-pact-stalemate"
+                }
+              ]
             },
             {
               "text": "会盟没争下先约，跟您说一声。",
               "nextNodeId": "war-defeat",
-              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-defeat" }]
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.mist-pact-defeat"
+                }
+              ]
             },
             {
               "text": "渡口的轮值章程，去哪里查？",
@@ -406,79 +449,203 @@
                 }
               ]
             },
-            { "text": "随便看看，这就走。", "nextNodeId": "farewell" },
+            {
+              "text": "随便看看，这就走。",
+              "nextNodeId": "farewell"
+            },
             {
               "text": "祝师父，旧船印旁那道潮泥，是何时留下的？",
               "nextNodeId": "r42-zhu-seal-account",
-              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-two-witnesses", "status": "active" }],
-              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.r42-zhu-ferry-seal" }]
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r42-two-witnesses",
+                  "status": "active"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r42-zhu-ferry-seal"
+                }
+              ]
             },
             {
               "text": "祝师父，我把你认出的旧印记入副页。",
               "nextNodeId": "r42-zhu-seal-account",
-              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-two-witnesses", "status": "completed" }],
-              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.r42-zhu-ferry-seal" }]
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r42-two-witnesses",
+                  "status": "completed"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r42-zhu-ferry-seal"
+                }
+              ]
             },
             {
               "text": "我把证词和拓本交给你封存。",
               "nextNodeId": "r42-protect-result",
-              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-protect-witness", "status": "completed" }],
-              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.r42-protected-witness-vow" }]
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r42-protect-witness",
+                  "status": "completed"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r42-protected-witness-vow"
+                }
+              ]
             },
             {
               "text": "祝师父，集口那个旧例管事，我这就去劝。",
               "nextNodeId": "r58-toll-squabble-active",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r58-market-toll-squabble", "status": "active" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r58-market-toll-squabble",
+                  "status": "active"
+                }
               ]
             },
             {
               "text": "这趟刀场差事，下一步往哪里去？",
               "nextNodeId": "r103-panzhou-next",
               "conditions": [
-                { "kind": "factionMembership", "factionId": "faction.panzhou-daochang", "isMember": true },
-                { "kind": "questStatus", "questId": "quest.r43-panzhou-return-tide", "status": "active" }
+                {
+                  "kind": "factionMembership",
+                  "factionId": "faction.panzhou-daochang",
+                  "isMember": true
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r43-panzhou-return-tide",
+                  "status": "active"
+                }
               ]
             },
             {
               "text": "潮沟的夺网客赶散了，来回禀。",
               "nextNodeId": "r103-panzhou-echo",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r43-panzhou-return-tide", "status": "completed" },
-                { "kind": "knowledgeKnown", "nodeId": "event.r103-panzhou-practice" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r43-panzhou-return-tide",
+                  "status": "completed"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r103-panzhou-practice"
+                }
               ]
             },
             {
               "text": "缆痕潮时那一段先前已核明，来回话。",
               "nextNodeId": "r103-panzhou-verify",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r43-panzhou-return-tide", "status": "completed" },
-                { "kind": "knowledgeKnown", "nodeId": "event.r103-panzhou-practice", "isKnown": false }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r43-panzhou-return-tide",
+                  "status": "completed"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r103-panzhou-practice",
+                  "isKnown": false
+                }
               ]
             },
             {
               "text": "听说刀场在查一封匿名信，能否让我也看一眼？",
               "nextNodeId": "r103-panzhou-letter",
               "conditions": [
-                { "kind": "factionMembership", "factionId": "faction.panzhou-daochang", "isMember": true },
-                { "kind": "knowledgeKnown", "nodeId": "event.r43-wayfarer-letter", "isKnown": false }
+                {
+                  "kind": "factionMembership",
+                  "factionId": "faction.panzhou-daochang",
+                  "isMember": true
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r43-wayfarer-letter",
+                  "isKnown": false
+                }
               ],
               "effects": [
-                { "kind": "discoverKnowledgeNode", "nodeId": "event.r43-wayfarer-letter" }
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r43-wayfarer-letter"
+                }
               ]
             },
             {
               "text": "刀场功夫的门槛与用处，请师父照实说一遍。",
               "nextNodeId": "r103-panzhou-training",
               "conditions": [
-                { "kind": "factionMembership", "factionId": "faction.panzhou-daochang", "isMember": true }
+                {
+                  "kind": "factionMembership",
+                  "factionId": "faction.panzhou-daochang",
+                  "isMember": true
+                }
+              ]
+            },
+            {
+              "text": "这项制作差事，材料与用处怎么安排？",
+              "nextNodeId": "r104-forge-brief",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r31-blade-quench-stock",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "制作与用途都做过了，来核对。",
+              "nextNodeId": "r104-forge-echo",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r31-blade-quench-stock",
+                  "status": "completed"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r104-forge-practice"
+                }
+              ]
+            },
+            {
+              "text": "旧清点的差事还记得吗？",
+              "nextNodeId": "r104-forge-legacy",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r31-blade-quench-stock",
+                  "status": "completed"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r104-forge-practice",
+                  "isKnown": false
+                }
               ]
             },
             {
               "text": "祝师父，集口的索钱人已经散了。",
               "nextNodeId": "r58-toll-squabble-done",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r58-market-toll-squabble", "status": "completed" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r58-market-toll-squabble",
+                  "status": "completed"
+                }
               ]
             }
           ]
@@ -491,40 +658,165 @@
           "id": "r32-open-lessons",
           "text": "祝九弦看了看你的站姿：「拦门刀法是护院和行路人常用的开门路数，不是刀场秘传。先把脚下站稳，学成后莫拿它欺人。」",
           "options": [
-            { "text": "请教拦门刀法。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.lanmen-daofa" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.lanmen-daofa" }] },
-            { "text": "我想再考虑。", "nextNodeId": "farewell" }
+            {
+              "text": "请教拦门刀法。",
+              "nextNodeId": "r32-taught",
+              "conditions": [
+                {
+                  "kind": "martialArtEligible",
+                  "martialArtId": "skill.lanmen-daofa"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "learnMartialArt",
+                  "martialArtId": "skill.lanmen-daofa"
+                }
+              ]
+            },
+            {
+              "text": "我想再考虑。",
+              "nextNodeId": "farewell"
+            }
           ]
         },
         {
           "id": "r32-lessons",
           "text": "祝九弦把几页刀谱压在缆绳下：「先学护船的规矩，再挑合你手脚的一式。窄板上站稳，比一刀劈得响更要紧。」",
           "options": [
-            { "text": "请教拦门刀法。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.lanmen-daofa" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.lanmen-daofa" }] },
-            { "text": "请教翻桨刀。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-panzhou-fanjing-dao" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-panzhou-fanjing-dao" }] },
-            { "text": "请教截浪回舷刀。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-panzhou-jielan-dao" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-panzhou-jielan-dao" }] },
-            { "text": "请教顺汛换步。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-panzhou-shunxun-bu" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-panzhou-shunxun-bu" }] },
-            { "text": "请教破白连环刀。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-panzhou-pobai-dao" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-panzhou-pobai-dao" }] },
-            { "text": "今日先到这里。", "nextNodeId": "farewell" }
+            {
+              "text": "请教拦门刀法。",
+              "nextNodeId": "r32-taught",
+              "conditions": [
+                {
+                  "kind": "martialArtEligible",
+                  "martialArtId": "skill.lanmen-daofa"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "learnMartialArt",
+                  "martialArtId": "skill.lanmen-daofa"
+                }
+              ]
+            },
+            {
+              "text": "请教翻桨刀。",
+              "nextNodeId": "r32-taught",
+              "conditions": [
+                {
+                  "kind": "martialArtEligible",
+                  "martialArtId": "skill.r32-panzhou-fanjing-dao"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "learnMartialArt",
+                  "martialArtId": "skill.r32-panzhou-fanjing-dao"
+                }
+              ]
+            },
+            {
+              "text": "请教截浪回舷刀。",
+              "nextNodeId": "r32-taught",
+              "conditions": [
+                {
+                  "kind": "martialArtEligible",
+                  "martialArtId": "skill.r32-panzhou-jielan-dao"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "learnMartialArt",
+                  "martialArtId": "skill.r32-panzhou-jielan-dao"
+                }
+              ]
+            },
+            {
+              "text": "请教顺汛换步。",
+              "nextNodeId": "r32-taught",
+              "conditions": [
+                {
+                  "kind": "martialArtEligible",
+                  "martialArtId": "skill.r32-panzhou-shunxun-bu"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "learnMartialArt",
+                  "martialArtId": "skill.r32-panzhou-shunxun-bu"
+                }
+              ]
+            },
+            {
+              "text": "请教破白连环刀。",
+              "nextNodeId": "r32-taught",
+              "conditions": [
+                {
+                  "kind": "martialArtEligible",
+                  "martialArtId": "skill.r32-panzhou-pobai-dao"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "learnMartialArt",
+                  "martialArtId": "skill.r32-panzhou-pobai-dao"
+                }
+              ]
+            },
+            {
+              "text": "今日先到这里。",
+              "nextNodeId": "farewell"
+            }
           ]
         },
         {
           "id": "r32-taught",
           "text": "祝九弦按你所选的路数带你在窄板上走过一轮：「刀可以收，脚不能乱。护住同船的人，才算真会使刀。」",
           "options": [
-            { "text": "再请教一门。", "nextNodeId": "r32-lessons" },
-            { "text": "多谢师父，告辞。", "nextNodeId": "farewell" }
+            {
+              "text": "再请教一门。",
+              "nextNodeId": "r32-lessons"
+            },
+            {
+              "text": "多谢师父，告辞。",
+              "nextNodeId": "farewell"
+            }
           ]
         },
-        { "id": "departed", "text": "祝九弦把缆绳收拢，半天说了一句：「船开了就不追。刀场的名号你带走，刀场的规矩留下——往后护人护己，自己掂量。」" },
-        { "id": "war-victory", "text": "「先约争到手，船期便定得早。」祝九弦点点头，「不过赢得时辰不算赢——替我把那句『对方药队照旧过桥』也记全了，护船的只认章程，不认输赢。」" },
-        { "id": "war-stalemate", "text": "「轮值？」他把缆绳结了个死扣，「这是最省事的结局。两派药队各走各的时辰，我们护航的排班也最稳。都赢一点，就都少赔一点。」" },
-        { "id": "war-defeat", "text": "「先约让了就让了。」祝九弦不以为意，「药道又没封，轮值照旧，船照开。下回会盟前把船上功夫练扎实，比在这儿懊恼强。」" },
-        { "id": "registry-point", "text": "「轮值章程？」祝九弦朝渡口公所的方向一抬下巴，「找渡董白鹭洲，渡籍正本在他手上。哪派哪个时辰过桥、误时怎么罚，白纸黑字，比十个教头记性都牢。」" },
-        { "id": "farewell", "text": "「栈桥湿滑，走稳些。」祝九弦重新蹲下去盘他的缆绳，不再看你。" },
+        {
+          "id": "departed",
+          "text": "祝九弦把缆绳收拢，半天说了一句：「船开了就不追。刀场的名号你带走，刀场的规矩留下——往后护人护己，自己掂量。」"
+        },
+        {
+          "id": "war-victory",
+          "text": "「先约争到手，船期便定得早。」祝九弦点点头，「不过赢得时辰不算赢——替我把那句『对方药队照旧过桥』也记全了，护船的只认章程，不认输赢。」"
+        },
+        {
+          "id": "war-stalemate",
+          "text": "「轮值？」他把缆绳结了个死扣，「这是最省事的结局。两派药队各走各的时辰，我们护航的排班也最稳。都赢一点，就都少赔一点。」"
+        },
+        {
+          "id": "war-defeat",
+          "text": "「先约让了就让了。」祝九弦不以为意，「药道又没封，轮值照旧，船照开。下回会盟前把船上功夫练扎实，比在这儿懊恼强。」"
+        },
+        {
+          "id": "registry-point",
+          "text": "「轮值章程？」祝九弦朝渡口公所的方向一抬下巴，「找渡董白鹭洲，渡籍正本在他手上。哪派哪个时辰过桥、误时怎么罚，白纸黑字，比十个教头记性都牢。」"
+        },
+        {
+          "id": "farewell",
+          "text": "「栈桥湿滑，走稳些。」祝九弦重新蹲下去盘他的缆绳，不再看你。"
+        },
         {
           "id": "r42-zhu-seal-account",
           "text": "祝九弦捻了捻指间旧茧：「那枚印压在缆桩内侧，船退潮后才看得见。泥还湿的时候，我先记了印，没有记人——过了这么些年，我只敢说它不是副本誊出来的。」",
-          "options": [{ "text": "我会把印与口述一并记下。", "nextNodeId": "farewell" }]
+          "options": [
+            {
+              "text": "我会把印与口述一并记下。",
+              "nextNodeId": "farewell"
+            }
+          ]
         },
         {
           "id": "r42-protect-result",
@@ -541,6 +833,18 @@
         {
           "id": "r58-toll-squabble-done",
           "text": "祝九弦头也不抬地打了个绳结：「散了就好。摊棚刚立起来，经不起第二回堵门。往后集期他再来，渡籍和旧账都在公所摆着，白纸黑字，轮不到他收什么过集钱。」"
+        },
+        {
+          "id": "r104-forge-brief",
+          "text": "祝九弦敲了敲铁砧：「先备两份熟铁砂。旧青铜笔剑在江南姜百味担上买，带来重理刃口，工钱二十四；穿戴着的先卸下。成了淬锋短剑，背包里装备，再去渡口芦桥集口赶散旧例索钱人。这不是传刀法，先看同类兵刃怎么把劲递出去。赢了回来。」"
+        },
+        {
+          "id": "r104-forge-echo",
+          "text": "祝九弦验过刃线：「比旧剑多两分力道，交手也练过；这一回的谢仪给过便不重付。那伙索钱人再来仍要应对，别当一场胜利就永远清了集口。丢了旧器还能向姜百味补买，缺银便先做差事，别在炉边把钱耗光。」"
+        },
+        {
+          "id": "r104-forge-legacy",
+          "text": "祝九弦点头：「你旧案里的两份淬料算清过，谢仪也结了，不追补成新锻造实战。铁砧和共通配方仍在；自己备器、卸下旧器再锻，不必为旧差事再交一遍。」"
         }
       ]
     },

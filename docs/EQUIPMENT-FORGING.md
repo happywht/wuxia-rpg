@@ -35,3 +35,9 @@ Round 24 不新增快照字段或改变 v1 协议。背包依旧保存 `{itemId,
 
 - `npm run validate:data`：检查 manifest 与所有登记基础 JSON Schema。
 - `npm run smoke:round-24`：检查解析/跨引用/占位隔离、邻接、坏配方隔离、拒绝事务不变性、满包转换、实际战斗加成和 v1 存档装备重算。
+
+## Round104 制作与实际用途
+
+药庐清点由备苍崖根×3扩为问生肌散方、药炉制作、背包实际恢复和容素青复核；刀场淬料由熟铁砂×2扩为铁砧重理笔剑、装备淬锋短剑、持剑击退芦桥旧例索钱人和祝九弦复命。两项原经验银两不变，新版全程才给实践见闻。Q/N导航制作工位，I背包操作；药炉(13,4)、铁砧(10,4)需站邻格E。材料由江南姜百味出售，未实现北坡采挖；生肌散18/28/40生命、0/6/12内力，没有恢复收益不消耗。
+
+通用目标`craftRecipe`只记录制作成功、`useItem`只记录实际使用、`equipItem`只记录穿戴成功；`alternativeTargetIds`兼容三品质，`defeatEncounter.requiredEquippedItemId`核对胜利时装备。购买/持有/失败/卸下/旧胜利不替代行动。v1旧完成保留，不能伪造新增实践；旧active保留原阶段。成本/配方/旧库存政策与真实旅程未验收边界见[CRAFTING-LOOPS.md](CRAFTING-LOOPS.md)。

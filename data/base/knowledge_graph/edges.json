@@ -3707,6 +3707,20 @@
       "toId": "event.r103-panzhou-practice",
       "relation": "knows",
       "summary": "师傅复命时记档此事；静态关系不替代运行时见闻。"
+    },
+    {
+      "id": "kg.edge.r104-medicine-practice",
+      "fromId": "char.rong-su-qing",
+      "toId": "event.r104-medicine-practice",
+      "relation": "knows",
+      "summary": "制作与用途完整结案后的复核记录；静态边不代替玩家实践。"
+    },
+    {
+      "id": "kg.edge.r104-forge-practice",
+      "fromId": "char.zhu-jiuxian",
+      "toId": "event.r104-forge-practice",
+      "relation": "knows",
+      "summary": "制作与用途完整结案后的复核记录；静态边不代替玩家实践。"
     }
   ]
 }

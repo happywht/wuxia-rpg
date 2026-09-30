@@ -1,3 +1,4 @@
+import { baseRecipeIds } from './support/base-recipe-ids';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
@@ -83,6 +84,7 @@ describe('Round 58 regional quest chains', () => {
   };
 
   const assembly = assembleQuests({
+    recipeIds: baseRecipeIds,
     questSet: questParse.set,
     questGiverNpcIds: new Set(rawNpcs.npcs.filter((npc) => npc.questGiver).map((npc) => npc.id)),
     npcIds: new Set(rawNpcs.npcs.map((npc) => npc.id)),
@@ -97,8 +99,8 @@ describe('Round 58 regional quest chains', () => {
     expect(assembly.warnings).toEqual([]);
     expect(assembly.quests.size).toBe(44);
     expect(graph.warnings).toEqual([]);
-    expect(nodeParse.data.nodes).toHaveLength(417); // 412 + five Round 103 practice insights
-    expect(edgeParse.data.edges).toHaveLength(529); // 524 + five Round 103 practice edges
+    expect(nodeParse.data.nodes).toHaveLength(419); // 417 + two Round104 practice insights
+    expect(edgeParse.data.edges).toHaveLength(531); // 529 + two Round104 practice edges
 
     const newQuestIds = [
       'quest.r58-market-discovery',

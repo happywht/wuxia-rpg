@@ -5,12 +5,16 @@
   "description": "任务集合静态契约。NPC、物品、遭遇与前置任务的跨资源引用由运行时装配层逐条校验；互斥分支组按整组校验（至少两个前置一致的成员）；任务名称、说明、目标描述与奖励数值均来自数据。",
   "type": "object",
   "additionalProperties": false,
-  "required": ["quests"],
+  "required": [
+    "quests"
+  ],
   "properties": {
     "quests": {
       "type": "array",
       "description": "任务条目；允许为空，id 应唯一。",
-      "items": { "$ref": "#/definitions/quest" }
+      "items": {
+        "$ref": "#/definitions/quest"
+      }
     }
   },
   "definitions": {
@@ -21,121 +25,385 @@
     "quest": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "name", "description", "giverNpcId", "objectives", "rewards"],
+      "required": [
+        "id",
+        "name",
+        "description",
+        "giverNpcId",
+        "objectives",
+        "rewards"
+      ],
       "properties": {
-        "id": { "$ref": "#/definitions/id" },
-        "name": { "type": "string", "minLength": 1, "maxLength": 48 },
-        "description": { "type": "string", "minLength": 1, "maxLength": 500 },
-        "giverNpcId": { "$ref": "#/definitions/id" },
-        "orderedObjectives": { "type": "boolean", "description": "可选有序阶段：只记录当前未完成目标的现场信号，省略时保持并行目标。" },
+        "id": {
+          "$ref": "#/definitions/id"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 48
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "giverNpcId": {
+          "$ref": "#/definitions/id"
+        },
+        "orderedObjectives": {
+          "type": "boolean",
+          "description": "可选有序阶段：只记录当前未完成目标的现场信号，省略时保持并行目标。"
+        },
         "exclusiveGroupId": {
           "description": "可选互斥分支组：同组且前置一致的任务构成一次玩家选择，接取其一会将其余已解锁成员记为失败；装配时整组校验。",
           "$ref": "#/definitions/id"
         },
-        "requiredFactionId": { "$ref": "#/definitions/id" },
-        "requiredKnowledgeNodeId": { "$ref": "#/definitions/id" },
+        "requiredFactionId": {
+          "$ref": "#/definitions/id"
+        },
+        "requiredKnowledgeNodeId": {
+          "$ref": "#/definitions/id"
+        },
         "prerequisiteQuestIds": {
           "type": "array",
           "uniqueItems": true,
-          "items": { "$ref": "#/definitions/id" }
+          "items": {
+            "$ref": "#/definitions/id"
+          }
         },
         "objectives": {
           "type": "array",
           "minItems": 1,
           "items": {
             "oneOf": [
-              { "$ref": "#/definitions/collect-objective" },
-              { "$ref": "#/definitions/defeat-objective" },
-              { "$ref": "#/definitions/talk-objective" },
-              { "$ref": "#/definitions/discover-knowledge-objective" }
+              {
+                "$ref": "#/definitions/collect-objective"
+              },
+              {
+                "$ref": "#/definitions/defeat-objective"
+              },
+              {
+                "$ref": "#/definitions/talk-objective"
+              },
+              {
+                "$ref": "#/definitions/discover-knowledge-objective"
+              },
+              {
+                "$ref": "#/definitions/craftRecipe-objective"
+              },
+              {
+                "$ref": "#/definitions/useItem-objective"
+              },
+              {
+                "$ref": "#/definitions/equipItem-objective"
+              }
             ]
           }
         },
         "failOnEncounterIds": {
           "type": "array",
           "uniqueItems": true,
-          "items": { "$ref": "#/definitions/id" }
+          "items": {
+            "$ref": "#/definitions/id"
+          }
         },
-        "rewards": { "$ref": "#/definitions/rewards" }
+        "rewards": {
+          "$ref": "#/definitions/rewards"
+        }
       }
     },
     "collect-objective": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "targetId", "requiredCount", "text"],
+      "required": [
+        "id",
+        "kind",
+        "targetId",
+        "requiredCount",
+        "text"
+      ],
       "properties": {
-        "id": { "$ref": "#/definitions/id" },
-        "kind": { "const": "collectItem" },
-        "targetId": { "$ref": "#/definitions/id" },
-        "requiredCount": { "type": "integer", "minimum": 1, "maximum": 999 },
-        "text": { "type": "string", "minLength": 1, "maxLength": 160 }
+        "id": {
+          "$ref": "#/definitions/id"
+        },
+        "kind": {
+          "const": "collectItem"
+        },
+        "targetId": {
+          "$ref": "#/definitions/id"
+        },
+        "requiredCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 999
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
       }
     },
     "defeat-objective": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "targetId", "requiredCount", "text"],
+      "required": [
+        "id",
+        "kind",
+        "targetId",
+        "requiredCount",
+        "text"
+      ],
       "properties": {
-        "id": { "$ref": "#/definitions/id" },
-        "kind": { "const": "defeatEncounter" },
-        "targetId": { "$ref": "#/definitions/id" },
-        "requiredCount": { "type": "integer", "minimum": 1, "maximum": 99 },
-        "text": { "type": "string", "minLength": 1, "maxLength": 160 }
+        "id": {
+          "$ref": "#/definitions/id"
+        },
+        "kind": {
+          "const": "defeatEncounter"
+        },
+        "targetId": {
+          "$ref": "#/definitions/id"
+        },
+        "requiredCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 99
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "requiredEquippedItemId": {
+          "$ref": "#/definitions/id"
+        }
       }
     },
     "talk-objective": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "targetId", "requiredCount", "text"],
+      "required": [
+        "id",
+        "kind",
+        "targetId",
+        "requiredCount",
+        "text"
+      ],
       "properties": {
-        "id": { "$ref": "#/definitions/id" },
-        "kind": { "const": "talkToNpc" },
-        "targetId": { "$ref": "#/definitions/id" },
-        "requiredCount": { "type": "integer", "minimum": 1, "maximum": 99 },
-        "text": { "type": "string", "minLength": 1, "maxLength": 160 }
+        "id": {
+          "$ref": "#/definitions/id"
+        },
+        "kind": {
+          "const": "talkToNpc"
+        },
+        "targetId": {
+          "$ref": "#/definitions/id"
+        },
+        "requiredCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 99
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
       }
     },
     "discover-knowledge-objective": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "kind", "targetId", "requiredCount", "text"],
+      "required": [
+        "id",
+        "kind",
+        "targetId",
+        "requiredCount",
+        "text"
+      ],
       "properties": {
-        "id": { "$ref": "#/definitions/id" },
-        "kind": { "const": "discoverKnowledge" },
-        "targetId": { "$ref": "#/definitions/id" },
-        "requiredCount": { "const": 1 },
-        "text": { "type": "string", "minLength": 1, "maxLength": 160 }
+        "id": {
+          "$ref": "#/definitions/id"
+        },
+        "kind": {
+          "const": "discoverKnowledge"
+        },
+        "targetId": {
+          "$ref": "#/definitions/id"
+        },
+        "requiredCount": {
+          "const": 1
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
       }
     },
     "rewards": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["experience", "currency"],
+      "required": [
+        "experience",
+        "currency"
+      ],
       "properties": {
-        "experience": { "type": "integer", "minimum": 0, "maximum": 999999 },
-        "currency": { "type": "integer", "minimum": 0, "maximum": 999999 },
+        "experience": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 999999
+        },
+        "currency": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 999999
+        },
         "factionRenown": {
           "type": "array",
-          "items": { "$ref": "#/definitions/faction-renown-reward" }
+          "items": {
+            "$ref": "#/definitions/faction-renown-reward"
+          }
         },
         "discoverKnowledgeNodeIds": {
           "type": "array",
           "uniqueItems": true,
-          "items": { "$ref": "#/definitions/id" }
+          "items": {
+            "$ref": "#/definitions/id"
+          }
         }
       }
     },
     "faction-renown-reward": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["factionId", "delta"],
+      "required": [
+        "factionId",
+        "delta"
+      ],
       "properties": {
-        "factionId": { "$ref": "#/definitions/id" },
+        "factionId": {
+          "$ref": "#/definitions/id"
+        },
         "delta": {
           "type": "integer",
           "minimum": -1000,
           "maximum": 1000,
-          "not": { "const": 0 }
+          "not": {
+            "const": 0
+          }
+        }
+      }
+    },
+    "craftRecipe-objective": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "targetId",
+        "requiredCount",
+        "text"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/id"
+        },
+        "kind": {
+          "const": "craftRecipe"
+        },
+        "targetId": {
+          "$ref": "#/definitions/id"
+        },
+        "requiredCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 99
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
+      }
+    },
+    "useItem-objective": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "targetId",
+        "requiredCount",
+        "text"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/id"
+        },
+        "kind": {
+          "const": "useItem"
+        },
+        "targetId": {
+          "$ref": "#/definitions/id"
+        },
+        "requiredCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 99
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "alternativeTargetIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/definitions/id"
+          }
+        }
+      }
+    },
+    "equipItem-objective": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "targetId",
+        "requiredCount",
+        "text"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/id"
+        },
+        "kind": {
+          "const": "equipItem"
+        },
+        "targetId": {
+          "$ref": "#/definitions/id"
+        },
+        "requiredCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 99
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "alternativeTargetIds": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 16,
+          "items": {
+            "$ref": "#/definitions/id"
+          }
         }
       }
     }

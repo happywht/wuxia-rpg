@@ -1,3 +1,4 @@
+import { baseRecipeIds } from './support/base-recipe-ids';
 /**
  * Round 59: regional quest echoes in the seven NPCs' condition-gated
  * dialogue. Everything runs against the real base quest/dialogue data —
@@ -95,6 +96,7 @@ const companions = readJson('../data/base/companions/round-19-companions.json') 
 };
 
 const questAssembly = assembleQuests({
+    recipeIds: baseRecipeIds,
   questSet: questParse.set,
   questGiverNpcIds,
   npcIds,
@@ -270,7 +272,7 @@ function visibleStartTargets(conversation: DialogueData, context: DialogueRuntim
 describe('Round 59 regional dialogue echoes', () => {
   it('parses real base data and assembles quests and dialogue references without warnings', () => {
     expect(graph.warnings).toEqual([]);
-    expect(graph.nodes.size).toBe(417); // 412 + five Round 103 practice insights
+    expect(graph.nodes.size).toBe(419); // 417 + two Round 104 practice insights
     expect(questAssembly.warnings).toEqual([]);
     expect(questAssembly.quests.size).toBe(44);
     expect(dialogueAssembly.warnings).toEqual([]);
@@ -334,7 +336,7 @@ describe('Round 59 regional dialogue echoes', () => {
     const expectedBaseline: Record<string, number> = {
       'dlg.shi-bei-mentor': 18, // 9 pre-existing + 4 echoes + 5 Round 103 practice entries
       'dlg.bai-luzhou-ferry-master': 21, // 14 pre-existing + 2 echoes + 4 Round 98 journey entries + 1 Round 103 field brief
-      'dlg.zhu-jiuxian-mentor': 20, // 12 pre-existing + 2 echoes + outsider lesson + 5 Round 103 practice entries
+      'dlg.zhu-jiuxian-mentor': 23, // prior 20 + three Round104 crafting responses
       'dlg.ma-shangyi-notice-board': 5, // 3 pre-existing + 2 echoes
       'dlg.lu-zhenniang-teastall': 9, // 7 pre-existing + 2 echoes
       'dlg.jiang-baiwei-peddler': 7, // 2 pre-existing + 2 echoes + 3 Round 98 journey entries

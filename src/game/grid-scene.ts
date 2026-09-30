@@ -803,6 +803,7 @@ export class GridScene extends Phaser.Scene {
       onClose: () => this.settleBattleClose(),
     });
     this.inventoryPanel = new InventoryPanel(this, {
+      onAction: (signal) => this.applyQuestUpdate(applyQuestSignal(this.quests, this.questJournal, signal)),
       onClose: () => this.noteOverlayClosed(),
       onChange: () => this.refreshQuestCollectObjectives(),
     });
@@ -1856,6 +1857,7 @@ export class GridScene extends Phaser.Scene {
         this.applyQuestUpdate(applyQuestSignal(this.quests, this.questJournal, {
           type: 'encounter-victory',
           encounterId: encounter.record.id,
+          equippedItemIds: Object.values(this.inventory?.equipped ?? {}),
         }));
       } else if (result?.outcome === 'defeat') {
         this.applyQuestUpdate(applyQuestSignal(this.quests, this.questJournal, {
@@ -2401,6 +2403,7 @@ export class GridScene extends Phaser.Scene {
         : world.assembly.npcsByPeriod.get(periodId) ?? world.assembly.npcs,
       currentMapNpcs: this.placedNpcs,
       encounters: world.assembly.encounters,
+      craftingStations: [...world.assembly.equipmentForges, ...world.assembly.alchemyStations],
       knowledgeNodeTitles: new Map([...world.knowledgeGraph.nodes]
         .map(([id, node]) => [id, node.title])),
       shops: world.assembly.shops,
@@ -2421,7 +2424,7 @@ export class GridScene extends Phaser.Scene {
       const messages: Record<QuestNavigationNoTargetReason, string> = {
         'unknown-quest': '这项差事当前无法导航。',
         'not-active': '只有进行中的差事可以导航。',
-        'no-spatial-objective': '这项差事接下来的目标没有地图标点，无法导航。',
+        'no-spatial-objective': '此阶段无需地图导航：按 I 打开背包，按目标文字使用或装备产物；用药须有可恢复的生命/内力损耗。',
         'unresolved-target': '地图资料暂时无法解析这项目标的位置，暂时无法导航。',
         'collect-item-not-stocked': '尚无在营商铺上架这项目标所需的物品，无法导航到卖家。',
         'collect-stock-insufficient': '在营商铺的现存数量不够补齐这项目标，暂时无法导航到卖家。',
@@ -3613,6 +3616,7 @@ export class GridScene extends Phaser.Scene {
           if (outcome.ok) {
             this.achievementState = recordAchievementCounter(this.achievementState, 'equipmentCrafts');
             this.refreshQuestCollectObjectives();
+            this.applyQuestUpdate(applyQuestSignal(this.quests, this.questJournal, { type: 'recipe-crafted', recipeId }));
           }
           return outcome.ok
             ? { ok: true, message: `已锻成「${outcome.result.name}」，剩余银两 ${outcome.remainingCurrency}。` }
@@ -3649,6 +3653,7 @@ export class GridScene extends Phaser.Scene {
           this.achievementState = recordAchievementCounter(this.achievementState, 'alchemyCrafts');
           this.refreshQuestCollectObjectives();
           this.markKnowledgeDiscovered(outcome.result.id);
+          this.applyQuestUpdate(applyQuestSignal(this.quests, this.questJournal, { type: 'recipe-crafted', recipeId }));
           return { ok: true, message: `已炼成「${outcome.result.name}」，剩余银两 ${outcome.remainingCurrency}。` };
         },
       });

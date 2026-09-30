@@ -146,6 +146,8 @@ export interface InventoryPanelOptions {
   onClose?: () => void;
   /** Invoked after an operation succeeds and changes player item counts. */
   onChange?: () => void;
+  /** Successful live action only; inventory snapshots never imply an action. */
+  onAction?: (action: { type: 'item-used' | 'item-equipped'; itemId: string }) => void;
 }
 
 export class InventoryPanel {
@@ -154,6 +156,7 @@ export class InventoryPanel {
   private readonly bindings: PanelKeyBinding[] = [];
   private readonly onClose?: () => void;
   private readonly onChange?: () => void;
+  private readonly onAction?: InventoryPanelOptions['onAction'];
 
   private model: InventoryPanelModel | null = null;
   private selection = 0;
@@ -164,6 +167,7 @@ export class InventoryPanel {
     this.scene = scene;
     this.onClose = options.onClose;
     this.onChange = options.onChange;
+    this.onAction = options.onAction;
     this.container = scene.add.container(0, 0).setVisible(false).setDepth(1050);
   }
 
@@ -259,7 +263,10 @@ export class InventoryPanel {
         ? `${item.name}：${LABELS.health}+${outcome.outcome.healthHealed} · ${LABELS.qi}+${outcome.outcome.qiRestored}`
         : outcome.message;
       this.clampSelection();
-      if (outcome.ok) this.onChange?.();
+      if (outcome.ok) {
+        this.onAction?.({ type: 'item-used', itemId: item.id });
+        this.onChange?.();
+      }
       this.render();
       return;
     }
@@ -277,7 +284,10 @@ export class InventoryPanel {
         ? `${item.name}：${slotLabel(outcome.slot)}${isEquipped(model.inventory, item.id) ? ' 已装备' : ' 已卸下'}`
         : outcome.message;
       this.clampSelection();
-      if (outcome.ok) this.onChange?.();
+      if (outcome.ok) {
+        if (isEquipped(model.inventory, item.id)) this.onAction?.({ type: 'item-equipped', itemId: item.id });
+        this.onChange?.();
+      }
       this.render();
       return;
     }

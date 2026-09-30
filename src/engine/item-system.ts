@@ -839,7 +839,7 @@ function reconcileEquipment(context: EquipmentContext): void {
 // Consumable rules
 // ---------------------------------------------------------------------------
 
-export type UseRefusalReason = 'not-owned' | 'not-consumable';
+export type UseRefusalReason = 'not-owned' | 'not-consumable' | 'no-effect';
 
 export interface UseOutcome {
   healthHealed: number;
@@ -874,6 +874,9 @@ export function useConsumable(
     character.health.max - character.health.current,
   );
   const qiRestored = Math.min(item.consumable.qiRestore, character.qi.max - character.qi.current);
+  if (healthHealed <= 0 && qiRestored <= 0) {
+    return { ok: false, reason: 'no-effect', message: '当前生命和内力无需此药恢复，已保留物品。' };
+  }
   character.health.current += healthHealed;
   character.qi.current += qiRestored;
   takeItem(inventory, item.id, 1);

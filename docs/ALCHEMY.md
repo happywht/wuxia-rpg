@@ -22,3 +22,9 @@ Round 25 加入数据驱动药炉、可发现配方和确定性成药品质。�
 药炉必须位于可通行地图格，不能与出生点、NPC、关口、区域事件、遭遇、擂台、门派战或锻造工位重叠。固定工位格还会屏蔽 NPC 时段日程；玩家需站在四方向相邻格按 E 使用。集合资源可缺省；资料结构错误只关闭炼丹入口。语义错误的单个工位/配方会分别被隔离并给出加载诊断，其他有效配方继续可用。
 
 MOD 可以同路径提供 `alchemy/round-25-alchemy.json` 覆盖默认工位和药方。编辑后运行 `npm run validate:data`；引擎事务和品质规则用 `npm run smoke:round-25` 验证。炼丹运行逻辑位于 Phaser-free `src/engine/alchemy-system.ts`，面板与世界接线位于 `src/game/alchemy-ui.ts`、`grid-scene.ts`。
+
+## Round104 制作与实际用途
+
+药庐清点由备苍崖根×3扩为问生肌散方、药炉制作、背包实际恢复和容素青复核；刀场淬料由熟铁砂×2扩为铁砧重理笔剑、装备淬锋短剑、持剑击退芦桥旧例索钱人和祝九弦复命。两项原经验银两不变，新版全程才给实践见闻。Q/N导航制作工位，I背包操作；药炉(13,4)、铁砧(10,4)需站邻格E。材料由江南姜百味出售，未实现北坡采挖；生肌散18/28/40生命、0/6/12内力，没有恢复收益不消耗。
+
+通用目标`craftRecipe`只记录制作成功、`useItem`只记录实际使用、`equipItem`只记录穿戴成功；`alternativeTargetIds`兼容三品质，`defeatEncounter.requiredEquippedItemId`核对胜利时装备。购买/持有/失败/卸下/旧胜利不替代行动。v1旧完成保留，不能伪造新增实践；旧active保留原阶段。成本/配方/旧库存政策与真实旅程未验收边界见[CRAFTING-LOOPS.md](CRAFTING-LOOPS.md)。

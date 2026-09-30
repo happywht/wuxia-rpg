@@ -1,0 +1,5 @@
+
+> wuxia-rpg@0.0.1 audit:round-34
+> node scripts/audit-round-34-docs.mjs
+
+通过：文档一致性审计。核验范围（计数由数据推导）：22 张地图/22 个区域/50 个关口/70 个定点事件/4 个漫游奇遇、对白条件 questStatus,itemCount,morality,renown,factionRenown,npcRelationship,knowledgeKnown,npcKnows,factionMembership,martialArtEligible,timeOfDay + 效果 acceptQuest,abandonQuest,giveItem,takeItem,adjustMorality,adjustRenown,adjustFactionRenown,adjustRelationship,discoverKnowledgeNode,shareKnowledgeNode,joinFaction,leaveFaction,learnMartialArt,recruitCompanion,dismissCompanion、65 项任务（目标 kind：collectItem/defeatEncounter/talkToNpc/discoverKnowledge/craftRecipe/useItem/equipItem）、5 个门派名。

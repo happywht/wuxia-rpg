@@ -1,6 +1,6 @@
 # 人物志（CHARACTERS）
 
-- 状态：截至 Round 103，基础世界共有 **38 名可交互 NPC**；全部为原创人物，七时段人物使用独立日程和对话资源。季无潮、虞星槎负责澜心洲—引航礁航路差事；本轮人物、对白和任务位于 `data/base/characters/round-97-lanxin-reef-npcs.json`、`data/base/dialogues/round-97-lanxin-reef-conversations.json` 与 `data/base/quests/round-97-lanxin-reef-quests.json`。
+- 状态：截至 Round 104，基础世界共有 **38 名可交互 NPC**；全部为原创人物，七时段人物使用独立日程和对话资源。季无潮、虞星槎负责澜心洲—引航礁航路差事；本轮人物、对白和任务位于 `data/base/characters/round-97-lanxin-reef-npcs.json`、`data/base/dialogues/round-97-lanxin-reef-conversations.json` 与 `data/base/quests/round-97-lanxin-reef-quests.json`。
 - 关联：`docs/NPC-SCHEDULES.md`（时段日程）、`docs/FACTIONS.md`（门派与师承）、`docs/KNOWLEDGE-GRAPH.md`（人物词条与关系边）、`docs/DIALOGUE-GUIDE.md`（对话写法）。
 
 ## 总表
@@ -186,3 +186,9 @@
 | 回潮验缆 | 青帆埠潮沟夺网客(73,68) | 渡口祝九弦 |
 
 Q可追踪当前阶段并N导航，M查实际人物位置和关口。云隐阶段只备药不扣药；恢复武学回复生命而非内力，守御只抵下一次受击，铁嶂护身桩当前仍为攻击。实践结案不自动学武、不绕过等级/属性资格；修习细表见FACTION-PRACTICE-DESIGN.md与MARTIAL-ARTS.md。旧完成核询保留原状态，师傅不据此伪造地区证明；进行态保留原第一目标，之后按序走。五派真实键盘旅程仍未验收。
+
+## Round104 制作与实际用途
+
+药庐清点由备苍崖根×3扩为问生肌散方、药炉制作、背包实际恢复和容素青复核；刀场淬料由熟铁砂×2扩为铁砧重理笔剑、装备淬锋短剑、持剑击退芦桥旧例索钱人和祝九弦复命。两项原经验银两不变，新版全程才给实践见闻。Q/N导航制作工位，I背包操作；药炉(13,4)、铁砧(10,4)需站邻格E。材料由江南姜百味出售，未实现北坡采挖；生肌散18/28/40生命、0/6/12内力，没有恢复收益不消耗。
+
+通用目标`craftRecipe`只记录制作成功、`useItem`只记录实际使用、`equipItem`只记录穿戴成功；`alternativeTargetIds`兼容三品质，`defeatEncounter.requiredEquippedItemId`核对胜利时装备。购买/持有/失败/卸下/旧胜利不替代行动。v1旧完成保留，不能伪造新增实践；旧active保留原阶段。成本/配方/旧库存政策与真实旅程未验收边界见[CRAFTING-LOOPS.md](CRAFTING-LOOPS.md)。

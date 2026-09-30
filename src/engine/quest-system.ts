@@ -6,7 +6,7 @@
  * validation, objective progress and one-time reward transitions.
  */
 
-export type QuestObjectiveKind = 'collectItem' | 'defeatEncounter' | 'talkToNpc' | 'discoverKnowledge';
+export type QuestObjectiveKind = 'collectItem' | 'defeatEncounter' | 'talkToNpc' | 'discoverKnowledge' | 'craftRecipe' | 'useItem' | 'equipItem';
 
 export interface QuestObjectiveData {
   id: string;
@@ -14,6 +14,10 @@ export interface QuestObjectiveData {
   targetId: string;
   requiredCount: number;
   text: string;
+  /** Equivalent item outcomes (for example quality tiers); action objectives only. */
+  alternativeTargetIds?: string[];
+  /** Optional victory equipment gate; historical victories cannot prove it. */
+  requiredEquippedItemId?: string;
 }
 
 export interface QuestRewardsData {
@@ -74,6 +78,9 @@ export interface QuestAssemblyInput {
   npcIds: ReadonlySet<string>;
   itemIds: ReadonlySet<string>;
   encounterIds: ReadonlySet<string>;
+  /** Recipe ids from validated, usable crafting stations. */
+  recipeIds?: ReadonlySet<string>;
+  itemCategories?: ReadonlyMap<string, string>;
   /** Optional reference catalogs; required quest gates are checked when provided. */
   factionIds?: ReadonlySet<string>;
   knowledgeNodeIds?: ReadonlySet<string>;
@@ -122,7 +129,10 @@ export interface QuestUpdateResult {
 
 export type QuestSignal =
   | { type: 'item-count'; itemId: string; quantity: number }
-  | { type: 'encounter-victory'; encounterId: string }
+  | { type: 'recipe-crafted'; recipeId: string }
+  | { type: 'item-used'; itemId: string }
+  | { type: 'item-equipped'; itemId: string }
+  | { type: 'encounter-victory'; encounterId: string; equippedItemIds?: readonly string[] }
   | { type: 'encounter-defeat'; encounterId: string }
   | { type: 'npc-talk'; npcId: string }
   | { type: 'knowledge-discovery'; nodeId: string };
@@ -201,7 +211,7 @@ function parseFactionRenownRewards(
 }
 
 const OBJECTIVE_KINDS: readonly QuestObjectiveKind[] = [
-  'collectItem', 'defeatEncounter', 'talkToNpc', 'discoverKnowledge',
+  'collectItem', 'defeatEncounter', 'talkToNpc', 'discoverKnowledge', 'craftRecipe', 'useItem', 'equipItem',
 ];
 
 function parseObjective(raw: unknown, label: string, errors: string[]): QuestObjectiveData | null {
@@ -216,6 +226,17 @@ function parseObjective(raw: unknown, label: string, errors: string[]): QuestObj
   const text = string(raw.text);
   const maximumCount = kind === 'collectItem' ? 999 : kind === 'discoverKnowledge' ? 1 : 99;
   const problems: string[] = [];
+  const alternativeTargetIds = parseIdList(raw.alternativeTargetIds, `${label}.alternativeTargetIds`, errors);
+  if (raw.alternativeTargetIds !== undefined && kind !== 'useItem' && kind !== 'equipItem') {
+    problems.push('alternativeTargetIds 仅用于使用/装备目标');
+  }
+  if (alternativeTargetIds === null || alternativeTargetIds.includes(targetId ?? '')) {
+    problems.push('替代目标不得重复主目标');
+  }
+  if ((alternativeTargetIds?.length ?? 0) > 16) problems.push('替代目标最多16项');
+  if (raw.requiredEquippedItemId !== undefined && (kind !== 'defeatEncounter' || string(raw.requiredEquippedItemId) === null)) {
+    problems.push('requiredEquippedItemId 仅用于战胜目标且应为非空ID');
+  }
   if (id === null) problems.push('id 应为非空字符串');
   if (!OBJECTIVE_KINDS.includes(kind as QuestObjectiveKind)) {
     problems.push(`kind 必须是 ${OBJECTIVE_KINDS.join(' 或 ')}`);
@@ -229,7 +250,9 @@ function parseObjective(raw: unknown, label: string, errors: string[]): QuestObj
     errors.push(`${label}：${problems.join('；')}`);
     return null;
   }
-  return { id, kind: kind as QuestObjectiveKind, targetId, requiredCount, text };
+  return { id, kind: kind as QuestObjectiveKind, targetId, requiredCount, text,
+    ...(raw.requiredEquippedItemId === undefined ? {} : { requiredEquippedItemId: raw.requiredEquippedItemId as string }),
+    ...(raw.alternativeTargetIds === undefined ? {} : { alternativeTargetIds: alternativeTargetIds! }) };
 }
 
 /** Defensive parser; schema validation still runs first in the data loader. */
@@ -390,6 +413,21 @@ export function assembleQuests(input: QuestAssemblyInput): QuestAssemblyResult {
     }
     const objectiveIds = new Set<string>();
     for (const objective of quest.objectives) {
+      if (objective.requiredEquippedItemId !== undefined && (!input.itemIds.has(objective.requiredEquippedItemId) ||
+        (input.itemCategories !== undefined && input.itemCategories.get(objective.requiredEquippedItemId) !== 'equipment'))) {
+        problems.push(`战胜装备条件引用无效装备 "${objective.requiredEquippedItemId}"`);
+      }
+      if (objective.kind === 'craftRecipe' && !input.recipeIds?.has(objective.targetId)) {
+        problems.push(`制作目标引用无效配方 "${objective.targetId}"`);
+      }
+      if (objective.kind === 'useItem' || objective.kind === 'equipItem') {
+        for (const itemId of [objective.targetId, ...(objective.alternativeTargetIds ?? [])]) {
+          if (!input.itemIds.has(itemId)) problems.push(`行动目标引用无效物品 "${itemId}"`);
+          if (input.itemCategories && input.itemCategories.get(itemId) !== (objective.kind === 'useItem' ? 'consumable' : 'equipment')) {
+            problems.push(`行动目标物品类别不匹配 "${itemId}"`);
+          }
+        }
+      }
       if (objectiveIds.has(objective.id)) problems.push(`目标 id "${objective.id}" 重复`);
       objectiveIds.add(objective.id);
       if (objective.kind === 'collectItem' && !input.itemIds.has(objective.targetId)) {
@@ -681,7 +719,8 @@ export function applyQuestSignal(
         next = Math.min(objective.requiredCount, quantity);
       } else if (
         objective.kind === 'defeatEncounter' && signal.type === 'encounter-victory' &&
-        objective.targetId === signal.encounterId
+        objective.targetId === signal.encounterId &&
+        (objective.requiredEquippedItemId === undefined || signal.equippedItemIds?.includes(objective.requiredEquippedItemId))
       ) {
         next = Math.min(objective.requiredCount, current + 1);
       } else if (
@@ -694,6 +733,13 @@ export function applyQuestSignal(
         objective.targetId === signal.nodeId
       ) {
         next = objective.requiredCount;
+      } else if (objective.kind === 'craftRecipe' && signal.type === 'recipe-crafted' &&
+        objective.targetId === signal.recipeId) {
+        next = Math.min(objective.requiredCount, current + 1);
+      } else if (((objective.kind === 'useItem' && signal.type === 'item-used') ||
+        (objective.kind === 'equipItem' && signal.type === 'item-equipped')) &&
+        [objective.targetId, ...(objective.alternativeTargetIds ?? [])].includes(signal.itemId)) {
+        next = Math.min(objective.requiredCount, current + 1);
       }
       if (next !== current) {
         state.objectiveCounts.set(objective.id, next);

@@ -1,3 +1,4 @@
+import { baseRecipeIds } from './support/base-recipe-ids';
 /** Round 68: one real-data journey across all four regions, a remote save, and an ending. */
 
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -287,6 +288,7 @@ function loadJourneyWorld(): JourneyWorld {
   const encounterIds = new Set(encounterSet.encounters.map(({ id }) => id));
   const questGivers = new Set(npcSet.npcs.filter(({ questGiver }) => questGiver).map(({ id }) => id));
   const questsAssembly = assembleQuests({
+    recipeIds: baseRecipeIds,
     questSet,
     questGiverNpcIds: questGivers,
     npcIds,

@@ -1266,6 +1266,9 @@ function assembleOptionalContent(
     }
   }
   const questAssembly = assembleQuests({
+    itemCategories: new Map([...itemAssembly.items].map(([id, item]) => [id, item.category])),
+    recipeIds: new Set([...equipmentForgeAssembly.stations, ...alchemyAssembly.stations]
+      .flatMap(station => station.recipes.map(recipe => recipe.id))),
     questSet,
     questGiverNpcIds: new Set(
       allNpcs.filter((npc) => npc.record.questGiver).map((npc) => npc.record.id),

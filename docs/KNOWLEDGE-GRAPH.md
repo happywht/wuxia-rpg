@@ -14,7 +14,7 @@ Round 11 建立可替换的图谱资料和玩家见闻状态。当前实现用�
 每条关系使用 `id`、`fromId`、`toId`、`relation` 和 `summary`。关系枚举为 `mentorOf`、`parentOf`、`hostileTo`、`belongsTo`、`locatedAt`、`holds`、`triggers`、`requires`、`rewards`、`knows`、`participatesIn`、`influences`。两个端点必须都声明在节点集内。
 
 
-当前基础资料包含 **417 个节点和 529 条关系**，其中 7 个结局节点。Round 74–93 持续增加云岭、海岸、列岛与北境的地点、人物、事件、任务和见闻关系；Round 94 新增天门关/归帆洲内容；Round 95 新增雾杉关、听杉谷、照叶港及风铃石/潮时调查关系；Round 96 新增千里石塘、半月环礁和灯序/潮序调查关系；Round 97 新增澜心洲、引航礁、季无潮/虞星槎、「澜心潮簿」「重燃星槎灯」与潮痕碑、观汐台、星槎灯等节点，共 18 个节点、21 条关系。跨区入口、调查目标、任务发布人与完成奖励仍由 `locatedAt`、`triggers`、`requires`、`rewards` 等边表达。
+当前基础资料包含 **419 个节点和 531 条关系**，其中 7 个结局节点。Round 74–93 持续增加云岭、海岸、列岛与北境的地点、人物、事件、任务和见闻关系；Round 94 新增天门关/归帆洲内容；Round 95 新增雾杉关、听杉谷、照叶港及风铃石/潮时调查关系；Round 96 新增千里石塘、半月环礁和灯序/潮序调查关系；Round 97 新增澜心洲、引航礁、季无潮/虞星槎、「澜心潮簿」「重燃星槎灯」与潮痕碑、观汐台、星槎灯等节点，共 18 个节点、21 条关系。跨区入口、调查目标、任务发布人与完成奖励仍由 `locatedAt`、`triggers`、`requires`、`rewards` 等边表达。
 
 边可选声明 `attitudeSpread`（非零 -1…1）：其 `fromId` 人物的关系变化按该有符号系数传递给 `toId` 人物。该字段只适用于两端都是人物的边；结构越界的边由 parser 隔离，端点类别不符时只移除传播系数并警告。没有系数的旧边不改变关系值。结局节点只保存百科摘要；可达性、锁定原因和终章文本来自独立 `ending-set` 资料，具体条件见 [`ENDINGS.md`](ENDINGS.md)。
 
@@ -140,3 +140,7 @@ v1 快照字段 `knownKnowledgeNodeIds` 保存玩家已知节点；区域奇遇�
 ## Round 103 五派实践见闻
 
 新增5个默认未知event.r103-{tingyu,tiezhang,yunyin,hanshan,panzhou}-practice节点，各由新版完整实践任务奖励发现；静态师傅knows边不替代实际证明。旧v1完成核询不自动给新证明，原R43核询见闻与实践见闻分别记录；匿名信摘要承认道路奇遇和师傅转抄两种来源。
+
+## Round104 制作用途证明
+
+event.r104-medicine-practice与event.r104-forge-practice默认为未知，仅两项新版完整差事结算发现；新增2静态knows边，不能当作实际制作、使用或持剑胜利。旧完成清点不会补造这些证明。当前419节点/531边。

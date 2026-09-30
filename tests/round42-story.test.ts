@@ -1,3 +1,4 @@
+import { baseRecipeIds } from './support/base-recipe-ids';
 /** Round 42: original main-story data, quest state progression and endings. */
 
 import { readFileSync } from 'node:fs';
@@ -53,6 +54,7 @@ function loadWorldQuests() {
     ).encounters,
   ].flat();
   const assembly = assembleQuests({
+    recipeIds: baseRecipeIds,
     questSet: parsed.set,
     questGiverNpcIds: new Set(npcs.filter((npc) => npc.questGiver).map((npc) => npc.id)),
     npcIds: new Set(npcs.map((npc) => npc.id)),

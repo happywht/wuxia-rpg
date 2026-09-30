@@ -1,3 +1,4 @@
+import { baseRecipeIds } from './support/base-recipe-ids';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
@@ -100,6 +101,7 @@ function loadWorld() {
     '../data/base/knowledge_graph/nodes.json',
   ).nodes;
   const assembly = assembleQuests({
+    recipeIds: baseRecipeIds,
     questSet: parsed.set,
     questGiverNpcIds: new Set(npcSet.filter((npc) => npc.questGiver).map((npc) => npc.id)),
     npcIds: new Set(npcSet.map((npc) => npc.id)),
@@ -261,6 +263,7 @@ describe('Round 43 faction routes', () => {
       '../data/base/knowledge_graph/nodes.json',
     ).nodes;
     const assembly = assembleQuests({
+    recipeIds: baseRecipeIds,
       questSet: parsed.set,
       questGiverNpcIds: new Set(npcIds.filter((npc) => npc.questGiver).map((npc) => npc.id)),
       npcIds: new Set(npcIds.map((npc) => npc.id)),

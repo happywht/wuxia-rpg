@@ -1627,6 +1627,9 @@ export function restoreRunState(input: RestoreRunInput): RestoredRunState {
       continue; // Defensive: the plan already dropped unknown shops.
     }
     for (const entry of savedShop.stock) {
+      // Shelf policy is current data: old finite exhaustion must not suppress
+      // newly unlimited supply; a removed unlimited policy cannot leak via v1.
+      if (runtime.get(entry.itemId) === -1 || entry.quantity === -1) continue;
       runtime.set(entry.itemId, entry.quantity);
     }
   }

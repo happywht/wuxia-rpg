@@ -8,7 +8,7 @@ import { findWorldTravelRoute } from './world-travel';
  * engine knows only which existing control applies — never the character,
  * place or story behind the objective (see docs/ARCHITECTURE.md).
  */
-export type NavigationArrivalAction = 'talk' | 'battle' | 'discover' | 'shop';
+export type NavigationArrivalAction = 'talk' | 'battle' | 'discover' | 'shop' | 'craft';
 
 export interface WorldNavigationGuideSegment {
   status: 'en-route' | 'at-gate' | 'arrived';
@@ -167,6 +167,8 @@ export function resolveWorldNavigationGuide(
  */
 export function arrivalActionHint(action: NavigationArrivalAction): string {
   switch (action) {
+    case 'craft':
+      return '按 E 打开工位，选择配方并制作；缺料先查投入与持有数';
     case 'talk':
       return '按 F 直接交谈（E 键优先处理商铺或差事名录）';
     case 'battle':

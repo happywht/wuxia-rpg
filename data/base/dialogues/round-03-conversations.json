@@ -1239,17 +1239,32 @@
             {
               "text": "愿闻生肌散的炼法。",
               "nextNodeId": "teach-shengji",
-              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.formula-shengji-san" }]
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.formula-shengji-san"
+                }
+              ]
             },
             {
               "text": "想学宁神丸的火候。",
               "nextNodeId": "teach-ningshen",
-              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.formula-ningshen-wan" }]
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.formula-ningshen-wan"
+                }
+              ]
             },
             {
               "text": "可有气血双补的方子？",
               "nextNodeId": "teach-shuanghe",
-              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.formula-shuanghe-dan" }]
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.formula-shuanghe-dan"
+                }
+              ]
             },
             {
               "text": "我已核实「yunyin-herb-road」所托之事。",
@@ -1272,19 +1287,92 @@
               "text": "药香对上了，这一程接下来怎么走？",
               "nextNodeId": "r103-yunyin-field-brief",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r43-yunyin-herb-road", "status": "active" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r43-yunyin-herb-road",
+                  "status": "active"
+                }
               ]
             },
-            { "text": "只是路过，叨扰了。", "nextNodeId": "farewell" }
+            {
+              "text": "这项制作差事，材料与用处怎么安排？",
+              "nextNodeId": "r104-medicine-brief",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r31-herbal-stocktaking",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "制作与用途都做过了，来核对。",
+              "nextNodeId": "r104-medicine-echo",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r31-herbal-stocktaking",
+                  "status": "completed"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r104-medicine-practice"
+                }
+              ]
+            },
+            {
+              "text": "旧清点的差事还记得吗？",
+              "nextNodeId": "r104-medicine-legacy",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r31-herbal-stocktaking",
+                  "status": "completed"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r104-medicine-practice",
+                  "isKnown": false
+                }
+              ]
+            },
+            {
+              "text": "只是路过，叨扰了。",
+              "nextNodeId": "farewell"
+            }
           ]
         },
-        { "id": "teach-shengji", "text": "她抓起一把寒珠草，又按上两段苍崖根：「寒珠败火定血，苍崖托气生肌，二比一下料，文火收霜，宁少勿多。记住了——散是死的，伤口是活的。」" },
-        { "id": "teach-ningshen", "text": "「落蝶花带半分辛香，能引寒珠的凉性往心经走。」她以指轻叩药匾，「蜜炼成丸，含服徐化；火候老了发苦，药力便钝三分。」" },
-        { "id": "teach-shuanghe", "text": "「双和丹不稀奇，稀奇的是肯守炉。」她三味各拈一撮，在匾上摆成鼎足，「武火催香，缓火固形，少看一眼便前功尽弃。去炉子那边练手，别烧了我的匾。」" },
-        { "id": "farewell", "text": "「炉子就在这渡口里，趁雾散前动手。」她低头继续翻匾，不再多言。" },
+        {
+          "id": "teach-shengji",
+          "text": "她抓起一把寒珠草，又按上两段苍崖根：「寒珠败火定血，苍崖托气生肌，二比一下料，文火收霜，宁少勿多。记住了——散是死的，伤口是活的。」"
+        },
+        {
+          "id": "teach-ningshen",
+          "text": "「落蝶花带半分辛香，能引寒珠的凉性往心经走。」她以指轻叩药匾，「蜜炼成丸，含服徐化；火候老了发苦，药力便钝三分。」"
+        },
+        {
+          "id": "teach-shuanghe",
+          "text": "「双和丹不稀奇，稀奇的是肯守炉。」她三味各拈一撮，在匾上摆成鼎足，「武火催香，缓火固形，少看一眼便前功尽弃。去炉子那边练手，别烧了我的匾。」"
+        },
+        {
+          "id": "farewell",
+          "text": "「炉子就在这渡口里，趁雾散前动手。」她低头继续翻匾，不再多言。"
+        },
         {
           "id": "r43-resolved-yunyin-herb-road",
           "text": "容素青拈了拈封蜡边的细末：「是陈艾受潮后的苦气，药性已散，不会伤人。若有人把它当毒香，倒会白白惊动药队。」"
+        },
+        {
+          "id": "r104-medicine-brief",
+          "text": "容素青拨开药簿：「三根先备在你自己包里，不是缴药。问我生肌散药方，再去药炉炼；寒珠草两份、苍崖根一份、工钱十八。姜百味在江南常卖药材。三档药都算，损耗后在背包里用，无可恢复的生命内力就莫糟蹋。用过再来，我核药案。」"
+        },
+        {
+          "id": "r104-medicine-echo",
+          "text": "容素青核完药案：「备料、守炉、用药，都走过了；剩下的根你留作路上急用。方子以金创血亏为主，中正与上乘兼续内力。此后缺药先查包与银两，再决定买成药还是重新守炉。」"
+        },
+        {
+          "id": "r104-medicine-legacy",
+          "text": "容素青点头：「从前清点的三根我记得，旧谢仪不再重付。新药炉实践没有记在你旧案里；愿意学方炼药、伤后试用仍可，别把旧清点当成已经炼过。」"
         }
       ]
     }

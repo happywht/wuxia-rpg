@@ -1,0 +1,11 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+
+ Test Files  78 passed (78)
+      Tests  555 passed (555)
+   Start at  04:18:09
+   Duration  121.57s (tests 94%, import 4%, transform 1%)
+
+    Isolate  78 workers spawned · ~208ms startup each (spawn + environment, per file)
+             at least ~7.89s faster with isolate: false — reuses workers across files instead of one per file

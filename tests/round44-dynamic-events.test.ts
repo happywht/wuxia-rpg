@@ -1,3 +1,4 @@
+import { baseRecipeIds } from './support/base-recipe-ids';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
@@ -131,6 +132,7 @@ describe('Round 44 scheduled ferry event and consequences', () => {
     const nodesParsed = parseKnowledgeNodeSet(readJson('../data/base/knowledge_graph/nodes.json'));
     const nodes = requireData<{ nodes: KnowledgeNodeData[] }>(nodesParsed, 'data');
     const assembly = assembleQuests({
+    recipeIds: baseRecipeIds,
       questSet,
       questGiverNpcIds: new Set(npcSet.npcs.filter((npc) => npc.questGiver).map((npc) => npc.id)),
       npcIds: new Set(allNpcs.map((npc) => npc.id)),

@@ -1,3 +1,4 @@
+import { baseRecipeIds } from './support/base-recipe-ids';
 /**
  * Round 98: 开局对白串联（江南—渡口）与大雍/大梁设定统一的回归测试。
  *
@@ -142,6 +143,7 @@ function loadRuntimeWorld(): RuntimeWorld {
   const knowledgeNodeIds = new Set(knowledgeNodes.keys());
 
   const questAssembly = assembleQuests({
+    recipeIds: baseRecipeIds,
     questSet: questResult.set,
     questGiverNpcIds: new Set(npcSet.filter((npc) => npc.questGiver).map((npc) => npc.id)),
     npcIds,

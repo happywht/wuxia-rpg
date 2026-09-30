@@ -1,3 +1,4 @@
+import { baseRecipeIds } from './support/base-recipe-ids';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
@@ -203,6 +204,7 @@ describe('Round 67 fourth playable region and expanded atlas', () => {
     const items = indexItems(itemSet.set).byId as Map<string, unknown>;
     const knowledge = new Set(graph.nodes.keys());
     const assembledQuests = assembleQuests({
+    recipeIds: baseRecipeIds,
       questSet: quests.set,
       questGiverNpcIds: new Set(npcSet.set.npcs.filter(({ questGiver }) => questGiver).map(({ id }) => id)),
       npcIds: new Set(npcSet.set.npcs.map(({ id }) => id)),

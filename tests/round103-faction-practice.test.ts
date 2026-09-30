@@ -1,3 +1,4 @@
+import { baseRecipeIds } from './support/base-recipe-ids';
 /**
  * Round 103: five-faction field practice — ordered objectives, mentor state
  * feedback, letter transcription, training advice, legacy-state compatibility,
@@ -67,6 +68,7 @@ function loadWorld() {
   const parsed = parseQuestSet(readJson('../data/base/quests/round-07-quests.json'));
   if (!parsed.ok) throw new Error(parsed.errors.join('\n'));
   const assembly = assembleQuests({
+    recipeIds: baseRecipeIds,
     questSet: parsed.set,
     questGiverNpcIds: new Set(allNpcIds),
     npcIds: new Set(allNpcIds),
@@ -572,6 +574,7 @@ function buildV1Quests() {
     delete quest.rewards.discoverKnowledgeNodeIds;
   }
   const assembly = assembleQuests({
+    recipeIds: baseRecipeIds,
     questSet: parsed.set,
     questGiverNpcIds: new Set(allNpcIds),
     npcIds: new Set(allNpcIds),

@@ -26,7 +26,8 @@ export type SpatialQuestObjectiveKind =
   | 'talkToNpc'
   | 'defeatEncounter'
   | 'discoverKnowledge'
-  | 'collectItem';
+  | 'collectItem'
+  | 'craftRecipe';
 
 /** One resolved, navigable quest objective target. */
 export interface QuestNavigationTarget {
@@ -87,6 +88,10 @@ export interface QuestNavigationInput {
   shopStocks?: ReadonlyMap<string, ShopStockRuntime>;
   /** Map the player currently walks; same-map sellers win seller selection. */
   currentMapResourceId?: string;
+  craftingStations?: readonly {
+    record: { id: string; name: string; mapResourceId: string; position: { col: number; row: number } };
+    recipes: readonly { id: string }[];
+  }[];
 }
 
 /** Builds the runtime-only selector stable across objective progression. */
@@ -99,6 +104,7 @@ export function questObjectiveArrivalAction(kind: SpatialQuestObjectiveKind): Na
   if (kind === 'talkToNpc') return 'talk';
   if (kind === 'defeatEncounter') return 'battle';
   if (kind === 'collectItem') return 'shop';
+  if (kind === 'craftRecipe') return 'craft';
   return 'discover';
 }
 
@@ -273,6 +279,20 @@ export function resolveQuestNavigationTarget(input: QuestNavigationInput): Quest
   }
 
   const id = questNavigationTargetId(quest.id);
+  if (objective.kind === 'useItem' || objective.kind === 'equipItem') {
+    return { status: 'no-target', reason: 'no-spatial-objective' };
+  }
+  if (objective.kind === 'craftRecipe') {
+    const station = input.craftingStations?.find(entry => entry.recipes.some(recipe => recipe.id === objective.targetId));
+    if (!station) return { status: 'no-target', reason: 'unresolved-target' };
+    return { status: 'target', target: {
+      id, questId: quest.id, objectiveId: objective.id, kind: objective.kind,
+      name: station.record.name, objectiveText: objective.text,
+      mapResourceId: station.record.mapResourceId,
+      col: station.record.position.col, row: station.record.position.row,
+      approachRadius: 1, arrivalAction: 'craft',
+    } };
+  }
   if (objective.kind === 'collectItem') {
     const current = state.objectiveCounts.get(objective.id) ?? 0;
     const seller = resolveCollectSeller(input, objective.targetId, objective.requiredCount - current);
