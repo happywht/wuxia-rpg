@@ -1,0 +1,4 @@
+import {mkdtempSync,cpSync,readFileSync,writeFileSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';import {join,resolve,sep} from 'node:path';import {execFileSync} from 'node:child_process';import assert from 'node:assert/strict';
+const root=resolve(mkdtempSync(join(tmpdir(),'wuxia-r107-history-')));assert(root.startsWith(resolve(tmpdir())+sep));
+try{cpSync('data',join(root,'data'),{recursive:true});cpSync('scripts',join(root,'scripts'),{recursive:true});const battle=readFileSync('data/base/battles/round-05-encounters.json','utf8');for(let i=0;i<2;i++)execFileSync(process.execPath,[join(root,'scripts/deepen-round101-north.mjs')],{cwd:root});assert.equal(readFileSync(join(root,'data/base/battles/round-05-encounters.json'),'utf8'),battle);console.log('PASS: R101 historical generator twice preserves R107 battle output in isolated verified workspace.');}finally{assert(root.startsWith(resolve(tmpdir())+sep));rmSync(root,{recursive:true,force:true});}

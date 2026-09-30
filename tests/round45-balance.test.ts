@@ -92,6 +92,15 @@ describe('Round 45 combat and reward balance', () => {
     expect(session.finalResult?.outcome).toBe('victory');
     expect(session.finalResult?.experienceGained).toBe(encounter!.victoryExperience);
     expect(turns).toBe(5);
-    expect(player.health).toEqual({ current: 29, max: 101 });
+    // R107's visible feint/heavy/breath cycle gives the opening one respite.
+    expect(player.health).toEqual({ current: 53, max: 101 });
+    const legacyEncounter = structuredClone(encounter!);
+    delete legacyEncounter.enemy.behavior;
+    const legacyPlayer = createCharacterState(profile);
+    const legacySession = new CombatSession({ encounter: legacyEncounter, profile, player: legacyPlayer,
+      martialArts: new Map(arts.set.martialArts.map((art) => [art.id, art])) });
+    for (let turn = 0; turn < 20 && !legacySession.isOver; turn++) legacySession.playerUse('skill.jianghu-sanshou');
+    expect(legacySession.finalResult?.outcome).toBe('victory');
+    expect(legacyPlayer.health).toEqual({ current: 29, max: 101 });
   });
 });

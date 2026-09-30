@@ -354,7 +354,8 @@ export class BattlePanel {
     top: number,
     contentWidth: number,
   ): number {
-    const candidates = session.log.slice(-6);
+    const candidates = session.enemyIntent === null ? session.log.slice(-6) :
+      [...session.log.slice(-5), { kind: 'enemy-intent', text: `敌方下一步：${session.enemyIntent}` }];
     const measured: { text: Phaser.GameObjects.Text; height: number }[] = [];
 
     // Measure from the newest entry backwards, then keep the newest prefix

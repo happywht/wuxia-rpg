@@ -67,3 +67,7 @@ npm run package:release
 ## Round 106 更新
 
 world-map可省略regionGuides；每条mapResourceId/role(hub/investigation/challenge/transit)/advice(≤240字)闭合Schema，结构失败拒绝该资料，重复/坏地图引用隔离单条指南。R目录从实际NPC、有效商店、库存、任务与关口导出，MOD不必手抄坐标；不推断隐藏地标。
+
+## Round 107 可选敌方循环
+
+覆盖既有battle资源时可添加enemy.behavior，规则见DATA-GUIDE.md；省略保持旧AI。必须把artId也放入该enemy.martialArtIds，武学须实际存在，cue不能代替真实效果。powerBonus仅attack有效；guardDisruptsBonus:true需正bonus，使现有守御先卸额外蓄势。数据结构失败拒绝资源，装配坏引用隔离遭遇；调用validate:data后仍需实际测试内力不足回退与战斗预告。不增加存档版本或持久化战斗中间状态。

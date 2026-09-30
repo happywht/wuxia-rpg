@@ -1,0 +1,733 @@
+{
+  "scope": "Actual headless transactions and CombatSession, not keyboard travel. Starting 120 silver; excludes achievement income. Three repeatable market bouts supply XP; healing purchases are paid.",
+  "rows": [
+    {
+      "action": "new-game",
+      "silver": 120,
+      "level": 1,
+      "experience": 0,
+      "health": 83,
+      "qi": 53
+    },
+    {
+      "action": "buy:item.huichun-gao",
+      "silver": 105,
+      "level": 1,
+      "experience": 0,
+      "health": 83,
+      "qi": 53,
+      "details": {
+        "quantity": 1
+      }
+    },
+    {
+      "action": "quest-reward:quest.round-07-medicine-run",
+      "silver": 123,
+      "level": 1,
+      "experience": 15,
+      "health": 83,
+      "qi": 53,
+      "details": {
+        "questId": "quest.round-07-medicine-run",
+        "experience": 15,
+        "currency": 18
+      }
+    },
+    {
+      "action": "quest-reward:quest.r31-peddler-errand",
+      "silver": 143,
+      "level": 1,
+      "experience": 27,
+      "health": 83,
+      "qi": 53,
+      "details": {
+        "questId": "quest.r31-peddler-errand",
+        "experience": 12,
+        "currency": 20
+      }
+    },
+    {
+      "action": "quest-reward:quest.r31-roadside-note",
+      "silver": 153,
+      "level": 2,
+      "experience": 41,
+      "health": 101,
+      "qi": 64,
+      "details": {
+        "questId": "quest.r31-roadside-note",
+        "experience": 14,
+        "currency": 10
+      }
+    },
+    {
+      "action": "quest-reward:quest.r31-herbal-inquiry",
+      "silver": 165,
+      "level": 2,
+      "experience": 61,
+      "health": 101,
+      "qi": 64,
+      "details": {
+        "questId": "quest.r31-herbal-inquiry",
+        "experience": 20,
+        "currency": 12
+      }
+    },
+    {
+      "action": "quest-reward:quest.r31-ferry-ledger",
+      "silver": 183,
+      "level": 2,
+      "experience": 81,
+      "health": 101,
+      "qi": 64,
+      "details": {
+        "questId": "quest.r31-ferry-ledger",
+        "experience": 20,
+        "currency": 18
+      }
+    },
+    {
+      "action": "battle:encounter.alley-blade-bully",
+      "silver": 183,
+      "level": 3,
+      "experience": 121,
+      "health": 71,
+      "qi": 75,
+      "details": {
+        "outcome": "victory",
+        "actions": [
+          "skill.jianghu-sanshou",
+          "skill.jianghu-sanshou",
+          "skill.jianghu-sanshou",
+          "skill.jianghu-sanshou",
+          "skill.jianghu-sanshou"
+        ],
+        "log": [
+          {
+            "kind": "intro",
+            "text": "疤脸刀客把刀往肩上一扛：「此路是我开！识相的留下钱粮！」"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对疤脸刀客造成 14 点伤害"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "疤脸刀客使出「江湖散手」，对抄书学徒造成 12 点伤害"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对疤脸刀客造成 14 点伤害"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "疤脸刀客使出「拦门刀法」，对抄书学徒造成 24 点伤害"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对疤脸刀客造成 14 点伤害"
+          },
+          {
+            "kind": "enemy-idle",
+            "text": "疤脸刀客收势调息，恢复 4 点内力"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对疤脸刀客造成 14 点伤害"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "疤脸刀客使出「江湖散手」，对抄书学徒造成 12 点伤害"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对疤脸刀客造成 14 点伤害"
+          },
+          {
+            "kind": "victory",
+            "text": "刀客捂着臂上的伤口连退几步，撂下一句「走着瞧」，翻身没入暗巷。"
+          }
+        ]
+      }
+    },
+    {
+      "action": "quest-reward:quest.round-07-clear-alley",
+      "silver": 208,
+      "level": 3,
+      "experience": 151,
+      "health": 71,
+      "qi": 75,
+      "details": {
+        "questId": "quest.round-07-clear-alley",
+        "experience": 30,
+        "currency": 25
+      }
+    },
+    {
+      "action": "use:item.huichun-gao",
+      "silver": 208,
+      "level": 3,
+      "experience": 151,
+      "health": 96,
+      "qi": 75
+    },
+    {
+      "action": "battle:encounter.r58-market-toll-claimer",
+      "silver": 208,
+      "level": 4,
+      "experience": 195,
+      "health": 84,
+      "qi": 86,
+      "details": {
+        "outcome": "victory",
+        "actions": [
+          "skill.jianghu-sanshou",
+          "skill.jianghu-sanshou",
+          "skill.jianghu-sanshou",
+          "skill.jianghu-sanshou",
+          "skill.jianghu-sanshou"
+        ],
+        "log": [
+          {
+            "kind": "intro",
+            "text": "那人把刀横在摊棚边：「芦桥集的老规矩，先交过集钱，再谈开市。」"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对旧例管事造成 16 点伤害"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "旧例管事使出「顺汛换步」，摆出守势（下次受击至多减伤 9 点）"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对旧例管事造成 7 点伤害（守御抵挡 9 点）"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "旧例管事使出「拦门刀法」，对抄书学徒造成 30 点伤害"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对旧例管事造成 16 点伤害"
+          },
+          {
+            "kind": "enemy-idle",
+            "text": "旧例管事收势调息，恢复 7 点内力"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对旧例管事造成 16 点伤害"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "旧例管事使出「顺汛换步」，摆出守势（下次受击至多减伤 9 点）"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对旧例管事造成 7 点伤害（守御抵挡 9 点）"
+          },
+          {
+            "kind": "victory",
+            "text": "旧例管事捂腕退开，挑担的商贩趁势把摊棚重新撑起。"
+          }
+        ]
+      }
+    },
+    {
+      "action": "use:item.huichun-gao",
+      "silver": 208,
+      "level": 4,
+      "experience": 195,
+      "health": 109,
+      "qi": 86
+    },
+    {
+      "action": "use:item.huichun-gao",
+      "silver": 208,
+      "level": 4,
+      "experience": 195,
+      "health": 134,
+      "qi": 86
+    },
+    {
+      "action": "battle:encounter.r58-market-toll-claimer",
+      "silver": 208,
+      "level": 4,
+      "experience": 239,
+      "health": 105,
+      "qi": 86,
+      "details": {
+        "outcome": "victory",
+        "actions": [
+          "skill.jianghu-sanshou",
+          "skill.jianghu-sanshou",
+          "skill.jianghu-sanshou",
+          "skill.jianghu-sanshou"
+        ],
+        "log": [
+          {
+            "kind": "intro",
+            "text": "那人把刀横在摊棚边：「芦桥集的老规矩，先交过集钱，再谈开市。」"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对旧例管事造成 18 点伤害"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "旧例管事使出「顺汛换步」，摆出守势（下次受击至多减伤 9 点）"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对旧例管事造成 9 点伤害（守御抵挡 9 点）"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "旧例管事使出「拦门刀法」，对抄书学徒造成 29 点伤害"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对旧例管事造成 18 点伤害"
+          },
+          {
+            "kind": "enemy-idle",
+            "text": "旧例管事收势调息，恢复 7 点内力"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对旧例管事造成 18 点伤害"
+          },
+          {
+            "kind": "victory",
+            "text": "旧例管事捂腕退开，挑担的商贩趁势把摊棚重新撑起。"
+          }
+        ]
+      }
+    },
+    {
+      "action": "buy:item.huichun-gao",
+      "silver": 193,
+      "level": 4,
+      "experience": 239,
+      "health": 105,
+      "qi": 86,
+      "details": {
+        "quantity": 1
+      }
+    },
+    {
+      "action": "use:item.huichun-gao",
+      "silver": 193,
+      "level": 4,
+      "experience": 239,
+      "health": 130,
+      "qi": 86
+    },
+    {
+      "action": "battle:encounter.r58-market-toll-claimer",
+      "silver": 193,
+      "level": 5,
+      "experience": 283,
+      "health": 119,
+      "qi": 97,
+      "details": {
+        "outcome": "victory",
+        "actions": [
+          "skill.jianghu-sanshou",
+          "skill.jianghu-sanshou",
+          "skill.jianghu-sanshou",
+          "skill.jianghu-sanshou"
+        ],
+        "log": [
+          {
+            "kind": "intro",
+            "text": "那人把刀横在摊棚边：「芦桥集的老规矩，先交过集钱，再谈开市。」"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对旧例管事造成 18 点伤害"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "旧例管事使出「顺汛换步」，摆出守势（下次受击至多减伤 9 点）"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对旧例管事造成 9 点伤害（守御抵挡 9 点）"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "旧例管事使出「拦门刀法」，对抄书学徒造成 29 点伤害"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对旧例管事造成 18 点伤害"
+          },
+          {
+            "kind": "enemy-idle",
+            "text": "旧例管事收势调息，恢复 7 点内力"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对旧例管事造成 18 点伤害"
+          },
+          {
+            "kind": "victory",
+            "text": "旧例管事捂腕退开，挑担的商贩趁势把摊棚重新撑起。"
+          }
+        ]
+      }
+    },
+    {
+      "action": "buy:item.huichun-gao",
+      "silver": 178,
+      "level": 5,
+      "experience": 283,
+      "health": 119,
+      "qi": 97,
+      "details": {
+        "quantity": 1
+      }
+    },
+    {
+      "action": "use:item.huichun-gao",
+      "silver": 178,
+      "level": 5,
+      "experience": 283,
+      "health": 144,
+      "qi": 97
+    },
+    {
+      "action": "dialogue:joinFaction",
+      "silver": 178,
+      "level": 5,
+      "experience": 283,
+      "health": 144,
+      "qi": 97
+    },
+    {
+      "action": "dialogue:learnMartialArt",
+      "silver": 178,
+      "level": 5,
+      "experience": 283,
+      "health": 144,
+      "qi": 97,
+      "details": "skill.r32-yunyin-buyun-lu"
+    },
+    {
+      "action": "dialogue:learnMartialArt",
+      "silver": 178,
+      "level": 5,
+      "experience": 283,
+      "health": 144,
+      "qi": 97,
+      "details": "skill.r32-yunyin-caomu-xinfa"
+    },
+    {
+      "action": "buy:item.fanbu-duanhe",
+      "silver": 138,
+      "level": 5,
+      "experience": 283,
+      "health": 144,
+      "qi": 97,
+      "details": {
+        "quantity": 1
+      }
+    },
+    {
+      "action": "equip:item.fanbu-duanhe",
+      "silver": 138,
+      "level": 5,
+      "experience": 283,
+      "health": 144,
+      "qi": 97
+    },
+    {
+      "action": "unlock:meridian.qihai",
+      "silver": 138,
+      "level": 5,
+      "experience": 283,
+      "health": 144,
+      "qi": 97
+    },
+    {
+      "action": "buy:item.huichun-gao",
+      "silver": 123,
+      "level": 5,
+      "experience": 283,
+      "health": 144,
+      "qi": 97,
+      "details": {
+        "quantity": 1
+      }
+    },
+    {
+      "action": "unlock:meridian.zuyang",
+      "silver": 123,
+      "level": 5,
+      "experience": 283,
+      "health": 144,
+      "qi": 97
+    },
+    {
+      "action": "custom-heal",
+      "silver": 77,
+      "level": 5,
+      "experience": 283,
+      "health": 144,
+      "qi": 97,
+      "details": {
+        "kind": "heal",
+        "power": 10,
+        "qiCost": 2
+      }
+    },
+    {
+      "action": "buy:item.huichun-gao",
+      "silver": 62,
+      "level": 5,
+      "experience": 283,
+      "health": 144,
+      "qi": 97,
+      "details": {
+        "quantity": 1
+      }
+    },
+    {
+      "action": "use:item.huichun-gao",
+      "silver": 62,
+      "level": 5,
+      "experience": 283,
+      "health": 169,
+      "qi": 97
+    },
+    {
+      "action": "battle:encounter.r58-market-toll-claimer",
+      "silver": 62,
+      "level": 5,
+      "experience": 327,
+      "health": 162,
+      "qi": 94,
+      "details": {
+        "outcome": "victory",
+        "actions": [
+          "skill.jianghu-sanshou",
+          "skill.r32-yunyin-buyun-lu",
+          "skill.jianghu-sanshou",
+          "skill.jianghu-sanshou",
+          "skill.jianghu-sanshou"
+        ],
+        "log": [
+          {
+            "kind": "intro",
+            "text": "那人把刀横在摊棚边：「芦桥集的老规矩，先交过集钱，再谈开市。」"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对旧例管事造成 20 点伤害"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "旧例管事使出「顺汛换步」，摆出守势（下次受击至多减伤 9 点）"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「步云履」，摆出守势（下次受击至多减伤 9 点）"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "旧例管事使出「拦门刀法」，对抄书学徒造成 7 点伤害（守御抵挡 9 点，蓄势已卸去）"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对旧例管事造成 11 点伤害（守御抵挡 9 点）"
+          },
+          {
+            "kind": "enemy-idle",
+            "text": "旧例管事收势调息，恢复 7 点内力"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对旧例管事造成 20 点伤害"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "旧例管事使出「顺汛换步」，摆出守势（下次受击至多减伤 9 点）"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对旧例管事造成 11 点伤害（守御抵挡 9 点）"
+          },
+          {
+            "kind": "victory",
+            "text": "旧例管事捂腕退开，挑担的商贩趁势把摊棚重新撑起。"
+          }
+        ]
+      }
+    },
+    {
+      "action": "battle:encounter.r101-beacon-raider",
+      "silver": 62,
+      "level": 5,
+      "experience": 375,
+      "health": 138,
+      "qi": 72,
+      "details": {
+        "outcome": "victory",
+        "actions": [
+          "skill.r32-yunyin-buyun-lu",
+          "skill.jianghu-sanshou",
+          "skill.jianghu-sanshou",
+          "skill.r32-yunyin-buyun-lu",
+          "skill.jianghu-sanshou",
+          "skill.r32-yunyin-buyun-lu",
+          "skill.jianghu-sanshou",
+          "skill.jianghu-sanshou",
+          "skill.r32-yunyin-buyun-lu",
+          "custom-art.1",
+          "skill.r32-yunyin-buyun-lu",
+          "custom-art.1",
+          "skill.jianghu-sanshou",
+          "skill.r32-yunyin-buyun-lu",
+          "skill.jianghu-sanshou",
+          "skill.jianghu-sanshou"
+        ],
+        "log": [
+          {
+            "kind": "intro",
+            "text": "头目举着学来的三烽牌：「谁分得清真火假火？留下过路药，才肯让你报信。」"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「步云履」，摆出守势（下次受击至多减伤 9 点）"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "冒号索路头目使出「铁嶂桩功」，对抄书学徒造成 14 点伤害（守御抵挡 9 点，蓄势已卸去）"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对冒号索路头目造成 19 点伤害"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "冒号索路头目运起「吐纳养气诀」，恢复 16 点生命"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对冒号索路头目造成 19 点伤害"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "冒号索路头目使出「步云履」，摆出守势（下次受击至多减伤 9 点）"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「步云履」，摆出守势（下次受击至多减伤 9 点）"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "冒号索路头目使出「江湖散手」，对抄书学徒造成 4 点伤害（守御抵挡 9 点）"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对冒号索路头目造成 10 点伤害（守御抵挡 9 点）"
+          },
+          {
+            "kind": "enemy-idle",
+            "text": "冒号索路头目收势调息，恢复 16 点内力"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「步云履」，摆出守势（下次受击至多减伤 9 点）"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "冒号索路头目使出「铁嶂桩功」，对抄书学徒造成 14 点伤害（守御抵挡 9 点，蓄势已卸去）"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对冒号索路头目造成 19 点伤害"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "冒号索路头目运起「吐纳养气诀」，恢复 16 点生命"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对冒号索路头目造成 19 点伤害"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "冒号索路头目使出「步云履」，摆出守势（下次受击至多减伤 9 点）"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「步云履」，摆出守势（下次受击至多减伤 9 点）"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "冒号索路头目使出「江湖散手」，对抄书学徒造成 4 点伤害（守御抵挡 9 点）"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒运起「循息回春」，恢复 15 点生命"
+          },
+          {
+            "kind": "enemy-idle",
+            "text": "冒号索路头目收势调息，恢复 16 点内力"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「步云履」，摆出守势（下次受击至多减伤 9 点）"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "冒号索路头目使出「铁嶂桩功」，对抄书学徒造成 14 点伤害（守御抵挡 9 点，蓄势已卸去）"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒运起「循息回春」，恢复 15 点生命"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "冒号索路头目运起「吐纳养气诀」，恢复 16 点生命"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对冒号索路头目造成 10 点伤害（守御抵挡 9 点）"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "冒号索路头目使出「步云履」，摆出守势（下次受击至多减伤 9 点）"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「步云履」，摆出守势（下次受击至多减伤 9 点）"
+          },
+          {
+            "kind": "enemy-action",
+            "text": "冒号索路头目使出「江湖散手」，对抄书学徒造成 4 点伤害（守御抵挡 9 点）"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对冒号索路头目造成 10 点伤害（守御抵挡 9 点）"
+          },
+          {
+            "kind": "enemy-idle",
+            "text": "冒号索路头目收势调息，恢复 16 点内力"
+          },
+          {
+            "kind": "player-action",
+            "text": "抄书学徒使出「江湖散手」，对冒号索路头目造成 19 点伤害"
+          },
+          {
+            "kind": "victory",
+            "text": "冒号客丢下假牌逃走，燧台附近不再被这伙人借号索钱。"
+          }
+        ]
+      }
+    }
+  ]
+}

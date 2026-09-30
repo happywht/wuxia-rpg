@@ -1,0 +1,161 @@
+{
+  "scope": "Same prepared state, headless real CombatSession; both strategies remain viable, observing cues trades qi/turns for health.",
+  "plain": {
+    "health": 115,
+    "qi": 97,
+    "log": [
+      {
+        "kind": "intro",
+        "text": "头目举着学来的三烽牌：「谁分得清真火假火？留下过路药，才肯让你报信。」"
+      },
+      {
+        "kind": "player-action",
+        "text": "抄书学徒使出「江湖散手」，对冒号索路头目造成 19 点伤害"
+      },
+      {
+        "kind": "enemy-action",
+        "text": "冒号索路头目使出「铁嶂桩功」，对抄书学徒造成 41 点伤害"
+      },
+      {
+        "kind": "player-action",
+        "text": "抄书学徒使出「江湖散手」，对冒号索路头目造成 19 点伤害"
+      },
+      {
+        "kind": "enemy-action",
+        "text": "冒号索路头目运起「吐纳养气诀」，恢复 16 点生命"
+      },
+      {
+        "kind": "player-action",
+        "text": "抄书学徒使出「江湖散手」，对冒号索路头目造成 19 点伤害"
+      },
+      {
+        "kind": "enemy-action",
+        "text": "冒号索路头目使出「步云履」，摆出守势（下次受击至多减伤 9 点）"
+      },
+      {
+        "kind": "player-action",
+        "text": "抄书学徒使出「江湖散手」，对冒号索路头目造成 10 点伤害（守御抵挡 9 点）"
+      },
+      {
+        "kind": "enemy-action",
+        "text": "冒号索路头目使出「江湖散手」，对抄书学徒造成 13 点伤害"
+      },
+      {
+        "kind": "player-action",
+        "text": "抄书学徒使出「江湖散手」，对冒号索路头目造成 19 点伤害"
+      },
+      {
+        "kind": "enemy-idle",
+        "text": "冒号索路头目收势调息，恢复 16 点内力"
+      },
+      {
+        "kind": "player-action",
+        "text": "抄书学徒使出「江湖散手」，对冒号索路头目造成 19 点伤害"
+      },
+      {
+        "kind": "victory",
+        "text": "冒号客丢下假牌逃走，燧台附近不再被这伙人借号索钱。"
+      }
+    ]
+  },
+  "planned": {
+    "action": "battle:encounter.r101-beacon-raider",
+    "silver": 62,
+    "level": 5,
+    "experience": 331,
+    "health": 128,
+    "qi": 91,
+    "details": {
+      "outcome": "victory",
+      "actions": [
+        "skill.r32-yunyin-buyun-lu",
+        "skill.jianghu-sanshou",
+        "skill.jianghu-sanshou",
+        "skill.jianghu-sanshou",
+        "skill.jianghu-sanshou",
+        "skill.r32-yunyin-buyun-lu",
+        "skill.jianghu-sanshou",
+        "skill.jianghu-sanshou",
+        "skill.jianghu-sanshou"
+      ],
+      "log": [
+        {
+          "kind": "intro",
+          "text": "头目举着学来的三烽牌：「谁分得清真火假火？留下过路药，才肯让你报信。」"
+        },
+        {
+          "kind": "player-action",
+          "text": "抄书学徒使出「步云履」，摆出守势（下次受击至多减伤 9 点）"
+        },
+        {
+          "kind": "enemy-action",
+          "text": "冒号索路头目使出「铁嶂桩功」，对抄书学徒造成 14 点伤害（守御抵挡 9 点，蓄势已卸去）"
+        },
+        {
+          "kind": "player-action",
+          "text": "抄书学徒使出「江湖散手」，对冒号索路头目造成 19 点伤害"
+        },
+        {
+          "kind": "enemy-action",
+          "text": "冒号索路头目运起「吐纳养气诀」，恢复 16 点生命"
+        },
+        {
+          "kind": "player-action",
+          "text": "抄书学徒使出「江湖散手」，对冒号索路头目造成 19 点伤害"
+        },
+        {
+          "kind": "enemy-action",
+          "text": "冒号索路头目使出「步云履」，摆出守势（下次受击至多减伤 9 点）"
+        },
+        {
+          "kind": "player-action",
+          "text": "抄书学徒使出「江湖散手」，对冒号索路头目造成 10 点伤害（守御抵挡 9 点）"
+        },
+        {
+          "kind": "enemy-action",
+          "text": "冒号索路头目使出「江湖散手」，对抄书学徒造成 13 点伤害"
+        },
+        {
+          "kind": "player-action",
+          "text": "抄书学徒使出「江湖散手」，对冒号索路头目造成 19 点伤害"
+        },
+        {
+          "kind": "enemy-idle",
+          "text": "冒号索路头目收势调息，恢复 16 点内力"
+        },
+        {
+          "kind": "player-action",
+          "text": "抄书学徒使出「步云履」，摆出守势（下次受击至多减伤 9 点）"
+        },
+        {
+          "kind": "enemy-action",
+          "text": "冒号索路头目使出「铁嶂桩功」，对抄书学徒造成 14 点伤害（守御抵挡 9 点，蓄势已卸去）"
+        },
+        {
+          "kind": "player-action",
+          "text": "抄书学徒使出「江湖散手」，对冒号索路头目造成 19 点伤害"
+        },
+        {
+          "kind": "enemy-action",
+          "text": "冒号索路头目运起「吐纳养气诀」，恢复 16 点生命"
+        },
+        {
+          "kind": "player-action",
+          "text": "抄书学徒使出「江湖散手」，对冒号索路头目造成 19 点伤害"
+        },
+        {
+          "kind": "enemy-action",
+          "text": "冒号索路头目使出「步云履」，摆出守势（下次受击至多减伤 9 点）"
+        },
+        {
+          "kind": "player-action",
+          "text": "抄书学徒使出「江湖散手」，对冒号索路头目造成 10 点伤害（守御抵挡 9 点）"
+        },
+        {
+          "kind": "victory",
+          "text": "冒号客丢下假牌逃走，燧台附近不再被这伙人借号索钱。"
+        }
+      ]
+    }
+  }
+}

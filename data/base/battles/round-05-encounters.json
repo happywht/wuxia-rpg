@@ -4,7 +4,10 @@
       "id": "encounter.alley-blade-bully",
       "name": "巷口拦路刀客",
       "mapResourceId": "map.round-01-grid",
-      "position": { "col": 55, "row": 44 },
+      "position": {
+        "col": 55,
+        "row": 44
+      },
       "profileId": "char.scribe-apprentice",
       "knowledgeNodeId": "char.alley-blade",
       "enemy": {
@@ -18,10 +21,35 @@
         },
         "health": 60,
         "qi": 16,
-        "martialArtIds": ["skill.lanmen-daofa", "skill.jianghu-sanshou"]
+        "martialArtIds": [
+          "skill.lanmen-daofa",
+          "skill.jianghu-sanshou"
+        ],
+        "behavior": [
+          {
+            "kind": "art",
+            "artId": "skill.jianghu-sanshou",
+            "cue": "刀客虚晃探手，先试距离"
+          },
+          {
+            "kind": "art",
+            "artId": "skill.lanmen-daofa",
+            "powerBonus": 6,
+            "guardDisruptsBonus": true,
+            "cue": "刀客举刀压肩，下一击较重"
+          },
+          {
+            "kind": "recoverQi",
+            "amount": 4,
+            "cue": "刀客退半步换气，留出空隙"
+          }
+        ]
       },
       "victoryExperience": 40,
-      "defeatRecovery": { "healthRatio": 0.6, "qiRatio": 0.6 },
+      "defeatRecovery": {
+        "healthRatio": 0.6,
+        "qiRatio": 0.6
+      },
       "repeatable": false,
       "texts": {
         "approach": "疤脸刀客横在巷口，按 E 迎战",
@@ -125,17 +153,52 @@
       "id": "encounter.r58-market-toll-claimer",
       "name": "芦桥旧例索钱人",
       "mapResourceId": "map.round-10-mist-ferry",
-      "position": { "col": 60, "row": 67 },
+      "position": {
+        "col": 60,
+        "row": 67
+      },
       "profileId": "char.scribe-apprentice",
       "enemy": {
         "name": "旧例管事",
-        "attributes": { "body": 8, "force": 8, "agility": 6, "insight": 5, "resolve": 5 },
+        "attributes": {
+          "body": 8,
+          "force": 8,
+          "agility": 6,
+          "insight": 5,
+          "resolve": 5
+        },
         "health": 56,
         "qi": 12,
-        "martialArtIds": ["skill.lanmen-daofa", "skill.jianghu-sanshou"]
+        "martialArtIds": [
+          "skill.lanmen-daofa",
+          "skill.jianghu-sanshou",
+          "skill.r32-panzhou-shunxun-bu"
+        ],
+        "behavior": [
+          {
+            "kind": "art",
+            "artId": "skill.r32-panzhou-shunxun-bu",
+            "cue": "管事侧身收刀，先护住中路"
+          },
+          {
+            "kind": "art",
+            "artId": "skill.lanmen-daofa",
+            "powerBonus": 12,
+            "guardDisruptsBonus": true,
+            "cue": "管事举刀压棚，重砍将至"
+          },
+          {
+            "kind": "recoverQi",
+            "amount": 7,
+            "cue": "管事横刀喘息，这一拍不追击"
+          }
+        ]
       },
       "victoryExperience": 44,
-      "defeatRecovery": { "healthRatio": 0.6, "qiRatio": 0.6 },
+      "defeatRecovery": {
+        "healthRatio": 0.6,
+        "qiRatio": 0.6
+      },
       "repeatable": true,
       "texts": {
         "approach": "芦桥集口有人堵路，旧例管事按 E 盘问",
@@ -287,7 +350,40 @@
         "qi": 20,
         "martialArtIds": [
           "skill.jianghu-sanshou",
-          "skill.tiezhang-zhuanggong"
+          "skill.tiezhang-zhuanggong",
+          "skill.r32-yunyin-buyun-lu",
+          "skill.tuna-yangqi-jue"
+        ],
+        "behavior": [
+          {
+            "kind": "art",
+            "artId": "skill.tiezhang-zhuanggong",
+            "powerBonus": 18,
+            "guardDisruptsBonus": true,
+            "cue": "头目踏雪沉肩，将借桩劲重砸"
+          },
+          {
+            "kind": "art",
+            "artId": "skill.tuna-yangqi-jue",
+            "cue": "头目捂伤调养，暂不出拳"
+          },
+          {
+            "kind": "art",
+            "artId": "skill.r32-yunyin-buyun-lu",
+            "cue": "头目缩身移步，护住受伤一侧"
+          },
+          {
+            "kind": "art",
+            "artId": "skill.tiezhang-zhuanggong",
+            "powerBonus": 18,
+            "guardDisruptsBonus": true,
+            "cue": "头目再度沉肩，将重砸来路"
+          },
+          {
+            "kind": "recoverQi",
+            "amount": 16,
+            "cue": "头目退到雪垛调息，留出反击窗口"
+          }
         ]
       },
       "victoryExperience": 48,

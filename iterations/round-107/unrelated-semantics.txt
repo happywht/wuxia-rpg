@@ -1,0 +1,2 @@
+warning: in the working copy of 'data/base/battles/round-05-encounters.json', LF will be replaced by CRLF the next time Git touches it
+PASS: only three behavior cycles/declared enemy arts and six preparation nodes/options changed. All old stats, locations, rewards, dialogue conditions/effects and other base data preserved.

@@ -54,6 +54,32 @@ export interface EncounterEnemyData {
   /** Maximum qi; the enemy starts at full qi. */
   qi: number;
   martialArtIds: string[];
+  /** Optional visible deterministic cycle; absent retains the legacy AI. */
+  behavior?: EnemyBehaviorStep[];
+}
+
+export type EnemyBehaviorStep =
+  | { kind: 'art'; artId: string; cue: string; powerBonus?: number; guardDisruptsBonus?: boolean }
+  | { kind: 'recoverQi'; amount: number; cue: string };
+
+export function parseEnemyBehavior(raw: unknown): EnemyBehaviorStep[] | null {
+  if (!Array.isArray(raw) || raw.length < 1 || raw.length > 12) return null;
+  const steps: EnemyBehaviorStep[] = [];
+  for (const value of raw) {
+    if (!isPlainObject(value) || typeof value.cue !== 'string' || !value.cue.trim() || value.cue.length > 80) return null;
+    if (value.kind === 'art') {
+      if (Object.keys(value).some(key => !['kind', 'artId', 'cue', 'powerBonus', 'guardDisruptsBonus'].includes(key)) || !requireNonEmptyString(value.artId) ||
+          (value.guardDisruptsBonus !== undefined && typeof value.guardDisruptsBonus !== 'boolean') ||
+          (value.powerBonus !== undefined && requireIntegerInRange(value.powerBonus, 0, 30) === null)) return null;
+      steps.push({ kind: 'art', artId: value.artId as string, cue: value.cue,
+        ...(value.powerBonus !== undefined ? { powerBonus: value.powerBonus as number } : {}),
+        ...(value.guardDisruptsBonus !== undefined ? { guardDisruptsBonus: value.guardDisruptsBonus as boolean } : {}) });
+    } else if (value.kind === 'recoverQi') {
+      if (Object.keys(value).some(key => !['kind', 'amount', 'cue'].includes(key)) || requireIntegerInRange(value.amount, 1, 9999) === null) return null;
+      steps.push({ kind: 'recoverQi', amount: value.amount as number, cue: value.cue });
+    } else return null;
+  }
+  return steps;
 }
 
 /** Wire format of one encounter inside a battle-encounters JSON file. */
@@ -148,6 +174,8 @@ function parseEnemy(raw: unknown, label: string): { enemy: EncounterEnemyData | 
   const health = requireIntegerInRange(raw.health, 1, 9999);
   const qi = requireIntegerInRange(raw.qi, 0, 9999);
   const martialArtIds = requireIdList(raw.martialArtIds);
+  const behavior = raw.behavior === undefined ? undefined : parseEnemyBehavior(raw.behavior);
+  if (behavior === null) problems.push(`${label}.behavior：应为1–12条有效的武学/回气循环`);
 
   const attributesSource = isPlainObject(raw.attributes) ? raw.attributes : null;
   const attributes = {} as AttributeMap;
@@ -185,11 +213,11 @@ function parseEnemy(raw: unknown, label: string): { enemy: EncounterEnemyData | 
     health === null ||
     qi === null ||
     martialArtIds === null ||
-    martialArtIds.length === 0
+    martialArtIds.length === 0 || behavior === null
   ) {
     return { enemy: null, problems };
   }
-  return { enemy: { name, attributes, health, qi, martialArtIds }, problems };
+  return { enemy: { name, attributes, health, qi, martialArtIds, ...(behavior ? { behavior } : {}) }, problems };
 }
 
 /** Reads one encounter's five prompt lines. */
@@ -477,6 +505,13 @@ export function assembleBattleEncounters(
     if (enemyArts.length === 0) {
       problems.push('敌人没有任何可用的有效武学');
     }
+    for (const step of record.enemy.behavior ?? []) {
+      if (step.kind !== 'art') continue;
+      const art = enemyArts.find(candidate => candidate.id === step.artId);
+      if (!art) problems.push(`行为引用武学 "${step.artId}" 不在敌方武学列表中`);
+      else if ((step.powerBonus ?? 0) > 0 && art.combat.kind !== 'attack') problems.push('行为额外威力只支持攻击武学');
+      else if (step.guardDisruptsBonus && (art.combat.kind !== 'attack' || (step.powerBonus ?? 0) <= 0)) problems.push('可卸蓄势要求攻击及正额外威力');
+    }
 
     seenIds.add(record.id);
     if (problems.length > 0) {
@@ -647,6 +682,7 @@ export class CombatSession {
   private successfulPlayerActions = 0;
   private playerGuardPower = 0;
   private enemyGuardPower = 0;
+  private enemyStepIndex = 0;
 
   private readonly enemy: CombatantView & { attributes: AttributeMap; arts: MartialArtData[] };
 
@@ -726,12 +762,40 @@ export class CombatSession {
     }));
   }
 
+  /** Preview and execution use the same resolver; reads do not advance AI. */
+  private resolveEnemyAction(): { art: MartialArtData | null; cue: string; powerBonus: number; recoverQi: number; guardDisruptsBonus?: boolean } {
+    const steps = this.encounter.enemy.behavior;
+    const step = steps?.[this.enemyStepIndex % steps.length];
+    if (step?.kind === 'recoverQi') return { art: null, cue: step.cue, powerBonus: 0, recoverQi: step.amount };
+    if (step?.kind === 'art') {
+      const art = this.enemy.arts.find(candidate => candidate.id === step.artId);
+      if (art && this.enemy.qi.current >= art.combat.qiCost) return { art, cue: step.cue,
+        powerBonus: art.combat.kind === 'attack' ? step.powerBonus ?? 0 : 0, recoverQi: 0, guardDisruptsBonus: step.guardDisruptsBonus };
+    }
+    const art = strongestAffordableArt(this.enemy.arts, this.enemy.qi.current, 'attack') ??
+      strongestAffordableArt(this.enemy.arts, this.enemy.qi.current, 'guard');
+    return { art, cue: step ? '预定招式内力不足或失效，改用可用招式' : '', powerBonus: 0, recoverQi: 0 };
+  }
+
+  /** Null after settlement; legacy enemies retain their old unannounced AI. */
+  get enemyIntent(): string | null {
+    if (this.isOver || !this.encounter.enemy.behavior) return null;
+    const action = this.resolveEnemyAction();
+    const prefix = `${action.cue} · `;
+    if (action.recoverQi > 0) return prefix + `回气 ${Math.min(action.recoverQi, this.enemy.qi.max - this.enemy.qi.current)}，本回合不攻击`;
+    if (!action.art) return prefix + '无可用招式，本回合停手';
+    const art = action.art;
+    const effect = art.combat.kind === 'attack' ? `预计未守御伤害 ${computeAttackDamage(art.combat.power + action.powerBonus, this.enemy.attributes.force, this.player.attributes.body)}` :
+      art.combat.kind === 'guard' ? `下一击至多减伤 ${art.combat.power}` : `最多疗伤 ${computeHealAmount(art.combat.power, this.enemy.attributes.resolve)}`;
+    return prefix + `「${art.name}」${effect}，耗气 ${art.combat.qiCost}${action.guardDisruptsBonus ? '；守御可卸蓄势' : ''}`;
+  }
+
   /**
    * Attempts one player action. An unknown art or one the player cannot
    * afford is refused without consuming the turn or any resource. A valid
-   * action resolves, then the enemy answers (highest-power affordable
-   * attack, otherwise highest-power affordable guard, ties by ascending art
-   * id; an enemy with neither passes), then the phase returns to `player-turn`
+   * action resolves, then the enemy follows its declared cycle, or the legacy
+   * strongest-affordable attack/guard fallback (ties by ascending art id;
+   * an enemy with neither passes), then the phase returns to `player-turn`
    * unless someone fell.
    */
   playerUse(artId: string): { ok: true } | { ok: false; reason: ActionRefusalReason } {
@@ -833,11 +897,28 @@ export class CombatSession {
     return { ok: true };
   }
 
-  /** Deterministic enemy answer: strongest attack, then strongest guard, or pass. */
+  /** Execute the declared cycle step or the legacy affordable fallback. */
   private enemyTurn(): void {
-    const attack = strongestAffordableArt(this.enemy.arts, this.enemy.qi.current, 'attack');
+    const action = this.resolveEnemyAction();
+    this.enemyStepIndex += 1;
+    if (action.recoverQi > 0) {
+      const gained = Math.min(action.recoverQi, this.enemy.qi.max - this.enemy.qi.current);
+      this.enemy.qi.current += gained;
+      this.logEntries.push({ kind: 'enemy-idle', text: `${this.enemy.name}收势调息，恢复 ${gained} 点内力` });
+      this.phase = 'player-turn';
+      return;
+    }
+    if (action.art?.combat.kind === 'heal') {
+      this.enemy.qi.current -= action.art.combat.qiCost;
+      const healed = Math.min(computeHealAmount(action.art.combat.power, this.enemy.attributes.resolve), this.enemy.health.max - this.enemy.health.current);
+      this.enemy.health.current += healed;
+      this.logEntries.push({ kind: 'enemy-action', text: `${this.enemy.name}运起「${action.art.name}」，恢复 ${healed} 点生命` });
+      this.phase = 'player-turn';
+      return;
+    }
+    const attack = action.art?.combat.kind === 'attack' ? action.art : null;
     if (attack === null) {
-      const guard = strongestAffordableArt(this.enemy.arts, this.enemy.qi.current, 'guard');
+      const guard = action.art?.combat.kind === 'guard' ? action.art : null;
       if (guard !== null) {
         this.enemy.qi.current -= guard.combat.qiCost;
         this.enemyGuardPower = Math.max(this.enemyGuardPower, guard.combat.power);
@@ -857,8 +938,9 @@ export class CombatSession {
     }
 
     this.enemy.qi.current -= attack.combat.qiCost;
+    const disrupted = action.guardDisruptsBonus === true && this.playerGuardPower > 0;
     const baseDamage = computeAttackDamage(
-      attack.combat.power,
+      attack.combat.power + (disrupted ? 0 : action.powerBonus),
       this.enemy.attributes.force,
       this.player.attributes.body,
     );
@@ -869,7 +951,7 @@ export class CombatSession {
     this.logEntries.push({
       kind: 'enemy-action',
       text: `${this.enemy.name}使出「${attack.name}」，对${this.playerName}造成 ${damage} 点伤害${
-        guarded.prevented > 0 ? `（守御抵挡 ${guarded.prevented} 点）` : ''
+          guarded.prevented > 0 ? `（守御抵挡 ${guarded.prevented} 点${disrupted ? '，蓄势已卸去' : ''}）` : ''
       }`,
     });
 

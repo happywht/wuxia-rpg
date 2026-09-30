@@ -130,6 +130,22 @@
                 "minimum": 0,
                 "maximum": 9999
               },
+              "behavior": {
+                "description": "可选的可预告循环；缺省沿用旧AI。武学引用须在敌方列表内，额外威力只允许攻击。",
+                "type": "array", "minItems": 1, "maxItems": 12,
+                "items": { "oneOf": [
+                  { "type": "object", "additionalProperties": false, "required": ["kind", "artId", "cue"], "properties": {
+                    "kind": { "const": "art" }, "artId": { "$ref": "#/definitions/stableId" },
+                    "cue": { "type": "string", "minLength": 1, "maxLength": 80, "pattern": "\\S" },
+                    "powerBonus": { "type": "integer", "minimum": 0, "maximum": 30 },
+                    "guardDisruptsBonus": { "type": "boolean", "description": "为true时，守御除正常减伤还卸去该步额外威力；须为有正额外威力的攻击。" }
+                  } },
+                  { "type": "object", "additionalProperties": false, "required": ["kind", "amount", "cue"], "properties": {
+                    "kind": { "const": "recoverQi" }, "amount": { "type": "integer", "minimum": 1, "maximum": 9999 },
+                    "cue": { "type": "string", "minLength": 1, "maxLength": 80, "pattern": "\\S" }
+                  } }
+                ] }
+              },
               "martialArtIds": {
                 "description": "敌人可用的武学 id 列表；每个 id 须存在于已加载且未禁用的武学集合（运行时逐条校验）。敌方优先选择可支付的最高威力攻击；没有可用攻击时才选择守御招式。",
                 "type": "array",

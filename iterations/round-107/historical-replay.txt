@@ -1,0 +1,1 @@
+PASS: R101 historical generator twice preserves R107 battle output in isolated verified workspace.
