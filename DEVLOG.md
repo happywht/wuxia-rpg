@@ -4,6 +4,17 @@
 
 ---
 
+## 2026-09-30 — Round 97 后专项盘点与目标更新
+
+- 用户要求先系统梳理当前完成内容，再将后续重点调整为已有内容的丰富、串联与细化。本次为专项产品/设计审计，不占用 Round 98，不新增地图、剧情或玩法实现。
+- Claude Code 协助扫描基础资料、系统和验证记录；主代理独立解析 manifest 的全部 100 项基础资源，复核数量、22 张地图的内容分布、前置图、目标组合、导师/制作/商店/遭遇落位及结局直接任务引用。修正委派初稿中的区域合计、笼统手测计数及无依据体验断言。
+- 新增 `docs/CURRENT-STATE-AUDIT.md`、`docs/PROJECT-GOALS.md`、只读 `scripts/audit-content-state.mjs` 和 `docs/audits/content-state-round97.json`；`npm run audit:content-state` 支持重新盘点。盘点不取代 Schema、运行时装配、BFS 或真实游玩。
+- 事实基线：22 张图全部 100×100；38 NPC、65 任务、52 物品、30 武学、7 结局、388 节点/500 关系。40 项任务由开局两区发布；普通遭遇只覆盖 7 图、商店 3 图、工位 1 图、导师 2 图。17 张 R79+ 地图上的发布人有 19 项任务，18 项含见闻目标；残篇线未接续，大雍/大梁设定冲突待 R98 处理。
+- 更新 GDD、README、世界设定/地图/玩家手册中的当前过时摘要，ROADMAP 保留已完成轮次并重排 R98–R110：开局、三章串联、差事差异、五派成长、制作经济、人物/伙伴后果、结局、像素 UI 与真实旅程交付。目标中的三章/十二项差事/八名人物/六处代表区是未来验收范围，未标完成。
+- 验证：`node --check scripts/audit-content-state.mjs` 与 `npm run audit:content-state` 通过；输出与提交的 R97 快照一致。静态前置图无循环/悬空任务前置，关键实体无重复 id 或悬空发布人，声明关口图从起点能覆盖 22 区（非动态地图 BFS 验收）。`npm run audit:round-34`、`npm run audit:round-48-docs` 均通过；`npx vitest run tests/docs-audit-round-48.test.ts`：1 文件/11 项通过；`git diff --check` 通过。未操作浏览器，未复跑游戏全量测试/构建，不将 R97 的全量检查记成本次复测。
+
+---
+
 ## Round 97 — 东溟中部航路与澜心洲（2026-09-30，已完成）
 
 ### 计划与实现
