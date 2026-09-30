@@ -116,6 +116,26 @@
       "schema": "quest-set"
     },
     {
+      "id": "map.round-85-tide-isle",
+      "path": "maps/round-85-tide-isle.json",
+      "schema": "grid-map"
+    },
+    {
+      "id": "npc.round-85-tide-isle-set",
+      "path": "characters/round-85-tide-isle-npcs.json",
+      "schema": "npc-set"
+    },
+    {
+      "id": "dialogue.round-85-tide-isle-set",
+      "path": "dialogues/round-85-tide-isle-conversations.json",
+      "schema": "dialogue-set"
+    },
+    {
+      "id": "quest.round-85-tide-isle-set",
+      "path": "quests/round-85-tide-isle-quests.json",
+      "schema": "quest-set"
+    },
+    {
       "id": "world.atlas",
       "path": "world/world-map.json",
       "schema": "world-map"

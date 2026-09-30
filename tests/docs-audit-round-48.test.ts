@@ -74,6 +74,24 @@ describe('Round 48 documentation audit', () => {
     expect(report).toEqual({ ok: true, problems: [] });
   });
 
+  it('recognizes the in-progress roadmap round as the current documentation state', async () => {
+    const root = await makeFixture();
+    const updates: Record<string, (text: string) => string> = {
+      'README.md': (text) => text.replace('Round 49 已完成；下一轮 Round 50', 'Round 50 开发中'),
+      'docs/ARCHITECTURE.md': (text) => text.replace('截至 Round 49', 'Round 50 进行中'),
+      'docs/DATA-GUIDE.md': (text) => text.replace('截至 Round 49', 'Round 50 进行中'),
+      'docs/PLAYER-GUIDE.md': (text) => text.replace('Round 49', 'Round 50'),
+      'ROADMAP.md': (text) => text.replace('- **R50** — 发布', '- **R50** — 进行中：正在整理发布\n- **R51** — 规划：世界拓展'),
+      'CHANGELOG.md': (text) => `${text}\n## Round 50`,
+      'DEVLOG.md': (text) => `${text}\n## Round 50`,
+    };
+    for (const [relative, transform] of Object.entries(updates)) {
+      const target = path.join(root, relative);
+      await writeFile(target, transform(await readFile(target, 'utf8')), 'utf8');
+    }
+    expect(await auditRound48Docs({ root })).toEqual({ ok: true, problems: [] });
+  });
+
   it('sums content counts across multiple resources with the same schema', async () => {
     const root = await makeFixture();
     const manifestPath = path.join(root, 'data/base/manifest.json');

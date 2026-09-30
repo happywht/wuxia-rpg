@@ -1,0 +1,40 @@
+{
+  "quests": [
+    {
+      "id": "quest.r85-low-tide-channel",
+      "name": "低潮礁道",
+      "description": "谢照汀托你渡往南溟潮生屿，趁低潮勘出礁道水则的刻度，把外海潮信记回风回岛。",
+      "giverNpcId": "char.r85-xie-zhaoting",
+      "objectives": [
+        {
+          "id": "objective.r85-land-on-tide-isle",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r85-tide-isle",
+          "requiredCount": 1,
+          "text": "渡水登临潮生屿"
+        },
+        {
+          "id": "objective.r85-survey-low-tide-channel",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r85-reef-channel",
+          "requiredCount": 1,
+          "text": "趁低潮勘测礁道水则"
+        },
+        {
+          "id": "objective.r85-return-water-level-record",
+          "kind": "talkToNpc",
+          "targetId": "char.r85-xie-zhaoting",
+          "requiredCount": 1,
+          "text": "回风回岛向谢照汀交回水则"
+        }
+      ],
+      "rewards": {
+        "experience": 38,
+        "currency": 30,
+        "discoverKnowledgeNodeIds": [
+          "place.r85-tide-pool"
+        ]
+      }
+    }
+  ]
+}

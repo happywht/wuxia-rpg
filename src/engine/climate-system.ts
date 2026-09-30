@@ -1,8 +1,8 @@
 /**
  * Data-driven climate protocol: wire types, defensive parsing with
  * cross-resource semantic checks, and the Phaser-free {@link ClimateRuntime}
- * that derives the current season and the deterministic daily weather from a
- * persisted 32-bit world seed plus the calendar day.
+ * that derives the current season, deterministic daily weather and optional
+ * tide phase from persisted game state.
  *
  * The module knows the *protocol* only — season names, weather names, tint
  * colors, precipitation styles and extra step minutes all come from
@@ -25,6 +25,9 @@
  *   the season's cumulative weight table. `Math.imul` keeps the mixing in
  *   exact 32-bit arithmetic; one weather per whole game day keeps the HUD
  *   stable and the visual layer free of per-minute churn.
+ * - An optional tide cycle is a pure modulo of the in-game minute and a
+ *   data-authored phase offset. The cycle divides one game day and its phase
+ *   durations sum to its length; omitting the cycle keeps older MODs valid.
  * - The world seed protocol is a plain unsigned 32-bit integer. New runs
  *   generate one from an injectable random source (never the system date);
  *   Round 14-and-earlier v1 saves lack the field and restore to
@@ -34,6 +37,7 @@
 import {
   type CalendarTimestamp,
   type GameCalendarData,
+  MINUTES_PER_DAY,
   daysPerYear,
 } from './game-calendar';
 
@@ -56,6 +60,7 @@ const MAX_WEIGHT_ENTRIES = 64;
 const MAX_WEIGHT = 1_000_000;
 const MAX_TINT_ALPHA = 0.45;
 const MAX_MINUTES = 1440;
+const MAX_TIDE_PHASES = 16;
 
 // ---------------------------------------------------------------------------
 // Wire format
@@ -91,11 +96,27 @@ export interface ClimateWeatherData {
   precipitation: ClimatePrecipitationData | null;
 }
 
+/** One named interval in the data-authored repeating tide cycle. */
+export interface ClimateTidePhaseData {
+  id: string;
+  name: string;
+  durationMinutes: number;
+}
+
+/** A deterministic cycle whose length must partition the 24-hour game day. */
+export interface ClimateTideCycleData {
+  cycleMinutes: number;
+  phaseOffsetMinutes: number;
+  phases: readonly ClimateTidePhaseData[];
+}
+
 /** Wire format of a climate JSON resource. */
 export interface ClimateData {
   id: string;
   seasons: readonly ClimateSeasonData[];
   weathers: readonly ClimateWeatherData[];
+  /** Optional for old climate MODs and saves that predate tide simulation. */
+  tideCycle?: ClimateTideCycleData;
 }
 
 export type ClimateParseResult =
@@ -137,6 +158,63 @@ function parseTintColor(value: unknown): number | null {
     return null;
   }
   return Number.parseInt(value.slice(1), 16);
+}
+
+function parseTideCycle(value: unknown, errors: string[]): ClimateTideCycleData | undefined {
+  if (value === undefined) return undefined;
+  if (!isPlainObject(value)) {
+    errors.push('tideCycle：应为潮汐周期对象');
+    return undefined;
+  }
+
+  const cycleMinutes = requireIntegerInRange(value.cycleMinutes, 1, MAX_MINUTES);
+  const phaseOffsetMinutes = requireIntegerInRange(value.phaseOffsetMinutes, 0, MAX_MINUTES - 1);
+  if (cycleMinutes === null) errors.push(`tideCycle.cycleMinutes：应为 1–${MAX_MINUTES} 的整数`);
+  if (phaseOffsetMinutes === null) errors.push(`tideCycle.phaseOffsetMinutes：应为 0–${MAX_MINUTES - 1} 的整数`);
+
+  const phases: ClimateTidePhaseData[] = [];
+  const phaseIds = new Set<string>();
+  if (!Array.isArray(value.phases) || value.phases.length < 2 || value.phases.length > MAX_TIDE_PHASES) {
+    errors.push(`tideCycle.phases：应为 2–${MAX_TIDE_PHASES} 个潮位相位`);
+  } else {
+    value.phases.forEach((entry, index) => {
+      const label = `tideCycle.phases[${index}]`;
+      const source = isPlainObject(entry) ? entry : null;
+      const id = source === null ? null : requireNonEmptyString(source.id);
+      const name = source === null ? null : requireNonEmptyString(source.name);
+      const durationMinutes = source === null
+        ? null
+        : requireIntegerInRange(source.durationMinutes, 1, MAX_MINUTES);
+      if (id === null || !/^[A-Za-z0-9_-][A-Za-z0-9._-]*$/.test(id)) {
+        errors.push(`${label}.id：应为非空稳定 id`);
+      } else if (phaseIds.has(id)) {
+        errors.push(`${label}.id：相位 id "${id}" 重复`);
+      } else {
+        phaseIds.add(id);
+      }
+      if (name === null) errors.push(`${label}.name：应为非空字符串`);
+      if (durationMinutes === null) errors.push(`${label}.durationMinutes：应为 1–${MAX_MINUTES} 的整数`);
+      if (id !== null && name !== null && durationMinutes !== null) {
+        phases.push({ id, name, durationMinutes });
+      }
+    });
+  }
+
+  if (cycleMinutes !== null) {
+    if (MINUTES_PER_DAY % cycleMinutes !== 0) {
+      errors.push('tideCycle.cycleMinutes：必须整除一个 1440 分钟的游戏日');
+    }
+    if (phaseOffsetMinutes !== null && phaseOffsetMinutes >= cycleMinutes) {
+      errors.push('tideCycle.phaseOffsetMinutes：必须小于 cycleMinutes');
+    }
+    const durationTotal = phases.reduce((sum, phase) => sum + phase.durationMinutes, 0);
+    if (Array.isArray(value.phases) && durationTotal !== cycleMinutes) {
+      errors.push(`tideCycle.phases：相位持续分钟合计 ${durationTotal}，应等于周期 ${cycleMinutes}`);
+    }
+  }
+
+  if (cycleMinutes === null || phaseOffsetMinutes === null || phases.length < 2) return undefined;
+  return { cycleMinutes, phaseOffsetMinutes, phases };
 }
 
 /**
@@ -349,12 +427,19 @@ export function parseClimate(
     }
   }
 
+  const tideCycle = parseTideCycle((raw as { tideCycle?: unknown }).tideCycle, errors);
+
   if (errors.length > 0) {
     return { ok: false, errors };
   }
   return {
     ok: true,
-    climate: { id: (raw as { id: string }).id, seasons, weathers },
+    climate: {
+      id: (raw as { id: string }).id,
+      seasons,
+      weathers,
+      ...(tideCycle === undefined ? {} : { tideCycle }),
+    },
   };
 }
 
@@ -484,6 +569,18 @@ export class ClimateRuntime {
     const season = this.seasonForStamp(stamp);
     const roll = weatherRoll(worldSeed, this.dayIndexOf(stamp));
     return this.drawWeather(season, roll);
+  }
+
+  /** Current named tide phase, or null for legacy climate resources without a cycle. */
+  tideForStamp(stamp: CalendarTimestamp): ClimateTidePhaseData | null {
+    const cycle = this.climateData.tideCycle;
+    if (cycle === undefined) return null;
+    let minute = (stamp.minuteOfDay + cycle.phaseOffsetMinutes) % cycle.cycleMinutes;
+    for (const phase of cycle.phases) {
+      if (minute < phase.durationMinutes) return phase;
+      minute -= phase.durationMinutes;
+    }
+    return cycle.phases[0] ?? null;
   }
 
   /** Weighted-table draw with `roll` in [0, 1); exposed for direct testing. */

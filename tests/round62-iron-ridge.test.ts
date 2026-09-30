@@ -42,6 +42,7 @@ describe('Round 62 iron-ridge playable region', () => {
     ['map.round-79-isles', loadMap('../data/base/maps/round-79-isles.json')],
     ['map.round-82-east-coast', loadMap('../data/base/maps/round-82-east-coast.json')],
     ['map.round-84-windward-isle', loadMap('../data/base/maps/round-84-windward-isle.json')],
+    ['map.round-85-tide-isle', loadMap('../data/base/maps/round-85-tide-isle.json')],
   ]);
 
   it('uses a complete, layered 100×100 CC0 map with bounded atlas gids and a clear route spine', () => {
@@ -86,8 +87,8 @@ describe('Round 62 iron-ridge playable region', () => {
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
     expect(assembled.warnings).toEqual([]);
-    expect(assembled.regions).toHaveLength(8);
-    expect(assembled.transitions).toHaveLength(14);
+    expect(assembled.regions).toHaveLength(9);
+    expect(assembled.transitions).toHaveLength(16);
 
     const ferry = maps.get('map.round-10-mist-ferry')!;
     const ridge = maps.get(RIDGE_ID)!;

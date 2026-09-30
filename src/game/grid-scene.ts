@@ -66,6 +66,7 @@ import {
   DEFAULT_WORLD_SEED,
   generateWorldSeed,
   type ClimateSeasonData,
+  type ClimateTidePhaseData,
   type ClimateWeatherData,
 } from '../engine/climate-system';
 import { type SocialState, applySocialChange, createSocialState } from '../engine/social-state';
@@ -2487,7 +2488,11 @@ export class GridScene extends Phaser.Scene {
   }
 
   /** Current data-driven season and weather for the in-game calendar date. */
-  private currentClimate(): { season: ClimateSeasonData; weather: ClimateWeatherData } | null {
+  private currentClimate(): {
+    season: ClimateSeasonData;
+    weather: ClimateWeatherData;
+    tide: ClimateTidePhaseData | null;
+  } | null {
     const clock = this.clock;
     const climate = this.climateRuntime;
     if (clock === null || climate === null) {
@@ -2497,6 +2502,7 @@ export class GridScene extends Phaser.Scene {
     return {
       season: climate.seasonForStamp(stamp),
       weather: climate.weatherForDay(this.worldSeed, stamp),
+      tide: climate.tideForStamp(stamp),
     };
   }
 
@@ -2506,9 +2512,10 @@ export class GridScene extends Phaser.Scene {
     if (reading === null) {
       return;
     }
-    const { season, weather } = reading;
+    const { season, weather, tide } = reading;
     const movementNote = weather.stepMinutes > 0 ? ` · 行走 +${weather.stepMinutes} 分/格` : '';
-    this.climateText?.setText(`${season.name} · ${weather.name}${movementNote}`);
+    const tideNote = tide === null ? '' : ` · 潮位：${tide.name}`;
+    this.climateText?.setText(`${season.name} · ${weather.name}${tideNote}${movementNote}`);
     if (
       this.lastClimateSeasonId === season.id &&
       this.lastClimateWeatherId === weather.id
@@ -3947,6 +3954,7 @@ export class GridScene extends Phaser.Scene {
   /** Fires ready events authored for the exact current cell. */
   /** Live knowledge/period/weather/adjacent-NPC state shared by region-event evaluation. */
   private regionEventContext(): RegionEventContext {
+    const climate = this.currentClimate();
     const nearbyNpcIds = new Set(this.placedNpcs
       .filter((npc) =>
         Math.abs(npc.col - this.playerCol) + Math.abs(npc.row - this.playerRow) === 1,
@@ -3955,7 +3963,8 @@ export class GridScene extends Phaser.Scene {
     return {
       knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
       periodId: this.clock?.currentPeriod().id ?? null,
-      weatherId: this.currentClimate()?.weather.id ?? null,
+      weatherId: climate?.weather.id ?? null,
+      tideId: climate?.tide?.id ?? null,
       nearbyNpcIds,
     };
   }

@@ -1,5 +1,15 @@
 {
   "id": "climate.base",
+  "tideCycle": {
+    "cycleMinutes": 720,
+    "phaseOffsetMinutes": 240,
+    "phases": [
+      { "id": "tide.high", "name": "满潮", "durationMinutes": 180 },
+      { "id": "tide.ebb", "name": "退潮", "durationMinutes": 180 },
+      { "id": "tide.low", "name": "低潮", "durationMinutes": 180 },
+      { "id": "tide.flood", "name": "涨潮", "durationMinutes": 180 }
+    ]
+  },
   "seasons": [
     {
       "id": "season.spring",

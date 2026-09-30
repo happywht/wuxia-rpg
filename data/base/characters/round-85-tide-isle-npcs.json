@@ -1,0 +1,39 @@
+{
+  "npcs": [
+    {
+      "id": "char.r85-xie-zhaoting",
+      "name": "谢照汀",
+      "mapResourceId": "map.round-84-windward-isle",
+      "position": {
+        "col": 48,
+        "row": 50
+      },
+      "dialogueId": "dlg.r85-xie-zhaoting-channel",
+      "questGiver": true,
+      "spriteFrame": 208,
+      "spriteFrames": {
+        "down": 192,
+        "right": 200,
+        "up": 208,
+        "left": 216
+      }
+    },
+    {
+      "id": "char.r85-cen-yinjiao",
+      "name": "岑隐礁",
+      "mapResourceId": "map.round-85-tide-isle",
+      "position": {
+        "col": 37,
+        "row": 55
+      },
+      "dialogueId": "dlg.r85-cen-yinjiao-reef",
+      "spriteFrame": 240,
+      "spriteFrames": {
+        "down": 224,
+        "right": 232,
+        "up": 240,
+        "left": 248
+      }
+    }
+  ]
+}

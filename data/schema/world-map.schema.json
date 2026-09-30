@@ -92,15 +92,15 @@
       "type": "object", "additionalProperties": false,
       "required": ["columns", "rows", "tileSize", "tilesets", "layers"],
       "properties": {
-        "columns": { "type": "integer", "minimum": 1, "maximum": 384 },
-        "rows": { "type": "integer", "minimum": 1, "maximum": 384 },
+        "columns": { "type": "integer", "minimum": 1, "maximum": 512 },
+        "rows": { "type": "integer", "minimum": 1, "maximum": 512 },
         "tileSize": { "type": "integer", "minimum": 1, "maximum": 256 },
         "regionFootprint": {
           "type": "object", "additionalProperties": false,
           "required": ["columns", "rows"],
           "properties": {
-            "columns": { "type": "number", "exclusiveMinimum": 0, "maximum": 384 },
-            "rows": { "type": "number", "exclusiveMinimum": 0, "maximum": 384 }
+            "columns": { "type": "number", "exclusiveMinimum": 0, "maximum": 512 },
+            "rows": { "type": "number", "exclusiveMinimum": 0, "maximum": 512 }
           }
         },
         "tilesets": {
@@ -128,9 +128,9 @@
               "id": { "type": "string", "minLength": 1 },
               "tilesetId": { "type": "string", "minLength": 1 },
               "cells": {
-                "type": "array", "minItems": 1, "maxItems": 384,
+                "type": "array", "minItems": 1, "maxItems": 512,
                 "items": {
-                  "type": "array", "minItems": 1, "maxItems": 384,
+                  "type": "array", "minItems": 1, "maxItems": 512,
                   "items": { "type": "integer", "minimum": 0, "maximum": 4294967295 }
                 }
               }
@@ -170,6 +170,7 @@
         "knowledgeNodeIds": { "$ref": "#/definitions/nonEmptyIdList" },
         "periodIds": { "$ref": "#/definitions/nonEmptyIdList" },
         "weatherIds": { "$ref": "#/definitions/nonEmptyIdList" },
+        "tideIds": { "$ref": "#/definitions/nonEmptyIdList" },
         "nearbyNpcIds": { "$ref": "#/definitions/nonEmptyIdList" }
       }
     },

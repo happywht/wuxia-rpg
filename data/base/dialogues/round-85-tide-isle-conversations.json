@@ -1,0 +1,127 @@
+{
+  "conversations": [
+    {
+      "id": "dlg.r85-xie-zhaoting-channel",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "谢照汀蹲在西滩的旧水则碑前，指尖敲着碑上深浅不一的刻痕：「潮信一年比一年野。青帆埠的水则测不到外海，我想请人渡去南边的潮生屿，趁低潮把礁道上的刻度记回来。」",
+          "options": [
+            {
+              "text": "我接下水则这趟差。",
+              "nextNodeId": "accepted",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r85-low-tide-channel",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r85-low-tide-channel"
+                }
+              ]
+            },
+            {
+              "text": "礁道刻度已经拓回来了。",
+              "nextNodeId": "completed",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r85-low-tide-channel",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "我还要回去核对潮位记录。",
+              "nextNodeId": "active",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r85-low-tide-channel",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "低潮要怎么等？",
+              "nextNodeId": "tides"
+            },
+            {
+              "text": "潮生屿上有什么？",
+              "nextNodeId": "isle"
+            },
+            {
+              "text": "改日再谈。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "accepted",
+          "text": "「涨潮淹礁，低潮见道。你在岛上守着水则碑等潮退——礁面滑、返潮急，日头落了就别贪。」"
+        },
+        {
+          "id": "active",
+          "text": "「先在潮生屿低潮时拓下礁道水则，再回风回岛交给我。一路留心返潮，别困在礁盘上。」"
+        },
+        {
+          "id": "completed",
+          "text": "谢照汀接过你拓下的刻度，对着日光照了半晌：「南汊的潮差比旧年大了将近一尺。多亏这份水则，秋汛之前渔队总算能改线了。」"
+        },
+        {
+          "id": "tides",
+          "text": "「潮生屿外是一道礁盘，涨潮时只露尖顶，低潮时才连成路。礁脊上立着岑家的水则碑，一道刻痕记一年潮位，比官府的历书还准。」"
+        },
+        {
+          "id": "isle",
+          "text": "「从西滩下水往南，半日水程。岛西有淡水洼，营地扎在松林边上——守礁人认生，报我谢照汀的名字就好。」"
+        },
+        {
+          "id": "farewell",
+          "text": "谢照汀把水则碑上的浮沙拂净，继续核对下一列刻痕。"
+        }
+      ]
+    },
+    {
+      "id": "dlg.r85-cen-yinjiao-reef",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "松林边的营地升起一缕细烟，守礁人岑隐礁放下手中的藤索：「又是来勘礁道的？潮还高着，礁尖都淹在水里。等潮退了，我引你上道。」",
+          "options": [
+            {
+              "text": "礁道什么时候能走？",
+              "nextNodeId": "reefwait"
+            },
+            {
+              "text": "你为什么守在这座岛上？",
+              "nextNodeId": "keeper"
+            },
+            {
+              "text": "打扰了。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "reefwait",
+          "text": "「礁道只在低潮露出两炷香的工夫。水则碑立在南脊，刻度要趁礁面还湿着拓，干了字口就糊了。」"
+        },
+        {
+          "id": "keeper",
+          "text": "「岑家守了三代礁。潮涨时数浪头，潮退时记水位——这块碑上每一道刻痕，都是一条被潮水记住的命。」"
+        },
+        {
+          "id": "farewell",
+          "text": "岑隐礁重新拾起藤索，目光越过礁盘投向远处的浪线。"
+        }
+      ]
+    }
+  ]
+}

@@ -68,7 +68,7 @@ const round83AtlasLayerHashes: Record<string, string> = {
 
 function parseCurrentWorld() {
   const parsed = parseWorldMap(rawWorld);
-  if (!parsed.ok || parsed.data.atlasArt === undefined) throw new Error('384×256 全域舆图未通过运行时解析。');
+  if (!parsed.ok || parsed.data.atlasArt === undefined) throw new Error('448×320 全域舆图未通过运行时解析。');
   return parsed.data;
 }
 
@@ -85,25 +85,27 @@ function loadMaps(): Map<string, GridMap> {
   return maps;
 }
 
-describe('Round 81–84 expanded movable atlas', () => {
-  it('passes JSON Schema and runtime validation at 384×256 while enforcing a 384-cell cap', () => {
+describe('Round 81–85 expanded movable atlas', () => {
+  it('passes JSON Schema and runtime validation at 448×320 while enforcing a 512-cell cap', () => {
     const ajv = new Ajv({ allErrors: true, strict: false });
     const validate = ajv.compile(readJson('../data/schema/world-map.schema.json') as AnySchema);
     expect(validate(rawWorld), JSON.stringify(validate.errors)).toBe(true);
     const data = parseCurrentWorld();
     expect(data.atlasArt).toMatchObject({
-      columns: 384, rows: 256, tileSize: 16,
+      columns: 448, rows: 320, tileSize: 16,
       regionFootprint: { columns: 35.84, rows: 23.04 },
     });
 
     const tooWide = structuredClone(rawWorld) as { atlasArt: { columns: number } };
-    tooWide.atlasArt.columns = 385;
+    tooWide.atlasArt.columns = 513;
+    expect(validate(tooWide)).toBe(false);
     const rejected = parseWorldMap(tooWide);
     expect(rejected.ok).toBe(false);
-    if (!rejected.ok) expect(rejected.errors.join('\n')).toContain('1–384');
+    if (!rejected.ok) expect(rejected.errors.join('\n')).toContain('1–512');
 
     const tooTall = structuredClone(rawWorld) as { atlasArt: { rows: number } };
-    tooTall.atlasArt.rows = 385;
+    tooTall.atlasArt.rows = 513;
+    expect(validate(tooTall)).toBe(false);
     expect(parseWorldMap(tooTall).ok).toBe(false);
   });
 
@@ -148,8 +150,8 @@ describe('Round 81–84 expanded movable atlas', () => {
     }
     expect(cells('world-r81-expanse-land').some((row, y) => y < 144 && row.slice(224).some((gid) => gid > 0))).toBe(true);
     expect(cells('world-r81-expanse-land').slice(144).some((row) => row.some((gid) => gid > 0))).toBe(true);
-    expect(data.regions).toHaveLength(8);
-    expect(data.transitions).toHaveLength(14);
+    expect(data.regions).toHaveLength(9);
+    expect(data.transitions).toHaveLength(16);
   });
 
   it('keeps the six Round 80 region centers plus every old gate, landmark and player projection in the same atlas pixels', () => {
@@ -237,8 +239,8 @@ describe('Round 81–84 expanded movable atlas', () => {
 
   it('fits the expanded atlas and can restore the fit after large pans', () => {
     const bounds = { x: 48, y: 116, width: 616, height: 340 };
-    const width = 384 * 16;
-    const height = 256 * 16;
+    const width = 448 * 16;
+    const height = 320 * 16;
     const fitted = createMapViewport(bounds, width, height);
     expect(fitted.scale).toBeCloseTo(bounds.height / height);
     const panned = panMapViewport(bounds, width, height,

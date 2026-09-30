@@ -111,6 +111,7 @@ export interface RegionEventConditionsData {
   knowledgeNodeIds?: string[];
   periodIds?: string[];
   weatherIds?: string[];
+  tideIds?: string[];
   /** Every listed NPC must be orthogonally adjacent to the player. */
   nearbyNpcIds?: string[];
 }
@@ -120,6 +121,8 @@ export interface RegionEventContext {
   knownKnowledgeNodeIds: ReadonlySet<string>;
   periodId: string | null;
   weatherId: string | null;
+  /** Current deterministic climate tide phase; null for legacy climate data. */
+  tideId?: string | null;
   /** NPCs on this map in the player's four-way interaction range. */
   nearbyNpcIds?: ReadonlySet<string>;
 }
@@ -133,6 +136,8 @@ export interface RegionEventReferenceIds {
   knowledgeNodeIds: ReadonlySet<string>;
   periodIds: ReadonlySet<string>;
   weatherIds: ReadonlySet<string>;
+  /** Optional for compatibility with older climate resources and direct callers. */
+  tideIds?: ReadonlySet<string>;
   /** Optional for compatibility with direct engine consumers. */
   npcIds?: ReadonlySet<string>;
 }
@@ -180,7 +185,7 @@ function parseRegionEventConditions(value: unknown, label: string, errors: strin
     errors.push(`${label}：应为对象`);
     return null;
   }
-  const allowedKeys = new Set(['knowledgeNodeIds', 'periodIds', 'weatherIds', 'nearbyNpcIds']);
+  const allowedKeys = new Set(['knowledgeNodeIds', 'periodIds', 'weatherIds', 'tideIds', 'nearbyNpcIds']);
   for (const key of Object.keys(value)) {
     if (!allowedKeys.has(key)) errors.push(`${label}.${key}：不是受支持的条件`);
   }
@@ -192,6 +197,7 @@ function parseRegionEventConditions(value: unknown, label: string, errors: strin
     if (key === 'knowledgeNodeIds') conditions.knowledgeNodeIds = ids;
     else if (key === 'periodIds') conditions.periodIds = ids;
     else if (key === 'weatherIds') conditions.weatherIds = ids;
+    else if (key === 'tideIds') conditions.tideIds = ids;
     else conditions.nearbyNpcIds = ids;
   }
   if (Object.keys(conditions).length === 0) {
@@ -262,8 +268,8 @@ function parseAtlasArt(value: unknown, errors: string[]): WorldAtlasArtData | nu
   for (const key of Object.keys(value)) if (!allowed.has(key)) errors.push(`${label}.${key}：不是受支持的字段`);
   const dimension = (field: 'columns' | 'rows'): number | null => {
     const candidate = value[field];
-    if (!integer(candidate) || candidate < 1 || candidate > 384) {
-      errors.push(`${label}.${field}：应为 1–384 之间的整数`);
+    if (!integer(candidate) || candidate < 1 || candidate > 512) {
+      errors.push(`${label}.${field}：应为 1–512 之间的整数`);
       return null;
     }
     return candidate;
@@ -278,9 +284,9 @@ function parseAtlasArt(value: unknown, errors: string[]): WorldAtlasArtData | nu
   if (value.regionFootprint !== undefined) {
     if (!isObject(value.regionFootprint) ||
       typeof value.regionFootprint.columns !== 'number' || !Number.isFinite(value.regionFootprint.columns) ||
-      value.regionFootprint.columns <= 0 || value.regionFootprint.columns > 384 ||
+      value.regionFootprint.columns <= 0 || value.regionFootprint.columns > 512 ||
       typeof value.regionFootprint.rows !== 'number' || !Number.isFinite(value.regionFootprint.rows) ||
-      value.regionFootprint.rows <= 0 || value.regionFootprint.rows > 384 ||
+      value.regionFootprint.rows <= 0 || value.regionFootprint.rows > 512 ||
       Object.keys(value.regionFootprint).some((key) => key !== 'columns' && key !== 'rows')) {
       errors.push(`${label}.regionFootprint：应为含正数 columns/rows 的对象`);
     } else {
@@ -676,6 +682,11 @@ export function assembleWorldMap(
       for (const weatherId of event.conditions?.weatherIds ?? []) {
         if (!eventReferences.weatherIds.has(weatherId)) problems.push(`引用无效天气：${weatherId}`);
       }
+      for (const tideId of event.conditions?.tideIds ?? []) {
+        if (eventReferences.tideIds !== undefined && !eventReferences.tideIds.has(tideId)) {
+          problems.push(`引用无效潮位：${tideId}`);
+        }
+      }
       for (const npcId of event.conditions?.nearbyNpcIds ?? []) {
         if (eventReferences.npcIds !== undefined && !eventReferences.npcIds.has(npcId)) {
           problems.push(`附近 NPC 未登记：${npcId}`);
@@ -705,6 +716,11 @@ export function assembleWorldMap(
       }
       for (const weatherId of event.conditions?.weatherIds ?? []) {
         if (!eventReferences.weatherIds.has(weatherId)) problems.push(`引用无效天气：${weatherId}`);
+      }
+      for (const tideId of event.conditions?.tideIds ?? []) {
+        if (eventReferences.tideIds !== undefined && !eventReferences.tideIds.has(tideId)) {
+          problems.push(`引用无效潮位：${tideId}`);
+        }
       }
       for (const npcId of event.conditions?.nearbyNpcIds ?? []) {
         if (eventReferences.npcIds !== undefined && !eventReferences.npcIds.has(npcId)) {
@@ -741,6 +757,8 @@ export function regionEventConditionsMet(
     (context.periodId === null || !conditions.periodIds.includes(context.periodId))) return false;
   if (conditions.weatherIds !== undefined &&
     (context.weatherId === null || !conditions.weatherIds.includes(context.weatherId))) return false;
+  if (conditions.tideIds !== undefined &&
+    (context.tideId == null || !conditions.tideIds.includes(context.tideId))) return false;
   const nearbyNpcIds = context.nearbyNpcIds ?? new Set<string>();
   if (conditions.nearbyNpcIds?.some((id) => !nearbyNpcIds.has(id))) return false;
   return true;

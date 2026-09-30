@@ -510,6 +510,7 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
       knowledgeNodeIds: new Set(knowledgeResult.graph.nodes.keys()),
       periodIds: new Set(parsedCalendar.calendar.periods.map((period) => period.id)),
       weatherIds: new Set(parsedClimate.climate.weathers.map((weather) => weather.id)),
+      tideIds: new Set(parsedClimate.climate.tideCycle?.phases.map((phase) => phase.id) ?? []),
       npcIds,
     });
     if ('ok' in worldMapResult && !worldMapResult.ok) {

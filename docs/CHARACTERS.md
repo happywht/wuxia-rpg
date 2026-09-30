@@ -1,6 +1,6 @@
 # 人物志（CHARACTERS）
 
-- 状态：截至 Round 84，基础世界共有 **21 名可交互 NPC**（江南道·七镇行旅 7 名、雾雨渡口 5 名、铁嶂北道 2 名、西陲盐道 1 名、云岭古道 1 名、落潮湾 1 名、东溟海岸 3 名、风回岛 1 名），全部为原创人物；Round 51 将江南道地图扩为 100×100 并重排七名 NPC 到开局聚落周围，NPC 均有独立像素精灵帧。Round 59 为七位与芦桥集/南麓任务链相关的人物补入按 `questStatus` 显隐的活动中/完成后区域回应，不接任务、不发效果。Round 62 增加铁嶂北道驿镇邵长庚、秦素砚；Round 67 增加西陲盐道驿站主人罗金子；Round 74 增加云岭古道记录人沈雨霁；Round 82 增加东溟海岸潮册抄录人温朝之；Round 83 增加沿岸商人金云帆和巡潮渔户顾潮生；Round 84 增加风回岛守灯人阮回澜。人物数据按轮次放在 `data/base/characters/`，对话按轮次放在 `data/base/dialogues/`，图谱词条在 `data/base/knowledge_graph/nodes.json`。
+- 状态：Round 85 进行中，基础世界共有 **23 名可交互 NPC**（江南道·七镇行旅 7 名、雾雨渡口 5 名、铁嶂北道 2 名、西陲盐道 1 名、云岭古道 1 名、落潮湾 1 名、东溟海岸 3 名、风回岛 2 名、潮生屿 1 名），全部为原创人物；Round 51 将江南道地图扩为 100×100 并重排七名 NPC 到开局聚落周围，NPC 均有独立像素精灵帧。Round 59 为七位与芦桥集/南麓任务链相关的人物补入按 `questStatus` 显隐的活动中/完成后区域回应，不接任务、不发效果。Round 62 增加铁嶂北道驿镇邵长庚、秦素砚；Round 67 增加西陲盐道驿站主人罗金子；Round 74 增加云岭古道记录人沈雨霁；Round 82 增加东溟海岸潮册抄录人温朝之；Round 83 增加沿岸商人金云帆和巡潮渔户顾潮生；Round 84 增加风回岛守灯人阮回澜；Round 85 增加风回岛测绘人谢照汀与潮生屿守礁人岑隐礁。人物数据按轮次放在 `data/base/characters/`，对话按轮次放在 `data/base/dialogues/`，图谱词条在 `data/base/knowledge_graph/nodes.json`。
 - 关联：`docs/NPC-SCHEDULES.md`（时段日程）、`docs/FACTIONS.md`（门派与师承）、`docs/KNOWLEDGE-GRAPH.md`（人物词条与关系边）、`docs/DIALOGUE-GUIDE.md`（对话写法）。
 
 ## 总表
@@ -27,6 +27,8 @@
 | 金云帆 | 东溟海岸·青帆埠 | (43,50) | `dlg.r83-jin-yunfan-provisions` | 潮行补给摊主；七时段沿岸行程（R83） |
 | 顾潮生 | 东溟海岸·青帆埠 | (62,63) | `dlg.r83-gu-chaosheng-tide-line` | 巡潮渔户；潮沟夺网、暮潮牵标发布人（R83） |
 | 阮回澜 | 东溟外海·风回岛 | (51,49) | `dlg.r84-ruan-huilan-lantern` | 守灯人；「风回灯影」发布人（R84） |
+| 谢照汀 | 东溟外海·风回岛 | (48,50) | `dlg.r85-xie-zhaoting-channel` | 测绘人；「低潮礁道」发布人（R85） |
+| 岑隐礁 | 南溟·潮生屿 | (37,55) | `dlg.r85-cen-yinjiao-reef` | 守礁人；低潮礁道路线说明（R85） |
 
 加粗为 Round 30 新增。所有位置为 `npc-set` 中的基础 `position`；带 `schedule` 的人物会按历法时段在图内移动（见总表之外的 `NPC-SCHEDULES.md`）。放置校验要求基础位与全部日程位可走、不压玩家出生点、不与其他 NPC 或任何固定互动格（遭遇/擂台/工位/药炉/门派战入口/终章入口/关口/区域事件）重叠。
 

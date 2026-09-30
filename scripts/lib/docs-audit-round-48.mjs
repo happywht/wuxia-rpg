@@ -40,18 +40,31 @@ export async function auditRound48Docs({ root }) {
     if (!releaseSmoke.includes(`'${guide}'`)) problems.push(`版本包 smoke 未解包验证 ${guide}`);
   }
 
-  const completedRounds = [...roadmap.matchAll(/^- \*\*R(\d{2})\*\* — ([^\r\n]+)/gm)]
+  const roadmapRounds = [...roadmap.matchAll(/^- \*\*R(\d{2})\*\* — ([^\r\n]+)/gm)];
+  const completedRounds = roadmapRounds
     .filter(([, , summary]) => summary.includes('已完成：'))
     .map(([, round]) => Number(round))
     .filter((round) => Number.isInteger(round));
-  const currentRound = Math.max(...completedRounds);
-  if (!Number.isFinite(currentRound)) {
+  const activeRounds = roadmapRounds
+    .filter(([, , summary]) => summary.startsWith('进行中：'))
+    .map(([, round]) => Number(round))
+    .filter((round) => Number.isInteger(round));
+  const lastCompletedRound = completedRounds.length > 0 ? Math.max(...completedRounds) : null;
+  const activeRound = activeRounds.length > 0 ? Math.max(...activeRounds) : null;
+  const currentRound = activeRound !== null && (lastCompletedRound === null || activeRound > lastCompletedRound)
+    ? activeRound
+    : lastCompletedRound;
+  if (currentRound === null) {
     problems.push('ROADMAP.md 没有任何带验收摘要的已完成轮次');
   } else {
     const currentLabel = `Round ${String(currentRound).padStart(2, '0')}`;
     const nextLabel = `Round ${String(currentRound + 1).padStart(2, '0')}`;
-    if (!readme.includes(`${currentLabel} 已完成；下一轮 ${nextLabel}`)) {
-      problems.push(`README.md 当前进度应标记为“${currentLabel} 已完成；下一轮 ${nextLabel}”`);
+    const isActive = activeRound === currentRound;
+    const expectedReadmeStatus = isActive
+      ? `${currentLabel} 开发中`
+      : `${currentLabel} 已完成；下一轮 ${nextLabel}`;
+    if (!readme.includes(expectedReadmeStatus)) {
+      problems.push(`README.md 当前进度应标记为“${expectedReadmeStatus}”`);
     }
     if (!roadmap.includes(`**R${String(currentRound).padStart(2, '0')}**`) ||
         !roadmap.includes(`**R${String(currentRound + 1).padStart(2, '0')}**`)) {
@@ -60,10 +73,11 @@ export async function auditRound48Docs({ root }) {
     if (!changelog.includes(currentLabel) || !devlog.includes(currentLabel)) {
       problems.push(`CHANGELOG.md 与 DEVLOG.md 都必须有 ${currentLabel} 记录`);
     }
-    if (!architecture.includes(`截至 ${currentLabel}`)) {
+    const expectedSummaryStatus = isActive ? `${currentLabel} 进行中` : `截至 ${currentLabel}`;
+    if (!architecture.includes(expectedSummaryStatus)) {
       problems.push(`ARCHITECTURE.md 状态摘要未更新到 ${currentLabel}`);
     }
-    if (!dataGuide.includes(`截至 ${currentLabel}`)) {
+    if (!dataGuide.includes(expectedSummaryStatus)) {
       problems.push(`DATA-GUIDE.md 状态摘要未更新到 ${currentLabel}`);
     }
     if (!playerGuide.includes(`Round ${currentRound}`)) {

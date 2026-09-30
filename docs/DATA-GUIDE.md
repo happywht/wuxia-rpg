@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：截至 Round 84，基础世界含 21 名 NPC、5 个门派、51 项任务、52 件物品、30 种武学、250 个图谱节点/356 条边，manifest 登记 52 项资源。八张区域地图均为 100×100 格；东溟海岸与风回岛复用已登记 Shade Puny World、ansimuz RPG Town 与 Puny Characters CC0 图素，全域舆图现为 384×256、20 层。地图碰撞、剧情与跨区连接仍由独立 JSON 声明，生成器保护玩法锚点；素材授权、MOD 和导航协议见 `REFERENCES.md`、`MOD-GUIDE.md`、`MAP-ATLAS.md`。
+- 状态：截至 Round 85；基础世界含 23 名 NPC、5 个门派、52 项任务、52 件物品、30 种武学、262 个图谱节点/366 条边，manifest 登记 56 项资源。九张区域地图均为 100×100 格；东溟海岸与两座外海岛复用已登记 Shade Puny World、ansimuz RPG Town 与 Puny Characters CC0 图素，全域舆图为 448×320、24 层。地图碰撞、剧情与跨区连接仍由独立 JSON 声明，生成器保护玩法锚点；素材授权、MOD 和导航协议见 `REFERENCES.md`、`MOD-GUIDE.md`、`MAP-ATLAS.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -284,6 +284,10 @@ NPC 条目可选声明 `spriteFrames`，键固定为 `down`、`left`、`right`�
 ## Round 84：风回岛数据资源与舆图扩展
 
 Round 84 在旧 336×224 区域逐格不变的条件下，把 `world-map.json` 的舆图扩至 384×256，并增加四个独立 CC0 地貌图层。`map.round-84-windward-isle` 为新的 `grid-map`，其碰撞 `grid` 与 Puny World/RPG Town 视觉图层分开；manifest 另登记 NPC、对白与任务资源。两个 `transition` 端点引用地图 id 和格坐标，起点/落点都需要通过 BFS 可达检查。任务的 `discoverKnowledge` 目标指向灯标词条，奖励发现淡泉词条；对应事件、地点、人物、任务和两向关系由图谱节点/边共同校验。运行 `npm run generate:round-84-windward-isle` 重建，`npm run smoke:round-84` 覆盖尺寸、GID、连接、交互和奖励闭环。
+
+## Round 85：扩展舆图、潮生屿与潮汐条件
+
+Round 85 将全域舆图扩为 448×320 格和 24 个渲染层，在保持原 384×256 区域中二十层旧像素不变的前提下添加南部海域与岛屿。新增 `map.round-85-tide-isle`、人物/对白/任务集合均独立登记；风回岛和潮生屿之间有显式双向 `transition`，入口与主要互动锚点通过路径可达校验。气候资料可选配置 `tideCycle.cycleMinutes`、`phaseOffsetMinutes` 与有序 `phases`；相位时长必须合计为周期，id 不重复，周期须整除游戏日。`tideIds` 作为区域事件条件引用这些相位，加载器校验悬空 id；HUD 与事件读取同一 `ClimateRuntime`，旧 climate 覆盖省略潮汐字段时返回无潮位状态。运行 `npm run generate:round-85-tide-isle` 幂等重建，`npm run smoke:round-85` 覆盖数据闭环与旧区域兼容。
 
 ## Round 80：地图环境对象调查
 

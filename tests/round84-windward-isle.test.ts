@@ -79,9 +79,9 @@ describe('Round 84 Windward Isle and expanded world atlas', () => {
     const parsed = parseWorldMap(readJson('../data/base/world/world-map.json'));
     expect(parsed.ok).toBe(true);
     if (!parsed.ok || parsed.data.atlasArt === undefined) return;
-    expect(parsed.data.atlasArt).toMatchObject({ columns: 384, rows: 256, tileSize: 16 });
-    expect(parsed.data.regions).toHaveLength(8);
-    expect(parsed.data.transitions).toHaveLength(14);
+    expect(parsed.data.atlasArt).toMatchObject({ columns: 448, rows: 320, tileSize: 16 });
+    expect(parsed.data.regions).toHaveLength(9);
+    expect(parsed.data.transitions).toHaveLength(16);
 
     const region = parsed.data.regions.find(({ mapResourceId }) => mapResourceId === ISLE_ID)!;
     const col = Math.round(region.atlasPosition.x / 100 * (parsed.data.atlasArt.columns - 1));
@@ -91,9 +91,9 @@ describe('Round 84 Windward Isle and expanded world atlas', () => {
     expect(land.cells[row]?.[col]).toBeGreaterThan(0);
     expect(land.cells.flat().filter((gid) => gid > 0).length).toBeGreaterThan(2_000);
 
-    const oldArea = parsed.data.atlasArt.layers.filter(({ id }) => !id.startsWith('world-r84-'));
+    const oldArea = parsed.data.atlasArt.layers.filter(({ id }) => !id.startsWith('world-r84-') && !id.startsWith('world-r85-'));
     expect(oldArea).toHaveLength(16);
-    expect(oldArea.every((layer) => layer.cells.length === 256 && layer.cells.every((line) => line.length === 384))).toBe(true);
+    expect(oldArea.every((layer) => layer.cells.length === 320 && layer.cells.every((line) => line.length === 448))).toBe(true);
   });
 
   it('connects both coasts through collision-valid reachable gates and anchors', () => {

@@ -1,10 +1,10 @@
-# 季节与天气资料
+# 季节、天气与潮汐资料
 
-Round 15 将季节、每日天气、环境叠色与雨雪移动代价接入游戏。资料契约是 `data/schema/climate.schema.json`，基础数据在 `data/base/worldview/climate.json`，manifest 资源 id 为 `climate.base`。气候是必需世界资料，与 `calendar.base` 一同加载；移除资料后世界加载会给出可读诊断，不会静默使用引擎内置四季或天气。
+Round 15 将季节、每日天气、环境叠色与雨雪移动代价接入游戏。Round 85 增加可选潮汐周期、HUD 潮位显示与区域事件潮位条件。资料契约是 `data/schema/climate.schema.json`，基础数据在 `data/base/worldview/climate.json`，manifest 资源 id 为 `climate.base`。气候是必需世界资料，与 `calendar.base` 一同加载；移除资料后世界加载会给出可读诊断，不会静默使用引擎内置四季或天气。
 
 ## 资料结构
 
-根对象含稳定 `id`、`seasons` 和 `weathers` 两个数组。
+根对象含稳定 `id`、`seasons` 和 `weathers` 两个数组，可选 `tideCycle` 描述潮位周期。
 
 - 季节 `id`、`name`：稳定引用键和显示名。
 - `monthIds`：声明本季节涵盖的历法月份 id。以 `data/base/worldview/calendar.json` 为准，必须让每个历法月份恰好归入一个季节；未知、重复、重叠和缺漏月份都会拒绝整份气候资源。
@@ -13,6 +13,7 @@ Round 15 将季节、每日天气、环境叠色与雨雪移动代价接入游�
 - `tintColor`：`#RRGGBB` 颜色；`tintAlpha` 为 0–0.45 的叠色透明度。实际绘制在昼夜调色层之上、地图 UI 之下。
 - `stepMinutes`：每次成功的网格移动额外消耗的整数分钟，可为 0。它与历法的 `actionCosts.stepMinutes` 相加；受阻/越界移动不耗时，区域旅行和 V 键等候不叠加天气步耗时。
 - `precipitation`：可省略或为 `null` 表示无粒子；否则 `kind` 取 `rain` / `snow`，`density` 为 0–1，驱动程序生成的雨线或雪点数量。
+- `tideCycle`：可选周期，含 `cycleMinutes`、`phaseOffsetMinutes` 和按顺序排列的 `phases`；每相位以稳定 `id`、显示名及持续分钟数声明。旧版 MOD 省略此字段时仍可加载，潮位返回空值。
 
 例子：
 
@@ -28,6 +29,12 @@ Round 15 将季节、每日天气、环境叠色与雨雪移动代价接入游�
 ```
 
 完整可校验例子见 `data/base/worldview/climate.json`。Schema 检查字段类型和值域；加载期的 Phaser-free 语义解析另检查唯一 id、月份分区与天气引用。气候是关键资料，任一必需语义不成立都会拒绝整份资源，并显示命中的字段或引用原因。
+
+## 潮汐周期
+
+潮汐仅取游戏内 `minuteOfDay` 与资料配置，不读取现实时间、不使用逐帧随机数。当前基础数据将 `cycleMinutes` 设为 720 分钟、相位偏移设为 240 分钟，四个相位各持续 180 分钟；周期整除 1440 分钟的一天。运行时按 `(minuteOfDay + phaseOffsetMinutes) % cycleMinutes` 选择相位，时间推进、等候和读档都会得到同一结果。Schema 约束字段范围，语义解析检查相位 id 唯一、周期整除游戏日、偏移小于周期且相位时长合计等于周期。
+
+舆图区域事件的 `conditions.tideIds` 可列出允许触发的潮位 id；同一事件上不同条件组均须满足，单组内 id 为“任一匹配”。加载期会将引用与 climate 相位核对；引用不存在的事件会被禁用并产生诊断。基础 HUD 显示当前潮位名，潮位变化后随游戏时间刷新。
 
 ## 每日天气与种子
 

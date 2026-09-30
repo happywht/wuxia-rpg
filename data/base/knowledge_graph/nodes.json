@@ -765,6 +765,18 @@
     {"id":"quest.r84-lantern-ledger","kind":"quest","title":"风回灯影","summary":"登上岛东坡灯标记下今季灯影方位，续写石厝旧簿。","knownByDefault":false},
     {"id":"event.r84-arrival","kind":"event","title":"初登风回","summary":"涉过潮滩沙脊首次踏上风回岛西滩。","knownByDefault":false},
     {"id":"event.r84-hamlet-ledger","kind":"event","title":"石厝灯簿","summary":"在石厝村檐下翻看守灯人续写的旧簿。","knownByDefault":false},
-    {"id":"event.r84-beacon-watch","kind":"event","title":"灯标夜风","summary":"在坡顶灯标观察灯影落下的浪线方位。","knownByDefault":false}
+    {"id":"event.r84-beacon-watch","kind":"event","title":"灯标夜风","summary":"在坡顶灯标观察灯影落下的浪线方位。","knownByDefault":false},
+    {"id":"map.round-85-tide-isle","kind":"place","title":"潮生屿探索地图","summary":"从风回岛南渡可登的南溟岛屿百格地图。","knownByDefault":false},
+    {"id":"place.r85-tide-isle","kind":"place","title":"南溟·潮生屿","summary":"南溟潮头上的步行岛屿，低潮时礁盘连成水道。","knownByDefault":false},
+    {"id":"place.r85-reef-channel","kind":"place","title":"低潮礁道","summary":"只在低潮露出的礁脊水道，立着岑家百年的水则碑。","knownByDefault":false},
+    {"id":"place.r85-camp","kind":"place","title":"隐礁营地","summary":"潮生屿松林边的守礁人营地，常年整备拓碑工具。","knownByDefault":false},
+    {"id":"place.r85-tide-pool","kind":"place","title":"退潮石窝","summary":"礁盘内侧的天然潮池，退潮后留汪静水。","knownByDefault":false},
+    {"id":"char.r85-xie-zhaoting","kind":"character","title":"谢照汀","summary":"驻在风回岛西滩的测潮师，专候外海潮信。","knownByDefault":false},
+    {"id":"char.r85-cen-yinjiao","kind":"character","title":"岑隐礁","summary":"潮生屿上的第三代守礁人，续写水则碑刻度。","knownByDefault":false},
+    {"id":"quest.r85-low-tide-channel","kind":"quest","title":"低潮礁道","summary":"趁低潮勘出潮生屿礁道水则，把外海潮信记回风回岛。","knownByDefault":false},
+    {"id":"event.r85-arrival","kind":"event","title":"初登潮生","summary":"渡过南溟水道首次踏上潮生屿西滩。","knownByDefault":false},
+    {"id":"event.r85-reef-channel","kind":"event","title":"低潮勘碑","summary":"趁低潮拓下水则碑上的百年潮位刻度。","knownByDefault":false},
+    {"id":"event.r85-camp-hearth","kind":"event","title":"营地炊烟","summary":"在松林边营地认识守礁人的常备行装。","knownByDefault":false},
+    {"id":"event.r85-tide-pool","kind":"event","title":"石窝潮池","summary":"退潮后在礁盘内侧看见留水的潮池。","knownByDefault":false}
   ]
 }

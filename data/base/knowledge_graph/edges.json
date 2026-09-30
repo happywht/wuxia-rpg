@@ -355,6 +355,16 @@
     {"id":"kg.edge.r84-npc-location","fromId":"char.r84-ruan-huilan","toId":"map.round-84-windward-isle","relation":"locatedAt","summary":"阮回澜在风回岛石厝守灯。"},
     {"id":"kg.edge.r84-npc-quest","fromId":"char.r84-ruan-huilan","toId":"quest.r84-lantern-ledger","relation":"participatesIn","summary":"阮回澜委托玩家记录灯影方位。"},
     {"id":"kg.edge.r84-quest-beacon","fromId":"quest.r84-lantern-ledger","toId":"place.r84-windward-beacon","relation":"requires","summary":"风回灯影需要玩家调查东坡灯标。"},
-    {"id":"kg.edge.r84-quest-spring","fromId":"quest.r84-lantern-ledger","toId":"place.r84-spring-hollow","relation":"rewards","summary":"完成风回灯影后，阮回澜带你认下岛心淡泉。"}
+    {"id":"kg.edge.r84-quest-spring","fromId":"quest.r84-lantern-ledger","toId":"place.r84-spring-hollow","relation":"rewards","summary":"完成风回灯影后，阮回澜带你认下岛心淡泉。"},
+    {"id":"kg.edge.r85-arrival-isle","fromId":"event.r85-arrival","toId":"place.r85-tide-isle","relation":"triggers","summary":"初登西滩时发现潮生屿。"},
+    {"id":"kg.edge.r85-isle-map","fromId":"place.r85-tide-isle","toId":"map.round-85-tide-isle","relation":"locatedAt","summary":"潮生屿由百格探索地图承载。"},
+    {"id":"kg.edge.r85-reef-event","fromId":"event.r85-reef-channel","toId":"place.r85-reef-channel","relation":"triggers","summary":"低潮勘碑后发现礁道水则的方位。"},
+    {"id":"kg.edge.r85-camp-event","fromId":"event.r85-camp-hearth","toId":"place.r85-camp","relation":"triggers","summary":"探访营地后得知守礁人的来历。"},
+    {"id":"kg.edge.r85-pool-event","fromId":"event.r85-tide-pool","toId":"place.r85-tide-pool","relation":"triggers","summary":"退潮后看见礁盘内侧的潮池。"},
+    {"id":"kg.edge.r85-surveyor-location","fromId":"char.r85-xie-zhaoting","toId":"map.round-84-windward-isle","relation":"locatedAt","summary":"谢照汀在风回岛西滩守着水则碑。"},
+    {"id":"kg.edge.r85-keeper-location","fromId":"char.r85-cen-yinjiao","toId":"map.round-85-tide-isle","relation":"locatedAt","summary":"岑隐礁在潮生屿松林边守礁。"},
+    {"id":"kg.edge.r85-surveyor-quest","fromId":"char.r85-xie-zhaoting","toId":"quest.r85-low-tide-channel","relation":"participatesIn","summary":"谢照汀委托玩家勘测低潮礁道。"},
+    {"id":"kg.edge.r85-quest-reef","fromId":"quest.r85-low-tide-channel","toId":"place.r85-reef-channel","relation":"requires","summary":"低潮礁道需要玩家趁低潮调查礁道。"},
+    {"id":"kg.edge.r85-quest-pool","fromId":"quest.r85-low-tide-channel","toId":"place.r85-tide-pool","relation":"rewards","summary":"完成低潮礁道后得知退潮石窝的方位。"}
   ]
 }

@@ -71,6 +71,28 @@
         }
       }
     },
+    "tideCycle": {
+      "description": "可选的游戏内潮汐周期。周期必须整除 1440 分钟；相位顺序和持续分钟来自资料，不读取现实时间。",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cycleMinutes", "phaseOffsetMinutes", "phases"],
+      "properties": {
+        "cycleMinutes": { "type": "integer", "minimum": 1, "maximum": 1440 },
+        "phaseOffsetMinutes": { "type": "integer", "minimum": 0, "maximum": 1439 },
+        "phases": {
+          "type": "array", "minItems": 2, "maxItems": 16,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["id", "name", "durationMinutes"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[A-Za-z0-9_\\-][A-Za-z0-9._\\-]*$" },
+              "name": { "type": "string", "minLength": 1, "maxLength": 16 },
+              "durationMinutes": { "type": "integer", "minimum": 1, "maximum": 1440 }
+            }
+          }
+        }
+      }
+    },
     "weathers": {
       "description": "天气列表；天气 id 在文档中必须唯一，所有季节权重引用必须能在此列表解析。",
       "type": "array",
