@@ -6,7 +6,7 @@
       "nodes": [
         {
           "id": "greet",
-          "text": "关墙下的石屋里，守烽人谷照雪正把松明捆上燧杆，见你踩雪进来，拍了拍身边的木墩：「北境照雪关，三十年没有生人从雁回崖那边走上来了。你若肯替我上一回燧，把这季的烽号点验清楚，屋里的烈酒分你一坛。」",
+          "text": "谷照雪把松明捆上燧杆：「雁候看季节，烽号报当下。有人学了火号向客商索路钱，你既肯点验，也得把燧台东南那伙冒号客赶开，再来复命。谢仪只有经验、银两和见闻，不送烈酒。」",
           "options": [
             {
               "text": "燧书我点。",
@@ -56,6 +56,42 @@
               "nextNodeId": "keeper"
             },
             {
+              "text": "烽号核妥，番号要传给所有过路人吗？",
+              "nextNodeId": "r101-code-choice",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r92-snow-beacon",
+                  "status": "completed"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-code-settled",
+                  "isKnown": false
+                }
+              ]
+            },
+            {
+              "text": "霜松谷处理旧界文之后，有什么变化？",
+              "nextNodeId": "r101-public-echo",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-mark-public"
+                }
+              ]
+            },
+            {
+              "text": "霜松谷处理旧界文之后，有什么变化？",
+              "nextNodeId": "r101-private-echo",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-mark-private"
+                }
+              ]
+            },
+            {
               "text": "改日再谈。",
               "nextNodeId": "farewell"
             }
@@ -63,15 +99,15 @@
         },
         {
           "id": "accepted",
-          "text": "「出关门往北，先过镜面冰河——认准中渡那条踏痕走，两岸的冰缝蓝得发黑，掉下去神仙也捞不上来。过河后石径直上，燧在关墙外东北的高台上。点验要挑落雪日的黄昏、入夜或子夜，雪光映着火号，三里外都数得清。在燧下按 E 记全三烽，回来找我。」"
+          "text": "「只走冰河中渡踏痕。落雪日的黄昏、入夜或子夜，到东北燧台按E点验。然后去燧台东南(62,25)击退冒号客，最后找我报告。若先前已赢过这伙人，记录仍作数，不必再找消失的敌人。」"
         },
         {
           "id": "active",
-          "text": "「记住了：只走中渡，只在落雪日暮夜点验。三烽一号不点全，燧书就作废。我在这儿给你温着酒。」"
+          "text": "「先点验再清扰号，最后复命；没核清时的闲聊不算报告。晨光/日中我在石屋(50,26)，暮时在燧台南(58,24)，夜与子夜在(51,27)，午后在(52,28)，黎明也在燧台南。天气或时辰不符，烽台提示会说明。」"
         },
         {
           "id": "completed",
-          "text": "谷照雪接过燧书，凑在灯下逐烽核对，忽然笑出一口白气：「三烽全对，火色还比去年亮——北境这条线，还活着。」她把一坛烈酒墩在你面前，酒封上落着经年的雪印。"
+          "text": "谷照雪把你记的烽号与册上相核：「这一回点验与复核记妥了，谢仪已结。若仍见冒号客，也可另外清扰，但本回谢仪不再结第二次。纸墨的旧案不能凭这季火号定年，更不能凭旧碑越界。」"
         },
         {
           "id": "route",
@@ -84,6 +120,122 @@
         {
           "id": "farewell",
           "text": "谷照雪重新背起燧杆，向东北高台的方向走去，靴印在雪地里拖出长长一行。"
+        },
+        {
+          "id": "r101-code-choice",
+          "text": "「一烽平安、二烽客至、三烽有事，是现行报码。」谷照雪把册压住，「公开番号，过路人看得懂，也有人能假传；限定报码，真假可核，却让客商多一次询问。传话与护号都要药品备夜路，定了便不能改选。」",
+          "options": [
+            {
+              "text": "公开番号（清心丸−1，谷关系−4、聂关系+3、声望+2）。",
+              "nextNodeId": "r101-code-open",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-code-settled",
+                  "isKnown": false
+                },
+                {
+                  "kind": "itemCount",
+                  "itemId": "item.qingxin-wan",
+                  "minCount": 1
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "takeItem",
+                  "itemId": "item.qingxin-wan",
+                  "quantity": 1
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "npcId": "char.r92-gu-zhaoxue",
+                  "delta": -4
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "npcId": "char.r91-nie-qiyan",
+                  "delta": 3
+                },
+                {
+                  "kind": "adjustRenown",
+                  "delta": 2
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r101-code-open"
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r101-code-settled"
+                }
+              ]
+            },
+            {
+              "text": "限定报码（回春膏−1，谷关系+4、聂关系−3、声望−2）。",
+              "nextNodeId": "r101-code-limited",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-code-settled",
+                  "isKnown": false
+                },
+                {
+                  "kind": "itemCount",
+                  "itemId": "item.huichun-gao",
+                  "minCount": 1
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "takeItem",
+                  "itemId": "item.huichun-gao",
+                  "quantity": 1
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "npcId": "char.r92-gu-zhaoxue",
+                  "delta": 4
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "npcId": "char.r91-nie-qiyan",
+                  "delta": -3
+                },
+                {
+                  "kind": "adjustRenown",
+                  "delta": -2
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r101-code-limited"
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r101-code-settled"
+                }
+              ]
+            },
+            {
+              "text": "先筹备药品，稍后再定。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "r101-code-open",
+          "text": "谷照雪收下清心丸给传号人凝神：「番号会传下去，我也得加倍查假火。回北台问聂栖雁，别只听我这里的一面话。西行冰桥到霜松谷，那里旧界文又是另一回事。」"
+        },
+        {
+          "id": "r101-code-limited",
+          "text": "她收下回春膏作护号救急：「细号只交报码队，过客须问人认火。回北台听聂栖雁怎样说，再走西行冰桥核谷里的旧界，别把前朝字当成今天的令。」"
+        },
+        {
+          "id": "r101-public-echo",
+          "text": "谷照雪看过传来的注记：「前朝屯界与今朝关防分开写，免了几次越界争论；柳寻径却要接住更多来问旧账的人。公开一页史料，不会自动给今天定界。」"
+        },
+        {
+          "id": "r101-private-echo",
+          "text": "「谷里留了内部旧刻记录。」她点头，「少惹争执是好事，可关外来的人看不到注记，问疆界时仍要有人解释。没有公开文字，不代表旧碑成了现行界。」"
         }
       ]
     }

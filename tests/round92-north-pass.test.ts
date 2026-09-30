@@ -319,13 +319,13 @@ describe('Round 92 North Pass (Snowlit Pass)', () => {
       questSet: questParse.set,
       questGiverNpcIds: new Set([NPC_ID]),
       npcIds: new Set([NPC_ID]),
-      itemIds: new Set(), encounterIds: new Set(),
+      itemIds: new Set(), encounterIds: new Set(['encounter.r101-beacon-raider']),
       knowledgeNodeIds,
     });
     expect(assembledQuests.warnings).toEqual([]);
     const quest = assembledQuests.quests.get(QUEST_ID)!;
     expect(quest.objectives.map(({ kind }) => kind)).toEqual([
-      'discoverKnowledge', 'discoverKnowledge', 'talkToNpc',
+      'discoverKnowledge', 'discoverKnowledge', 'defeatEncounter', 'talkToNpc',
     ]);
     const journal = createQuestJournal(assembledQuests.quests);
     expect(acceptQuest(assembledQuests.quests, journal, QUEST_ID).ok).toBe(true);
@@ -334,6 +334,9 @@ describe('Round 92 North Pass (Snowlit Pass)', () => {
     }).completed).toEqual([]);
     expect(applyQuestSignal(assembledQuests.quests, journal, {
       type: 'knowledge-discovery', nodeId: BEACON_NODE_ID,
+    }).completed).toEqual([]);
+    expect(applyQuestSignal(assembledQuests.quests, journal, {
+      type: 'encounter-victory', encounterId: 'encounter.r101-beacon-raider',
     }).completed).toEqual([]);
     const report = applyQuestSignal(assembledQuests.quests, journal, {
       type: 'npc-talk', npcId: NPC_ID,
@@ -389,6 +392,7 @@ describe('Round 92 North Pass (Snowlit Pass)', () => {
       'scripts/generate-round92-north-pass.mjs',
       'scripts/generate-round93-snow-pine-valley.mjs',
       'scripts/lib/atlas-rle.mjs',
+      'scripts/lib/round101-north-content.mjs',
       'data/base/world/world-map.json',
       'data/base/manifest.json',
       'data/base/maps/round-79-isles.json',

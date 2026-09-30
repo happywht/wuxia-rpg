@@ -1,6 +1,6 @@
 # 人物志（CHARACTERS）
 
-- 状态：截至 Round 100，基础世界共有 **38 名可交互 NPC**；全部为原创人物，七时段人物使用独立日程和对话资源。季无潮、虞星槎负责澜心洲—引航礁航路差事；本轮人物、对白和任务位于 `data/base/characters/round-97-lanxin-reef-npcs.json`、`data/base/dialogues/round-97-lanxin-reef-conversations.json` 与 `data/base/quests/round-97-lanxin-reef-quests.json`。
+- 状态：截至 Round 101，基础世界共有 **38 名可交互 NPC**；全部为原创人物，七时段人物使用独立日程和对话资源。季无潮、虞星槎负责澜心洲—引航礁航路差事；本轮人物、对白和任务位于 `data/base/characters/round-97-lanxin-reef-npcs.json`、`data/base/dialogues/round-97-lanxin-reef-conversations.json` 与 `data/base/quests/round-97-lanxin-reef-quests.json`。
 - 关联：`docs/NPC-SCHEDULES.md`（时段日程）、`docs/FACTIONS.md`（门派与师承）、`docs/KNOWLEDGE-GRAPH.md`（人物词条与关系边）、`docs/DIALOGUE-GUIDE.md`（对话写法）。
 
 ## 总表
@@ -156,3 +156,11 @@
 ## Round 100 四人回响
 
 秦素砚要求处理报信姓名；邵长庚区分路客核牌与证人安全；罗金子既核货担水份也面对驿棚补给缺口；沈雨霁根据留药/自备回应，并对照三地刻痕。各入口按实际任务/见闻条件显示，返回回声不刷奖励。
+
+## Round 101 北境有序调查
+
+四项既有差事依资料顺序推进：崖台雁候、雪燧传烽、界标寻踪、雪脊传书。调查之前的闲聊不算复命；雪燧须先观察落雪暮夜烽台，再击退(62,25)冒号客，最后重新向谷照雪报告。先前已战胜的一次性遭遇可作为历史事实同步，不能反复计数。
+
+传号公开消耗清心丸、谷照雪关系下降且聂栖雁关系上升；限定传号消耗回春膏并交换相反的人物立场。旧界公开消耗清心丸，内部留录消耗回春膏；柳寻径与沈问秋会回应选择。没有药品可暂缓，出发前在既有商店购备至少两份所选药品；本轮没有新增北境商店。四项调查复命、两处决定与北境对照后，沈问秋给出章节阶段答案，旧驿线继续连接南方海路。
+
+雁候、现行火号、前朝屯界、旧驿向是不同证据，不能据此推定残篇作者或纸龄。北境三章实走、双结果浏览器验收仍待后续。

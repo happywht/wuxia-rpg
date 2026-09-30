@@ -3,7 +3,7 @@
     {
       "id": "quest.r93-boundary-mark",
       "name": "界标寻踪",
-      "description": "北境巡路人柳寻径请你沿雪谷西行，越过冰溪找到谷中那块前朝屯垦的旧界标，拓下刻文带回石屋。",
+      "description": "越照雪关西行冰桥入霜松谷，核谷西旧界刻，再找柳寻径报告。前朝屯垦界不是当朝疆界；随后选择公开注记或内部留录，两途需药品，后果见闻保存。",
       "giverNpcId": "char.r93-liu-xunjing",
       "objectives": [
         {
@@ -25,7 +25,7 @@
           "kind": "talkToNpc",
           "targetId": "char.r93-liu-xunjing",
           "requiredCount": 1,
-          "text": "把拓文带回给柳寻径"
+          "text": "调查完成后，向任务人物报告所记见闻（无字据物品）"
         }
       ],
       "rewards": {
@@ -34,7 +34,8 @@
         "discoverKnowledgeNodeIds": [
           "place.r93-wind-gap"
         ]
-      }
+      },
+      "orderedObjectives": true
     }
   ]
 }

@@ -3,7 +3,7 @@
     {
       "id": "quest.r94-snowline-signal",
       "name": "雪脊传书",
-      "description": "守关人沈问秋请你沿东脊检查旧烽台的石刻，再把记录带回天门关。",
+      "description": "从北台东行天门雪道至天门关，核东望烽台旧驿刻，再找沈问秋报告。完成雁候/雪烽/谷界与两处立场后，可对照现行烽号和旧商路，获得海路续查入口。",
       "giverNpcId": "char.r94-shen-wenqiu",
       "objectives": [
         {
@@ -25,7 +25,7 @@
           "kind": "talkToNpc",
           "targetId": "char.r94-shen-wenqiu",
           "requiredCount": 1,
-          "text": "带着拓记回关向沈问秋复命"
+          "text": "调查完成后，向任务人物报告所记见闻（无字据物品）"
         }
       ],
       "rewards": {
@@ -34,7 +34,8 @@
         "discoverKnowledgeNodeIds": [
           "place.r94-cloud-window"
         ]
-      }
+      },
+      "orderedObjectives": true
     },
     {
       "id": "quest.r94-homeward-lantern",

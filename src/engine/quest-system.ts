@@ -46,6 +46,8 @@ export interface QuestData {
    * prerequisites are disabled as a whole during assembly.
    */
   exclusiveGroupId?: string;
+  /** Optional staged objectives; omitted retains legacy parallel signals. */
+  orderedObjectives?: boolean;
   objectives: QuestObjectiveData[];
   failOnEncounterIds: string[];
   rewards: QuestRewardsData;
@@ -101,6 +103,7 @@ export interface QuestJournal {
 export interface QuestAccessContext {
   factionId?: string | null;
   knownKnowledgeNodeIds?: ReadonlySet<string>;
+  completedEncounterIds?: ReadonlySet<string>;
 }
 
 export interface QuestRewardGrant {
@@ -288,6 +291,9 @@ export function parseQuestSet(raw: unknown): QuestSetParseResult {
     if (name === null) problems.push('name 应为非空字符串');
     if (description === null) problems.push('description 应为非空字符串');
     if (giverNpcId === null) problems.push('giverNpcId 应为非空字符串');
+    if (entry.orderedObjectives !== undefined && typeof entry.orderedObjectives !== 'boolean') {
+      problems.push('orderedObjectives 应为布尔值');
+    }
     if (entry.exclusiveGroupId !== undefined && exclusiveGroupId === null) {
       problems.push('exclusiveGroupId 应为非空字符串');
     }
@@ -315,6 +321,7 @@ export function parseQuestSet(raw: unknown): QuestSetParseResult {
       name,
       description,
       giverNpcId,
+      ...(entry.orderedObjectives === undefined ? {} : { orderedObjectives: entry.orderedObjectives as boolean }),
       ...(exclusiveGroupId !== null && exclusiveGroupId !== undefined
         ? { exclusiveGroupId }
         : {}),
@@ -598,7 +605,10 @@ export function acceptQuest(
       state.objectiveCounts.set(objective.id, Math.min(quantity, objective.requiredCount));
     } else if (objective.kind === 'discoverKnowledge' && access.knownKnowledgeNodeIds?.has(objective.targetId)) {
       state.objectiveCounts.set(objective.id, objective.requiredCount);
+    } else if (objective.kind === 'defeatEncounter' && access.completedEncounterIds?.has(objective.targetId)) {
+      state.objectiveCounts.set(objective.id, 1);
     }
+    if (quest.orderedObjectives && (state.objectiveCounts.get(objective.id) ?? 0) < objective.requiredCount) break;
   }
   if (quest.objectives.every(
     (objective) => (state.objectiveCounts.get(objective.id) ?? 0) >= objective.requiredCount,
@@ -660,7 +670,10 @@ export function applyQuestSignal(
       continue;
     }
 
+    const pending = quest.orderedObjectives ? quest.objectives.find(objective =>
+      (state.objectiveCounts.get(objective.id) ?? 0) < objective.requiredCount) : undefined;
     for (const objective of quest.objectives) {
+      if (quest.orderedObjectives && objective !== pending) continue;
       const current = state.objectiveCounts.get(objective.id) ?? 0;
       let next = current;
       if (objective.kind === 'collectItem' && signal.type === 'item-count' && objective.targetId === signal.itemId) {
@@ -713,7 +726,8 @@ export function reconcileKnownKnowledgeObjectives(
   // seen earlier in this pass. Every pass either settles a quest or stops.
   let passChanged = true;
   let passes = 0;
-  while (passChanged && passes <= quests.size) {
+  const maxPasses = [...quests.values()].reduce((sum, quest) => sum + quest.objectives.length, 1);
+  while (passChanged && passes <= maxPasses) {
     passChanged = false;
     passes += 1;
     for (const nodeId of knownKnowledgeNodeIds) {
@@ -726,6 +740,56 @@ export function reconcileKnownKnowledgeObjectives(
     }
   }
   return aggregate;
+}
+
+/** Replay persistent facts, never prior conversations; one saved victory counts once. */
+export function reconcileQuestFacts(
+  quests: ReadonlyMap<string, QuestData>, journal: QuestJournal,
+  facts: QuestAccessContext & { itemCounts?: ReadonlyMap<string, number> },
+): QuestUpdateResult {
+  const completed: QuestRewardGrant[] = [];
+  let changed = false;
+  const maxPasses = [...quests.values()].reduce((sum, quest) => sum + quest.objectives.length, 1);
+  for (let pass = 0; pass < maxPasses; pass += 1) {
+    let passChanged = false;
+    for (const quest of quests.values()) {
+      const state = journal.states.get(quest.id);
+      if (state?.status !== 'active') continue;
+      const pending = quest.orderedObjectives ? quest.objectives.find(objective =>
+        (state.objectiveCounts.get(objective.id) ?? 0) < objective.requiredCount) : undefined;
+      for (const objective of quest.objectives) {
+        if (quest.orderedObjectives && objective !== pending) continue;
+        const current = state.objectiveCounts.get(objective.id) ?? 0;
+        let next = current;
+        if (objective.kind === 'discoverKnowledge' && facts.knownKnowledgeNodeIds?.has(objective.targetId)) next = objective.requiredCount;
+        else if (objective.kind === 'defeatEncounter' && facts.completedEncounterIds?.has(objective.targetId)) next = Math.max(current, 1);
+        else if (objective.kind === 'collectItem' && facts.itemCounts !== undefined) {
+          const quantity = facts.itemCounts.get(objective.targetId) ?? 0;
+          next = Math.min(objective.requiredCount, Number.isSafeInteger(quantity) ? Math.max(0, quantity) : 0);
+        }
+        if (next !== current) { state.objectiveCounts.set(objective.id, next); changed = true; passChanged = true; }
+      }
+      if (quest.objectives.every(objective => (state.objectiveCounts.get(objective.id) ?? 0) >= objective.requiredCount)) {
+        completed.push(completeQuest(journal, quest)); changed = true; passChanged = true;
+      }
+    }
+    if (!passChanged) break;
+  }
+  if (refreshUnlocked(quests, journal)) changed = true;
+  return { changed, completed, failedQuestIds: [] };
+}
+
+/** Clear out-of-order active save progress; completed legacy tasks stay completed. */
+export function resetFutureOrderedObjectiveCounts(quest: QuestData, state: QuestProgressState): string[] {
+  if (!quest.orderedObjectives || state.status !== 'active') return [];
+  let pendingSeen = false;
+  const reset: string[] = [];
+  for (const objective of quest.objectives) {
+    const current = state.objectiveCounts.get(objective.id) ?? 0;
+    if (pendingSeen && current > 0) { state.objectiveCounts.set(objective.id, 0); reset.push(objective.id); }
+    if (current < objective.requiredCount) pendingSeen = true;
+  }
+  return reset;
 }
 
 export function getQuestObjectiveProgress(

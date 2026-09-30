@@ -264,6 +264,45 @@
         "defeat": "你被逼退到云栈客舍附近，只能稍作休整再来。",
         "flee": "你退回石阶，拦路客仍守在断索边。"
       }
+    },
+    {
+      "id": "encounter.r101-beacon-raider",
+      "name": "照雪燧台冒号客",
+      "mapResourceId": "map.round-92-north-pass",
+      "position": {
+        "col": 62,
+        "row": 25
+      },
+      "profileId": "char.scribe-apprentice",
+      "enemy": {
+        "name": "冒号索路头目",
+        "attributes": {
+          "body": 10,
+          "force": 11,
+          "agility": 8,
+          "insight": 6,
+          "resolve": 8
+        },
+        "health": 76,
+        "qi": 20,
+        "martialArtIds": [
+          "skill.jianghu-sanshou",
+          "skill.tiezhang-zhuanggong"
+        ]
+      },
+      "victoryExperience": 48,
+      "defeatRecovery": {
+        "healthRatio": 0.6,
+        "qiRatio": 0.6
+      },
+      "repeatable": false,
+      "texts": {
+        "approach": "燧台东南有人借烽号索路钱，按E阻止",
+        "intro": "头目举着学来的三烽牌：「谁分得清真火假火？留下过路药，才肯让你报信。」",
+        "victory": "冒号客丢下假牌逃走，燧台附近不再被这伙人借号索钱。",
+        "defeat": "你被逼退到雪坡，伤势稍复后可再来，调查见闻不会因此丢失。",
+        "flee": "你退到关墙下，冒号客仍在燧台东南。"
+      }
     }
   ]
 }

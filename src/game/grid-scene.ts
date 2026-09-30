@@ -139,6 +139,7 @@ import {
   applyQuestSignal,
   createQuestJournal,
   reconcileKnownKnowledgeObjectives,
+  reconcileQuestFacts,
 } from '../engine/quest-system';
 import {
   type SaveSlotId,
@@ -3221,6 +3222,12 @@ export class GridScene extends Phaser.Scene {
 
   /** Applies one state transition's rewards and refreshes the visible tracker. */
   private applyQuestUpdate(update: QuestUpdateResult): void {
+    const factsUpdate = reconcileQuestFacts(this.quests, this.questJournal, {
+      knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
+      completedEncounterIds: this.completedEncounters,
+      ...(this.inventory === null ? {} : { itemCounts: this.questItemCounts() }),
+    });
+    update = { changed: update.changed || factsUpdate.changed, completed: [...update.completed, ...factsUpdate.completed], failedQuestIds: [...update.failedQuestIds, ...factsUpdate.failedQuestIds] };
     const completed = [...update.completed];
     if (completed.length > 0 || update.failedQuestIds.length > 0) {
       this.questNoticeTimer?.remove(false);

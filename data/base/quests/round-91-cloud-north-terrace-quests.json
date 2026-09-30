@@ -3,7 +3,7 @@
     {
       "id": "quest.r91-goose-vigil",
       "name": "崖台雁候",
-      "description": "守雁人聂栖雁请你越过悬空雁桥登上观雁台，在晨光、日中或午后的雁阵回翔时记下头雁的阵形，把这份雁书带回给她。",
+      "description": "白日越雁桥记雁候，再回聂栖雁复核，谢仪为经验与银两，不发崖茶物品。目标按顺序推进；北境栈道通照雪关，东行天门雪道通天门关。",
       "giverNpcId": "char.r91-nie-qiyan",
       "objectives": [
         {
@@ -25,7 +25,7 @@
           "kind": "talkToNpc",
           "targetId": "char.r91-nie-qiyan",
           "requiredCount": 1,
-          "text": "把雁书带回给聂栖雁"
+          "text": "调查完成后，向任务人物报告所记见闻（无字据物品）"
         }
       ],
       "rewards": {
@@ -34,7 +34,8 @@
         "discoverKnowledgeNodeIds": [
           "place.r91-goose-stone"
         ]
-      }
+      },
+      "orderedObjectives": true
     }
   ]
 }

@@ -1,3 +1,4 @@
+import { deepenNorthQuests, deepenNorthDialogues } from './lib/round101-north-content.mjs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { dirname, resolve } from 'node:path';
@@ -736,7 +737,7 @@ const writeTasks = [
   writeJson(paths.world, world), writeJson(paths.manifest, manifest),
   writeJson(paths.nodes, nodes), writeJson(paths.edges, edges),
   writeJson(paths.east, eastMap), writeJson(paths.south, southMap),
-  writeJson(paths.npcs, npcData), writeJson(paths.dialogues, dialogueData), writeJson(paths.quests, questData),
+  writeJson(paths.npcs, npcData), writeJson(paths.dialogues, deepenNorthDialogues(dialogueData)), writeJson(paths.quests, deepenNorthQuests(questData)),
 ];
 await Promise.all(writeTasks);
 console.log(`Expanded the mobile atlas to ${targetSize.columns}×${targetSize.rows} (8 px/cell), ${world.atlasArt.layers.length} layers, ${world.regions.length} regions.`);

@@ -66,6 +66,7 @@ import {
   type QuestJournal,
   type QuestStatus,
   createQuestJournal,
+  resetFutureOrderedObjectiveCounts,
 } from './quest-system';
 import {
   type SocialState,
@@ -1419,6 +1420,14 @@ export function planSnapshotRestore(
       );
       return [{ ...entry, value: requiredCount }];
     });
+    if (questRecord?.orderedObjectives && state.status === 'active') {
+      const runtimeState = { questId: state.questId, status: state.status, objectiveCounts: new Map(objectiveCounts.map(entry => [entry.id, entry.value])) };
+      const reset = resetFutureOrderedObjectiveCounts(questRecord, runtimeState);
+      if (reset.length > 0) {
+        warnings.push(`任务 "${state.questId}" 已改为有序阶段，重置提前记录的目标：${reset.join('、')}`);
+        return [{ ...state, objectiveCounts: [...runtimeState.objectiveCounts].map(([id, value]) => ({ id, value })) }];
+      }
+    }
     return [{ ...state, objectiveCounts }];
   });
   let trackedQuestId = snapshot.quests.trackedQuestId;
@@ -1634,6 +1643,7 @@ export function restoreRunState(input: RestoreRunInput): RestoredRunState {
     state.objectiveCounts = new Map(
       quest.objectives.map((objective) => [objective.id, savedCounts.get(objective.id) ?? 0]),
     );
+    resetFutureOrderedObjectiveCounts(quest, state);
   }
   journal.trackedQuestId = snapshot.quests.trackedQuestId;
 

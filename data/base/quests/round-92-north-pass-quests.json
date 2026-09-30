@@ -3,7 +3,7 @@
     {
       "id": "quest.r92-snow-beacon",
       "name": "雪燧传烽",
-      "description": "守烽人谷照雪请你北上越过镜面冰河，在黄昏、入夜或子夜的落雪天登上照雪烽燧点验本季烽号，把燧书带回给她。",
+      "description": "入照雪关，在落雪日黄昏/入夜/子夜点验烽号，击退燧台东南(62,25)的冒号客，再找谷照雪复命。随后可决定公开番号或限定传号，皆需药品支援；谢仪为经验、银两及北界碑见闻。",
       "giverNpcId": "char.r92-gu-zhaoxue",
       "objectives": [
         {
@@ -21,11 +21,18 @@
           "text": "落雪日的黄昏、入夜或子夜，在照雪烽燧点验烽号"
         },
         {
+          "id": "objective.r101-clear-beacon-raider",
+          "kind": "defeatEncounter",
+          "targetId": "encounter.r101-beacon-raider",
+          "requiredCount": 1,
+          "text": "在燧台东南(62,25)击退冒用烽号的索路客"
+        },
+        {
           "id": "objective.r92-report-gu-zhaoxue",
           "kind": "talkToNpc",
           "targetId": "char.r92-gu-zhaoxue",
           "requiredCount": 1,
-          "text": "把燧书带回给谷照雪"
+          "text": "调查与挑战完成后，向任务人物报告所记见闻（无字据物品）"
         }
       ],
       "rewards": {
@@ -34,7 +41,8 @@
         "discoverKnowledgeNodeIds": [
           "place.r92-north-cairn"
         ]
-      }
+      },
+      "orderedObjectives": true
     }
   ]
 }

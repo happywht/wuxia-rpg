@@ -2771,6 +2771,62 @@
       "title": "大陆调查阶段结案",
       "summary": "更簿与补给立场、三地对照、碎岭和悬桥战斗完成；路障清除不等于护索修复，东行船货与北台界标继续未解线索。",
       "knownByDefault": false
+    },
+    {
+      "id": "event.r101-code-open",
+      "kind": "event",
+      "title": "照雪番号公开",
+      "summary": "玩家支出清心丸1公开番号，谷关系−4、聂关系+3、声望+2；过客易认，守烽者多防假号。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r101-code-limited",
+      "kind": "event",
+      "title": "照雪限定传号",
+      "summary": "玩家支出回春膏1限定报码，谷关系+4、聂关系−3、声望−2；真假易核，客商须再询问。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r101-code-settled",
+      "kind": "event",
+      "title": "照雪传号已定",
+      "summary": "番号公开与限定不可重复或同时选择。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r101-mark-public",
+      "kind": "event",
+      "title": "霜松前朝注记公开",
+      "summary": "支出清心丸1，柳关系−4、声望+3；时代说明易查，巡路人承受旧账争执。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r101-mark-private",
+      "kind": "event",
+      "title": "霜松旧刻内部留录",
+      "summary": "支出回春膏1，柳关系+4、沈问秋关系−3、声望−2；内部护卷，过客难查。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r101-mark-settled",
+      "kind": "event",
+      "title": "霜松旧刻处理已定",
+      "summary": "公开注记与内部留录不可改选或重复结算。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r101-north-crosscheck",
+      "kind": "event",
+      "title": "北境记录用途分辨",
+      "summary": "雁候、现行火号、前朝屯界用途不一；大梁遗刻不能认作大雍今界，不能替残篇定纸龄。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r101-north-close",
+      "kind": "event",
+      "title": "北境调查阶段结案",
+      "summary": "四地复核和两处决定完成，旧驿线通向南行海路，水纹纸药墨作者仍待船货证据。",
+      "knownByDefault": false
     }
   ]
 }

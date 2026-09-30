@@ -3560,6 +3560,62 @@
       "toId": "event.r100-mainland-close",
       "relation": "knows",
       "summary": "人物在本轮条件对白中处理或复核此事；此静态关联不表示运行时已知。"
+    },
+    {
+      "id": "kg.edge.r101-code-open",
+      "fromId": "char.r92-gu-zhaoxue",
+      "toId": "event.r101-code-open",
+      "relation": "knows",
+      "summary": "人物在条件对白中处理或复核此事；静态百科关系不表示运行时已知。"
+    },
+    {
+      "id": "kg.edge.r101-code-limited",
+      "fromId": "char.r92-gu-zhaoxue",
+      "toId": "event.r101-code-limited",
+      "relation": "knows",
+      "summary": "人物在条件对白中处理或复核此事；静态百科关系不表示运行时已知。"
+    },
+    {
+      "id": "kg.edge.r101-code-settled",
+      "fromId": "char.r92-gu-zhaoxue",
+      "toId": "event.r101-code-settled",
+      "relation": "knows",
+      "summary": "人物在条件对白中处理或复核此事；静态百科关系不表示运行时已知。"
+    },
+    {
+      "id": "kg.edge.r101-mark-public",
+      "fromId": "char.r93-liu-xunjing",
+      "toId": "event.r101-mark-public",
+      "relation": "knows",
+      "summary": "人物在条件对白中处理或复核此事；静态百科关系不表示运行时已知。"
+    },
+    {
+      "id": "kg.edge.r101-mark-private",
+      "fromId": "char.r93-liu-xunjing",
+      "toId": "event.r101-mark-private",
+      "relation": "knows",
+      "summary": "人物在条件对白中处理或复核此事；静态百科关系不表示运行时已知。"
+    },
+    {
+      "id": "kg.edge.r101-mark-settled",
+      "fromId": "char.r93-liu-xunjing",
+      "toId": "event.r101-mark-settled",
+      "relation": "knows",
+      "summary": "人物在条件对白中处理或复核此事；静态百科关系不表示运行时已知。"
+    },
+    {
+      "id": "kg.edge.r101-north-crosscheck",
+      "fromId": "char.r94-shen-wenqiu",
+      "toId": "event.r101-north-crosscheck",
+      "relation": "knows",
+      "summary": "人物在条件对白中处理或复核此事；静态百科关系不表示运行时已知。"
+    },
+    {
+      "id": "kg.edge.r101-north-close",
+      "fromId": "char.r94-shen-wenqiu",
+      "toId": "event.r101-north-close",
+      "relation": "knows",
+      "summary": "人物在条件对白中处理或复核此事；静态百科关系不表示运行时已知。"
     }
   ]
 }

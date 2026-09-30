@@ -419,6 +419,7 @@ describe('Round 93 Snow Pine Valley (Frostpine Valley)', () => {
       'scripts/generate-round92-north-pass.mjs',
       'scripts/generate-round93-snow-pine-valley.mjs',
       'scripts/lib/atlas-rle.mjs',
+      'scripts/lib/round101-north-content.mjs',
       'data/base/world/world-map.json',
       'data/base/manifest.json',
       'data/base/maps/round-79-isles.json',

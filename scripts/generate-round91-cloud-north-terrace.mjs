@@ -1,3 +1,4 @@
+import { deepenNorthQuests, deepenNorthDialogues } from './lib/round101-north-content.mjs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -946,8 +947,8 @@ world.atlasArt.layers = world.atlasArt.layers.map((layer) => ({
 await Promise.all([
   writeNewJson(paths.map, mapData, '雁回崖地图'),
   writeNewJson(paths.npcs, npcs, '雁回崖人物'),
-  writeNewJson(paths.dialogues, dialogues, '雁回崖对白'),
-  writeNewJson(paths.quests, quests, '雁回崖任务'),
+  writeNewJson(paths.dialogues, deepenNorthDialogues(dialogues), '雁回崖对白'),
+  writeNewJson(paths.quests, deepenNorthQuests(quests), '雁回崖任务'),
   writeJson(paths.world, world),
   writeJson(paths.manifest, manifest),
   appendGraphEntries(paths.nodes, 'nodes', newNodes),
