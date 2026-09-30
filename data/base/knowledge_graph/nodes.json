@@ -2827,6 +2827,62 @@
       "title": "北境调查阶段结案",
       "summary": "四地复核和两处决定完成，旧驿线通向南行海路，水纹纸药墨作者仍待船货证据。",
       "knownByDefault": false
+    },
+    {
+      "id": "event.r102-shore-aid",
+      "kind": "event",
+      "title": "岸上救伤补给",
+      "summary": "海盐敷膏1罐，顾+4/岑−3/声望+2；守礁急药仍需另外筹备。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r102-keeper-aid",
+      "kind": "event",
+      "title": "守礁应急补给",
+      "summary": "回春膏1份，顾−3/岑+4/声望−1；岸上伤者仍待后批。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r102-supply-settled",
+      "kind": "event",
+      "title": "沿海补给决定",
+      "summary": "岸上或守礁两种去向已单次结算。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r102-pilot-public",
+      "kind": "event",
+      "title": "公开传示潮时",
+      "summary": "贝壳2片，季+4/虞−4/声望+3；散船便利，辨假号负担增加。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r102-pilot-crew",
+      "kind": "event",
+      "title": "熟船传示潮时",
+      "summary": "清心丸1份，季−4/虞+4/声望−2；队内便利，散船等待。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r102-pilot-settled",
+      "kind": "event",
+      "title": "传航范围决定",
+      "summary": "公开或熟船两种范围已单次结算，不改变地图通路。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r102-sea-crosscheck",
+      "kind": "event",
+      "title": "海路五类刻记对照",
+      "summary": "回湾线、风灯向、水则、潮痕和灯谱用途不同，不确定残篇作者或纸龄。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r102-sea-close",
+      "kind": "event",
+      "title": "海路阶段结案",
+      "summary": "六差事、两处决定与刻记对照已记录，供后续终章读取。",
+      "knownByDefault": false
     }
   ]
 }

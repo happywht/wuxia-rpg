@@ -1,4 +1,5 @@
 import { readFile, writeFile } from 'node:fs/promises';
+import { deepenSeaQuests, deepenSeaDialogues } from './lib/round102-sea-content.mjs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -346,8 +347,8 @@ await Promise.all([
   writeJson(paths.shops, shops),
   writeJson(paths.encounters, encounters),
   writeJson(paths.npcs, npcs),
-  writeJson(paths.dialogues, dialogues),
-  writeJson(paths.quests, quests),
+  writeJson(paths.dialogues, deepenSeaDialogues(dialogues)),
+  writeJson(paths.quests, deepenSeaQuests(quests)),
   writeJson(paths.manifest, manifest),
   writeJson(paths.world, world),
   appendGraphEntries(paths.nodes, 'nodes', newNodes),

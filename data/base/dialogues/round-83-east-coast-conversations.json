@@ -28,7 +28,7 @@
         },
         {
           "id": "harbor",
-          "text": "「退潮后有人往潮沟里拖东西。顾潮生看过几回，最近连系浮标也少了。」"
+          "text": "「顾潮生在查夺网客和暮潮刻线。海盐敷膏每罐26银两，回春膏15，清心丸12；贝壳也在货匣里。相邻按E买货，F打听。两处传航决定会消耗药或贝壳，先留够自己的伤药，没有物资可暂缓，不会凭空赊给你。」"
         },
         {
           "id": "farewell",
@@ -62,7 +62,7 @@
               ]
             },
             {
-              "text": "网具已经拿回来了。",
+              "text": "夺网客已经击退，浅滩见闻已记。",
               "nextNodeId": "recovery-complete",
               "conditions": [
                 {
@@ -101,6 +101,52 @@
               ]
             },
             {
+              "text": "这份补给给岸上救伤，还是留给守标人？",
+              "nextNodeId": "r102-supply-choice",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r83-night-channel",
+                  "status": "completed"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-supply-settled",
+                  "isKnown": false
+                }
+              ]
+            },
+            {
+              "text": "大陆的刻痕对照，对海路有何用？",
+              "nextNodeId": "r102-mainland-link",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-paper-crosscheck"
+                }
+              ]
+            },
+            {
+              "text": "澜心洲的传航办法如何？",
+              "nextNodeId": "r102-echo-pilot-public",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-public"
+                }
+              ]
+            },
+            {
+              "text": "澜心洲的传航办法如何？",
+              "nextNodeId": "r102-echo-pilot-crew",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-crew"
+                }
+              ]
+            },
+            {
               "text": "先说说这片潮沟。",
               "nextNodeId": "tidal-flat"
             }
@@ -112,7 +158,7 @@
         },
         {
           "id": "recovery-complete",
-          "text": "「浮标能重新连起来了。等入夜以后，再去浅滩北侧看灯影落在哪道浪线上。」"
+          "text": "「夺网客已退，浅滩见闻和谢仪已经结算；你身上没有新增网具，浮标也不会自动换样。接下暮潮牵标，在黄昏或入夜调查浅滩石标，再来谈沿海补给。」"
         },
         {
           "id": "channel-accepted",
@@ -120,11 +166,135 @@
         },
         {
           "id": "channel-complete",
-          "text": "「这回涨潮时就有路标可循。走水路的人不用再拿命赌浪头了。」"
+          "text": "「回湾刻线已经记入见闻，谢仪结清。它说明这一段浅湾的辨向，不能凭一条线许诺全海路都安全。由青帆埠东南海口(91,71)到风回岛，再由风回岛东岸关口(97,50)往潮生屿；M舆图可查实际关口。」"
         },
         {
           "id": "tidal-flat",
           "text": "「白日看沙纹只能辨风，天黑后才看得出潮沟怎么转。两样都要记，才算真懂这段海岸。」"
+        },
+        {
+          "id": "r102-supply-choice",
+          "text": "这份补给给岸上救伤，还是留给守标人？",
+          "options": [
+            {
+              "text": "给岸上救伤留海盐敷膏1罐（顾+4、岑−3、声望+2）",
+              "nextNodeId": "r102-shore-aid",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-supply-settled",
+                  "isKnown": false
+                },
+                {
+                  "kind": "itemCount",
+                  "itemId": "item.r83-sea-salt-ointment",
+                  "minCount": 1
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "takeItem",
+                  "itemId": "item.r83-sea-salt-ointment",
+                  "quantity": 1
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "npcId": "char.r83-gu-chaosheng",
+                  "delta": 4
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "npcId": "char.r85-cen-yinjiao",
+                  "delta": -3
+                },
+                {
+                  "kind": "adjustRenown",
+                  "delta": 2
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r102-shore-aid"
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r102-supply-settled"
+                }
+              ]
+            },
+            {
+              "text": "给守礁药囊留回春膏1份（顾−3、岑+4、声望−1）",
+              "nextNodeId": "r102-keeper-aid",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-supply-settled",
+                  "isKnown": false
+                },
+                {
+                  "kind": "itemCount",
+                  "itemId": "item.huichun-gao",
+                  "minCount": 1
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "takeItem",
+                  "itemId": "item.huichun-gao",
+                  "quantity": 1
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "npcId": "char.r83-gu-chaosheng",
+                  "delta": -3
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "npcId": "char.r85-cen-yinjiao",
+                  "delta": 4
+                },
+                {
+                  "kind": "adjustRenown",
+                  "delta": -1
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r102-keeper-aid"
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r102-supply-settled"
+                }
+              ]
+            },
+            {
+              "text": "先备好物资，再作决定。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "r102-shore-aid",
+          "text": "顾潮生收下海盐敷膏交给岸上伤者：「船回埠有人照应了，守礁人的缺药却得另想办法。」"
+        },
+        {
+          "id": "r102-keeper-aid",
+          "text": "顾潮生收下回春膏，记在守礁药囊名下：「岛上应急多一份，岸上的人却要等下一批。」"
+        },
+        {
+          "id": "r102-mainland-link",
+          "text": "「更簿、井壁、索孔都不是水则；海上也要分清回湾线、风灯向和潮位层。先到风回岛问阮回澜与谢照汀，再调查潮生屿。海盐敷膏在金云帆摊上按价买，别把谢仪当成药已经到手。」"
+        },
+        {
+          "id": "r102-echo-pilot-public",
+          "text": "「散船能看到核过的潮时了，假号也会照学；虞星槎的辨号差事比从前重。」"
+        },
+        {
+          "id": "r102-echo-pilot-crew",
+          "text": "「熟船队好互认，散船还得找人核簿。海路秩序省下的麻烦，换成了陌生人的等候。」"
+        },
+        {
+          "id": "farewell",
+          "text": "你暂且收住话头，先去筹备要用的物资。"
         }
       ]
     }

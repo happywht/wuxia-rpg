@@ -3,7 +3,7 @@
     {
       "id": "quest.r84-lantern-ledger",
       "name": "风回灯影",
-      "description": "阮回澜请你登上风回岛东坡的灯标，把今季灯影落下的浪线方位记回石厝旧簿。",
+      "description": "登风回岛东坡调查风回灯标，灯影方位记入见闻即结算经验、银两，不再交实体簿页。阮回澜可说明它与潮生屿水则的不同用途。",
       "giverNpcId": "char.r84-ruan-huilan",
       "objectives": [
         {

@@ -3616,6 +3616,62 @@
       "toId": "event.r101-north-close",
       "relation": "knows",
       "summary": "人物在条件对白中处理或复核此事；静态百科关系不表示运行时已知。"
+    },
+    {
+      "id": "kg.edge.r102-shore-aid",
+      "fromId": "char.r83-gu-chaosheng",
+      "toId": "event.r102-shore-aid",
+      "relation": "knows",
+      "summary": "条件对白处理和回应此事，静态关系不替代运行时见闻。"
+    },
+    {
+      "id": "kg.edge.r102-keeper-aid",
+      "fromId": "char.r83-gu-chaosheng",
+      "toId": "event.r102-keeper-aid",
+      "relation": "knows",
+      "summary": "条件对白处理和回应此事，静态关系不替代运行时见闻。"
+    },
+    {
+      "id": "kg.edge.r102-supply-settled",
+      "fromId": "char.r83-gu-chaosheng",
+      "toId": "event.r102-supply-settled",
+      "relation": "knows",
+      "summary": "条件对白处理和回应此事，静态关系不替代运行时见闻。"
+    },
+    {
+      "id": "kg.edge.r102-pilot-public",
+      "fromId": "char.r97-ji-wuchao",
+      "toId": "event.r102-pilot-public",
+      "relation": "knows",
+      "summary": "条件对白处理和回应此事，静态关系不替代运行时见闻。"
+    },
+    {
+      "id": "kg.edge.r102-pilot-crew",
+      "fromId": "char.r97-ji-wuchao",
+      "toId": "event.r102-pilot-crew",
+      "relation": "knows",
+      "summary": "条件对白处理和回应此事，静态关系不替代运行时见闻。"
+    },
+    {
+      "id": "kg.edge.r102-pilot-settled",
+      "fromId": "char.r97-ji-wuchao",
+      "toId": "event.r102-pilot-settled",
+      "relation": "knows",
+      "summary": "条件对白处理和回应此事，静态关系不替代运行时见闻。"
+    },
+    {
+      "id": "kg.edge.r102-sea-crosscheck",
+      "fromId": "char.r97-yu-xingcha",
+      "toId": "event.r102-sea-crosscheck",
+      "relation": "knows",
+      "summary": "条件对白处理和回应此事，静态关系不替代运行时见闻。"
+    },
+    {
+      "id": "kg.edge.r102-sea-close",
+      "fromId": "char.r97-yu-xingcha",
+      "toId": "event.r102-sea-close",
+      "relation": "knows",
+      "summary": "条件对白处理和回应此事，静态关系不替代运行时见闻。"
     }
   ]
 }

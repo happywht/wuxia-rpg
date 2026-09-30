@@ -3,7 +3,7 @@
     {
       "id": "quest.r85-low-tide-channel",
       "name": "低潮礁道",
-      "description": "谢照汀托你渡往南溟潮生屿，趁低潮勘出礁道水则的刻度，把外海潮信记回风回岛。",
+      "description": "谢照汀托你渡潮生屿，低潮调查礁道水则，再回风回岛报告见闻，无拓纸物品。目标有序，调查前闲聊不算复命；已知水则不必重拓。",
       "giverNpcId": "char.r85-xie-zhaoting",
       "objectives": [
         {
@@ -25,7 +25,7 @@
           "kind": "talkToNpc",
           "targetId": "char.r85-xie-zhaoting",
           "requiredCount": 1,
-          "text": "回风回岛向谢照汀交回水则"
+          "text": "调查后回风回岛向谢照汀报告所记水则（无拓纸物品）"
         }
       ],
       "rewards": {
@@ -34,7 +34,8 @@
         "discoverKnowledgeNodeIds": [
           "place.r85-tide-pool"
         ]
-      }
+      },
+      "orderedObjectives": true
     }
   ]
 }

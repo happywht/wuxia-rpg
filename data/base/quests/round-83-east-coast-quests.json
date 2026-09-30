@@ -3,7 +3,7 @@
     {
       "id": "quest.r83-net-recovery",
       "name": "潮沟夺网",
-      "description": "顾潮生说退潮后有人从潮沟拖走网具和浮标。击退夺网客，找回浅滩上的潮标。",
+      "description": "承接青帆埠潮尺调查，击退潮沟夺网客后即结算经验、银两与浅滩见闻，不发网具物品，也不改变浮标地形。回顾潮生可续查暮潮刻线。",
       "giverNpcId": "char.r83-gu-chaosheng",
       "prerequisiteQuestIds": [
         "quest.r82-follow-the-tide"
@@ -28,7 +28,7 @@
     {
       "id": "quest.r83-night-channel",
       "name": "暮潮牵标",
-      "description": "浮标网具复位后，顾潮生请你在黄昏或入夜时辨出石标上的回湾刻线。",
+      "description": "击退夺网客之后，黄昏或入夜调查浅滩石标，见闻记下回湾刻线即结算，不须交拓纸。随后顾潮生会问补给给谁留：两种决定消耗药品并改变人物关系。",
       "giverNpcId": "char.r83-gu-chaosheng",
       "prerequisiteQuestIds": [
         "quest.r83-net-recovery"

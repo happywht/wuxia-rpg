@@ -1,4 +1,5 @@
 import { readFile, writeFile } from 'node:fs/promises';
+import { deepenSeaQuests, deepenSeaDialogues } from './lib/round102-sea-content.mjs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -675,8 +676,8 @@ edges.edges = [
 await Promise.all([
   writeNewJson(paths.map, mapData, '风回岛地图'),
   writeNewJson(paths.npcs, npcs, '风回岛人物'),
-  writeNewJson(paths.dialogues, dialogues, '风回岛对白'),
-  writeNewJson(paths.quests, quests, '风回岛任务'),
+  writeNewJson(paths.dialogues, deepenSeaDialogues(dialogues), '风回岛对白'),
+  writeNewJson(paths.quests, deepenSeaQuests(quests), '风回岛任务'),
   writeJson(paths.world, world),
   writeJson(paths.manifest, manifest),
   appendGraphEntries(paths.nodes, 'nodes', newNodes),

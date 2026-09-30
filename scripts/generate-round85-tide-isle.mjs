@@ -1,4 +1,5 @@
 import { readFile, writeFile } from 'node:fs/promises';
+import { deepenSeaQuests, deepenSeaDialogues } from './lib/round102-sea-content.mjs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -773,8 +774,8 @@ world.atlasArt.layers = world.atlasArt.layers.map((layer) => ({
 await Promise.all([
   writeNewJson(paths.map, mapData, '潮生屿地图'),
   writeNewJson(paths.npcs, npcs, '潮生屿人物'),
-  writeNewJson(paths.dialogues, dialogues, '潮生屿对白'),
-  writeNewJson(paths.quests, quests, '潮生屿任务'),
+  writeNewJson(paths.dialogues, deepenSeaDialogues(dialogues), '潮生屿对白'),
+  writeNewJson(paths.quests, deepenSeaQuests(quests), '潮生屿任务'),
   writeJson(paths.world, world),
   writeJson(paths.manifest, manifest),
   appendGraphEntries(paths.nodes, 'nodes', newNodes),

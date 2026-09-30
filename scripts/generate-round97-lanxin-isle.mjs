@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { deepenSeaQuests, deepenSeaDialogues } from './lib/round102-sea-content.mjs';
 import { readFileSync } from 'node:fs';
 import { access, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
@@ -161,8 +162,8 @@ await Promise.all([
   writeJson(files.world, world), writeJson(files.manifest, manifest),
   writeJson(files.nodes, nodes), writeJson(files.edges, edges),
   writeJson(files.npcs, { npcs }),
-  writeJson(files.dialogues, { conversations: dialogues }),
-  writeJson(files.quests, { quests }),
+  writeJson(files.dialogues, deepenSeaDialogues({ conversations: dialogues })),
+  writeJson(files.quests, deepenSeaQuests({ quests })),
 ]);
 
 console.log(`Round 97 東溟航路已生成：${maps.length} 張探索地圖、${regions.length} 個區域、4 組雙向航路（8 個有向關口）、${world.atlasArt.layers.length} 個輿圖圖層；天門關→潮生嶼最短路為 3 段。`);

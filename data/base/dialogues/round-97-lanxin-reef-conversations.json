@@ -52,6 +52,52 @@
               "nextNodeId": "route"
             },
             {
+              "text": "核过的潮时传给散船，还是只传熟船队？",
+              "nextNodeId": "r102-pilot-choice",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r97-tide-ledger",
+                  "status": "completed"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-settled",
+                  "isKnown": false
+                }
+              ]
+            },
+            {
+              "text": "沿岸补给怎样影响这里？",
+              "nextNodeId": "r102-echo-shore-aid",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-shore-aid"
+                }
+              ]
+            },
+            {
+              "text": "沿岸补给怎样影响这里？",
+              "nextNodeId": "r102-echo-keeper-aid",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-keeper-aid"
+                }
+              ]
+            },
+            {
+              "text": "北境已对照，海上能续出什么？",
+              "nextNodeId": "r102-north-link",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-north-close"
+                }
+              ]
+            },
+            {
               "text": "先告辞。",
               "nextNodeId": "farewell"
             }
@@ -59,15 +105,15 @@
         },
         {
           "id": "accepted",
-          "text": "「沿西沙脊向东北到三岔口，再往北直上脊尽头。碑上横痕层层，最新一道还带着湿沙，描下来便是最眼下的潮时。」"
+          "text": "「北沙脊潮痕碑(58,22)按E调查，再来复核；这处调查没有额外低潮条件，局部通路限制看提示。上午我在(50,44)、日中在(54,50)，其余时段看M人物位置；已有见闻不用重复描刻。」"
         },
         {
           "id": "active",
-          "text": "「沿西沙脊向东北到三岔口，再往北直上脊尽头。碑上横痕层层，最新一道还带着湿沙，描下来便是最眼下的潮时。」"
+          "text": "「先记潮痕碑，再报告；先前闲聊不算复命。潮时在见闻里，没有簿页物品。下一步核观汐台(46,76)灯谱，可在去引航礁前顺路记好，少一次往返。」"
         },
         {
           "id": "completed",
-          "text": "季无潮把新潮时誊进潮簿：「三朝一转，刻痕不欺人。东北那片礁盘叫引航礁，守标的虞星槎若问起，就说澜心洲应了簿。」"
+          "text": "「潮簿已经核定，谢仪结清。先顺路记观汐台灯谱，再由东北关口到引航礁向虞星槎承接并报告；已有灯谱见闻会同步，不必再渡回来。澜心洲西口通风回岛、南口通潮生屿。」"
         },
         {
           "id": "route",
@@ -76,6 +122,126 @@
         {
           "id": "farewell",
           "text": "季无潮把潮簿揣回怀里，目光仍落在湾口的潮头上。"
+        },
+        {
+          "id": "r102-pilot-choice",
+          "text": "核过的潮时传给散船，还是只传熟船队？",
+          "options": [
+            {
+              "text": "拿贝壳2片作公开辨潮记号（季+4、虞−4、声望+3）",
+              "nextNodeId": "r102-pilot-public",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-settled",
+                  "isKnown": false
+                },
+                {
+                  "kind": "itemCount",
+                  "itemId": "item.r32.clam-shell",
+                  "minCount": 2
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "takeItem",
+                  "itemId": "item.r32.clam-shell",
+                  "quantity": 2
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "npcId": "char.r97-ji-wuchao",
+                  "delta": 4
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "npcId": "char.r97-yu-xingcha",
+                  "delta": -4
+                },
+                {
+                  "kind": "adjustRenown",
+                  "delta": 3
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r102-pilot-public"
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r102-pilot-settled"
+                }
+              ]
+            },
+            {
+              "text": "留清心丸1份给熟船值守（季−4、虞+4、声望−2）",
+              "nextNodeId": "r102-pilot-crew",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-settled",
+                  "isKnown": false
+                },
+                {
+                  "kind": "itemCount",
+                  "itemId": "item.qingxin-wan",
+                  "minCount": 1
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "takeItem",
+                  "itemId": "item.qingxin-wan",
+                  "quantity": 1
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "npcId": "char.r97-ji-wuchao",
+                  "delta": -4
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "npcId": "char.r97-yu-xingcha",
+                  "delta": 4
+                },
+                {
+                  "kind": "adjustRenown",
+                  "delta": -2
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r102-pilot-crew"
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r102-pilot-settled"
+                }
+              ]
+            },
+            {
+              "text": "先备好物资，再作决定。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "r102-pilot-public",
+          "text": "季无潮接下两片贝壳作传示样记：「散船有了认潮的样子，假号客也能照学；虞星槎得承担辨号。」"
+        },
+        {
+          "id": "r102-pilot-crew",
+          "text": "季无潮把清心丸记在船队值守名下：「队内认得人，核号快了；陌生的散船要再来问，夜航的等待仍由他们担。」"
+        },
+        {
+          "id": "r102-echo-shore-aid",
+          "text": "「你先照应岸上伤者，岑隐礁的急药却没补齐。传潮时也不能只看谁方便，得看谁承担漏下的风险。」"
+        },
+        {
+          "id": "r102-echo-keeper-aid",
+          "text": "「礁上多一份急药，岸上却少一份。传潮时之前也要想好，要把等候留给谁。」"
+        },
+        {
+          "id": "r102-north-link",
+          "text": "「北境火号报当下，旧驿刻记从前；海上潮痕记水位，灯谱记报码节律，都不是残篇密钥。别把相似短线当同一个东西。到引航礁复核，我们才有资格说海路这一段核清了。」"
         }
       ]
     },
@@ -85,7 +251,7 @@
       "nodes": [
         {
           "id": "greet",
-          "text": "虞星槎擦拭着航标的琉璃罩：「北去的船认我这盏灯。可灯何时点、点多久，得按澜心洲的潮簿来——洲上观汐台刻着一份灯谱，替我抄来。」",
+          "text": "虞星槎擦着灯罩：「灯一直有人养护，重燃星槎灯这趟差事要核准灯谱。观汐台见闻记过，就接下差事后直接报告；没记过再南渡。灯号核准了，行船仍要看潮。」",
           "options": [
             {
               "text": "我替你跑一趟。",
@@ -131,6 +297,132 @@
               "nextNodeId": "route"
             },
             {
+              "text": "公开传潮时，守标人怎样回应？",
+              "nextNodeId": "r102-echo-pilot-public",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-public"
+                }
+              ]
+            },
+            {
+              "text": "限定熟船传潮时，守标人怎样回应？",
+              "nextNodeId": "r102-echo-pilot-crew",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-crew"
+                }
+              ]
+            },
+            {
+              "text": "六项差事核妥，海路刻痕可以合成什么？",
+              "nextNodeId": "r102-sea-crosscheck",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r83-net-recovery",
+                  "status": "completed"
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r83-night-channel",
+                  "status": "completed"
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r84-lantern-ledger",
+                  "status": "completed"
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r85-low-tide-channel",
+                  "status": "completed"
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r97-tide-ledger",
+                  "status": "completed"
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r97-beacon-relight",
+                  "status": "completed"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-sea-crosscheck",
+                  "isKnown": false
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r102-sea-crosscheck"
+                }
+              ]
+            },
+            {
+              "text": "连同两处决定，结清海路这一阶段。",
+              "nextNodeId": "r102-sea-close",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r83-net-recovery",
+                  "status": "completed"
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r83-night-channel",
+                  "status": "completed"
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r84-lantern-ledger",
+                  "status": "completed"
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r85-low-tide-channel",
+                  "status": "completed"
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r97-tide-ledger",
+                  "status": "completed"
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r97-beacon-relight",
+                  "status": "completed"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-supply-settled"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-settled"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-sea-crosscheck"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-sea-close",
+                  "isKnown": false
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r102-sea-close"
+                }
+              ]
+            },
+            {
               "text": "先告辞。",
               "nextNodeId": "farewell"
             }
@@ -138,15 +430,15 @@
         },
         {
           "id": "accepted",
-          "text": "「先南渡回澜心洲，下船沿南沙脊向西南，观汐台就在脊弯处。灯谱抄全了再渡回来，灯油我已经备好了。」"
+          "text": "「观汐台在澜心洲(46,76)，灯谱记入见闻即可，不交纸物品。已有见闻可以直接报告，调查之前的闲聊不作数。」"
         },
         {
           "id": "active",
-          "text": "「先南渡回澜心洲，下船沿南沙脊向西南，观汐台就在脊弯处。灯谱抄全了再渡回来，灯油我已经备好了。」"
+          "text": "「核观汐台见闻以后，再来报告。M舆图能查人物日程与关口，东南航路(89,89)通天门关，可接北境旧驿线。」"
         },
         {
           "id": "completed",
-          "text": "虞星槎对着灯谱拨正灯芯，航标次第亮起：「潮簿对灯谱，澜心洲到天门关的夜路就亮了。往后北去的船，我替你留一盏。」"
+          "text": "「潮簿对灯谱，报码时序已核妥，谢仪与航标见闻结清。我照常养护这盏灯，你往返仍须看潮；两处决定让不同船客承担了不同的等候。」"
         },
         {
           "id": "route",
@@ -155,6 +447,22 @@
         {
           "id": "farewell",
           "text": "虞星槎拍了拍塔柱，转身去添灯油。"
+        },
+        {
+          "id": "r102-echo-pilot-public",
+          "text": "「散船方便了，可假号会照抄。你拿贝壳作样记有用，查假号的余担仍由我来收。」"
+        },
+        {
+          "id": "r102-echo-pilot-crew",
+          "text": "「值守有清心丸，认船也快。但散船不能靠这份便利，他们夜里仍要停下来核簿。」"
+        },
+        {
+          "id": "r102-sea-crosscheck",
+          "text": "虞星槎逐项对照：「回湾刻线指浅湾、风灯指向、水则记露礁、潮痕记水位、灯谱记报码节律；不是一串藏起来的暗码。残篇纸墨仍只能沿既有证据判断，作者与年岁未定。海路调查这一步有了可用的阶段答案。」"
+        },
+        {
+          "id": "r102-sea-close",
+          "text": "「调查和两处决定都留下了记录。海路阶段结案，但谁承担等候、谁先得到补给不会被一声结案抹去。北行至天门关可找沈问秋核旧驿脊，南返潮生屿可看岑隐礁的回应；大陆的更簿也仍有报信人的代价。」"
         }
       ]
     }
