@@ -110,13 +110,13 @@ function parseErrors(raw: unknown): string {
 }
 
 describe('Round 86 world-atlas row-RLE wire protocol', () => {
-  it('ships the 768×576 atlas as canonical row-RLE that passes the JSON schema', () => {
+  it('ships the 768×576 atlas with 57 canonical row-RLE layers that pass the JSON schema', () => {
     const ajv = new Ajv({ allErrors: true, strict: false });
     const validate = ajv.compile(readJson('../data/schema/world-map.schema.json') as AnySchema);
     expect(validate(rawWorld), JSON.stringify(validate.errors)).toBe(true);
 
     const art = rawWorld.atlasArt;
-    expect(art.layers).toHaveLength(53);
+    expect(art.layers).toHaveLength(57);
     for (const layer of art.layers) {
       expect(layer.cells, layer.id).toBeUndefined();
       expect(layer.cellsRle, layer.id).toHaveLength(art.rows);
@@ -133,7 +133,7 @@ describe('Round 86 world-atlas row-RLE wire protocol', () => {
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
     const art = parsed.data.atlasArt!;
-    expect(art.layers).toHaveLength(53);
+    expect(art.layers).toHaveLength(57);
     expect(Object.keys(denseLayerHashes)).toHaveLength(43);
     for (const layer of art.layers) {
       expect(layer.cells, layer.id).toHaveLength(art.rows);

@@ -49,10 +49,13 @@ describe('Round 81 global world atlas art and projection', () => {
       'world-r93-valley-snow', 'world-r93-valley-trees', 'world-r93-valley-walls',
       'world-r93-valley-detail', 'world-r93-valley-route',
     ]);
-    expect(art.layers.slice(43).map(({ id }) => id)).toEqual([
+    expect(art.layers.slice(43, 53).map(({ id }) => id)).toEqual([
       'world-r94-east-snow', 'world-r94-east-cliffs', 'world-r94-east-pines',
       'world-r94-east-route', 'world-r94-east-settlement', 'world-r94-south-shallows',
       'world-r94-south-sand', 'world-r94-south-land', 'world-r94-south-pines', 'world-r94-south-lane',
+    ]);
+    expect(art.layers.slice(53).map(({ id }) => id)).toEqual([
+      'world-r95-eastland', 'world-r95-east-coast', 'world-r95-east-trails', 'world-r95-east-forest',
     ]);
     const tilesets = new Map(art.tilesets.map((tileset) => [tileset.id, tileset]));
     expect(tilesets.has('kenney.roguelike-rpg')).toBe(true);

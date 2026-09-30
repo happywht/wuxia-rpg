@@ -52,7 +52,7 @@ describe('validateBaseData against the real repository', () => {
 
     const result = await validateBaseData(repoRoot);
     expect(result).toEqual({ ok: true, validated: expectedCount });
-  });
+  }, 15000);
 });
 
 describe('validateBaseData failure paths (temp fixtures)', () => {

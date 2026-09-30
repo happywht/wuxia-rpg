@@ -1,6 +1,6 @@
 # 人物志（CHARACTERS）
 
-- 状态：Round 94 已完成，基础世界共有 **32 名可交互 NPC**（前十三处区域 30 名；东隅·天门关的守关人沈问秋、南溟·归帆洲的舟师赵千帆各 1 名），全部为原创人物。每人有独立像素精灵帧和七时段日程，并分别发布「雪脊传书」「归帆灯火」。既有人物沿革与兼容说明见下文；Round 94 人物、对白和任务分别位于 `data/base/characters/round-94-frontiers-npcs.json`、`data/base/dialogues/round-94-frontiers-conversations.json` 与 `data/base/quests/round-94-frontiers-quests.json`。
+- 状态：Round 95 已完成，基础世界共有 **34 名可交互 NPC**；全部为原创人物，七时段人物使用独立日程和对话资源。Round 94 的沈问秋、赵千帆与 Round 95 的林越、裴杭负责东境雪关、南溟归帆与林谷海港差事。Round 95 人物、对白和任务位于 `data/base/characters/round-95-east-woodland-npcs.json`、`data/base/dialogues/round-95-east-woodland-conversations.json` 与 `data/base/quests/round-95-east-woodland-quests.json`。
 - 关联：`docs/NPC-SCHEDULES.md`（时段日程）、`docs/FACTIONS.md`（门派与师承）、`docs/KNOWLEDGE-GRAPH.md`（人物词条与关系边）、`docs/DIALOGUE-GUIDE.md`（对话写法）。
 
 ## 总表
@@ -135,3 +135,8 @@
 
 - **谷照雪**（北境·照雪关，基础位置 `(50,26)`）：守烽人，按七时段在关内、烽燧附近和南归道巡守；委托玩家在落雪夜点验本季烽号，并把燧书带回。方向精灵帧、日程、任务发布人和对白都由独立角色/任务/对白资料声明，人物外观使用既有 Puny Characters CC0 图集。
 - **柳寻径**（北境·霜松谷，基础位置 `(48,58)`）：巡路人，按七时段往返巡路石屋、冰溪渡口与界标方向；委托玩家越溪拓回前朝界标刻文，并把拓文带回。方向精灵帧、日程、任务发布人和对白都由独立角色/任务/对白资料声明，人物外观使用既有 Puny Characters CC0 图集。
+
+## Round 95 新增人物
+
+- **林越**（东境·雾杉关，基础位置 `(46,47)`）：巡林向导，按七时段走访关道与风铃石附近；发布「风铃石上的路」，请玩家沿林谷调查风铃石并返回复命。
+- **裴杭**（东溟·照叶港，基础位置 `(52,48)`）：潮路抄手，按七时段巡查码头与旧潮尺；前置差事完成后发布「照叶港的潮时」，引导玩家核对潮尺记录并返回报信。两人都复用既有 Puny Characters CC0 方向帧，日程、对白和任务引用由 Round 95 独立 JSON 声明。

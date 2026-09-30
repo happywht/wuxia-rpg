@@ -1,0 +1,11 @@
+Forest Tileset for 16 x 16 by Pav Creations (OpenGameArt.org)
+Source page: https://opengameart.org/content/forest-tileset-for-16-x-16
+Source image: https://opengameart.org/sites/default/files/forest-level-4-sheet_0.png
+License: CC0 1.0 Universal
+License deed: https://creativecommons.org/publicdomain/zero/1.0/
+
+The OpenGameArt source page marks this tileset as CC0. The original 112x64
+RGBA image is shipped unchanged and sampled on a 7x4 grid of 16x16 tiles. The
+Round 95 maps use selected tree and undergrowth frames for visible woodland
+props. The source image remains attributed here for provenance even though
+CC0 does not require attribution.

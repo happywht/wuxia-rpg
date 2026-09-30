@@ -118,7 +118,7 @@ const assembledWorld = assembleWorldMap(worldParse.data, maps, {
 if ('ok' in assembledWorld) throw new Error(assembledWorld.errors.join('\n'));
 
 describe('Round 93 Snow Pine Valley (Frostpine Valley)', () => {
-  it('extends the atlas to 43 layers while preserving all 38 old layers and region centers', () => {
+  it('extends the atlas to 57 layers while preserving all 38 old layers and region centers', () => {
     const baseline = readJson('iterations/round-93/round92-atlas-baseline.json') as {
       columns: number;
       rows: number;
@@ -132,7 +132,7 @@ describe('Round 93 Snow Pine Valley (Frostpine Valley)', () => {
 
     const art = parsed.data.atlasArt!;
     expect([art.columns, art.rows, art.tileSize]).toEqual([768, 576, 8]);
-    expect(art.layers).toHaveLength(53);
+    expect(art.layers).toHaveLength(57);
     const layers = new Map(art.layers.map((layer) => [layer.id, layer]));
     for (const [id, expectedHash] of Object.entries(baseline.layers)) {
       const layer = layers.get(id);
@@ -140,14 +140,17 @@ describe('Round 93 Snow Pine Valley (Frostpine Valley)', () => {
       const prefix = layer!.cells.slice(0, baseline.rows).map((row) => row.slice(0, baseline.columns));
       expect(sha256(JSON.stringify(prefix)), id).toBe(expectedHash);
     }
-    // The five new layers are appended after the preserved 38 baseline layers.
+    // The five Round 93 layers are appended after the preserved 38-layer baseline.
     expect(art.layers.slice(0, 38).map(({ id }) => id))
       .toEqual(Object.keys(baseline.layers));
     expect(art.layers.slice(38, 43).map(({ id }) => id)).toEqual(EXTENSION_LAYER_IDS);
-    expect(art.layers.slice(43).map(({ id }) => id)).toEqual([
+    expect(art.layers.slice(43, 53).map(({ id }) => id)).toEqual([
       'world-r94-east-snow', 'world-r94-east-cliffs', 'world-r94-east-pines',
       'world-r94-east-route', 'world-r94-east-settlement', 'world-r94-south-shallows',
       'world-r94-south-sand', 'world-r94-south-land', 'world-r94-south-pines', 'world-r94-south-lane',
+    ]);
+    expect(art.layers.slice(53).map(({ id }) => id)).toEqual([
+      'world-r95-eastland', 'world-r95-east-coast', 'world-r95-east-trails', 'world-r95-east-forest',
     ]);
 
     for (const [mapResourceId, oldAnchor] of Object.entries(baseline.regions)) {
@@ -158,7 +161,7 @@ describe('Round 93 Snow Pine Valley (Frostpine Valley)', () => {
       expect(after.x / art.tileSize, `${mapResourceId} x`).toBeCloseTo(before.x / art.tileSize, 4);
       expect(after.y / art.tileSize, `${mapResourceId} y`).toBeCloseTo(before.y / art.tileSize, 4);
     }
-    expect(parsed.data.regions).toHaveLength(15);
+    expect(parsed.data.regions).toHaveLength(18);
 
     const valley = parsed.data.regions.find(({ mapResourceId }) => mapResourceId === MAP_ID)!;
     const point = projectAtlasPosition(valley.atlasPosition, art);

@@ -175,6 +175,7 @@ try {
       'assets/opengameart/rpg-town-pixel-art-assets/transparent-bg-tiles.png',
       'assets/opengameart/puny-characters/actors.png',
       'assets/opengameart/puny-world/tileset.png',
+      'assets/opengameart/forest-tileset-for-16x16/forest-level-4-sheet.png',
       'assets/generated/world-palette.png',
     ]) {
       const response = await fetch(`${siteBase}${assetPath}`);
@@ -189,6 +190,7 @@ try {
       'assets/opengameart/rpg-town-pixel-art-assets/License.txt',
       'assets/opengameart/puny-characters/NOTICE.txt',
       'assets/opengameart/puny-world/NOTICE.txt',
+      'assets/opengameart/forest-tileset-for-16x16/NOTICE.txt',
     ]) {
       const response = await fetch(`${siteBase}${licensePath}`);
       assert.equal(response.status, 200, `素材许可或来源声明随包并可读取：${licensePath}`);

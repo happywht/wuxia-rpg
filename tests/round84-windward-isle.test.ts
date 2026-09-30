@@ -80,8 +80,8 @@ describe('Round 84 Windward Isle and expanded world atlas', () => {
     expect(parsed.ok).toBe(true);
     if (!parsed.ok || parsed.data.atlasArt === undefined) return;
     expect(parsed.data.atlasArt).toMatchObject({ columns: 768, rows: 576, tileSize: 8 });
-    expect(parsed.data.regions).toHaveLength(15);
-    expect(parsed.data.transitions).toHaveLength(28);
+    expect(parsed.data.regions).toHaveLength(18);
+    expect(parsed.data.transitions).toHaveLength(36);
 
     const region = parsed.data.regions.find(({ mapResourceId }) => mapResourceId === ISLE_ID)!;
     const col = Math.round(region.atlasPosition.x / 100 * (parsed.data.atlasArt.columns - 1));
@@ -91,7 +91,7 @@ describe('Round 84 Windward Isle and expanded world atlas', () => {
     expect(land.cells[row]?.[col]).toBeGreaterThan(0);
     expect(land.cells.flat().filter((gid) => gid > 0).length).toBeGreaterThan(2_000);
 
-    const oldArea = parsed.data.atlasArt.layers.filter(({ id }) => !id.startsWith('world-r84-') && !id.startsWith('world-r85-') && !id.startsWith('world-r87-') &&
+    const oldArea = parsed.data.atlasArt.layers.filter(({ id }) => !id.startsWith('world-r84-') && !id.startsWith('world-r85-') && !id.startsWith('world-r87-') && !id.startsWith('world-r95-') &&
       !id.startsWith('world-r91-') && !id.startsWith('world-r92-') && !id.startsWith('world-r93-') && !id.startsWith('world-r94-'));
     expect(oldArea.map(({ id }) => id)).toEqual([
       'world-ocean', 'world-land', 'world-coast', 'world-forest', 'world-relief', 'world-roads', 'world-settlements',

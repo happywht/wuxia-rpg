@@ -2344,6 +2344,132 @@
       "title": "核对归帆灯刻",
       "summary": "调查礁岸灯标，辨出安全水巷的刻线。",
       "knownByDefault": false
+    },
+    {
+      "id": "place.r95-misty-pine-gate",
+      "kind": "place",
+      "title": "雾杉关",
+      "summary": "天门关南下的林门，旧驿道穿过杉林。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.r95-windbell-stone",
+      "kind": "place",
+      "title": "风铃石",
+      "summary": "石面刻痕指向听杉谷与东溟旧潮路。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.r95-cedar-valley",
+      "kind": "place",
+      "title": "听杉谷",
+      "summary": "溪水、石桥和古杉交错的东境山谷。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.r95-old-tide-gauge",
+      "kind": "place",
+      "title": "旧潮尺",
+      "summary": "在溪谷记录潮汐泊舟时刻的古老石尺。",
+      "knownByDefault": false
+    },
+    {
+      "id": "place.r95-east-harbor",
+      "kind": "place",
+      "title": "照叶港",
+      "summary": "背靠林地、面朝东溟的渡船港口。",
+      "knownByDefault": false
+    },
+    {
+      "id": "char.r95-lin-yue",
+      "kind": "character",
+      "title": "林越",
+      "summary": "雾杉关守路人，熟悉石刻和旧驿记。",
+      "knownByDefault": false
+    },
+    {
+      "id": "char.r95-pei-hang",
+      "kind": "character",
+      "title": "裴杭",
+      "summary": "照叶港舟师，按旧潮尺安排南下渡船。",
+      "knownByDefault": false
+    },
+    {
+      "id": "quest.r95-windbell-route",
+      "kind": "quest",
+      "title": "风铃石上的路",
+      "summary": "辨认风铃石的旧路记号，带回林门。",
+      "knownByDefault": false
+    },
+    {
+      "id": "quest.r95-east-tide-course",
+      "kind": "quest",
+      "title": "照叶港的潮时",
+      "summary": "核对旧潮尺并确认渡船潮时。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r95-pine-arrival",
+      "kind": "event",
+      "title": "抵达雾杉关",
+      "summary": "沿天门关南下，发现杉林旧驿道。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r95-windbell-stone",
+      "kind": "event",
+      "title": "查看风铃石",
+      "summary": "从石刻发现通往听杉谷的方向。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r95-valley-arrival",
+      "kind": "event",
+      "title": "抵达听杉谷",
+      "summary": "发现杉溪与东溟之间的古驿路线。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r95-old-tide-gauge",
+      "kind": "event",
+      "title": "辨认旧潮尺",
+      "summary": "从溪谷石尺读出可泊舟的潮汐刻度。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r95-harbor-arrival",
+      "kind": "event",
+      "title": "抵达照叶港",
+      "summary": "发现按旧潮尺候船的林港。",
+      "knownByDefault": false
+    },
+    {
+      "id": "map.round-95-misty-pine-gate",
+      "kind": "place",
+      "title": "雾杉关探索地图",
+      "summary": "天门关南下、通往听杉谷的百格林地。",
+      "knownByDefault": false
+    },
+    {
+      "id": "map.round-95-cedar-valley",
+      "kind": "place",
+      "title": "听杉谷探索地图",
+      "summary": "溪桥、古杉与东溟旧潮尺所在的百格山谷。",
+      "knownByDefault": false
+    },
+    {
+      "id": "map.round-95-east-harbor",
+      "kind": "place",
+      "title": "照叶港探索地图",
+      "summary": "由雾杉林路进入、乘船南下归帆洲的港口地图。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r95-east-pier",
+      "kind": "event",
+      "title": "照叶港南栈",
+      "summary": "在南栈尽头确认前往归帆洲的潮船。",
+      "knownByDefault": false
     }
   ]
 }

@@ -1,6 +1,6 @@
 # 世界舆图与区域旅行
 
-Round 10 将单张网格地图扩展为资料驱动的区域集合；Round 79 新增东海群岛·落潮湾；Round 81–87 扩展东岸与列岛；Round 91–93 建设雁回崖、照雪关和霜松谷；Round 94 将可移动总图扩至 **768×576 格、53 个 RLE 图层**，新增东隅·天门关与南溟·归帆洲。当前共有十五处 100×100 区域，总图输出为 8 源像素/格。玩家可在总览与当前区域细图间切换，拖动、缩放和方向键平移；M 打开舆图，Home 回到总览。旧 640×448 范围内的 43 层逐格不变，旧区域中心保持稳定。地图尺寸、碰撞、分层贴图、区域命名、地标、关口端点和区域事件仍由 `data/` 声明；引擎只执行通用协议。
+Round 10 将单张网格地图扩展为资料驱动的区域集合；Round 79 新增东海群岛·落潮湾；Round 81–87 扩展东岸与列岛；Round 91–94 建设北境、东境与南溟；Round 95 将可移动总图维持在 **768×576 格**、扩至 **57 个 RLE 图层**，并新增雾杉关、听杉谷和照叶港。当前共有十八处 100×100 区域，总图输出为 8 源像素/格。玩家可在总览与当前区域细图间切换，拖动、缩放和方向键平移；M 打开舆图，Home 回到总览。Round 95 前 53 层像素逐格不变，原十五处区域中心保持稳定。地图尺寸、碰撞、分层贴图、区域命名、地标、关口端点和区域事件仍由 `data/` 声明；引擎只执行通用协议。
 
 ## Round 89：雾航湾至东汊旧水槽
 
@@ -113,10 +113,13 @@ Round 10 将单张网格地图扩展为资料驱动的区域集合；Round 79 �
 | `map.round-93-snow-pine-valley` | 北境·霜松谷 | (56.32333768, 4.17391305) | 100×100 | (96, 50) | `.`、`,`、`=` 可走；`#`、`~` 冰崖/山体阻挡 |
 | `map.round-94-east-gate` | 东隅·天门关 | (91.26466754, 16.69565217) | 100×100 | (3, 50) | `.`、`,`、`=` 可走；`#`、`~` 冰崖/山体阻挡 |
 | `map.round-94-returning-sails` | 南溟·归帆洲 | (52.80312907, 85.56521739) | 100×100 | (50, 97) | `.`、`,`、`=` 可走；`#`、`~` 海水/礁石阻挡 |
+| `map.round-95-misty-pine-gate` | 东境·雾杉关 | (91.26466753585397, 38.26086956521739) | 100×100 | (3, 50) | `.`、`,`、`=` 可走；`#`、`^`、`~` 林石/山体阻挡 |
+| `map.round-95-cedar-valley` | 东境·听杉谷 | (91.26466753585397, 60) | 100×100 | (3, 50) | `.`、`,`、`=` 可走；`#`、`^`、`~` 林石/山体阻挡 |
+| `map.round-95-east-harbor` | 东溟·照叶港 | (75.61929595827901, 81.73913043478261) | 100×100 | (3, 50) | `.`、`,`、`=` 可走；`#`、`^`、`~` 林石/海水阻挡 |
 
-- 世界图 `world.atlas` 的 `startingMapResourceId` 为 `map.round-01-grid`；十五张地图的 `id` 均与 manifest 资源 id 一致，区域地图格尺寸均为 48 世界像素。
-- 十五张百格区域图均将 16×16 素材格最近邻放大至 48×48 世界像素；舆图总览使用独立 8 像素/格烘焙图层，移动碰撞始终只看区域地图的 `grid`，不会根据美术像素推断阻挡。
-- 玩家行走在十五张百格大地图时镜头均跟随并限制在地图范围内；地图视觉对象显式采用世界滚动系数，不继承场景为 HUD 设定的固定坐标。HUD、面板与天气覆盖层固定在画面上。
+- 世界图 `world.atlas` 的 `startingMapResourceId` 为 `map.round-01-grid`；十八张地图的 `id` 均与 manifest 资源 id 一致，区域地图格尺寸均为 48 世界像素。
+- 十八张百格区域图均将 16×16 素材格最近邻放大至 48×48 世界像素；舆图总览使用独立 8 像素/格烘焙图层，移动碰撞始终只看区域地图的 `grid`，不会根据美术像素推断阻挡。
+- 玩家行走在十八张百格大地图时镜头均跟随并限制在地图范围内；地图视觉对象显式采用世界滚动系数，不继承场景为 HUD 设定的固定坐标。HUD、面板与天气覆盖层固定在画面上。
 - 芦苇河滩（`place.reedbank`）仍是知识图谱地点词条而非地图资源：第三张 `grid-map` 是铁嶂北道，河滩不可旅行，详见 [`WORLD-SETTING.md`](WORLD-SETTING.md) §2。
 
 ## 关口端点
@@ -153,6 +156,14 @@ Round 10 将单张网格地图扩展为资料驱动的区域集合；Round 79 �
 | `gate.r94-east-to-terrace` | 西返雁回崖 | `map.round-94-east-gate` · (4, 50) | `map.round-91-cloud-north-terrace` · (95, 60) |
 | `gate.r94-tide-to-south` | 南渡归帆洲 | `map.round-85-tide-isle` · (7, 50) | `map.round-94-returning-sails` · (50, 97) |
 | `gate.r94-south-to-tide` | 北返潮生屿 | `map.round-94-returning-sails` · (49, 97) | `map.round-85-tide-isle` · (9, 50) |
+| `gate.r95-east-to-pine` | 东脊入杉关 | `map.round-94-east-gate` · (5, 50) | `map.round-95-misty-pine-gate` · (3, 50) |
+| `gate.r95-pine-to-east` | 北返天门关 | `map.round-95-misty-pine-gate` · (4, 50) | `map.round-94-east-gate` · (6, 50) |
+| `gate.r95-pine-to-valley` | 南下听杉谷 | `map.round-95-misty-pine-gate` · (96, 50) | `map.round-95-cedar-valley` · (3, 50) |
+| `gate.r95-valley-to-pine` | 北返雾杉关 | `map.round-95-cedar-valley` · (4, 50) | `map.round-95-misty-pine-gate` · (95, 50) |
+| `gate.r95-valley-to-harbor` | 沿海路赴照叶港 | `map.round-95-cedar-valley` · (96, 50) | `map.round-95-east-harbor` · (3, 50) |
+| `gate.r95-harbor-to-valley` | 循溪路返听杉谷 | `map.round-95-east-harbor` · (4, 50) | `map.round-95-cedar-valley` · (95, 50) |
+| `gate.r95-harbor-to-south` | 西渡归帆洲 | `map.round-95-east-harbor` · (75, 50) | `map.round-94-returning-sails` · (52, 97) |
+| `gate.r95-south-to-harbor` | 东返照叶港 | `map.round-94-returning-sails` · (52, 96) | `map.round-95-east-harbor` · (74, 50) |
 
 引擎装配规则（`src/engine/world-map.ts` 的 `assembleWorldMap`）：`from` 端点必须可走**且不得位于该图玩家出生格**；`to` 落点必须可走；两端地图必须都已登记进 `regions`。任一不满足即整条关口禁用并给出警告，不影响其他关口。协议不自动推断双向旅行——往返必须像上表一样显式声明两条记录。
 
@@ -213,6 +224,12 @@ Round 10 将单张网格地图扩展为资料驱动的区域集合；Round 79 �
 | `event.r94-east-beacon` | `map.round-94-east-gate` · (83, 62) | 邻近按 E 调查 | 是 | 无 | `place.r94-east-beacon`（东望烽台） |
 | `event.r94-south-arrival` | `map.round-94-returning-sails` · (50, 94) | 踏入 | 是 | 无 | `place.r94-returning-sails`（南溟·归帆洲） |
 | `event.r94-south-lantern` | `map.round-94-returning-sails` · (79, 65) | 邻近按 E 调查 | 是 | 无 | `place.r94-homeward-lantern`（归帆灯标） |
+| `event.r95-pine-arrival` | `map.round-95-misty-pine-gate` · (6, 50) | 踏入 | 是 | 无 | `place.r95-misty-pine-gate`（雾杉关） |
+| `event.r95-windbell-stone` | `map.round-95-misty-pine-gate` · (72, 33) | 邻近按 E 调查 | 是 | 无 | `place.r95-windbell-stone`（风铃石） |
+| `event.r95-valley-arrival` | `map.round-95-cedar-valley` · (6, 50) | 踏入 | 是 | 无 | `place.r95-cedar-valley`（听杉谷） |
+| `event.r95-old-tide-gauge` | `map.round-95-cedar-valley` · (77, 31) | 邻近按 E 调查 | 是 | 无 | `place.r95-old-tide-gauge`（旧潮尺） |
+| `event.r95-harbor-arrival` | `map.round-95-east-harbor` · (7, 50) | 踏入 | 是 | 无 | `place.r95-east-harbor`（照叶港） |
+| `event.r95-east-pier` | `map.round-95-east-harbor` · (74, 50) | 踏入 | 是 | 无 | `place.r95-east-harbor`（照叶港） |
 
 `interaction` 声明 `prompt`、可选曼哈顿距离 `range`（1–4，省略按 1 格）和可选 `approachDirections`（从玩家格朝向目标格的 `down/left/right/up`；省略表示四向均可）。调查目标必须与玩家同一行或同一列；两格以上时，中间地形必须可走且不能被 NPC/遭遇占用。交互只在提示、方向/距离、事件条件和一次性状态同时允许时出现，并在按 E 后复用固定事件文本、一次性完成记账及知识发现。含 `interaction` 的事件不会因走上目标格而自动结算。未声明该字段的旧世界图事件仍按原有踏入触发路径工作。
 
@@ -406,6 +423,13 @@ Round 79 新增第六块 100×100 海岛地图「东海群岛·落潮湾」，�
 - 新增 `map.round-94-east-gate`（东隅·天门关）和 `map.round-94-returning-sails`（南溟·归帆洲），均为独立 100×100 网格地图。天门关由雁回崖东脊双向步行接入；归帆洲由潮生屿乘渡双向接入。新区域中心约为 `(700.5,96.5)` 与 `(405.5,492.5)`。
 - 新增沈问秋与赵千帆七时段日程、烽台/灯标调查、双向路线、地标及「雪脊传书」「归帆灯火」。自动化逐图 BFS 检查入口、NPC、调查点和返程；真实跨图步行是否完成另记在本轮开发日志。
 - 舆图使用已登记的 Ansimuz Tiny RPG Mountain、zaphgames Winter、Shade Puny World CC0 素材与 Puny Characters 人物帧；来源许可与本轮新用途见 [`REFERENCES.md`](REFERENCES.md)。
+
+## Round 95：雾杉关、听杉谷与照叶港
+
+- 总图画布继续保持 768×576 格，追加 `world-r95-eastland`、`world-r95-east-coast`、`world-r95-east-trails`、`world-r95-east-forest` 四层林谷地貌/道路像素。Round 94 的 53 层哈希以及十五处既有区域投影由 Round 95 基线与专项测试逐项守护。
+- 新增 `map.round-95-misty-pine-gate`（雾杉关）、`map.round-95-cedar-valley`（听杉谷）、`map.round-95-east-harbor`（照叶港）三张完整 100×100 地图。从雁回崖往东接天门关后，依次穿过三地；照叶港由双向乘渡往返南溟·归帆洲。四组往返路线对应八个有向关口，地图内入口逐格可达，世界路线可由 BFS 求出。
+- 林冠与矮灌木装饰使用本地透明 16×16 PNG，来源为 OpenGameArt 上的 [Forest Tileset for 16 x 16](https://opengameart.org/content/forest-tileset-for-16-x-16)，来源页面标示 CC0 1.0。图集原文件与 NOTICE 随发行白名单打包，来源/用途记录见 [`REFERENCES.md`](REFERENCES.md)；人物继续使用既有 Puny Characters CC0 图集。
+- 新增林越、裴杭七时段日程、六处调查地标、区域事件和「风铃石上的路」→「照叶港的潮时」连续差事。详细地图碰撞、门口坐标和任务发现条件以三张独立 `grid-map` 与 Round 95 世界/任务资料为准；自动化验证覆盖入口、NPC、调查格和返程路线。
 - 新增第十三张 100×100 地图「北境·霜松谷」。自照雪关西缘 `(3,64)` 经西行冰桥进入谷内东口 `(96,50)`，返程从霜松谷 `(95,50)` 走东归雪道回到照雪关 `(4,64)`；冰溪冰缝、风口崖、雪松林海与边界的阻挡都在独立 `grid`，贴图不承担碰撞。生成器统计 6,426 个可行格且 6,418 格可由入口到达。
 - 雪原、冰溪与雪松全部复用 Round 92 已目检的 OpenGameArt zaphgames Winter Tileset 18 个唯一 0 基许可帧，不引入任何新素材；角色继续使用既有 CC0 Puny Characters 图集。来源、许可文本和发行白名单见 [`REFERENCES.md`](REFERENCES.md)。
 - 新增巡路人柳寻径（七时段日程）、「界标寻踪」和 4 个区域发现事件；任务要求先从照雪关西缘冰桥进入霜松谷，越过冰溪在旧界标下按 E 拓下前朝刻文，再回到柳寻径处复命。角色、任务、对白、触发条件和图谱见独立资料，测试命令为 `npm run smoke:round-93`。

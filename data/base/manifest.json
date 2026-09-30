@@ -261,6 +261,36 @@
       "schema": "world-map"
     },
     {
+      "id": "map.round-95-misty-pine-gate",
+      "path": "maps/round-95-misty-pine-gate.json",
+      "schema": "grid-map"
+    },
+    {
+      "id": "map.round-95-cedar-valley",
+      "path": "maps/round-95-cedar-valley.json",
+      "schema": "grid-map"
+    },
+    {
+      "id": "map.round-95-east-harbor",
+      "path": "maps/round-95-east-harbor.json",
+      "schema": "grid-map"
+    },
+    {
+      "id": "npc.round-95-east-woodland-set",
+      "path": "characters/round-95-east-woodland-npcs.json",
+      "schema": "npc-set"
+    },
+    {
+      "id": "dialogue.round-95-east-woodland-set",
+      "path": "dialogues/round-95-east-woodland-conversations.json",
+      "schema": "dialogue-set"
+    },
+    {
+      "id": "quest.round-95-east-woodland-set",
+      "path": "quests/round-95-east-woodland-quests.json",
+      "schema": "quest-set"
+    },
+    {
       "id": "calendar.base",
       "path": "worldview/calendar.json",
       "schema": "game-calendar"

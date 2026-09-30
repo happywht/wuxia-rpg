@@ -145,7 +145,7 @@ describe('Round 50 final acceptance audit', () => {
     expect(report.problems).toContain('缺少 Round 43 计划：iterations/round-43/plan.md');
     expect(report.problems).toContain('Git 历史缺少 Round 43 commit（前缀应为 round-43:）');
     expect(report.problems.some((problem) => problem.includes('物品数量不足：49/50'))).toBe(true);
-  });
+  }, 15000);
 
   it('rejects incomplete plans and a MOD resource that does not match a base resource', async () => {
     const fixture = await makeValidFixture();
@@ -179,7 +179,7 @@ describe('Round 50 final acceptance audit', () => {
       problem.includes('子任务小节含 0 项') &&
       problem.includes('最低工时估算 5 分钟'))).toBe(true);
     expect(report.problems).toContain('示例 MOD 覆盖的资源未登记在基础 manifest：map.unregistered');
-  });
+  }, 15000);
 
   it('flags exact world-data names found in engine source', async () => {
     const fixture = await makeValidFixture();

@@ -100,3 +100,9 @@ Kenney 的许可 FAQ 明确说明 Kenney.nl 提供的素材可在 CC0 条款下�
 
 - 本轮未下载或新增第三方素材，继续使用上文登记的 CC0 来源：Ansimuz Tiny RPG Mountain 的山地/桥梁图素、zaphgames Winter 的雪原与雪松帧、Shade Puny World 的海水/沙滩/林地，以及 Puny Characters 的人物方向帧。
 - 用途扩展为 768×576 全域舆图的东境天门关雪脊与南溟归帆洲浅滩、沙洲和岛林；overview 每格按 8 源像素烘焙，区域地图仍按 16×16 源图素读取。人物帧由两个 Round 94 NPC 的 JSON 数据引用。素材页、CC0 授权和发行白名单规则沿用各来源条目；不含未授权商业素材。
+
+### Round 95 新增素材
+
+- **OpenGameArt Pav Creations Forest Tileset for 16 x 16**： [素材页](https://opengameart.org/content/forest-tileset-for-16-x-16)；[源 PNG](https://opengameart.org/sites/default/files/forest-level-4-sheet_0.png)。素材页明确标注 CC0；CC0 1.0 不要求署名，本项目仍记录作者和来源以便核查。
+- 实际使用 `data/assets/opengameart/forest-tileset-for-16x16/forest-level-4-sheet.png`（112×64 RGBA，7×4 个 16×16 格）。素材保持原图，使用经人工查看的透明树冠/灌木帧，渲染在东境三张探索地图与 768×576 世界舆图的林地层；图集随 `NOTICE.txt` 进入发行包，不含预览或源工程文件。
+- 新增地图人物继续引用 Shade Puny Characters 公开 CC0 精灵图集；玩家与 NPC 精灵不使用来源不明的图像。所有游戏运行时素材均本地打包，不依赖远程 URL。

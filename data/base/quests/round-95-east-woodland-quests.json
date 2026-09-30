@@ -1,0 +1,65 @@
+{
+  "quests": [
+    {
+      "id": "quest.r95-windbell-route",
+      "name": "风铃石上的路",
+      "description": "杉关守路人林越请你辨认风铃石的旧路记号，并把通往溪谷的线索带回林门。",
+      "giverNpcId": "char.r95-lin-yue",
+      "objectives": [
+        {
+          "id": "objective.r95-find-windbell",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r95-windbell-stone",
+          "requiredCount": 1,
+          "text": "在杉林深处辨认风铃石的刻痕"
+        },
+        {
+          "id": "objective.r95-report-windbell",
+          "kind": "talkToNpc",
+          "targetId": "char.r95-lin-yue",
+          "requiredCount": 1,
+          "text": "回雾杉关向林越说明石上的路记"
+        }
+      ],
+      "rewards": {
+        "experience": 44,
+        "currency": 32,
+        "discoverKnowledgeNodeIds": [
+          "place.r95-cedar-valley"
+        ]
+      }
+    },
+    {
+      "id": "quest.r95-east-tide-course",
+      "name": "照叶港的潮时",
+      "description": "林越的路记确认后，照叶港舟师裴杭请你核对听杉谷旧潮尺，再回港确认渡船时刻。",
+      "giverNpcId": "char.r95-pei-hang",
+      "prerequisiteQuestIds": [
+        "quest.r95-windbell-route"
+      ],
+      "objectives": [
+        {
+          "id": "objective.r95-read-tide-gauge",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r95-old-tide-gauge",
+          "requiredCount": 1,
+          "text": "在听杉溪辨出旧潮尺的泊舟刻度"
+        },
+        {
+          "id": "objective.r95-report-tide-course",
+          "kind": "talkToNpc",
+          "targetId": "char.r95-pei-hang",
+          "requiredCount": 1,
+          "text": "回照叶港与裴杭校准渡船时刻"
+        }
+      ],
+      "rewards": {
+        "experience": 56,
+        "currency": 46,
+        "discoverKnowledgeNodeIds": [
+          "place.r95-east-harbor"
+        ]
+      }
+    }
+  ]
+}

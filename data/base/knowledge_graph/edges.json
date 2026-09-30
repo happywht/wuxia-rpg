@@ -3077,6 +3077,146 @@
       "toId": "place.r94-moon-reef",
       "relation": "rewards",
       "summary": "复命后解锁半月浅礁见闻。"
+    },
+    {
+      "id": "kg.edge.r95-pine-located",
+      "fromId": "map.round-95-misty-pine-gate",
+      "toId": "place.r95-misty-pine-gate",
+      "relation": "locatedAt",
+      "summary": "雾杉关地图承载林门旧驿道。"
+    },
+    {
+      "id": "kg.edge.r95-stone-located",
+      "fromId": "place.r95-windbell-stone",
+      "toId": "map.round-95-misty-pine-gate",
+      "relation": "locatedAt",
+      "summary": "风铃石位于雾杉关杉林深处。"
+    },
+    {
+      "id": "kg.edge.r95-valley-located",
+      "fromId": "map.round-95-cedar-valley",
+      "toId": "place.r95-cedar-valley",
+      "relation": "locatedAt",
+      "summary": "听杉谷地图承载溪桥与古杉地貌。"
+    },
+    {
+      "id": "kg.edge.r95-gauge-located",
+      "fromId": "place.r95-old-tide-gauge",
+      "toId": "map.round-95-cedar-valley",
+      "relation": "locatedAt",
+      "summary": "旧潮尺位于听杉谷溪边。"
+    },
+    {
+      "id": "kg.edge.r95-harbor-located",
+      "fromId": "map.round-95-east-harbor",
+      "toId": "place.r95-east-harbor",
+      "relation": "locatedAt",
+      "summary": "照叶港地图承载东溟渡船栈桥。"
+    },
+    {
+      "id": "kg.edge.r95-lin-located",
+      "fromId": "char.r95-lin-yue",
+      "toId": "map.round-95-misty-pine-gate",
+      "relation": "locatedAt",
+      "summary": "林越每日在雾杉关附近巡视。"
+    },
+    {
+      "id": "kg.edge.r95-pei-located",
+      "fromId": "char.r95-pei-hang",
+      "toId": "map.round-95-east-harbor",
+      "relation": "locatedAt",
+      "summary": "裴杭在照叶港安排潮船。"
+    },
+    {
+      "id": "kg.edge.r95-lin-participates",
+      "fromId": "char.r95-lin-yue",
+      "toId": "quest.r95-windbell-route",
+      "relation": "participatesIn",
+      "summary": "林越委托玩家辨认风铃石。"
+    },
+    {
+      "id": "kg.edge.r95-windbell-needs",
+      "fromId": "quest.r95-windbell-route",
+      "toId": "place.r95-windbell-stone",
+      "relation": "requires",
+      "summary": "风铃石上的路需要调查旧石刻。"
+    },
+    {
+      "id": "kg.edge.r95-windbell-rewards",
+      "fromId": "quest.r95-windbell-route",
+      "toId": "place.r95-cedar-valley",
+      "relation": "rewards",
+      "summary": "完成路记后确认听杉谷见闻。"
+    },
+    {
+      "id": "kg.edge.r95-pei-participates",
+      "fromId": "char.r95-pei-hang",
+      "toId": "quest.r95-east-tide-course",
+      "relation": "participatesIn",
+      "summary": "裴杭委托玩家校准渡船潮时。"
+    },
+    {
+      "id": "kg.edge.r95-tide-needs",
+      "fromId": "quest.r95-east-tide-course",
+      "toId": "place.r95-old-tide-gauge",
+      "relation": "requires",
+      "summary": "照叶港潮时需要辨认听杉谷旧潮尺。"
+    },
+    {
+      "id": "kg.edge.r95-tide-prerequisite",
+      "fromId": "quest.r95-east-tide-course",
+      "toId": "quest.r95-windbell-route",
+      "relation": "requires",
+      "summary": "先辨清风铃石旧路，裴杭才托付潮时校验。"
+    },
+    {
+      "id": "kg.edge.r95-tide-rewards",
+      "fromId": "quest.r95-east-tide-course",
+      "toId": "place.r95-east-harbor",
+      "relation": "rewards",
+      "summary": "完成潮时校验后记录照叶港渡船时刻。"
+    },
+    {
+      "id": "kg.edge.r95-arrival-triggers",
+      "fromId": "event.r95-pine-arrival",
+      "toId": "place.r95-misty-pine-gate",
+      "relation": "triggers",
+      "summary": "进入雾杉关时发现林门。"
+    },
+    {
+      "id": "kg.edge.r95-stone-triggers",
+      "fromId": "event.r95-windbell-stone",
+      "toId": "place.r95-windbell-stone",
+      "relation": "triggers",
+      "summary": "查看风铃石时发现旧路记。"
+    },
+    {
+      "id": "kg.edge.r95-valley-triggers",
+      "fromId": "event.r95-valley-arrival",
+      "toId": "place.r95-cedar-valley",
+      "relation": "triggers",
+      "summary": "进入听杉谷时记录溪桥。"
+    },
+    {
+      "id": "kg.edge.r95-gauge-triggers",
+      "fromId": "event.r95-old-tide-gauge",
+      "toId": "place.r95-old-tide-gauge",
+      "relation": "triggers",
+      "summary": "调查旧潮尺时发现潮汐刻度。"
+    },
+    {
+      "id": "kg.edge.r95-harbor-triggers",
+      "fromId": "event.r95-harbor-arrival",
+      "toId": "place.r95-east-harbor",
+      "relation": "triggers",
+      "summary": "进入照叶港时发现渡船港口。"
+    },
+    {
+      "id": "kg.edge.r95-pier-triggers",
+      "fromId": "event.r95-east-pier",
+      "toId": "place.r95-east-harbor",
+      "relation": "triggers",
+      "summary": "走到照叶南栈时查看渡船时刻。"
     }
   ]
 }

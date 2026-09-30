@@ -70,6 +70,8 @@ async function ensureBuildIsPresent() {
     'assets/opengameart/winter-tileset-zaph/tileset.png',
     'assets/opengameart/winter-tileset-zaph/CC0-1.0.txt',
     'assets/opengameart/winter-tileset-zaph/NOTICE.txt',
+    'assets/opengameart/forest-tileset-for-16x16/forest-level-4-sheet.png',
+    'assets/opengameart/forest-tileset-for-16x16/NOTICE.txt',
     'assets/generated/world-palette.png',
   ];
   for (const relative of required) {

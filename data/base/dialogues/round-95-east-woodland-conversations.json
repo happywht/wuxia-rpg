@@ -1,0 +1,162 @@
+{
+  "conversations": [
+    {
+      "id": "dlg.r95-lin-yue",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "林越把一张旧驿图压在木箱上的线索写在旧路记上。",
+          "options": [
+            {
+              "text": "我来查一查。",
+              "nextNodeId": "accepted",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r95-windbell-route",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r95-windbell-route"
+                }
+              ]
+            },
+            {
+              "text": "事情已经办妥。",
+              "nextNodeId": "completed",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r95-windbell-route",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "我还在路上。",
+              "nextNodeId": "active",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r95-windbell-route",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "这条路怎么走？",
+              "nextNodeId": "route"
+            },
+            {
+              "text": "先告辞。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "accepted",
+          "text": "「沿主路向南，过两处杉影后从溪石边折上坡。风铃石就在坡顶，记号会指向谷中石桥。」"
+        },
+        {
+          "id": "active",
+          "text": "「沿主路向南，过两处杉影后从溪石边折上坡。风铃石就在坡顶，记号会指向谷中石桥。」"
+        },
+        {
+          "id": "completed",
+          "text": "林越把路记补全：「三道短线从山入水，看来旧驿道与潮船本是一条路。」"
+        },
+        {
+          "id": "route",
+          "text": "「沿主路向南，过两处杉影后从溪石边折上坡。风铃石就在坡顶，记号会指向谷中石桥。」"
+        },
+        {
+          "id": "farewell",
+          "text": "对方点头收好手边的行旅记，继续看顾林路与潮船。"
+        }
+      ]
+    },
+    {
+      "id": "dlg.r95-pei-hang",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "裴杭在潮牌旁比对着船期的线索写在旧路记上。",
+          "options": [
+            {
+              "text": "我来查一查。",
+              "nextNodeId": "accepted",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r95-east-tide-course",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r95-east-tide-course"
+                }
+              ]
+            },
+            {
+              "text": "事情已经办妥。",
+              "nextNodeId": "completed",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r95-east-tide-course",
+                  "status": "completed"
+                }
+              ]
+            },
+            {
+              "text": "我还在路上。",
+              "nextNodeId": "active",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r95-east-tide-course",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "这条路怎么走？",
+              "nextNodeId": "route"
+            },
+            {
+              "text": "先告辞。",
+              "nextNodeId": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "accepted",
+          "text": "「从港口回听杉谷，沿溪找到旧潮尺。记下末端指向的浅礁，再回来定船时。」"
+        },
+        {
+          "id": "active",
+          "text": "「从港口回听杉谷，沿溪找到旧潮尺。记下末端指向的浅礁，再回来定船时。」"
+        },
+        {
+          "id": "completed",
+          "text": "裴杭将潮牌翻到渡船一面：「旧潮尺没有骗人。下一班船退潮时开，归帆洲的灯会替你引路。」"
+        },
+        {
+          "id": "route",
+          "text": "「从港口回听杉谷，沿溪找到旧潮尺。记下末端指向的浅礁，再回来定船时。」"
+        },
+        {
+          "id": "farewell",
+          "text": "对方点头收好手边的行旅记，继续看顾林路与潮船。"
+        }
+      ]
+    }
+  ]
+}
