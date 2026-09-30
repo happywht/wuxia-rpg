@@ -2111,7 +2111,7 @@
       "id": "place.r92-north-cairn",
       "kind": "place",
       "title": "北界碑",
-      "summary": "雪原尽头的界碑，刻着大梁北界的极限。",
+      "summary": "雪原尽头的界碑，前朝大梁的旧刻标记着大雍北境的极限。",
       "knownByDefault": false
     },
     {
@@ -2153,7 +2153,7 @@
       "id": "event.r92-north-cairn",
       "kind": "event",
       "title": "界碑读雪",
-      "summary": "在北界碑下读出大梁版图的北限。",
+      "summary": "在北界碑下辨出前朝大梁旧刻与大雍北境的交界。",
       "knownByDefault": false
     },
     {

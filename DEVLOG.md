@@ -4,6 +4,43 @@
 
 ---
 
+## Round 98 — 设定统一与江南—渡口旅程入口（2026-09-30，已完成）
+
+### 计划与实现
+
+- 计划先写于 [`iterations/round-98/plan.md`](iterations/round-98/plan.md)：统一大雍/大梁设定、深化四人开局对白、串联既有两项差事、补回归测试与文档；不新增地图/任务/知识节点，不触碰既有未跟踪截图。
+- 王朝设定：当朝统一为大雍；`scripts/generate-round92-north-pass.mjs` 的守烽人指路、照雪关区域描述、界碑事件与两个图谱词条改为「大雍为当下、碑面『大梁北界，至此为限』为前朝大梁遗刻」，对应 5 处 JSON 输出（world-map×2、nodes×2、round-92 对白×1）同步手改。**未重跑生成器**——本轮未做 replay 验证，重跑对后续轮次手改资料的实际影响未经验证，不能当作确定事实；出于风险控制选择不重跑。源/输出一致性改由 `tests/round98-opening.test.ts` 从生成器源文件与 JSON 双向对表守护。`docs/WORLD-SETTING.md` 记录设定决策并更新 §1 残篇描述与 §8 叙事边界。
+- 开局对白（`data/base/dialogues/round-03-conversations.json`、`round-30-conversations.json`）：
+  - 沈墨涵：删除「今夜子时，后巷灯下」及 `agree` 节点与两个 timeOfDay 选项；新增 `scroll-assessment`（纸墨两条阶段判断）与 `scroll-leads`（白鹭洲/柳听澜 + 镇东石阶渡口真实指路）；`scroll-honest`/`scroll-bully` 保留原结算（后者修掉虚构碎银文本）；「问声好」移除 +5 关系效果。
+  - 姜百味：货郎口信三态选项（offered 由其亲口接取 / active 方向 / completed 引出渡籍补录）；「帮扶货担」加 `npcRelationship ≤ 4` 门控（关系在门槛之上时隐藏、跌回门槛内可再见——关系门控，非一次性标记，防同一时点刷清心丸与关系）。
+  - 白鹭洲：三个会盟报备选项移除 +5 关系（`shareKnowledgeNode` 幂等保留）；新增口信送达回声（completed 门控，见同日复核修订）与渡籍补录 offered/active/completed 三态（offer 节点沿用 `acceptQuest` 确认模式），完成后引出书院夜课。
+  - 柳听澜：新增纸龄判断节点 `canpian-assessment`（按转述对照五年前誊盟书样纸、相近只作参照，明确「不替纸猜」不揭幕后；入口无条件，交出残篇的旧档可推进）；渡籍誊正/归档回声两态。
+- 新增 `docs/JOURNEY-FACTS.md` 旅程事实索引（三条主线的已实现/阶段答案/未解线索/奖励边界、四人动机速查、本轮修复与范围外奖励问题清单——陆贞娘、顾夜尘的重复关系增益明确记录待后续人物线轮次处理）。
+- 不新增任务/地图/知识节点；未实现的阶段规则零引入（幂等全部复用 `questStatus`/`npcRelationship`/`itemCount`/`shareKnowledgeNode` 既有协议）。
+
+### 验证记录
+
+- `npm run validate:data`：100 项基础资源 Schema 通过（对话修改后即时复跑）。
+- `npx vitest run tests/round98-opening.test.ts`：11 项通过（真实 dialogue runtime 条件求值、原子效果、任务三态、幂等与设定源/输出一致）。
+- 修复过程中三处测试问题：`indexMartialArts` 笔误、开局自带清心丸导致的计数断言（改增量断言）、声望下限 0 钳制（先垫 +10 再验 −2 真实生效）。
+- `tests/round59-regional-dialogue.test.ts` greet 选项数量基准更新（白鹭洲 16→20、姜百味 4→7），注明 Round 98 旅程入口。
+- 全量 `npm run check`、`npm run build` 与 `git diff --check` 结果见 [`iterations/round-98/verification.md`](iterations/round-98/verification.md)。
+
+### 未做与边界
+
+- 未重跑 `generate-round92-north-pass.mjs`（理由见上）；生成器与输出一致性靠测试对表而非全量 replay。
+- 未做真实键盘实走（Round 99 计划项）；未处理范围外奖励问题（已记录于 JOURNEY-FACTS §5）；总目标不因本轮标完成。
+
+### 同日复核修订（独立复核发现实质问题，已修复）
+
+1. **谈话时序**：`GridScene.openDialogueWith` 先发 `npc-talk` 信号、后 `panel.open` 求值首节点——「货郎口信」「渡籍补录」这类谈话即完成的差事，玩家实机看到的首节点已是 completed 态，active 门控回声不可见。修复：白鹭洲口信回声改 completed 门控（幂等复述，无 effects）；柳听澜完成回声改「先生，渡籍已经誊好了么？」/`r31-filed`「刚誊好」文案（誊好即自动完成，返回渡口只是可选复核）；`r31-transcribe` active 节点数据保留，实机由完成节点承接。测试改为先发谈话信号、再按 completed 态选择，并断言 active 选项完成后不可见。
+2. **不存在的字据操作**：渡籍补录 quest 描述去掉「字据随后取回」，写明「见面向柳听澜说明来意，誊正完成即算办妥，谢仪自动致付」；白鹭洲 offer/accepted/done 与柳听澜誊正文案同步去字据；「几步路的事」两处（白 offer、沈指路）删除——100×100 大地图不作错误路程承诺。
+3. **残篇证据表述**：无残页在手的判断不能物理比对——柳听澜 `canpian-assessment` 改为按掌柜描述/转述对照五年前样纸，相近仅作参照，不断言「同一批」与确切纸龄，指向渡籍底册；沈墨涵 `scroll-assessment` 的「渡口船上进的货」改为「像是从水路来的（推测）」，`scroll-leads` 不再称柳「一眼能断年份」。
+4. **JOURNEY-FACTS 校正**：「唯一一组真正分支」为误述，按 `docs/CURRENT-STATE-AUDIT.md` 口径改为 3 组互斥各 2 项（R31/R42/R44）；「帮扶货担只结算一次」改为关系门控边界表述（跌回 ≤4 可重领，非永久一次性），测试补该边界断言。
+5. **世界设定开头与 replay 表述**：§1 引用框的「并存未解释、列为事项」改为历史盘点口吻（Round 98 已处理），状态行升至 Round 98；本日志与 verification 的 replay 风险改为「本轮未验证、影响未经验证」，不把猜测当必然事实。
+
+---
+
 ## 2026-09-30 — Round 97 后专项盘点与目标更新
 
 - 用户要求先系统梳理当前完成内容，再将后续重点调整为已有内容的丰富、串联与细化。本次为专项产品/设计审计，不占用 Round 98，不新增地图、剧情或玩法实现。

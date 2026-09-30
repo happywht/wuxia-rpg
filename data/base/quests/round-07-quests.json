@@ -134,7 +134,7 @@
     {
       "id": "quest.r31-ferry-ledger",
       "name": "渡籍补录",
-      "description": "连日阴雨泡坏了渡籍的半页轮值，白鹭洲要按药道会盟的新约补录，须请寒山书院的教习柳听澜誊正一份用印。替他把话带到，字据随后取回。",
+      "description": "连日阴雨泡坏了渡籍的半页轮值，白鹭洲要按药道会盟的新约补录，须请寒山书院的教习柳听澜誊正一份用印。见面向柳听澜说明来意，誊正完成即算办妥，谢仪自动致付。",
       "giverNpcId": "char.bai-luzhou",
       "prerequisiteQuestIds": ["quest.r31-peddler-errand"],
       "objectives": [

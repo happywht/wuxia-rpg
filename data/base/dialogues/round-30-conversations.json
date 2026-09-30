@@ -98,6 +98,24 @@
             },
             { "text": "不叨扰了，先生请便。", "nextNodeId": "farewell" },
             {
+              "text": "书铺的沈掌柜说，残篇的纸墨要请教先生。",
+              "nextNodeId": "canpian-assessment"
+            },
+            {
+              "text": "白鹭洲托我请先生誊正渡籍。",
+              "nextNodeId": "r31-transcribe",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r31-ferry-ledger", "status": "active" }
+              ]
+            },
+            {
+              "text": "先生，渡籍已经誊好了么？",
+              "nextNodeId": "r31-filed",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r31-ferry-ledger", "status": "completed" }
+              ]
+            },
+            {
               "text": "白鹭洲托我来对一对旧渡籍。",
               "nextNodeId": "r42-copy-mismatch",
               "conditions": [{ "kind": "questStatus", "questId": "quest.r42-ledger-audit", "status": "completed" }],
@@ -168,6 +186,22 @@
         },
         { "id": "departed", "text": "柳听澜沉默片刻，把你的名字从课业簿上圈去：「学籍除名，笔墨两清。书院的门不锁，但誊过的盟书里，不会再有你的手笔。」" },
         { "id": "farewell", "text": "「去吧。」柳听澜重新蘸墨，「路上少说多看——见过的事，都是文章。」" },
+        {
+          "id": "canpian-assessment",
+          "text": "柳听澜听完转述，取出书院誊册用的样纸摆在案头：「按沈掌柜的说法，那纸是水纹纸，帘纹、分量都对得上渡口船上来往的纸——江南纸铺寻常不进这个，多半是从水路来的，可隔着转述，这层只能说像，不能说定；墨里的药气也是同理，像药栈批货记账用的。五年前书院誊盟书的样纸我留着一叠，纸性相近——但没有残页在手比对，同不同批、确切的年份，都断不得。要坐实来路，去渡口对渡籍底册——白鹭洲那边进出货都有底。至于写它的人是谁、缺的半部在哪里——纸上没写的事，我不替纸猜。」",
+          "options": [
+            { "text": "（记下纸墨线索与去向）多谢先生。", "nextNodeId": "farewell" },
+            { "text": "先生方才说的盟书，可在堂中？", "nextNodeId": "papers" }
+          ]
+        },
+        {
+          "id": "r31-transcribe",
+          "text": "柳听澜净手研墨，按药道会盟新约把轮值半页誊正、用印、吹干，前后不过一炷香：「好了。正本一笔一笔在渡籍上，书院留这份副页，两家自会对页归档。」"
+        },
+        {
+          "id": "r31-filed",
+          "text": "柳听澜指了指案上晾干的副页：「刚誊好，印也吹干了——正本一笔一笔在渡籍上，书院留这份副页，两家自会对页归档，不劳你再跑渡口。」他把笔搁下，「对了，书院这几晚赶抄渡籍与药档，学子们熬得眼酸。我想备两丸清心丸放在案头——你若在外采买，替我留意。」"
+        },
         {
           "id": "r42-copy-mismatch",
           "text": "柳听澜将两张纸举向窗前：「水痕在副本誊出之前已经干了，边角却压着新印。书院只照原页落笔，没有改这一行；要查谁搬动过正本，还须问熟悉水路与船印的人。」",
@@ -399,8 +433,7 @@
               "nextNodeId": "logged-victory",
               "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-victory" }],
               "effects": [
-                { "kind": "shareKnowledgeNode", "nodeId": "event.mist-pact-victory" },
-                { "kind": "adjustRelationship", "npcId": "char.bai-luzhou", "delta": 5 }
+                { "kind": "shareKnowledgeNode", "nodeId": "event.mist-pact-victory" }
               ]
             },
             {
@@ -408,8 +441,7 @@
               "nextNodeId": "logged-stalemate",
               "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-stalemate" }],
               "effects": [
-                { "kind": "shareKnowledgeNode", "nodeId": "event.mist-pact-stalemate" },
-                { "kind": "adjustRelationship", "npcId": "char.bai-luzhou", "delta": 5 }
+                { "kind": "shareKnowledgeNode", "nodeId": "event.mist-pact-stalemate" }
               ]
             },
             {
@@ -417,8 +449,7 @@
               "nextNodeId": "logged-defeat",
               "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-defeat" }],
               "effects": [
-                { "kind": "shareKnowledgeNode", "nodeId": "event.mist-pact-defeat" },
-                { "kind": "adjustRelationship", "npcId": "char.bai-luzhou", "delta": 5 }
+                { "kind": "shareKnowledgeNode", "nodeId": "event.mist-pact-defeat" }
               ]
             },
             {
@@ -444,6 +475,34 @@
               ]
             },
             { "text": "都不是，随便看看。", "nextNodeId": "farewell" },
+            {
+              "text": "姜百味托我带的口信已经带到了：下一批针线茶叶改走水路。",
+              "nextNodeId": "r31-peddler-received",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r31-peddler-errand", "status": "completed" }
+              ]
+            },
+            {
+              "text": "渡董，听说渡籍要补录誊正？",
+              "nextNodeId": "r31-ledger-offer",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r31-ferry-ledger", "status": "offered" }
+              ]
+            },
+            {
+              "text": "柳教习誊正的事，我正要回镇里去办。",
+              "nextNodeId": "r31-ledger-active",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r31-ferry-ledger", "status": "active" }
+              ]
+            },
+            {
+              "text": "渡董，柳教习那边渡籍誊好了、用了印。",
+              "nextNodeId": "r31-ledger-done",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r31-ferry-ledger", "status": "completed" }
+              ]
+            },
             {
               "text": "补录过的旧簿，柳教习发现了不合潮时的水痕。",
               "nextNodeId": "r42-audit-offer",
@@ -543,6 +602,27 @@
           "text": "白鹭洲翻到你方才报备的那一页，指腹压住墨迹未干的「轮值成约」四字：「自今日起，两派药队按簿上时辰过桥。误时的罚则、抢渡的处置，都照章程来——你既亲历会盟，往后若见有人坏约，渡口公所随时受理。」"
         },
         { "id": "farewell", "text": "白鹭洲把渡籍收回袖中，重新拨响算盘：「栈桥上人多，慢行。章程之外的事，渡口不问。」" },
+        {
+          "id": "r31-peddler-received",
+          "text": "白鹭洲翻开船期簿落笔：「改走水路——记下了，替我谢姜老板。」他把簿子合上，「你既然肯替药道上的人跑腿，渡口这边的账，往后也少不了你。」"
+        },
+        {
+          "id": "r31-ledger-offer",
+          "text": "白鹭洲把一册边角泡皱的渡籍摊开：「连日阴雨，轮值半页字都洇了。要按药道会盟的新约补录，须请寒山书院的柳教习誊正一份、加盖书院印。柳教习就在镇东头的书院，从石阶渡口回镇便能到。见面把来意说明，誊好用印便算办妥。」",
+          "options": [
+            { "text": "誊正的事，交给我。", "nextNodeId": "r31-ledger-accepted", "effects": [{ "kind": "acceptQuest", "questId": "quest.r31-ferry-ledger" }] },
+            { "text": "我再想想。", "nextNodeId": "farewell" }
+          ]
+        },
+        { "id": "r31-ledger-accepted", "text": "「有劳。」白鹭洲把泡坏的半页小心夹好，「柳教习誊好用印，这边即刻誊录归档。」" },
+        {
+          "id": "r31-ledger-active",
+          "text": "「柳教习在镇东书院。」白鹭洲头也不抬地拨着算盘，「从渡口过关回镇，照旧走石阶渡口。誊正用印的事，见面一说便成。」"
+        },
+        {
+          "id": "r31-ledger-done",
+          "text": "白鹭洲翻出渡籍新页，与书院副页的对记核过一遍：「墨色匀，印也正——柳教习的字，渡籍认。」他把簿子合上，「副页留书院，正本这边我自会归档，不劳你再跑。对了，书院这几晚赶抄渡籍与药档，柳教习想备两丸清心丸放在案头。你若回镇里，替我问一句他要什么成色。」"
+        },
         {
           "id": "r42-audit-offer",
           "text": "白鹭洲把旧册推到你面前：「此页在誊副前后各过一次手。柳教习守着书院副本，先把两页的时辰对上。纸上的水痕说不得人名，咱们先查纸，不先猜人。」",

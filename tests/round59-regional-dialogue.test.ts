@@ -326,14 +326,15 @@ describe('Round 59 regional dialogue echoes', () => {
   it('keeps every pre-existing option of the seven greet nodes intact', () => {
     // Anchored greet-node option counts: pre-existing options plus the
     // Round 59 echoes (shi-bei carries two quest pairs, hence four); Zhu
-    // also has the Round 69 outsider lesson entry.
+    // also has the Round 69 outsider lesson entry. Round 98 adds the
+    // peddler-errand/ferry-ledger journey entries to Bai and Jiang.
     const expectedBaseline: Record<string, number> = {
       'dlg.shi-bei-mentor': 13, // 9 pre-existing + 4 echoes
-      'dlg.bai-luzhou-ferry-master': 16, // 14 pre-existing + 2 echoes
+      'dlg.bai-luzhou-ferry-master': 20, // 14 pre-existing + 2 echoes + 4 Round 98 journey entries
       'dlg.zhu-jiuxian-mentor': 15, // 12 pre-existing + 2 echoes + outsider lesson
       'dlg.ma-shangyi-notice-board': 5, // 3 pre-existing + 2 echoes
       'dlg.lu-zhenniang-teastall': 9, // 7 pre-existing + 2 echoes
-      'dlg.jiang-baiwei-peddler': 4, // 2 pre-existing + 2 echoes
+      'dlg.jiang-baiwei-peddler': 7, // 2 pre-existing + 2 echoes + 3 Round 98 journey entries
       'dlg.gu-yechen-roadside': 9, // 7 pre-existing + 2 echoes
     };
     for (const [dialogueId, expectedCount] of Object.entries(expectedBaseline)) {

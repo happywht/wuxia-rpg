@@ -13,8 +13,7 @@
             {
               "text": "镇上有人托我，向你问声好。",
               "nextNodeId": "goodwill",
-              "conditions": [{ "kind": "morality", "minValue": 5 }],
-              "effects": [{ "kind": "adjustRelationship", "npcId": "char.shen-mohan", "delta": 5 }]
+              "conditions": [{ "kind": "morality", "minValue": 5 }]
             },
             {
               "text": "（旁人正低声议论你做下的事）……掌柜的，墨多少钱一锭？",
@@ -42,20 +41,10 @@
         },
         {
           "id": "about-scroll",
-          "text": "残本？……你是说那册《洗髓残篇》？嘘——这话不能在铺子里讲。今夜子时，后巷灯下，我等你。",
+          "text": "残本？……你是说那册《洗髓残篇》？（他压低声音，朝门外的雨帘看了一眼）这话屋里说可以——我对它验得出的，只有纸墨两条。你若要听，我便讲；听完去不去查，你自己拿主意。",
           "options": [
-            { "text": "好，子时见。", "nextNodeId": "agree" },
+            { "text": "愿闻其详。", "nextNodeId": "scroll-assessment" },
             { "text": "掌柜的为何这般谨慎？", "nextNodeId": "why-careful" },
-            {
-              "text": "（天色已暗）后巷的灯这会儿点上了么？我今夜便去。",
-              "nextNodeId": "agree",
-              "conditions": [{ "kind": "timeOfDay", "periodId": "period.dusk" }]
-            },
-            {
-              "text": "（夜色正浓）不等子时了，现在就随你去后巷。",
-              "nextNodeId": "agree",
-              "conditions": [{ "kind": "timeOfDay", "periodId": "period.night" }]
-            },
             {
               "text": "掌柜的，残篇就在我身上，现在交给你。",
               "nextNodeId": "scroll-honest",
@@ -83,20 +72,28 @@
           ]
         },
         {
+          "id": "scroll-assessment",
+          "text": "沈墨涵从柜底取出一方压纸的镇石，一边比划一边低声道：「第一，纸。残页是水纹纸——这类纸多在渡口船上见着，江南镇上的纸铺寻常不进，像是从水路来的，这只是我的推测。第二，墨。墨里掺着药气，像药栈批货记账用的。这两条对上，这册残篇多半在渡口那条水路上走过一遭——多半，不是定论，纸上的来路要对底册才算数。至于缺的半部去了哪里、写它的人是谁——我一个卖墨的，验不出，也不敢往下猜。」",
+          "options": [
+            { "text": "这两条线，能找谁坐实？", "nextNodeId": "scroll-leads" },
+            { "text": "多谢掌柜，我先记下。", "nextNodeId": "browse" }
+          ]
+        },
+        {
+          "id": "scroll-leads",
+          "text": "「两条路。渡口公所的白鹭洲掌着渡籍——渡籍用的就是水纹纸，进出货都有底册，纸是从哪条船卸的，查得到。本镇东头书院的柳教习柳听澜识纸性——书院誊册子用纸讲究，纸的成色他见得多。出镇往东走石阶渡口，过了关就是雾雨渡口的地界；书院就在镇东。先寻哪位，你自己看。」"
+        },
+        {
           "id": "why-careful",
           "text": "近半月，镇上外乡刀客多了七八个，个个都在打听旧书旧账。我卖墨的惹不起，只好把话压低些说。"
         },
         {
-          "id": "agree",
-          "text": "记得独身前来，别叫人瞧见你与我同行。"
-        },
-        {
           "id": "scroll-honest",
-          "text": "（沈墨涵双手接过残篇，指尖微微发颤，随即把它收进柜底的暗格）……你既肯亲手交还，我便信得过你。这份心，我记下了。子时之约作罢——有些话，倒不必非等到夜里说了。"
+          "text": "（沈墨涵双手接过残篇，指尖微微发颤，随即把它收进柜底的暗格）……你既肯亲手交还，我便信得过你。这份心，我记下了。方才说的两条线仍作数——纸墨的事，你去渡口对底册也好，去书院问纸龄也好，都查得下去。"
         },
         {
           "id": "scroll-bully",
-          "text": "（他盯着你半晌，从柜底摸出几粒碎银丢在柜面上）……拿去。东西我收了，话说在前头——往后我这铺子，不招待你这样的客。"
+          "text": "（他盯着你半晌，把残篇从柜面上收进暗格，指尖压着账簿不再看你）……东西我收了。我这铺子里没有你能再拿走的东西，往后也不招待你这样的客。"
         },
         {
           "id": "goodwill",
@@ -414,6 +411,30 @@
             { "text": "不急，你先忙你的。", "nextNodeId": "wait" },
             { "text": "你这担子里最值钱的是什么？", "nextNodeId": "prized" },
             {
+              "text": "听说你有句口信要带给渡口的白鹭洲？",
+              "nextNodeId": "r31-peddler-offer",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r31-peddler-errand", "status": "offered" }
+              ],
+              "effects": [
+                { "kind": "acceptQuest", "questId": "quest.r31-peddler-errand" }
+              ]
+            },
+            {
+              "text": "给白鹭洲的口信，我正带去渡口。",
+              "nextNodeId": "r31-peddler-active",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r31-peddler-errand", "status": "active" }
+              ]
+            },
+            {
+              "text": "姜老板，白鹭洲那边的口信已经送到了。",
+              "nextNodeId": "r31-peddler-done",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r31-peddler-errand", "status": "completed" }
+              ]
+            },
+            {
               "text": "姜老板，往南麓捎药的货，你这边可备得下？",
               "nextNodeId": "r58-peddler-supply-active",
               "conditions": [
@@ -436,6 +457,9 @@
             {
               "text": "我帮你把货担扶起来。",
               "nextNodeId": "help-done",
+              "conditions": [
+                { "kind": "npcRelationship", "npcId": "char.jiang-baiwei", "maxValue": 4 }
+              ],
               "effects": [
                 { "kind": "giveItem", "itemId": "item.qingxin-wan", "quantity": 1 },
                 { "kind": "adjustRelationship", "npcId": "char.jiang-baiwei", "delta": 5 }
@@ -458,6 +482,18 @@
         {
           "id": "farewell",
           "text": "去去去，改日担子归置好了，管挑管换，亏待不了你！"
+        },
+        {
+          "id": "r31-peddler-offer",
+          "text": "（货郎把担子往肩上一颠）好嘞，正愁没人捎！就一句：下一批针线茶叶改走水路，让渡董记在船期簿上，免得误了船期。出镇往东走石阶渡口，过关便是雾雨渡口——渡口公所就在进渡口的路上，白鹭洲整日守着渡籍，见面一说便成。"
+        },
+        {
+          "id": "r31-peddler-active",
+          "text": "（货郎掰着指头）口信带到就成：出镇往东，石阶渡口过关，进渡口先见着的就是公所——白鹭洲在那儿守着渡籍呢。捎到了替我谢一声，他那边船期紧。"
+        },
+        {
+          "id": "r31-peddler-done",
+          "text": "（货郎长出一口气）到了就好，船期保住了！对了，白鹭洲那头还有下文——阴雨泡坏了渡籍半页，他要请你们镇东书院的柳教习誊正用印。你要是回镇里，顺路替渡董把这句话带上，也算我姜百味还个人情。"
         },
         {
           "id": "r58-peddler-supply-active",

@@ -856,7 +856,7 @@ const dialogues = {
       { id: 'accepted', text: '「出关门往北，先过镜面冰河——认准中渡那条踏痕走，两岸的冰缝蓝得发黑，掉下去神仙也捞不上来。过河后石径直上，燧在关墙外东北的高台上。点验要挑落雪日的黄昏、入夜或子夜，雪光映着火号，三里外都数得清。在燧下按 E 记全三烽，回来找我。」' },
       { id: 'active', text: '「记住了：只走中渡，只在落雪日暮夜点验。三烽一号不点全，燧书就作废。我在这儿给你温着酒。」' },
       { id: 'completed', text: '谷照雪接过燧书，凑在灯下逐烽核对，忽然笑出一口白气：「三烽全对，火色还比去年亮——北境这条线，还活着。」她把一坛烈酒墩在你面前，酒封上落着经年的雪印。' },
-      { id: 'route', text: '「南栈口进来一路向北，冰河中渡有踏痕；过了河是关门，我就在门里住。燧台在东北高处，台南留了踏脚的雪坡。再往北走到雪原尽头，有块北界碑——界外就不是大梁的地图了。」' },
+      { id: 'route', text: '「南栈口进来一路向北，冰河中渡有踏痕；过了河是关门，我就在门里住。燧台在东北高处，台南留了踏脚的雪坡。再往北走到雪原尽头，有块北界碑——碑上的刻字还是前朝大梁留下的，界外就不是大雍的地图了。」' },
       { id: 'keeper', text: '「谷家四代守这盏燧。烽号是北境的命：雪原上什么都会白得一样，只有火不会。祖父说，只要照雪烽还亮着，山下的人就知道关外还有人。」' },
       { id: 'farewell', text: '谷照雪重新背起燧杆，向东北高台的方向走去，靴印在雪地里拖出长长一行。' },
     ],
@@ -865,7 +865,7 @@ const dialogues = {
 const region = {
   mapResourceId: mapId,
   name: '北境·照雪关',
-  description: '雁回崖以北的极北雪原，镜面冰河与照雪烽燧之间横着一道老关墙，守着大梁版图最北的界线。',
+  description: '雁回崖以北的极北雪原，镜面冰河与照雪烽燧之间横着一道老关墙，守着大雍版图最北的界线；雪原尽头的界碑仍是前朝大梁的遗刻。',
   atlasPosition: {
     x: Number(((passAtlasCell.col / (overview.columns - 1)) * 100).toFixed(8)),
     y: Number(((passAtlasCell.row / (overview.rows - 1)) * 100).toFixed(8)),
@@ -926,7 +926,7 @@ const events = [
     id: nodeIds.cairnEvent,
     mapResourceId: mapId,
     ...cairnEventCell,
-    text: '北界碑立在雪原尽头，碑面的刻字被风雪磨得只剩浅痕：「大梁北界，至此为限」。碑北的雪再无人扫，也无路可走——界外的事，只有烽火知道。',
+    text: '北界碑立在雪原尽头，碑面的刻字被风雪磨得只剩浅痕：「大梁北界，至此为限」。那是前朝大梁立碑时留下的旧刻——大雍的北境如今也巡到这雪原为止。碑北的雪再无人扫，也无路可走——界外的事，只有烽火知道。',
     approachText: '雪原尽头的石碑下埋着半截界绳，碑面刻痕已浅。',
     once: true,
     discoverKnowledgeNodeId: nodeIds.cairn,
@@ -937,13 +937,13 @@ const newNodes = [
   { id: nodeIds.pass, kind: 'place', title: '北境·照雪关', summary: '雁回崖以北的极北雪原，冰河、关墙与烽燧守着版图北界。', knownByDefault: false },
   { id: nodeIds.river, kind: 'place', title: '镜面冰河', summary: '横过照雪关中部的封冻冰河，只有中渡踏痕可以过人。', knownByDefault: false },
   { id: nodeIds.beacon, kind: 'place', title: '照雪烽燧', summary: '关墙外东北高台上的石燧，雪夜烽号三里外可见。', knownByDefault: false },
-  { id: nodeIds.cairn, kind: 'place', title: '北界碑', summary: '雪原尽头的界碑，刻着大梁北界的极限。', knownByDefault: false },
+  { id: nodeIds.cairn, kind: 'place', title: '北界碑', summary: '雪原尽头的界碑，前朝大梁的旧刻标记着大雍北境的极限。', knownByDefault: false },
   { id: nodeIds.keeper, kind: 'character', title: '谷照雪', summary: '谷家第四代守烽人，在照雪关的石屋里守着北境烽号。', knownByDefault: false },
   { id: nodeIds.quest, kind: 'quest', title: '雪燧传烽', summary: '越过镜面冰河在照雪烽燧点验烽号，把燧书带回给谷照雪。', knownByDefault: false },
   { id: nodeIds.arrival, kind: 'event', title: '初入照雪关', summary: '从雁回崖北境栈口首次踏上北境雪原。', knownByDefault: false },
   { id: nodeIds.riverEvent, kind: 'event', title: '冰河中渡', summary: '在镜面冰河中渡认清守关人拖粮的旧线。', knownByDefault: false },
   { id: nodeIds.beaconEvent, kind: 'event', title: '雪夜点燧', summary: '落雪日暮夜在照雪烽燧点验本季烽号。', knownByDefault: false },
-  { id: nodeIds.cairnEvent, kind: 'event', title: '界碑读雪', summary: '在北界碑下读出大梁版图的北限。', knownByDefault: false },
+  { id: nodeIds.cairnEvent, kind: 'event', title: '界碑读雪', summary: '在北界碑下辨出前朝大梁旧刻与大雍北境的交界。', knownByDefault: false },
 ];
 const newEdges = [
   { id: 'kg.edge.r92-arrival-pass', fromId: nodeIds.arrival, toId: nodeIds.pass, relation: 'triggers', summary: '初入照雪关时发现北境·照雪关。' },
