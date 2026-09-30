@@ -1,5 +1,7 @@
 # 武学目录
 
+Round 103修习与地区实践设计见 [FACTION-PRACTICE-DESIGN.md](FACTION-PRACTICE-DESIGN.md)。拜师、差事结案、等级和属性是不同条件；最低等级达到以后仍须检查全部属性，实践不自动授艺。现有五派武学均有实际导师入口，具体 eligibility 仍以资料与运行时为准。
+
 基础武学位于 `data/base/skills/round-04-martial-arts.json`，使用 `martial-arts-set` Schema。当前共有 **30 种武学**：Round 32 新增 24 种，另有两门开局武学和四门旧式传承。Round 69 审计从每段对话的起点追踪 `learnMartialArt` 效果，核对相同武学 id 的 `martialArtEligible` 条件及授艺 NPC 的门派导师登记；门派资格、等级和属性门槛仍由武学资料定义。
 
 战斗协议使用资料中的 `combat.kind`（attack/heal/guard）、`power` 与 `qiCost`。攻击伤害为 `max(1, power + 力道 − floor(敌方体魄/3))`；治疗量为 `power + floor(定力/2)`。守御在使用者下一次受击时减去至多 `power` 点伤害，最终伤害至少为 1，受击后守御消失。类别是武学展示和内容分类，具体战斗作用以 `combat` 字段为准。下表括号内数值为“作用强度 / 内力消耗”。

@@ -504,10 +504,11 @@
     {
       "id": "quest.r43-tingyu-eave-rain",
       "name": "檐雨听锋",
-      "description": "赶路人带来的匿名信提到芦苇岸边有一段不合潮声的剑鸣。听雨剑阁不愿只凭传闻指认来客，叶庭舟请你把信中时辰交柳听澜核对，辨清究竟是剑声还是船索回荡。",
+      "description": "赶路人带来的匿名信提到芦苇岸边有一段不合潮声的剑鸣。听雨剑阁不愿只凭传闻指认来客：先请柳听澜核对信中时辰，再往云岭古道云纹石阶观察旧索孔与刻痕的记法，最后回叶庭舟处复命；山中刻纹证不了江岸的声音，练的是眼力与分寸。",
       "giverNpcId": "char.ye-tingzhou",
       "requiredFactionId": "faction.tingyu-jiange",
       "requiredKnowledgeNodeId": "event.r43-wayfarer-letter",
+      "orderedObjectives": true,
       "objectives": [
         {
           "id": "objective.r43-tingyu-compare",
@@ -515,17 +516,39 @@
           "targetId": "char.liu-tinglan",
           "requiredCount": 1,
           "text": "请柳听澜核对信中剑鸣时辰"
+        },
+ {
+          "id": "objective.r103-tingyu-ridge-sight",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r74-cloud-markers",
+          "requiredCount": 1,
+          "text": "到云岭古道云纹石阶观察旧索孔与刻痕记法"
+        },
+ {
+          "id": "objective.r103-tingyu-report",
+          "kind": "talkToNpc",
+          "targetId": "char.ye-tingzhou",
+          "requiredCount": 1,
+          "text": "回镇里向叶庭舟复命"
         }
       ],
-      "rewards": { "experience": 36, "currency": 22 }
+      "rewards": {
+        "experience": 36,
+        "currency": 22,
+        "factionRenown": [
+          { "factionId": "faction.tingyu-jiange", "delta": 5 }
+        ],
+        "discoverKnowledgeNodeIds": ["event.r103-tingyu-practice", "event.r43-tingyu-eave-rain"]
+      }
     },
     {
       "id": "quest.r43-tiezhang-stone-post",
       "name": "石桩回声",
-      "description": "信中说芦苇岸旧桩夜里会传来三下空响。铁嶂派不信邪说，石北让你去问走过旧船道的顾夜尘：先弄清是桩脚松动，还是有人借声引路，再回报是否需要加固。",
+      "description": "信中说芦苇岸旧桩夜里会传来三下空响。铁嶂派不信邪说：先问走过旧船道的顾夜尘弄清桩脚底细，再击退碎岭路上借界石截道的拦路客，最后回石北处复命，回报是否需要加固。",
       "giverNpcId": "char.shi-bei",
       "requiredFactionId": "faction.tiezhang-pai",
       "requiredKnowledgeNodeId": "event.r43-wayfarer-letter",
+      "orderedObjectives": true,
       "objectives": [
         {
           "id": "objective.r43-tiezhang-ask-gu",
@@ -533,17 +556,39 @@
           "targetId": "char.gu-yechen",
           "requiredCount": 1,
           "text": "向顾夜尘问清旧系缆桩的底脚"
+        },
+        {
+          "id": "objective.r103-tiezhang-clear-road",
+          "kind": "defeatEncounter",
+          "targetId": "encounter.r62-ridge-roadblock",
+          "requiredCount": 1,
+          "text": "击退碎岭路上截道的拦路客"
+        },
+ {
+          "id": "objective.r103-tiezhang-report",
+          "kind": "talkToNpc",
+          "targetId": "char.shi-bei",
+          "requiredCount": 1,
+          "text": "回雾雨渡口向石北复命"
         }
       ],
-      "rewards": { "experience": 40, "currency": 18 }
+      "rewards": {
+        "experience": 40,
+        "currency": 18,
+        "factionRenown": [
+          { "factionId": "faction.tiezhang-pai", "delta": 5 }
+        ],
+        "discoverKnowledgeNodeIds": ["event.r103-tiezhang-practice", "event.r43-tiezhang-stone-post"]
+      }
     },
     {
       "id": "quest.r43-yunyin-herb-road",
       "name": "药路余香",
-      "description": "匿名信的封蜡沾着一味不该出现在江风里的苦香。闻素心不肯贸然辨药，托你去问容素青最近是否有人将湿药材带过旧船道；若能对上药气，庄中才好提前备下解潮方。",
+      "description": "匿名信的封蜡沾着一味不该出现在江风里的苦香。闻素心托你先向容素青确认药香来历，再到西陲盐道回声苦井核对水线，并自备两份回春膏以防途中急用，最后回来复命；药是自备防身，庄中并不收取。",
       "giverNpcId": "char.wen-suxin",
       "requiredFactionId": "faction.yunyin-shanzhuang",
       "requiredKnowledgeNodeId": "event.r43-wayfarer-letter",
+      "orderedObjectives": true,
       "objectives": [
         {
           "id": "objective.r43-yunyin-ask-rong",
@@ -551,17 +596,46 @@
           "targetId": "char.rong-su-qing",
           "requiredCount": 1,
           "text": "向容素青确认封蜡残留的药香"
+        },
+        {
+          "id": "objective.r103-yunyin-well-check",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r67-brine-well",
+          "requiredCount": 1,
+          "text": "到西陲盐道回声苦井核对水线"
+        },
+        {
+          "id": "objective.r103-yunyin-prepare-ointment",
+          "kind": "collectItem",
+          "targetId": "item.huichun-gao",
+          "requiredCount": 2,
+          "text": "自备两份回春膏以防急用"
+        },
+        {
+          "id": "objective.r103-yunyin-report",
+          "kind": "talkToNpc",
+          "targetId": "char.wen-suxin",
+          "requiredCount": 1,
+          "text": "回雾雨渡口向闻素心复命"
         }
       ],
-      "rewards": { "experience": 34, "currency": 20 }
+      "rewards": {
+        "experience": 34,
+        "currency": 20,
+        "factionRenown": [
+          { "factionId": "faction.yunyin-shanzhuang", "delta": 5 }
+        ],
+        "discoverKnowledgeNodeIds": ["event.r103-yunyin-practice", "event.r43-yunyin-herb-road"]
+      }
     },
     {
       "id": "quest.r43-hanshan-copybook",
       "name": "副页留白",
-      "description": "五封信里有一封提到旧渡籍曾少抄一列船名。柳听澜不愿把缺字补成猜测，请你向沈墨涵核一核书铺旧抄的墨色和纸龄，再决定那一栏该留白还是补注。",
+      "description": "五封信里有一封提到旧渡籍曾少抄一列船名。柳听澜请你先向沈墨涵核一核书铺旧抄的墨色和纸龄，再往北境霜松谷亲眼看一看旧界标——界刻立碑的年头不是纸龄的凭据，回来再定那一栏留白还是补注。",
       "giverNpcId": "char.liu-tinglan",
       "requiredFactionId": "faction.hanshan-shuyuan",
       "requiredKnowledgeNodeId": "event.r43-wayfarer-letter",
+      "orderedObjectives": true,
       "objectives": [
         {
           "id": "objective.r43-hanshan-ask-shen",
@@ -569,17 +643,39 @@
           "targetId": "char.shen-mohan",
           "requiredCount": 1,
           "text": "请沈墨涵辨认旧抄的纸龄与墨色"
+        },
+        {
+          "id": "objective.r103-hanshan-old-mark-check",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r93-old-mark",
+          "requiredCount": 1,
+          "text": "到北境霜松谷核看旧界标"
+        },
+        {
+          "id": "objective.r103-hanshan-report",
+          "kind": "talkToNpc",
+          "targetId": "char.liu-tinglan",
+          "requiredCount": 1,
+          "text": "回讲书堂向柳听澜复命"
         }
       ],
-      "rewards": { "experience": 38, "currency": 24 }
+      "rewards": {
+        "experience": 38,
+        "currency": 24,
+        "factionRenown": [
+          { "factionId": "faction.hanshan-shuyuan", "delta": 5 }
+        ],
+        "discoverKnowledgeNodeIds": ["event.r103-hanshan-practice", "event.r43-hanshan-copybook"]
+      }
     },
     {
       "id": "quest.r43-panzhou-return-tide",
       "name": "回潮验缆",
-      "description": "信上画了三道缆痕，却没有写船名。祝九弦要你将潮时与痕迹交给白鹭洲核对公所旧簿；若只是往来船队留下的磨损，刀场便不必惊动整条水路。",
+      "description": "信上画了三道缆痕，却没有写船名。祝九弦要你先将潮时与痕迹交白鹭洲核对公所旧簿，再击退东溟海岸潮沟趁退潮夺网的夺网客，最后回来复命；若只是往来船队的磨损，刀场便不必惊动整条水路。",
       "giverNpcId": "char.zhu-jiuxian",
       "requiredFactionId": "faction.panzhou-daochang",
       "requiredKnowledgeNodeId": "event.r43-wayfarer-letter",
+      "orderedObjectives": true,
       "objectives": [
         {
           "id": "objective.r43-panzhou-ask-bai",
@@ -587,9 +683,30 @@
           "targetId": "char.bai-luzhou",
           "requiredCount": 1,
           "text": "请白鹭洲核对三道缆痕对应的渡船"
+        },
+        {
+          "id": "objective.r103-panzhou-defend-netters",
+          "kind": "defeatEncounter",
+          "targetId": "encounter.r83-tide-wake-looters",
+          "requiredCount": 1,
+          "text": "击退东溟海岸潮沟的夺网客"
+        },
+        {
+          "id": "objective.r103-panzhou-report",
+          "kind": "talkToNpc",
+          "targetId": "char.zhu-jiuxian",
+          "requiredCount": 1,
+          "text": "回栈桥向祝九弦复命"
         }
       ],
-      "rewards": { "experience": 42, "currency": 26 }
+      "rewards": {
+        "experience": 42,
+        "currency": 26,
+        "factionRenown": [
+          { "factionId": "faction.panzhou-daochang", "delta": 5 }
+        ],
+        "discoverKnowledgeNodeIds": ["event.r103-panzhou-practice", "event.r43-panzhou-return-tide"]
+      }
     },
     {
       "id": "quest.r44-post-first",

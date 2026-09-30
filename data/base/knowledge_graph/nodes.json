@@ -1033,7 +1033,7 @@
       "id": "event.r43-wayfarer-letter",
       "kind": "event",
       "title": "风雨传函",
-      "summary": "黄昏雨夜在雾雨渡口偶遇赶路人，他带来五派各自托寻的一封匿名求助信。",
+      "summary": "黄昏雨夜在雾雨渡口偶遇赶路人，他带来五派各自托寻的一封匿名求助信；写信人未具名，入门弟子也可请本派师傅转抄与己派相关的一段。",
       "knownByDefault": false
     },
     {
@@ -2882,6 +2882,41 @@
       "kind": "event",
       "title": "海路阶段结案",
       "summary": "六差事、两处决定与刻记对照已记录，供后续终章读取。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r103-tingyu-practice",
+      "kind": "event",
+      "title": "听雨云阶实践",
+      "summary": "柳听澜核对时辰、观察云纹石阶旧索孔刻痕后回叶庭舟复命；听雨剑阁声望+5，山中刻纹证不了江岸剑鸣，观察记法自成一手。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r103-tiezhang-practice",
+      "kind": "event",
+      "title": "铁嶂碎岭清道",
+      "summary": "顾夜尘问明桩脚、击退碎岭拦路客后回雾雨渡口石北复命；铁嶂派声望+5，旧桩空响与截道两事一并了清。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r103-yunyin-practice",
+      "kind": "event",
+      "title": "云隐盐道验药",
+      "summary": "容素青辨明药香、回声苦井核对水线并自备回春膏两份后回闻素心复命；云隐山庄声望+5，药膏留作自用，庄中不收。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r103-hanshan-practice",
+      "kind": "event",
+      "title": "寒山界刻核证",
+      "summary": "沈墨涵验过纸墨、霜松谷旧界标核看后回柳听澜复命；寒山书院声望+5，界刻年头不能断纸龄，缺页照旧注缺。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r103-panzhou-practice",
+      "kind": "event",
+      "title": "盘舷潮沟护航",
+      "summary": "白鹭洲对清缆痕、击退潮沟夺网客后回祝九弦复命；盘舷刀场声望+5，缆痕系运盐船磨损，水路不必惊动。",
       "knownByDefault": false
     }
   ]

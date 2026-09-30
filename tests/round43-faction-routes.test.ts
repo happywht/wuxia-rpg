@@ -29,6 +29,7 @@ const routes = [
     targetNpcId: 'char.liu-tinglan',
     targetConversationId: 'dlg.liu-tinglan-mentor',
     outcomeNodeId: 'event.r43-tingyu-eave-rain',
+    practiceSignals: [{ type: 'knowledge-discovery', nodeId: 'place.r74-cloud-markers' }] as const,
   },
   {
     questId: 'quest.r43-tiezhang-stone-post',
@@ -38,6 +39,7 @@ const routes = [
     targetNpcId: 'char.gu-yechen',
     targetConversationId: 'dlg.gu-yechen-roadside',
     outcomeNodeId: 'event.r43-tiezhang-stone-post',
+    practiceSignals: [{ type: 'encounter-victory', encounterId: 'encounter.r62-ridge-roadblock' }] as const,
   },
   {
     questId: 'quest.r43-yunyin-herb-road',
@@ -47,6 +49,10 @@ const routes = [
     targetNpcId: 'char.rong-su-qing',
     targetConversationId: 'dlg.rong-su-qing-herbalist',
     outcomeNodeId: 'event.r43-yunyin-herb-road',
+    practiceSignals: [
+      { type: 'knowledge-discovery', nodeId: 'place.r67-brine-well' },
+      { type: 'item-count', itemId: 'item.huichun-gao', quantity: 2 },
+    ] as const,
   },
   {
     questId: 'quest.r43-hanshan-copybook',
@@ -56,6 +62,7 @@ const routes = [
     targetNpcId: 'char.shen-mohan',
     targetConversationId: 'dlg.shen-mohan-bookshop',
     outcomeNodeId: 'event.r43-hanshan-copybook',
+    practiceSignals: [{ type: 'knowledge-discovery', nodeId: 'place.r93-old-mark' }] as const,
   },
   {
     questId: 'quest.r43-panzhou-return-tide',
@@ -65,6 +72,7 @@ const routes = [
     targetNpcId: 'char.bai-luzhou',
     targetConversationId: 'dlg.bai-luzhou-ferry-master',
     outcomeNodeId: 'event.r43-panzhou-return-tide',
+    practiceSignals: [{ type: 'encounter-victory', encounterId: 'encounter.r83-tide-wake-looters' }] as const,
   },
 ] as const;
 
@@ -77,9 +85,14 @@ function loadWorld() {
   const itemSet = readJson<{ items: Array<{ id: string }> }>(
     '../data/base/items/round-06-items.json',
   ).items;
-  const encounterSet = readJson<{ encounters: Array<{ id: string }> }>(
-    '../data/base/battles/round-05-encounters.json',
-  ).encounters;
+  const encounterSet = [
+    ...readJson<{ encounters: Array<{ id: string }> }>(
+      '../data/base/battles/round-05-encounters.json',
+    ).encounters,
+    ...readJson<{ encounters: Array<{ id: string }> }>(
+      '../data/base/battles/round-83-east-coast-encounters.json',
+    ).encounters,
+  ];
   const factionSet = readJson<{ factions: Array<{ id: string }> }>(
     '../data/base/factions/round-04-factions.json',
   ).factions;
@@ -173,8 +186,25 @@ describe('Round 43 faction routes', () => {
         knownKnowledgeNodeIds: letter,
       });
       expect(accepted.ok).toBe(true);
-      const completed = applyQuestSignal(world.quests, journal, { type: 'npc-talk', npcId: route.targetNpcId });
+
+      // Round 103 turned each route into an ordered field practice: the first
+      // verifier talk alone no longer completes the quest.
+      const lastObjective = quest?.objectives[quest!.objectives.length - 1];
+      expect(lastObjective?.kind).toBe('talkToNpc');
+      const firstTalk = applyQuestSignal(world.quests, journal, { type: 'npc-talk', npcId: route.targetNpcId });
+      expect(firstTalk.completed).toEqual([]);
+      expect(journal.states.get(route.questId)?.status).toBe('active');
+      for (const signal of route.practiceSignals) {
+        applyQuestSignal(world.quests, journal, signal);
+      }
+      const completed = applyQuestSignal(world.quests, journal, {
+        type: 'npc-talk',
+        npcId: lastObjective!.targetId,
+      });
       expect(completed.completed.map((entry) => entry.questId)).toContain(route.questId);
+      const grant = completed.completed.find((entry) => entry.questId === route.questId)!;
+      expect(grant.factionRenown).toEqual([{ factionId: route.factionId, delta: 5 }]);
+      expect(grant.discoverKnowledgeNodeIds).toContain(route.outcomeNodeId);
 
       const report = optionWithEffect(
         world.conversations.get(route.targetConversationId)!,

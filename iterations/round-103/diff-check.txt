@@ -1,0 +1,23 @@
+=== git diff --check ===
+warning: in the working copy of 'CHANGELOG.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'DEVLOG.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/ARCHITECTURE.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/CHARACTERS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/DATA-GUIDE.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/FACTIONS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/JOURNEY-FACTS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/KNOWLEDGE-GRAPH.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/MARTIAL-ARTS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/PLAYER-GUIDE.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/PROJECT-GOALS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/QUESTS.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/round42-story.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/round43-faction-routes.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/round44-dynamic-events.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/round58-region-quests.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/round59-regional-dialogue.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/round67-salt-road.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/round68-long-journey.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/round98-opening.test.ts', LF will be replaced by CRLF the next time Git touches it
+EXIT_CODE=0

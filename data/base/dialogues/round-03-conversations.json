@@ -5,6 +5,10 @@
       "startNodeId": "greet",
       "nodes": [
         {
+          "id": "r103-hanshan-field-brief",
+          "text": "沈墨涵把旧抄迎着窗光收好：「纸墨的年限我验到头了——纤维与墨色都早于那场争执，再多我验不出。有人往北边寻『旧界刻』对年头，我得提醒一句：界标刻的是立碑的年头，不是纸上落的笔，拿它断纸龄，断不得。旧界标在北境霜松谷西(24,32)：由云岭古道北上(62,2)入雁回崖，再过关(50,2)入照雪关，出关(3,64)便是霜松谷东口(96,50)，界标在谷西。路远天寒，备足伤药。」"
+        },
+        {
           "id": "greet",
           "text": "小客官今日又来啦。新到的徽墨磨好了，正适合抄经——只是我看你眉间带雾，可是遇上了什么事？",
           "options": [
@@ -19,6 +23,13 @@
               "text": "（旁人正低声议论你做下的事）……掌柜的，墨多少钱一锭？",
               "nextNodeId": "wary",
               "conditions": [{ "kind": "morality", "maxValue": -5 }]
+            },
+            {
+              "text": "纸墨验到头了，往北还能核什么？",
+              "nextNodeId": "r103-hanshan-field-brief",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r43-hanshan-copybook", "status": "active" }
+              ]
             },
             {
               "text": "我已核实「hanshan-copybook」所托之事。",
@@ -232,6 +243,10 @@
       "startNodeId": "greet",
       "nodes": [
         {
+          "id": "r103-tiezhang-field-brief",
+          "text": "顾夜尘用刀鞘点了点桩脚的方向：「底细我问清了，路却还堵着——碎岭弯道(71,63)有伙拦路客借『界石』截停过山客，铁钎横在路心。由雾雨渡口北门(89,15)过关入铁嶂北道，往中段东去便是。那头目筋骨硬、力气沉，你挨不起就先躲，带够伤药再动身。」"
+        },
+        {
           "id": "greet",
           "text": "站住——别再近了。刀还没归鞘，我这手不听使唤。",
           "options": [
@@ -282,6 +297,13 @@
               "nextNodeId": "r58-pond-active",
               "conditions": [
                 { "kind": "questStatus", "questId": "quest.r58-pond-bandit-camp", "status": "active" }
+              ]
+            },
+            {
+              "text": "桩脚问清了，碎岭那边还要做什么？",
+              "nextNodeId": "r103-tiezhang-field-brief",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r43-tiezhang-stone-post", "status": "active" }
               ]
             },
             {
@@ -632,6 +654,26 @@
       "id": "dlg.ye-tingzhou-mentor",
       "startNodeId": "greet",
       "nodes": [
+ {
+          "id": "r103-tingyu-next",
+          "text": "叶庭舟把剑谱合上：「这一程分三段：柳教习核时辰、云纹石阶看旧索孔刻痕、回我这里复命。看的是记法，练的是分寸。」"
+        },
+ {
+          "id": "r103-tingyu-echo",
+          "text": "叶庭舟听完，在门中名册上记了一笔：「柳教习的结论仍是索环回弹，你在石阶看的是刻痕记法——两件事各自成立，谁也不替谁作证。眼力练到了，剑阁记你一功。修习照剑录的门槛来：够得着的先练，够不着的别硬够。」"
+        },
+ {
+          "id": "r103-tingyu-verify",
+          "text": "叶庭舟点头：「时辰那一段，柳教习替你核明了，这桩告一段落。石阶那趟观察还没人替剑阁走过——往后行经云岭古道，多看多记，回来仍可与我说。剑法上的事，剑谱都在。」"
+        },
+        {
+          "id": "r103-tingyu-letter",
+          "text": "叶庭舟从案头取出一页抄本：「门中正查那封匿名信。与剑阁相关的一段，我抄了副本给你——写信人未具名，抄本照抄，我不替他落款。」"
+        },
+ {
+          "id": "r103-tingyu-training",
+          "text": "叶庭舟把剑录翻到末页，逐条指给你看：「落雨七分剑，等级2、身法11/悟性11，攻击12、耗气3；覆水回澜剑，等级4、身法12/悟性13，攻击16、耗气5；怀音养息诀，等级4、悟性14/定力12，恢复17、耗气7；回澜照影剑，等级6、身法14/悟性15，攻击20、耗气8；听潮入微剑，等级10、身法18/悟性18，攻击27、耗气13。出手只分攻、养、守三用：攻是伤敌，养是疗伤回复生命、要耗内力却不补内力，守只挡得住下一击。剑阁没有隔空封穴的手段，别信传闻。」"
+        },
         {
           "id": "greet",
           "text": "叶庭舟看过你手中折旧的纸页，轻轻摇头：「字里藏锋，终究还要落到脚下。你想问剑，还是问路？」",
@@ -706,6 +748,48 @@
                 }
               ]
             },
+            {
+              "text": "这趟门中差事，下一步往哪里去？",
+              "nextNodeId": "r103-tingyu-next",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.tingyu-jiange", "isMember": true },
+                { "kind": "questStatus", "questId": "quest.r43-tingyu-eave-rain", "status": "active" }
+              ]
+            },
+ {
+              "text": "云纹石阶的旧索孔刻痕看过了，来回禀。",
+              "nextNodeId": "r103-tingyu-echo",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r43-tingyu-eave-rain", "status": "completed" },
+                { "kind": "knowledgeKnown", "nodeId": "event.r103-tingyu-practice" }
+              ]
+            },
+            {
+              "text": "信中剑鸣那一段先前已核明，来回话。",
+              "nextNodeId": "r103-tingyu-verify",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r43-tingyu-eave-rain", "status": "completed" },
+                { "kind": "knowledgeKnown", "nodeId": "event.r103-tingyu-practice", "isKnown": false }
+              ]
+            },
+            {
+              "text": "听说门中在查一封匿名信，能否让我也看一眼？",
+              "nextNodeId": "r103-tingyu-letter",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.tingyu-jiange", "isMember": true },
+                { "kind": "knowledgeKnown", "nodeId": "event.r43-wayfarer-letter", "isKnown": false }
+              ],
+              "effects": [
+                { "kind": "discoverKnowledgeNode", "nodeId": "event.r43-wayfarer-letter" }
+              ]
+            },
+            {
+              "text": "门中剑法的门槛与用处，请师父照实说一遍。",
+              "nextNodeId": "r103-tingyu-training",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.tingyu-jiange", "isMember": true }
+              ]
+            },
             { "text": "多谢指点，告辞。", "nextNodeId": "farewell" }
           ]
         },
@@ -745,6 +829,26 @@
       "id": "dlg.shi-bei-mentor",
       "startNodeId": "greet",
       "nodes": [
+ {
+          "id": "r103-tiezhang-next",
+          "text": "石北把手掌按回桩顶：「三步：顾夜尘问桩脚、碎岭赶散拦路客、回渡口向我复命。桩要一根一根打，路要一段一段清。」"
+        },
+ {
+          "id": "r103-tiezhang-echo",
+          "text": "石北听完，在你肩上重重一拍：「拦路客这一趟散了，碎岭眼前清净；他们若再来，照今日的办法再清便是。桩脚松、人借声，两笔账一并了清。铁嶂记你一功。修习照桩谱的门槛来，站得稳的先练。」"
+        },
+        {
+          "id": "r103-tiezhang-verify",
+          "text": "石北沉声道：「桩脚的事，顾夜尘替你问明白了，旧响有了下文。只是碎岭那伙截道的还没人去清——(71,63)的事，遇上便是铁嶂的差事。功夫的事照桩谱来。」"
+        },
+        {
+          "id": "r103-tiezhang-letter",
+          "text": "石北从桩顶取下一张折起的纸：「那封匿名信门中在查，与铁嶂相关的一段我抄下来了。信是谁写的没查实，抄本是抄本，别当原件传。」"
+        },
+ {
+          "id": "r103-tiezhang-training",
+          "text": "石北把桩谱摊开，粗指逐行划过：「铁桩靠山拳，等级2、体魄11/定力9，攻击13、耗气3；翻磅劲，等级4、体魄13/定力10，攻击17、耗气5；开山扛鼎刀，等级5、体魄15/力道13，攻击20、耗气7；截顶护身桩，等级7、体魄17/定力13，攻击22、耗气9；十手推碑腿，等级10、体魄19/身法14，攻击27、耗气12。铁嶂的功夫只分攻、养、守：攻是伤敌，养是疗伤回复生命、要耗内力却不补内力，守只挡得住下一击。没有站着不倒挨打不还手的神功。」"
+        },
         {
           "id": "greet",
           "text": "石北赤着双臂立在渡口石桩旁：「想入铁嶂，先把身子站稳。你若连一趟苦差都扛不住，山门不收。」",
@@ -849,6 +953,48 @@
                 { "kind": "questStatus", "questId": "quest.r58-market-stall-pact", "status": "completed" }
               ]
             },
+            {
+              "text": "这趟门中差事，下一步往哪里去？",
+              "nextNodeId": "r103-tiezhang-next",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.tiezhang-pai", "isMember": true },
+                { "kind": "questStatus", "questId": "quest.r43-tiezhang-stone-post", "status": "active" }
+              ]
+            },
+            {
+              "text": "碎岭的拦路客散了，来回禀。",
+              "nextNodeId": "r103-tiezhang-echo",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r43-tiezhang-stone-post", "status": "completed" },
+                { "kind": "knowledgeKnown", "nodeId": "event.r103-tiezhang-practice" }
+              ]
+            },
+            {
+              "text": "旧桩空响那一段先前已核明，来回话。",
+              "nextNodeId": "r103-tiezhang-verify",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r43-tiezhang-stone-post", "status": "completed" },
+                { "kind": "knowledgeKnown", "nodeId": "event.r103-tiezhang-practice", "isKnown": false }
+              ]
+            },
+            {
+              "text": "听说门中在查一封匿名信，能否让我也看一眼？",
+              "nextNodeId": "r103-tiezhang-letter",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.tiezhang-pai", "isMember": true },
+                { "kind": "knowledgeKnown", "nodeId": "event.r43-wayfarer-letter", "isKnown": false }
+              ],
+              "effects": [
+                { "kind": "discoverKnowledgeNode", "nodeId": "event.r43-wayfarer-letter" }
+              ]
+            },
+            {
+              "text": "门中功夫的门槛与用处，请师父照实说一遍。",
+              "nextNodeId": "r103-tiezhang-training",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.tiezhang-pai", "isMember": true }
+              ]
+            },
             { "text": "这便去磨练筋骨。", "nextNodeId": "farewell" }
           ]
         },
@@ -909,6 +1055,26 @@
       "id": "dlg.wen-suxin-mentor",
       "startNodeId": "greet",
       "nodes": [
+        {
+          "id": "r103-yunyin-next",
+          "text": "闻素心把手上的药汁擦净：「这一程四段：容医师辨药香、苦井对水线、自备两份回春膏、回来复命。药是给你自己路上用的——救人之前，先护好自己。」"
+        },
+        {
+          "id": "r103-yunyin-echo",
+          "text": "闻素心听完，在庄中记档上落了一笔：「陈艾受潮、井水水线，两处对上了，解潮方心里有底。膏子你自己收好，庄里不收你的药。云隐记你一功。修习照札记的门槛来，莫为争胜强练。」"
+        },
+        {
+          "id": "r103-yunyin-verify",
+          "text": "闻素心颔首：「药香那一段，容素青替你核明了。若要再进一步，盐道的苦井(26,28)水线还没人去看——这趟你若肯去，备好自己的药。修习的事照札记来。」"
+        },
+        {
+          "id": "r103-yunyin-letter",
+          "text": "闻素心取过一页素笺：「那封匿名信庄里也收了风声，与药香相关的一段我抄给你。写信人是谁未明，抄的时候别添名字。」"
+        },
+ {
+          "id": "r103-yunyin-training",
+          "text": "闻素心翻开行功札记：「草木回息篇，等级2、定力10/悟性11，恢复15、耗气6；步云履，等级2、身法11/悟性10，守御9、耗气3；清风拂穴掌，等级4、身法12/定力12，攻击18、耗气6；回阳引气诀，等级7、定力15/悟性15，恢复24、耗气10；露墙穿枝步，等级8、身法16/悟性15，守御16、耗气6。庄中功夫只分攻、养、守：养是疗伤回复生命、要耗内力却不补内力，守只挡得住下一击。没有制住人穴道叫人不能动的手段。」"
+        },
         {
           "id": "greet",
           "text": "闻素心正在渡口为人包扎伤处。她洗净手上的药草汁，问道：「练武是为了赢，还是为了让身边的人少受一次伤？」",
@@ -980,6 +1146,48 @@
                 }
               ]
             },
+            {
+              "text": "这趟庄中差事，下一步往哪里去？",
+              "nextNodeId": "r103-yunyin-next",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.yunyin-shanzhuang", "isMember": true },
+                { "kind": "questStatus", "questId": "quest.r43-yunyin-herb-road", "status": "active" }
+              ]
+            },
+            {
+              "text": "苦井水线对过、药也备下了，来回禀。",
+              "nextNodeId": "r103-yunyin-echo",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r43-yunyin-herb-road", "status": "completed" },
+                { "kind": "knowledgeKnown", "nodeId": "event.r103-yunyin-practice" }
+              ]
+            },
+            {
+              "text": "封蜡药香那一段先前已核明，来回话。",
+              "nextNodeId": "r103-yunyin-verify",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r43-yunyin-herb-road", "status": "completed" },
+                { "kind": "knowledgeKnown", "nodeId": "event.r103-yunyin-practice", "isKnown": false }
+              ]
+            },
+            {
+              "text": "听说庄中在查一封匿名信，能否让我也看一眼？",
+              "nextNodeId": "r103-yunyin-letter",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.yunyin-shanzhuang", "isMember": true },
+                { "kind": "knowledgeKnown", "nodeId": "event.r43-wayfarer-letter", "isKnown": false }
+              ],
+              "effects": [
+                { "kind": "discoverKnowledgeNode", "nodeId": "event.r43-wayfarer-letter" }
+              ]
+            },
+            {
+              "text": "庄中功夫的门槛与用处，请庄主照实说一遍。",
+              "nextNodeId": "r103-yunyin-training",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.yunyin-shanzhuang", "isMember": true }
+              ]
+            },
             { "text": "我还想再想一想。", "nextNodeId": "farewell" }
           ]
         },
@@ -1021,6 +1229,10 @@
       "startNodeId": "greet",
       "nodes": [
         {
+          "id": "r103-yunyin-field-brief",
+          "text": "容素青把药匾往檐下一收：「药香对上了陈艾受潮——纸上闻得出，井边对得上才算数。回声苦井在西陲盐道西北(26,28)：由雾雨渡口北门(89,15)入铁嶂北道，南下(52,90)过关便是青岩驿(95,74)，井在盐道中北。回春膏渡镇姜百味的担子上就有，青帆埠金云帆的摊上也备着；各备两份防身——路上要用是真，不逼你交出来。」"
+        },
+        {
           "id": "greet",
           "text": "容素青在檐下翻晒药匾，见你走近，先把半筐寒珠草挪开，让出一张小凳：「坐。渡口雾潮，药材存不住三日，方子倒有几副烂在肚子里。你想问哪一副？」",
           "options": [
@@ -1054,6 +1266,13 @@
                   "kind": "discoverKnowledgeNode",
                   "nodeId": "event.r43-yunyin-herb-road"
                 }
+              ]
+            },
+            {
+              "text": "药香对上了，这一程接下来怎么走？",
+              "nextNodeId": "r103-yunyin-field-brief",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r43-yunyin-herb-road", "status": "active" }
               ]
             },
             { "text": "只是路过，叨扰了。", "nextNodeId": "farewell" }

@@ -5,6 +5,30 @@
       "startNodeId": "greet",
       "nodes": [
         {
+          "id": "r103-hanshan-next",
+          "text": "柳听澜铺开一张空白的副页：「三段路：沈掌柜验纸墨、霜松谷看界刻、回来定夺。记住——碑上的年头是碑的，纸上的年头是纸的，两笔账不能混。」"
+        },
+        {
+          "id": "r103-hanshan-echo",
+          "text": "柳听澜听罢，在副页那一栏旁批了一行小字：「立碑之年与落笔之年，两不相干——这一栏照旧留白，只注缺页。这一趟山跑得值，书院记你一功。武课照武录的门槛来。」"
+        },
+        {
+          "id": "r103-hanshan-verify",
+          "text": "柳听澜点头：「纸墨那一段，沈掌柜已替你验明，缺的一列只能注缺页。往北霜松谷有旧界标(24,32)，立的年头与纸龄对不上号；若要去看，路远天寒，量力而行。武课照武录来。」"
+        },
+        {
+          "id": "r103-hanshan-letter",
+          "text": "柳听澜从抄档里抽出一页：「那封信书院有抄档，与渡籍相关的一段誊给你。写信人未具名，抄本照抄，不添一笔。」"
+        },
+ {
+          "id": "r103-hanshan-training",
+          "text": "柳听澜翻开武录副本：「朱墨点腕笔，等级2、悟性11/身法10，攻击12、耗气3；点津校脉笔，等级4、悟性13/身法12，攻击16、耗气5；锋折批隙手，等级6、悟性15/定力13，攻击20、耗气7；经纶定息篇，等级6、悟性16/定力14，恢复21、耗气9；定理贯脉诀，等级10、悟性19/定力17，恢复27、耗气13。笔路只分攻、养、守三用：攻是伤敌，养是疗伤回复生命、要耗内力却不补内力，守只挡得住下一击。没有封穴制人的手段，别把话本当课业。」"
+        },
+ {
+          "id": "r103-tingyu-field-brief",
+          "text": "柳听澜把对过的时辰誊在信角：「核时辰是第一步——眼力也得练。云岭古道的云纹石阶在道西北(27,31)：由雾雨渡口北门(89,15)过关入铁嶂北道，循北麓(50,2)登上云岭古道，石阶就在左近，云栈客舍(39,43)可歇脚。去看旧索孔与刻痕如何记时序与受力，只记所见、不替它下结论——山里的刻纹，证不了江岸的声音。」"
+        },
+        {
           "id": "greet",
           "text": "柳听澜坐在讲书堂的案前，笔未停，先抬眼把你打量一遍：「堂中在誊一份要紧文书，不便喧哗。你要问学，还是要问路？」",
           "options": [
@@ -134,6 +158,55 @@
               "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.r42-public-record-vow" }]
             },
             {
+              "text": "信中时辰核对过了，接下来这一程怎么走？",
+              "nextNodeId": "r103-tingyu-field-brief",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r43-tingyu-eave-rain", "status": "active" }
+              ]
+            },
+            {
+              "text": "这趟书院差事，下一步往哪里去？",
+              "nextNodeId": "r103-hanshan-next",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.hanshan-shuyuan", "isMember": true },
+                { "kind": "questStatus", "questId": "quest.r43-hanshan-copybook", "status": "active" }
+              ]
+            },
+            {
+              "text": "霜松谷的界刻看过了，来回禀。",
+              "nextNodeId": "r103-hanshan-echo",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r43-hanshan-copybook", "status": "completed" },
+                { "kind": "knowledgeKnown", "nodeId": "event.r103-hanshan-practice" }
+              ]
+            },
+            {
+              "text": "旧抄纸墨那一段先前已核明，来回话。",
+              "nextNodeId": "r103-hanshan-verify",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r43-hanshan-copybook", "status": "completed" },
+                { "kind": "knowledgeKnown", "nodeId": "event.r103-hanshan-practice", "isKnown": false }
+              ]
+            },
+            {
+              "text": "听说书院在查一封匿名信，能否让我也看一眼？",
+              "nextNodeId": "r103-hanshan-letter",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.hanshan-shuyuan", "isMember": true },
+                { "kind": "knowledgeKnown", "nodeId": "event.r43-wayfarer-letter", "isKnown": false }
+              ],
+              "effects": [
+                { "kind": "discoverKnowledgeNode", "nodeId": "event.r43-wayfarer-letter" }
+              ]
+            },
+            {
+              "text": "书院武课的门槛与用处，请先生照实说一遍。",
+              "nextNodeId": "r103-hanshan-training",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.hanshan-shuyuan", "isMember": true }
+              ]
+            },
+            {
               "text": "白鹭洲说旧桩已固，我来核对当夜潮时。",
               "nextNodeId": "r44-ledger-verified",
               "conditions": [{ "kind": "questStatus", "questId": "quest.r44-ledger-first", "status": "completed" }]
@@ -233,6 +306,26 @@
       "id": "dlg.zhu-jiuxian-mentor",
       "startNodeId": "greet",
       "nodes": [
+        {
+          "id": "r103-panzhou-next",
+          "text": "祝九弦把缆绳往桩上一套：「三步走：白鹭洲对旧簿、潮沟赶散夺网客、回来复命。船上规矩——先认人，再出手。」"
+        },
+ {
+          "id": "r103-panzhou-echo",
+          "text": "祝九弦听罢，指节在缆桩上一叩：「夺网客这一趟散了，浮标也重新露了头——缆痕的账、滩上的事，一并了清。这类人退了还来，护船的就再赶一场。刀场记你一功。修习照刀谱的门槛来。」"
+        },
+        {
+          "id": "r103-panzhou-verify",
+          "text": "祝九弦点点头：「缆痕那段，白鹭洲替你对清了，是运盐船磨的痕，不必封渡。滩上夺网的事还没人管——潮沟(73,68)的事，遇上便是刀场的差事。刀谱都在，按门槛挑。」"
+        },
+        {
+          "id": "r103-panzhou-letter",
+          "text": "祝九弦从缆桩下抽出一张油纸包着的纸：「那封匿名信刀场也在查，与缆痕相关的一段我抄下来了。写信人没露名，抄本上我也不替他落款。」"
+        },
+ {
+          "id": "r103-panzhou-training",
+          "text": "祝九弦把刀谱压平在膝上：「翻桨刀，等级2、体魄11/身法11，攻击14、耗气4；顺汛换步，等级3、身法12/体魄10，守御9、耗气3；截浪回舷刀，等级4、体魄13/身法13，攻击18、耗气6；破白连环刀，等级9、体魄17/身法16，攻击26、耗气11。刀路只分攻、养、守：攻是伤敌，养是疗伤回复生命、要耗内力却不补内力，守只挡得住下一击。窄板上护住同船的人，比一刀劈得响要紧。」"
+        },
         {
           "id": "greet",
           "text": "祝九弦蹲在栈桥头清点缆绳，指节粗大，动作却极利落。见你停步，他头也不抬：「借过便借过，站着不动，是要问刀，还是要问船？」",
@@ -340,6 +433,48 @@
               ]
             },
             {
+              "text": "这趟刀场差事，下一步往哪里去？",
+              "nextNodeId": "r103-panzhou-next",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.panzhou-daochang", "isMember": true },
+                { "kind": "questStatus", "questId": "quest.r43-panzhou-return-tide", "status": "active" }
+              ]
+            },
+            {
+              "text": "潮沟的夺网客赶散了，来回禀。",
+              "nextNodeId": "r103-panzhou-echo",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r43-panzhou-return-tide", "status": "completed" },
+                { "kind": "knowledgeKnown", "nodeId": "event.r103-panzhou-practice" }
+              ]
+            },
+            {
+              "text": "缆痕潮时那一段先前已核明，来回话。",
+              "nextNodeId": "r103-panzhou-verify",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r43-panzhou-return-tide", "status": "completed" },
+                { "kind": "knowledgeKnown", "nodeId": "event.r103-panzhou-practice", "isKnown": false }
+              ]
+            },
+            {
+              "text": "听说刀场在查一封匿名信，能否让我也看一眼？",
+              "nextNodeId": "r103-panzhou-letter",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.panzhou-daochang", "isMember": true },
+                { "kind": "knowledgeKnown", "nodeId": "event.r43-wayfarer-letter", "isKnown": false }
+              ],
+              "effects": [
+                { "kind": "discoverKnowledgeNode", "nodeId": "event.r43-wayfarer-letter" }
+              ]
+            },
+            {
+              "text": "刀场功夫的门槛与用处，请师父照实说一遍。",
+              "nextNodeId": "r103-panzhou-training",
+              "conditions": [
+                { "kind": "factionMembership", "factionId": "faction.panzhou-daochang", "isMember": true }
+              ]
+            },
+            {
               "text": "祝师父，集口的索钱人已经散了。",
               "nextNodeId": "r58-toll-squabble-done",
               "conditions": [
@@ -413,6 +548,10 @@
       "id": "dlg.bai-luzhou-ferry-master",
       "startNodeId": "greet",
       "nodes": [
+        {
+          "id": "r103-panzhou-field-brief",
+          "text": "白鹭洲把旧簿翻到缆痕那一页：「三道痕对上了三艘运盐船——账是清了，滩上却有人趁退潮夺网。潮沟在东溟海岸(73,68)：由云岭古道东南(96,50)过关至青帆埠(6,50)，往中段南去便是。那伙人力气不小，窄滩上站稳再出手，别追进水里。」"
+        },
         {
           "id": "greet",
           "text": "渡口公所的檐下，白鹭洲正把一册翻旧的船票簿合上。他把算盘拨了一颗，抬眼道：「渡籍在此。要过桥的问班次，要讲理的查章程——你是哪一种？」",
@@ -543,6 +682,13 @@
               "nextNodeId": "r58-stall-pact-charter",
               "conditions": [
                 { "kind": "questStatus", "questId": "quest.r58-market-stall-pact", "status": "active" }
+              ]
+            },
+            {
+              "text": "缆痕对清了，滩上的事怎么办？",
+              "nextNodeId": "r103-panzhou-field-brief",
+              "conditions": [
+                { "kind": "questStatus", "questId": "quest.r43-panzhou-return-tide", "status": "active" }
               ]
             },
             {

@@ -252,7 +252,13 @@ function loadJourneyWorld(): JourneyWorld {
   const climate = new ClimateRuntime(climateData, calendar);
   const questSet = requireParsed(parseQuestSet(readJson('../data/base/quests/round-07-quests.json')), '任务').set;
   const npcSet = requireParsed(parseNpcSet(readJson('../data/base/characters/round-03-npcs.json')), '人物').set;
-  const encounterSet = requireParsed(parseBattleEncounterSet(readJson('../data/base/battles/round-05-encounters.json')), '遭遇').set;
+  const encounterSet = {
+    // Round 103 routes the panzhou practice at the east-coast tide-wake looters.
+    encounters: [
+      ...requireParsed(parseBattleEncounterSet(readJson('../data/base/battles/round-05-encounters.json')), '遭遇').set.encounters,
+      ...requireParsed(parseBattleEncounterSet(readJson('../data/base/battles/round-83-east-coast-encounters.json')), '东岸遭遇').set.encounters,
+    ],
+  };
   const itemSet = requireParsed(parseItemSet(readJson('../data/base/items/round-06-items.json')), '物品').set;
   const factionSet = requireParsed(parseFactionSet(readJson('../data/base/factions/round-04-factions.json')), '门派').set;
   const profileSet = requireParsed(parseCharacterProfileSet(readJson('../data/base/characters/round-04-profiles.json')), '角色模板').set;

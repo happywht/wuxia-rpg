@@ -43,9 +43,15 @@ function loadWorldQuests() {
     '../data/base/characters/round-03-npcs.json',
   ).npcs;
   const items = readJson<{ items: Array<{ id: string }> }>('../data/base/items/round-06-items.json').items;
-  const encounters = readJson<{ encounters: Array<{ id: string }> }>(
-    '../data/base/battles/round-05-encounters.json',
-  ).encounters;
+  const encounters = [
+    readJson<{ encounters: Array<{ id: string }> }>(
+      '../data/base/battles/round-05-encounters.json',
+    ).encounters,
+    // Round 103 routes the panzhou practice at the east-coast tide-wake looters.
+    readJson<{ encounters: Array<{ id: string }> }>(
+      '../data/base/battles/round-83-east-coast-encounters.json',
+    ).encounters,
+  ].flat();
   const assembly = assembleQuests({
     questSet: parsed.set,
     questGiverNpcIds: new Set(npcs.filter((npc) => npc.questGiver).map((npc) => npc.id)),

@@ -3672,6 +3672,41 @@
       "toId": "event.r102-sea-close",
       "relation": "knows",
       "summary": "条件对白处理和回应此事，静态关系不替代运行时见闻。"
+    },
+    {
+      "id": "kg.edge.r103-tingyu-practice",
+      "fromId": "char.ye-tingzhou",
+      "toId": "event.r103-tingyu-practice",
+      "relation": "knows",
+      "summary": "师傅复命时记档此事；静态关系不替代运行时见闻。"
+    },
+    {
+      "id": "kg.edge.r103-tiezhang-practice",
+      "fromId": "char.shi-bei",
+      "toId": "event.r103-tiezhang-practice",
+      "relation": "knows",
+      "summary": "师傅复命时记档此事；静态关系不替代运行时见闻。"
+    },
+    {
+      "id": "kg.edge.r103-yunyin-practice",
+      "fromId": "char.wen-suxin",
+      "toId": "event.r103-yunyin-practice",
+      "relation": "knows",
+      "summary": "师傅复命时记档此事；静态关系不替代运行时见闻。"
+    },
+    {
+      "id": "kg.edge.r103-hanshan-practice",
+      "fromId": "char.liu-tinglan",
+      "toId": "event.r103-hanshan-practice",
+      "relation": "knows",
+      "summary": "师傅复命时记档此事；静态关系不替代运行时见闻。"
+    },
+    {
+      "id": "kg.edge.r103-panzhou-practice",
+      "fromId": "char.zhu-jiuxian",
+      "toId": "event.r103-panzhou-practice",
+      "relation": "knows",
+      "summary": "师傅复命时记档此事；静态关系不替代运行时见闻。"
     }
   ]
 }

@@ -4,6 +4,18 @@
 
 ---
 
+## 2026-10-01 — Round 103 五派地区实践与修习反馈
+
+- 先写plan，预计人类12–20小时。Claude默认模型只读扫描后执行有边界的资料/脚本/测试工作；主代理制定五派实践范围并复核事实、旧状态、无关语义和最终结果，文档独立更新。
+- 保留五R43任务的第一核询/资格/经验银两，新增地区实践与师傅复命、本门声望5和独立证明；转抄匿名信给门人确定入口。没有扩图或更改武学/引擎规则。
+- 旧completed核询与新实践证明分别反馈，active原第一目标保留。只备药不扣药、修习仍看全部资格；修正旧文档书院暂无武学的错误。
+- 复核定向纠错：回程地名对表NPC实际放置（叶庭舟回镇里、石北回雾雨渡口）、heal措辞改"疗伤回复生命"、force写"力道"、听雨实践改为旧索孔/刻痕观察证据边界、盘舷echo去绳结、云隐备药按reconcileQuestFacts当前持有量结算（不需再购买）；增量脚本升级为受管同步，文案纠错原地生效且重跑字节稳定。
+- 最终验证（iterations/round-103/*.txt 逐项exit）：typecheck、validate-data（100资源Schema）、inspect-mods、audit-round-34（修正docs/QUESTS.md五行审计token后通过：22地图/65任务/5门派）、audit-round-48-docs、`vitest run --maxWorkers=2`（77文件541测试全过）、vite build、git diff --check 全部exit 0；check-unrelated-semantics.mjs在运行窗口内被并行移除未执行（已记录替代证据）。新增v1存档兼容回归用capture→parse→planSnapshotRestore→restoreRunState真链覆盖五派旧completed不获证明与active核询保留/越前重置。
+- 浏览器标签页4两次CDP焦点连接超时，未做本轮真实UI/键盘验证。不得把自动夹具状态准备算作五派实走。具体命令、Claude终态与纠错结果见本轮verification.md。
+- M3实践机械接线推进，M2–M5尚未通过；三章、两构筑/制作、伙伴/结局/发行仍须继续，goal保持active。
+
+---
+
 ## 2026-10-01 — Round 102 海路补给与传航立场
 
 - 先写plan，预计人类10–16小时；Claude额度恢复前主代理实现六既有差事、五区状态对白、两处成本选择与8见闻。复用已有协议，不扩图。

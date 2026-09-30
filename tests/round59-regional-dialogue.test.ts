@@ -60,9 +60,11 @@ const rawNpcs = readJson('../data/base/characters/round-03-npcs.json') as {
 const npcIds = new Set(rawNpcs.npcs.map((npc) => npc.id));
 const questGiverNpcIds = new Set(rawNpcs.npcs.filter((npc) => npc.questGiver).map((npc) => npc.id));
 
-const rawEncounters = readJson('../data/base/battles/round-05-encounters.json') as {
-  encounters: Array<{ id: string }>;
-};
+const rawEncounters = [
+  readJson('../data/base/battles/round-05-encounters.json') as { encounters: Array<{ id: string }> },
+  // Round 103 routes the panzhou practice at the east-coast tide-wake looters.
+  readJson('../data/base/battles/round-83-east-coast-encounters.json') as { encounters: Array<{ id: string }> },
+].flatMap((source) => source.encounters);
 
 const itemResult = parseItemSet(readJson('../data/base/items/round-06-items.json'));
 requireParsed(itemResult, 'Item set');
@@ -97,7 +99,7 @@ const questAssembly = assembleQuests({
   questGiverNpcIds,
   npcIds,
   itemIds: new Set(items.keys()),
-  encounterIds: new Set(rawEncounters.encounters.map((encounter) => encounter.id)),
+  encounterIds: new Set(rawEncounters.map((encounter) => encounter.id)),
   factionIds: new Set(factions.keys()),
   knowledgeNodeIds: new Set(graph.nodes.keys()),
 });
@@ -268,7 +270,7 @@ function visibleStartTargets(conversation: DialogueData, context: DialogueRuntim
 describe('Round 59 regional dialogue echoes', () => {
   it('parses real base data and assembles quests and dialogue references without warnings', () => {
     expect(graph.warnings).toEqual([]);
-    expect(graph.nodes.size).toBe(412);
+    expect(graph.nodes.size).toBe(417); // 412 + five Round 103 practice insights
     expect(questAssembly.warnings).toEqual([]);
     expect(questAssembly.quests.size).toBe(44);
     expect(dialogueAssembly.warnings).toEqual([]);
@@ -327,15 +329,16 @@ describe('Round 59 regional dialogue echoes', () => {
     // Anchored greet-node option counts: pre-existing options plus the
     // Round 59 echoes (shi-bei carries two quest pairs, hence four); Zhu
     // also has the Round 69 outsider lesson entry. Round 98 adds the
-    // peddler-errand/ferry-ledger journey entries to Bai and Jiang.
+    // peddler-errand/ferry-ledger journey entries to Bai and Jiang. Round 103
+    // adds five mentor practice entries and one field brief per verifier.
     const expectedBaseline: Record<string, number> = {
-      'dlg.shi-bei-mentor': 13, // 9 pre-existing + 4 echoes
-      'dlg.bai-luzhou-ferry-master': 20, // 14 pre-existing + 2 echoes + 4 Round 98 journey entries
-      'dlg.zhu-jiuxian-mentor': 15, // 12 pre-existing + 2 echoes + outsider lesson
+      'dlg.shi-bei-mentor': 18, // 9 pre-existing + 4 echoes + 5 Round 103 practice entries
+      'dlg.bai-luzhou-ferry-master': 21, // 14 pre-existing + 2 echoes + 4 Round 98 journey entries + 1 Round 103 field brief
+      'dlg.zhu-jiuxian-mentor': 20, // 12 pre-existing + 2 echoes + outsider lesson + 5 Round 103 practice entries
       'dlg.ma-shangyi-notice-board': 5, // 3 pre-existing + 2 echoes
       'dlg.lu-zhenniang-teastall': 9, // 7 pre-existing + 2 echoes
       'dlg.jiang-baiwei-peddler': 7, // 2 pre-existing + 2 echoes + 3 Round 98 journey entries
-      'dlg.gu-yechen-roadside': 9, // 7 pre-existing + 2 echoes
+      'dlg.gu-yechen-roadside': 10, // 7 pre-existing + 2 echoes + 1 Round 103 field brief
     };
     for (const [dialogueId, expectedCount] of Object.entries(expectedBaseline)) {
       const conversation = dialogueAssembly.conversations.get(dialogueId)!;

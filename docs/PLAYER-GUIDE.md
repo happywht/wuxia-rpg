@@ -8,7 +8,7 @@
 
 Round 99 对话：↑/↓（W/S）切换选项，PgUp/PgDn 翻正文，←/→ 翻当前长选项，Enter 先翻页再确认，Esc 关闭。页码与选项总数在面板底部显示。Q 优先列出追踪/活动差事；无追踪时 HUD 给出附近托付人物及 F/E 入口。真实开局示例见 `iterations/round-99/playtest.md`。
 
-这份手册对应当前仓库 Round 102 的可运行原型。菜单、键位与玩法以游戏内 H「操作手册」和现行资料为准；浏览器存档仅保存在当前浏览器的本地存储中。R00–R102 均有独立计划；R50 最终验收边界见 [`FINAL-ACCEPTANCE.md`](FINAL-ACCEPTANCE.md)，二十二张百格地图、全域舆图、区域内容与路线证据见 [`MAP-ATLAS.md`](MAP-ATLAS.md)、[`ROUND-61-ROUTE-AUDIT.md`](ROUND-61-ROUTE-AUDIT.md)、[`ROUND-63-TIMED-ROUTE-AUDIT.md`](ROUND-63-TIMED-ROUTE-AUDIT.md)、[`ROUND-64-ROUTE-AUDIT.md`](ROUND-64-ROUTE-AUDIT.md)、[`ROUND-68-JOURNEY-PLAYTEST.md`](ROUND-68-JOURNEY-PLAYTEST.md)、[`ROUND-71-BROWSER-PLAYTEST.md`](ROUND-71-BROWSER-PLAYTEST.md) 和 [`ROUND-72-BROWSER-PLAYTEST.md`](ROUND-72-BROWSER-PLAYTEST.md)。Round 95 在天门关以南新增雾杉关、听杉谷、照叶港三处可步行百格地图；Round 96 打通南海礁岛海路；Round 97 在东溟中部新增澜心洲、引航礁两处百格地图，以四组双向海路接上风回岛、潮生屿和天门关，天门关至潮生屿缩短为三段航路，并新增「澜心潮簿」→「重燃星槎灯」连续差事。Round 98 统一王朝设定（当朝大雍、北界碑大梁为前朝遗刻），沈墨涵、姜百味、白鹭洲、柳听澜的开局问询当场给出纸墨线索与真实出镇方向，货郎口信与渡籍补录按未接/进行/完成提示进展；三条主线的已实现事实与未解线索见 [`JOURNEY-FACTS.md`](JOURNEY-FACTS.md)。全域图可缩放与平移，细部森林与礁岛图素来自已记录授权的 OpenGameArt CC0 图集。Round 69 起四门身法拥有一次性守御战斗作用；无门派拦门刀法可向盘舷门外玩家授艺。Round 70 更新四区总图地貌与地图图素；Round 74 新增云岭古道、双向铁嶂关口及两段链式任务；Round 75 为固定见闻点新增临近线索；Round 76 在五区补充 CC0 环境图素；Round 77 为五区玩家与 NPC 接入方向帧、行走动画和十种 CC0 角色外观。Round 73 让 M 舆图和 HUD 共用当前 NPC/遭遇占位，绕行时显示提示、临时封路时区别于地形断路。Round 79–97 的岛屿与北境区域沿革见 [`MAP-ATLAS.md`](MAP-ATLAS.md)。地图素材来源及许可见 [`REFERENCES.md`](REFERENCES.md)。招式名称、门槛和作用见 [`MARTIAL-ARTS.md`](MARTIAL-ARTS.md)。
+这份手册对应当前仓库 Round 103 的可运行原型。菜单、键位与玩法以游戏内 H「操作手册」和现行资料为准；浏览器存档仅保存在当前浏览器的本地存储中。R00–R103 均有独立计划；R50 最终验收边界见 [`FINAL-ACCEPTANCE.md`](FINAL-ACCEPTANCE.md)，二十二张百格地图、全域舆图、区域内容与路线证据见 [`MAP-ATLAS.md`](MAP-ATLAS.md)、[`ROUND-61-ROUTE-AUDIT.md`](ROUND-61-ROUTE-AUDIT.md)、[`ROUND-63-TIMED-ROUTE-AUDIT.md`](ROUND-63-TIMED-ROUTE-AUDIT.md)、[`ROUND-64-ROUTE-AUDIT.md`](ROUND-64-ROUTE-AUDIT.md)、[`ROUND-68-JOURNEY-PLAYTEST.md`](ROUND-68-JOURNEY-PLAYTEST.md)、[`ROUND-71-BROWSER-PLAYTEST.md`](ROUND-71-BROWSER-PLAYTEST.md) 和 [`ROUND-72-BROWSER-PLAYTEST.md`](ROUND-72-BROWSER-PLAYTEST.md)。Round 95 在天门关以南新增雾杉关、听杉谷、照叶港三处可步行百格地图；Round 96 打通南海礁岛海路；Round 97 在东溟中部新增澜心洲、引航礁两处百格地图，以四组双向海路接上风回岛、潮生屿和天门关，天门关至潮生屿缩短为三段航路，并新增「澜心潮簿」→「重燃星槎灯」连续差事。Round 98 统一王朝设定（当朝大雍、北界碑大梁为前朝遗刻），沈墨涵、姜百味、白鹭洲、柳听澜的开局问询当场给出纸墨线索与真实出镇方向，货郎口信与渡籍补录按未接/进行/完成提示进展；三条主线的已实现事实与未解线索见 [`JOURNEY-FACTS.md`](JOURNEY-FACTS.md)。全域图可缩放与平移，细部森林与礁岛图素来自已记录授权的 OpenGameArt CC0 图集。Round 69 起四门身法拥有一次性守御战斗作用；无门派拦门刀法可向盘舷门外玩家授艺。Round 70 更新四区总图地貌与地图图素；Round 74 新增云岭古道、双向铁嶂关口及两段链式任务；Round 75 为固定见闻点新增临近线索；Round 76 在五区补充 CC0 环境图素；Round 77 为五区玩家与 NPC 接入方向帧、行走动画和十种 CC0 角色外观。Round 73 让 M 舆图和 HUD 共用当前 NPC/遭遇占位，绕行时显示提示、临时封路时区别于地形断路。Round 79–97 的岛屿与北境区域沿革见 [`MAP-ATLAS.md`](MAP-ATLAS.md)。地图素材来源及许可见 [`REFERENCES.md`](REFERENCES.md)。招式名称、门槛和作用见 [`MARTIAL-ARTS.md`](MARTIAL-ARTS.md)。
 
 ## 世界外观（Round 65 起）
 ### 五区环境细节（Round 76）
@@ -142,3 +142,17 @@ npm run dev
 顾潮生完成暮潮后可单次决定岸上救伤（海盐敷膏1、顾+4/岑−3/声望+2）或守礁药囊（回春膏1、顾−3/岑+4/声望−1）。季无潮完成潮簿后可公开传航（厚蚌壳片2、季+4/虞−4/声望+3）或熟船队传航（清心丸1、季−4/虞+4/声望−2）。缺物可暂缓，金云帆E补给/F打听；海盐26银两、回春15、清心12、贝壳25/片，库存以面板为准，守礁药商有限库存。人物回响与v1保存记录实际代价。
 
 澜心潮痕碑(58,22)、观汐台(46,76)按E调查；季无潮上午(50,44)、日中(54,50)，其余位置看M日程。青帆埠至风回岛关口(91,71)，风回至潮生(97,50)、至澜心(93,55)，潮生至澜心(86,54)，引航礁至天门关(89,89)。六差事与两处决定、海路对照后向虞星槎阶段结案。回湾线、风灯向、水则、潮痕、灯谱用途不同，不推定残篇作者或纸龄。真实旅程和双结果浏览器未验收。
+
+## Round 103 五派地区实践
+
+拜师后向本门师傅F问话，可转抄匿名信，确定发现风雨传函见闻；原道路奇遇仍可触发。五项既有差事保留门派/信件门槛与原经验银两，按序完成原核询、地区实践、回师傅报告，新版结案给本门声望5和独立实践见闻。
+
+| 门派差事 | 地区实践 | 回师傅 |
+| --- | --- | --- |
+| 檐雨听锋 | 云岭云纹石阶见闻(27,31) | 江南叶庭舟 |
+| 石桩回声 | 铁嶂碎岭拦路客(71,63) | 渡口石北 |
+| 药路余香 | 盐道苦井见闻(26,28)，备回春膏2份 | 渡口闻素心 |
+| 副页留白 | 霜松谷旧界刻(24,32) | 江南柳听澜 |
+| 回潮验缆 | 青帆埠潮沟夺网客(73,68) | 渡口祝九弦 |
+
+Q可追踪当前阶段并N导航，M查实际人物位置和关口。云隐阶段只备药不扣药；恢复武学回复生命而非内力，守御只抵下一次受击，铁嶂护身桩当前仍为攻击。实践结案不自动学武、不绕过等级/属性资格；修习细表见FACTION-PRACTICE-DESIGN.md与MARTIAL-ARTS.md。旧完成核询保留原状态，师傅不据此伪造地区证明；进行态保留原第一目标，之后按序走。五派真实键盘旅程仍未验收。

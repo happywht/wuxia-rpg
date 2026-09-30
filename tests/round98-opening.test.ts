@@ -25,7 +25,7 @@ import {
   type FactionData,
   type MartialArtData,
 } from '../src/engine/character-progression';
-import { parseBattleEncounterSet } from '../src/engine/turn-based-combat';
+import { parseBattleEncounterSet, type BattleEncounterData } from '../src/engine/turn-based-combat';
 import { DialogueSession, parseDialogueSet, type DialogueData, type DialogueOptionData } from '../src/engine/dialogue-graph';
 import {
   applyDialogueEffects,
@@ -122,9 +122,17 @@ function loadRuntimeWorld(): RuntimeWorld {
     npcSet.flatMap((npc) => npc.dialogueId === undefined ? [] : [[npc.dialogueId, npc.id] as const]),
   );
 
-  const battleResult = parseBattleEncounterSet(readJson('../data/base/battles/round-05-encounters.json'));
-  if (!battleResult.ok) throw new Error(battleResult.errors.join('\n'));
-  const encounters = new Map(battleResult.set.encounters.map((entry) => [entry.id, entry]));
+  const battleSources = [
+    parseBattleEncounterSet(readJson('../data/base/battles/round-05-encounters.json')),
+    // Round 103 routes the panzhou practice at the east-coast tide-wake looters.
+    parseBattleEncounterSet(readJson('../data/base/battles/round-83-east-coast-encounters.json')),
+  ];
+  const encounterEntries: Array<[string, BattleEncounterData]> = [];
+  for (const result of battleSources) {
+    if (!result.ok) throw new Error(result.errors.join('\n'));
+    for (const entry of result.set.encounters) encounterEntries.push([entry.id, entry]);
+  }
+  const encounters = new Map(encounterEntries);
 
   const knowledgeNodes = new Map(
     readJson<{ nodes: KnowledgeNodeData[] }>(

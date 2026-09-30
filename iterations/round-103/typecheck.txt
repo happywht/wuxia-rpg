@@ -1,0 +1,6 @@
+=== npm run typecheck ===
+
+> wuxia-rpg@0.0.1 typecheck
+> tsc --noEmit
+
+EXIT_CODE=0

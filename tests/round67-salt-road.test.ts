@@ -174,12 +174,14 @@ describe('Round 67 fourth playable region and expanded atlas', () => {
     const nodes = parseKnowledgeNodeSet(readJson('../data/base/knowledge_graph/nodes.json'));
     const edges = parseKnowledgeEdgeSet(readJson('../data/base/knowledge_graph/edges.json'));
     const encounterSet = parseBattleEncounterSet(readJson('../data/base/battles/round-05-encounters.json'));
+    // Round 103 routes the panzhou practice at the east-coast tide-wake looters.
+    const eastCoastEncounters = parseBattleEncounterSet(readJson('../data/base/battles/round-83-east-coast-encounters.json'));
     const itemSet = parseItemSet(readJson('../data/base/items/round-06-items.json'));
     const factionSet = parseFactionSet(readJson('../data/base/factions/round-04-factions.json'));
     const martialSet = parseMartialArtSet(readJson('../data/base/skills/round-04-martial-arts.json'));
-    expect(quests.ok && npcSet.ok && dialogues.ok && nodes.ok && edges.ok && encounterSet.ok && itemSet.ok && factionSet.ok && martialSet.ok)
+    expect(quests.ok && npcSet.ok && dialogues.ok && nodes.ok && edges.ok && encounterSet.ok && eastCoastEncounters.ok && itemSet.ok && factionSet.ok && martialSet.ok)
       .toBe(true);
-    if (!quests.ok || !npcSet.ok || !dialogues.ok || !nodes.ok || !edges.ok || !encounterSet.ok || !itemSet.ok || !factionSet.ok || !martialSet.ok) return;
+    if (!quests.ok || !npcSet.ok || !dialogues.ok || !nodes.ok || !edges.ok || !encounterSet.ok || !eastCoastEncounters.ok || !itemSet.ok || !factionSet.ok || !martialSet.ok) return;
 
     const graph = assembleKnowledgeGraph(nodes.data, edges.data);
     expect(graph.warnings).toEqual([]);
@@ -205,7 +207,10 @@ describe('Round 67 fourth playable region and expanded atlas', () => {
       questGiverNpcIds: new Set(npcSet.set.npcs.filter(({ questGiver }) => questGiver).map(({ id }) => id)),
       npcIds: new Set(npcSet.set.npcs.map(({ id }) => id)),
       itemIds: new Set(items.keys()),
-      encounterIds: new Set(encounterSet.set.encounters.map(({ id }) => id)),
+      encounterIds: new Set([
+        ...encounterSet.set.encounters.map(({ id }) => id),
+        ...eastCoastEncounters.set.encounters.map(({ id }) => id),
+      ]),
       factionIds: new Set(factionIds.keys()),
       knowledgeNodeIds: knowledge,
     });

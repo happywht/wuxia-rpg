@@ -40,14 +40,25 @@ describe('Round 58 regional quest chains', () => {
       questGiver?: boolean;
     }>;
   };
-  const rawEncounters = readJson('../data/base/battles/round-05-encounters.json') as {
-    encounters: Array<{
-      id: string;
-      mapResourceId: string;
-      position: { col: number; row: number };
-      repeatable: boolean;
-    }>;
-  };
+  const rawEncounters = [
+    readJson('../data/base/battles/round-05-encounters.json') as {
+      encounters: Array<{
+        id: string;
+        mapResourceId: string;
+        position: { col: number; row: number };
+        repeatable: boolean;
+      }>;
+    },
+    // Round 103 routes the panzhou practice at the east-coast tide-wake looters.
+    readJson('../data/base/battles/round-83-east-coast-encounters.json') as {
+      encounters: Array<{
+        id: string;
+        mapResourceId: string;
+        position: { col: number; row: number };
+        repeatable: boolean;
+      }>;
+    },
+  ].flatMap((source) => source.encounters);
   const rawItems = readJson('../data/base/items/round-06-items.json') as {
     items: Array<{ id: string }>;
   };
@@ -76,7 +87,7 @@ describe('Round 58 regional quest chains', () => {
     questGiverNpcIds: new Set(rawNpcs.npcs.filter((npc) => npc.questGiver).map((npc) => npc.id)),
     npcIds: new Set(rawNpcs.npcs.map((npc) => npc.id)),
     itemIds: new Set(rawItems.items.map((item) => item.id)),
-    encounterIds: new Set(rawEncounters.encounters.map((encounter) => encounter.id)),
+    encounterIds: new Set(rawEncounters.map((encounter) => encounter.id)),
     factionIds: new Set(rawFactions.factions.map((faction) => faction.id)),
     knowledgeNodeIds: new Set(graph.nodes.keys()),
   });
@@ -86,8 +97,8 @@ describe('Round 58 regional quest chains', () => {
     expect(assembly.warnings).toEqual([]);
     expect(assembly.quests.size).toBe(44);
     expect(graph.warnings).toEqual([]);
-    expect(nodeParse.data.nodes).toHaveLength(412);
-    expect(edgeParse.data.edges).toHaveLength(524);
+    expect(nodeParse.data.nodes).toHaveLength(417); // 412 + five Round 103 practice insights
+    expect(edgeParse.data.edges).toHaveLength(529); // 524 + five Round 103 practice edges
 
     const newQuestIds = [
       'quest.r58-market-discovery',
@@ -128,7 +139,7 @@ describe('Round 58 regional quest chains', () => {
     }
 
     const newEncounterIds = ['encounter.r58-market-toll-claimer', 'encounter.r58-pond-fake-escort'];
-    const newEncounters = newEncounterIds.map((id) => rawEncounters.encounters.find((encounter) => encounter.id === id));
+    const newEncounters = newEncounterIds.map((id) => rawEncounters.find((encounter) => encounter.id === id));
     expect(newEncounters.every((encounter) => encounter !== undefined)).toBe(true);
     for (const encounter of newEncounters) {
       if (encounter === undefined) continue;

@@ -1,0 +1,9 @@
+=== npx vitest run --maxWorkers=2 ===
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+ Test Files  77 passed (77)
+      Tests  541 passed (541)
+   Start at  03:21:22
+   Duration  116.84s (tests 94%, import 4%, transform 2%)
+    Isolate  77 workers spawned · ~210ms startup each (spawn + environment, per file)
+             at least ~7.88s faster with isolate: false — reuses workers across files instead of one per file
+EXIT_CODE=0
