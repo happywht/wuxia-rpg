@@ -62,6 +62,9 @@ describe('Round 70 continental world atlas', () => {
       } else if (region.mapResourceId === 'map.round-85-tide-isle') {
         const tideIsleLand = art.layers.find(({ id }) => id === 'world-r85-expanse-land')!.cells;
         expect(tideIsleLand[row]?.[col]).toBeGreaterThan(0);
+      } else if (region.mapResourceId === 'map.round-87-southwest-isles') {
+        const southwestLand = art.layers.find(({ id }) => id === 'world-r87-expanse-land')!.cells;
+        expect(southwestLand[row]?.[col]).toBeGreaterThan(0);
       } else if (region.mapResourceId === 'map.round-79-isles') {
         const shoalLand = art.layers.find(({ id }) => id === 'world-r79-shoal-land')!.cells;
         expect(shoalLand[row]?.[col]).toBeGreaterThan(0);
@@ -80,8 +83,15 @@ describe('Round 70 continental world atlas', () => {
           expect(art.layers.find(({ id }) => id === 'world-r84-expanse-land')?.cells[cell.row]?.[cell.col]).toBeGreaterThan(0);
         } else if (endpoint.mapResourceId === 'map.round-85-tide-isle') {
           expect(art.layers.find(({ id }) => id === 'world-r85-expanse-land')?.cells[cell.row]?.[cell.col]).toBeGreaterThan(0);
+        } else if (endpoint.mapResourceId === 'map.round-87-southwest-isles') {
+          expect(art.layers.find(({ id }) => id === 'world-r87-expanse-land')?.cells[cell.row]?.[cell.col]).toBeGreaterThan(0);
         } else if (endpoint.mapResourceId === 'map.round-79-isles') {
-          expect(art.layers.find(({ id }) => id === 'world-r79-gate-routes')?.cells[cell.row]?.[cell.col]).toBeGreaterThan(0);
+          // Round 87 fog-pilot gates leave from the western reef shallows
+          // instead of the old official ferry route.
+          const layerId = transition.id.startsWith('gate.r87-')
+            ? 'world-r79-shoal-water'
+            : 'world-r79-gate-routes';
+          expect(art.layers.find(({ id }) => id === layerId)?.cells[cell.row]?.[cell.col]).toBeGreaterThan(0);
         } else {
           expect(land[cell.row]?.[cell.col]).toBeGreaterThan(1);
         }

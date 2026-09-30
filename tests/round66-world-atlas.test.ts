@@ -27,12 +27,12 @@ function loadWorld() {
 }
 
 describe('Round 81 global world atlas art and projection', () => {
-  it('loads the 448×320 continental and island atlas with per-layer tileset validation', () => {
+  it('loads the 512×384 continental and island atlas with per-layer tileset validation', () => {
     const { parsed } = loadWorld();
     const art = parsed.atlasArt;
     expect(art).toBeDefined();
     if (art === undefined) return;
-    expect({ columns: art.columns, rows: art.rows, tileSize: art.tileSize }).toEqual({ columns: 448, rows: 320, tileSize: 16 });
+    expect({ columns: art.columns, rows: art.rows, tileSize: art.tileSize }).toEqual({ columns: 512, rows: 384, tileSize: 16 });
     expect(art.layers.map(({ id }) => id)).toEqual([
       'world-ocean', 'world-land', 'world-coast', 'world-forest', 'world-relief', 'world-roads', 'world-settlements',
       'world-r79-shoal-water', 'world-r79-shoal-sand', 'world-r79-shoal-land', 'world-r79-shoal-pines',
@@ -40,6 +40,8 @@ describe('Round 81 global world atlas art and projection', () => {
       'world-r81-expanse-land', 'world-r81-expanse-pines',
       'world-r84-expanse-water', 'world-r84-expanse-sand', 'world-r84-expanse-land', 'world-r84-expanse-pines',
       'world-r85-expanse-water', 'world-r85-expanse-sand', 'world-r85-expanse-land', 'world-r85-expanse-pines',
+      'world-r87-expanse-water', 'world-r87-expanse-sand',
+      'world-r87-expanse-land', 'world-r87-expanse-pines',
     ]);
     const tilesets = new Map(art.tilesets.map((tileset) => [tileset.id, tileset]));
     expect(tilesets.has('kenney.roguelike-rpg')).toBe(true);
@@ -125,7 +127,7 @@ describe('Round 81 global world atlas art and projection', () => {
   it('uses edge-safe atlas coordinates and does not reveal undiscovered landmark names', () => {
     const { world, maps, parsed } = loadWorld();
     const art = parsed.atlasArt!;
-    expect(projectAtlasPosition({ x: 0, y: 100 }, art)).toEqual({ x: 8, y: 5112 });
+    expect(projectAtlasPosition({ x: 0, y: 100 }, art)).toEqual({ x: 8, y: 6136 });
     const undiscovered = buildWorldAtlasOverlays(world, maps, parsed.startingMapResourceId, { col: 43, row: 37 }, new Set());
     const undiscoveredJson = JSON.stringify(undiscovered);
     expect(undiscoveredJson).not.toContain('landmark.reedbank-landing');

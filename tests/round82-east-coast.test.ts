@@ -49,25 +49,25 @@ describe('Round 82 eastern coastline and walkable world expansion', () => {
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
 
-    expect(parsed.data.regions).toHaveLength(9);
-    expect(parsed.data.transitions).toHaveLength(16);
-    expect(maps.size).toBe(9);
+    expect(parsed.data.regions).toHaveLength(10);
+    expect(parsed.data.transitions).toHaveLength(18);
+    expect(maps.size).toBe(10);
     expect(maps.has(COAST_ID)).toBe(true);
 
     const oldPositions = new Map([
-      ['map.round-01-grid', { x: 9.26174475, y: 18.31347969 }],
-      ['map.round-10-mist-ferry', { x: 29.63758401, y: 24.28526638 }],
-      ['map.round-62-iron-ridge', { x: 29.63758401, y: 10.35109714 }],
-      ['map.round-67-salt-road', { x: 9.26174475, y: 24.28526638 }],
-      ['map.round-74-cloud-ridge', { x: 39.82550315, y: 20.3040751 }],
-      ['map.round-79-isles', { x: 24.94407159, y: 39.89655172 }],
+      ['map.round-01-grid', { x: 8.10176106, y: 15.25326376 }],
+      ['map.round-10-mist-ferry', { x: 25.92563611, y: 20.22715398 }],
+      ['map.round-62-iron-ridge', { x: 25.92563611, y: 8.62140989 }],
+      ['map.round-67-salt-road', { x: 8.10176106, y: 20.22715398 }],
+      ['map.round-74-cloud-ridge', { x: 34.83757321, y: 16.91122704 }],
+      ['map.round-79-isles', { x: 21.81996086, y: 33.22976501 }],
     ]);
     for (const [id, position] of oldPositions) {
       expect(parsed.data.regions.find(({ mapResourceId }) => mapResourceId === id)?.atlasPosition).toEqual(position);
     }
-    expect(parsed.data.atlasArt).toMatchObject({ columns: 448, rows: 320, tileSize: 16 });
+    expect(parsed.data.atlasArt).toMatchObject({ columns: 512, rows: 384, tileSize: 16 });
     const newRegion = parsed.data.regions.find(({ mapResourceId }) => mapResourceId === COAST_ID)!;
-    expect(newRegion).toMatchObject({ name: '东溟海岸·青帆埠', atlasPosition: { x: 63.70246085, y: 30.75862069 } });
+    expect(newRegion).toMatchObject({ name: '东溟海岸·青帆埠', atlasPosition: { x: 55.72407045, y: 25.61879896 } });
     const atlasColumn = Math.round(newRegion.atlasPosition.x / 100 * (parsed.data.atlasArt!.columns - 1));
     const atlasRow = Math.round(newRegion.atlasPosition.y / 100 * (parsed.data.atlasArt!.rows - 1));
     const eastLand = parsed.data.atlasArt!.layers.find(({ id }) => id === 'world-r81-expanse-land')!;

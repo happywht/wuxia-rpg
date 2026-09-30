@@ -136,6 +136,26 @@
       "schema": "quest-set"
     },
     {
+      "id": "map.round-87-southwest-isles",
+      "path": "maps/round-87-southwest-isles.json",
+      "schema": "grid-map"
+    },
+    {
+      "id": "npc.round-87-southwest-isles-set",
+      "path": "characters/round-87-southwest-isles-npcs.json",
+      "schema": "npc-set"
+    },
+    {
+      "id": "dialogue.round-87-southwest-isle-set",
+      "path": "dialogues/round-87-southwest-isle-conversations.json",
+      "schema": "dialogue-set"
+    },
+    {
+      "id": "quest.round-87-southwest-isle-set",
+      "path": "quests/round-87-southwest-isle-quests.json",
+      "schema": "quest-set"
+    },
+    {
       "id": "world.atlas",
       "path": "world/world-map.json",
       "schema": "world-map"

@@ -1,0 +1,40 @@
+{
+  "quests": [
+    {
+      "id": "quest.r87-fog-pilot-ledger",
+      "name": "雾航引水",
+      "description": "孟海洲托你航向西南雾海，登上雾航湾点燃雾哨崖的引水烽信号，把新航路的雾信带回落潮湾。",
+      "giverNpcId": "char.r87-meng-haizhou",
+      "objectives": [
+        {
+          "id": "objective.r87-land-on-southwest-isles",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r87-southwest-isles",
+          "requiredCount": 1,
+          "text": "渡雾登临西南列岛"
+        },
+        {
+          "id": "objective.r87-light-mist-signal",
+          "kind": "discoverKnowledge",
+          "targetId": "place.r87-mist-signal",
+          "requiredCount": 1,
+          "text": "登上雾哨崖勘明引水烽信"
+        },
+        {
+          "id": "objective.r87-return-fog-pilot-ledger",
+          "kind": "talkToNpc",
+          "targetId": "char.r87-meng-haizhou",
+          "requiredCount": 1,
+          "text": "回落潮湾向孟海洲交回雾信"
+        }
+      ],
+      "rewards": {
+        "experience": 36,
+        "currency": 28,
+        "discoverKnowledgeNodeIds": [
+          "place.r87-spring-hollow"
+        ]
+      }
+    }
+  ]
+}

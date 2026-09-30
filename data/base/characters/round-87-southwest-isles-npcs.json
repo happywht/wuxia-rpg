@@ -1,0 +1,39 @@
+{
+  "npcs": [
+    {
+      "id": "char.r87-meng-haizhou",
+      "name": "孟海洲",
+      "mapResourceId": "map.round-79-isles",
+      "position": {
+        "col": 7,
+        "row": 35
+      },
+      "dialogueId": "dlg.r87-meng-haizhou-pilot",
+      "questGiver": true,
+      "spriteFrame": 144,
+      "spriteFrames": {
+        "down": 128,
+        "right": 136,
+        "up": 144,
+        "left": 152
+      }
+    },
+    {
+      "id": "char.r87-ao-wanqing",
+      "name": "敖晚晴",
+      "mapResourceId": "map.round-87-southwest-isles",
+      "position": {
+        "col": 49,
+        "row": 48
+      },
+      "dialogueId": "dlg.r87-ao-wanqing-signal",
+      "spriteFrame": 112,
+      "spriteFrames": {
+        "down": 96,
+        "right": 104,
+        "up": 112,
+        "left": 120
+      }
+    }
+  ]
+}

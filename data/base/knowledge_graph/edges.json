@@ -369,6 +369,16 @@
     {"id":"edge.r86-lu-yubai-supply","fromId":"char.r86-lu-yubai","toId":"place.r86-tide-isle-supply","relation":"locatedAt","summary":"陆余白在潮线药囊摊售卖有限补给。"},
     {"id":"edge.r86-supply-isle","fromId":"place.r86-tide-isle-supply","toId":"place.r85-tide-isle","relation":"locatedAt","summary":"潮线药囊摊位于南溟·潮生屿内岸。"},
     {"id":"edge.r86-raider-participates","fromId":"char.r86-heiqi-qi","toId":"event.r86-reef-raiders","relation":"participatesIn","summary":"黑鳍七在低潮时带人拦截礁道旅客。"},
-    {"id":"edge.r86-event-isle","fromId":"event.r86-reef-raiders","toId":"place.r85-tide-isle","relation":"locatedAt","summary":"低潮夺货发生在南溟·潮生屿东侧礁道。"}
+    {"id":"edge.r86-event-isle","fromId":"event.r86-reef-raiders","toId":"place.r85-tide-isle","relation":"locatedAt","summary":"低潮夺货发生在南溟·潮生屿东侧礁道。"},
+    {"id":"kg.edge.r87-arrival-isle","fromId":"event.r87-arrival","toId":"place.r87-southwest-isles","relation":"triggers","summary":"初入北滩时发现西南列岛。"},
+    {"id":"kg.edge.r87-isle-map","fromId":"place.r87-southwest-isles","toId":"map.round-87-southwest-isles","relation":"locatedAt","summary":"西南列岛由百格探索地图承载。"},
+    {"id":"kg.edge.r87-harbor-event","fromId":"event.r87-fog-harbor","toId":"place.r87-fog-harbor","relation":"triggers","summary":"探访渔村后得知雾泊渔村的来历。"},
+    {"id":"kg.edge.r87-signal-event","fromId":"event.r87-mist-signal","toId":"place.r87-mist-signal","relation":"triggers","summary":"勘明烽信后认清雾哨崖的方位。"},
+    {"id":"kg.edge.r87-spring-event","fromId":"event.r87-spring-hollow","toId":"place.r87-spring-hollow","relation":"triggers","summary":"寻得石缝清泉后发现石涧淡泉。"},
+    {"id":"kg.edge.r87-pilot-location","fromId":"char.r87-meng-haizhou","toId":"map.round-79-isles","relation":"locatedAt","summary":"孟海洲在落潮湾西礁守着雾图。"},
+    {"id":"kg.edge.r87-keeper-location","fromId":"char.r87-ao-wanqing","toId":"map.round-87-southwest-isles","relation":"locatedAt","summary":"敖晚晴在雾航湾雾哨崖守烽。"},
+    {"id":"kg.edge.r87-pilot-quest","fromId":"char.r87-meng-haizhou","toId":"quest.r87-fog-pilot-ledger","relation":"participatesIn","summary":"孟海洲委托玩家勘明雾航烽信。"},
+    {"id":"kg.edge.r87-quest-signal","fromId":"quest.r87-fog-pilot-ledger","toId":"place.r87-mist-signal","relation":"requires","summary":"雾航引水需要玩家调查雾哨崖烽台。"},
+    {"id":"kg.edge.r87-quest-spring","fromId":"quest.r87-fog-pilot-ledger","toId":"place.r87-spring-hollow","relation":"rewards","summary":"完成雾航引水后得知石涧淡泉的方位。"}
   ]
 }

@@ -781,6 +781,18 @@
     {"id":"char.r86-lu-yubai","kind":"character","title":"陆余白","summary":"潮生屿潮线外的药囊商，按有限库存售卖过礁药物，并熟悉低潮时的礁道风险。","knownByDefault":false},
     {"id":"place.r86-tide-isle-supply","kind":"place","title":"潮线药囊摊","summary":"陆余白在潮生屿设置的临时补给点，摆在可步行的内岸，货品数量有限。","knownByDefault":false},
     {"id":"char.r86-heiqi-qi","kind":"character","title":"黑鳍七","summary":"只在低潮礁道露面的夺货客，守着退潮后显露的窄路拦截行旅。","knownByDefault":false},
-    {"id":"event.r86-reef-raiders","kind":"event","title":"低潮夺货","summary":"低潮时黑鳍七一伙人在潮生屿礁道拦船货；涨潮后退回浪线外。","knownByDefault":false}
+    {"id":"event.r86-reef-raiders","kind":"event","title":"低潮夺货","summary":"低潮时黑鳍七一伙人在潮生屿礁道拦船货；涨潮后退回浪线外。","knownByDefault":false},
+    {"id":"map.round-87-southwest-isles","kind":"place","title":"西南列岛探索地图","summary":"从落潮湾西南雾海可登的列岛百格地图。","knownByDefault":false},
+    {"id":"place.r87-southwest-isles","kind":"place","title":"西南列岛·雾航湾","summary":"西南雾海中的步行列岛，北滩黑沙连着渔村与雾哨崖。","knownByDefault":false},
+    {"id":"place.r87-fog-harbor","kind":"place","title":"雾泊渔村","summary":"雾航湾北坡的渔村，檐下常年挂着雾灯。","knownByDefault":false},
+    {"id":"place.r87-mist-signal","kind":"place","title":"雾哨崖","summary":"岛东崖顶的烽台，三刻烽信号由此传向落潮湾。","knownByDefault":false},
+    {"id":"place.r87-spring-hollow","kind":"place","title":"石涧淡泉","summary":"岛西石缝间的淡水泉，列岛取水的旧地。","knownByDefault":false},
+    {"id":"char.r87-meng-haizhou","kind":"character","title":"孟海洲","summary":"驻在落潮湾西礁的老引水人，想验回雾航湾的烽信。","knownByDefault":false},
+    {"id":"char.r87-ao-wanqing","kind":"character","title":"敖晚晴","summary":"雾哨崖上的第三代守望人，量了十七年雾路。","knownByDefault":false},
+    {"id":"quest.r87-fog-pilot-ledger","kind":"quest","title":"雾航引水","summary":"登上雾航湾勘明雾哨崖烽信，把新航路雾信带回落潮湾。","knownByDefault":false},
+    {"id":"event.r87-arrival","kind":"event","title":"初入雾航","summary":"渡过西南雾海首次踏上雾航湾北滩。","knownByDefault":false},
+    {"id":"event.r87-fog-harbor","kind":"event","title":"渔村雾灯","summary":"在雾泊渔村檐下看清成串的雾灯。","knownByDefault":false},
+    {"id":"event.r87-mist-signal","kind":"event","title":"崖顶烽信","summary":"在雾哨崖勘明三刻烽信号的规矩。","knownByDefault":false},
+    {"id":"event.r87-spring-hollow","kind":"event","title":"石涧得泉","summary":"在岛西石缝间寻得列岛的淡水泉。","knownByDefault":false}
   ]
 }

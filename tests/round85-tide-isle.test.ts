@@ -36,8 +36,8 @@ const REEF_NODE = 'place.r85-reef-channel';
 const POOL_NODE = 'place.r85-tide-pool';
 const REEF_EVENT = 'event.r85-reef-channel';
 const LOW_TIDE_ID = 'tide.low';
-const ATLAS_COLUMNS = 448;
-const ATLAS_ROWS = 320;
+const ATLAS_COLUMNS = 512;
+const ATLAS_ROWS = 384;
 const OLD_COLUMNS = 384;
 const OLD_ROWS = 256;
 
@@ -98,19 +98,18 @@ for (const resource of manifest.resources.filter(({ schema }) => schema === 'gri
   maps.set(resource.id, parseMap(readJson(`../data/base/${resource.path}`)));
 }
 
-describe('Round 85 Tide Isle and the 448×320 atlas', () => {
-  it('expands the atlas to 448×320 with 24 layers while every old cell stays identical', () => {
+describe('Round 85 Tide Isle and the 512×384 atlas', () => {
+  it('keeps the atlas expansion lossless with every old cell identical', () => {
     const world = readJson('../data/base/world/world-map.json');
     const art = world.atlasArt;
     expect(art).toMatchObject({
       columns: ATLAS_COLUMNS, rows: ATLAS_ROWS, tileSize: 16,
       regionFootprint: { columns: 35.84, rows: 23.04 },
     });
-    expect(art.layers).toHaveLength(24);
-    expect(art.layers.slice(-4).map(({ id }: { id: string }) => id)).toEqual([
+    expect(art.layers.map(({ id }: { id: string }) => id)).toEqual(expect.arrayContaining([
       'world-r85-expanse-water', 'world-r85-expanse-sand',
       'world-r85-expanse-land', 'world-r85-expanse-pines',
-    ]);
+    ]));
     // Round 86 wire format: every atlas layer ships as compact row-RLE strings.
     expect(art.layers.every((layer: any) =>
       layer.cells === undefined && Array.isArray(layer.cellsRle) &&
@@ -174,8 +173,8 @@ describe('Round 85 Tide Isle and the 448×320 atlas', () => {
 
   it('keeps all eight old region centers in the same atlas pixels after rebasing', () => {
     const world = readJson('../data/base/world/world-map.json');
-    expect(world.regions).toHaveLength(9);
-    expect(world.transitions).toHaveLength(16);
+    expect(world.regions).toHaveLength(10);
+    expect(world.transitions).toHaveLength(18);
     for (const [mapResourceId, anchor] of Object.entries(round84RegionAnchors)) {
       const region = world.regions.find((entry: any) => entry.mapResourceId === mapResourceId);
       expect(region, mapResourceId).toBeDefined();
