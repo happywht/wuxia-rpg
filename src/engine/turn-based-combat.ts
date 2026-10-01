@@ -620,9 +620,19 @@ export type CombatPhase = 'player-turn' | 'enemy-turn' | 'victory' | 'defeat' | 
 /** Why a player action was refused; the turn and all resources stay intact. */
 export type ActionRefusalReason = 'not-player-turn' | 'unknown-art' | 'insufficient-qi';
 
+export interface CompanionSupportReceipt {
+  kind: 'attack' | 'heal';
+  power: number;
+  actualAmount: number;
+  before: number;
+  after: number;
+  actionNumber: number;
+}
+
 export interface CombatLogEntry {
   kind: 'intro' | 'player-action' | 'companion-action' | 'enemy-action' | 'enemy-idle' | 'victory' | 'defeat' | 'fled';
   text: string;
+  companionSupport?: CompanionSupportReceipt;
 }
 
 /** Read-only view of one combatant for UI rendering. */
@@ -875,19 +885,23 @@ export class CombatSession {
     const companion = this.companion;
     if (companion === undefined || this.successfulPlayerActions % companion.support.everyPlayerActions !== 0) return;
     if (companion.support.kind === 'attack') {
-      const damage = companion.support.power;
-      this.enemy.health.current = Math.max(0, this.enemy.health.current - damage);
+      const before = this.enemy.health.current;
+      const damage = Math.min(companion.support.power, before);
+      this.enemy.health.current = before - damage;
       this.logEntries.push({
         kind: 'companion-action',
-        text: `${companion.name}援手一击，对${this.enemy.name}造成 ${damage} 点伤害`,
+        text: `${companion.name}援手一击，对${this.enemy.name}造成 ${damage} 点伤害（生命 ${before}→${this.enemy.health.current}）`,
+        companionSupport: { kind: 'attack', power: companion.support.power, actualAmount: damage, before, after: this.enemy.health.current, actionNumber: this.successfulPlayerActions },
       });
       return;
     }
-    const healed = Math.min(companion.support.power, this.player.health.max - this.player.health.current);
-    this.player.health.current += healed;
+    const before = this.player.health.current;
+    const healed = Math.min(companion.support.power, this.player.health.max - before);
+    this.player.health.current = before + healed;
     this.logEntries.push({
       kind: 'companion-action',
-      text: `${companion.name}出手相助，为${this.playerName}恢复 ${healed} 点生命`,
+      text: `${companion.name}出手相助，为${this.playerName}恢复 ${healed} 点生命（${before}→${this.player.health.current}）`,
+      companionSupport: { kind: 'heal', power: companion.support.power, actualAmount: healed, before, after: this.player.health.current, actionNumber: this.successfulPlayerActions },
     });
   }
 
