@@ -63,6 +63,7 @@ import {
   teachNpcKnowledge,
 } from './social-state';
 import type { KnowledgeEdgeData, KnowledgeNodeData } from './knowledge-graph';
+import { describeFactionDeparture, projectFactionDeparture } from './faction-departure';
 import {
   checkMartialArtEligibility,
   type CharacterState,
@@ -368,6 +369,23 @@ export function getVisibleOptions(
 // ---------------------------------------------------------------------------
 // Atomic effect execution
 // ---------------------------------------------------------------------------
+
+/** Decorate only the current-faction departure step; raw graph/index remain intact. */
+export function getVisibleOptionsForDisplay(
+  node: Readonly<DialogueNodeData>, context: Readonly<DialogueRuntimeContext>,
+): readonly VisibleDialogueOption[] {
+  return getVisibleOptions(node, context).map(entry => {
+    const effects = entry.option.effects ?? [];
+    const departureIndex = effects.findIndex(effect => effect.kind === 'leaveFaction');
+    const membership = context.factionState.membership;
+    const faction = membership === null ? undefined : context.factions.get(membership.factionId);
+    // Earlier state-changing effects require their own staged projection; never
+    // present an uncomputed composite result as a current departure quote.
+    if (departureIndex !== 0 || faction === undefined || !faction.departure.allowed) return entry;
+    const preview = describeFactionDeparture(faction, context.social, context.character, context.martialArts);
+    return { index: entry.index, option: { ...entry.option, text: `${entry.option.text}\n${preview}` } };
+  });
+}
 
 /** Mechanical feedback line per executed effect (names come from data). */
 export interface DialogueEffectSummary {
@@ -827,13 +845,12 @@ export function applyDialogueEffects(
         const previous = staged.factionState.membership;
         const faction = previous === null ? undefined : staged.factions.get(previous.factionId);
         if (faction !== undefined) {
-          adjustMorality(staged.social, faction.departure.moralityDelta);
-          adjustRenown(staged.social, faction.departure.renownDelta);
-          adjustFactionRenown(staged.social, faction.id, faction.departure.factionRenownDelta);
-          if (faction.departure.forgetFactionMartialArts && staged.character !== null) {
-            staged.character.martialArtIds = staged.character.martialArtIds.filter((artId) =>
-              !staged.martialArts.get(artId)?.factionIds.includes(faction.id),
-            );
+          const departure = projectFactionDeparture(faction, staged.social, staged.character, staged.martialArts);
+          staged.social.morality = departure.morality;
+          staged.social.renown = departure.renown;
+          staged.social.factionRenown.set(faction.id, departure.factionRenown);
+          if (staged.character !== null) {
+            staged.character.martialArtIds = staged.character.martialArtIds.filter(id => !departure.forgottenArtIds.includes(id));
           }
           clearFactionMembership(staged.factionState);
           const artConsequence = faction.departure.forgetFactionMartialArts

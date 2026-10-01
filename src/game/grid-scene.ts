@@ -59,6 +59,7 @@ import {
   type DialogueRuntimeContext,
   applyDialogueEffects,
   getVisibleOptions,
+  getVisibleOptionsForDisplay,
 } from '../engine/dialogue-runtime';
 import { GameClock } from '../engine/game-calendar';
 import { selectAdjacentEndingGate, type EndingEvaluationContext } from '../engine/ending-system';
@@ -4266,7 +4267,7 @@ export class GridScene extends Phaser.Scene {
     }));
     panel.open(conversation, target.record.name, {
       visibleOptions: (node) =>
-        getVisibleOptions(node, this.dialogueContextFor(target.record.id)),
+        getVisibleOptionsForDisplay(node, this.dialogueContextFor(target.record.id)),
       confirmOption: (session, visibleIndex) =>
         this.confirmDialogueOption(target.record.id, session, visibleIndex),
     });
