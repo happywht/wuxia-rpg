@@ -12,7 +12,7 @@ import {
   toggleTrackedQuest,
 } from '../engine/quest-system';
 import { uiFontSize } from './settings';
-import { orderQuestRows } from './quest-presentation';
+import { activeQuestProgressLabel, orderQuestRows } from './quest-presentation';
 import { buildQuestDetailBlocks, buildQuestPanelGeometry, paginateQuestDetail, questFooterColumns } from './quest-panel-layout';
 import { addPixelPanelChrome, UI_FONT_FAMILY, addPixelSelection } from './ui-theme';
 
@@ -107,10 +107,7 @@ function questStatusText(model: QuestPanelModel, quest: QuestData): string {
 function questRow(model: QuestPanelModel, quest: QuestData): string {
   const state = model.journal.states.get(quest.id);
   if (state?.status !== 'active') return `${quest.name}　［${questStatusText(model, quest)}］`;
-  const objective = quest.objectives[0];
-  if (objective === undefined) return `${quest.name}　［${LABELS.status.active}］`;
-  const current = state.objectiveCounts.get(objective.id) ?? 0;
-  return `${quest.name}　${current}/${objective.requiredCount}　［${LABELS.status.active}］`;
+  return `${quest.name}　${activeQuestProgressLabel(quest, state)}　［${LABELS.status.active}］`;
 }
 
 export class QuestPanel {
@@ -381,13 +378,14 @@ export class QuestPanel {
       this.detailPage = 0;
       this.addText(LABELS.noSelection, left + PADDING, geometry.detailTop, 12, UI.muted);
     } else {
-      // Complete lossless body: description, live objectives, full rewards —
-      // wrapped at the measured width and paginated to the real band.
+      // Complete lossless body: description, staged objectives (live stage
+      // boundary for ordered quests, live inventory beside journal counts),
+      // full rewards — wrapped at the measured width and paginated to the band.
       const pages = paginateQuestDetail(
         buildQuestDetailBlocks(selected, state, {
           factionNames: model.factionNames,
           knowledgeNodeTitles: model.knowledgeNodeTitles,
-        }),
+        }, model.itemCounts),
         geometry.contentWidth,
         geometry.detailCapacity,
         measure,

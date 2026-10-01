@@ -91,6 +91,55 @@ export interface QuestDetailNameMaps {
 }
 
 /**
+ * Round 122: ordered quests present their real stage boundary, unordered ones
+ * stay honestly simultaneous. The stage derivation mirrors quest-system
+ * exactly: for ordered quests the CURRENT objective is the first whose count
+ * is below its requirement; everything before it is done, everything after it
+ * is later — even an out-of-order older save's stale counts never masquerade
+ * as the current stage. Collect objectives also quote the LIVE inventory
+ * beside the historical journal count, so a spent stockpile cannot be read as
+ * currently-held supplies. Content-free: no world, NPC or item names live
+ * here; every label derives from the objective's own data.
+ */
+export function buildQuestObjectiveStageLines(input: {
+  quest: QuestData;
+  state: QuestProgressState;
+  liveItemCounts?: ReadonlyMap<string, number>;
+}): string[] {
+  const status = input.state.status;
+  const count = (objective: QuestData['objectives'][number]): number =>
+    input.state.objectiveCounts.get(objective.id) ?? 0;
+  const live = (objective: QuestData['objectives'][number]): string => {
+    if (objective.kind !== 'collectItem' || input.liveItemCounts === undefined) return '';
+    const held = input.liveItemCounts.get(objective.targetId) ?? 0;
+    return `（现持 ${held}/${objective.requiredCount}，尚缺 ${Math.max(0, objective.requiredCount - held)}）`;
+  };
+  // Only an active journey has a live stage boundary; offered/locked rows
+  // keep the plain progress line — nothing has been stepped yet.
+  if (status !== 'active') {
+    return input.quest.objectives.map(objective =>
+      `目标 ${count(objective)}/${objective.requiredCount}：${objective.text}`);
+  }
+  if (input.quest.orderedObjectives !== true) {
+    // Unordered goals are genuinely simultaneous — one shared label, no
+    // fabricated sequence.
+    return input.quest.objectives.map(objective =>
+      `[并行] 目标 ${count(objective)}/${objective.requiredCount}：${objective.text}${live(objective)}`);
+  }
+  const pending = input.quest.objectives.find(objective => count(objective) < objective.requiredCount);
+  return input.quest.objectives.map(objective => {
+    const stage = pending === undefined
+      ? '已完成' // Everything counts complete (a completion transition is due).
+      : objective === pending
+        ? '当前'
+        : (input.quest.objectives.indexOf(objective) < input.quest.objectives.indexOf(pending) ? '已完成' : '后续');
+    if (stage === '已完成') return `[${stage}] ${objective.text}（记录 ${count(objective)}/${objective.requiredCount}）${live(objective)}`;
+    if (stage === '当前') return `[${stage}] 目标 ${count(objective)}/${objective.requiredCount}：${objective.text}${live(objective)}`;
+    return `[${stage}] ${objective.text}${live(objective)}`;
+  });
+}
+
+/**
  * Assembles one quest's complete detail body as blank-line-separated blocks:
  * the authored description, every objective with its live progress, and the
  * full reward line (experience, silver, faction renown, discoveries). Pure
@@ -100,13 +149,11 @@ export function buildQuestDetailBlocks(
   quest: QuestData,
   state: QuestProgressState | undefined,
   maps: QuestDetailNameMaps = {},
+  liveItemCounts?: ReadonlyMap<string, number>,
 ): string[] {
   const blocks: string[] = [quest.name, quest.description];
   if (state !== undefined) {
-    for (const objective of quest.objectives) {
-      const current = state.objectiveCounts.get(objective.id) ?? 0;
-      blocks.push(`目标 ${current}/${objective.requiredCount}：${objective.text}`);
-    }
+    blocks.push(buildQuestObjectiveStageLines({ quest, state, liveItemCounts }).join('\n'));
   }
   const rewards = [
     `经验 +${quest.rewards.experience}`,

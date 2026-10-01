@@ -63,10 +63,15 @@ describe('Round119 complete lossless detail body (real R97 task and long MOD)', 
     for (const char of tideLedger.description) expect(body).toContain(char === '\n' ? ' ' : char); // Every authored char survives (newlines re-flow as separators).
     expect(blocks[0]).toBe(tideLedger.name);
     expect(blocks[1]).toBe(tideLedger.description);
+    // Round 122: an active ORDERED errand shows staged lines; the invariant
+    // stays "every objective's count and text is visible" — done steps carry
+    // their count in （c/r）, the current step keeps the 目标 c/r prefix.
     for (const objective of tideLedger.objectives) {
       expect(body).toContain(objective.text);
-      expect(body).toContain(`目标 ${state.objectiveCounts.get(objective.id) ?? 0}/${objective.requiredCount}`);
+      expect(body).toContain(`${state.objectiveCounts.get(objective.id) ?? 0}/${objective.requiredCount}`);
     }
+    expect(body).toContain('[已完成]');
+    expect(body).toContain('[当前]');
     expect(body).toContain(`报酬：经验 +${tideLedger.rewards.experience} · 银两 +${tideLedger.rewards.currency}`);
     for (const reward of tideLedger.rewards.factionRenown ?? []) {
       expect(body).toContain(`${reward.delta > 0 ? '+' : ''}${reward.delta}`);

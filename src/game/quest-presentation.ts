@@ -1,4 +1,4 @@
-import type { QuestData, QuestJournal, QuestStatus } from '../engine/quest-system';
+import type { QuestData, QuestJournal, QuestStatus, QuestProgressState } from '../engine/quest-system';
 const priority: Record<QuestStatus, number> = { active: 0, offered: 1, locked: 2, completed: 3, failed: 4 };
 /** Stable priority preserves authored order within each group; tracked active task comes first. */
 export function orderQuestRows(quests: readonly QuestData[], journal: QuestJournal): QuestData[] {
@@ -59,4 +59,17 @@ export function projectQuestTrackerLine(input: QuestTrackerInput): QuestTrackerL
     `${objective.text} ${state.objectiveCounts.get(objective.id) ?? 0}/${objective.requiredCount}`,
   ).join(' · ');
   return { text: `跟踪：${quest.name}　${progress}`, tone: 'tracked' };
+}
+
+/** The row summarizes the live step, never the first completed objective. */
+export function activeQuestProgressLabel(quest: QuestData, state: QuestProgressState): string {
+  if (state.status !== 'active') return '';
+  if (quest.orderedObjectives) {
+    const pending = quest.objectives.findIndex(objective => (state.objectiveCounts.get(objective.id) ?? 0) < objective.requiredCount);
+    if (pending < 0) return '目标均已达成';
+    const objective = quest.objectives[pending]!;
+    return `第${pending + 1}/${quest.objectives.length}步 ${state.objectiveCounts.get(objective.id) ?? 0}/${objective.requiredCount}`;
+  }
+  const completed = quest.objectives.filter(objective => (state.objectiveCounts.get(objective.id) ?? 0) >= objective.requiredCount).length;
+  return `已成${completed}/${quest.objectives.length}项`;
 }
