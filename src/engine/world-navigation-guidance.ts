@@ -9,7 +9,7 @@ import { findWorldTravelRoute } from './world-travel';
  * engine knows only which existing control applies — never the character,
  * place or story behind the objective (see docs/ARCHITECTURE.md).
  */
-export type NavigationArrivalAction = 'talk' | 'battle' | 'discover' | 'shop' | 'craft' | 'travel' | 'companion';
+export type NavigationArrivalAction = 'talk' | 'battle' | 'discover' | 'shop' | 'craft' | 'travel' | 'companion' | 'ending';
 
 export interface WorldNavigationGuideSegment {
   status: 'en-route' | 'at-gate' | 'arrived';
@@ -180,6 +180,8 @@ export function resolveWorldNavigationGuide(
  */
 export function arrivalActionHint(action: NavigationArrivalAction): string {
   switch (action) {
+    case 'ending':
+      return '按 E 查看终章条件；导航不会自动结束或保存旅程';
     case 'companion':
       return '按 P 再 T 与当前同行者交谈';
     case 'travel':

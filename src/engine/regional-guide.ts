@@ -1,3 +1,4 @@
+import type { EndingGateData } from './ending-system';
 import type { PlacedNpc } from './npc-placement';
 import type { AssembledShop, ItemRecordData, ShopStockRuntime } from './item-system';
 import type { WorldMapAssembly } from './world-map';
@@ -13,6 +14,8 @@ export interface RegionGuideEntry { id: string; category: RegionGuideCategory; t
 export interface RegionalGuideInput {
   worldMap: WorldMapAssembly;
   currentMapResourceId: string;
+  /** Optional assembled terminal gate; navigation never selects an ending. */
+  endingGate?: EndingGateData;
   baseNpcs: readonly PlacedNpc[];
   periodNpcs?: readonly PlacedNpc[];
   currentMapNpcs?: readonly PlacedNpc[];
@@ -41,6 +44,11 @@ export function resolveRegionGuideNpc(input: RegionalGuideInput, id: string): Pl
 export function resolveRegionalGuideDestination(input: RegionalGuideInput, selector: string): NavigationDestinationCell | null {
   if (!selector.startsWith(REGION_GUIDE_PREFIX)) return null;
   const token = selector.slice(REGION_GUIDE_PREFIX.length);
+  if (token.startsWith('ending:')) {
+    const gate = input.endingGate;
+    if (!gate || token !== 'ending:' + gate.id || !input.worldMap.regions.some(region => region.mapResourceId === gate.mapResourceId) || !findWorldTravelRoute(input.worldMap, input.currentMapResourceId, gate.mapResourceId, input.knownKnowledgeNodeIds)) return null;
+    return { mapResourceId: gate.mapResourceId, ...gate.position, name: gate.name, approachRadius: 1, arrivalAction: 'ending' };
+  }
   if (token.startsWith('npc:')) {
     const npc=resolveRegionGuideNpc(input,token.slice(4)); if (!npc) return null;
     return { mapResourceId: npc.record.mapResourceId, col:npc.col,row:npc.row,name:npc.record.name,approachRadius:1,
@@ -90,5 +98,13 @@ export function buildRegionalGuideEntries(input: RegionalGuideInput): RegionGuid
     result.push({id:'exit:'+gate.id,category:'exit',title:gate.name,detail:`(${gate.from.col},${gate.from.row}) → ${destination}。走到旁边按E；这里不会自动通过或传送。${travelText}${fareText}${accessReason===null?'':'\n尚未开通：'+accessReason}`,destinationId:accessReason===null?REGION_GUIDE_PREFIX+'gate:'+gate.id:null});
   }
   for(const landmark of selectVisibleWorldLandmarks(input.worldMap.landmarks,input.knownKnowledgeNodeIds).filter(l=>l.mapResourceId===input.currentMapResourceId))result.push({id:'landmark:'+landmark.id,category:'landmark',title:landmark.name,detail:`已知地标 (${landmark.col},${landmark.row})；导航只带路，调查仍按实际事件条件。`,destinationId:LANDMARK_DESTINATION_PREFIX+landmark.id});
+  const endingGate = input.endingGate;
+  if (endingGate) {
+    const region = input.worldMap.regions.find(entry => entry.mapResourceId === endingGate.mapResourceId);
+    const route = region ? findWorldTravelRoute(input.worldMap, input.currentMapResourceId, endingGate.mapResourceId, input.knownKnowledgeNodeIds) : null;
+    result.push({ id: 'ending:' + endingGate.id, category: 'landmark', title: endingGate.name + ' · 终章入口',
+      detail: `${region?.name ?? '入口地区资料缺失'} (${endingGate.position.col},${endingGate.position.row})。${route ? `跨 ${route.legs.length} 处关口（不含步行）；到邻格按E查看终章。` : '当前没有可达路线。'}导航只带路，不自动结束旅程，也不代表结局条件已满足。已有师门时请先核对所选结局要求。`,
+      destinationId: route ? REGION_GUIDE_PREFIX + 'ending:' + endingGate.id : null });
+  }
   return result;
 }

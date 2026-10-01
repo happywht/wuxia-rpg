@@ -3312,7 +3312,7 @@ export class GridScene extends Phaser.Scene {
     const npc=this.activeCompanionNpc(),marker=this.companionFollower?.marker,map=this.map;
     const follower=npc!==undefined&&marker?.visible&&map!==null ? {npc,mapResourceId:this.currentMapResourceId,
       col:Math.floor((marker.x-this.mapOrigin.x)/map.tileSize),row:Math.floor((marker.y-this.mapOrigin.y)/map.tileSize)}:undefined;
-    return {worldMap:world.worldMap,currentMapResourceId:this.currentMapResourceId,baseNpcs:world.assembly.npcs,
+    return {worldMap:world.worldMap,currentMapResourceId:this.currentMapResourceId,...(world.assembly.endings === null ? {} : { endingGate: world.assembly.endings.gate }),baseNpcs:world.assembly.npcs,
       periodNpcs:period===undefined?world.assembly.npcs:world.assembly.npcsByPeriod.get(period)??world.assembly.npcs,
       currentMapNpcs:this.placedNpcs,...(follower===undefined?{}:{follower}),activeFollowerNpcId:this.companions.get(this.companionState.activeCompanionId??'')?.npcId,shops:world.assembly.shops,items:world.assembly.items,
       shopStocks:this.shopStocks,knownKnowledgeNodeIds:this.knownKnowledgeNodeIds,

@@ -481,3 +481,7 @@ Round140继续沈柳新增复谈、关键双分支完整后果/活动失败恢�
 ## 截至 Round 144
 
 终章评估附加selectedRoute，选择结果附加route，UI使用纯派生回执，不写存档。长路线标题进入无损分页；长确认Enter续读后执行，Esc取消。资料、Schema和稳定ID不变。
+
+## 截至 Round 145
+
+RegionalGuideInput可选endingGate来自装配资料；region-guide:ending:<id>复核当前ID/地区/可达路线后生成邻格导航，坐标不存档。新增通用ending到达动作只提示E检查结局条件，不执行结局、传送或保存。缺结局资料保留旧指南。

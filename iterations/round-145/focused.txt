@@ -1,0 +1,28 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round145-ending-guide.test.ts (6 tests | 6 skipped) 25ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round145-ending-guide.test.ts [ tests/round145-ending-guide.test.ts ]
+Error: manifest：响应不是 JSON（text/plain;charset=utf-8）
+文件：/base/manifest.json
+/base/manifest.json
+服务器可能把请求回退到了 HTML 页面（SPA fallback）。
+建议：确认请求命中的是 JSON 文件而非被服务器回退成 HTML 的页面（SPA fallback）。
+ ❯ tests/round145-ending-guide.test.ts:17:57
+     15|   catch{return new Response('not found',{status:404});}
+
+     16|  });
+     17|  const result=await loadWorldData();if(!result.ok)throw Error(result.l…
+       |                                                         ^
+     18| });
+     19| afterAll(()=>{vi.unstubAllGlobals();vi.restoreAllMocks();});
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  27 passed | 6 skipped (33)
+   Start at  07:24:49
+   Duration  3.35s (tests 76%, transform 16%, import 7%)

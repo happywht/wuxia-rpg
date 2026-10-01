@@ -2,7 +2,7 @@
 
 更新日期：2026-10-02。执行起点：Round 98（`cd1e74b`）；内容盘点基线仍为 Round 97（`c0d551b`）。本文件根据用户本次调整，规定下一阶段的产品目标；目标附件同步当前执行点，并保留原始需求。现状证据见 [CURRENT-STATE-AUDIT.md](CURRENT-STATE-AUDIT.md)，逐轮安排见 [ROADMAP.md](../ROADMAP.md)。本文中的“目标/验收”均为待实现要求，不是完成声明。
 
-当前执行检查点：Round144修复original遮蔽三章终章引言，并增加实际采用路径回执和长确认全文分页；测试与正常读取证据见本轮verification。尚未离门或完成照心石实走。Round145优先正常离门及混合终章完整旅程，随后原始变量/teleport/startBattle、另两组章节后果和兼容/发行。Round142误覆盖旧Lv4未恢复，完整交付条件不缩减，tracker保持active。
+当前执行检查点：Round145接入终章入口跨区行旅指引与邻格检查动作，源码/测试证据见本轮verification。尚未正常离门或抵达照心石；Round146沿指引推进混合终章实际旅程及存读，随后原始变量/teleport/startBattle、另两组完整后果与兼容/发行。旧Lv4未恢复，完整目标不缩减，tracker active。
 
 ## 1. 持续有效的总目标
 
