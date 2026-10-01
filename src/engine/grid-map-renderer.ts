@@ -454,3 +454,47 @@ export function cellCenterOffset(map: GridMap, col: number, row: number): { x: n
   const tileSize = map.tileSize;
   return { x: col * tileSize + tileSize / 2, y: row * tileSize + tileSize / 2 };
 }
+
+/** An actor that carries Phaser's scroll-factor component (world images, shapes). */
+export type GridMapWorldActor = Phaser.GameObjects.GameObject & {
+  setScrollFactor(x: number, y?: number): unknown;
+};
+
+/**
+ * Round 111 transition lifecycle, part 1 — detach.
+ *
+ * Phaser's exclusive `Container.remove()` re-queues the child onto the scene
+ * display list (Container.removeHandler → GameObject.addToDisplayList →
+ * DisplayList.addChildCallback), which re-fires the scene-wide ADDED_TO_SCENE
+ * event. GridScene pins every object announced there onto the HUD plane
+ * (`setScrollFactor(0)`), so a world actor that is merely removed comes back
+ * pinned to screen coordinates — and since Phaser 4 multiplies the child's
+ * factor with the container's while rendering, the actor stays drawn at its
+ * raw screen coordinates once the camera scrolls away. Restoring the world
+ * factor right at detach keeps the surviving actor on the world plane no
+ * matter what happens between the old layer's death and the re-add.
+ */
+export function detachGridMapWorldActor(
+  container: Phaser.GameObjects.Container,
+  actor: GridMapWorldActor,
+): void {
+  container.remove(actor);
+  actor.setScrollFactor(1);
+}
+
+/**
+ * Round 111 transition lifecycle, part 2 — adopt.
+ *
+ * Re-parenting into a fresh world layer removes the actor from the display
+ * list again (no ADDED_TO_SCENE fires on that path), so nothing else restores
+ * a factor the detach re-queue may have zeroed. Normalizing at adoption makes
+ * the pair order-safe and keeps a reused actor equivalent to a freshly
+ * created one (`createGridMapActor` also ends at factor 1).
+ */
+export function adoptGridMapWorldActor(
+  container: Phaser.GameObjects.Container,
+  actor: GridMapWorldActor,
+): void {
+  actor.setScrollFactor(1);
+  container.add(actor);
+}

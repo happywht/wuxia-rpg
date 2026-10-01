@@ -1,0 +1,4 @@
+2026-10-01T02:03:12.454Z [quest] 任务 "%s" 完成：经验 +%d，银两 +%d%s quest.r74-cloud-marks 28 20
+2026-10-01T02:05:27.185Z [quest] 任务 "%s" 完成：经验 +%d，银两 +%d%s quest.r74-cloud-bridge 44 32
+2026-10-01T02:05:27.187Z [achievement] 已解锁 "%s"：经验 +%d，银两 +%d achievement.first-victories 55 35
+2026-10-01T02:05:27.189Z [battle] 遭遇 "%s" 结束：%s（经验 +%d，升级 %d 次） encounter.r74-cloud-bridge-bandits victory 48 0

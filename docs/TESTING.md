@@ -214,3 +214,9 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 新指南16项规则/v1事实测试、3项面板导航测试，主代理复跑含旧指南6文件66项通过；另2项实际GridScene减少动态移动深度回归，与R78合计2文件9项通过。专项命令与最终全量构建以iterations/round-110/verification.md为准。正常浏览器三调查、两处四即时结果、公开更簿盐道回响、第三档正常存读和减少动态效果恢复有截图；不把自动测试当作云岭或三章验收。
 
 最终npm run build：100文件826测试、Schema/MOD/typecheck与文档审计、Vite构建通过。第一次821通过5失败（四加载超时/一摘要审计）保留日志；maxWorkers=2修复并发资源竞争，未改5秒阈值或断言。
+
+## Round 111 过关生命周期与大陆实走
+
+新增6测试加载实际Phaser4.2.1 GameObject/Container/DisplayList/Camera，复现remove重新入场后HUD钉屏，覆盖detach/adopt所有权、两次过关、相机与新角色因子；最小全局仅用于模块加载，没有完整DOM/Game/WebGL。源码guard是辅助，不以字段模拟代替真实普通/减少动态移动。主代理6文件30项专项通过。实际三次关口与普通一步、大陆调查/两战/两处当前选择回响、章末正常保存读回见iterations/round-111；完整npm run build：101文件832测试与资料/类型/文档审计及Vite通过。
+
+Round111 最终验证：npm run build exit0；101文件832测试（82.03秒）、100资源Schema、MOD 0问题、类型、R34/R48文档审计与Vite构建通过。原有大分块提示保留；独立发行包未在本轮验收。

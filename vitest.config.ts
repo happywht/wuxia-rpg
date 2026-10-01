@@ -9,8 +9,9 @@ import { defineConfig } from 'vitest/config';
  * When both files exist Vitest picks `vitest.config.ts` and never loads the
  * app config, keeping the engine tests free of dev-server state.
  *
- * Tests are Phaser-free engine units plus the shared data validator, so the
- * plain Node environment is enough — no DOM, no browser, no network.
+ * Most tests are engine units plus the shared data validator. Round 111 also
+ * loads real Phaser lifecycle classes with minimal module-loading globals;
+ * it does not boot a Game, full DOM, browser or network. Node remains enough.
  *
  * Round 40 adds the separate benchmark channel: `benchmark.include` matches
  * every `*.bench.ts` under tests/, which the plain `test.include` glob above

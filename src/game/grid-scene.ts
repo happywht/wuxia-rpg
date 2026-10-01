@@ -18,6 +18,8 @@ import {
   gridMapActorDepth,
   createGridMapDepthRows,
   createGridMapActor,
+  adoptGridMapWorldActor,
+  detachGridMapWorldActor,
   loadGridMapArtAssets,
   renderGridMap,
   setGridMapActorFrame,
@@ -2057,7 +2059,10 @@ export class GridScene extends Phaser.Scene {
   /** Draws every placed NPC and its data-driven name label. */
   private renderNpcs(map: GridMap): void {
     this.npcLayer = this.add.container().setScrollFactor(1);
-    if (this.marker !== null) this.npcLayer.add(this.marker);
+    // Round 111: adopt (never a bare add) — a transition-detached marker was
+    // re-queued through the display list, where the scene HUD pin zeroed its
+    // scroll factor. Adoption restores the world plane before re-parenting.
+    if (this.marker !== null) adoptGridMapWorldActor(this.npcLayer, this.marker);
     this.npcLayer.add(createGridMapDepthRows(this, map, this.mapOrigin.x, this.mapOrigin.y));
     this.npcVisuals.clear();
     (this.world?.assembly.npcs ?? [])
@@ -4464,7 +4469,10 @@ export class GridScene extends Phaser.Scene {
     }
 
     this.mapLayer?.destroy();
-    if (this.marker !== null) this.npcLayer?.remove(this.marker);
+    // Round 111: a plain Container.remove() re-queues the marker through the
+    // scene display list, and the scene-wide ADDED_TO_SCENE HUD pin there
+    // would zero its scroll factor (invisible after the camera scrolls).
+    if (this.marker !== null && this.npcLayer !== null) detachGridMapWorldActor(this.npcLayer, this.marker);
     this.npcLayer?.destroy();
     this.encounterLayer?.destroy();
     // Old gate markers go down with the old map layers; every refusal above
@@ -4500,6 +4508,9 @@ export class GridScene extends Phaser.Scene {
     const center = cellCenterOffset(destinationMap, this.playerCol, this.playerRow);
     this.marker?.setPosition(this.mapOrigin.x + center.x, this.mapOrigin.y + center.y);
     if (this.marker !== null) this.setWorldActorDepth(this.marker, undefined, destinationMap.tileSize);
+    // Round 111: show the destination atlas' idle frame immediately instead
+    // of waiting for the first step (maps may declare different actor sets).
+    this.updatePlayerActorFrame(false);
     this.configureMapCamera(destinationMap, this.marker);
     this.renderNpcs(destinationMap);
     this.renderEncounterMarkers(destinationMap);

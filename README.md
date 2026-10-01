@@ -4,8 +4,8 @@
 
 - 设计文档：`docs/GDD.md`
 - 新版产品目标：[PROJECT-GOALS.md](docs/PROJECT-GOALS.md)；当前系统与内容盘点：[CURRENT-STATE-AUDIT.md](docs/CURRENT-STATE-AUDIT.md)
-- 逐轮路线图（R00–R110+）：`ROADMAP.md`
-- 当前进度：**Round 110 已完成；下一轮 Round 111**。整个产品目标仍在推进中。
+- 逐轮路线图（R00–R111+）：`ROADMAP.md`
+- 当前进度：**Round 111 已完成；下一轮 Round 112**。整个产品目标仍在推进中。
 - 下一阶段优先丰富、串联和细化现有 22 个区域：开局闭环、大陆/北境/海路章节、任务差异、五派成长、制作经济、人物后果与结局回响。扩地图须证明其产品价值；静态盘点可运行 `npm run audit:content-state`，该命令不代表真实旅程验收。
 
 ## 范围
@@ -187,3 +187,7 @@ npm run audit:final # 完整 Git 历史上的 R00–R50 计划/提交、内容�
 ## Round110 大陆调查衔接
 
 实走铁嶂校标、更簿与盐道井水调查；用正常第三栏存读档核对两处抉择四种即时结果、药品成本，以及公开更簿的盐道人物回应。R差事页增加当前地区实际可接委托，保持进行中目标导航；修复减少动态效果和过关落点的角色遮挡排序。 三章完整旅程、另支跨区回响、云岭清障/收束仍待后轮；大目标active。操作和证据见[本轮记录](iterations/round-110/playtest.md)。
+
+## Round 111 大陆章末与角色过关修复
+
+正常第三档完成铁嶂清道、云岭刻痕与断桥、三证会合及大陆阶段结案，公开更簿/自留药品均有跨区实际回应，章末保存读回显示已记下。修复真实过关时 exclusive Container.remove 触发 HUD 钉屏导致的角色持续消失，detach/adopt 恢复世界滚动因子并刷新目的地帧；连续三次实际过门和正常移动可见。证据见 `iterations/round-111/playtest.md` 与 `verification.md`。另一组完整跨区流程及北境/海路未完成，目标保持 active。
