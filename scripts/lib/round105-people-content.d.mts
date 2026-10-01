@@ -19,3 +19,5 @@ export const knowledgeEdges: { id: string; fromId: string; toId: string; relatio
 export function deepenPeopleConversation(conversation: DialogueData): DialogueData;
 
 export function deepenPeopleDialogues<T extends { conversations: DialogueData[] }>(set: T): T;
+
+export const relayWaitingDirections: Record<string, string>;

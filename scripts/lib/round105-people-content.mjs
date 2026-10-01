@@ -59,6 +59,11 @@ export const relays = [
       { flag: 'event.r102-pilot-crew', delta: -1, text: '季无潮皱眉：「顾夜尘提醒别只顾熟人，你却把潮时限定在熟船。辨号固然容易，散船仍要等。我记下话与选择的这层张力，不把未得照顾的人说成已经安置。」' },
     ] },
 ];
+export const relayWaitingDirections = {
+  ledger: '话已由你记下。接收人是雁回崖的聂栖雁：从铁嶂北道经北口入云岭，再沿云岭北口到雁回崖，寻找巡雁记录人。她的守更差事办完后，仍须由你亲口说明原署名取舍；我不会替她说已经听见。',
+  carving: '话已由你记下。接收人是霜松谷的柳寻径：从云岭北口经雁回崖、照雪关，再由照雪关西口入霜松谷，寻找巡路人。界标差事办完后由你亲口说明，云阶刻纹不能替谷中界标年代作证；我不会替他说已经听见。',
+  'road-sea': '话已由你记下。接收人是澜心洲的季无潮：已探索青帆埠可在雾雨渡口渡籍班船赴青帆，未探索时从云岭东口先走陆路。青帆东南涉潮登岛到风回岛，再经东渡澜心洲到季的潮簿记录处；澜心潮簿查完后亲口说明。途中关口、班船和走格各有时间代价；他回应前仍是待送。',
+};
 export const sharingChoices = [
   ['event.r100-record-open', '把更簿公开署名的决定告诉你。', '顾夜尘听完：「查牌便于路客，报信人却要避处。这条路上若同行，我先帮你正面应对；别把公开的好处说成人人都没有风险。」'],
   ['event.r100-record-guard', '把更簿保护姓名的决定告诉你。', '顾夜尘听完：「人还能走路，证词却留缺口。这一带若同行，我把援护更多留作照顾伤者；承认代价，比替所有人编一个满意结局强。」'],
@@ -109,7 +114,7 @@ export function deepenPeopleConversation(conversation) {
         for (const [index, flag] of relay.sourceSharedAny.entries()) upsert(conversation, `r105-${relay.key}-source-${index}`, relay.sourceText,
           '把这番护路顾虑转述给季无潮，可以吗？', [...base, { kind: 'npcKnows', nodeId: flag }], [discover(message)]);
       } else upsert(conversation, `r105-${relay.key}-source`, relay.sourceText, '能把你的判断转述给另一处的记录人吗？', base, [discover(message)]);
-      upsert(conversation, `r105-${relay.key}-waiting`, '话已由你记下，须到对方所在地区亲口说明；没回来前，我不会说对方已经听见。', '那番转述现在怎样了？', [known(message), known(delivered, false)]);
+      upsert(conversation, `r105-${relay.key}-waiting`, relayWaitingDirections[relay.key], '那番转述现在怎样了？', [known(message), known(delivered, false)]);
       upsert(conversation, `r105-${relay.key}-closed`, '你已经亲口转述并得到回应。这一回关系后果已经记过，不能重复领认同；原判断和对方的取舍仍各自成立。', '对方听过后，这层关系怎样看？', [known(delivered)]);
     }
     if (relay.targetDialogueId === conversation.id) {

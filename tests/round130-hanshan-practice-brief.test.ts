@@ -25,6 +25,7 @@ import { addHanshanBriefs, HANSHAN_BRIEF_IDS } from '../scripts/lib/round130-han
 import { addTransferDirections } from '../scripts/lib/round127-transfer-directions.mjs';
 import { repairRound03Raw, repairRound30Raw } from '../scripts/lib/round128-aid-donation.mjs';
 import { addIronPracticeBriefs } from '../scripts/lib/round129-iron-practice-brief.mjs';
+import { applyRelayWaitingDirections } from '../scripts/lib/round133-relay-directions.mjs';
 import { applyCompanionTrust } from '../scripts/lib/round131-companion-trust.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -290,7 +291,7 @@ describe('Round130 Hanshan practice briefs (real assembled data)', () => {
       execFileSync(process.execPath, [probe], { cwd: sandbox });
       const chained03 = rf(j(sandbox, 'data/base/dialogues/round-03-conversations.json'), 'utf8');
       const chained30 = rf(j(sandbox, 'data/base/dialogues/round-30-conversations.json'), 'utf8');
-      expect(applyCompanionTrust(chained03).replace(/\r\n/g, '\n')).toBe(readFileSync(join(root, 'data/base/dialogues/round-03-conversations.json'), 'utf8').replace(/\r\n/g, '\n'));
+      expect(applyRelayWaitingDirections(applyCompanionTrust(chained03)).replace(/\r\n/g, '\n')).toBe(readFileSync(join(root, 'data/base/dialogues/round-03-conversations.json'), 'utf8').replace(/\r\n/g, '\n'));
       expect(chained30.replace(/\r\n/g, '\n')).toBe(readFileSync(join(root, 'data/base/dialogues/round-30-conversations.json'), 'utf8').replace(/\r\n/g, '\n'));
       expect(chained03).toContain('r130-hanshan-paper-route');
       expect(chained03).toContain('一份十五两、自购两份共三十两'); // R128 intact.
