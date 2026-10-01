@@ -1,0 +1,2 @@
+tests/round115-navigation-budget.test.ts(40,17): error TS2339: Property 'path' does not exist on type 'WorldNavigationGuide'.
+  Property 'path' does not exist on type '{ status: "target-lost"; }'.

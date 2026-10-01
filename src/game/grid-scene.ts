@@ -2,6 +2,7 @@ import {RegionalGuidePanel} from './regional-guide-ui';
 import {buildRegionalGuideEntries,resolveRegionalGuideDestination,REGION_GUIDE_PREFIX,REGION_ROLE_LABELS,type RegionalGuideInput,type RegionGuideEntry} from '../engine/regional-guide';
 import {buildQuestGuideEntries} from '../engine/quest-guide';
 import { nearestGuideNpc } from './quest-presentation';
+import { estimateNavigationWalkingBudget, navigationWalkingBudgetHint } from '../engine/navigation-walking-budget';
 import { paddedWorldCameraBounds } from './world-camera-bounds';
 import Phaser from 'phaser';
 
@@ -2721,6 +2722,9 @@ export class GridScene extends Phaser.Scene {
     } else {
       this.hudLines.nav = `行路「${destinationName}」· ${direction}${steps}格。`;
     }
+    const budget = estimateNavigationWalkingBudget(guide, this.clock?.calendar.actionCosts,
+      this.currentClimate()?.weather.stepMinutes ?? 0, this.clock?.snapshot().minuteOfDay);
+    if (budget !== null) this.hudLines.nav += `\n${navigationWalkingBudgetHint(budget)}`;
     this.relayoutHud();
   }
 
@@ -2888,6 +2892,8 @@ export class GridScene extends Phaser.Scene {
     }
     const minutes = clock.calendar.actionCosts.waitMinutes;
     this.advanceTime(minutes);
+    // Waiting can change a midnight estimate even within the same NPC period.
+    this.refreshNavigationGuide();
     const period = clock.currentPeriod();
     this.triggerRegionEvents(`静候片刻（${minutes} 分钟），此刻已是「${period.name}」。`);
   }
@@ -4396,11 +4402,13 @@ export class GridScene extends Phaser.Scene {
     this.playerRow = targetRow;
     this.updateCoordsHud();
     this.updateTransitionMarkerProximity();
-    this.refreshNavigationGuide();
     this.updateInteractHint();
     const baseStepMinutes = this.clock?.calendar.actionCosts.stepMinutes ?? 0;
     const weatherStepMinutes = this.currentClimate()?.weather.stepMinutes ?? 0;
     this.advanceTime(baseStepMinutes + weatherStepMinutes);
+    // Quote the remaining walk against the new time and local weather.
+    // This also refreshes zero-time movement, where advanceTime is a no-op.
+    this.refreshNavigationGuide();
 
     const target = cellCenterOffset(map, targetCol, targetRow);
     const finishMove = (): void => {
