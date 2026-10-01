@@ -3,6 +3,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 
+import { createQuestJournal } from '../src/engine/quest-system';
+import { isConditionMet, type DialogueRuntimeContext } from '../src/engine/dialogue-runtime';
 import { loadWorldData } from '../src/game/world-loader';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -53,6 +55,13 @@ describe('Round 49 default world integrity', () => {
       const manifest = JSON.parse(readFileSync(path.join(repoRoot, 'data/base/manifest.json'), 'utf8')) as {
         resources: unknown[];
       };
+      const relay = assembly.dialogues.get('dlg.r91-nie-qiyan-vigil')!.nodes.find(n => n.id === 'greet')!.options!.find(o => o.nextNodeId === 'r105-ledger-receive-0');
+      expect(relay).toBeDefined();
+      const journal = createQuestJournal(assembly.quests);
+      journal.states.get('quest.r91-goose-vigil')!.status = 'completed';
+      // This option reads exactly these two fields; actual UI evidence remains separate.
+      const context = { journal, knownKnowledgeNodeIds: new Set(['event.r105-ledger-message', 'event.r100-record-open']) } as DialogueRuntimeContext;
+      expect(relay!.conditions!.every(c => isConditionMet(c, context))).toBe(true);
       expect(resourceSources).toHaveLength(manifest.resources.length);
       expect(assembly.npcs.length).toBeGreaterThanOrEqual(10);
       expect(assembly.npcs.some(({ record }) => record.id === 'char.r74-shen-yuji')).toBe(true);

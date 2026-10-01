@@ -1,3 +1,4 @@
+import { describeOralPrerequisites } from './dialogue-prerequisites';
 import {RegionalGuidePanel} from './regional-guide-ui';
 import {buildRegionalGuideEntries,resolveRegionalGuideDestination,REGION_GUIDE_PREFIX,REGION_ROLE_LABELS,type RegionalGuideInput,type RegionGuideEntry} from '../engine/regional-guide';
 import {buildQuestGuideEntries} from '../engine/quest-guide';
@@ -4281,6 +4282,7 @@ export class GridScene extends Phaser.Scene {
       npcId: target.record.id,
     }));
     panel.open(conversation, target.record.name, {
+      oralPrerequisites: (node) => describeOralPrerequisites(node, this.dialogueContextFor(target.record.id)),
       visibleOptions: (node) =>
         getVisibleOptionsForDisplay(node, this.dialogueContextFor(target.record.id)),
       confirmOption: (session, visibleIndex) =>

@@ -70,6 +70,7 @@ export interface DialogueConfirmOutcome {
  * atomically, advances the session only on success and reports feedback.
  */
 export interface DialogueHostController {
+  oralPrerequisites?(node: DialogueNodeData): string;
   visibleOptions(node: DialogueNodeData): readonly VisibleDialogueOption[];
   confirmOption(session: DialogueSession, visibleIndex: number): DialogueConfirmOutcome;
 }
@@ -171,6 +172,7 @@ export class DialoguePanel {
       [KeyCodes.PAGE_DOWN, () => this.changePage(1, false)],
       [KeyCodes.LEFT, () => this.changePage(-1, true)],
       [KeyCodes.RIGHT, () => this.changePage(1, true)],
+      [KeyCodes.TAB, () => { if (this.session && this.controller?.oralPrerequisites) { this.feedback = this.controller.oralPrerequisites(this.session.currentNode); this.feedbackWarn = false; this.bodyPage = 0; this.renderNode(); } }],
       [KeyCodes.ESC, () => this.close()],
     ];
     for (const [code, handler] of pairs) {
@@ -295,6 +297,6 @@ export class DialoguePanel {
     }
     const status = `正文 ${this.bodyPage + 1}/${this.bodyPages.length}` + (choice === undefined ? '' : ` · 选项 ${this.selection + 1}/${visible.length} · 选项页 ${this.optionPage + 1}/${this.optionPages.length}`);
     makeText(left + PADDING, top + panelHeight - PADDING - hintHeight + 4, status, uiFontSize(10), UI.textMuted);
-    makeText(left + PADDING, top + panelHeight - PADDING - 18, '↑/↓ 选项 · PgUp/PgDn 正文 · ←/→ 选项页 · Enter 翻页/确认 · Esc 关闭', uiFontSize(10), UI.textMuted);
+    makeText(left + PADDING, top + panelHeight - PADDING - 18, '↑/↓ 选项 · Tab 转述条件 · PgUp/PgDn 正文 · ←/→ 选项页 · Enter 翻页/确认 · Esc 关闭', uiFontSize(10), UI.textMuted);
   }
 }

@@ -1,0 +1,106 @@
+/**
+ * Round139 诊断： Nie Qiyan relay 选项缺失的装配层定位（临时诊断文件）。
+ * 用全量 base 数据走真实 world-loader 装配 + 纯条件求值，逐层报告
+ * r105-ledger-receive-0 的存亡。不做修复。
+ */
+import { readFileSync, appendFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { beforeAll, afterAll, describe, expect, it, vi } from 'vitest';
+
+const root = fileURLToPath(new URL('../', import.meta.url));
+const diag = (label: string, value: unknown): void => {
+  appendFileSync('.r139-diag.log', `${label} ${JSON.stringify(value)}\n`, 'utf8');
+};
+
+let world: unknown;
+beforeAll(async () => {
+  vi.stubGlobal('fetch', (async (input: RequestInfo | URL) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+    try {
+      const rel = decodeURIComponent(new URL(url, 'http://r139.test').pathname);
+      return new Response(readFileSync(join(root, 'data', rel), 'utf8'), { status: 200, headers: { 'content-type': 'application/json' } });
+    } catch { return new Response('not found', { status: 404 }); }
+  }) as typeof fetch);
+  const { loadWorldData } = await import('../src/game/world-loader');
+  const result = await loadWorldData();
+  if (!result.ok) throw Error(result.lines.join('\n'));
+  world = result.world;
+});
+afterAll(() => { vi.unstubAllGlobals(); });
+
+describe('R139 diagnosis: assembly-level fate of the relay option', () => {
+  it('reports each layer verdict for r105-ledger-receive-0', async () => {
+    const { parseDialogueSet } = await import('../src/engine/dialogue-graph');
+    const parsed = parseDialogueSet(JSON.parse(readFileSync(join(root, 'data/base/dialogues/round-91-cloud-north-terrace-conversations.json'), 'utf8')));
+    if (!parsed.ok) {
+      diag('parseErrors:', parsed.errors);
+    }
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    const conv = parsed.set.conversations.find((c: { id: string }) => c.id === 'dlg.r91-nie-qiyan-vigil') as unknown as { nodes: { id: string; options?: { nextNodeId: string; conditions?: unknown[] }[] }[] };
+    const greet = conv!.nodes.find(n => n.id === 'greet')!;
+    diag('parsedOptions:', (greet.options ?? []).map(o => o.nextNodeId));
+    diag('parsedWarnings:', (parsed as unknown as { warnings?: string[] }).warnings ?? []);
+    const w = world as { optionalWarnings?: string[] };
+    diag('loaderWarnings:', w.optionalWarnings ?? []);
+    const wFull = world as { assembly: { quests?: Map<string, unknown>; dialogues?: unknown; npcs?: { record: { id: string } }[] } };
+    diag('loaderHasVigilQuest:', wFull.assembly.quests?.has('quest.r91-goose-vigil') ?? 'no-map');
+    const niePlaced = (wFull.assembly.npcs ?? []).some(n => n.record.id === 'char.r91-nie-qiyan');
+    diag('loaderNiePlaced:', niePlaced);
+    const assembledDialogue = await import('../src/engine/dialogue-runtime').then(m => m);
+    void assembledDialogue;
+
+    const { assembleDialogueReferences, getVisibleOptions } = await import('../src/engine/dialogue-runtime');
+    const questRaw = JSON.parse(readFileSync(join(root, 'data/base/quests/round-91-cloud-north-terrace-quests.json'), 'utf8'));
+    const questParse = (await import('../src/engine/quest-system')).parseQuestSet(questRaw);
+    if (!questParse.ok) throw Error(questParse.errors.join('\n'));
+    const refs = assembleDialogueReferences({
+      conversations: new Map(parsed.set.conversations.map((c: { id: string }) => [c.id, c])),
+      quests: new Map(questParse.set.quests.map((q: { id: string }) => [q.id, q])),
+      items: new Map(),
+      placedNpcIds: new Set(['char.r91-nie-qiyan']),
+      knowledgeNodeIds: new Set(['event.r105-ledger-message', 'event.r105-ledger-delivered', 'event.r100-record-open', 'event.r100-record-guard']),
+      factionIds: new Set(),
+      martialArtIds: new Set(),
+      timeOfDayPeriodIds: new Set(['period.midday']),
+    } as never);
+    diag('referenceWarnings:', refs.warnings);
+
+    const { createQuestJournal } = await import('../src/engine/quest-system');
+    const vigil = questParse.set.quests.find(q => q.id === 'quest.r91-goose-vigil')!;
+    const quests = new Map([[vigil.id, vigil]]);
+    const journal = createQuestJournal(quests);
+    journal.states.get(vigil.id)!.status = 'completed';
+    const ctx = {
+      quests, journal, items: new Map(), inventory: null,
+      social: { npcKnowledge: new Map(), relationships: new Map(), morality: 0, renown: 0 } as never, speakerNpcId: 'char.r91-nie-qiyan',
+      knownKnowledgeNodeIds: new Set(['event.r105-ledger-message', 'event.r100-record-open']),
+      knowledgeNodes: new Map(), character: null, factions: new Map(), martialArts: new Map(),
+      factionState: {} as never, timeOfDayPeriodId: 'period.midday',
+    } as never;
+    // Enumerate the four condition bits: which combo yields 8 options WITHOUT
+    // the relay? (message known, delivered known, vigil completed, record-open known)
+    const baseKnown = ['event.r100-record-settled'];
+    for (const [msg, deliv, done, open] of [
+      [true, false, true, true],   // The user-confirmed state.
+      [true, true, true, true],    // Delivered secretly known.
+      [true, false, false, true],  // Journal not completed after all.
+      [true, false, true, false],  // Open actually unknown (guard branch instead).
+      [true, true, false, true],
+    ] as const) {
+      const known = new Set<string>(baseKnown);
+      if (msg) known.add('event.r105-ledger-message');
+      if (deliv) known.add('event.r105-ledger-delivered');
+      if (open) known.add('event.r100-record-open'); else known.add('event.r100-record-guard');
+      const journalX = createQuestJournal(quests);
+      journalX.states.get(vigil.id)!.status = done ? 'completed' : 'active';
+      const ctxX = { ...ctx, knownKnowledgeNodeIds: known, journal: journalX } as never;
+      const vis = getVisibleOptions(greet as never, ctxX);
+      diag(`combo(msg=${msg},deliv=${deliv},done=${done},open=${open}):`, { count: vis.length, hasRelay: vis.some(v => v.option.nextNodeId === 'r105-ledger-receive-0'), list: vis.map(v => v.option.nextNodeId) });
+    }
+    const visible = getVisibleOptions(greet as never, ctx);
+    diag('visibleOptions:', visible.map(v => v.option.nextNodeId));
+    expect(Array.isArray(visible)).toBe(true);
+  });
+});

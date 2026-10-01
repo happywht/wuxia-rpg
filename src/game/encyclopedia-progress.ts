@@ -11,3 +11,8 @@ export function describeEncyclopediaProgress(node: KnowledgeNodeData, known: Rea
   const progress = projectKnowledgeProgress(node, known);
   return progress === undefined ? undefined : `玩家进度：${progress.label}`;
 }
+
+/** Pending work is visible only after the player discovers its own entry. */
+export function isPendingEncyclopediaEntry(node: KnowledgeNodeData, known: ReadonlySet<string>): boolean {
+  return known.has(node.id) && projectKnowledgeProgress(node, known)?.state === 'pending';
+}

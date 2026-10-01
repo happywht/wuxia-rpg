@@ -8,7 +8,7 @@ import {
   type KnowledgeRelation,
 } from '../engine/knowledge-graph';
 import { uiFontSize } from './settings';
-import { describeEncyclopediaProgress, paginateEncyclopediaSummary } from './encyclopedia-progress';
+import { describeEncyclopediaProgress, isPendingEncyclopediaEntry, paginateEncyclopediaSummary } from './encyclopedia-progress';
 import { wrapDialogueText } from './dialogue-layout';
 import { addPixelPanelChrome, addPixelSelection, UI_FONT_FAMILY } from './ui-theme';
 
@@ -79,6 +79,7 @@ export class EncyclopediaPanel {
   private readonly onClose?: () => void;
   private model: EncyclopediaPanelModel | null = null;
   private filterIndex = 0;
+  private pendingOnly = false;
   private selection = 0;
   private summaryPage = 0;
   private summaryPageCount = 1;
@@ -98,6 +99,7 @@ export class EncyclopediaPanel {
     if (this.openState) return;
     this.model = model;
     this.filterIndex = 0;
+    this.pendingOnly = false;
     this.selection = 0;
     this.summaryPage = 0;
     this.openState = true;
@@ -134,6 +136,7 @@ export class EncyclopediaPanel {
       [codes.A, () => this.changeFilter(-1)],
       [codes.RIGHT, () => this.changeFilter(1)],
       [codes.D, () => this.changeFilter(1)],
+      [codes.TAB, () => this.togglePending()],
       [codes.PAGE_UP, () => this.changeSummaryPage(-1)],
       [codes.PAGE_DOWN, () => this.changeSummaryPage(1)],
       [codes.ESC, () => this.close()],
@@ -159,12 +162,19 @@ export class EncyclopediaPanel {
     if (model === null) return [];
     const nodes = [...model.graph.nodes.values()].filter((node) => this.filter === null || node.kind === this.filter);
     const known = nodes
-      .filter((node) => model.knownNodeIds.has(node.id))
+      .filter((node) => model.knownNodeIds.has(node.id) && (!this.pendingOnly || isPendingEncyclopediaEntry(node, model.knownNodeIds)))
       .sort((a, b) => a.title.localeCompare(b.title, 'zh-Hans-CN'))
       .map((node): EncyclopediaRow => ({ kind: 'known', node }));
-    return nodes.some((node) => !model.knownNodeIds.has(node.id))
+    return !this.pendingOnly && nodes.some((node) => !model.knownNodeIds.has(node.id))
       ? [...known, { kind: 'locked' }]
       : known;
+  }
+
+  private togglePending(): void {
+    this.pendingOnly = !this.pendingOnly;
+    this.selection = 0;
+    this.summaryPage = 0;
+    this.render();
   }
 
   private moveSelection(delta: number): void {
@@ -206,9 +216,9 @@ export class EncyclopediaPanel {
     const category = currentFilter === null ? '全部' : KIND_LABELS[currentFilter];
     const knownCount = [...model.graph.nodes.keys()].filter((id) => model.knownNodeIds.has(id)).length;
     this.addText('江湖百科', left + 22, top + 16, 19, UI.warning);
-    this.addText(`←/→ 类别：${category}　·　已知词条 ${knownCount}`, left + 22, top + 47, 11, UI.muted);
+    this.addText(`←/→ 类别：${category}　·　${this.pendingOnly ? '待说明' : '完整'} · 已知词条 ${knownCount}`, left + 22, top + 47, 11, UI.muted);
     this.summaryPageCount = 1;
-    this.addText('↑/↓ 浏览 · PgUp/PgDn 正文 · K 或 Esc 关闭', left + PANEL_WIDTH - 22, top + PANEL_HEIGHT - 25, 10, UI.muted, 'right');
+    this.addText('Tab 待说明 · ↑/↓ 浏览 · PgUp/PgDn 正文 · K 或 Esc 关闭', left + PANEL_WIDTH - 22, top + PANEL_HEIGHT - 25, 10, UI.muted, 'right');
     this.addLine(left + 322, top + 75, left + 322, top + PANEL_HEIGHT - 46);
 
     const rows = this.rows;
@@ -216,7 +226,7 @@ export class EncyclopediaPanel {
     const windowStart = Math.floor(this.selection / VISIBLE_ROWS) * VISIBLE_ROWS;
     const listTop = top + 83;
     if (rows.length === 0) {
-      this.addText('此类尚无可查词条。', left + 22, listTop, 12, UI.muted);
+      this.addText(this.pendingOnly ? '此类暂无待说明见闻。' : '此类尚无可查词条。', left + 22, listTop, 12, UI.muted);
     }
     for (let offset = 0; offset < VISIBLE_ROWS; offset += 1) {
       const row = rows[windowStart + offset];
@@ -240,7 +250,7 @@ export class EncyclopediaPanel {
     const detailX = left + 346;
     const detailWidth = PANEL_WIDTH - 368;
     if (selected === undefined) {
-      this.addText('知识图谱资料尚未加载。', detailX, listTop, 13, UI.muted);
+      this.addText(this.pendingOnly ? '切换类别或按 Tab 查看完整百科。' : '此类尚无可查词条。', detailX, listTop, 13, UI.muted);
       return;
     }
     if (selected.kind === 'locked') {
