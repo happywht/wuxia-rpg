@@ -42,6 +42,9 @@ export interface QuestPanelGeometryInput {
   maxVisibleRows?: number;
   padding?: number;
   listGap?: number;
+  /** Round 120: crafting panels are a different size; defaults stay quest-panel. */
+  maxWidth?: number;
+  maxHeight?: number;
 }
 
 /**
@@ -54,8 +57,8 @@ export function buildQuestPanelGeometry(input: QuestPanelGeometryInput): QuestPa
   const padding = input.padding ?? 24;
   const gap = input.listGap ?? 8;
   const maxRows = input.maxVisibleRows ?? 6;
-  const width = Math.min(720, Math.max(280, input.viewWidth - 40));
-  const height = Math.min(440, Math.max(240, input.viewHeight - 40));
+  const width = Math.min(input.maxWidth ?? 720, Math.max(280, input.viewWidth - 40));
+  const height = Math.min(input.maxHeight ?? 440, Math.max(240, input.viewHeight - 40));
   const left = Math.round((input.viewWidth - width) / 2);
   const top = Math.round((input.viewHeight - height) / 2);
   const hintTop = top + height - 10 - input.hintHeight;

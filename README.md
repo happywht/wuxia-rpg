@@ -4,8 +4,8 @@
 
 - 设计文档：`docs/GDD.md`
 - 新版产品目标：[PROJECT-GOALS.md](docs/PROJECT-GOALS.md)；当前系统与内容盘点：[CURRENT-STATE-AUDIT.md](docs/CURRENT-STATE-AUDIT.md)
-- 逐轮路线图（R00–R119+）：`ROADMAP.md`
-- 当前进度：**Round 119 已完成；下一轮 Round 120**。整个产品目标仍在推进中。
+- 逐轮路线图（R00–R120+）：`ROADMAP.md`
+- 当前进度：**Round 120 已完成；下一轮 Round 121**。整个产品目标仍在推进中。
 - 下一阶段优先丰富、串联和细化现有 22 个区域：开局闭环、大陆/北境/海路章节、任务差异、五派成长、制作经济、人物后果与结局回响。扩地图须证明其产品价值；静态盘点可运行 `npm run audit:content-state`，该命令不代表真实旅程验收。
 
 ## 范围
@@ -199,3 +199,8 @@ npm run audit:final # 完整 Git 历史上的 R00–R50 计划/提交、内容�
 ### Round 118
 
 四岛全部实际入口接入入场见闻，完成守礁＋熟船一路海路阶段结案及传航两种即时成本实走。目标仍active，另一分支后续、成长、结局与发行验收未完成。证据见[本轮验证](iterations/round-118/verification.md)。
+
+
+## Round 120
+
+Round 120 已完成：炼丹与锻造详情按实际宽度换行、字号分页；材料/工钱/用途/拒绝反馈完整，未知药方仅显示线索。制作回执区分工钱后余额与后续奖励变化，炼丹读取实时悟性。正常第三档完成买料→交药→问药→学方→炼成→实际用药→回报，随后拜入云隐山庄并学云隐身法。最大字号炼丹3页、锻造4页；材料不足拒绝不扣费。完整目标保持 active，M2–M5未通过。 实际账本与截图见 [playtest](iterations/round-120/playtest.md)。

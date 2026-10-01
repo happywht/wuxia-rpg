@@ -121,6 +121,7 @@ import {
   selectEquipmentForgeStation,
 } from '../engine/equipment-forge';
 import { craftAlchemy, selectAlchemyStation } from '../engine/alchemy-system';
+import { craftingReceipt } from './crafting-panel-layout';
 import {
   aggregateMeridianEffects,
   applyMeridianEffects,
@@ -4118,7 +4119,7 @@ export class GridScene extends Phaser.Scene {
             this.applyQuestUpdate(applyQuestSignal(this.quests, this.questJournal, { type: 'recipe-crafted', recipeId }));
           }
           return outcome.ok
-            ? { ok: true, message: `已锻成「${outcome.result.name}」，剩余银两 ${outcome.remainingCurrency}。` }
+            ? { ok: true, message: craftingReceipt('锻成', outcome.result.name, outcome.remainingCurrency, inventory.currency) }
             : { ok: false, message: outcome.reason };
         },
       });
@@ -4139,11 +4140,12 @@ export class GridScene extends Phaser.Scene {
         items: this.items,
         knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
         insight: character.attributes.insight,
+        getInsight: () => this.playerState?.attributes.insight ?? character.attributes.insight,
         onCraft: (recipeId) => {
           const outcome = craftAlchemy({
             station: alchemy,
             recipeId,
-            character,
+            character: this.playerState ?? character,
             knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
             inventory,
             items: this.items,
@@ -4153,7 +4155,7 @@ export class GridScene extends Phaser.Scene {
           this.refreshQuestCollectObjectives();
           this.markKnowledgeDiscovered(outcome.result.id);
           this.applyQuestUpdate(applyQuestSignal(this.quests, this.questJournal, { type: 'recipe-crafted', recipeId }));
-          return { ok: true, message: `已炼成「${outcome.result.name}」，剩余银两 ${outcome.remainingCurrency}。` };
+          return { ok: true, message: craftingReceipt('炼成', outcome.result.name, outcome.remainingCurrency, inventory.currency) };
         },
       });
       this.updateInteractHint();
