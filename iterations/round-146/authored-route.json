@@ -1,0 +1,31 @@
+{
+  "scope": "Authored terrain only; NPCs, encounters and live movement require normal UI verification. Not journey evidence.",
+  "mapId": "map.round-93-snow-pine-valley",
+  "start": [
+    50,
+    62
+  ],
+  "target": [
+    94,
+    50
+  ],
+  "length": 56,
+  "segments": [
+    {
+      "direction": "Up",
+      "count": 11
+    },
+    {
+      "direction": "Right",
+      "count": 19
+    },
+    {
+      "direction": "Up",
+      "count": 1
+    },
+    {
+      "direction": "Right",
+      "count": 25
+    }
+  ]
+}

@@ -600,3 +600,7 @@ Round140继续沈柳新增复谈、关键双分支完整后果/活动失败恢�
 ## 截至 Round 145
 
 RegionalGuideInput可选endingGate来自装配资料；region-guide:ending:<id>复核当前ID/地区/可达路线后生成邻格导航，坐标不存档。新增通用ending到达动作只提示E检查结局条件，不执行结局、传送或保存。缺结局资料保留旧指南。
+
+## 截至 Round 146
+
+只读scripts/inspect-walking-path.mjs按作者地图地形计算方向段，拒绝无效参数/不可行格/无路径；明确不处理实时NPC/遭遇，不等于实际旅程。真实返程与r108-voyage终章已正常输入验证，未改变资料/Schema/存档协议。

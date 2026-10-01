@@ -1,0 +1,55 @@
+{
+  "scope": "Authored terrain only; NPCs, encounters and live movement require normal UI verification. Not journey evidence.",
+  "mapId": "map.round-92-north-pass",
+  "start": [
+    4,
+    64
+  ],
+  "target": [
+    49,
+    96
+  ],
+  "length": 77,
+  "segments": [
+    {
+      "direction": "Right",
+      "count": 24
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Right",
+      "count": 1
+    },
+    {
+      "direction": "Down",
+      "count": 2
+    },
+    {
+      "direction": "Right",
+      "count": 1
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Right",
+      "count": 3
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Right",
+      "count": 16
+    },
+    {
+      "direction": "Down",
+      "count": 27
+    }
+  ]
+}

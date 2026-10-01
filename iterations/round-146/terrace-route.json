@@ -1,0 +1,39 @@
+{
+  "scope": "Authored terrain only; NPCs, encounters and live movement require normal UI verification. Not journey evidence.",
+  "mapId": "map.round-91-cloud-north-terrace",
+  "start": [
+    49,
+    2
+  ],
+  "target": [
+    49,
+    96
+  ],
+  "length": 112,
+  "segments": [
+    {
+      "direction": "Down",
+      "count": 5
+    },
+    {
+      "direction": "Left",
+      "count": 8
+    },
+    {
+      "direction": "Down",
+      "count": 10
+    },
+    {
+      "direction": "Right",
+      "count": 9
+    },
+    {
+      "direction": "Down",
+      "count": 79
+    },
+    {
+      "direction": "Left",
+      "count": 1
+    }
+  ]
+}
