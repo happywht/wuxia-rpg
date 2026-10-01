@@ -334,13 +334,13 @@ describe('Round 59 regional dialogue echoes', () => {
     // peddler-errand/ferry-ledger journey entries to Bai and Jiang. Round 103
     // adds five mentor practice entries and one field brief per verifier.
     const expectedBaseline: Record<string, number> = {
-      'dlg.shi-bei-mentor': 18, // 9 pre-existing + 4 echoes + 5 Round 103 practice entries
+      'dlg.shi-bei-mentor': 19, // +1 R129 no-effect complete route brief;  9 pre-existing + 4 echoes + 5 Round 103 practice entries
       'dlg.bai-luzhou-ferry-master': 22, // 14 pre-existing + 2 echoes + 4 Round 98 journey entries + 1 Round 103 field brief
       'dlg.zhu-jiuxian-mentor': 24, // prior 20 + three Round104 crafting responses
       'dlg.ma-shangyi-notice-board': 5, // 3 pre-existing + 2 echoes
       'dlg.lu-zhenniang-teastall': 9, // 7 pre-existing + 2 echoes
       'dlg.jiang-baiwei-peddler': 7, // 2 pre-existing + 2 echoes + 3 Round 98 journey entries
-      'dlg.gu-yechen-roadside': 24, // 10 prior options + 14 Round105 stage/share/relay responses
+      'dlg.gu-yechen-roadside': 25, // +1 R129 no-effect return route brief;  10 prior options + 14 Round105 stage/share/relay responses
     };
     for (const [dialogueId, expectedCount] of Object.entries(expectedBaseline)) {
       const conversation = dialogueAssembly.conversations.get(dialogueId)!;
