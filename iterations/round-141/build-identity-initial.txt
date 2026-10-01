@@ -1,0 +1,446 @@
+
+> wuxia-rpg@0.0.1 build
+> npm run check && vite build
+
+
+> wuxia-rpg@0.0.1 check
+> npm run validate:data && npm run inspect:mods && npm run typecheck && npm test && npm run audit:round-34 && npm run audit:round-48-docs
+
+
+> wuxia-rpg@0.0.1 validate:data
+> node scripts/validate-data.mjs
+
+通过：manifest Schema 与 100 个基础资源 Schema。
+
+> wuxia-rpg@0.0.1 inspect:mods
+> node scripts/inspect-mods.mjs
+
+启用 MOD：未启用任何 MOD
+资源 100 项 · 问题 0 条
+
+[1/100] map.round-01-grid（maps/round-01-grid.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[2/100] map.round-10-mist-ferry（maps/round-10-mist-ferry.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[3/100] map.round-62-iron-ridge（maps/round-62-iron-ridge.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[4/100] map.round-67-salt-road（maps/round-67-salt-road.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[5/100] map.round-74-cloud-ridge（maps/round-74-cloud-ridge.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[6/100] npc.round-79-isles-set（characters/round-79-isles-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[7/100] dialogue.round-79-isles-set（dialogues/round-79-isles-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[8/100] quest.round-79-isles-set（quests/round-79-isles-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[9/100] map.round-79-isles（maps/round-79-isles.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[10/100] map.round-82-east-coast（maps/round-82-east-coast.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[11/100] npc.round-82-east-coast-set（characters/round-82-east-coast-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[12/100] dialogue.round-82-east-coast-set（dialogues/round-82-east-coast-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[13/100] quest.round-82-east-coast-set（quests/round-82-east-coast-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[14/100] npc.round-83-east-coast-set（characters/round-83-east-coast-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[15/100] dialogue.round-83-east-coast-set（dialogues/round-83-east-coast-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[16/100] quest.round-83-east-coast-set（quests/round-83-east-coast-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[17/100] item.round-83-east-coast-set（items/round-83-east-coast-items.json，schema：items-set）
+  基础层 ✓ 通过
+  最终来源：base
+[18/100] shop.round-83-east-coast-set（shops/round-83-east-coast-shops.json，schema：shops-set）
+  基础层 ✓ 通过
+  最终来源：base
+[19/100] encounter.round-83-east-coast-set（battles/round-83-east-coast-encounters.json，schema：battle-encounters）
+  基础层 ✓ 通过
+  最终来源：base
+[20/100] map.round-84-windward-isle（maps/round-84-windward-isle.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[21/100] npc.round-84-windward-isle-set（characters/round-84-windward-isle-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[22/100] dialogue.round-84-windward-isle-set（dialogues/round-84-windward-isle-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[23/100] quest.round-84-windward-isle-set（quests/round-84-windward-isle-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[24/100] map.round-85-tide-isle（maps/round-85-tide-isle.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[25/100] npc.round-85-tide-isle-set（characters/round-85-tide-isle-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[26/100] dialogue.round-85-tide-isle-set（dialogues/round-85-tide-isle-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[27/100] quest.round-85-tide-isle-set（quests/round-85-tide-isle-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[28/100] map.round-87-southwest-isles（maps/round-87-southwest-isles.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[29/100] npc.round-87-southwest-isles-set（characters/round-87-southwest-isles-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[30/100] dialogue.round-87-southwest-isle-set（dialogues/round-87-southwest-isle-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[31/100] quest.round-87-southwest-isle-set（quests/round-87-southwest-isle-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[32/100] npc.round-89-southwest-isles-set（characters/round-89-southwest-isles-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[33/100] dialogue.round-89-southwest-isle-set（dialogues/round-89-southwest-isle-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[34/100] quest.round-89-cross-region-set（quests/round-89-cross-region-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[35/100] map.round-91-cloud-north-terrace（maps/round-91-cloud-north-terrace.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[36/100] npc.round-91-cloud-north-terrace-set（characters/round-91-cloud-north-terrace-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[37/100] dialogue.round-91-cloud-north-terrace-set（dialogues/round-91-cloud-north-terrace-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[38/100] quest.round-91-cloud-north-terrace-set（quests/round-91-cloud-north-terrace-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[39/100] map.round-92-north-pass（maps/round-92-north-pass.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[40/100] npc.round-92-north-pass-set（characters/round-92-north-pass-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[41/100] dialogue.round-92-north-pass-set（dialogues/round-92-north-pass-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[42/100] quest.round-92-north-pass-set（quests/round-92-north-pass-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[43/100] map.round-93-snow-pine-valley（maps/round-93-snow-pine-valley.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[44/100] npc.round-93-snow-pine-valley-set（characters/round-93-snow-pine-valley-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[45/100] dialogue.round-93-snow-pine-valley-set（dialogues/round-93-snow-pine-valley-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[46/100] quest.round-93-snow-pine-valley-set（quests/round-93-snow-pine-valley-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[47/100] map.round-94-east-gate（maps/round-94-east-gate.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[48/100] map.round-94-returning-sails（maps/round-94-returning-sails.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[49/100] npc.round-94-frontiers-set（characters/round-94-frontiers-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[50/100] dialogue.round-94-frontiers-set（dialogues/round-94-frontiers-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[51/100] quest.round-94-frontiers-set（quests/round-94-frontiers-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[52/100] world.atlas（world/world-map.json，schema：world-map）
+  基础层 ✓ 通过
+  最终来源：base
+[53/100] map.round-97-lanxin-isle（maps/round-97-lanxin-isle.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[54/100] map.round-97-pilot-reef（maps/round-97-pilot-reef.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[55/100] npc.round-97-lanxin-reef-set（characters/round-97-lanxin-reef-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[56/100] dialogue.round-97-lanxin-reef-set（dialogues/round-97-lanxin-reef-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[57/100] quest.round-97-lanxin-reef-set（quests/round-97-lanxin-reef-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[58/100] map.round-96-stone-reef（maps/round-96-stone-reef.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[59/100] map.round-96-halfmoon-atoll（maps/round-96-halfmoon-atoll.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[60/100] npc.round-96-south-reef-set（characters/round-96-south-reef-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[61/100] dialogue.round-96-south-reef-set（dialogues/round-96-south-reef-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[62/100] quest.round-96-south-reef-set（quests/round-96-south-reef-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[63/100] map.round-95-misty-pine-gate（maps/round-95-misty-pine-gate.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[64/100] map.round-95-cedar-valley（maps/round-95-cedar-valley.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[65/100] map.round-95-east-harbor（maps/round-95-east-harbor.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[66/100] npc.round-95-east-woodland-set（characters/round-95-east-woodland-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[67/100] dialogue.round-95-east-woodland-set（dialogues/round-95-east-woodland-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[68/100] quest.round-95-east-woodland-set（quests/round-95-east-woodland-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[69/100] calendar.base（worldview/calendar.json，schema：game-calendar）
+  基础层 ✓ 通过
+  最终来源：base
+[70/100] climate.base（worldview/climate.json，schema：climate）
+  基础层 ✓ 通过
+  最终来源：base
+[71/100] npc.round-03-set（characters/round-03-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[72/100] npc.round-74-cloud-ridge-set（characters/round-74-cloud-ridge-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[73/100] companion.round-19-set（companions/round-19-companions.json，schema：companion-set）
+  基础层 ✓ 通过
+  最终来源：base
+[74/100] dialogue.round-03-set（dialogues/round-03-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[75/100] dialogue.round-30-set（dialogues/round-30-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[76/100] dialogue.round-62-set（dialogues/round-62-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[77/100] dialogue.round-67-set（dialogues/round-67-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[78/100] dialogue.round-74-cloud-ridge-set（dialogues/round-74-cloud-ridge-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[79/100] character-profile.round-04-set（characters/round-04-profiles.json，schema：character-profiles）
+  基础层 ✓ 通过
+  最终来源：base
+[80/100] faction.round-04-set（factions/round-04-factions.json，schema：faction-set）
+  基础层 ✓ 通过
+  最终来源：base
+[81/100] martial-art.round-04-set（skills/round-04-martial-arts.json，schema：martial-arts-set）
+  基础层 ✓ 通过
+  最终来源：base
+[82/100] martial-art-components.round-22-set（skills/round-22-components.json，schema：martial-art-components）
+  基础层 ✓ 通过
+  最终来源：base
+[83/100] meridian.round-23-set（meridians/round-23-meridians.json，schema：meridian-set）
+  基础层 ✓ 通过
+  最终来源：base
+[84/100] equipment-forge.round-24-set（forges/round-24-equipment-forges.json，schema：equipment-forge-set）
+  基础层 ✓ 通过
+  最终来源：base
+[85/100] alchemy.round-25-set（alchemy/round-25-alchemy.json，schema：alchemy-set）
+  基础层 ✓ 通过
+  最终来源：base
+[86/100] ending.round-27-set（endings/round-27-endings.json，schema：ending-set）
+  基础层 ✓ 通过
+  最终来源：base
+[87/100] achievement.round-28-set（achievements/round-28-achievements.json，schema：achievement-set）
+  基础层 ✓ 通过
+  最终来源：base
+[88/100] encounter.round-05-set（battles/round-05-encounters.json，schema：battle-encounters）
+  基础层 ✓ 通过
+  最终来源：base
+[89/100] arena.round-20-set（arenas/round-20-arenas.json，schema：arena-set）
+  基础层 ✓ 通过
+  最终来源：base
+[90/100] faction-war.round-21-set（faction_wars/round-21-wars.json，schema：faction-war-set）
+  基础层 ✓ 通过
+  最终来源：base
+[91/100] item.round-06-set（items/round-06-items.json，schema：items-set）
+  基础层 ✓ 通过
+  最终来源：base
+[92/100] shop.round-06-set（shops/round-06-shops.json，schema：shops-set）
+  基础层 ✓ 通过
+  最终来源：base
+[93/100] quest.round-07-set（quests/round-07-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[94/100] quest.round-74-cloud-ridge-set（quests/round-74-cloud-ridge-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[95/100] knowledge.round-11-nodes（knowledge_graph/nodes.json，schema：knowledge-nodes）
+  基础层 ✓ 通过
+  最终来源：base
+[96/100] knowledge.round-11-edges（knowledge_graph/edges.json，schema：knowledge-edges）
+  基础层 ✓ 通过
+  最终来源：base
+[97/100] npc.round-86-tide-isle-set（characters/round-86-tide-isle-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[98/100] dialogue.round-86-tide-isle-set（dialogues/round-86-tide-isle-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[99/100] shop.round-86-tide-isle-set（shops/round-86-tide-isle-shops.json，schema：shops-set）
+  基础层 ✓ 通过
+  最终来源：base
+[100/100] encounter.round-86-tide-isle-set（battles/round-86-tide-isle-encounters.json，schema：battle-encounters）
+  基础层 ✓ 通过
+  最终来源：base
+
+说明：覆盖为整文件替换：后声明且校验通过的层获胜，被拒绝的覆盖不改变上一有效来源。
+说明：跨资源语义校验（引用闭合、坐标/占格、历法分区等）由游戏运行时加载器在装配时执行，本命令仅静态校验 JSON 与 schema。
+
+> wuxia-rpg@0.0.1 typecheck
+> tsc --noEmit
+
+
+> wuxia-rpg@0.0.1 test
+> vitest run
+
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+round129 refused (file untouched): r129-gu-iron-route 文本被改动，请人工复核。
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-Xloyb0/scripts/lib/round129-iron-practice-brief.mjs:132
+    throw new Error(`${brief.nodeId} 文本被改动，请人工复核。`);
+          ^
+
+Error: r129-gu-iron-route 文本被改动，请人工复核。
+    at verifyApplied (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-Xloyb0/scripts/lib/round129-iron-practice-brief.mjs:132:11)
+    at addOne (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-Xloyb0/scripts/lib/round129-iron-practice-brief.mjs:88:5)
+    at addIronPracticeBriefs (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-Xloyb0/scripts/lib/round129-iron-practice-brief.mjs:59:11)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-Xloyb0/scripts/apply-round129.mjs:20:9
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:647:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.18.0
+round130 refused round-30-conversations.json (file untouched): r130-hanshan-practice-brief 文本被改动，请人工复核。
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-wdVe0l/scripts/lib/round130-hanshan-practice-brief.mjs:147
+    throw new Error(`${brief.nodeId} 文本被改动，请人工复核。`);
+          ^
+
+Error: r130-hanshan-practice-brief 文本被改动，请人工复核。
+    at verifyApplied (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-wdVe0l/scripts/lib/round130-hanshan-practice-brief.mjs:147:11)
+    at addOne (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-wdVe0l/scripts/lib/round130-hanshan-practice-brief.mjs:86:5)
+    at addHanshanBriefs (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-wdVe0l/scripts/lib/round130-hanshan-practice-brief.mjs:62:15)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-wdVe0l/scripts/apply-round130.mjs:20:11
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:647:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.18.0
+node:internal/modules/esm/resolve:274
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\Users\Hitao\AppData\Local\Temp\wuxia-r105-jHbGbT\scripts\lib\round141-weather-dialogue.mjs' imported from C:\Users\Hitao\AppData\Local\Temp\wuxia-r105-jHbGbT\scripts\lib\round105-people-content.mjs
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:783:12)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:707:25)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:690:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:307:38)
+    at ModuleJob._link (node:internal/modules/esm/module_job:183:49) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r105-jHbGbT/scripts/lib/round141-weather-dialogue.mjs'
+}
+
+Node.js v22.18.0
+ ❯ tests/round105-combat-source.test.ts (3 tests | 1 failed) 282ms
+   ❯ Round105 real combat and incremental writer (3)
+     × two incremental runs are byte stable inside an isolated checked sandbox 272ms
+stdout | tests/round128-achievement-receipt.test.ts > Round128 real scene dialogue achievement receipts > five costed donations pay exactly two first achievements, separate from quest rewards, then no repeat
+[achievement] 已解锁 "achievement.name-in-the-rivers"：经验 +45，银两 +40
+[achievement] 已解锁 "achievement.kind-deed"：经验 +35，银两 +30
+
+ ❯ tests/round128-achievement-receipt.test.ts (3 tests | 1 failed) 32ms
+   ❯ Round128 real scene dialogue achievement receipts (3)
+     × five costed donations pay exactly two first achievements, separate from quest rewards, then no repeat 22ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round105-combat-source.test.ts > Round105 real combat and incremental writer > two incremental runs are byte stable inside an isolated checked sandbox
+Error: Command failed: D:\nvm4w\nodejs\node.exe C:\Users\Hitao\AppData\Local\Temp\wuxia-r105-jHbGbT\scripts\deepen-round105-people.mjs
+node:internal/modules/esm/resolve:274
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\Users\Hitao\AppData\Local\Temp\wuxia-r105-jHbGbT\scripts\lib\round141-weather-dialogue.mjs' imported from C:\Users\Hitao\AppData\Local\Temp\wuxia-r105-jHbGbT\scripts\lib\round105-people-content.mjs
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:783:12)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:707:25)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:690:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:307:38)
+    at ModuleJob._link (node:internal/modules/esm/module_job:183:49) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r105-jHbGbT/scripts/lib/round141-weather-dialogue.mjs'
+}
+
+Node.js v22.18.0
+
+ ❯ tests/round105-combat-source.test.ts:22:536
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/round128-achievement-receipt.test.ts > Round128 real scene dialogue achievement receipts > five costed donations pay exactly two first achievements, separate from quest rewards, then no repeat
+AssertionError: expected { advanced: false, …(1) } to deeply equal { advanced: false, feedback: null }
+
+- Expected
++ Received
+
+  {
+    "advanced": false,
+-   "feedback": null,
++   "feedback": "选项条件已变化，请重新选择。",
+  }
+
+ ❯ tests/round128-achievement-receipt.test.ts:16:708
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 139 passed (141)
+      Tests  2 failed | 1216 passed (1218)
+   Start at  06:03:23
+   Duration  96.55s (tests 89%, import 9%, transform 2%)
+
+    Isolate  141 workers spawned · ~176ms startup each (spawn + environment, per file)
+             at least ~12.24s faster with isolate: false — reuses workers across files instead of one per file

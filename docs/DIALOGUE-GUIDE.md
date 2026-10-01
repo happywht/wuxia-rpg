@@ -61,6 +61,7 @@
 | `factionMembership` | `factionId`（可省）、`isMember` | 属于/不属于指定门派；省略 id 时检查是否加入任意门派 |
 | `martialArtEligible` | `martialArtId` | 尚未掌握且满足该武学的等级/属性/门派资格 |
 | `timeOfDay` | `periodId` | **游戏内当前时段**等于历法声明的时段 id |
+| `weather` | `weatherId` | 当前地区气候的天气 id 精确匹配；缺上下文时不成立，坏引用只剔除该选项 |
 
 ### 3.1 时段条件（timeOfDay，Round 14）
 
@@ -150,3 +151,11 @@ Round 19 以后，引用装配覆盖任务、物品、NPC、见闻、门派、�
 ## Round 105 更新
 
 先从来源discoverKnowledgeNode记录判断，再在接收人现场shareKnowledgeNode；分享与关系/送达由同事务处理。仅玩家已知不表示npcKnows成立，重复送达须以knowledgeKnown.isKnown:false封门。
+
+## Round 141 已完成：对白天气条件与巡路提示
+
+新增对白条件 {kind:weather,weatherId}：封闭Schema/防御解析，装配校验已声明天气，未知引用只移除本选项；GridScene使用当前地区currentClimate，缺上下文失败关闭。柳寻径八种天气纯巡路分支，无效果/奖励；当前晴天实际重复与第三栏保存。未改变存档字段、资源数量或原任务/转述。实际只验证晴天，其它天气为测试可见性/结构验证；不会把测试当天气实走。作者源scripts/apply-round141-weather-dialogue.mjs幂等并拒绝覆盖已改节点。旧消费者可省weatherId/weatherIds：旧无天气条件对白仍可用，新增条件不会假定默认晴天。MOD可引用已声明天气，错引用装配警告；不新增迁移。
+
+确认边界补充：界面传最后显示的原始选项index，运行时重筛条件并核对同一index；天气变化使可见位置挪动时，不执行挪入该位置的另一选项，而提示重新选择。旧控制器第三参数可省，保留接口兼容。身份变化纯测试通过；未真实注入天气变更。作者链通过round105的深化入口接入，历史生成器fixture同步复制新helper；缺d.mts曾使类型检查失败，已补类型声明，日志保留。
+
+天气示例：`{"kind":"weather","weatherId":"weather.snow"}`。weatherId须来自已校验climate.weathers；所有conditions仍按AND组合，时间/天气/任务条件各自成立才可选。确认重新筛选并核对最后显示的原始选项索引，条件变化不能把另一选项当旧选择执行。

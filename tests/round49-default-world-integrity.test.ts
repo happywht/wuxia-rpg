@@ -62,6 +62,9 @@ describe('Round 49 default world integrity', () => {
       // This option reads exactly these two fields; actual UI evidence remains separate.
       const context = { journal, knownKnowledgeNodeIds: new Set(['event.r105-ledger-message', 'event.r100-record-open']) } as DialogueRuntimeContext;
       expect(relay!.conditions!.every(c => isConditionMet(c, context))).toBe(true);
+      const weatherOptions = assembly.dialogues.get('dlg.r93-liu-xunjing-rounds')!.nodes.find(n => n.id === 'greet')!.options!.filter(o => o.nextNodeId.startsWith('r141-weather-'));
+      expect(weatherOptions).toHaveLength(outcome.world.climate.weathers.length);
+      expect(weatherOptions.every(o => o.conditions?.some(c => c.kind === 'weather') && !o.effects)).toBe(true);
       expect(resourceSources).toHaveLength(manifest.resources.length);
       expect(assembly.npcs.length).toBeGreaterThanOrEqual(10);
       expect(assembly.npcs.some(({ record }) => record.id === 'char.r74-shen-yuji')).toBe(true);

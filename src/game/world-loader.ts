@@ -536,6 +536,7 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
       calendarPeriodIds,
       new Set(parsedClimate.climate.tideCycle?.phases.map((phase) => phase.id) ?? []),
       parsedCalendar.calendar.periods,
+      new Set(parsedClimate.climate.weathers.map(weather => weather.id)),
     );
     assembly.warnings.push(...knowledgeResult.warnings);
     const overlapWarnings: string[] = [];
@@ -694,6 +695,7 @@ function assembleOptionalContent(
   timeOfDayPeriodIds: ReadonlySet<string>,
   climateTideIds: ReadonlySet<string>,
   calendarPeriods: GameCalendarData['periods'],
+  weatherIds: ReadonlySet<string>,
 ): WorldAssembly {
   const warnings: Diagnostic[] = [];
   const knowledgeCharacterNodeIds = new Set(
@@ -1363,6 +1365,7 @@ function assembleOptionalContent(
     factionIds: new Set(progression.factions.keys()),
     martialArtIds: new Set(progression.martialArts.keys()),
     timeOfDayPeriodIds,
+    weatherIds,
   });
   for (const message of dialogueReferences.warnings) {
     // The message names the offending conversation id already, and talks may

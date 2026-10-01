@@ -285,6 +285,86 @@
               ]
             },
             {
+              "text": "按眼下天候，巡路有什么要留意？",
+              "nextNodeId": "r141-weather-clear",
+              "conditions": [
+                {
+                  "kind": "weather",
+                  "weatherId": "weather.clear"
+                }
+              ]
+            },
+            {
+              "text": "按眼下天候，巡路有什么要留意？",
+              "nextNodeId": "r141-weather-cloudy",
+              "conditions": [
+                {
+                  "kind": "weather",
+                  "weatherId": "weather.cloudy"
+                }
+              ]
+            },
+            {
+              "text": "按眼下天候，巡路有什么要留意？",
+              "nextNodeId": "r141-weather-overcast",
+              "conditions": [
+                {
+                  "kind": "weather",
+                  "weatherId": "weather.overcast"
+                }
+              ]
+            },
+            {
+              "text": "按眼下天候，巡路有什么要留意？",
+              "nextNodeId": "r141-weather-drizzle",
+              "conditions": [
+                {
+                  "kind": "weather",
+                  "weatherId": "weather.drizzle"
+                }
+              ]
+            },
+            {
+              "text": "按眼下天候，巡路有什么要留意？",
+              "nextNodeId": "r141-weather-rain",
+              "conditions": [
+                {
+                  "kind": "weather",
+                  "weatherId": "weather.rain"
+                }
+              ]
+            },
+            {
+              "text": "按眼下天候，巡路有什么要留意？",
+              "nextNodeId": "r141-weather-storm",
+              "conditions": [
+                {
+                  "kind": "weather",
+                  "weatherId": "weather.storm"
+                }
+              ]
+            },
+            {
+              "text": "按眼下天候，巡路有什么要留意？",
+              "nextNodeId": "r141-weather-snow",
+              "conditions": [
+                {
+                  "kind": "weather",
+                  "weatherId": "weather.snow"
+                }
+              ]
+            },
+            {
+              "text": "按眼下天候，巡路有什么要留意？",
+              "nextNodeId": "r141-weather-mist",
+              "conditions": [
+                {
+                  "kind": "weather",
+                  "weatherId": "weather.mist"
+                }
+              ]
+            },
+            {
               "text": "改日再谈。",
               "nextNodeId": "farewell"
             }
@@ -452,6 +532,38 @@
         {
           "id": "r136-carving-followup-1",
           "text": "柳寻径翻开巡簿：「你把年代说明留在私记里，眼下巡路人少卷入争执，外人却不便核看。沈雨霁的分项判断与界标证据分别保存，不混成今日疆令。此前关系已记过，这次没有额外认同。」"
+        },
+        {
+          "id": "r141-weather-clear",
+          "text": "柳寻径看了看谷口：「眼下霜松谷晴朗。能看清渡口踏痕和松影。晴朗不免除冰溪碰撞，仍沿主径过桥，别从溪心抄近。这里每次成功行走没有天气额外耗时；关口费用与行旅时长另算，不用这段话当成补给或通行奖励。」"
+        },
+        {
+          "id": "r141-weather-cloudy",
+          "text": "柳寻径看了看谷口：「眼下霜松谷多云。云影压住远处的界标，近处主径仍可辨。认准东口与渡口踏痕，不拿云影当岔路。这里每次成功行走没有天气额外耗时；关口费用与行旅时长另算，不用这段话当成补给或通行奖励。」"
+        },
+        {
+          "id": "r141-weather-overcast",
+          "text": "柳寻径看了看谷口：「眼下霜松谷阴沉。天色发暗，界标在松林后更难认。先沿主径辨渡口，北岔风口不是通往照雪关的东口。这里每次成功行走没有天气额外耗时；关口费用与行旅时长另算，不用这段话当成补给或通行奖励。」"
+        },
+        {
+          "id": "r141-weather-drizzle",
+          "text": "柳寻径看了看谷口：「眼下霜松谷细雨。雨水沾湿旧踏痕，行路要慢些。碑阳刻文仍在谷西，天气提示不会替你拓文。这里每次成功行走另加1世界分钟；关口费用与行旅时长另算，不用这段话当成补给或通行奖励。」"
+        },
+        {
+          "id": "r141-weather-rain",
+          "text": "柳寻径看了看谷口：「眼下霜松谷降雨。溪边雨重，切勿离开踏痕抄近。出谷仍走东口，备好余时再向照雪关赶路。这里每次成功行走另加2世界分钟；关口费用与行旅时长另算，不用这段话当成补给或通行奖励。」"
+        },
+        {
+          "id": "r141-weather-storm",
+          "text": "柳寻径看了看谷口：「眼下霜松谷骤雨。骤雨遮住远处松林，赶路尤其费时。沿已有主径和渡口走，东口回照雪关，北岔通风口。这里每次成功行走另加3世界分钟；关口费用与行旅时长另算，不用这段话当成补给或通行奖励。」"
+        },
+        {
+          "id": "r141-weather-snow",
+          "text": "柳寻径看了看谷口：「眼下霜松谷落雪。雪会盖住旧踏痕，行走额外费时；需要落雪的调查等到此时才可能开放，仍须核对时段和见闻。这里每次成功行走另加2世界分钟；关口费用与行旅时长另算，不用这段话当成补给或通行奖励。」"
+        },
+        {
+          "id": "r141-weather-mist",
+          "text": "柳寻径看了看谷口：「眼下霜松谷轻雾。雾里不要把近处松影当谷口。沿主径回东口可到照雪关，绕北岔只会进风口。这里每次成功行走另加1世界分钟；关口费用与行旅时长另算，不用这段话当成补给或通行奖励。」"
         }
       ]
     }

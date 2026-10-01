@@ -1,0 +1,25 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round141-weather-dialogue.test.ts (10 tests | 1 failed) 20ms
+   ❯ Round141 weather protocol (10)
+     × shipped talk is schema valid and exactly one pure branch per declared weather 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round141-weather-dialogue.test.ts > Round141 weather protocol > shipped talk is schema valid and exactly one pure branch per declared weather
+
+AssertionError: expected '柳寻径看了看谷口：「眼下霜松谷晴朗。能看清渡口踏痕和松影。晴朗不免除冰溪碰…' to contain '世界分钟'
+ Test Files  1 failed | 1 passed (2)
+
+      Tests  1 failed | 10 passed (11)
+Expected: "世界分钟"
+   Start at  05:51:42
+Received: "柳寻径看了看谷口：「眼下霜松谷晴朗。能看清渡口踏痕和松影。晴朗不免除冰溪碰撞，仍沿主径过桥，别从溪心抄近。这里每次成功行走没有天气额外耗时；关口费用与行旅时长另算，不用这段话当成补给或通行奖励。」"
+
+   Duration  1.98s (tests 64%, transform 23%, import 13%, worker 1%)
+
+ ❯ tests/round141-weather-dialogue.test.ts:27:470
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯

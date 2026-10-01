@@ -72,7 +72,7 @@ export interface DialogueConfirmOutcome {
 export interface DialogueHostController {
   oralPrerequisites?(node: DialogueNodeData): string;
   visibleOptions(node: DialogueNodeData): readonly VisibleDialogueOption[];
-  confirmOption(session: DialogueSession, visibleIndex: number): DialogueConfirmOutcome;
+  confirmOption(session: DialogueSession, visibleIndex: number, displayedRawIndex?: number): DialogueConfirmOutcome;
 }
 
 export interface DialoguePanelOptions {
@@ -95,6 +95,7 @@ export class DialoguePanel {
   private openState = false;
   private bodyPage = 0;
   private optionPage = 0;
+  private displayedRawIndex: number | undefined;
   private bodyPages: string[] = [''];
   private optionPages: string[] = [''];
 
@@ -224,7 +225,7 @@ export class DialoguePanel {
       return;
     }
     if (this.controller !== null) {
-      const outcome = this.controller.confirmOption(session, this.selection);
+      const outcome = this.controller.confirmOption(session, this.selection, this.displayedRawIndex);
       this.feedback = outcome.feedback;
       this.feedbackWarn = !outcome.advanced;
       this.selection = outcome.advanced ? 0 : this.selection;
@@ -286,6 +287,7 @@ export class DialoguePanel {
     body.setText(this.bodyPages[this.bodyPage]!);
     if (this.feedbackWarn) body.setColor(UI.feedbackWarn);
     const choice = visible[this.selection];
+    this.displayedRawIndex = choice?.index;
     this.optionPages = [''];
     if (choice !== undefined) {
       const optionY = top + panelHeight - PADDING - hintHeight - optionHeight;

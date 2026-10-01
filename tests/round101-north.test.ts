@@ -71,7 +71,7 @@ describe('Round101 ordered objectives',()=>{
 });
 describe('Round101 choices and records',()=>{
  it('assembles all shipped northern option references without dropping choices',()=>{
-  const r=run();const a=assembleDialogueReferences({conversations:r.dialogues,quests:r.ctx.quests,items:r.ctx.items,placedNpcIds:r.npcIds,knowledgeNodeIds:new Set(r.ctx.knowledgeNodes.keys()),factionIds:new Set(),martialArtIds:new Set(r.ctx.martialArts.keys()),timeOfDayPeriodIds:new Set(['period.night'])});expect(a.warnings).toEqual([]);
+  const r=run();const a=assembleDialogueReferences({conversations:r.dialogues,quests:r.ctx.quests,items:r.ctx.items,placedNpcIds:r.npcIds,knowledgeNodeIds:new Set(r.ctx.knowledgeNodes.keys()),factionIds:new Set(),martialArtIds:new Set(r.ctx.martialArts.keys()),timeOfDayPeriodIds:new Set(['period.night']),weatherIds:new Set(read('worldview/climate.json').weathers.map((w:{id:string})=>w.id))});expect(a.warnings).toEqual([]);
  });
  it.each(['open','limited'])('code %s has material/social cost, repeat lock and north-terrace echo',branch=>{
   const r=run();complete(r,BEACON);choose(r,DG,'greet','r101-code-choice');choose(r,DG,'r101-code-choice','r101-code-'+branch);

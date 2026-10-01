@@ -214,6 +214,16 @@
             "kind": { "const": "timeOfDay" },
             "periodId": { "type": "string", "minLength": 1, "maxLength": 64 }
           }
+        },
+        {
+          "description": "当前地区气候天气等于weatherId；引用在装配期核对，未知或上下文缺失不放行。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "weatherId"],
+          "properties": {
+            "kind": { "const": "weather" },
+            "weatherId": { "type": "string", "minLength": 1, "maxLength": 128 }
+          }
         }
       ]
     },

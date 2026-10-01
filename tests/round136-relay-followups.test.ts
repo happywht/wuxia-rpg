@@ -1,3 +1,4 @@
+import { addWeatherPatrol } from '../scripts/lib/round141-weather-dialogue.mjs';
 import { readFileSync } from 'node:fs';
 import { describe, it, expect } from 'vitest';
 import { relays, people, deepenPeopleConversation } from '../scripts/lib/round105-people-content.mjs';
@@ -19,7 +20,7 @@ describe('Round136 remembered branch consequences', () => {
       const before = structuredClone(c);
       before.nodes = before.nodes.filter(n => !n.id.startsWith('r136-'));
       for (const node of before.nodes) if (node.options) node.options = node.options.filter(o => !o.nextNodeId?.startsWith('r136-'));
-      expect(addRelayFollowups(before, relays)).toEqual(c);
+      expect(addWeatherPatrol(addRelayFollowups(before, relays))).toEqual(c);
       for (const [i] of relay.variants.entries()) {
         const node = c.nodes.find(n => n.id === `r136-${relay.key}-followup-${i}`)!;
         expect(node.text).toBe(relayFollowups[relay.key]![i]);

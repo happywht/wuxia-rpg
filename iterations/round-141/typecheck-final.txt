@@ -1,0 +1,5 @@
+
+> wuxia-rpg@0.0.1 typecheck
+> tsc --noEmit
+
+tests/round136-relay-followups.test.ts(1,34): error TS7016: Could not find a declaration file for module '../scripts/lib/round141-weather-dialogue.mjs'. 'D:/工作/城建院/2609/收心/wuxia-rpg/scripts/lib/round141-weather-dialogue.mjs' implicitly has an 'any' type.

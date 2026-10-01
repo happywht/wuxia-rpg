@@ -1,0 +1,94 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round92-north-pass.test.ts (7 tests | 1 failed) 745ms
+   ❯ Round 92 North Pass (Snowlit Pass) (7)
+     × re-runs the Round 92, 93, 91 and 87 generators safely without drifting shipped data 156ms
+ ❯ tests/round93-snow-pine-valley.test.ts (7 tests | 1 failed) 827ms
+   ❯ Round 93 Snow Pine Valley (Frostpine Valley) (7)
+     × re-runs the Round 93, 92, 91 and 87 generators in either chronology without drifting shipped data 165ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round92-north-pass.test.ts > Round 92 North Pass (Snowlit Pass) > re-runs the Round 92, 93, 91 and 87 generators safely without drifting shipped data
+AssertionError: node:internal/modules/esm/resolve:274
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\Users\Hitao\AppData\Local\Temp\round92-generators-HvRKZv\scripts\lib\round141-weather-dialogue.mjs' imported from C:\Users\Hitao\AppData\Local\Temp\round92-generators-HvRKZv\scripts\lib\round105-people-content.mjs
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:783:12)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:707:25)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:690:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:307:38)
+    at ModuleJob._link (node:internal/modules/esm/module_job:183:49) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///C:/Users/Hitao/AppData/Local/Temp/round92-generators-HvRKZv/scripts/lib/round141-weather-dialogue.mjs'
+}
+
+Node.js v22.18.0
+: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/round92-north-pass.test.ts:433:38
+    431|       const r92 = run('scripts/generate-round92-north-pass.mjs');
+    432|       expect(r92.error).toBeUndefined();
+    433|       expect(r92.status, r92.stderr).toBe(0);
+       |                                      ^
+    434|       expect(r92.stdout).toContain('Rebuilt the Round 92 extension');
+    435|       const r93 = run('scripts/generate-round93-snow-pine-valley.mjs');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/round93-snow-pine-valley.test.ts > Round 93 Snow Pine Valley (Frostpine Valley) > re-runs the Round 93, 92, 91 and 87 generators in either chronology without drifting shipped data
+AssertionError: node:internal/modules/esm/resolve:274
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\Users\Hitao\AppData\Local\Temp\round93-generators-6ThOio\scripts\lib\round141-weather-dialogue.mjs' imported from C:\Users\Hitao\AppData\Local\Temp\round93-generators-6ThOio\scripts\lib\round105-people-content.mjs
+    at finalizeResolution (node:internal/modules/esm/resolve:274:11)
+    at moduleResolve (node:internal/modules/esm/resolve:859:10)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at ModuleLoader.defaultResolve (node:internal/modules/esm/loader:783:12)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:707:25)
+    at ModuleLoader.resolve (node:internal/modules/esm/loader:690:38)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:307:38)
+    at ModuleJob._link (node:internal/modules/esm/module_job:183:49) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///C:/Users/Hitao/AppData/Local/Temp/round93-generators-6ThOio/scripts/lib/round141-weather-dialogue.mjs'
+}
+
+Node.js v22.18.0
+: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/round93-snow-pine-valley.test.ts:460:38
+    458|       const r93 = run('scripts/generate-round93-snow-pine-valley.mjs');
+    459|       expect(r93.error).toBeUndefined();
+    460|       expect(r93.status, r93.stderr).toBe(0);
+       |                                      ^
+    461|       expect(r93.stdout).toContain('Rebuilt the Round 93 extension');
+    462|       const r92 = run('scripts/generate-round92-north-pass.mjs');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 3 passed (5)
+      Tests  2 failed | 50 passed (52)
+   Start at  06:00:18
+   Duration  2.28s (tests 50%, import 31%, transform 19%, worker 1%)
+
+    Isolate  5 workers spawned · ~172ms startup each (spawn + environment, per file)
+             at least ~257ms faster with isolate: false — reuses workers across files instead of one per file

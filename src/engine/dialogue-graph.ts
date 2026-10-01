@@ -61,7 +61,8 @@ export type DialogueConditionData =
   | { kind: 'npcKnows'; npcId?: string; nodeId: string }
   | { kind: 'factionMembership'; factionId?: string; isMember: boolean }
   | { kind: 'martialArtEligible'; martialArtId: string }
-  | { kind: 'timeOfDay'; periodId: string };
+  | { kind: 'timeOfDay'; periodId: string }
+  | { kind: 'weather'; weatherId: string };
 
 /**
  * One effect executed when its option is confirmed. The runtime validates
@@ -280,6 +281,11 @@ function parseCondition(raw: unknown): DialogueConditionData | null {
       if (!hasOnlyKeys(source, ['kind', 'martialArtId'])) return null;
       const martialArtId = requireNonEmptyString(source.martialArtId);
       return martialArtId === null ? null : { kind: 'martialArtEligible', martialArtId };
+    }
+    case 'weather': {
+      if (!hasOnlyKeys(source, ['kind', 'weatherId'])) return null;
+      const weatherId = requireNonEmptyString(source.weatherId);
+      return weatherId === null ? null : { kind: 'weather', weatherId };
     }
     case 'timeOfDay': {
       if (!hasOnlyKeys(source, ['kind', 'periodId'])) return null;

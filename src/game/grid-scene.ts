@@ -59,7 +59,7 @@ import {
 import {
   type DialogueRuntimeContext,
   applyDialogueEffects,
-  getVisibleOptions,
+  dialogueChoiceForConfirmation,
   getVisibleOptionsForDisplay,
 } from '../engine/dialogue-runtime';
 import { GameClock } from '../engine/game-calendar';
@@ -4285,8 +4285,8 @@ export class GridScene extends Phaser.Scene {
       oralPrerequisites: (node) => describeOralPrerequisites(node, this.dialogueContextFor(target.record.id)),
       visibleOptions: (node) =>
         getVisibleOptionsForDisplay(node, this.dialogueContextFor(target.record.id)),
-      confirmOption: (session, visibleIndex) =>
-        this.confirmDialogueOption(target.record.id, session, visibleIndex),
+      confirmOption: (session, visibleIndex, displayedRawIndex) =>
+        this.confirmDialogueOption(target.record.id, session, visibleIndex, displayedRawIndex),
     });
     this.updateInteractHint();
   }
@@ -4309,6 +4309,7 @@ export class GridScene extends Phaser.Scene {
       martialArts: this.progression.martialArts,
       factionState: this.factionState,
       timeOfDayPeriodId: this.clock?.currentPeriod().id ?? '',
+      weatherId: this.currentClimate()?.weather.id,
       companions: this.companions,
       companionState: this.companionState,
     };
@@ -4326,12 +4327,12 @@ export class GridScene extends Phaser.Scene {
     speakerNpcId: string,
     session: DialogueSession,
     visibleIndex: number,
+    displayedRawIndex?: number,
   ): DialogueConfirmOutcome {
     const context = this.dialogueContextFor(speakerNpcId);
-    const visible = getVisibleOptions(session.currentNode, context);
-    const choice = visible[visibleIndex];
+    const choice = dialogueChoiceForConfirmation(session.currentNode, context, visibleIndex, displayedRawIndex);
     if (choice === undefined) {
-      return { advanced: false, feedback: null };
+      return { advanced: false, feedback: displayedRawIndex === undefined ? null : '选项条件已变化，请重新选择。' };
     }
     const effects = choice.option.effects ?? [];
     if (effects.length > 0) {

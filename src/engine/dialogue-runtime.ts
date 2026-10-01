@@ -107,6 +107,8 @@ export interface DialogueRuntimeContext {
   factionState: FactionMembershipState;
   /** Current in-game day-period id the `timeOfDay` condition compares to. */
   timeOfDayPeriodId: string;
+  /** Current regional weather; absent in legacy/empty contexts means unavailable. */
+  weatherId?: string;
   /** Optional for older headless consumers; required when companion effects are authored. */
   companions?: ReadonlyMap<string, CompanionData>;
   companionState?: CompanionState;
@@ -129,6 +131,8 @@ export interface DialogueReferenceAssemblyInput {
   martialArtIds: ReadonlySet<string>;
   /** Day-period ids declared by the loaded calendar (timeOfDay conditions). */
   timeOfDayPeriodIds: ReadonlySet<string>;
+  /** Weather ids declared by validated climate; optional for legacy consumers. */
+  weatherIds?: ReadonlySet<string>;
   companionIds?: ReadonlySet<string>;
 }
 
@@ -148,6 +152,7 @@ function optionReferences(option: DialogueOptionData): {
   factionIds: string[];
   martialArtIds: string[];
   periodIds: string[];
+  weatherIds: string[];
   companionIds: string[];
 } {
   const questIds: string[] = [];
@@ -157,6 +162,7 @@ function optionReferences(option: DialogueOptionData): {
   const factionIds: string[] = [];
   const martialArtIds: string[] = [];
   const periodIds: string[] = [];
+  const weatherIds: string[] = [];
   const companionIds: string[] = [];
   for (const condition of option.conditions ?? []) {
     if (condition.kind === 'questStatus') questIds.push(condition.questId);
@@ -171,6 +177,7 @@ function optionReferences(option: DialogueOptionData): {
       factionIds.push(condition.factionId);
     } else if (condition.kind === 'martialArtEligible') martialArtIds.push(condition.martialArtId);
     else if (condition.kind === 'timeOfDay') periodIds.push(condition.periodId);
+    else if (condition.kind === 'weather') weatherIds.push(condition.weatherId);
   }
   for (const effect of option.effects ?? []) {
     if (effect.kind === 'acceptQuest' || effect.kind === 'abandonQuest') questIds.push(effect.questId);
@@ -184,7 +191,7 @@ function optionReferences(option: DialogueOptionData): {
     else if (effect.kind === 'learnMartialArt') martialArtIds.push(effect.martialArtId);
     else if (effect.kind === 'recruitCompanion') companionIds.push(effect.companionId);
   }
-  return { questIds, itemIds, npcIds, knowledgeNodeIds, factionIds, martialArtIds, periodIds, companionIds };
+  return { questIds, itemIds, npcIds, knowledgeNodeIds, factionIds, martialArtIds, periodIds, weatherIds, companionIds };
 }
 
 /**
@@ -229,6 +236,9 @@ export function assembleDialogueReferences(
         }
         for (const periodId of references.periodIds) {
           if (!input.timeOfDayPeriodIds.has(periodId)) problems.push(`引用无效时段 "${periodId}"`);
+        }
+        for (const weatherId of references.weatherIds) {
+          if (!input.weatherIds?.has(weatherId)) problems.push(`引用无效天气 "${weatherId}"`);
         }
         for (const companionId of references.companionIds) {
           if (!input.companionIds?.has(companionId)) problems.push(`引用无效伙伴 "${companionId}"`);
@@ -332,6 +342,8 @@ export function isConditionMet(
         factionId: context.factionState.membership?.factionId ?? null,
       }).eligible;
     }
+    case 'weather':
+      return context.weatherId !== undefined && context.weatherId === condition.weatherId;
     case 'timeOfDay':
       // The context carries the clock's current period id (reference
       // assembly removed dangling ids, so an unknown id never matches).
@@ -364,6 +376,16 @@ export function getVisibleOptions(
     }
   }
   return visible;
+}
+
+/** Revalidate both live conditions and the last displayed raw option identity. */
+export function dialogueChoiceForConfirmation(
+  node: Readonly<DialogueNodeData>, context: Readonly<DialogueRuntimeContext>,
+  visibleIndex: number, displayedRawIndex?: number,
+): VisibleDialogueOption | undefined {
+  const choice = getVisibleOptions(node, context)[visibleIndex];
+  return choice !== undefined && (displayedRawIndex === undefined || choice.index === displayedRawIndex)
+    ? choice : undefined;
 }
 
 // ---------------------------------------------------------------------------
