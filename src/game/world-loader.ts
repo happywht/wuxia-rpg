@@ -48,7 +48,7 @@ import {
 import { assembleDialogueReferences } from '../engine/dialogue-runtime';
 import { assembleCompanions, parseCompanionSet, type CompanionData, type CompanionSetData } from '../engine/companion-system';
 import { type GameCalendarData, parseGameCalendar } from '../engine/game-calendar';
-import { type ClimateData, parseClimate } from '../engine/climate-system';
+import { type ClimateData, parseClimate, validateClimateRegions } from '../engine/climate-system';
 import {
   type CharacterProfileData,
   type FactionData,
@@ -476,6 +476,8 @@ export async function loadWorldData(): Promise<WorldLoadOutcome> {
     if (!parsedWorldMap.ok) {
       return { ok: false, title: '世界地图数据结构不合规', lines: parsedWorldMap.errors };
     }
+    const climateRegionErrors = validateClimateRegions(parsedClimate.climate, new Set(parsedWorldMap.data.regions.map(region => region.mapResourceId)));
+    if (climateRegionErrors.length > 0) return { ok: false, title: '地域气候引用校验未通过', lines: climateRegionErrors };
 
     const maps = new Map<string, GridMap>();
     for (const resource of result.resources.values()) {

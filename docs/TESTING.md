@@ -231,3 +231,7 @@ Round 112 最终门槛：最终 npm run build exit0：100资源Schema、默认�
 专项2文件19测试通过；11项新增调查导航回归覆盖实际E协议、方向/距离/视线、五组条件、真实北台失败检查点、占位阻断、已完成一次事件、春季无雪提示。实际键盘前后截图与正常第三档保护记录在iterations/round-113/playtest.md；完整门槛见verification.md。
 
 Round113最终build：103文件851测试、100资源Schema、默认MOD静态覆盖检查、类型、R34/R48审计与Vite生产构建通过；大分块提示保留，发行包未验收。
+
+## Round114 更新
+
+地域气候以可选regionalWeatherProfiles落地，旧MOD省略时沿用季节天气；当前地图的HUD/粒子/移动耗时/事件/导航保持一致，存档协议不变。北境春季天气阻断解除，仍需夜间落雪。R行旅建议明确真实出口坐标与无补给长路；没有缩短地图或注入天气。协议详见CLIMATE.md，真实账本及验证边界详见../iterations/round-114/playtest.md和verification.md。北境整章和完整目标尚未通过，继续Round115。

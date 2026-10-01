@@ -115,8 +115,23 @@ export interface ClimateData {
   id: string;
   seasons: readonly ClimateSeasonData[];
   weathers: readonly ClimateWeatherData[];
+  /** Optional local distributions; absent maps retain their seasonal table. */
+  regionalWeatherProfiles?: readonly RegionalWeatherProfile[];
   /** Optional for old climate MODs and saves that predate tide simulation. */
   tideCycle?: ClimateTideCycleData;
+}
+
+export interface RegionalWeatherProfile {
+  id: string;
+  name: string;
+  mapResourceIds: string[];
+  weatherWeights: { weatherId: string; weight: number }[];
+}
+
+/** Validate authored region references without making degraded optional maps fatal. */
+export function validateClimateRegions(climate: ClimateData, declaredMapIds: ReadonlySet<string>): string[] {
+  return (climate.regionalWeatherProfiles ?? []).flatMap(profile => profile.mapResourceIds
+    .filter(id => !declaredMapIds.has(id)).map(id => `地域气候 "${profile.id}" 引用未登记区域 "${id}"`));
 }
 
 export type ClimateParseResult =
@@ -429,6 +444,43 @@ export function parseClimate(
     }
   }
 
+  const regionalWeatherProfiles: RegionalWeatherProfile[] = [];
+  const rawProfiles = raw.regionalWeatherProfiles;
+  if (rawProfiles !== undefined) {
+    const claimedMaps = new Set<string>();
+    const profileIds = new Set<string>();
+    if (!Array.isArray(rawProfiles) || rawProfiles.length < 1 || rawProfiles.length > 64) {
+      errors.push('regionalWeatherProfiles：应为1–64项地域天气表');
+    } else rawProfiles.forEach((entry, index) => {
+      const label = `regionalWeatherProfiles[${index}]`;
+      if (!isPlainObject(entry)) { errors.push(`${label}：应为对象`); return; }
+      const id = requireNonEmptyString(entry.id), name = requireNonEmptyString(entry.name);
+      if (!id || profileIds.has(id)) errors.push(`${label}.id：为空或重复`);
+      if (id) profileIds.add(id);
+      if (!name) errors.push(`${label}.name：应为非空显示名`);
+      const mapResourceIds: string[] = [];
+      if (!Array.isArray(entry.mapResourceIds) || entry.mapResourceIds.length < 1 || entry.mapResourceIds.length > 64) {
+        errors.push(`${label}.mapResourceIds：应为1–64张地图`);
+      } else for (const value of entry.mapResourceIds) {
+        const mapId = requireNonEmptyString(value);
+        if (!mapId || claimedMaps.has(mapId)) errors.push(`${label}.mapResourceIds：为空或地图重复归属`);
+        else { claimedMaps.add(mapId); mapResourceIds.push(mapId); }
+      }
+      const weatherWeights: RegionalWeatherProfile['weatherWeights'] = [];
+      const seen = new Set<string>();
+      if (!Array.isArray(entry.weatherWeights) || entry.weatherWeights.length < 1 || entry.weatherWeights.length > MAX_WEIGHT_ENTRIES) {
+        errors.push(`${label}.weatherWeights：应为1–${MAX_WEIGHT_ENTRIES}项`);
+      } else for (const value of entry.weatherWeights) {
+        const weatherId = isPlainObject(value) ? requireNonEmptyString(value.weatherId) : null;
+        const weight = isPlainObject(value) ? requireIntegerInRange(value.weight, 0, MAX_WEIGHT) : null;
+        if (!weatherId || !weatherById.has(weatherId) || seen.has(weatherId) || weight === null) {
+          errors.push(`${label}.weatherWeights：天气未声明、重复或权重无效`);
+        } else { seen.add(weatherId); weatherWeights.push({ weatherId, weight }); }
+      }
+      if (weatherWeights.reduce((sum, e) => sum + e.weight, 0) <= 0) errors.push(`${label}.weatherWeights：权重和必须为正`);
+      if (id && name) regionalWeatherProfiles.push({ id, name, mapResourceIds, weatherWeights });
+    });
+  }
   const tideCycle = parseTideCycle((raw as { tideCycle?: unknown }).tideCycle, errors);
 
   if (errors.length > 0) {
@@ -440,6 +492,7 @@ export function parseClimate(
       id: (raw as { id: string }).id,
       seasons,
       weathers,
+      ...(rawProfiles === undefined ? {} : { regionalWeatherProfiles }),
       ...(tideCycle === undefined ? {} : { tideCycle }),
     },
   };
@@ -567,10 +620,17 @@ export class ClimateRuntime {
    * always return the identical weather entry; crossing a day or a season
    * boundary simply re-derives from the new date.
    */
-  weatherForDay(worldSeed: number, stamp: CalendarTimestamp): ClimateWeatherData {
-    const season = this.seasonForStamp(stamp);
+  weatherForDay(worldSeed: number, stamp: CalendarTimestamp, mapResourceId?: string): ClimateWeatherData {
     const roll = weatherRoll(worldSeed, this.dayIndexOf(stamp));
-    return this.drawWeather(season, roll);
+    return this.drawWeather({ weatherWeights: this.weatherWeightsForStamp(stamp, mapResourceId) }, roll);
+  }
+
+  regionalProfileForMap(mapResourceId?: string): RegionalWeatherProfile | undefined {
+    return mapResourceId === undefined ? undefined : this.climateData.regionalWeatherProfiles?.find(profile => profile.mapResourceIds.includes(mapResourceId));
+  }
+
+  weatherWeightsForStamp(stamp: CalendarTimestamp, mapResourceId?: string): readonly { weatherId: string; weight: number }[] {
+    return this.regionalProfileForMap(mapResourceId)?.weatherWeights ?? this.seasonForStamp(stamp).weatherWeights;
   }
 
   /** Current named tide phase, or null for legacy climate resources without a cycle. */
@@ -586,7 +646,7 @@ export class ClimateRuntime {
   }
 
   /** Weighted-table draw with `roll` in [0, 1); exposed for direct testing. */
-  drawWeather(season: ClimateSeasonData, roll: number): ClimateWeatherData {
+  drawWeather(season: { weatherWeights: readonly { weatherId: string; weight: number }[] }, roll: number): ClimateWeatherData {
     const entries = season.weatherWeights.filter((entry) => entry.weight > 0);
     const total = entries.reduce((sum, entry) => sum + entry.weight, 0);
     let cursor = roll * total;

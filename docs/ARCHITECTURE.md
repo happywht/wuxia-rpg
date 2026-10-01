@@ -319,5 +319,9 @@ exclusive Container.remove 将子对象返回 DisplayList，场景 ADDED_TO_SCEN
 
 本轮不改engine/game或Schema。脚本lib/round112-cloud-routes只处理云岭作者资料：复制的不透明地坪归入普通地面纹理，树/石/其余客舍层保持逐行前景，清出四条石路及现有关口缓冲。R74复制源过滤round76追加层，R78排除地坪；R112覆写步骤补回对白、有限库存店铺、NPC绑定与指南。正常运行继续复用shopStock/v1保存及动态指南库存过滤。不能把所有前景降低作为遮挡解决方案。
 
-## 截至 Round 113
-调查导航复用region-event-navigation与实际E选择器，导航条件上下文仅为运行时派生，不增加v1存档字段。Q/R/HUD/M共享允许方向、范围与视线；时间天气门槛不改变。真实春季落雪不可达已记录，区域气候待Round114；完整深化目标未验收。
+## 截至 Round 114
+调查导航复用region-event-navigation与实际E选择器，Q/R/HUD/M共享允许方向、范围、视线和当前天气条件。地域气候协议已在北境三图接入，修复春季无雪阻断；旧MOD季节表和v1存档字段保留。夜间及落雪调查门槛仍有效，完整深化目标未验收。
+
+## Round114 更新
+
+地域气候以可选regionalWeatherProfiles落地，旧MOD省略时沿用季节天气；当前地图的HUD/粒子/移动耗时/事件/导航保持一致，存档协议不变。北境春季天气阻断解除，仍需夜间落雪。R行旅建议明确真实出口坐标与无补给长路；没有缩短地图或注入天气。协议详见CLIMATE.md，真实账本及验证边界详见../iterations/round-114/playtest.md和verification.md。北境整章和完整目标尚未通过，继续Round115。

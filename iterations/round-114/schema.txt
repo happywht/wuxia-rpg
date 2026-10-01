@@ -1,0 +1,1 @@
+通过：manifest Schema 与 100 个基础资源 Schema。

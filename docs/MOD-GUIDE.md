@@ -75,3 +75,7 @@ world-map可省略regionGuides；每条mapResourceId/role(hub/investigation/chal
 ## Round 108 结局路径与回响
 
 同路径覆盖ending-set可使用可选unlockRoutes和epilogueSections；具体字段/数量见DATA-GUIDE.md。原路径仍参与评估，替代路径为OR，不能把互斥选择写成一个AND；original为保留路线id。variants按顺序取首个满足条件项，必须提供fallbackText以兼容缺少新见闻的旧档。条件引用必须存在，否则运行时隔离所属结局并给出诊断，其他结局可用。资料源不保存评估后文本；选择时解析副本，章节文本保持数据驱动。
+
+## Round114 更新
+
+地域气候以可选regionalWeatherProfiles落地，旧MOD省略时沿用季节天气；当前地图的HUD/粒子/移动耗时/事件/导航保持一致，存档协议不变。北境春季天气阻断解除，仍需夜间落雪。R行旅建议明确真实出口坐标与无补给长路；没有缩短地图或注入天气。协议详见CLIMATE.md，真实账本及验证边界详见../iterations/round-114/playtest.md和verification.md。北境整章和完整目标尚未通过，继续Round115。

@@ -59,6 +59,8 @@ describe('Round 88 mist weather and watch schedule', () => {
     expect(climate.weathers.find(({ id }) => id === 'weather.snow')?.precipitation?.kind).toBe('snow');
 
     const legacy = structuredClone(CLIMATE_RAW);
+    // This fixture represents pre-mist data, before regional profiles existed.
+    delete legacy.regionalWeatherProfiles;
     legacy.weathers = legacy.weathers.filter(({ id }: { id: string }) => id !== 'weather.mist');
     for (const season of legacy.seasons) {
       season.weatherWeights = season.weatherWeights.filter(

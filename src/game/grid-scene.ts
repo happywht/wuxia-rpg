@@ -2781,7 +2781,8 @@ export class GridScene extends Phaser.Scene {
 
   private navigationEventContext(): NavigationEventContext {
     const reading = this.currentClimate();
-    return { ...this.regionEventContext(), completedEventIds: this.completedRegionalEvents, ...(reading ? { possibleWeatherIds: new Set(reading.season.weatherWeights.filter(entry => entry.weight > 0).map(entry => entry.weatherId)) } : {}), conditionLabel: (kind, id) => {
+    const localWeights = this.clock && this.climateRuntime ? this.climateRuntime.weatherWeightsForStamp(this.clock.snapshot(), this.currentMapResourceId) : undefined;
+    return { ...this.regionEventContext(), completedEventIds: this.completedRegionalEvents, ...(reading && localWeights ? { possibleWeatherIds: new Set(localWeights.filter(entry => entry.weight > 0).map(entry => entry.weatherId)) } : {}), conditionLabel: (kind, id) => {
       const records = kind === 'period' ? this.world?.calendar.periods
         : kind === 'weather' ? this.world?.climate.weathers : this.world?.climate.tideCycle?.phases;
       return records?.find(record => record.id === id)?.name;
@@ -2961,6 +2962,7 @@ export class GridScene extends Phaser.Scene {
     season: ClimateSeasonData;
     weather: ClimateWeatherData;
     tide: ClimateTidePhaseData | null;
+    regionalClimateName?: string;
   } | null {
     const clock = this.clock;
     const climate = this.climateRuntime;
@@ -2970,8 +2972,9 @@ export class GridScene extends Phaser.Scene {
     const stamp = clock.snapshot();
     return {
       season: climate.seasonForStamp(stamp),
-      weather: climate.weatherForDay(this.worldSeed, stamp),
+      weather: climate.weatherForDay(this.worldSeed, stamp, this.currentMapResourceId),
       tide: climate.tideForStamp(stamp),
+      regionalClimateName: climate.regionalProfileForMap(this.currentMapResourceId)?.name,
     };
   }
 
@@ -2984,7 +2987,8 @@ export class GridScene extends Phaser.Scene {
     const { season, weather, tide } = reading;
     const movementNote = weather.stepMinutes > 0 ? ` · 行走 +${weather.stepMinutes} 分/格` : '';
     const tideNote = tide === null ? '' : ` · 潮位：${tide.name}`;
-    this.hudLines.climate = `${season.name} · ${weather.name}${tideNote}${movementNote}`;
+    const regionalNote = reading.regionalClimateName ? ` · ${reading.regionalClimateName}` : '';
+    this.hudLines.climate = `${season.name}${regionalNote} · ${weather.name}${tideNote}${movementNote}`;
     this.relayoutHud();
     if (
       this.lastClimateSeasonId === season.id &&

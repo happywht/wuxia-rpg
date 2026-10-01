@@ -125,5 +125,34 @@
       "stepMinutes": 1,
       "precipitation": { "kind": "fog", "density": 0.38 }
     }
+  ],
+  "regionalWeatherProfiles": [
+    {
+      "id": "climate.r114-north-highland",
+      "name": "高寒北境",
+      "mapResourceIds": [
+        "map.round-92-north-pass",
+        "map.round-93-snow-pine-valley",
+        "map.round-94-east-gate"
+      ],
+      "weatherWeights": [
+        {
+          "weatherId": "weather.snow",
+          "weight": 50
+        },
+        {
+          "weatherId": "weather.cloudy",
+          "weight": 25
+        },
+        {
+          "weatherId": "weather.clear",
+          "weight": 15
+        },
+        {
+          "weatherId": "weather.mist",
+          "weight": 10
+        }
+      ]
+    }
   ]
 }
