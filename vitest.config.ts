@@ -22,6 +22,9 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['tests/**/*.test.ts'],
+    // Keep schema-heavy suites from competing for CPU with the live preview.
+    // Round110's unrestricted run spawned 100 workers and hit four 5s limits.
+    maxWorkers: 2,
     benchmark: {
       include: ['tests/**/*.bench.ts'],
       // The render benchmark intentionally keeps Vitest's module runner (and

@@ -28,7 +28,8 @@ export interface RegionalGuideInput {
   travelMinutes?: number;
 }
 export const REGION_ROLE_LABELS = { hub: '枢纽', investigation: '调查', challenge: '挑战', transit: '过境' } as const;
-function liveNpc(input: RegionalGuideInput, id: string): PlacedNpc | undefined {
+/** Live NPC cell for one stable id: follower placement wins, then current-map, period and base records. */
+export function resolveRegionGuideNpc(input: RegionalGuideInput, id: string): PlacedNpc | undefined {
   const follower = input.follower;
   if (follower?.npc.record.id === id) return { ...follower.npc, col: follower.col, row: follower.row,
     record: { ...follower.npc.record, mapResourceId: follower.mapResourceId } };
@@ -40,7 +41,7 @@ export function resolveRegionalGuideDestination(input: RegionalGuideInput, selec
   if (!selector.startsWith(REGION_GUIDE_PREFIX)) return null;
   const token = selector.slice(REGION_GUIDE_PREFIX.length);
   if (token.startsWith('npc:')) {
-    const npc=liveNpc(input,token.slice(4)); if (!npc) return null;
+    const npc=resolveRegionGuideNpc(input,token.slice(4)); if (!npc) return null;
     return { mapResourceId: npc.record.mapResourceId, col:npc.col,row:npc.row,name:npc.record.name,approachRadius:1,
       arrivalAction:input.follower?.npc.record.id === npc.record.id ? 'companion' : npc.record.shopId !== null && input.shops.get(npc.record.shopId)?.record.npcId === npc.record.id ? 'shop' : 'talk' };
   }
@@ -55,7 +56,7 @@ export function buildRegionalGuideEntries(input: RegionalGuideInput): RegionGuid
   const result:RegionGuideEntry[]=[];
   const supplies:{entry:RegionGuideEntry;legs:number}[]=[];
   for(const shop of input.shops.values()) {
-    const npc=liveNpc(input,shop.record.npcId);if(!npc||npc.record.shopId!==shop.record.id)continue;
+    const npc=resolveRegionGuideNpc(input,shop.record.npcId);if(!npc||npc.record.shopId!==shop.record.id)continue;
     const route=findWorldTravelRoute(input.worldMap,input.currentMapResourceId,npc.record.mapResourceId);if(!route)continue;
     const medicines=shop.stock.flatMap(stock=>{
       const item=input.items.get(stock.itemId);const remaining=input.shopStocks.get(shop.record.id)?.get(stock.itemId) ?? stock.quantity;
@@ -77,7 +78,7 @@ export function buildRegionalGuideEntries(input: RegionalGuideInput): RegionGuid
   const locals=supplies.filter(s=>s.legs===0);const offered=locals.length?locals:supplies.sort((a,b)=>a.legs-b.legs||a.entry.id.localeCompare(b.entry.id)).filter((s,_i,array)=>s.legs===array[0]?.legs);
   result.push(...offered.map(s=>s.entry));
   const ids=new Set(input.baseNpcs.map(n=>n.record.id));
-  for(const id of ids){const npc=liveNpc(input,id);if(!npc||npc.record.mapResourceId!==input.currentMapResourceId)continue;result.push({id:'people:'+id,category:'people',title:npc.record.name,
+  for(const id of ids){const npc=resolveRegionGuideNpc(input,id);if(!npc||npc.record.mapResourceId!==input.currentMapResourceId)continue;result.push({id:'people:'+id,category:'people',title:npc.record.name,
     detail:`当前 (${npc.col},${npc.row}) · ${input.follower?.npc.record.id===id?'真实同行位置':'位置随当前时段重算'}。F交谈${npc.record.shopId?'；E商铺':npc.record.questGiver?'；E查看差事名录':''}。`,destinationId:REGION_GUIDE_PREFIX+'npc:'+id});}
   for(const gate of input.worldMap.transitions.filter(g=>g.from.mapResourceId===input.currentMapResourceId)) {
     const destination=input.worldMap.regions.find(r=>r.mapResourceId===gate.to.mapResourceId)?.name??gate.to.mapResourceId;

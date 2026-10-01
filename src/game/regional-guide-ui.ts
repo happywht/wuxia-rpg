@@ -5,7 +5,10 @@ import {uiFontSize} from './settings';
 import type {RegionGuideCategory,RegionGuideEntry} from '../engine/regional-guide';
 export interface RegionalGuidePanelModel { name:string;role:string;advice:string;entries:readonly RegionGuideEntry[];onNavigate:(id:string)=>void }
 const categories:RegionGuideCategory[]=['supply','quest','people','exit','landmark','overview'];
-const labels:Record<RegionGuideCategory,string>={supply:'补给',quest:'活动差事',people:'人物',exit:'出区',landmark:'已知地标',overview:'说明'};
+/** Empty-state copy per category; the quest page names where to look next instead of a bare blank. */
+const emptyText:Record<RegionGuideCategory,string>={supply:'目前没有可达且有库存的生命/内力补给。可切出区查看去向。',quest:'暂无进行中或本地可接委托；人物页可查交谈。',people:'此分类当前没有可用条目。',exit:'此分类当前没有可用条目。',landmark:'此分类当前没有可用条目。',overview:'此分类当前没有可用条目。'};
+function emptyCategoryText(category:RegionGuideCategory|undefined):string{return category===undefined?'此分类当前没有可用条目。':emptyText[category];}
+const labels:Record<RegionGuideCategory,string>={supply:'补给',quest:'差事',people:'人物',exit:'出区',landmark:'已知地标',overview:'说明'};
 /** Read-only directory: Enter selects a walking guide, never performs its action. */
 export class RegionalGuidePanel {
  private container:Phaser.GameObjects.Container;
@@ -95,7 +98,7 @@ export class RegionalGuidePanel {
   cat.setPosition(innerX,catTop).setText(catUse.join('\n'));
   const entries=this.entries(),page=capacity>0?Math.floor(this.selected/capacity):0;
   const shown=capacity>0?entries.slice(page*capacity,page*capacity+capacity):[];
-  if(!entries.length)this.text(innerX,listTop,categories[this.category]==='supply'?'目前没有可达且有库存的生命/内力补给。可切出区查看去向。':'此分类当前没有可用条目。',12,UI_PALETTE.muted,innerW);
+  if(!entries.length)this.text(innerX,listTop,emptyCategoryText(categories[this.category]),12,UI_PALETTE.muted,innerW);
   else if(capacity===0)this.text(innerX,listTop,'面板空间不足：请在设置中调小字号或放大窗口后重新打开本页。',12,UI_PALETTE.muted,innerW);
   shown.forEach((entry,i)=>{const row=this.text(innerX,listTop+i*rowH,`${page*capacity+i===this.selected?'▶':'　'} ${entry.title}`,13,page*capacity+i===this.selected?UI_PALETTE.accent:UI_PALETTE.text);const lines=wrapDialogueText(row.text,width-60,s=>row.context.measureText(s).width);if(lines.length>1)row.setText(this.fitLine(`${lines[0]}…`,width-60,row));});
   // The detail band starts after the rows actually in use; its capacity is

@@ -1,5 +1,6 @@
 import {RegionalGuidePanel} from './regional-guide-ui';
 import {buildRegionalGuideEntries,resolveRegionalGuideDestination,REGION_GUIDE_PREFIX,REGION_ROLE_LABELS,type RegionalGuideInput,type RegionGuideEntry} from '../engine/regional-guide';
+import {buildQuestGuideEntries} from '../engine/quest-guide';
 import { nearestGuideNpc } from './quest-presentation';
 import { paddedWorldCameraBounds } from './world-camera-bounds';
 import Phaser from 'phaser';
@@ -3272,12 +3273,19 @@ export class GridScene extends Phaser.Scene {
     if(panel.isOpen){panel.close();return;}if(this.anyOverlayOpen()||this.moving||this.activeSession!==null)return;
     const input=this.regionalGuideInput();if(input===null)return;
     const world=input.worldMap,region=world.regions.find(r=>r.mapResourceId===this.currentMapResourceId),guide=world.regionGuides?.find(g=>g.mapResourceId===this.currentMapResourceId);
-    const entries:RegionGuideEntry[]=buildRegionalGuideEntries(input);
-    for(const state of this.questJournal.states.values())if(state.status==='active'){
-      const quest=this.quests.get(state.questId);if(!quest)continue;const resolution=this.resolveQuestNavigation(quest.id);
-      entries.push({id:'quest:'+quest.id,category:'quest',title:quest.name,detail:resolution.status==='no-target'?'下一步暂不是空间目标或相关资料不可用；Q日志可查看操作与资格。':resolution.target.objectiveText+' · '+resolution.target.name,
-        destinationId:resolution.status==='no-target'?null:resolution.target.id});
-    }
+    // Round 110: both quest bands (active journeys with their original
+    // objective navigation, plus commissions acceptable from local givers)
+    // come from the Phaser-free quest-guide helper. A non-null input already
+    // proves the loaded world exists.
+    const loaded=this.world!;
+    const entries:RegionGuideEntry[]=[
+      ...buildRegionalGuideEntries(input),
+      ...buildQuestGuideEntries({guide:input,quests:this.quests,journal:this.questJournal,
+        access:{factionId:this.factionState.membership?.factionId??null,knownKnowledgeNodeIds:this.knownKnowledgeNodeIds},
+        encounters:loaded.assembly.encounters,
+        craftingStations:[...loaded.assembly.equipmentForges,...loaded.assembly.alchemyStations],
+        knowledgeNodeTitles:new Map([...loaded.knowledgeGraph.nodes].map(([id,node])=>[id,node.title]))}),
+    ];
     panel.open({name:region?.name??this.currentMapResourceId,role:guide?REGION_ROLE_LABELS[guide.role]:'区域',
       advice:guide?.advice??'此资料未声明区域角色；以下入口从当前装配、库存和差事推导，导航只带路。',entries,
       onNavigate:id=>{this.navigationDestinationId=id;this.refreshNavigationGuide();this.updateInteractHint();}});
@@ -4374,6 +4382,7 @@ export class GridScene extends Phaser.Scene {
 
     const target = cellCenterOffset(map, targetCol, targetRow);
     const finishMove = (): void => {
+      this.setWorldActorDepth(marker, undefined, map.tileSize);
       this.moving = false;
       this.updatePlayerActorFrame(false);
       this.refreshCompanionFollower(previousCell);
@@ -4490,6 +4499,7 @@ export class GridScene extends Phaser.Scene {
     this.mapLayer.setScrollFactor(1);
     const center = cellCenterOffset(destinationMap, this.playerCol, this.playerRow);
     this.marker?.setPosition(this.mapOrigin.x + center.x, this.mapOrigin.y + center.y);
+    if (this.marker !== null) this.setWorldActorDepth(this.marker, undefined, destinationMap.tileSize);
     this.configureMapCamera(destinationMap, this.marker);
     this.renderNpcs(destinationMap);
     this.renderEncounterMarkers(destinationMap);
