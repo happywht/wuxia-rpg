@@ -1,6 +1,7 @@
 import type { CellPosition, GridMap } from './grid-map';
 import { findGridPath, findGridPathToAdjacentCell, type GridPathSurface } from './grid-path';
 import { selectVisibleWorldLandmarks, type WorldMapAssembly } from './world-map';
+import { findRegionEventInteractionPath, regionEventNavigationHint, type NavigationEventContext } from './region-event-navigation';
 import { findWorldTravelRoute } from './world-travel';
 
 /**
@@ -16,6 +17,7 @@ export interface WorldNavigationGuideSegment {
   destinationLandmarkId?: string;
   /** Control hint carried from quest targets; landmarks leave this unset. */
   arrivalAction?: NavigationArrivalAction;
+  inspectionHint?: string;
   destinationName: string;
   destinationRegionName: string;
   /** Current map's cell path, ending at a landmark or beside its next gate. */
@@ -69,6 +71,7 @@ export function resolveCellNavigationGuide(
   map: GridMap,
   playerPosition: CellPosition,
   blockedCells?: ReadonlySet<string>,
+  eventContext?: NavigationEventContext,
 ): WorldNavigationGuide {
   const route = findWorldTravelRoute(world, currentMapResourceId, destination.mapResourceId);
   if (route === null) return { status: 'route-broken', destinationName: destination.name };
@@ -81,8 +84,13 @@ export function resolveCellNavigationGuide(
 
   const nextLeg = route.legs[0];
   const navigationMap = withNavigationBlockers(map, blockedCells);
+  const inspection = nextLeg === undefined && (destination.arrivalAction === undefined || destination.arrivalAction === 'discover')
+    ? world.events.find(event => event.interaction && event.mapResourceId === destination.mapResourceId
+      && !(event.once && eventContext?.completedEventIds?.has(event.id))
+      && event.col === destination.col && event.row === destination.row) : undefined;
   const findPath = (surface: GridPathSurface) => nextLeg === undefined
-    ? destination.approachRadius === 1
+    ? inspection ? findRegionEventInteractionPath(surface, playerPosition, inspection)
+    : destination.approachRadius === 1
       // NPC and encounter cells are occupied at runtime but remain walkable
       // in static map data, so route to a real adjacent cell explicitly.
       ? findGridPathToAdjacentCell(surface, playerPosition, destination)
@@ -113,6 +121,7 @@ export function resolveCellNavigationGuide(
     path,
     regionRouteNames: route.regionNames,
     nextTransitionName: nextLeg?.transition.name ?? null,
+    ...(inspection ? { inspectionHint: regionEventNavigationHint(inspection, eventContext) } : {}),
     ...(destination.arrivalAction === undefined
       ? {}
       : { arrivalAction: destination.arrivalAction }),
@@ -132,6 +141,7 @@ export function resolveWorldNavigationGuide(
   map: GridMap,
   playerPosition: CellPosition,
   blockedCells?: ReadonlySet<string>,
+  eventContext?: NavigationEventContext,
 ): WorldNavigationGuide {
   const landmark = selectVisibleWorldLandmarks(world.landmarks, knownKnowledgeNodeIds)
     .find((candidate) => candidate.id === destinationLandmarkId);
@@ -150,6 +160,7 @@ export function resolveWorldNavigationGuide(
     map,
     playerPosition,
     blockedCells,
+    eventContext,
   );
   if (guide.status === 'target-lost' || guide.status === 'route-broken' || guide.status === 'route-blocked') {
     return guide;

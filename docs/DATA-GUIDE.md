@@ -428,3 +428,6 @@ RegionalGuideInput的liveCurrency与travelMinutes为可选运行期输入，来�
 新增shop.r112-cloud-waystation位于既有shops/round-06-shops.json，由既有char.r74-shen-yuji的shopId绑定，回春膏3/清心丸2，原价格15/12，售完本程不补货。E交易优先，Q查任务日志，F保留接任务及问话选项。旧v1缺新店库存时按资料初始化；购买后stock与资源正常存读，reload不补满。资料仍100资源；地图22、差事65、NPC38、物品52、武学30、图谱425/540不变。
 
 `node scripts/deepen-round112-cloud.mjs`为幂等局部更新。隔离测试覆盖R74→R76→R78→R112复现云岭；不建议在活跃未存旅程中重跑早期完整生成链，早期脚本仍会覆盖后续资料，需按现行覆写链补齐。舆图图素/锚点/50关口未改。
+
+## 截至 Round 113
+调查导航复用region-event-navigation与实际E选择器，导航条件上下文仅为运行时派生，不增加v1存档字段。Q/R/HUD/M共享允许方向、范围与视线；时间天气门槛不改变。真实春季落雪不可达已记录，区域气候待Round114；完整深化目标未验收。

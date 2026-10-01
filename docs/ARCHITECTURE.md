@@ -318,3 +318,6 @@ exclusive Container.remove 将子对象返回 DisplayList，场景 ADDED_TO_SCEN
 ## Round 112 既有区域深化
 
 本轮不改engine/game或Schema。脚本lib/round112-cloud-routes只处理云岭作者资料：复制的不透明地坪归入普通地面纹理，树/石/其余客舍层保持逐行前景，清出四条石路及现有关口缓冲。R74复制源过滤round76追加层，R78排除地坪；R112覆写步骤补回对白、有限库存店铺、NPC绑定与指南。正常运行继续复用shopStock/v1保存及动态指南库存过滤。不能把所有前景降低作为遮挡解决方案。
+
+## 截至 Round 113
+调查导航复用region-event-navigation与实际E选择器，导航条件上下文仅为运行时派生，不增加v1存档字段。Q/R/HUD/M共享允许方向、范围与视线；时间天气门槛不改变。真实春季落雪不可达已记录，区域气候待Round114；完整深化目标未验收。

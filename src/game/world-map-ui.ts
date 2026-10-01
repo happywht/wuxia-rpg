@@ -19,6 +19,7 @@ import {
 } from '../engine/world-atlas-view';
 import { buildWorldMapWaypoints, cycleWorldWaypointIndex, normalizeWorldMapPointer, type WorldMapWaypoint } from '../engine/world-navigation';
 import { resolveCellNavigationGuide } from '../engine/world-navigation-guidance';
+import type { NavigationEventContext } from '../engine/region-event-navigation';
 import { uiFontSize } from './settings';
 import { addPixelPanelChrome, UI_FONT_FAMILY } from './ui-theme';
 
@@ -80,6 +81,7 @@ export class WorldMapPanel {
   private routeDestinationText: Phaser.GameObjects.Text | null = null;
   private activeMap: GridMap | null = null;
   private worldMap: WorldMapAssembly | null = null;
+  private eventContext?: NavigationEventContext;
   private allMaps: ReadonlyMap<string, GridMap> = new Map();
   private waypoints: WorldMapWaypoint[] = [];
   private atlasOverlays: WorldAtlasOverlays | null = null;
@@ -204,6 +206,7 @@ export class WorldMapPanel {
     selectedDestinationId: string | null = null,
     supplementalQuestTargets: readonly QuestNavigationTarget[] = [],
     blockedCells: ReadonlySet<string> = new Set(),
+    eventContext?: NavigationEventContext,
   ): void {
     if (this.openState) return;
     this.openState = true;
@@ -214,6 +217,7 @@ export class WorldMapPanel {
     this.allMaps = maps;
     this.knownKnowledgeNodeIds = knownKnowledgeNodeIds;
     this.blockedCells = blockedCells;
+    this.eventContext = eventContext;
     this.viewMode = worldMap.data.atlasArt === undefined ? 'local' : 'world';
     this.bindKeys();
     this.scene.input.on('pointerdown', this.pointerDown);
@@ -700,6 +704,7 @@ export class WorldMapPanel {
       row: waypoint.position.row,
       name: waypoint.name,
       approachRadius: approachToGate ? 1 : waypoint.approachRadius,
+      ...(approachToGate ? { arrivalAction: 'travel' as const } : {}),
     };
     const resolveGuide = (blockers?: ReadonlySet<string>) => resolveCellNavigationGuide(
       worldMap,
@@ -708,6 +713,7 @@ export class WorldMapPanel {
       map,
       start,
       blockers,
+      this.eventContext,
     );
     const guide = resolveGuide(this.blockedCells);
     this.routeCells = guide.status === 'en-route' || guide.status === 'at-gate' || guide.status === 'arrived'
@@ -736,7 +742,8 @@ export class WorldMapPanel {
         : waypoint.kind === 'transition'
           ? `步行 ${steps} 格到关口旁，按 E 通过${detourNote}`
           : `步行 ${steps} 格 · 至地标或最近可行停靠点${detourNote}`);
-      this.routeDirectionsText?.setText(formatRouteDirections(this.routeCells));
+      this.routeDirectionsText?.setText(guide.status === 'arrived' && guide.inspectionHint
+        ? guide.inspectionHint : formatRouteDirections(this.routeCells));
     }
     if (waypoint.kind === 'remote-landmark' || waypoint.kind === 'remote-region') {
       this.routeDestinationText?.setText(`行程：${waypoint.regionRouteNames?.join(' → ') ?? waypoint.destinationRegionName ?? ''}`);

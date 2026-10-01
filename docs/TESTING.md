@@ -226,3 +226,8 @@ Round111 最终验证：npm run build exit0；101文件832测试（82.03秒）�
 新增8测试覆盖实际world-loader装配、地坪/前景分层、带NPC/遭遇占位的静态通路、七时段/关口/事件可达、有限成本与拒绝、v1 parse/preflight/restore、新店旧档默认库存、实际指南售罄后备、隔离生成链与非云岭保护；不是完整游戏光栅化。5文件44专项与类型检查通过，完整build结果见iterations/round-112/verification.md。真实浏览器正常E购买69银两、B用3膏、菜单保存/读回售罄与资源一致，25/36路线、北口过关和北境接取、普通动画角色可见见playtest。静态最短不冒充实际输入计数。
 
 Round 112 最终门槛：最终 npm run build exit0：100资源Schema、默认未启用MOD的静态覆盖检查、tsc、102文件840测试（2 worker）、文档34/48审计及Vite生产构建均通过；既有>500KB分块警告保留。最终日志build.txt，初次失败build-first.txt保留，未伪装首跑通过。
+
+## Round 113
+专项2文件19测试通过；11项新增调查导航回归覆盖实际E协议、方向/距离/视线、五组条件、真实北台失败检查点、占位阻断、已完成一次事件、春季无雪提示。实际键盘前后截图与正常第三档保护记录在iterations/round-113/playtest.md；完整门槛见verification.md。
+
+Round113最终build：103文件851测试、100资源Schema、默认MOD静态覆盖检查、类型、R34/R48审计与Vite生产构建通过；大分块提示保留，发行包未验收。

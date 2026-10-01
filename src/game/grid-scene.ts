@@ -217,6 +217,7 @@ import {
   resolveQuestNavigationTarget,
 } from '../engine/quest-navigation';
 import { deriveNpcRegionNames, LANDMARK_DESTINATION_PREFIX } from '../engine/world-navigation';
+import type { NavigationEventContext } from '../engine/region-event-navigation';
 import {
   arrivalActionHint,
   resolveCellNavigationGuide,
@@ -2706,13 +2707,13 @@ export class GridScene extends Phaser.Scene {
       // Quest targets name the existing control that acts on arrival; plain
       // landmark stops keep their original copy. Arrival is only proximity,
       // so the hint stays a suggestion and never reports an interaction.
-      const action = guide.arrivalAction === undefined
+      const action = guide.inspectionHint !== undefined ? `，${guide.inspectionHint}` : guide.arrivalAction === undefined
         ? ''
         : `，${arrivalActionHint(guide.arrivalAction)}`;
       this.hudLines.nav = `行路「${destinationName}」· 已抵达附近${action}。`;
       // A landmark is complete when reached; an NPC/encounter still needs its
       // interaction, so keep that quest pin selected until the objective moves.
-      if (this.navigationDestinationId?.startsWith(QUEST_NAVIGATION_ID_PREFIX) !== true) {
+      if (guide.inspectionHint === undefined && this.navigationDestinationId?.startsWith(QUEST_NAVIGATION_ID_PREFIX) !== true) {
         this.navigationDestinationId = null;
       }
     } else if (guide.nextTransitionName !== null) {
@@ -2745,13 +2746,14 @@ export class GridScene extends Phaser.Scene {
         map,
         { col: this.playerCol, row: this.playerRow },
         blockedCells,
+        this.navigationEventContext(),
       );
     }
     if (destinationId.startsWith(REGION_GUIDE_PREFIX)) {
       const input = this.regionalGuideInput();
       const destination = input === null ? null : resolveRegionalGuideDestination(input, destinationId);
       return destination === null ? { status: 'target-lost' } : resolveCellNavigationGuide(world.worldMap, this.currentMapResourceId, destination, map,
-        { col: this.playerCol, row: this.playerRow }, blockedCells);
+        { col: this.playerCol, row: this.playerRow }, blockedCells, this.navigationEventContext());
     }
     if (!destinationId.startsWith(QUEST_NAVIGATION_ID_PREFIX)) return { status: 'target-lost' };
 
@@ -2773,7 +2775,17 @@ export class GridScene extends Phaser.Scene {
       map,
       { col: this.playerCol, row: this.playerRow },
       blockedCells,
+      this.navigationEventContext(),
     );
+  }
+
+  private navigationEventContext(): NavigationEventContext {
+    const reading = this.currentClimate();
+    return { ...this.regionEventContext(), completedEventIds: this.completedRegionalEvents, ...(reading ? { possibleWeatherIds: new Set(reading.season.weatherWeights.filter(entry => entry.weight > 0).map(entry => entry.weatherId)) } : {}), conditionLabel: (kind, id) => {
+      const records = kind === 'period' ? this.world?.calendar.periods
+        : kind === 'weather' ? this.world?.climate.weathers : this.world?.climate.tideCycle?.phases;
+      return records?.find(record => record.id === id)?.name;
+    } };
   }
 
   /** Current live NPC and encounter cells; rebuilt with every guide refresh. */
@@ -3494,6 +3506,7 @@ export class GridScene extends Phaser.Scene {
       this.navigationDestinationId,
       questTarget === null ? [] : [questTarget],
       this.navigationBlockedCells(),
+      this.navigationEventContext(),
     );
     this.updateInteractHint();
   }
