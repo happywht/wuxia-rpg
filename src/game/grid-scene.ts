@@ -4604,6 +4604,7 @@ export class GridScene extends Phaser.Scene {
       { mapResourceId: this.currentMapResourceId, col: this.playerCol, row: this.playerRow },
       this.completedRegionalEvents,
       eventContext,
+      arrivalTransitionId,
     );
     // Round 90: the roaming draw keeps its two causes strictly separate — a
     // finished grid step samples step rows only, while a completed map switch

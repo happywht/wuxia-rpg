@@ -79,3 +79,7 @@ world-map可省略regionGuides；每条mapResourceId/role(hub/investigation/chal
 ## Round114 更新
 
 地域气候以可选regionalWeatherProfiles落地，旧MOD省略时沿用季节天气；当前地图的HUD/粒子/移动耗时/事件/导航保持一致，存档协议不变。北境春季天气阻断解除，仍需夜间落雪。R行旅建议明确真实出口坐标与无补给长路；没有缩短地图或注入天气。协议详见CLIMATE.md，真实账本及验证边界详见../iterations/round-114/playtest.md和verification.md。北境整章和完整目标尚未通过，继续Round115。
+
+## Round 116 关口入场事件
+
+定点非互动事件可选 arrivalTransitionIds（1–64个不重复非空关口id）。实际装配关口必须有效且to.mapResourceId等于事件地图；坏引用警告并隔离事件。运行时保留精确格触发，同时仅实际switchRegion完成传入关口id；启动、等待、拒绝过关不会产生此原因，旧坐标触发规则仍有效。一次性和全部五类条件两种触发都遵循。当前默认仅天门关声明新字段，不代表其余海岛入口已修。无需存档迁移，旧MOD省略兼容。局部脚本fix-round116-east-arrival.mjs只更新该事件及传航正文；不在现有树重跑旧整链生成。

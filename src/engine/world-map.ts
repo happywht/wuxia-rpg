@@ -79,6 +79,8 @@ export interface RegionEventData extends CellPosition {
   once: boolean;
   conditions?: RegionEventConditionsData;
   discoverKnowledgeNodeId?: string;
+  /** Also trigger this fixed, non-interactive event after these actual map arrivals. */
+  arrivalTransitionIds?: string[];
   /**
    * Optional E-key inspection declaration. When present, the event activates
    * only through a facing interaction instead of by stepping onto the cell;
@@ -631,6 +633,13 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
     const interaction = entry.interaction === undefined
       ? undefined
       : parseRegionEventInteraction(entry.interaction, `${label}.interaction`, errors);
+    const arrivalTransitionIds = entry.arrivalTransitionIds === undefined
+      ? undefined
+      : parseUniqueStringArray(entry.arrivalTransitionIds, `${label}.arrivalTransitionIds`, errors);
+    const conflictingTriggers = interaction !== undefined && arrivalTransitionIds !== undefined;
+    if (conflictingTriggers) errors.push(`${label}.arrivalTransitionIds：E交互事件不能同时声明过关触发`);
+    const tooManyArrivals = arrivalTransitionIds !== null && arrivalTransitionIds !== undefined && arrivalTransitionIds.length > 64;
+    if (tooManyArrivals) errors.push(`${label}.arrivalTransitionIds：最多64个关口`);
     if (id === null) errors.push(`${label}.id：应为非空字符串`);
     if (mapResourceId === null) errors.push(`${label}.mapResourceId：应为非空字符串`);
     if (text === null) errors.push(`${label}.text：应为非空字符串`);
@@ -638,13 +647,15 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
     if (once === null) errors.push(`${label}.once：应为布尔值`);
     if (discoverKnowledgeNodeId === null) errors.push(`${label}.discoverKnowledgeNodeId：应为非空字符串`);
     if (id !== null && mapResourceId !== null && text !== null && approachText !== null && once !== null &&
-      cell !== null && conditions !== null && discoverKnowledgeNodeId !== null && interaction !== null) {
+      cell !== null && conditions !== null && discoverKnowledgeNodeId !== null && interaction !== null &&
+      arrivalTransitionIds !== null && !conflictingTriggers && !tooManyArrivals) {
       events.push({
         id, mapResourceId, ...cell, text, once,
         ...(approachText === undefined ? {} : { approachText }),
         ...(conditions === undefined ? {} : { conditions }),
         ...(discoverKnowledgeNodeId === undefined ? {} : { discoverKnowledgeNodeId }),
         ...(interaction === undefined ? {} : { interaction }),
+        ...(arrivalTransitionIds === undefined ? {} : { arrivalTransitionIds }),
       });
     }
   });
@@ -816,6 +827,13 @@ export function assembleWorldMap(
   for (const event of data.events) {
     const map = maps.get(event.mapResourceId);
     const problems: string[] = [];
+    for (const transitionId of event.arrivalTransitionIds ?? []) {
+      const transition = transitionsById.get(transitionId);
+      if (transition === undefined) problems.push(`入境关口未登记或无效：${transitionId}`);
+      else if (transition.to.mapResourceId !== event.mapResourceId) {
+        problems.push(`入境关口 "${transitionId}" 通向的地图与事件地图不一致`);
+      }
+    }
     if (seenEvents.has(event.id)) problems.push('id 重复');
     if (!regions.some((region) => region.mapResourceId === event.mapResourceId)) problems.push('地图不在世界图区域中');
     if (event.interaction === undefined) {
@@ -938,7 +956,8 @@ export function regionEventConditionsMet(
 }
 
 /**
- * Selects ready step-triggered events at an exact cell without mutating
+ * Selects ready fixed events at an exact cell or after an explicitly authored
+ * actual gate arrival, without mutating
  * completion or knowledge state. Events carrying an interaction declaration
  * are E-key inspections and never fire by stepping onto their cell.
  */
@@ -947,11 +966,13 @@ export function selectTriggeredRegionEvents(
   location: { mapResourceId: string } & CellPosition,
   completedEventIds: ReadonlySet<string>,
   context: RegionEventContext,
+  arrivalTransitionId: string | null = null,
 ): RegionEventData[] {
   return events.filter((event) =>
     event.interaction === undefined &&
     event.mapResourceId === location.mapResourceId &&
-    event.col === location.col && event.row === location.row &&
+    ((event.col === location.col && event.row === location.row) ||
+      (arrivalTransitionId !== null && event.arrivalTransitionIds?.includes(arrivalTransitionId))) &&
     (!event.once || !completedEventIds.has(event.id)) &&
     regionEventConditionsMet(event, context),
   );

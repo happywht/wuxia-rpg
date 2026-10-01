@@ -1,0 +1,41 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round116-east-arrival.test.ts (8 tests | 2 failed) 61070ms
+   ❯ Round116 actual eastern entry discovery (8)
+     × repairs an older authoring coordinate idempotently without mutating input or unrelated world content 35958ms
+     × refuses missing, duplicated or mismatched authoring references 25094ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round116-east-arrival.test.ts > Round116 actual eastern entry discovery > repairs an older authoring coordinate idempotently without mutating input or unrelated world content
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/round116-east-arrival.test.ts:62:3
+     60|     expect(applyQuestSignal(r.quests, r.journal, { type: 'npc-talk', n…
+     61|   });
+     62|   it('repairs an older authoring coordinate idempotently without mutat…
+       |   ^
+     63|     const old = structuredClone(world);
+     64|     old.events.find(row => row.id === EVENT)!.col = 6;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/round116-east-arrival.test.ts > Round116 actual eastern entry discovery > refuses missing, duplicated or mismatched authoring references
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/round116-east-arrival.test.ts:73:3
+
+     71|     expect(repaired.events.filter(row => row.id !== EVENT)).toEqual(ol…
+     72|   });
+     73|   it('refuses missing, duplicated or mismatched authoring references',…
+       |   ^
+     74|     for (const cause of ['missing', 'duplicate', 'map', 'interaction']…
+     75|       const bad = structuredClone(world);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 24 passed (26)
+   Start at  13:05:04
+   Duration  61.66s (tests 99%, transform 1%)

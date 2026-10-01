@@ -11,6 +11,7 @@ const add=(d,node,entry)=>{upsert(d.nodes,node);if(entry){const opts=d.nodes.fin
 const text=(d,id,value)=>{const node=d.nodes.find(n=>n.id===id);if(node)node.text=value;};
 const GU='char.r83-gu-chaosheng',JIN='char.r83-jin-yunfan',RUAN='char.r84-ruan-huilan',CEN='char.r85-cen-yinjiao',JI='char.r97-ji-wuchao',YU='char.r97-yu-xingcha';
 export const seaQuestIds=['quest.r83-net-recovery','quest.r83-night-channel','quest.r84-lantern-ledger','quest.r85-low-tide-channel','quest.r97-tide-ledger','quest.r97-beacon-relight'];
+export const PILOT_COST_HINT='核过的潮时传给散船，还是只传熟船队？公开传示需厚蚌壳片2片，青帆埠金云帆的补给摊出售；熟船值守需清心丸1份。备齐再决定，传航范围与各家态度都会记下。';
 export function deepenSeaQuests(set){
  const descriptions=[
   '承接青帆埠潮尺调查，击退潮沟夺网客后即结算经验、银两与浅滩见闻，不发网具物品，也不改变浮标地形。回顾潮生可续查暮潮刻线。',
@@ -73,6 +74,7 @@ export function deepenSeaDialogues(set){
   choice(d,'pilot','核过的潮时传给散船，还是只传熟船队？',[done('quest.r97-tide-ledger')],[
    {flag:'pilot-public',label:'拿贝壳2片作公开辨潮记号（季+4、虞−4、声望+3）',item:'item.r32.clam-shell',quantity:2,effects:[relation(JI,4),relation(YU,-4),{kind:'adjustRenown',delta:3}],response:'季无潮接下两片贝壳作传示样记：「散船有了认潮的样子，假号客也能照学；虞星槎得承担辨号。」'},
    {flag:'pilot-crew',label:'留清心丸1份给熟船值守（季−4、虞+4、声望−2）',item:'item.qingxin-wan',effects:[relation(JI,-4),relation(YU,4),{kind:'adjustRenown',delta:-2}],response:'季无潮把清心丸记在船队值守名下：「队内认得人，核号快了；陌生的散船要再来问，夜航的等待仍由他们担。」'}]);
+  text(d,'r102-pilot-choice',PILOT_COST_HINT);
   echo(d,'shore-aid','沿岸补给怎样影响这里？','「你先照应岸上伤者，岑隐礁的急药却没补齐。传潮时也不能只看谁方便，得看谁承担漏下的风险。」');
   echo(d,'keeper-aid','沿岸补给怎样影响这里？','「礁上多一份急药，岸上却少一份。传潮时之前也要想好，要把等候留给谁。」');
   add(d,{id:'r102-north-link',text:'「北境火号报当下，旧驿刻记从前；海上潮痕记水位，灯谱记报码节律，都不是残篇密钥。别把相似短线当同一个东西。到引航礁复核，我们才有资格说海路这一段核清了。」'},option('北境已对照，海上能续出什么？','r102-north-link',[known('event.r101-north-close')]));

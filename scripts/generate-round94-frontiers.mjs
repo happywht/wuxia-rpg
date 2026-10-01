@@ -564,6 +564,7 @@ const conversations = [
 const events = [
   {
     id: 'event.r94-east-arrival', mapResourceId: eastId, col: 6, row: 50,
+    arrivalTransitionIds: ['gate.r94-terrace-to-east'],
     text: '走过雁回崖东脊的石门，视野豁然一宽：雪岭尽头立着一座低矮关城，烽台的旧刻痕正对东海雾线。',
     approachText: '石门背风处有新雪扫出的脚印，一直向东。', once: true, discoverKnowledgeNodeId: 'place.r94-east-gate',
   },

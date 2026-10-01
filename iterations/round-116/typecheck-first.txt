@@ -1,0 +1,13 @@
+
+> wuxia-rpg@0.0.1 typecheck
+> tsc --noEmit
+
+tests/round116-east-arrival.test.ts(138,19): error TS2339: Property 'ok' does not exist on type 'WorldMapAssembly | { ok: false; errors: string[]; }'.
+  Property 'ok' does not exist on type 'WorldMapAssembly'.
+tests/round116-east-arrival.test.ts(139,16): error TS2339: Property 'ok' does not exist on type 'WorldMapAssembly | { ok: false; errors: string[]; }'.
+  Property 'ok' does not exist on type 'WorldMapAssembly'.
+tests/round116-east-arrival.test.ts(140,21): error TS2339: Property 'events' does not exist on type 'WorldMapAssembly | { ok: false; errors: string[]; }'.
+  Property 'events' does not exist on type '{ ok: false; errors: string[]; }'.
+tests/round116-east-arrival.test.ts(141,21): error TS2339: Property 'warnings' does not exist on type 'WorldMapAssembly | { ok: false; errors: string[]; }'.
+  Property 'warnings' does not exist on type '{ ok: false; errors: string[]; }'.
+tests/round116-east-arrival.test.ts(141,35): error TS7006: Parameter 'w' implicitly has an 'any' type.
