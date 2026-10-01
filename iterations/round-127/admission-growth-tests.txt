@@ -1,0 +1,866 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round107-growth-routes.test.ts (9 tests | 1 failed) 368ms
+   ❯ Round107 actual conservative growth transactions and encounters (9)
+     × incremental authoring replays twice in verified temporary workspace without touching the checkout 340ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round107-growth-routes.test.ts > Round107 actual conservative growth transactions and encounters > incremental authoring replays twice in verified temporary workspace without touching the checkout
+AssertionError: expected '{\r\n  "conversations": [\r\n    {\r\…' to be '{\r\n  "conversations": [\r\n    {\r\…' // Object.is equality
+
+- Expected
++ Received
+
+@@ -1029,424 +1029,424 @@
+            "text": "马尚义在旧账上勾了一笔：「路认清就好。贞娘已说要给药队配散，你把村口的情形也告诉姜百味一声——差事一环扣一环，往后南边的药就不用我挨家捎话了。」"
+          },
+          { "id": "leave", "text": "不妨事，路上留神便好。" }
+        ]
+      },
+-     {
+-       "id": "dlg.ye-tingzhou-mentor",
+-       "startNodeId": "greet",
+-       "nodes": [
+-         {
+-           "id": "r107-sword-1",
+-           "text": "叶庭舟指了指剑录：「先做镇中差事、清巷口，再到渡口护集。抄书学徒原生身法7，每级长1；落雨七分剑虽然等级门槛2，还要身法11、悟性11。不是升到2就能学：不借装备，要到5；柳叶判官笔加身法1，可在4级够得着。先问剑意，关系达5，再按入门条件拜师，来授艺页逐条核资格。」",
+-           "options": [
+-             {
+-               "text": "接着说。",
+-               "nextNodeId": "r107-sword-2"
+-             }
+-           ]
+-         },
+-         {
+-           "id": "r107-sword-2",
+-           "text": "「出门先问祝九弦刀场淬料，按清点差事备熟铁砂与青铜笔剑，在渡口工位淬锋；基础刀料与工钱合108两，成品加力道4。先学会再换兵器，不要把兵器加成当天生根骨。气海拓8内力，手阳耗修为1与清心丸1、加力道1，都是实付。导师不替你免费置办。」",
+-           "options": [
+-             {
+-               "text": "接着说。",
+-               "nextNodeId": "r107-sword-3"
+-             }
+-           ]
+-         },
+-         {
+-           "id": "r107-sword-3",
+-           "text": "「旧例管事先摆守势，再举刀重砍，随后调息；看『敌方下一步』，别把重砍窗口白送给他。你的剑法多耗气，能在他调息时结束就不必拖。照雪冒号客有重砸、调养、守势与回气，抢攻未必每次都划算；有伤先在战外用药，输了照既有比例复原，调查不会丢。装备与成长可缩短出手轮数，仍须自己选择。」",
+-           "options": [
+-             {
+-               "text": "记下了，回去准备。",
+-               "nextNodeId": "greet"
+-             }
+-           ]
+-         },
+-         {
+-           "id": "r103-tingyu-next",
+-           "text": "叶庭舟把剑谱合上：「这一程分三段：柳教习核时辰、云纹石阶看旧索孔刻痕、回我这里复命。看的是记法，练的是分寸。」既有见闻在核时辰后可推进记录；若这轮未实到云阶，不能把记录回填说成此行观察。"
+-         },
+-         {
+-           "id": "r103-tingyu-echo",
+-           "text": "叶庭舟听完，在门中名册上记了一笔：「柳教习的结论仍是索环回弹，你在石阶看的是刻痕记法——两件事各自成立，谁也不替谁作证。眼力练到了，剑阁记你一功。修习照剑录的门槛来：够得着的先练，够不着的别硬够。」"
+-         },
+-         {
+-           "id": "r103-tingyu-verify",
+-           "text": "叶庭舟点头：「时辰那一段，柳教习替你核明了，这桩告一段落。石阶那趟观察还没人替剑阁走过——往后行经云岭古道，多看多记，回来仍可与我说。剑法上的事，剑谱都在。」"
+-         },
+-         {
+-           "id": "r103-tingyu-letter",
+-           "text": "叶庭舟从案头取出一页抄本：「门中正查那封匿名信。与剑阁相关的一段，我抄了副本给你——写信人未具名，抄本照抄，我不替他落款。」"
+-         },
+-         {
+-           "id": "r103-tingyu-training",
+-           "text": "叶庭舟把剑录翻到末页，逐条指给你看：「落雨七分剑，等级2、身法11/悟性11，攻击12、耗气3；覆水回澜剑，等级4、身法12/悟性13，攻击16、耗气5；怀音养息诀，等级4、悟性14/定力12，恢复17、耗气7；回澜照影剑，等级6、身法14/悟性15，攻击20、耗气8；听潮入微剑，等级10、身法18/悟性18，攻击27、耗气13。出手只分攻、养、守三用：攻是伤敌，养是疗伤回复生命、要耗内力却不补内力，守只挡得住下一击。剑阁没有隔空封穴的手段，别信传闻。」"
+-         },
+-         {
+-           "id": "greet",
+-           "text": "叶庭舟看过你手中折旧的纸页，轻轻摇头：「字里藏锋，终究还要落到脚下。你想问剑，还是问路？」",
+-           "options": [
+-             {
+-               "text": "想走剑法与淬锋路线，该怎样准备？",
+-               "nextNodeId": "r107-sword-1"
+-             },
+-             {
+-               "text": "请教剑意。",
+-               "nextNodeId": "sword-talk",
+-               "conditions": [
+-                 {
+-                   "kind": "npcRelationship",
+-                   "npcId": "char.ye-tingzhou",
+-                   "maxValue": 4
+-                 }
+-               ],
+-               "effects": [
+-                 {
+-                   "kind": "adjustRelationship",
+-                   "delta": 5
+-                 }
+-               ]
+-             },
+-             {
+-               "text": "愿拜入听雨剑阁门下。",
+-               "nextNodeId": "accepted",
+-               "conditions": [
+-                 {
+-                   "kind": "factionMembership",
+-                   "isMember": false
+-                 }
+-               ],
+-               "effects": [
+-                 {
+-                   "kind": "joinFaction",
+-                   "factionId": "faction.tingyu-jiange"
+-                 },
+-                 {
+-                   "kind": "adjustFactionRenown",
+-                   "factionId": "faction.tingyu-jiange",
+-                   "delta": 10
+-                 }
+-               ]
+-             },
+-             {
+-               "text": "门中弟子似乎已认可我的行事。",
+-               "nextNodeId": "respected",
+-               "conditions": [
+-                 {
+-                   "kind": "factionMembership",
+-                   "factionId": "faction.tingyu-jiange",
+-                   "isMember": true
+-                 },
+-                 {
+-                   "kind": "factionRenown",
+-                   "factionId": "faction.tingyu-jiange",
+-                   "minValue": 10
+-                 }
+-               ]
+-             },
+-             {
+-               "text": "请师父指点门中剑法。",
+-               "nextNodeId": "r32-lessons",
+-               "conditions": [
+-                 {
+-                   "kind": "factionMembership",
+-                   "factionId": "faction.tingyu-jiange",
+-                   "isMember": true
+-                 }
+-               ]
+-             },
+-             {
+-               "text": "我想退出听雨剑阁。",
+-               "nextNodeId": "departed",
+-               "conditions": [
+-                 {
+-                   "kind": "factionMembership",
+-                   "factionId": "faction.tingyu-jiange",
+-                   "isMember": true
+-                 }
+-               ],
+-               "effects": [
+-                 {
+-                   "kind": "leaveFaction"
+-                 }
+-               ]
+-             },
+-             {
+-               "text": "信中提到芦苇岸有一段不合潮声的剑鸣，愿替听雨剑阁向柳教习核实吗？",
+-               "nextNodeId": "r43-accepted-tingyu-eave-rain",
+-               "conditions": [
+-                 {
+-                   "kind": "factionMembership",
+-                   "factionId": "faction.tingyu-jiange",
+-                   "isMember": true
+-                 },
+-                 {
+-                   "kind": "knowledgeKnown",
+-                   "nodeId": "event.r43-wayfarer-letter"
+-                 },
+-                 {
+-                   "kind": "questStatus",
+-                   "questId": "quest.r43-tingyu-eave-rain",
+-                   "status": "offered"
+-                 }
+-               ],
+-               "effects": [
+-                 {
+-                   "kind": "acceptQuest",
+-                   "questId": "quest.r43-tingyu-eave-rain"
+-                 }
+-               ]
+-             },
+-             {
+-               "text": "这趟门中差事，下一步往哪里去？",
+-               "nextNodeId": "r103-tingyu-next",
+-               "conditions": [
+-                 {
+-                   "kind": "factionMembership",
+-                   "factionId": "faction.tingyu-jiange",
+-                   "isMember": true
+-                 },
+-                 {
+-                   "kind": "questStatus",
+-                   "questId": "quest.r43-tingyu-eave-rain",
+-                   "status": "active"
+-                 }
+-               ]
+-             },
+-             {
+-               "text": "云纹石阶的旧索孔刻痕看过了，来回禀。",
+-               "nextNodeId": "r103-tingyu-echo",
+-               "conditions": [
+-                 {
+-                   "kind": "questStatus",
+-                   "questId": "quest.r43-tingyu-eave-rain",
+-                   "status": "completed"
+-                 },
+-                 {
+-                   "kind": "knowledgeKnown",
+-                   "nodeId": "event.r103-tingyu-practice"
+-                 }
+-               ]
+-             },
+-             {
+-               "text": "信中剑鸣那一段先前已核明，来回话。",
+-               "nextNodeId": "r103-tingyu-verify",
+-               "conditions": [
+-                 {
+-                   "kind": "questStatus",
+-                   "questId": "quest.r43-tingyu-eave-rain",
+-                   "status": "completed"
+-                 },
+-                 {
+-                   "kind": "knowledgeKnown",
+-                   "nodeId": "event.r103-tingyu-practice",
+-                   "isKnown": false
+-                 }
+-               ]
+-             },
+-             {
+-               "text": "听说门中在查一封匿名信，能否让我也看一眼？",
+-               "nextNodeId": "r103-tingyu-letter",
+-               "conditions": [
+-                 {
+-                   "kind": "factionMembership",
+-                   "factionId": "faction.tingyu-jiange",
+-                   "isMember": true
+-                 },
+-                 {
+-                   "kind": "knowledgeKnown",
+-                   "nodeId": "event.r43-wayfarer-letter",
+-                   "isKnown": false
+-                 }
+-               ],
+-               "effects": [
+-                 {
+-                   "kind": "discoverKnowledgeNode",
+-                   "nodeId": "event.r43-wayfarer-letter"
+-                 }
+-               ]
+-             },
+-             {
+-               "text": "门中剑法的门槛与用处，请师父照实说一遍。",
+-               "nextNodeId": "r103-tingyu-training",
+-               "conditions": [
+-                 {
+-                   "kind": "factionMembership",
+-                   "factionId": "faction.tingyu-jiange",
+-                   "isMember": true
+-                 }
+-               ]
+-             },
+-             {
+-               "text": "多谢指点，告辞。",
+-               "nextNodeId": "farewell"
+-             },
+-             {
+-               "text": "改投之前，怎样核对入门资格与这一程实践？",
+-               "nextNodeId": "r127-transfer-readiness"
+-             }
+-           ]
+-         },
+-         {
+-           "id": "sword-talk",
+-           "text": "叶庭舟以枝代剑，点出你眼中尚急的锋芒：「先看清对面，再谈出剑。等你心与手不再相争，我再看你的根骨。」"
+-         },
+-         {
+-           "id": "accepted",
+-           "text": "叶庭舟替你正了衣襟：「入门不是求一块招牌。从今日起，先学听雨，再学听人。」"
+-         },
+-         {
+-           "id": "respected",
+-           "text": "叶庭舟点头道：「肯把门中规矩放进心里，这份信任就不是白给的。」"
+-         },
+-         {
+-           "id": "r32-lessons",
+-           "text": "叶庭舟把几页剑谱依次铺开：「先按你的根基选一式。学会之后，若仍想请教，再把剑谱翻回来。」",
+-           "options": [
+-             {
+-               "text": "请教听雨剑法。",
+-               "nextNodeId": "r32-taught",
+-               "conditions": [
+-                 {
+-                   "kind": "martialArtEligible",
+-                   "martialArtId": "skill.tingyu-jianfa"
+-                 }
+-               ],
+-               "effects": [
+-                 {
+-                   "kind": "learnMartialArt",
+-                   "martialArtId": "skill.tingyu-jianfa"
+-                 }
+-               ]
+-             },
+-             {
+-               "text": "请教落雨七分剑。",
+-               "nextNodeId": "r32-taught",
+-               "conditions": [
+-                 {
+-                   "kind": "martialArtEligible",
+-                   "martialArtId": "skill.r32-tingyu-luoyu-jian"
+-                 }
+-               ],
+-               "effects": [
+-                 {
+-                   "kind": "learnMartialArt",
+-                   "martialArtId": "skill.r32-tingyu-luoyu-jian"
+-                 }
+-               ]
+-             },
+-             {
+-               "text": "请教覆水回澜剑。",
+-               "nextNodeId": "r32-taught",
+-               "conditions": [
+-                 {
+-                   "kind": "martialArtEligible",
+-                   "martialArtId": "skill.r32-tingyu-fushui-jian"
+-                 }
+-               ],
+-               "effects": [
+-                 {
+-                   "kind": "learnMartialArt",
+-                   "martialArtId": "skill.r32-tingyu-fushui-jian"
+-                 }
+-               ]
+-             },
+-             {
+-               "text": "请教回澜照影剑。",
+-               "nextNodeId": "r32-taught",
+-               "conditions": [
+-                 {
+-                   "kind": "martialArtEligible",
+-                   "martialArtId": "skill.r32-tingyu-huilan-jian"
+-                 }
+-               ],
+-               "effects": [
+-                 {
+-                   "kind": "learnMartialArt",
+-                   "martialArtId": "skill.r32-tingyu-huilan-jian"
+-                 }
+-               ]
+-             },
+-             {
+-               "text": "请教怀音养息诀。",
+-               "nextNodeId": "r32-taught",
+-               "conditions": [
+-                 {
+-                   "kind": "martialArtEligible",
+-                   "martialArtId": "skill.r32-tingyu-huaiyin-jue"
+-                 }
+-               ],
+-               "effects": [
+-                 {
+-                   "kind": "learnMartialArt",
+-                   "martialArtId": "skill.r32-tingyu-huaiyin-jue"
+-                 }
+-               ]
+-             },
+-             {
+-               "text": "请教听潮入微剑。",
+-               "nextNodeId": "r32-taught",
+-               "conditions": [
+-                 {
+-                   "kind": "martialArtEligible",
+-                   "martialArtId": "skill.r32-tingyu-tingchao-jian"
+-                 }
+-               ],
+-               "effects": [
+-                 {
+-                   "kind": "learnMartialArt",
+-                   "martialArtId": "skill.r32-tingyu-tingchao-jian"
+-                 }
+-               ]
+-             },
+-             {
+-               "text": "今日先到这里。",
+-               "nextNodeId": "farewell"
+-             }
+-           ]
+-         },
+-         {
+-           "id": "r32-taught",
+-           "text": "叶庭舟把你方才所选的剑路拆成数段，让你记清步眼、收势与留白：「招式授了，往后要在每一场交手里读懂它。」",
+-           "options": [
+-             {
+-               "text": "再请教一门。",
+-               "nextNodeId": "r32-lessons"
+-             },
+-             {
+-               "text": "多谢师父，告辞。",
+-               "nextNodeId": "farewell"
+-             }
+-           ]
+-         },
+-         {
+-           "id": "departed",
+-           "text": "叶庭舟收回目光：「缘分既尽，便各走各路。门中剑法也随今日一并还来。」"
+-         },
+-         {
+-           "id": "farewell",
+-           "text": "叶庭舟将纸页收进袖中：「沿路多看，答案不在一处。」"
+-         },
+-         {
+-           "id": "r43-accepted-tingyu-eave-rain",
+-           "text": "叶庭舟把剑穗压在信角上：「先核准时辰。江湖话传得快，剑阁不替传闻磨出锋刃。」"
+-         },
+-         {
+-           "id": "r127-transfer-readiness",
+-           "text": "叶庭舟把名册摊开：「先按J看当前师门退出后的真实声望、善恶及各派缺口，别只看未退门的数。我这里江湖声望门槛是0，善恶须在−20至80，悟性至少9，与我关系至少5；先请教剑意建立关系，再按规矩拜师。不是每派都要先刷声望。入听雨后核柳教习的时辰，再看云纹石阶，回来复命；旧见闻可推进记录，但记录回填不能冒充此行观察。听潮入微剑还要身法18，够不着就先练可学的剑式。出手、养息皆花真实内力，师门不替你白补。」",
+-           "options": [
+-             {
+-               "text": "明白了，我照实际条件准备。",
+-               "nextNodeId": "greet"
+-             }
+-           ]
+-         }
+-       ]
++     {
++       "id": "dlg.ye-tingzhou-mentor",
++       "startNodeId": "greet",
++       "nodes": [
++         {
++           "id": "r107-sword-1",
++           "text": "叶庭舟指了指剑录：「先做镇中差事、清巷口，再到渡口护集。抄书学徒原生身法7，每级长1；落雨七分剑虽然等级门槛2，还要身法11、悟性11。不是升到2就能学：不借装备，要到5；柳叶判官笔加身法1，可在4级够得着。先问剑意，关系达5，再按入门条件拜师，来授艺页逐条核资格。」",
++           "options": [
++             {
++               "text": "接着说。",
++               "nextNodeId": "r107-sword-2"
++             }
++           ]
++         },
++         {
++           "id": "r107-sword-2",
++           "text": "「出门先问祝九弦刀场淬料，按清点差事备熟铁砂与青铜笔剑，在渡口工位淬锋；基础刀料与工钱合108两，成品加力道4。先学会再换兵器，不要把兵器加成当天生根骨。气海拓8内力，手阳耗修为1与清心丸1、加力道1，都是实付。导师不替你免费置办。」",
++           "options": [
++             {
++               "text": "接着说。",
++               "nextNodeId": "r107-sword-3"
++             }
++           ]
++         },
++         {
++           "id": "r107-sword-3",
++           "text": "「旧例管事先摆守势，再举刀重砍，随后调息；看『敌方下一步』，别把重砍窗口白送给他。你的剑法多耗气，能在他调息时结束就不必拖。照雪冒号客有重砸、调养、守势与回气，抢攻未必每次都划算；有伤先在战外用药，输了照既有比例复原，调查不会丢。装备与成长可缩短出手轮数，仍须自己选择。」",
++           "options": [
++             {
++               "text": "记下了，回去准备。",
++               "nextNodeId": "greet"
++             }
++           ]
++         },
++         {
++           "id": "r103-tingyu-next",
++           "text": "叶庭舟把剑谱合上：「这一程分三段：柳教习核时辰、云纹石阶看旧索孔刻痕、回我这里复命。看的是记法，练的是分寸。」既有见闻在核时辰后可推进记录；若这轮未实到云阶，不能把记录回填说成此行观察。"
++         },
++         {
++           "id": "r103-tingyu-echo",
++           "text": "叶庭舟听完，在门中名册上记了一笔：「柳教习的结论仍是索环回弹，你在石阶看的是刻痕记法——两件事各自成立，谁也不替谁作证。眼力练到了，剑阁记你一功。修习照剑录的门槛来：够得着的先练，够不着的别硬够。」"
++         },
++         {
++           "id": "r103-tingyu-verify",
++           "text": "叶庭舟点头：「时辰那一段，柳教习替你核明了，这桩告一段落。石阶那趟观察还没人替剑阁走过——往后行经云岭古道，多看多记，回来仍可与我说。剑法上的事，剑谱都在。」"
++         },
++         {
++           "id": "r103-tingyu-letter",
++           "text": "叶庭舟从案头取出一页抄本：「门中正查那封匿名信。与剑阁相关的一段，我抄了副本给你——写信人未具名，抄本照抄，我不替他落款。」"
++         },
++         {
++           "id": "r103-tingyu-training",
++           "text": "叶庭舟把剑录翻到末页，逐条指给你看：「落雨七分剑，等级2、身法11/悟性11，攻击12、耗气3；覆水回澜剑，等级4、身法12/悟性13，攻击16、耗气5；怀音养息诀，等级4、悟性14/定力12，恢复17、耗气7；回澜照影剑，等级6、身法14/悟性15，攻击20、耗气8；听潮入微剑，等级10、身法18/悟性18，攻击27、耗气13。出手只分攻、养、守三用：攻是伤敌，养是疗伤回复生命、要耗内力却不补内力，守只挡得住下一击。剑阁没有隔空封穴的手段，别信传闻。」"
++         },
++         {
++           "id": "greet",
++           "text": "叶庭舟看过你手中折旧的纸页，轻轻摇头：「字里藏锋，终究还要落到脚下。你想问剑，还是问路？」",
++           "options": [
++             {
++               "text": "想走剑法与淬锋路线，该怎样准备？",
++               "nextNodeId": "r107-sword-1"
++             },
++             {
++               "text": "请教剑意。",
++               "nextNodeId": "sword-talk",
++               "conditions": [
++                 {
++                   "kind": "npcRelationship",
++                   "npcId": "char.ye-tingzhou",
++                   "maxValue": 4
++                 }
++               ],
++               "effects": [
++                 {
++                   "kind": "adjustRelationship",
++                   "delta": 5
++                 }
++               ]
++             },
++             {
++               "text": "愿拜入听雨剑阁门下。",
++               "nextNodeId": "accepted",
++               "conditions": [
++                 {
++                   "kind": "factionMembership",
++                   "isMember": false
++                 }
++               ],
++               "effects": [
++                 {
++                   "kind": "joinFaction",
++                   "factionId": "faction.tingyu-jiange"
++                 },
++                 {
++                   "kind": "adjustFactionRenown",
++                   "factionId": "faction.tingyu-jiange",
++                   "delta": 10
++                 }
++               ]
++             },
++             {
++               "text": "门中弟子似乎已认可我的行事。",
++               "nextNodeId": "respected",
++               "conditions": [
++                 {
++                   "kind": "factionMembership",
++                   "factionId": "faction.tingyu-jiange",
++                   "isMember": true
++                 },
++                 {
++                   "kind": "factionRenown",
++                   "factionId": "faction.tingyu-jiange",
++                   "minValue": 10
++                 }
++               ]
++             },
++             {
++               "text": "请师父指点门中剑法。",
++               "nextNodeId": "r32-lessons",
++               "conditions": [
++                 {
++                   "kind": "factionMembership",
++                   "factionId": "faction.tingyu-jiange",
++                   "isMember": true
++                 }
++               ]
++             },
++             {
++               "text": "我想退出听雨剑阁。",
++               "nextNodeId": "departed",
++               "conditions": [
++                 {
++                   "kind": "factionMembership",
++                   "factionId": "faction.tingyu-jiange",
++                   "isMember": true
++                 }
++               ],
++               "effects": [
++                 {
++                   "kind": "leaveFaction"
++                 }
++               ]
++             },
++             {
++               "text": "信中提到芦苇岸有一段不合潮声的剑鸣，愿替听雨剑阁向柳教习核实吗？",
++               "nextNodeId": "r43-accepted-tingyu-eave-rain",
++               "conditions": [
++                 {
++                   "kind": "factionMembership",
++                   "factionId": "faction.tingyu-jiange",
++                   "isMember": true
++                 },
++                 {
++                   "kind": "knowledgeKnown",
++                   "nodeId": "event.r43-wayfarer-letter"
++                 },
++                 {
++                   "kind": "questStatus",
++                   "questId": "quest.r43-tingyu-eave-rain",
++                   "status": "offered"
++                 }
++               ],
++               "effects": [
++                 {
++                   "kind": "acceptQuest",
++                   "questId": "quest.r43-tingyu-eave-rain"
++                 }
++               ]
++             },
++             {
++               "text": "这趟门中差事，下一步往哪里去？",
++               "nextNodeId": "r103-tingyu-next",
++               "conditions": [
++                 {
++                   "kind": "factionMembership",
++                   "factionId": "faction.tingyu-jiange",
++                   "isMember": true
++                 },
++                 {
++                   "kind": "questStatus",
++                   "questId": "quest.r43-tingyu-eave-rain",
++                   "status": "active"
++                 }
++               ]
++             },
++             {
++               "text": "云纹石阶的旧索孔刻痕看过了，来回禀。",
++               "nextNodeId": "r103-tingyu-echo",
++               "conditions": [
++                 {
++                   "kind": "questStatus",
++                   "questId": "quest.r43-tingyu-eave-rain",
++                   "status": "completed"
++                 },
++                 {
++                   "kind": "knowledgeKnown",
++                   "nodeId": "event.r103-tingyu-practice"
++                 }
++               ]
++             },
++             {
++               "text": "信中剑鸣那一段先前已核明，来回话。",
++               "nextNodeId": "r103-tingyu-verify",
++               "conditions": [
++                 {
++                   "kind": "questStatus",
++                   "questId": "quest.r43-tingyu-eave-rain",
++                   "status": "completed"
++                 },
++                 {
++                   "kind": "knowledgeKnown",
++                   "nodeId": "event.r103-tingyu-practice",
++                   "isKnown": false
++                 }
++               ]
++             },
++             {
++               "text": "听说门中在查一封匿名信，能否让我也看一眼？",
++               "nextNodeId": "r103-tingyu-letter",
++               "conditions": [
++                 {
++                   "kind": "factionMembership",
++                   "factionId": "faction.tingyu-jiange",
++                   "isMember": true
++                 },
++                 {
++                   "kind": "knowledgeKnown",
++                   "nodeId": "event.r43-wayfarer-letter",
++                   "isKnown": false
++                 }
++               ],
++               "effects": [
++                 {
++                   "kind": "discoverKnowledgeNode",
++                   "nodeId": "event.r43-wayfarer-letter"
++                 }
++               ]
++             },
++             {
++               "text": "门中剑法的门槛与用处，请师父照实说一遍。",
++               "nextNodeId": "r103-tingyu-training",
++               "conditions": [
++                 {
++                   "kind": "factionMembership",
++                   "factionId": "faction.tingyu-jiange",
++                   "isMember": true
++                 }
++               ]
++             },
++             {
++               "text": "多谢指点，告辞。",
++               "nextNodeId": "farewell"
++             },
++             {
++               "text": "改投之前，怎样核对入门资格与这一程实践？",
++               "nextNodeId": "r127-transfer-readiness"
++             }
++           ]
++         },
++         {
++           "id": "sword-talk",
++           "text": "叶庭舟以枝代剑，点出你眼中尚急的锋芒：「先看清对面，再谈出剑。等你心与手不再相争，我再看你的根骨。」"
++         },
++         {
++           "id": "accepted",
++           "text": "叶庭舟替你正了衣襟：「入门不是求一块招牌。从今日起，先学听雨，再学听人。」"
++         },
++         {
++           "id": "respected",
++           "text": "叶庭舟点头道：「肯把门中规矩放进心里，这份信任就不是白给的。」"
++         },
++         {
++           "id": "r32-lessons",
++           "text": "叶庭舟把几页剑谱依次铺开：「先按你的根基选一式。学会之后，若仍想请教，再把剑谱翻回来。」",
++           "options": [
++             {
++               "text": "请教听雨剑法。",
++               "nextNodeId": "r32-taught",
++               "conditions": [
++                 {
++                   "kind": "martialArtEligible",
++                   "martialArtId": "skill.tingyu-jianfa"
++                 }
++               ],
++               "effects": [
++                 {
++                   "kind": "learnMartialArt",
++                   "martialArtId": "skill.tingyu-jianfa"
++                 }
++               ]
++             },
++             {
++               "text": "请教落雨七分剑。",
++               "nextNodeId": "r32-taught",
++               "conditions": [
++                 {
++                   "kind": "martialArtEligible",
++                   "martialArtId": "skill.r32-tingyu-luoyu-jian"
++                 }
++               ],
++               "effects": [
++                 {
++                   "kind": "learnMartialArt",
++                   "martialArtId": "skill.r32-tingyu-luoyu-jian"
++                 }
++               ]
++             },
++             {
++               "text": "请教覆水回澜剑。",
++               "nextNodeId": "r32-taught",
++               "conditions": [
++                 {
++                   "kind": "martialArtEligible",
++                   "martialArtId": "skill.r32-tingyu-fushui-jian"
++                 }
++               ],
++               "effects": [
++                 {
++                   "kind": "learnMartialArt",
++                   "martialArtId": "skill.r32-tingyu-fushui-jian"
++                 }
++               ]
++             },
++             {
++               "text": "请教回澜照影剑。",
++               "nextNodeId": "r32-taught",
++               "conditions": [
++                 {
++                   "kind": "martialArtEligible",
++                   "martialArtId": "skill.r32-tingyu-huilan-jian"
++                 }
++               ],
++               "effects": [
++                 {
++                   "kind": "learnMartialArt",
++                   "martialArtId": "skill.r32-tingyu-huilan-jian"
++                 }
++               ]
++             },
++             {
++               "text": "请教怀音养息诀。",
++               "nextNodeId": "r32-taught",
++               "conditions": [
++                 {
++                   "kind": "martialArtEligible",
++                   "martialArtId": "skill.r32-tingyu-huaiyin-jue"
++                 }
++               ],
++               "effects": [
++                 {
++                   "kind": "learnMartialArt",
++                   "martialArtId": "skill.r32-tingyu-huaiyin-jue"
++                 }
++               ]
++             },
++             {
++               "text": "请教听潮入微剑。",
++               "nextNodeId": "r32-taught",
++               "conditions": [
++                 {
++                   "kind": "martialArtEligible",
++                   "martialArtId": "skill.r32-tingyu-tingchao-jian"
++                 }
++               ],
++               "effects": [
++                 {
++                   "kind": "learnMartialArt",
++                   "martialArtId": "skill.r32-tingyu-tingchao-jian"
++                 }
++               ]
++             },
++             {
++               "text": "今日先到这里。",
++               "nextNodeId": "farewell"
++             }
++           ]
++         },
++         {
++           "id": "r32-taught",
++           "text": "叶庭舟把你方才所选的剑路拆成数段，让你记清步眼、收势与留白：「招式授了，往后要在每一场交手里读懂它。」",
++           "options": [
++             {
++               "text": "再请教一门。",
+
++               "nextNodeId": "r32-lessons"
++             },
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 20 passed (21)
+   Start at  20:33:38
+   Duration  947ms (transform 47%, tests 41%, import 11%, worker 1%)
+
++             {
++               "text": "多谢师父，告辞。",
++               "nextNodeId": "farewell"
++             }
++           ]
++         },
++         {
++           "id": "departed",
++           "text": "叶庭舟收回目光：「缘分既尽，便各走各路。门中剑法也随今日一并还来。」"
++         },
++         {
++           "id": "farewell",
++           "text": "叶庭舟将纸页收进袖中：「沿路多看，答案不在一处。」"
++         },
++         {
++           "id": "r43-accepted-tingyu-eave-rain",
++           "text": "叶庭舟把剑穗压在信角上：「先核准时辰。江湖话传得快，剑阁不替传闻磨出锋刃。」"
++         },
++         {
++           "id": "r127-transfer-readiness",
++           "text": "叶庭舟把名册摊开：「先按J看当前师门退出后的真实声望、善恶及各派缺口，别只看未退门的数。我这里江湖声望门槛是0，善恶须在−20至80，悟性至少9，与我关系至少5；先请教剑意建立关系，再按规矩拜师。不是每派都要先刷声望。入听雨后核柳教习的时辰，再看云纹石阶，回来复命；旧见闻可推进记录，但记录回填不能冒充此行观察。听潮入微剑还要身法18，够不着就先练可学的剑式。出手、养息皆花真实内力，师门不替你白补。」",
++           "options": [
++             {
++               "text": "明白了，我照实际条件准备。",
++               "nextNodeId": "greet"
++             }
++           ]
++         }
++       ]
+      },
+      {
+        "id": "dlg.shi-bei-mentor",
+        "startNodeId": "greet",
+        "nodes": [
+
+ ❯ tests/round107-growth-routes.test.ts:46:728
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

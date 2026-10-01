@@ -3362,6 +3362,9 @@ export class GridScene extends Phaser.Scene {
         ? undefined
         : deriveNpcRegionNames(world.assembly.npcs, world.worldMap.regions),
       quests: this.quests,
+      character: this.playerState,
+      journal: this.questJournal,
+      martialArts: this.progression.martialArts,
     });
     this.updateInteractHint();
   }

@@ -1,8 +1,9 @@
 import Phaser from 'phaser';
 
-import type { FactionData } from '../engine/character-progression';
+import type { CharacterState, FactionData, MartialArtData } from '../engine/character-progression';
+import { projectFactionAdmissions } from '../engine/faction-admission-preview';
 import type { FactionMembership } from '../engine/faction-system';
-import type { QuestData } from '../engine/quest-system';
+import type { QuestData, QuestJournal } from '../engine/quest-system';
 import { getFactionRenown, type SocialState } from '../engine/social-state';
 import { uiFontSize } from './settings';
 import {
@@ -21,6 +22,9 @@ export interface FactionPanelModel {
   /** Data-derived region name per assembled NPC id (Round 64 dossier). */
   npcRegionNames?: ReadonlyMap<string, string>;
   quests: ReadonlyMap<string, QuestData>;
+  character?: Readonly<CharacterState> | null;
+  journal?: Readonly<QuestJournal>;
+  martialArts?: ReadonlyMap<string, MartialArtData>;
 }
 
 type PanelBinding = { key: Phaser.Input.Keyboard.Key; handler: () => void };
@@ -149,6 +153,8 @@ export class FactionPanel {
     const socialLine = `个人行声：善恶 ${this.signed(model.social.morality)} · 江湖声望 ${model.social.renown}/1000`;
 
     const factions = [...model.factions.values()];
+    const admissionPreviews = model.character === undefined || model.journal === undefined || model.martialArts === undefined
+      ? new Map() : projectFactionAdmissions({ ...model, character: model.character, journal: model.journal, martialArts: model.martialArts });
     const factionBlocks = factions.length === 0
       ? ['当前没有有效门派资料。']
       : factions.map(faction => buildFactionBlock({
@@ -163,6 +169,7 @@ export class FactionPanel {
           }),
           renown: getFactionRenown(model.social, faction.id),
           quests: model.quests,
+          admissionPreview: admissionPreviews.get(faction.id),
         }));
     const blocks = [...buildDossierIdentityBlocks({ identityText, socialLine }), ...factionBlocks];
     const pages = paginateFactionDossier(blocks, contentWidth, geometry.bodyCapacity, measure);

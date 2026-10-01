@@ -10,6 +10,7 @@
  */
 import type { FactionData } from '../engine/character-progression';
 import type { QuestData } from '../engine/quest-system';
+import type { FactionAdmissionPreview } from '../engine/faction-admission-preview';
 
 export { buildQuestPanelGeometry as buildFactionPanelGeometry, paginateQuestDetail as paginateFactionDossier, type QuestPanelGeometry as FactionPanelGeometry } from './quest-panel-layout';
 
@@ -105,6 +106,7 @@ export function buildFactionBlock(input: {
   mentorLabels: readonly string[];
   renown: number;
   quests: ReadonlyMap<string, QuestData>;
+  admissionPreview?: FactionAdmissionPreview;
 }): string {
   const { faction } = input;
   const mentors = input.mentorLabels.length > 0 ? input.mentorLabels.join('、') : '暂无登记师父';
@@ -112,7 +114,21 @@ export function buildFactionBlock(input: {
     ? `退门代价：善恶 ${signed(faction.departure.moralityDelta)}、江湖声望 ${signed(faction.departure.renownDelta)}、本门声望 ${signed(faction.departure.factionRenownDelta)}；${faction.departure.forgetFactionMartialArts ? '遗忘本门武学' : '保留已学武学'}`
     : '退门：门规不许';
   const heading = `${input.isCurrent ? '◆' : '◇'} ${faction.name} · 师父：${mentors}`;
-  return `${heading}\n本门声望：${input.renown}/1000。入门：${factionAdmissionSummary(faction, input.quests)}。${departure}。`;
+  const preview = input.admissionPreview;
+  let eligibility = '';
+  if (preview !== undefined && !preview.isCurrent) {
+    if (preview.unavailableReason !== undefined) eligibility = `\n改投资格：${preview.unavailableReason}。`;
+    else {
+      const basis = preview.basis === 'after-departure' ? '按退出当前师门后估算' : '按当前无师门身份核对';
+      const mentors = preview.mentors.map((mentor, index) => {
+        const label = input.mentorLabels[index] ?? mentor.npcId;
+        const reasons = mentor.reasons.map(reason => reason.replace(/\b(body|force|agility|insight|resolve)\b/g, id => ATTRIBUTE_NAMES[id] ?? id));
+        return `${label}：${mentor.eligible ? '条件已满足，可交谈申请（尚未拜师）' : reasons.join('；')}`;
+      });
+      eligibility = `\n${basis}：善恶 ${preview.morality}，江湖声望 ${preview.renown}。${mentors.length === 0 ? '暂无登记导师，不能申请。' : mentors.join('\n')}`;
+    }
+  }
+  return `${heading}\n本门声望：${input.renown}/1000。入门：${factionAdmissionSummary(faction, input.quests)}。${departure}。${eligibility}`;
 }
 
 /**
