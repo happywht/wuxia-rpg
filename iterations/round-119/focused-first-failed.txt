@@ -1,0 +1,64 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round119-quest-panel-detail.test.ts (11 tests | 3 failed) 33ms
+   ❯ Round119 QuestPanel paged CJK detail with intact row semantics (4)
+     × shows the real R97 task, paginates its detail and resets on row change 6ms
+     × keeps bands disjoint at max font on the narrow canvas 1ms
+     × accepts the offered row with Enter and reports it, keeping N/A/Esc semantics 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round119-quest-panel-detail.test.ts > Round119 QuestPanel paged CJK detail with intact row semantics > shows the real R97 task, paginates its detail and resets on row change
+ReferenceError: VISIBLE_ROWS is not defined
+ ❯ QuestPanel.render src/game/quest-ui.ts:316:32
+    314|       statusHeight: lineSize(11),
+    315|       hintHeight: lineSize(10),
+    316|       maxVisibleRows: Math.min(VISIBLE_ROWS, Math.max(1, rows.length)),
+       |                                ^
+    317|     });
+    318|     // Font-synced probes: Phaser syncs a Text object's canvas context…
+ ❯ QuestPanel.open src/game/quest-ui.ts:151:10
+ ❯ setupPanel tests/round119-quest-panel-detail.test.ts:173:9
+ ❯ tests/round119-quest-panel-detail.test.ts:182:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/round119-quest-panel-detail.test.ts > Round119 QuestPanel paged CJK detail with intact row semantics > keeps bands disjoint at max font on the narrow canvas
+ReferenceError: VISIBLE_ROWS is not defined
+ ❯ QuestPanel.render src/game/quest-ui.ts:316:32
+    314|       statusHeight: lineSize(11),
+    315|       hintHeight: lineSize(10),
+    316|       maxVisibleRows: Math.min(VISIBLE_ROWS, Math.max(1, rows.length)),
+       |                                ^
+    317|     });
+    318|     // Font-synced probes: Phaser syncs a Text object's canvas context…
+ ❯ QuestPanel.open src/game/quest-ui.ts:151:10
+ ❯ setupPanel tests/round119-quest-panel-detail.test.ts:173:9
+ ❯ tests/round119-quest-panel-detail.test.ts:205:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/round119-quest-panel-detail.test.ts > Round119 QuestPanel paged CJK detail with intact row semantics > accepts the offered row with Enter and reports it, keeping N/A/Esc semantics
+ReferenceError: VISIBLE_ROWS is not defined
+ ❯ QuestPanel.render src/game/quest-ui.ts:316:32
+    314|       statusHeight: lineSize(11),
+    315|       hintHeight: lineSize(10),
+    316|       maxVisibleRows: Math.min(VISIBLE_ROWS, Math.max(1, rows.length)),
+       |                                ^
+    317|     });
+    318|     // Font-synced probes: Phaser syncs a Text object's canvas context…
+ ❯ QuestPanel.open src/game/quest-ui.ts:151:10
+ ❯ setupPanel tests/round119-quest-panel-detail.test.ts:173:9
+ ❯ tests/round119-quest-panel-detail.test.ts:225:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  3 failed | 41 passed (44)
+   Start at  15:14:20
+   Duration  2.05s (tests 64%, transform 27%, import 8%, worker 1%)
+
+    Isolate  5 workers spawned · ~176ms startup each (spawn + environment, per file)
+             at least ~264ms faster with isolate: false — reuses workers across files instead of one per file

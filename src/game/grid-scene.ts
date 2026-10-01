@@ -4398,6 +4398,10 @@ export class GridScene extends Phaser.Scene {
     this.updateCoordsHud();
     this.updateTransitionMarkerProximity();
     this.updateInteractHint();
+    // Round 119: the tracker line quotes the nearest giver's live cell, so
+    // every successful step re-projects it (zero-minute steps included — the
+    // notice timer and active-quest priority live inside the projection).
+    this.updateQuestTrackerHud();
     const baseStepMinutes = this.clock?.calendar.actionCosts.stepMinutes ?? 0;
     const weatherStepMinutes = this.currentClimate()?.weather.stepMinutes ?? 0;
     this.advanceTime(baseStepMinutes + weatherStepMinutes);
