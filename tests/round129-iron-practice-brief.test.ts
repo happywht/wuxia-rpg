@@ -159,8 +159,8 @@ describe('Round129 iron-practice briefs (real assembled data)', () => {
   });
 
   it('supports LF and CRLF inputs, preserving each file byte convention', () => {
-    const lf = readFileSync(join(root, 'data/base/dialogues/round-03-conversations.json'), 'utf8');
-    expect(lf.includes('\r\n')).toBe(false); // The checkout ships LF today.
+    const lf = readFileSync(join(root, 'data/base/dialogues/round-03-conversations.json'), 'utf8').replace(/\r\n/g, '\n');
+    expect(lf.includes('\r\n')).toBe(false); // Exercise LF independently of checkout autocrlf.
     expect(addIronPracticeBriefs(lf)).toBe(lf); // Idempotent on LF.
     const crlf = lf.replace(/\n/g, '\r\n');
     expect(addIronPracticeBriefs(crlf)).toBe(crlf); // Idempotent on CRLF too — a Windows checkout is normal, not drift.
