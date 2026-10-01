@@ -1887,10 +1887,15 @@
       "mapResourceId": "map.round-84-windward-isle",
       "col": 2,
       "row": 50,
-      "text": "踏过最后一段露水的沙脊，风回岛的西滩在午后的潮光里铺开，东坡上隐约立着一座白石灯标。",
+      "text": "风回岛在潮光里铺开：细沙滩脊一路向东坡收拢，坡上隐约立着一座白石灯标。",
       "approachText": "潮声从东南方压过来，沙脊尽头浮出一线岛影。",
       "once": true,
-      "discoverKnowledgeNodeId": "place.r84-windward-isle"
+      "discoverKnowledgeNodeId": "place.r84-windward-isle",
+      "arrivalTransitionIds": [
+        "gate.r84-east-coast-to-windward-isle",
+        "gate.r85-tide-isle-to-windward-isle",
+        "gate.r97-lanxin-to-windward"
+      ]
     },
     {
       "id": "event.r84-hamlet-ledger",
@@ -1925,10 +1930,15 @@
       "mapResourceId": "map.round-85-tide-isle",
       "col": 2,
       "row": 50,
-      "text": "渡船擦着礁盘外缘靠上西滩，潮生屿在正午的潮光里显出层层叠叠的礁脊，松林深处升起一缕炊烟。",
+      "text": "潮生屿在潮光里显出层层叠叠的礁脊，松林深处升起一缕炊烟，滩上水线层层退去又涨回。",
       "approachText": "南面浪线后浮出一线低平的岛影，潮声在礁盘上碎成白沫。",
       "once": true,
-      "discoverKnowledgeNodeId": "place.r85-tide-isle"
+      "discoverKnowledgeNodeId": "place.r85-tide-isle",
+      "arrivalTransitionIds": [
+        "gate.r85-windward-isle-to-tide-isle",
+        "gate.r94-south-to-tide",
+        "gate.r97-lanxin-to-tide"
+      ]
     },
     {
       "id": "event.r85-reef-channel",
@@ -2454,10 +2464,15 @@
       "mapResourceId": "map.round-97-lanxin-isle",
       "col": 7,
       "row": 40,
-      "text": "沙脊自分浪处露出，三道岔脊一路向岛心收拢。澜心湾里泊着候潮的旧船，桅灯未点，缆绳却都收得利落。",
+      "text": "澜心洲在潮线间铺开，三道岔脊一路向岛心收拢。湾里泊着候潮的旧船，桅灯未点，缆绳却都收得利落。",
       "approachText": "脊上深浅两色水线交叠，潮退到一半。",
       "once": true,
-      "discoverKnowledgeNodeId": "place.r97-lanxin-isle"
+      "discoverKnowledgeNodeId": "place.r97-lanxin-isle",
+      "arrivalTransitionIds": [
+        "gate.r97-windward-to-lanxin",
+        "gate.r97-tide-to-lanxin",
+        "gate.r97-pilot-to-lanxin"
+      ]
     },
     {
       "id": "event.r97-tide-mark-stone",
@@ -2502,10 +2517,14 @@
       "mapResourceId": "map.round-97-pilot-reef",
       "col": 50,
       "row": 92,
-      "text": "礁盘自潮水中浮现，黑礁连成一线，栈道自南向北直贯礁心。风里有一缕灯油味，航标就在礁脊某处亮着。",
+      "text": "引航礁在眼前铺开，黑礁连成一线，栈道自南向北直贯礁心。风里有一缕灯油味，航标就在礁脊某处亮着。",
       "approachText": "栈板缝里塞着换下来的旧灯芯。",
       "once": true,
-      "discoverKnowledgeNodeId": "place.r97-pilot-reef"
+      "discoverKnowledgeNodeId": "place.r97-pilot-reef",
+      "arrivalTransitionIds": [
+        "gate.r97-lanxin-to-pilot",
+        "gate.r97-east-to-pilot"
+      ]
     },
     {
       "id": "event.r97-beacon-tower",

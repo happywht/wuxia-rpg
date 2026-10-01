@@ -674,10 +674,11 @@ const events = [
     id: nodeIds.arrival,
     mapResourceId: mapId,
     ...start,
-    text: '渡船擦着礁盘外缘靠上西滩，潮生屿在正午的潮光里显出层层叠叠的礁脊，松林深处升起一缕炊烟。',
+    text: '潮生屿在潮光里显出层层叠叠的礁脊，松林深处升起一缕炊烟，滩上水线层层退去又涨回。',
     approachText: '南面浪线后浮出一线低平的岛影，潮声在礁盘上碎成白沫。',
     once: true,
     discoverKnowledgeNodeId: nodeIds.isle,
+    arrivalTransitionIds: ['gate.r85-windward-isle-to-tide-isle', 'gate.r94-south-to-tide', 'gate.r97-lanxin-to-tide'],
   },
   {
     id: nodeIds.reefEvent,

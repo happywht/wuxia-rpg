@@ -583,10 +583,11 @@ const events = [
     id: nodeIds.arrival,
     mapResourceId: mapId,
     ...start,
-    text: '踏过最后一段露水的沙脊，风回岛的西滩在午后的潮光里铺开，东坡上隐约立着一座白石灯标。',
+    text: '风回岛在潮光里铺开：细沙滩脊一路向东坡收拢，坡上隐约立着一座白石灯标。',
     approachText: '潮声从东南方压过来，沙脊尽头浮出一线岛影。',
     once: true,
     discoverKnowledgeNodeId: nodeIds.isle,
+    arrivalTransitionIds: ['gate.r84-east-coast-to-windward-isle', 'gate.r85-tide-isle-to-windward-isle', 'gate.r97-lanxin-to-windward'],
   },
   {
     id: nodeIds.hamletEvent,

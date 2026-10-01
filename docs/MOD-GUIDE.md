@@ -83,3 +83,7 @@ world-map可省略regionGuides；每条mapResourceId/role(hub/investigation/chal
 ## Round 116 关口入场事件
 
 定点非互动事件可选 arrivalTransitionIds（1–64个不重复非空关口id）。实际装配关口必须有效且to.mapResourceId等于事件地图；坏引用警告并隔离事件。运行时保留精确格触发，同时仅实际switchRegion完成传入关口id；启动、等待、拒绝过关不会产生此原因，旧坐标触发规则仍有效。一次性和全部五类条件两种触发都遵循。当前默认仅天门关声明新字段，不代表其余海岛入口已修。无需存档迁移，旧MOD省略兼容。局部脚本fix-round116-east-arrival.mjs只更新该事件及传航正文；不在现有树重跑旧整链生成。
+
+## Round 118 四岛入场覆盖
+
+四岛固定非互动事件列出全部入站关口，事件/一次性id及旧坐标保持。MOD若增加岛屿入口，须同时更新目标事件arrivalTransitionIds；装配要求关口有效且目的地地图匹配。旧覆盖省略该字段仍用精确格触发。作者修复脚本只接受当前默认11入口清单，不用于任意MOD资料；新增入口将拒绝并要求人工复核。
