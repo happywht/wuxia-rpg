@@ -16,6 +16,7 @@ import {
   equipItem,
 } from '../engine/item-system';
 import { uiFontSize } from './settings';
+import { wrapDialogueText, paginateDialogueLines } from './dialogue-layout';
 import { addPixelPanelChrome, UI_FONT_FAMILY, addPixelSelection } from './ui-theme';
 
 /**
@@ -25,11 +26,18 @@ import { addPixelPanelChrome, UI_FONT_FAMILY, addPixelSelection } from './ui-the
  * profile's own attribute labels), equipment slots and item stacks; the
  * selected stack's data description shows below the list. Enter uses a
  * consumable, equips/unequips equipment and reports unusable categories;
- * Up/Down (W/S) move the selection and Esc closes. All names, descriptions
- * and numbers come from data — this class only draws, forwards input and
- * calls the Phaser-free item engine, so no world content lives here. The
- * owning scene gates movement input on `isOpen`, exactly like the dialogue
- * and battle panels.
+ * Up/Down (W/S) move the selection, Space pages through a long description
+ * and Esc closes. All names, descriptions and numbers come from data — this
+ * class only draws, forwards input and calls the Phaser-free item engine, so
+ * no world content lives here. The owning scene gates movement input on
+ * `isOpen`, exactly like the dialogue and battle panels.
+ *
+ * Round 109 geometry: the panel clamps to the viewport, every text block is
+ * wrapped with the shared measured grapheme wrapper (no Phaser wordWrap), and
+ * list/detail/footer heights are derived from the live font size, so long
+ * residual-scroll descriptions page inside the panel instead of spilling
+ * past the right edge — at 640×360 with the 1.5 font scale included. Enter
+ * semantics, engine rules and the data itself are untouched.
  */
 
 const UI = {
@@ -48,14 +56,21 @@ const UI = {
 } as const;
 
 const PADDING = 24;
-const ROW_HEIGHT = 26;
+const COMPACT_PADDING = 16;
+/** Panel never wider/taller than these; smaller viewports clamp instead. */
+const PANEL_MAX_WIDTH = 560;
+const PANEL_MAX_HEIGHT = 452;
+/** Minimum gap between the panel and the viewport edges. */
+const VIEW_MARGIN = 12;
 /** Rows visible at once; longer lists scroll around the selection. */
-const VISIBLE_ROWS = 8;
+const LIST_ROWS_MAX = 8;
+/** Description lines aimed for; squeezed panels may shrink towards one. */
+const DETAIL_LINES_MAX = 4;
+/** Shared body line step (font px + spacing), mirroring the test geometry. */
+const LINE_SPACING = 3;
 const CURSOR_ACTIVE = '▸ ';
 const CURSOR_IDLE = '  ';
 const EQUIPPED_MARK = '［装备中］';
-const PANEL_WIDTH = 560;
-const PANEL_HEIGHT = 452;
 
 /** Mechanic-only labels rendered next to data-driven values. */
 const LABELS = {
@@ -74,9 +89,45 @@ const LABELS = {
   equipAction: 'Enter 装备',
   unequipAction: 'Enter 卸下',
   miscAction: '此物此刻用不上',
-  selectHint: '↑/↓ 选择 · Enter 使用/装备 · Esc 关闭',
+  selectHint: '↑/↓ 选择 · Enter 使用/装备 · Space 读说明 · Esc 关闭',
   stacksHidden: '……（其余堆数未显示）',
+  detailPageRead: 'Space 续读',
 } as const;
+
+/** Parses a `uiFontSize` pixel string; defensive fallback keeps geometry sane. */
+function fontPx(spec: string): number {
+  const value = Number.parseInt(spec, 10);
+  return Number.isFinite(value) && value > 0 ? value : 12;
+}
+
+/**
+ * Picks the widest single-line variant that fits: the full row first, then
+ * the name/count/equipped summary, then a grapheme-truncated tail (the data
+ * caps names at six characters, so the truncation branch is a safety net).
+ */
+function fitRowLine(
+  full: string,
+  summary: string,
+  maxWidth: number,
+  measure: (value: string) => number,
+): string {
+  if (measure(full) <= maxWidth) {
+    return full;
+  }
+  if (measure(summary) <= maxWidth) {
+    return summary;
+  }
+  const marker = '…';
+  let line = '';
+  const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+  for (const { segment } of segmenter.segment(summary)) {
+    if (line !== '' && measure(line + segment + marker) > maxWidth) {
+      break;
+    }
+    line += segment;
+  }
+  return line + marker;
+}
 
 function slotLabel(slot: EquipmentSlotId): string {
   if (slot === 'weapon') {
@@ -162,6 +213,10 @@ export class InventoryPanel {
   private selection = 0;
   private status: string | null = null;
   private openState = false;
+  /** Current page of the selected stack's description (0-based). */
+  private detailPage = 0;
+  /** Page count of the last rendered description; 1 when there is none. */
+  private detailPages = 1;
 
   constructor(scene: Phaser.Scene, options: InventoryPanelOptions = {}) {
     this.scene = scene;
@@ -183,6 +238,8 @@ export class InventoryPanel {
     this.model = model;
     this.selection = 0;
     this.status = null;
+    this.detailPage = 0;
+    this.detailPages = 1;
     this.openState = true;
     this.container.setVisible(true);
     this.bindKeys();
@@ -220,6 +277,7 @@ export class InventoryPanel {
       [KeyCodes.DOWN, () => this.moveSelection(1)],
       [KeyCodes.S, () => this.moveSelection(1)],
       [KeyCodes.ENTER, () => this.confirm()],
+      [KeyCodes.SPACE, () => this.turnDetailPage()],
       [KeyCodes.ESC, () => this.close()],
     ];
     for (const [code, handler] of pairs) {
@@ -243,6 +301,19 @@ export class InventoryPanel {
     }
     this.status = null;
     this.selection = (this.selection + delta + count) % count;
+    this.detailPage = 0; // A different stack starts its description over.
+    this.render();
+  }
+
+  /**
+   * Space advances the selected description's pages cyclically. It never
+   * uses, equips, crafts or closes anything — reading costs nothing.
+   */
+  private turnDetailPage(): void {
+    if (this.detailPages <= 1) {
+      return;
+    }
+    this.detailPage = (this.detailPage + 1) % this.detailPages;
     this.render();
   }
 
@@ -313,22 +384,70 @@ export class InventoryPanel {
     }
     this.container.removeAll(true);
 
-    const width = this.scene.scale.width;
-    const height = this.scene.scale.height;
-    const panelLeft = (width - PANEL_WIDTH) / 2;
-    const panelTop = (height - PANEL_HEIGHT) / 2 + 6;
-    const contentWidth = PANEL_WIDTH - PADDING * 2;
+    // Viewport-clamped panel geometry; every later block derives from the
+    // live font sizes so nothing can spill past the frame at any scale.
+    const viewWidth = this.scene.scale.width;
+    const viewHeight = this.scene.scale.height;
+    const panelWidth = Math.min(PANEL_MAX_WIDTH, viewWidth - VIEW_MARGIN * 2);
+    const panelHeight = Math.min(PANEL_MAX_HEIGHT, viewHeight - VIEW_MARGIN * 2);
+    const panelLeft = Math.round((viewWidth - panelWidth) / 2);
+    const panelTop = Math.round((viewHeight - panelHeight) / 2 + 6);
+    const padding = panelWidth >= PANEL_MAX_WIDTH - 80 ? PADDING : COMPACT_PADDING;
+    const contentWidth = panelWidth - padding * 2;
 
     addPixelPanelChrome(
       this.scene,
       this.container,
-      { x: panelLeft, y: panelTop, width: PANEL_WIDTH, height: PANEL_HEIGHT },
+      { x: panelLeft, y: panelTop, width: panelWidth, height: panelHeight },
       UI.overlayAlpha,
     );
 
+    const titleSize = fontPx(uiFontSize(18));
+    const bodySize = fontPx(uiFontSize(12));
+    const rowSize = fontPx(uiFontSize(13));
+    const moreSize = fontPx(uiFontSize(11));
+    const hintSize = fontPx(uiFontSize(10));
+    const bodyLine = bodySize + LINE_SPACING;
+    const rowHeight = Math.max(rowSize + 8, rowSize * 2);
+    const moreLine = moreSize + LINE_SPACING;
+    const hintLine = hintSize + LINE_SPACING;
+    const detailLine = Math.max(bodySize + 4, Math.ceil(bodySize * 1.5));
+
+    // Measuring probes share the panel container, so teardown reclaims them.
+    const measureWith = (size: number): ((value: string) => number) => {
+      const probe = this.scene.add.text(0, 0, '', {
+        fontFamily: UI.fontFamily,
+        fontSize: `${size}px`,
+        color: UI.textMuted,
+      });
+      this.container.add(probe);
+      return (value: string): number => probe.context.measureText(value).width;
+    };
+    const wrapLines = (text: string, size: number): string[] =>
+      wrapDialogueText(text, contentWidth, measureWith(size));
+    const addWrapped = (
+      x: number,
+      y: number,
+      lines: readonly string[],
+      size: number,
+      color: string,
+      align?: 'right',
+    ): void => {
+      const text = this.scene.add
+        .text(x, y, lines.join('\n'), {
+          fontFamily: UI.fontFamily,
+          fontSize: `${size}px`,
+          color,
+          align,
+        })
+        .setOrigin(align === 'right' ? 1 : 0, 0);
+      this.container.add(text);
+    };
+
     // Header: title, money and stack capacity.
+    const headerTop = panelTop + Math.max(10, Math.round(titleSize * 0.55));
     const title = this.scene.add
-      .text(panelLeft + PADDING, panelTop + 16, LABELS.title, {
+      .text(panelLeft + padding, headerTop, LABELS.title, {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(18),
         color: UI.accent,
@@ -338,7 +457,7 @@ export class InventoryPanel {
 
     const moneyLine = `${LABELS.currency} ${model.inventory.currency}　${LABELS.capacity} ${model.inventory.stacks.length}/${model.inventory.capacity}`;
     const moneyText = this.scene.add
-      .text(panelLeft + PANEL_WIDTH - PADDING, panelTop + 20, moneyLine, {
+      .text(panelLeft + panelWidth - padding, headerTop + Math.round((titleSize - bodySize) / 2), moneyLine, {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(13),
         color: UI.textWarn,
@@ -352,23 +471,12 @@ export class InventoryPanel {
         `${model.profile.attributeLabels[attributeId]} ${model.character.attributes[attributeId]}`,
     );
     const vitalLine = `${LABELS.level} ${model.character.level}　${LABELS.health} ${model.character.health.current}/${model.character.health.max}　${LABELS.qi} ${model.character.qi.current}/${model.character.qi.max}`;
-    const vitalsText = this.scene.add
-      .text(panelLeft + PADDING, panelTop + 44, vitalLine, {
-        fontFamily: UI.fontFamily,
-        fontSize: uiFontSize(12),
-        color: UI.textPrimary,
-      })
-      .setOrigin(0, 0);
-    this.container.add(vitalsText);
+    const vitalLines = wrapLines(vitalLine, bodySize);
+    addWrapped(panelLeft + padding, headerTop + titleSize + Math.max(8, Math.round(bodySize * 0.45)), vitalLines, bodySize, UI.textPrimary);
 
-    const attributesText = this.scene.add
-      .text(panelLeft + PADDING, panelTop + 64, attributeParts.join('　'), {
-        fontFamily: UI.fontFamily,
-        fontSize: uiFontSize(12),
-        color: UI.textPrimary,
-      })
-      .setOrigin(0, 0);
-    this.container.add(attributesText);
+    const attributeLines = wrapLines(attributeParts.join('　'), bodySize);
+    const attributesTop = headerTop + titleSize + Math.max(8, Math.round(bodySize * 0.45)) + vitalLines.length * bodyLine + Math.max(4, Math.round(bodySize * 0.3));
+    addWrapped(panelLeft + padding, attributesTop, attributeLines, bodySize, UI.textPrimary);
 
     // Equipment slots strip.
     const slotParts = (['weapon', 'garment', 'ornament'] as const).map((slot) => {
@@ -376,22 +484,51 @@ export class InventoryPanel {
       const item = itemId === undefined ? undefined : model.items.get(itemId);
       return `${slotLabel(slot)}：${item === undefined ? LABELS.emptySlots : item.name}`;
     });
-    const slotsText = this.scene.add
-      .text(panelLeft + PADDING, panelTop + 84, `${LABELS.equippedTitle}　${slotParts.join('　')}`, {
-        fontFamily: UI.fontFamily,
-        fontSize: uiFontSize(12),
-        color: UI.rowEquipped,
-        wordWrap: { width: contentWidth },
-      })
-      .setOrigin(0, 0);
-    this.container.add(slotsText);
+    const slotLines = wrapLines(`${LABELS.equippedTitle}　${slotParts.join('　')}`, bodySize);
+    const slotsTop = attributesTop + attributeLines.length * bodyLine + Math.max(4, Math.round(bodySize * 0.3));
+    addWrapped(panelLeft + padding, slotsTop, slotLines, bodySize, UI.rowEquipped);
 
-    // Item rows inside a scrolling window around the selection.
-    const listTop = panelTop + 116;
+    const listTop = slotsTop + slotLines.length * bodyLine + Math.max(6, Math.round(rowSize * 0.4));
+    const listGap = Math.max(6, Math.round(rowSize * 0.4));
+
+    // Footer (status line + key hint) reserves its real height first.
+    const hintLines = wrapLines(LABELS.selectHint, hintSize);
+    const hintBottom = panelTop + panelHeight - Math.max(10, Math.round(hintSize * 0.8));
+    const hintTop = hintBottom - hintLines.length * hintLine;
+    const statusLines = this.status === null ? [] : wrapLines(this.status, bodySize);
+    const statusTop =
+      hintTop - Math.max(4, Math.round(bodySize * 0.35)) - statusLines.length * bodyLine;
+    const detailLimit = statusTop - Math.max(4, Math.round(bodySize * 0.3));
+
+    // Split the remaining height between the row window and the description,
+    // always keeping at least one line of each and a fixed action row.
     const stacks = model.inventory.stacks;
+    const actionBlock = bodyLine + 8;
+    const budget = detailLimit - listTop;
+    const layoutFor = (moreReserve: number): { rows: number; capacity: number } => {
+      const usable = Math.max(0, budget - listGap - actionBlock - moreReserve);
+      let capacity = Math.min(
+        DETAIL_LINES_MAX,
+        Math.max(1, Math.floor((usable - rowHeight) / detailLine)),
+      );
+      const rows = Math.max(
+        1,
+        Math.min(LIST_ROWS_MAX, Math.floor((usable - capacity * detailLine) / rowHeight)),
+      );
+      capacity = Math.min(
+        DETAIL_LINES_MAX,
+        Math.max(1, Math.floor((usable - rows * rowHeight) / detailLine)),
+      );
+      return { rows, capacity };
+    };
+    const firstPass = layoutFor(0);
+    const moreReserve = stacks.length > firstPass.rows ? moreLine + 2 : 0;
+    const { rows: visibleRows, capacity: detailCapacity } = layoutFor(moreReserve);
+
+    const listBottom = listTop + visibleRows * rowHeight;
     if (stacks.length === 0) {
       const emptyText = this.scene.add
-        .text(panelLeft + PADDING, listTop, LABELS.emptySlots, {
+        .text(panelLeft + padding, listTop, LABELS.emptySlots, {
           fontFamily: UI.fontFamily,
           fontSize: uiFontSize(13),
           color: UI.textMuted,
@@ -399,8 +536,9 @@ export class InventoryPanel {
         .setOrigin(0, 0);
       this.container.add(emptyText);
     } else {
-      const windowStart = Math.floor(this.selection / VISIBLE_ROWS) * VISIBLE_ROWS;
-      stacks.slice(windowStart, windowStart + VISIBLE_ROWS).forEach((stack, offset) => {
+      const windowStart = Math.floor(this.selection / visibleRows) * visibleRows;
+      const rowMeasure = measureWith(rowSize);
+      stacks.slice(windowStart, windowStart + visibleRows).forEach((stack, offset) => {
         const index = windowStart + offset;
         const item = model.items.get(stack.itemId);
         if (item === undefined) {
@@ -410,17 +548,19 @@ export class InventoryPanel {
         const equipped = isEquipped(model.inventory, item.id);
         if (active) {
           addPixelSelection(this.scene, this.container, {
-            x: panelLeft + PADDING,
-            y: listTop + offset * ROW_HEIGHT - 2,
-            width: PANEL_WIDTH - PADDING * 2,
-            height: ROW_HEIGHT,
+            x: panelLeft + padding,
+            y: listTop + offset * rowHeight - 2,
+            width: panelWidth - padding * 2,
+            height: rowHeight,
           });
         }
-        const line = this.scene.add
+        const full = `${active ? CURSOR_ACTIVE : CURSOR_IDLE}${stackLineText(item, stack.quantity, equipped)}`;
+        const summary = `${active ? CURSOR_ACTIVE : CURSOR_IDLE}${item.name} ×${stack.quantity}${equipped ? ` ${EQUIPPED_MARK}` : ''}`;
+        const lineText = this.scene.add
           .text(
-            panelLeft + PADDING + 6,
-            listTop + offset * ROW_HEIGHT,
-            `${active ? CURSOR_ACTIVE : CURSOR_IDLE}${stackLineText(item, stack.quantity, equipped)}`,
+            panelLeft + padding + 6,
+            listTop + offset * rowHeight,
+            fitRowLine(full, summary, contentWidth - 6, rowMeasure),
             {
               fontFamily: UI.fontFamily,
               fontSize: uiFontSize(13),
@@ -428,11 +568,11 @@ export class InventoryPanel {
             },
           )
           .setOrigin(0, 0);
-        this.container.add(line);
+        this.container.add(lineText);
       });
-      if (windowStart + VISIBLE_ROWS < stacks.length) {
+      if (windowStart + visibleRows < stacks.length) {
         const moreText = this.scene.add
-          .text(panelLeft + PADDING + 6, listTop + VISIBLE_ROWS * ROW_HEIGHT, LABELS.stacksHidden, {
+          .text(panelLeft + padding + 6, listBottom + 2, LABELS.stacksHidden, {
             fontFamily: UI.fontFamily,
             fontSize: uiFontSize(11),
             color: UI.textMuted,
@@ -442,27 +582,54 @@ export class InventoryPanel {
       }
     }
 
-    // Selected item description (data text) and action hint.
-    const detailTop = listTop + (VISIBLE_ROWS + 1) * ROW_HEIGHT + 6;
+    // Selected item description (data text), paginated for full reading.
+    const detailTop = listBottom + moreReserve + listGap;
     const selectedStack = stacks[this.selection];
     const selectedItem =
       selectedStack === undefined ? undefined : model.items.get(selectedStack.itemId);
-    if (selectedItem !== undefined) {
+    if (selectedItem === undefined) {
+      this.detailPages = 1;
+      this.detailPage = 0;
+    } else {
       const detailText = this.scene.add
-        .text(panelLeft + PADDING, detailTop, selectedItem.description, {
+        .text(panelLeft + padding, detailTop, '', {
           fontFamily: UI.fontFamily,
           fontSize: uiFontSize(12),
           color: UI.textMuted,
-          wordWrap: { width: contentWidth },
           lineSpacing: 4,
         })
         .setOrigin(0, 0);
       this.container.add(detailText);
+      const pages = paginateDialogueLines(
+        wrapDialogueText(selectedItem.description, contentWidth, (value) =>
+          detailText.context.measureText(value).width,
+        ),
+        detailCapacity,
+      );
+      this.detailPages = pages.length;
+      this.detailPage = Math.min(this.detailPage, pages.length - 1);
+      detailText.setText(pages[this.detailPage] ?? '');
+    }
 
+    // Fixed action row inside the reserved detail space: page hint left,
+    // Enter hint right — Space paging never changes what Enter does.
+    const actionTop = detailTop + detailCapacity * detailLine + 4;
+    if (selectedItem !== undefined && this.detailPages > 1) {
+      addWrapped(
+        panelLeft + padding,
+        actionTop,
+        [
+          `说明 ${this.detailPage + 1}/${this.detailPages} · ${LABELS.detailPageRead}`,
+        ],
+        bodySize,
+        UI.textMuted,
+      );
+    }
+    if (selectedItem !== undefined) {
       const actionText = this.scene.add
         .text(
-          panelLeft + PANEL_WIDTH - PADDING,
-          detailTop + detailText.height + 8,
+          panelLeft + panelWidth - padding,
+          actionTop,
           actionHintFor(selectedItem, isEquipped(model.inventory, selectedItem.id)),
           {
             fontFamily: UI.fontFamily,
@@ -475,23 +642,15 @@ export class InventoryPanel {
     }
 
     // Status line (latest operation result) and the key hint.
-    if (this.status !== null) {
-      const statusText = this.scene.add
-        .text(panelLeft + PADDING, panelTop + PANEL_HEIGHT - 44, this.status, {
-          fontFamily: UI.fontFamily,
-          fontSize: uiFontSize(12),
-          color: UI.textWarn,
-          wordWrap: { width: contentWidth },
-        })
-        .setOrigin(0, 0);
-      this.container.add(statusText);
+    if (statusLines.length > 0) {
+      addWrapped(panelLeft + padding, statusTop, statusLines, bodySize, UI.textWarn);
     }
-
     const hintText = this.scene.add
-      .text(panelLeft + PANEL_WIDTH - PADDING, panelTop + PANEL_HEIGHT - 20, LABELS.selectHint, {
+      .text(panelLeft + panelWidth - padding, hintBottom, hintLines.join('\n'), {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(10),
         color: UI.textMuted,
+        align: 'right',
       })
       .setOrigin(1, 1);
     this.container.add(hintText);

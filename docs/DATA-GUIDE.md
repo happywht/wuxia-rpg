@@ -1,6 +1,6 @@
 # 数据规范指南（DATA-GUIDE）
 
-- 状态：截至 Round 108；基础世界含 **38 名 NPC、5 个门派、65 项任务、52 件物品、30 种武学、425 个图谱节点/540 条边**，manifest 登记 **100 项资源**。二十二张区域地图均为 100×100 格；全域舆图为 **768×576、65 层**并以 RLE 保存，输出图素为 8 源像素/格；Round 97 前 61 层像素与二十处既有区域锚点逐格/投影不变。Round 97 新增东溟·澜心洲、东溟·引航礁两张地图、四组双向海路关口（天门关至潮生屿缩短为三段）、两名七时段人物、跨区调查与两段连续差事，全图复用已登记的 Puny World/Puny Characters CC0 素材；新岛与海路逐格检查岸线和叠层。Round 98 修订江南—渡口四人开局对白与两项既有差事的三态提示、统一王朝设定文本（当朝大雍、北界碑大梁为前朝遗刻），资源数量与协议不变。气候、目的地发现门控、跨区任务阶段、NPC 日程与地图均由独立 JSON 声明。素材授权、MOD 和导航协议见 `REFERENCES.md`、`MOD-GUIDE.md`、`MAP-ATLAS.md`。
+- 状态：截至 Round 109；基础世界含 **38 名 NPC、5 个门派、65 项任务、52 件物品、30 种武学、425 个图谱节点/540 条边**，manifest 登记 **100 项资源**。二十二张区域地图均为 100×100 格；全域舆图为 **768×576、65 层**并以 RLE 保存，输出图素为 8 源像素/格；Round 97 前 61 层像素与二十处既有区域锚点逐格/投影不变。Round 97 新增东溟·澜心洲、东溟·引航礁两张地图、四组双向海路关口（天门关至潮生屿缩短为三段）、两名七时段人物、跨区调查与两段连续差事，全图复用已登记的 Puny World/Puny Characters CC0 素材；新岛与海路逐格检查岸线和叠层。Round 98 修订江南—渡口四人开局对白与两项既有差事的三态提示、统一王朝设定文本（当朝大雍、北界碑大梁为前朝遗刻），资源数量与协议不变。气候、目的地发现门控、跨区任务阶段、NPC 日程与地图均由独立 JSON 声明。素材授权、MOD 和导航协议见 `REFERENCES.md`、`MOD-GUIDE.md`、`MAP-ATLAS.md`。
 - 关联：`docs/ARCHITECTURE.md`（引擎/数据分离与降级策略）、`docs/ADR.md` ADR-0004
 
 ---
@@ -410,3 +410,7 @@ battle-encounters.enemy.behavior可省略，最多12步且至少1步。art步含
 ## Round 108 可选结局协议
 
 unlockRoutes为1–8条可替代达成路径，含id/title/epilogue/conditions；epilogueSections为1–8段，含id/title/fallbackText/variants，变体含id/text/conditions。条件1–12项、变体1–8项；同层id唯一，路线original保留。路径条件AND，路径间OR；首个满足变体生效。原资料省略新增字段仍沿原行为。新增引用也参加装配校验。生成源为scripts/lib/round108-ending-content.mjs，重放入口scripts/deepen-round108-endings.mjs；仅增量覆盖三个目标结局的R108字段。详见ENDING-CONSEQUENCES.md。
+
+## Round 109 运行期行旅事实
+
+RegionalGuideInput的liveCurrency与travelMinutes为可选运行期输入，来自背包和已加载历法actionCosts.travelMinutes；不是新增JSON或存档字段。药品每项单独一行，价格、余量和效果仍取真实商店/物品。跨区补给的分钟仅为有向路线关口数乘声明旅程成本，明确不含步行、等待或战斗；出口显示单个关口成本。旧调用方省略输入时不伪造余额或分钟。基础资料、Schema、地图坐标和稳定ID保持Round108基线。

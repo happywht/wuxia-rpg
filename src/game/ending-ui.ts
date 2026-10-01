@@ -10,7 +10,7 @@ import {
 } from '../engine/ending-system';
 import { uiFontSize } from './settings';
 import { addPixelPanelChrome, UI_FONT_FAMILY, UI_PALETTE } from './ui-theme';
-import { wrapDialogueText, paginateDialogueLines } from './dialogue-layout';
+import { wrapDialogueText, paginateDialogueBlocks } from './dialogue-layout';
 
 export interface EndingPanelModel {
   endingSet: AssembledEndingSet;
@@ -50,6 +50,7 @@ export class EndingPanel {
     this.selectedEnding = null;
     this.confirming = false;
     this.detailPage = 0;
+    this.pageCount = 1; // Stale counts from a previous view must not invite a next page.
     this.notice = null;
     this.openState = true;
     this.container.setVisible(true);
@@ -172,6 +173,7 @@ export class EndingPanel {
     this.container.removeAll(true);
     const model = this.model;
     if (model === null) return;
+    this.pageCount = 1; // Only addPaged raises it again; unpaged views show no pager.
     const width = Math.min(860, this.scene.scale.width - 28);
     const height = Math.min(510, this.scene.scale.height - 24);
     const left = (this.scene.scale.width - width) / 2;
@@ -182,7 +184,12 @@ export class EndingPanel {
       this.addText(left + 30, top + 24, this.selectedEnding.title, 25, UI_PALETTE.accent);
       this.addText(left + width - 24, top + 31, '终章', 12, UI_PALETTE.muted, 'right');
       this.addPaged(this.selectedEnding.epilogue, left + 34, top + 92, width - 68, height - 174, 17, UI_PALETTE.text);
-      this.addWrapped(`终章 ${this.detailPage + 1}/${this.pageCount} · ←/→或Space翻页；Enter读下一页/末页结束，Esc结束。`,
+      // The footer must match reality: a single page never offers a next
+      // page, and a multi-page read distinguishes "next page" from the
+      // final page's finish.
+      const pager = this.pageCount > 1 ? `终章 ${this.detailPage + 1}/${this.pageCount} · ←/→或Space翻页 · ` : '终章已完整显示 · ';
+      const enter = this.pageCount > 1 && this.detailPage < this.pageCount - 1 ? 'Enter读下一页' : 'Enter结束本次旅程';
+      this.addWrapped(`${pager}${enter}，Esc结束。`,
         left + 34, top + height - 64, width - 68, 12, UI_PALETTE.jade);
       return;
     }
@@ -228,7 +235,10 @@ export class EndingPanel {
         '任一完整路径达成即可，各路径内需满足全部条件：\n\n' + selected.routes.map(route =>
           route.title + (route.available ? ' · 已达成' : '\n' + route.unmetHints.map(hint => '· ' + hint).join('\n'))).join('\n\n');
       this.addPaged(body, detailX, listY + 38, detailWidth, height - 179, 12, UI_PALETTE.text);
-      this.addWrapped(`详情 ${this.detailPage + 1}/${this.pageCount} · Space/←/→翻页`, detailX, top + height - 65,
+      const detailPager = this.pageCount > 1
+        ? `详情 ${this.detailPage + 1}/${this.pageCount} · Space/←/→翻页`
+        : '详情已完整显示';
+      this.addWrapped(detailPager, detailX, top + height - 65,
         detailWidth, 11, UI_PALETTE.muted);
     }
     if (this.notice !== null) {
@@ -239,7 +249,10 @@ export class EndingPanel {
   private addPaged(value: string, x: number, y: number, width: number, height: number, size: number, color: string): void {
     const text = this.scene.add.text(x, y, '', { fontFamily: UI_FONT_FAMILY, fontSize: uiFontSize(size), color, lineSpacing: 3 }).setOrigin(0, 0);
     const lineHeight = Math.ceil(Number.parseInt(uiFontSize(size), 10) * 1.5);
-    const pages = paginateDialogueLines(wrapDialogueText(value, width, content => text.context.measureText(content).width),
+    // Block-aware pagination: authored epilogues are blank-line separated
+    // `title\nbody` chapters, and a chapter title never strands alone at a
+    // page bottom.
+    const pages = paginateDialogueBlocks(wrapDialogueText(value, width, content => text.context.measureText(content).width),
       Math.max(1, Math.floor(height / lineHeight)));
     this.pageCount = pages.length;
     this.detailPage = Math.min(this.detailPage, pages.length - 1);

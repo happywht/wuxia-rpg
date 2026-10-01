@@ -31,6 +31,7 @@ export class MartialArtForgePanel {
   private readonly onClose?: () => void;
   private model: MartialArtForgePanelModel | null = null;
   private openState = false;
+  private destroyed = false;
   private selectedRow = 0;
   private recipe: MartialArtRecipe = { intentId: '', formId: '', breathId: '' };
   private name = '';
@@ -57,6 +58,9 @@ export class MartialArtForgePanel {
     // A focused DOM input owns all key events, including IME and Backspace.
     event.stopPropagation();
   };
+  private readonly handleSceneShutdown = (): void => {
+    this.destroy();
+  };
 
   constructor(scene: Phaser.Scene, onClose?: () => void) {
     this.scene = scene;
@@ -73,11 +77,14 @@ export class MartialArtForgePanel {
     (scene.game.canvas.parentElement ?? document.body).append(this.nameInput);
     this.nameInput.addEventListener('input', this.handleNameInput);
     this.nameInput.addEventListener('keydown', this.handleNameKeydown);
+    // The offscreen input outlives Phaser's children teardown, so the panel
+    // also owns its own scene-lifecycle exit; destroy() detaches this hook.
+    scene.events.once(Phaser.Scenes.Events.SHUTDOWN, this.handleSceneShutdown);
   }
   get isOpen(): boolean { return this.openState; }
 
   open(model: MartialArtForgePanelModel): void {
-    if (this.openState) return;
+    if (this.openState || this.destroyed) return;
     this.model = model;
     this.selectedRow = 0;
     this.name = '';
@@ -103,7 +110,16 @@ export class MartialArtForgePanel {
     this.model = null;
     this.onClose?.();
   }
+  /**
+   * Idempotent teardown of everything this panel owns outside Phaser's
+   * children list: the DOM key listeners, the offscreen input element and
+   * the scene SHUTDOWN hook. Safe to call repeatedly (world replacement
+   * disposal plus a late scene shutdown).
+   */
   destroy(): void {
+    if (this.destroyed) return;
+    this.destroyed = true;
+    this.scene.events.off(Phaser.Scenes.Events.SHUTDOWN, this.handleSceneShutdown);
     this.close();
     this.nameInput.removeEventListener('input', this.handleNameInput);
     this.nameInput.removeEventListener('keydown', this.handleNameKeydown);

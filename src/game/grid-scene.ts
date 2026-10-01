@@ -1,6 +1,7 @@
 import {RegionalGuidePanel} from './regional-guide-ui';
 import {buildRegionalGuideEntries,resolveRegionalGuideDestination,REGION_GUIDE_PREFIX,REGION_ROLE_LABELS,type RegionalGuideInput,type RegionGuideEntry} from '../engine/regional-guide';
 import { nearestGuideNpc } from './quest-presentation';
+import { paddedWorldCameraBounds } from './world-camera-bounds';
 import Phaser from 'phaser';
 
 import type { Diagnostic } from '../engine/data-loader';
@@ -198,6 +199,12 @@ import {
 } from './input-settings';
 import { ModStatusPanel } from './mod-status-ui';
 import { UI_FONT_FAMILY } from './ui-theme';
+import { wrapDialogueText } from './dialogue-layout';
+import {
+  TRANSITION_MARKER_DEPTH,
+  createTransitionGateMarkers,
+  type TransitionMarkerRenderer,
+} from './transition-markers';
 import { summarizePathRuns } from '../engine/grid-path';
 import {
   QUEST_NAVIGATION_ID_PREFIX,
@@ -263,6 +270,9 @@ import {
 const VIEW_WIDTH = 960;
 const VIEW_HEIGHT = 540;
 
+/** Measured-width cap for the HUD's right-hand fact column (coords/date). */
+const HUD_RIGHT_COLUMN_WIDTH = 344;
+
 /** Vertical space reserved for controls, run state, climate, and warning lines. */
 const HUD_HEIGHT = 72;
 
@@ -297,6 +307,20 @@ const UI = {
   textWarn: '#e8b04b',
   fontFamily: UI_FONT_FAMILY,
 } as const;
+
+/**
+ * Overlay panel fields torn down together by {@link GridScene}'s single
+ * disposal pass: every listed panel owns key bindings (and the martial-art
+ * forge additionally owns an offscreen DOM input), none of which Phaser's
+ * children teardown would release.
+ */
+const WORLD_OVERLAY_PANEL_FIELDS = [
+  'dialoguePanel', 'battlePanel', 'inventoryPanel', 'shopPanel', 'questPanel',
+  'pauseMenu', 'controlsPanel', 'factionPanel', 'worldMapPanel', 'encyclopediaPanel',
+  'modStatusPanel', 'collectionPanel', 'companionPanel', 'regionalGuidePanel',
+  'arenaPanel', 'factionWarPanel', 'martialArtForgePanel', 'equipmentForgePanel',
+  'alchemyPanel', 'endingPanel', 'achievementPanel', 'meridianPanel',
+] as const;
 
 export class GridScene extends Phaser.Scene {
   private map: GridMap | null = null;
@@ -471,6 +495,33 @@ export class GridScene extends Phaser.Scene {
   /** First HUD line; its movement segment follows the live layout setting. */
   private movementHintText: Phaser.GameObjects.Text | null = null;
   private readonly scaledTextTargets: { text: Phaser.GameObjects.Text; base: number }[] = [];
+  /**
+   * Round 109 measured HUD plumbing. `hudLines` keeps the UNWRAPPED raw copy
+   * of every HUD line (wrapping/ellipsising happens only inside
+   * {@link relayoutHud}, so a later re-layout at another text scale always
+   * starts from the full text); `hudMeasureText` is an offscreen probe whose
+   * canvas context performs every width measurement at the exact live font
+   * size; the two rectangles are resized to the measured stack instead of a
+   * fixed slab so all header text stays on a visible background without the
+   * opaque band growing more than the text actually needs.
+   */
+  private hudLines = {
+    title: '',
+    time: '',
+    climate: '',
+    help: '',
+    quest: '',
+    nav: '',
+    interact: '',
+  };
+  private hudMeasureText: Phaser.GameObjects.Text | null = null;
+  private hudMeasureFontSize = '';
+  private hudTopRect: Phaser.GameObjects.Rectangle | null = null;
+  private hudBottomRect: Phaser.GameObjects.Rectangle | null = null;
+  private hudWarningTexts: Phaser.GameObjects.Text[] = [];
+  private hudWarningRawLines: string[] = [];
+  /** Round 109 scene markers for the current map's outgoing region gates. */
+  private transitionMarkers: TransitionMarkerRenderer | null = null;
 
   /**
    * Round 36 dev data hot reload. `pendingDataReload` latches a change that
@@ -486,6 +537,13 @@ export class GridScene extends Phaser.Scene {
   private dataReloading = false;
   private hotReloadSnapshot: SaveSnapshotV1 | null = null;
   private unsubscribeDataChanges: UnsubscribeDataChanges | null = null;
+  /**
+   * Round 109 world replacement guard: true while the overlay panels are
+   * being torn down. Panel destroy() may fire its onClose callback; that is
+   * a disposal, not a user close boundary, and must not re-enter
+   * noteOverlayClosed/runPendingDataReload mid-teardown.
+   */
+  private disposingWorldPanels = false;
 
   constructor() {
     super('grid');
@@ -519,6 +577,12 @@ export class GridScene extends Phaser.Scene {
 
     this.bindMovementKeys();
     this.subscribeDataHotReload();
+    // Round 109: the SHUTDOWN event fires before Phaser tears the children
+    // list down, so panel destroy() still sees live containers — and it
+    // releases what Phaser never would (key bindings, forge DOM input).
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.disposeWorldPanels();
+    });
     this.add
       .text(VIEW_WIDTH / 2, VIEW_HEIGHT / 2, '正在加载地图数据…', {
         fontFamily: UI.fontFamily,
@@ -595,6 +659,12 @@ export class GridScene extends Phaser.Scene {
       playerWarnings.push(...restoration.warnings);
     }
 
+    // Round 109 world replacement: tear the OLD overlay panel objects down
+    // first — Phaser only destroys game objects here, while the panels keep
+    // key bindings and the forge's offscreen DOM input alive. A refused
+    // preflight above returned early, so the previous run is untouched until
+    // this point by design.
+    this.disposeWorldPanels();
     this.children.removeAll(true); // Drop the transient loading hint.
     this.scaledTextTargets.length = 0;
     this.world = world;
@@ -795,6 +865,9 @@ export class GridScene extends Phaser.Scene {
     this.renderAlchemyMarkers(activeMap);
     this.renderEndingGateMarker(activeMap);
     this.ensureDaylightLayer();
+    // Round 109 gate markers: created once the map origin and the initial
+    // player cell are both final, so the first projection is already correct.
+    this.rebuildTransitionMarkers();
     this.buildHud(activeMap, world.optionalWarnings, world.modWarnings);
     this.updateCoordsHud();
     this.updateTimeHud();
@@ -868,6 +941,85 @@ export class GridScene extends Phaser.Scene {
     this.refreshNavigationGuide();
     this.updateInteractHint();
     this.triggerRegionEvents();
+  }
+
+  /**
+   * Round 109 single disposal pass for every overlay panel this scene owns;
+   * both world REPLACEMENT (setupWorld after a hot-reload preflight) and
+   * scene SHUTDOWN route here. destroy() releases each panel's key bindings
+   * and owned DOM elements and clears the field, so a later rebuild (or the
+   * next scene entry) never stacks a second generation of panels. Overlay
+   * close callbacks fired inside destroy() are neutralized through
+   * {@link disposingWorldPanels} so teardown cannot re-enter the reload
+   * pipeline; the stale HUD text refs (destroyed with the children list)
+   * are dropped so nothing dereferences them before buildHud recreates them.
+   */
+  private disposeWorldPanels(): void {
+    if (this.disposingWorldPanels) return;
+    this.disposingWorldPanels = true;
+    try {
+      for (const field of WORLD_OVERLAY_PANEL_FIELDS) {
+        const panel = this[field];
+        panel?.destroy();
+        this[field] = null;
+      }
+      this.destroyTransitionMarkers();
+      this.coordsText = null;
+      this.timeText = null;
+      this.climateText = null;
+      this.interactText = null;
+      this.questTrackerText = null;
+      this.navigationHintText = null;
+      this.mapNameText = null;
+      this.movementHintText = null;
+      this.hudMeasureText = null;
+      this.hudMeasureFontSize = '';
+      this.hudTopRect = null;
+      this.hudBottomRect = null;
+      this.hudWarningTexts = [];
+      this.hudWarningRawLines = [];
+    } finally {
+      this.disposingWorldPanels = false;
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Round 109 transition gate markers (world-space, presentation only)
+  // -------------------------------------------------------------------------
+
+  /** Destroys the current gate marker renderer; idempotent and field-clearing. */
+  private destroyTransitionMarkers(): void {
+    this.transitionMarkers?.destroy();
+    this.transitionMarkers = null;
+  }
+
+  /**
+   * Rebuilds the gate markers for the CURRENT map from the world map's own
+   * authored transitions and region records. Any previous renderer is
+   * destroyed first (world replacement and map switches route here only
+   * after every refusal has returned), the container scrolls with the world
+   * despite the scene's add-hook pinning overlays, and the depth keeps the
+   * badges above the world layers but below the daylight wash and the HUD.
+   */
+  private rebuildTransitionMarkers(): void {
+    this.destroyTransitionMarkers();
+    const world = this.world;
+    const map = this.map;
+    if (world === null || map === null) return;
+    this.transitionMarkers = createTransitionGateMarkers(this, {
+      mapResourceId: this.currentMapResourceId,
+      transitions: world.worldMap.transitions,
+      regions: world.worldMap.regions,
+      tileSize: map.tileSize,
+      mapOrigin: { x: this.mapOrigin.x, y: this.mapOrigin.y },
+      playerCell: { col: this.playerCol, row: this.playerRow },
+      depth: TRANSITION_MARKER_DEPTH,
+    });
+  }
+
+  /** Proximity refresh after a successful step; a no-op without markers. */
+  private updateTransitionMarkerProximity(): void {
+    this.transitionMarkers?.update({ col: this.playerCol, row: this.playerRow });
   }
 
   // -------------------------------------------------------------------------
@@ -1250,6 +1402,9 @@ export class GridScene extends Phaser.Scene {
    * menu in the same keypress.
    */
   private noteOverlayClosed(): void {
+    // Disposing panels fire onClose callbacks; teardown is not a user close
+    // boundary and must not re-enter the reload pipeline mid-disposal.
+    if (this.disposingWorldPanels) return;
     this.lastOverlayCloseAt = this.time.now;
     this.syncSettingsPresentation();
     this.gamepadEdges.reset(); // A confirm press that closed a panel must not leak through.
@@ -1261,10 +1416,15 @@ export class GridScene extends Phaser.Scene {
   private syncSettingsPresentation(): void {
     // The pause/settings pages may have just changed the movement layout,
     // text scale, or reduced-motion preference — reflect them immediately.
-    this.movementHintText?.setText(
-      `${currentMovementHelpText()} · E 交互 · R 行旅 · H 帮助`,
-    );
+    this.hudLines.help = `${currentMovementHelpText()} · E 交互 · R 行旅 · H 帮助`;
+    // Font sizes first, then the measured reflow: relayoutHud re-measures
+    // every line at the new size, and the gate markers re-wrap their labels
+    // through their own refreshFonts (a no-op once destroyed, so a stale
+    // marker reference can never survive here).
     this.refreshScaledTextTargets();
+    this.relayoutHud();
+    this.layoutInteractHint();
+    this.transitionMarkers?.refreshFonts();
     this.syncReducedMotionPresentation();
   }
 
@@ -1923,12 +2083,23 @@ export class GridScene extends Phaser.Scene {
     camera.stopFollow();
     camera.setRoundPixels(true);
     if (map.pixelWidth > VIEW_WIDTH || map.pixelHeight > VIEW_HEIGHT) {
-      camera.setBounds(0, 0, map.pixelWidth, map.pixelHeight);
+      const bounds = paddedWorldCameraBounds(map.pixelWidth, map.pixelHeight, VIEW_WIDTH, VIEW_HEIGHT,
+        this.hudTopRect?.height ?? HUD_HEIGHT, this.hudBottomRect?.height ?? 32);
+      camera.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
       if (target !== null) camera.startFollow(target, true, 1, 1);
       return;
     }
     camera.setBounds(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
     camera.setScroll(0, 0);
+  }
+
+  /** Permit edge cells to remain outside the measured HUD without moving them. */
+  private refreshWorldCameraBounds(): void {
+    const map = this.map;
+    if (map === null || (map.pixelWidth <= VIEW_WIDTH && map.pixelHeight <= VIEW_HEIGHT)) return;
+    const bounds = paddedWorldCameraBounds(map.pixelWidth, map.pixelHeight, VIEW_WIDTH, VIEW_HEIGHT,
+      this.hudTopRect?.height ?? HUD_HEIGHT, this.hudBottomRect?.height ?? 32);
+    this.cameras.main.setBounds(bounds.x, bounds.y, bounds.width, bounds.height);
   }
 
   private createNpcVisual(npc: PlacedNpc, map: GridMap): void {
@@ -2147,12 +2318,30 @@ export class GridScene extends Phaser.Scene {
     modWarnings: readonly Diagnostic[],
   ): void {
     // HUD text lives above the daylight wash (depth 50) so every period's
-    // tint keeps the interface fully legible. The leading movement segment
-    // follows the live layout setting (refreshed on overlay close).
-    this.add.rectangle(VIEW_WIDTH / 2, 46, VIEW_WIDTH, 92, 0x10141d, 0.94).setScrollFactor(0).setDepth(HUD_TEXT_DEPTH - 1);
-    this.add.rectangle(VIEW_WIDTH / 2, VIEW_HEIGHT - 16, VIEW_WIDTH, 32, 0x10141d, 0.94).setScrollFactor(0).setDepth(HUD_TEXT_DEPTH - 1);
+    // tint keeps the interface fully legible. Round 109: every line below is
+    // positioned by relayoutHud() from MEASURED grapheme-wrapped text (never
+    // Phaser's space-only native wordWrap, which lets CJK runs run past the
+    // configured width), and both backing rectangles are resized to the
+    // measured stack so the whole header stays on a visible background at
+    // any text scale without a fixed slab hiding more world than needed.
+    this.hudTopRect = this.add.rectangle(VIEW_WIDTH / 2, 46, VIEW_WIDTH, 92, 0x10141d, 0.94)
+      .setScrollFactor(0).setDepth(HUD_TEXT_DEPTH - 1);
+    this.hudBottomRect = this.add.rectangle(VIEW_WIDTH / 2, VIEW_HEIGHT - 16, VIEW_WIDTH, 32, 0x10141d, 0.94)
+      .setScrollFactor(0).setDepth(HUD_TEXT_DEPTH - 1);
+    // Offscreen measuring probe: kept out of the scaled targets because each
+    // measurement sets its font size explicitly before reading the context.
+    this.hudMeasureText = this.add
+      .text(-256, -256, '', {
+        fontFamily: UI.fontFamily,
+        fontSize: uiFontSize(12),
+        color: UI.textMuted,
+      })
+      .setOrigin(0, 0)
+      .setVisible(false)
+      .setDepth(HUD_TEXT_DEPTH);
+
     this.movementHintText = this.registerScaledText(this.add
-      .text(16, 12, `${currentMovementHelpText()} · E 交互 · R 行旅 · H 帮助`, {
+      .text(16, 12, '', {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(13),
         color: UI.textMuted,
@@ -2165,7 +2354,6 @@ export class GridScene extends Phaser.Scene {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(11),
         color: UI.textMuted,
-        wordWrap: { width: 360, useAdvancedWrap: true },
       })
       .setOrigin(0, 0)
       .setDepth(HUD_TEXT_DEPTH), 11);
@@ -2175,13 +2363,12 @@ export class GridScene extends Phaser.Scene {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(10),
         color: UI.textWarn,
-        wordWrap: { width: VIEW_WIDTH - 32, useAdvancedWrap: true },
       })
       .setOrigin(0, 0)
       .setDepth(HUD_TEXT_DEPTH), 10);
 
     this.mapNameText = this.registerScaledText(this.add
-      .text(VIEW_WIDTH / 2, 14, map.data.name, {
+      .text(VIEW_WIDTH / 2, 14, '', {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(14),
         color: UI.textPrimary,
@@ -2199,19 +2386,15 @@ export class GridScene extends Phaser.Scene {
         shown: modWarnings.length > 0,
       },
     ];
-    lines.forEach((line, index) => {
-      if (!line.shown) {
-        return;
-      }
-      this.registerScaledText(this.add
-        .text(VIEW_WIDTH / 2, 33 + index * 15, line.text, {
-          fontFamily: UI.fontFamily,
-          fontSize: uiFontSize(11),
-          color: UI.textWarn,
-        })
-        .setOrigin(0.5, 0)
-        .setDepth(HUD_TEXT_DEPTH), 11);
-    });
+    this.hudWarningRawLines = lines.filter((line) => line.shown).map((line) => line.text);
+    this.hudWarningTexts = this.hudWarningRawLines.map(() => this.registerScaledText(this.add
+      .text(VIEW_WIDTH / 2, 0, '', {
+        fontFamily: UI.fontFamily,
+        fontSize: uiFontSize(11),
+        color: UI.textWarn,
+      })
+      .setOrigin(0.5, 0)
+      .setDepth(HUD_TEXT_DEPTH), 11));
     for (const diagnostic of optionalWarnings) {
       console.warn(`[optional] ${diagnostic.message}`, diagnostic.details);
     }
@@ -2253,6 +2436,17 @@ export class GridScene extends Phaser.Scene {
       })
       .setOrigin(0.5, 1)
       .setDepth(HUD_TEXT_DEPTH), 12);
+
+    this.hudLines = {
+      title: map.data.name,
+      time: '',
+      climate: '',
+      help: `${currentMovementHelpText()} · E 交互 · R 行旅 · H 帮助`,
+      quest: '',
+      nav: '',
+      interact: '',
+    };
+    this.relayoutHud();
   }
 
   private registerScaledText(text: Phaser.GameObjects.Text, base: number): Phaser.GameObjects.Text {
@@ -2272,8 +2466,188 @@ export class GridScene extends Phaser.Scene {
   }
 
   private updateCoordsHud(): void {
-    const name = this.playerDisplayName.length > 0 ? `${this.playerDisplayName} · ` : '';
-    this.coordsText?.setText(`${name}位置 (${this.playerCol}, ${this.playerRow})`);
+    this.relayoutHud();
+  }
+
+  /** Width of `value` at the live font size for the given base size. */
+  private measureHudText(value: string, base: number): number {
+    const probe = this.hudMeasureText;
+    if (probe === null) return value.length * base; // HUD not built: coarse fallback
+    const fontSize = uiFontSize(base);
+    if (fontSize !== this.hudMeasureFontSize) {
+      probe.setFontSize(fontSize);
+      this.hudMeasureFontSize = fontSize;
+    }
+    return probe.context.measureText(value).width;
+  }
+
+  /** Uniform HUD line rhythm at the live font scale (pure arithmetic). */
+  private hudLineHeight(base: number): number {
+    return Math.ceil(Number.parseInt(uiFontSize(base), 10) * 1.4);
+  }
+
+  /** Grapheme-truncates with an ellipsis until the text fits `width`. */
+  private ellipsizeHudText(value: string, width: number, base: number): string {
+    if (value.length === 0 || this.measureHudText(value, base) <= width) return value;
+    const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+    let kept = '';
+    for (const { segment } of segmenter.segment(value)) {
+      if (this.measureHudText(`${kept}${segment}…`, base) > width) break;
+      kept += segment;
+    }
+    return `${kept}…`;
+  }
+
+  /**
+   * Last shown line of a capped block: always carries an ellipsis marker,
+   * even when the wrapped line itself already fits the width.
+   */
+  private cappedHudLine(line: string, width: number, base: number): string {
+    const marked = `${line}…`;
+    return this.measureHudText(marked, base) <= width
+      ? marked
+      : this.ellipsizeHudText(marked, width, base);
+  }
+
+  /**
+   * Coordinates line with the player name fitted first: the position fact is
+   * never dropped, only a very long (MOD) display name ellipsizes.
+   */
+  private composedCoordsLine(): string {
+    const base = 13;
+    const suffix = `位置 (${this.playerCol}, ${this.playerRow})`;
+    const name = this.playerDisplayName.trim();
+    if (name.length === 0) return suffix;
+    const full = `${name} · ${suffix}`;
+    const cap = HUD_RIGHT_COLUMN_WIDTH;
+    if (this.measureHudText(full, base) <= cap) return full;
+    const budget = cap - this.measureHudText(`… · ${suffix}`, base);
+    return `${this.ellipsizeHudText(name, budget, base)} · ${suffix}`;
+  }
+
+  /**
+   * Round 109 measured HUD reflow — the single place every HUD line gets its
+   * wrapped copy, origin and position, and both backing rectangles their
+   * size. Reserved bands and columns make overlaps impossible by construction
+   * at any text scale:
+   *
+   *   row 1  |      centred map title       | right: coordinates |
+   *   row 2  | left: movement help   | right: date/time               |
+   *   row 3  | left: tracked quest   | right: season/weather           |
+   *   row 4  | left: navigation line (full width)                       |
+   *   row 5+ | centred optional/MOD warning lines (rare, data-broken)  |
+   *
+   * Each left-column line wraps against the measured width of the right
+   * column entry sharing its row, the title ellipsizes inside the free zone
+   * left of the coordinates (its full name stays in the guide/panels), and
+   * quest/navigation lines keep their actionable copy: they only wrap, or
+   * cap at a bounded line count with an ellipsis on the last shown line.
+   */
+  private relayoutHud(): void {
+    const help = this.movementHintText;
+    const quest = this.questTrackerText;
+    const nav = this.navigationHintText;
+    const title = this.mapNameText;
+    const coords = this.coordsText;
+    const time = this.timeText;
+    const climate = this.climateText;
+    if (
+      help === null || quest === null || nav === null || title === null ||
+      coords === null || time === null || climate === null
+    ) {
+      return; // HUD not built yet (or torn down).
+    }
+
+    const pad = 8;
+    const gap = 4;
+    const leftX = 16;
+    const rightX = VIEW_WIDTH - 16;
+    const columnGap = 14;
+
+    // ---- Right column: three single-line facts, top-aligned, width-fitted.
+    const rightEntries = [
+      { text: coords, raw: this.composedCoordsLine(), base: 13 },
+      { text: time, raw: this.hudLines.time, base: 13 },
+      { text: climate, raw: this.hudLines.climate, base: 10 },
+    ].map((entry) => {
+      const shown = this.ellipsizeHudText(entry.raw, HUD_RIGHT_COLUMN_WIDTH, entry.base);
+      entry.text.setText(shown).setOrigin(1, 0);
+      return { text: entry.text, base: entry.base, width: this.measureHudText(shown, entry.base) };
+    });
+    let rightBottom = pad;
+    for (const entry of rightEntries) {
+      entry.text.setPosition(rightX, rightBottom);
+      rightBottom += this.hudLineHeight(entry.base) + gap;
+    }
+    rightBottom -= gap;
+
+    // ---- Title: centred on screen, clamped inside the free zone left of the
+    // coordinates; long (MOD) names ellipsize with the full name still
+    // available in the regional guide and world map panels.
+    const titleBase = 14;
+    const coordsLeftEdge = rightX - rightEntries[0]!.width;
+    const titleCap = Math.max(160, coordsLeftEdge - columnGap - leftX);
+    const titleShown = this.ellipsizeHudText(this.hudLines.title, titleCap, titleBase);
+    const titleWidth = this.measureHudText(titleShown, titleBase);
+    const titleCenter = Math.min(
+      VIEW_WIDTH / 2,
+      Math.max(leftX + titleWidth / 2, coordsLeftEdge - columnGap - titleWidth / 2),
+    );
+    title.setText(titleShown).setOrigin(0.5, 0).setPosition(titleCenter, pad);
+    const rowOneBottom = Math.max(
+      pad + this.hudLineHeight(titleBase),
+      pad + this.hudLineHeight(13),
+    );
+
+    // ---- Left column rows; each wraps against its own row's right entry.
+    const wrapLeftColumn = (
+      text: Phaser.GameObjects.Text,
+      raw: string,
+      base: number,
+      wrapWidth: number,
+      maxLines: number,
+    ): number => {
+      const lines = wrapDialogueText(raw, Math.max(1, wrapWidth), (s) => this.measureHudText(s, base));
+      const shown = lines.length <= maxLines
+        ? lines
+        : [...lines.slice(0, maxLines - 1), this.cappedHudLine(lines[maxLines - 1]!, wrapWidth, base)];
+      text.setText(shown.join('\n'));
+      return shown.length;
+    };
+    const leftColumnWidth = (rightIndex: number): number =>
+      rightX - rightEntries[rightIndex]!.width - columnGap - leftX;
+
+    const helpBase = 13;
+    const helpTop = rowOneBottom + gap;
+    const helpLineCount = wrapLeftColumn(help, this.hudLines.help, helpBase, leftColumnWidth(1), 2);
+    help.setOrigin(0, 0).setPosition(leftX, helpTop);
+    const helpBottom = helpTop + Math.max(1, helpLineCount) * this.hudLineHeight(helpBase);
+
+    const questBase = 11;
+    const questTop = helpBottom + gap;
+    const questLineCount = wrapLeftColumn(quest, this.hudLines.quest, questBase, leftColumnWidth(2), 2);
+    quest.setOrigin(0, 0).setPosition(leftX, questTop);
+    const questBottom = questTop + Math.max(1, questLineCount) * this.hudLineHeight(questBase);
+
+    // ---- Navigation gets its own full-width band below BOTH columns; it
+    // keeps the actionable route copy (up to three measured lines).
+    const navBase = 10;
+    const navTop = Math.max(questBottom, rightBottom) + gap;
+    const navLineCount = wrapLeftColumn(nav, this.hudLines.nav, navBase, rightX - leftX, 3);
+    nav.setOrigin(0, 0).setPosition(leftX, navTop);
+    let hudBottom = navTop + Math.max(1, navLineCount) * this.hudLineHeight(navBase);
+
+    // ---- Warning lines: rare full-width centred lines below everything.
+    this.hudWarningTexts.forEach((text, index) => {
+      const raw = this.hudWarningRawLines[index] ?? '';
+      const lines = wrapDialogueText(raw, rightX - leftX, (s) => this.measureHudText(s, 11));
+      text.setText(lines.join('\n')).setOrigin(0.5, 0).setPosition(VIEW_WIDTH / 2, hudBottom + gap);
+      hudBottom += gap + lines.length * this.hudLineHeight(11);
+    });
+
+    // ---- Backing rectangle sized to the measured stack (never a fixed slab).
+    this.hudTopRect?.setSize(VIEW_WIDTH, hudBottom + pad).setPosition(VIEW_WIDTH / 2, (hudBottom + pad) / 2);
+    this.refreshWorldCameraBounds();
   }
 
   /** Rebuilds the selected destination's local route and compact HUD instruction. */
@@ -2284,7 +2658,8 @@ export class GridScene extends Phaser.Scene {
     const text = this.navigationHintText;
     if (text === null) return;
     if (destinationId === null || map === null || world === null) {
-      text.setText('');
+      this.hudLines.nav = '';
+      this.relayoutHud();
       return;
     }
 
@@ -2292,28 +2667,35 @@ export class GridScene extends Phaser.Scene {
     if (guide === null) return; // A readable status was already shown.
     if (guide.status === 'target-lost') {
       this.navigationDestinationId = null;
-      text.setText('行路目标已失效；可在 M 舆图重新选择。');
+      this.hudLines.nav = '行路目标已失效；可在 M 舆图重新选择。';
+      this.relayoutHud();
       return;
     }
     if (guide.status === 'route-blocked') {
       // Keep the selector: NPC schedules and battle outcomes can reopen this
       // route, and the next world refresh will rebuild its local path.
-      text.setText(`行路「${guide.destinationName}」暂被人物或遭遇堵住，通路变化后将自动重算。`);
+      this.hudLines.nav = `行路「${this.ellipsizeHudText(guide.destinationName, VIEW_WIDTH / 3, 10)}」暂被人物或遭遇堵住，通路变化后将自动重算。`;
+      this.relayoutHud();
       return;
     }
     if (guide.status === 'route-broken') {
       this.navigationDestinationId = null;
-      text.setText(`行路「${guide.destinationName}」当前无可行路线；可在 M 舆图重新规划。`);
+      this.hudLines.nav = `行路「${this.ellipsizeHudText(guide.destinationName, VIEW_WIDTH / 3, 10)}」当前无可行路线；可在 M 舆图重新规划。`;
+      this.relayoutHud();
       return;
     }
 
+    // Compact only labels; reserve room for the actual route/action suffix.
+    const destinationName = this.ellipsizeHudText(guide.destinationName, VIEW_WIDTH / 3, 10);
+    const transitionName = guide.nextTransitionName === null ? null
+      : this.ellipsizeHudText(guide.nextTransitionName, VIEW_WIDTH / 3, 10);
     const directionNames = { north: '北', east: '东', south: '南', west: '西' } as const;
     const runs = summarizePathRuns(guide.path).slice(0, 3)
       .map((run) => `${directionNames[run.direction]}${run.steps}`);
     const direction = runs.length > 0 ? `${runs.join('→')} · ` : '';
     const steps = Math.max(0, guide.path.length - 1);
     if (guide.status === 'at-gate') {
-      text.setText(`行路「${guide.destinationName}」· 已到「${guide.nextTransitionName ?? '关口'}」旁，按 E 通过。`);
+      this.hudLines.nav = `行路「${destinationName}」· 已到「${transitionName ?? '关口'}」旁，按 E 通过。`;
     } else if (guide.status === 'arrived') {
       // Quest targets name the existing control that acts on arrival; plain
       // landmark stops keep their original copy. Arrival is only proximity,
@@ -2321,17 +2703,18 @@ export class GridScene extends Phaser.Scene {
       const action = guide.arrivalAction === undefined
         ? ''
         : `，${arrivalActionHint(guide.arrivalAction)}`;
-      text.setText(`行路「${guide.destinationName}」· 已抵达附近${action}。`);
+      this.hudLines.nav = `行路「${destinationName}」· 已抵达附近${action}。`;
       // A landmark is complete when reached; an NPC/encounter still needs its
       // interaction, so keep that quest pin selected until the objective moves.
       if (this.navigationDestinationId?.startsWith(QUEST_NAVIGATION_ID_PREFIX) !== true) {
         this.navigationDestinationId = null;
       }
     } else if (guide.nextTransitionName !== null) {
-      text.setText(`行路「${guide.destinationName}」· ${direction}${steps}格至「${guide.nextTransitionName}」旁。`);
+      this.hudLines.nav = `行路「${destinationName}」· ${direction}${steps}格至「${transitionName}」旁。`;
     } else {
-      text.setText(`行路「${guide.destinationName}」· ${direction}${steps}格。`);
+      this.hudLines.nav = `行路「${destinationName}」· ${direction}${steps}格。`;
     }
+    this.relayoutHud();
   }
 
   /**
@@ -2370,7 +2753,8 @@ export class GridScene extends Phaser.Scene {
     const resolution = this.resolveQuestNavigation(questId);
     if (resolution.status === 'no-target') {
       this.navigationDestinationId = null;
-      text.setText('差事目标已变化，行路提示到此为止；可在 Q 日志重新导航。');
+      this.hudLines.nav = '差事目标已变化，行路提示到此为止；可在 Q 日志重新导航。';
+      this.relayoutHud();
       return null;
     }
     // One stable quest selector can follow a multi-stage objective chain and
@@ -2455,12 +2839,6 @@ export class GridScene extends Phaser.Scene {
     return { ok: true, message: `正在导航至「${target.name}」。` };
   }
 
-  /** Keeps route guidance below the variable-height tracked-quest line. */
-  private positionNavigationHint(): void {
-    if (this.questTrackerText === null || this.navigationHintText === null) return;
-    this.navigationHintText.setY(Math.max(65, this.questTrackerText.y + this.questTrackerText.height + 2));
-  }
-
   // -------------------------------------------------------------------------
   // Round 14 in-game time: advancement, waiting, HUD and daylight
   // -------------------------------------------------------------------------
@@ -2506,9 +2884,9 @@ export class GridScene extends Phaser.Scene {
     const hour = String(Math.floor(stamp.minuteOfDay / 60)).padStart(2, '0');
     const minute = String(stamp.minuteOfDay % 60).padStart(2, '0');
     const monthName = month === undefined ? '?' : month.name;
-    this.timeText.setText(
-      `第${stamp.year}年 ${monthName}${stamp.day}日 ${hour}:${minute} · ${clock.currentPeriod().name}`,
-    );
+    this.hudLines.time =
+      `第${stamp.year}年 ${monthName}${stamp.day}日 ${hour}:${minute} · ${clock.currentPeriod().name}`;
+    this.relayoutHud();
   }
 
   /**
@@ -2588,7 +2966,8 @@ export class GridScene extends Phaser.Scene {
     const { season, weather, tide } = reading;
     const movementNote = weather.stepMinutes > 0 ? ` · 行走 +${weather.stepMinutes} 分/格` : '';
     const tideNote = tide === null ? '' : ` · 潮位：${tide.name}`;
-    this.climateText?.setText(`${season.name} · ${weather.name}${tideNote}${movementNote}`);
+    this.hudLines.climate = `${season.name} · ${weather.name}${tideNote}${movementNote}`;
+    this.relayoutHud();
     if (
       this.lastClimateSeasonId === season.id &&
       this.lastClimateWeatherId === weather.id
@@ -2691,16 +3070,22 @@ export class GridScene extends Phaser.Scene {
     if (this.interactText === null) {
       return;
     }
+    this.refreshInteractHintRaw();
+    this.layoutInteractHint();
+  }
+
+  /** Resolves the raw interaction prompt; never touches geometry. */
+  private refreshInteractHintRaw(): void {
     if (this.controlsPanel?.isOpen) {
-      this.interactText.setText('按 H 或 Esc 收起操作手册');
+      this.hudLines.interact = '按 H 或 Esc 收起操作手册';
       return;
     }
     if (this.anyOverlayOpen()) {
-      this.interactText.setText('');
+      this.hudLines.interact = '';
       return;
     }
     if (this.regionNotice !== null) {
-      this.interactText.setText(this.regionNotice);
+      this.hudLines.interact = this.regionNotice;
       return;
     }
 
@@ -2724,7 +3109,7 @@ export class GridScene extends Phaser.Scene {
         : keepsQuests
           ? `按 E 向「${npcTarget.record.name}」查看差事 · F 交谈`
           : `按 E 与「${npcTarget.record.name}」交谈`;
-      this.interactText.setText(prompt);
+      this.hudLines.interact = prompt;
       return;
     }
     const encounterTarget = selectEncounterTarget(this.activeEncounters(), {
@@ -2732,7 +3117,7 @@ export class GridScene extends Phaser.Scene {
       row: this.playerRow,
     });
     if (encounterTarget !== null) {
-      this.interactText.setText(encounterTarget.record.texts.approach);
+      this.hudLines.interact = encounterTarget.record.texts.approach;
       return;
     }
     const arenaTarget = this.world === null ? null : selectArenaTarget(
@@ -2741,7 +3126,7 @@ export class GridScene extends Phaser.Scene {
       { col: this.playerCol, row: this.playerRow },
     );
     if (arenaTarget !== null) {
-      this.interactText.setText(arenaTarget.record.texts.approach);
+      this.hudLines.interact = arenaTarget.record.texts.approach;
       return;
     }
     const factionWarTarget = this.world === null ? null : selectFactionWarTarget(
@@ -2750,7 +3135,7 @@ export class GridScene extends Phaser.Scene {
       { col: this.playerCol, row: this.playerRow },
     );
     if (factionWarTarget !== null) {
-      this.interactText.setText(factionWarTarget.record.texts.approach);
+      this.hudLines.interact = factionWarTarget.record.texts.approach;
       return;
     }
     const forgeTarget = this.world === null ? null : selectEquipmentForgeStation(
@@ -2759,7 +3144,7 @@ export class GridScene extends Phaser.Scene {
       { col: this.playerCol, row: this.playerRow },
     );
     if (forgeTarget !== null) {
-      this.interactText.setText(`按 E 在「${forgeTarget.record.name}」锻造装备 · ${forgeTarget.recipes.length} 种配方`);
+      this.hudLines.interact = `按 E 在「${forgeTarget.record.name}」锻造装备 · ${forgeTarget.recipes.length} 种配方`;
       return;
     }
     const alchemyTarget = this.world === null ? null : selectAlchemyStation(
@@ -2769,12 +3154,12 @@ export class GridScene extends Phaser.Scene {
     );
     if (alchemyTarget !== null) {
       const known = alchemyTarget.recipes.filter((recipe) => this.knownKnowledgeNodeIds.has(recipe.discoveryNodeId)).length;
-      this.interactText.setText(`按 E 在「${alchemyTarget.record.name}」炼药 · 已识药方 ${known}/${alchemyTarget.recipes.length}`);
+      this.hudLines.interact = `按 E 在「${alchemyTarget.record.name}」炼药 · 已识药方 ${known}/${alchemyTarget.recipes.length}`;
       return;
     }
     const mapEventTarget = this.interactableRegionEventTarget();
     if (mapEventTarget !== null) {
-      this.interactText.setText(`按 E · ${mapEventTarget.prompt}`);
+      this.hudLines.interact = `按 E · ${mapEventTarget.prompt}`;
       return;
     }
     const gate = this.world === null
@@ -2784,7 +3169,7 @@ export class GridScene extends Phaser.Scene {
           row: this.playerRow,
         });
     if (gate !== null) {
-      this.interactText.setText(`按 E 通过「${gate.name}」前往另一处地界`);
+      this.hudLines.interact = `按 E 通过「${gate.name}」前往另一处地界`;
       return;
     }
     const endingGate = this.world === null ? null : selectAdjacentEndingGate(
@@ -2793,7 +3178,7 @@ export class GridScene extends Phaser.Scene {
       { col: this.playerCol, row: this.playerRow },
     );
     if (endingGate !== null) {
-      this.interactText.setText(endingGate.gate.approachText);
+      this.hudLines.interact = endingGate.gate.approachText;
       return;
     }
     // Lowest-priority contextual hint: with no actionable target around, a
@@ -2806,16 +3191,39 @@ export class GridScene extends Phaser.Scene {
       this.regionEventContext(),
     );
     if (approachClue !== null) {
-      this.interactText.setText(approachClue);
+      this.hudLines.interact = approachClue;
       return;
     }
     if (this.placedNpcs.length === 0 && this.activeEncounters().length === 0) {
-      this.interactText.setText(this.companionState.activeCompanionId === null
+      this.hudLines.interact = this.companionState.activeCompanionId === null
         ? '暂无可交互人物'
-        : 'P 同行伙伴 · 暂无可交互人物');
+        : 'P 同行伙伴 · 暂无可交互人物';
       return;
     }
-    this.interactText.setText('N 经脉 · C 自创武学 · L 图鉴 · G 成就 · H 操作帮助 · Esc 暂停');
+    this.hudLines.interact = 'N 经脉 · C 自创武学 · L 图鉴 · G 成就 · H 操作帮助 · Esc 暂停';
+  }
+
+  /**
+   * Measured bottom band: the interaction line wraps through grapheme
+   * segmentation (Phaser's native wrap cannot break CJK runs) and the bar
+   * grows to cover the shown lines, so even long data-authored approach
+   * texts and stacked region notices always sit on the visible background.
+   */
+  private layoutInteractHint(): void {
+    const text = this.interactText;
+    const bar = this.hudBottomRect;
+    if (text === null || bar === null) return;
+    const base = 12;
+    const width = VIEW_WIDTH - 32;
+    const lines = wrapDialogueText(this.hudLines.interact, width, (s) => this.measureHudText(s, base));
+    const shown = lines.length <= 3
+      ? lines
+      : [...lines.slice(0, 2), this.cappedHudLine(lines[2]!, width, base)];
+    text.setText(shown.join('\n'));
+    const barHeight = shown.length * this.hudLineHeight(base) + 12;
+    bar.setSize(VIEW_WIDTH, barHeight).setPosition(VIEW_WIDTH / 2, VIEW_HEIGHT - barHeight / 2);
+    text.setOrigin(0.5, 1).setPosition(VIEW_WIDTH / 2, VIEW_HEIGHT - 6);
+    this.refreshWorldCameraBounds();
   }
 
   /** True while any keyboard overlay owns the input (dialogue/battle/backpack/shop/quest/pause). */
@@ -2855,7 +3263,8 @@ export class GridScene extends Phaser.Scene {
     return {worldMap:world.worldMap,currentMapResourceId:this.currentMapResourceId,baseNpcs:world.assembly.npcs,
       periodNpcs:period===undefined?world.assembly.npcs:world.assembly.npcsByPeriod.get(period)??world.assembly.npcs,
       currentMapNpcs:this.placedNpcs,...(follower===undefined?{}:{follower}),activeFollowerNpcId:this.companions.get(this.companionState.activeCompanionId??'')?.npcId,shops:world.assembly.shops,items:world.assembly.items,
-      shopStocks:this.shopStocks,knownKnowledgeNodeIds:this.knownKnowledgeNodeIds};
+      shopStocks:this.shopStocks,knownKnowledgeNodeIds:this.knownKnowledgeNodeIds,
+      liveCurrency:this.inventory?.currency,travelMinutes:this.clock?.calendar.actionCosts.travelMinutes};
   }
 
   private toggleRegionalGuide(): void {
@@ -3341,7 +3750,8 @@ export class GridScene extends Phaser.Scene {
     const text = this.questTrackerText;
     if (text === null) return;
     if (this.questNotice !== null) {
-      text.setText(this.questNotice).setColor(UI.textWarn);
+      this.hudLines.quest = this.questNotice;
+      text.setColor(UI.textWarn);
       if (this.questNoticeTimer === null) {
         this.questNoticeTimer = this.time.delayedCall(5000, () => {
           this.questNotice = null;
@@ -3349,7 +3759,7 @@ export class GridScene extends Phaser.Scene {
           this.updateQuestTrackerHud();
         });
       }
-      this.positionNavigationHint();
+      this.relayoutHud();
       return;
     }
     const trackedId = this.questJournal.trackedQuestId;
@@ -3357,15 +3767,19 @@ export class GridScene extends Phaser.Scene {
     const state = trackedId === null ? undefined : this.questJournal.states.get(trackedId);
     if (quest === undefined || state?.status !== 'active') {
       const guide = nearestGuideNpc(this.placedNpcs, { col: this.playerCol, row: this.playerRow });
-      text.setText(guide === undefined ? 'Q 查看差事 · H 查看操作' : `附近：${guide.record.name} (${guide.col},${guide.row}) · 相邻按 F 打听 / E 看托付 · Q 查差事`).setColor(UI.textPrimary);
-      this.positionNavigationHint();
+      this.hudLines.quest = guide === undefined
+        ? 'Q 查看差事 · H 查看操作'
+        : `附近：${guide.record.name} (${guide.col},${guide.row}) · 相邻按 F 打听 / E 看托付 · Q 查差事`;
+      text.setColor(UI.textPrimary);
+      this.relayoutHud();
       return;
     }
     const progress = quest.objectives.map((objective) =>
       `${objective.text} ${state.objectiveCounts.get(objective.id) ?? 0}/${objective.requiredCount}`,
     ).join(' · ');
-    text.setText(`跟踪：${quest.name}　${progress}`).setColor(UI.textMuted);
-    this.positionNavigationHint();
+    this.hudLines.quest = `跟踪：${quest.name}　${progress}`;
+    text.setColor(UI.textMuted);
+    this.relayoutHud();
   }
 
   /** B key: open the backpack while free, close it while it is open. */
@@ -3951,6 +4365,7 @@ export class GridScene extends Phaser.Scene {
     this.playerCol = targetCol;
     this.playerRow = targetRow;
     this.updateCoordsHud();
+    this.updateTransitionMarkerProximity();
     this.refreshNavigationGuide();
     this.updateInteractHint();
     const baseStepMinutes = this.clock?.calendar.actionCosts.stepMinutes ?? 0;
@@ -4043,6 +4458,9 @@ export class GridScene extends Phaser.Scene {
     if (this.marker !== null) this.npcLayer?.remove(this.marker);
     this.npcLayer?.destroy();
     this.encounterLayer?.destroy();
+    // Old gate markers go down with the old map layers; every refusal above
+    // has already returned, so markers never vanish on a refused transition.
+    this.destroyTransitionMarkers();
     this.mapLayer = null;
     this.npcLayer = null;
     this.encounterLayer = null;
@@ -4081,7 +4499,8 @@ export class GridScene extends Phaser.Scene {
     this.renderAlchemyMarkers(destinationMap);
     this.renderEndingGateMarker(destinationMap);
     this.ensureDaylightLayer(); // The rebuilt world layers must sit below the wash again.
-    this.mapNameText?.setText(destinationMap.data.name);
+    this.rebuildTransitionMarkers(); // New map: new outgoing gates at their world cells.
+    this.hudLines.title = destinationMap.data.name;
     this.updateCoordsHud();
     this.advanceTime(travelMinutes);
     this.refreshCompanionFollower(null);

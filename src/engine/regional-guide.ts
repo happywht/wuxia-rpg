@@ -22,6 +22,10 @@ export interface RegionalGuideInput {
   items: ReadonlyMap<string, ItemRecordData>;
   shopStocks: ReadonlyMap<string, ShopStockRuntime>;
   knownKnowledgeNodeIds: ReadonlySet<string>;
+  /** Optional live player silver; when present the guide quotes the real balance instead of a disclaimer. */
+  liveCurrency?: number;
+  /** Optional declared per-gate travel minutes (calendar actionCosts); walking steps are excluded. */
+  travelMinutes?: number;
 }
 export const REGION_ROLE_LABELS = { hub: '枢纽', investigation: '调查', challenge: '挑战', transit: '过境' } as const;
 function liveNpc(input: RegionalGuideInput, id: string): PlacedNpc | undefined {
@@ -60,8 +64,15 @@ export function buildRegionalGuideEntries(input: RegionalGuideInput): RegionGuid
     });
     if(!medicines.length)continue;
     const region=route.regionNames.at(-1)!;
+    // Gate minutes come from the route leg count times the calendar's declared
+    // per-gate cost; transition records themselves carry no minutes field.
+    const gateText=input.travelMinutes!==undefined&&route.legs.length>0
+      ?`（关口行程约 ${route.legs.length*input.travelMinutes} 分钟，不含步行）`:'';
+    const budgetText=input.liveCurrency===undefined
+      ?'价格不代表已有银两；有限库存可耗尽。'
+      :`现有银两 ${input.liveCurrency}；有限库存可耗尽。`;
     supplies.push({legs:route.legs.length,entry:{id:'supply:'+shop.record.id,category:'supply',title:shop.record.name,
-      detail:`${region} · ${route.legs.length===0?'本地':`跨${route.legs.length}处关口`} · ${npc.record.name} (${npc.col},${npc.row})\n${medicines.join('；')}。价格不代表已有银两；有限库存可耗尽。`,destinationId:REGION_GUIDE_PREFIX+'npc:'+npc.record.id}});
+      detail:`${region} · ${route.legs.length===0?'本地':`跨${route.legs.length}处关口${gateText}`} · ${npc.record.name} (${npc.col},${npc.row})\n${medicines.join('\n')}\n${budgetText}`,destinationId:REGION_GUIDE_PREFIX+'npc:'+npc.record.id}});
   }
   const locals=supplies.filter(s=>s.legs===0);const offered=locals.length?locals:supplies.sort((a,b)=>a.legs-b.legs||a.entry.id.localeCompare(b.entry.id)).filter((s,_i,array)=>s.legs===array[0]?.legs);
   result.push(...offered.map(s=>s.entry));
@@ -70,7 +81,8 @@ export function buildRegionalGuideEntries(input: RegionalGuideInput): RegionGuid
     detail:`当前 (${npc.col},${npc.row}) · ${input.follower?.npc.record.id===id?'真实同行位置':'位置随当前时段重算'}。F交谈${npc.record.shopId?'；E商铺':npc.record.questGiver?'；E查看差事名录':''}。`,destinationId:REGION_GUIDE_PREFIX+'npc:'+id});}
   for(const gate of input.worldMap.transitions.filter(g=>g.from.mapResourceId===input.currentMapResourceId)) {
     const destination=input.worldMap.regions.find(r=>r.mapResourceId===gate.to.mapResourceId)?.name??gate.to.mapResourceId;
-    result.push({id:'exit:'+gate.id,category:'exit',title:gate.name,detail:`(${gate.from.col},${gate.from.row}) → ${destination}。走到旁边按E；这里不会自动通过或传送。`,destinationId:REGION_GUIDE_PREFIX+'gate:'+gate.id});
+    const travelText=input.travelMinutes===undefined?'':`过此关口按日程需 ${input.travelMinutes} 分钟（不含步行）。`;
+    result.push({id:'exit:'+gate.id,category:'exit',title:gate.name,detail:`(${gate.from.col},${gate.from.row}) → ${destination}。走到旁边按E；这里不会自动通过或传送。${travelText}`,destinationId:REGION_GUIDE_PREFIX+'gate:'+gate.id});
   }
   for(const landmark of selectVisibleWorldLandmarks(input.worldMap.landmarks,input.knownKnowledgeNodeIds).filter(l=>l.mapResourceId===input.currentMapResourceId))result.push({id:'landmark:'+landmark.id,category:'landmark',title:landmark.name,detail:`已知地标 (${landmark.col},${landmark.row})；导航只带路，调查仍按实际事件条件。`,destinationId:LANDMARK_DESTINATION_PREFIX+landmark.id});
   return result;
