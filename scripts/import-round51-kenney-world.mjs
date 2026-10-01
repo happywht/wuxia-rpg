@@ -1,3 +1,4 @@
+import { repairTownWestWicket } from './lib/round128-town-wicket.mjs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { inflateSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
@@ -214,7 +215,7 @@ const output = {
   },
 };
 
-await writeFile(outputPath, `${JSON.stringify(output, null, 2)}\n`);
+await writeFile(outputPath, `${JSON.stringify(repairTownWestWicket(output), null, 2)}\n`);
 const openCells = solidGrid.flat().filter((solid) => !solid).length;
 console.log(`Imported ${columns}×${rows} Tiled world (${layers.length} visual layers, ${openCells} walkable cells).`);
 console.log(`Spawn: (${playerStart.col}, ${playerStart.row}); collision derived from open-water GIDs and ${blockingLayers.map((layer) => layer.name).join(', ')}.`);

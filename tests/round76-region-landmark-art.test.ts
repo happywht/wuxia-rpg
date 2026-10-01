@@ -15,8 +15,9 @@ const MAPS = [
     file: '../data/base/maps/round-01-grid.json',
     id: 'map.round-01-grid',
     layer: 'round76-jiangnan-orchard',
-    collisionHash: '0ebca5f79f1718d31f33cc9efa3e3c9f022a676122772ebc65c80882d5c55519',
-    priorArtHash: 'db84a211939f3a1b87f7ad9b4dd1c3a0f75ef959ac60b3ee42527769e87f0462',
+    // R128 approved exactly (42,37): road decoration moves to ground; strict diff is tested separately.
+    collisionHash: '84cde6075dfc2f183b6f65bc12e3ee6698bbfc202641388918c91977769d7618',
+    priorArtHash: '2dab1430c3f1ac77fd6f8c48fdcffb1bd954d6d2b514da8f0ccda2f74cff169f',
     start: { col: 43, row: 37 },
   },
   {

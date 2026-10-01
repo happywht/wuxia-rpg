@@ -37,7 +37,7 @@ export class RegionalGuidePanel {
   for(const {segment}of segmenter.segment(value)){if(this.measure(kept+segment+'…',text)>width)break;kept+=segment;}
   return kept+'…';
  }
- private text(x:number,y:number,value:string,size:number,color:string,width?:number){const t=this.scene.add.text(x,y,value,{fontFamily:UI_FONT_FAMILY,fontSize:uiFontSize(size),color}).setOrigin(0,0);if(width)t.setText(wrapDialogueText(value,width,s=>t.context.measureText(s).width).join('\n'));this.container.add(t);return t;}
+ private text(x:number,y:number,value:string,size:number,color:string,width?:number){const t=this.scene.add.text(x,y,value,{fontFamily:UI_FONT_FAMILY,fontSize:uiFontSize(size),color,lineSpacing:Math.ceil(Number.parseInt(uiFontSize(size),10)*0.4)}).setOrigin(0,0);if(width)t.setText(wrapDialogueText(value,width,s=>t.context.measureText(s).width).join('\n'));this.container.add(t);return t;}
  private render(){const model=this.model;if(!model)return;this.container.removeAll(true);const width=Math.min(850,this.scene.scale.width-40),height=Math.min(500,this.scene.scale.height-40),left=(this.scene.scale.width-width)/2,top=(this.scene.scale.height-height)/2;
   addPixelPanelChrome(this.scene,this.container,{x:left,y:top,width,height},0.96);
   const innerX=left+24,innerW=width-48;

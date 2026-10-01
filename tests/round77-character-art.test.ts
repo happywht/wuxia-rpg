@@ -8,7 +8,7 @@ import { parseGridMap, selectGridMapPlayerFrame } from '../src/engine/grid-map';
 const ATLAS_PATH = new URL('../data/assets/opengameart/puny-characters/actors.png', import.meta.url);
 const NOTICE_PATH = new URL('../data/assets/opengameart/puny-characters/NOTICE.txt', import.meta.url);
 const MAPS = [
-  { path: '../data/base/maps/round-01-grid.json', collisionHash: '0ebca5f79f1718d31f33cc9efa3e3c9f022a676122772ebc65c80882d5c55519' },
+  { path: '../data/base/maps/round-01-grid.json', collisionHash: '84cde6075dfc2f183b6f65bc12e3ee6698bbfc202641388918c91977769d7618' },
   { path: '../data/base/maps/round-10-mist-ferry.json', collisionHash: '2de5414beda5988ca79b08f7ef1fabb76fa295ac4777fd243571fb9cbce6e754' },
   { path: '../data/base/maps/round-62-iron-ridge.json', collisionHash: '19198b97b771cebbbba05a52115213940d3406beedd163ae726bbe13ba60b3ff' },
   { path: '../data/base/maps/round-67-salt-road.json', collisionHash: '036340bed97f662c5b166ca94eaffbd379194e00104b6bc3511ee21a3c3353b3' },

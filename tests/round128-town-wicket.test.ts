@@ -1,0 +1,27 @@
+import {readFileSync,readdirSync} from 'node:fs';
+import {describe,it,expect} from 'vitest';
+import {parseGridMap,type GridMapData,type GridMapArtLayerData} from '../src/engine/grid-map';
+import {parseNpcSet,type PlacedNpc} from '../src/engine/npc-placement';
+import {compileNpcSchedules,resolveNpcPlacementsForPlayer} from '../src/engine/npc-schedule';
+import {parseGameCalendar} from '../src/engine/game-calendar';
+import {repairTownWestWicket} from '../scripts/lib/round128-town-wicket.mjs';
+const read=(p:string)=>JSON.parse(readFileSync(p,'utf8'));
+const authored:GridMapData=read('data/base/maps/round-01-grid.json');
+const layer=(m:GridMapData,id:string):GridMapArtLayerData=>m.art!.layers.find(l=>l.id===id)!;
+function before(){const m=structuredClone(authored);m.grid[37]=m.grid[37]!.slice(0,42)+'#'+m.grid[37]!.slice(43);layer(m,'layer-2').cells[37]![42]=0;layer(m,'layer-3').cells[37]![42]=409;return m;}
+const parsedCalendar=parseGameCalendar(read('data/base/worldview/calendar.json'));
+if(!parsedCalendar.ok)throw Error('calendar');
+const periods=parsedCalendar.calendar.periods;
+const npcs:PlacedNpc[]=[];
+for(const file of readdirSync('data/base/characters').filter(f=>f.endsWith('.json'))){const raw=read('data/base/characters/'+file);if(!raw.npcs)continue;const p=parseNpcSet(raw);if(!p.ok)throw Error('npcs');for(const record of p.set.npcs)if(record.mapResourceId===authored.id)npcs.push({record,col:record.position.col,row:record.position.row});}
+const encounters=new Set<string>();
+for(const file of readdirSync('data/base/battles').filter(f=>f.endsWith('.json')))for(const e of read('data/base/battles/'+file).encounters??[])if(e.mapResourceId===authored.id)encounters.add(`${e.position.col},${e.position.row}`);
+function steps(m:GridMapData,blocked:ReadonlySet<string>,reverse=false){const start=reverse?[47,43]:[40,37],target=reverse?[40,37]:[47,43],q=[start],dist=new Map([[start.join(','),0]]);for(let i=0;i<q.length;i++){const[x,y]=q[i]!;if(x===target[0]&&y===target[1])return dist.get(`${x},${y}`)!;for(const[dx,dy]of[[0,-1],[1,0],[0,1],[-1,0]]){const nx=x!+dx!,ny=y!+dy!,key=`${nx},${ny}`;if(nx<0||ny<0||nx>=m.columns||ny>=m.rows||m.tileTypes[m.grid[ny]![nx]!]!.solid||blocked.has(key)||dist.has(key))continue;dist.set(key,dist.get(`${x},${y}`)!+1);q.push([nx,ny]);}}throw Error('no route');}
+function placements(m:GridMapData,periodId:string){const p=parseGridMap(m);if(!p.ok)throw Error('map');const compiled=compileNpcSchedules({npcs,periods,maps:new Map([[m.id,p.map]]),blockedCellsByMap:new Map([[m.id,encounters]])});expect(compiled.warnings).toEqual([]);const resolved=resolveNpcPlacementsForPlayer({baseNpcs:npcs,periodNpcs:compiled.placementsByPeriod.get(periodId)!,mapResourceId:m.id,map:p.map,playerPosition:null,blockedCells:encounters});return new Set([...encounters,...resolved.map(n=>`${n.col},${n.row}`)]);}
+describe('Round128 single road repair',()=>{
+ it('opens exactly one collision and moves exactly two art cells, preserves actors/anchors and shared rows',()=>{const old=before(),next=repairTownWestWicket(old);expect(next).toEqual(authored);expect(repairTownWestWicket(next)).toBe(next);expect(next.art!.actors).toBe(old.art!.actors);expect(layer(next,'layer-2').cells[38]).toBe(layer(old,'layer-2').cells[38]);expect(layer(next,'layer-2').cells[37]).not.toBe(layer(old,'layer-2').cells[37]);expect(layer(next,'layer-1')).toBe(layer(old,'layer-1'));const p=parseGridMap(next);if(!p.ok)throw Error('parse');expect(p.map.canEnter(42,37)).toBe(true);});
+ for(const cause of ['id','size','ground','tileset','depth','missing','duplicate','other','partial','repaired-other'])it('refuses changed protocol: '+cause,()=>{const m=cause==='repaired-other'?structuredClone(authored):before();if(cause==='id')m.id='other';if(cause==='size')m.columns=99;if(cause==='ground')layer(m,'layer-1').cells[37]![42]=61;if(cause==='tileset')layer(m,'layer-2').tilesetId='other';if(cause==='depth')layer(m,'layer-2').depthSort='y';if(cause==='missing')m.art!.layers=m.art!.layers.filter(l=>l.id!=='layer-3');if(cause==='duplicate')m.art!.layers.push(layer(m,'layer-3'));if(cause==='other'||cause==='repaired-other')layer(m,'layer-4').cells[37]![42]=1;if(cause==='partial')layer(m,'layer-3').cells[37]![42]=0;expect(()=>repairTownWestWicket(m)).toThrow();});
+ for(const period of periods)it('same-period formal NPC scheduler, bidirectional old83 to shorter '+period.id,()=>{const old=before(),oldBlocked=placements(old,period.id),newBlocked=placements(authored,period.id);expect([...newBlocked].sort()).toEqual([...oldBlocked].sort());const expected=['period.afternoon','period.dusk','period.night'].includes(period.id)?15:17;for(const reverse of [false,true]){expect(steps(old,oldBlocked,reverse)).toBe(83);expect(steps(authored,newBlocked,reverse)).toBe(expected);}});
+ it('preserves the union-of-all-periods conservative83 rather than claiming it is actual simultaneous occupancy',()=>{const blocked=new Set([...encounters,...npcs.flatMap(n=>[n.record.position,...n.record.schedule.map(s=>s.position)].map(p=>`${p.col},${p.row}`))]);expect(steps(before(),blocked)).toBe(83);expect(steps(authored,blocked)).toBe(83);});
+ it('R51 invokes the same strict one-cell author repair, without global frame-based unlocking',()=>{const source=readFileSync('scripts/import-round51-kenney-world.mjs','utf8');expect(source).toContain('JSON.stringify(repairTownWestWicket(output), null, 2)');expect(source).not.toContain('const roadGid = 409;');expect(source).toContain("...(index >= 2 ? { depthSort: 'y' } : {})");});
+});

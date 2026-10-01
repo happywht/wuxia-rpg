@@ -916,73 +916,132 @@
           "id": "greet",
           "text": "马尚义把一卷新旧不一的告示压在石上：「镇里大事小事，都有人托我问个明白。你若想替人跑腿，看看有没有合意的差事。」",
           "options": [
-            { "text": "我看看告示。", "nextNodeId": "board" },
-            { "text": "今日不接差事。", "nextNodeId": "leave" },
+            {
+              "text": "我看看告示。",
+              "nextNodeId": "board"
+            },
+            {
+              "text": "今日不接差事。",
+              "nextNodeId": "leave"
+            },
             {
               "text": "马叔，镇上近来可还太平？",
               "nextNodeId": "friendly",
               "conditions": [
-                { "kind": "npcRelationship", "npcId": "char.ma-shangyi", "minValue": 10 }
+                {
+                  "kind": "npcRelationship",
+                  "npcId": "char.ma-shangyi",
+                  "minValue": 10
+                }
               ]
             },
             {
               "text": "马叔，去南麓认路的差事，我正走着。",
               "nextNodeId": "r58-hamlet-survey-active",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r58-south-hamlet-survey", "status": "active" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r58-south-hamlet-survey",
+                  "status": "active"
+                }
               ]
             },
             {
               "text": "马叔，南麓村口的旧路记清了。",
               "nextNodeId": "r58-hamlet-survey-done",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r58-south-hamlet-survey", "status": "completed" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r58-south-hamlet-survey",
+                  "status": "completed"
+                }
               ]
             }
           ]
         },
         {
           "id": "board",
-          "text": "有劳。做成做不成，都请回来告我一声。",
+          "text": "有劳。已办完送药后，仍可额外支援巷口伤者：每次交回春膏三份，善恶+5、江湖声望+5、与我关系+10。药由你自备；姜百味现价每份15银，三份45银，不退银两或重发差事奖励。不足三份时不能交药。",
           "options": [
             {
               "text": "巷口伤者缺药的事，我来跑腿。",
               "nextNodeId": "quest-accepted",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.round-07-medicine-run", "status": "offered" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.round-07-medicine-run",
+                  "status": "offered"
+                }
               ],
               "effects": [
-                { "kind": "acceptQuest", "questId": "quest.round-07-medicine-run" }
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.round-07-medicine-run"
+                }
               ]
             },
             {
               "text": "送药的差事，办得怎么样了？",
               "nextNodeId": "quest-progress",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.round-07-medicine-run", "status": "active" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.round-07-medicine-run",
+                  "status": "active"
+                }
               ]
             },
             {
-              "text": "回春膏备齐了，这就交给你带去。",
+              "text": "捐回春膏三份：善恶+5、声望+5、关系+10。",
               "nextNodeId": "quest-delivered",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.round-07-medicine-run", "status": "completed" },
-                { "kind": "itemCount", "itemId": "item.huichun-gao", "minCount": 3 }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.round-07-medicine-run",
+                  "status": "completed"
+                },
+                {
+                  "kind": "itemCount",
+                  "itemId": "item.huichun-gao",
+                  "minCount": 3
+                }
               ],
               "effects": [
-                { "kind": "takeItem", "itemId": "item.huichun-gao", "quantity": 3 },
-                { "kind": "adjustRelationship", "npcId": "char.ma-shangyi", "delta": 10 },
-                { "kind": "adjustRenown", "delta": 5 }
+                {
+                  "kind": "takeItem",
+                  "itemId": "item.huichun-gao",
+                  "quantity": 3
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "npcId": "char.ma-shangyi",
+                  "delta": 10
+                },
+                {
+                  "kind": "adjustMorality",
+                  "delta": 5
+                },
+                {
+                  "kind": "adjustRenown",
+                  "delta": 5
+                }
               ]
             },
             {
               "text": "疤脸刀客堵巷口的事，也交给我。",
               "nextNodeId": "quest-accepted",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.round-07-clear-alley", "status": "offered" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.round-07-clear-alley",
+                  "status": "offered"
+                }
               ],
               "effects": [
-                { "kind": "acceptQuest", "questId": "quest.round-07-clear-alley" }
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.round-07-clear-alley"
+                }
               ]
             }
           ]
@@ -995,15 +1054,25 @@
           "id": "quest-progress",
           "text": "药还没备齐？不急。姜百味的担子里就有回春膏，银两一时不凑手，也先赊着——回头我替你补上。",
           "options": [
-            { "text": "好，我再想想办法。", "nextNodeId": "board" },
+            {
+              "text": "好，我再想想办法。",
+              "nextNodeId": "board"
+            },
             {
               "text": "这趟差事我怕是办不成了，抱歉。",
               "nextNodeId": "quest-abandoned",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.round-07-medicine-run", "status": "active" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.round-07-medicine-run",
+                  "status": "active"
+                }
               ],
               "effects": [
-                { "kind": "abandonQuest", "questId": "quest.round-07-medicine-run" }
+                {
+                  "kind": "abandonQuest",
+                  "questId": "quest.round-07-medicine-run"
+                }
               ]
             }
           ]
@@ -1014,7 +1083,7 @@
         },
         {
           "id": "quest-delivered",
-          "text": "（马尚义接过药，掂了掂分量）齐了！我这就给人送去。你这份心意，镇上的乡邻都记着——往后有什么难处，尽管来寻我。"
+          "text": "马尚义把三份回春膏收好：「药已送去。此回实耗三份，善恶+5、江湖声望+5、与我关系+10。额外援药由你自备，不退银两，也不再发已办差事的酬金。往后备足三份仍可再援药。」"
         },
         {
           "id": "friendly",
@@ -1028,7 +1097,10 @@
           "id": "r58-hamlet-survey-done",
           "text": "马尚义在旧账上勾了一笔：「路认清就好。贞娘已说要给药队配散，你把村口的情形也告诉姜百味一声——差事一环扣一环，往后南边的药就不用我挨家捎话了。」"
         },
-        { "id": "leave", "text": "不妨事，路上留神便好。" }
+        {
+          "id": "leave",
+          "text": "不妨事，路上留神便好。"
+        }
       ]
     },
     {
@@ -1285,6 +1357,10 @@
               "nextNodeId": "farewell"
             },
             {
+              "text": "叶先生与柳先生之间，镇内如何走？",
+              "nextNodeId": "r128-west-wicket"
+            },
+            {
               "text": "改投之前，怎样核对入门资格与这一程实践？",
               "nextNodeId": "r127-transfer-readiness"
             }
@@ -1433,6 +1509,10 @@
         {
           "id": "r43-accepted-tingyu-eave-rain",
           "text": "叶庭舟把剑穗压在信角上：「先核准时辰。江湖话传得快，剑阁不替传闻磨出锋刃。」"
+        },
+        {
+          "id": "r128-west-wicket",
+          "text": "叶庭舟指向东侧：「从我身旁向东，经土路(42,37)接上镇内街面，再沿街向南转到柳听澜(48,43)旁。不必绕北门。陆贞娘和姜百味会换摊位，经过时让一让；若要买药，可先寻姜百味。」"
         },
         {
           "id": "r127-transfer-readiness",

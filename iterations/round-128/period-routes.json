@@ -1,0 +1,1067 @@
+{
+  "note": "Static per-period authored slots, not runtime inspection. Actual placements and route still require formal scheduler and keyboard checks.",
+  "output": [
+    {
+      "period": "period.midnight",
+      "before": {
+        "steps": 83,
+        "runs": [
+          {
+            "key": "Up",
+            "count": 3
+          },
+          {
+            "key": "Right",
+            "count": 1
+          },
+          {
+            "key": "Up",
+            "count": 6
+          },
+          {
+            "key": "Right",
+            "count": 1
+          },
+          {
+            "key": "Up",
+            "count": 1
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 8
+          },
+          {
+            "key": "Left",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 2
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 4
+          },
+          {
+            "key": "Right",
+            "count": 7
+          },
+          {
+            "key": "Down",
+            "count": 12
+          },
+          {
+            "key": "Right",
+            "count": 3
+          },
+          {
+            "key": "Down",
+            "count": 20
+          },
+          {
+            "key": "Left",
+            "count": 3
+          },
+          {
+            "key": "Up",
+            "count": 1
+          },
+          {
+            "key": "Left",
+            "count": 4
+          },
+          {
+            "key": "Up",
+            "count": 1
+          }
+        ]
+      },
+      "after": {
+        "steps": 17,
+        "runs": [
+          {
+            "key": "Right",
+            "count": 4
+          },
+          {
+            "key": "Down",
+            "count": 2
+          },
+          {
+            "key": "Left",
+            "count": 1
+          },
+          {
+            "key": "Down",
+            "count": 2
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Down",
+            "count": 3
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 1
+          }
+        ]
+      },
+      "reverse": {
+        "steps": 17,
+        "runs": [
+          {
+            "key": "Down",
+            "count": 1
+          },
+          {
+            "key": "Left",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 3
+          },
+          {
+            "key": "Left",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 2
+          },
+          {
+            "key": "Right",
+            "count": 1
+          },
+          {
+            "key": "Up",
+            "count": 2
+          },
+          {
+            "key": "Left",
+            "count": 4
+          }
+        ]
+      }
+    },
+    {
+      "period": "period.dawn",
+      "before": {
+        "steps": 83,
+        "runs": [
+          {
+            "key": "Up",
+            "count": 3
+          },
+          {
+            "key": "Right",
+            "count": 1
+          },
+          {
+            "key": "Up",
+            "count": 6
+          },
+          {
+            "key": "Right",
+            "count": 1
+          },
+          {
+            "key": "Up",
+            "count": 1
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 8
+          },
+          {
+            "key": "Left",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 2
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 4
+          },
+          {
+            "key": "Right",
+            "count": 7
+          },
+          {
+            "key": "Down",
+            "count": 12
+          },
+          {
+            "key": "Right",
+            "count": 3
+          },
+          {
+            "key": "Down",
+            "count": 20
+          },
+          {
+            "key": "Left",
+            "count": 3
+          },
+          {
+            "key": "Up",
+            "count": 1
+          },
+          {
+            "key": "Left",
+            "count": 4
+          },
+          {
+            "key": "Up",
+            "count": 1
+          }
+        ]
+      },
+      "after": {
+        "steps": 17,
+        "runs": [
+          {
+            "key": "Right",
+            "count": 4
+          },
+          {
+            "key": "Down",
+            "count": 2
+          },
+          {
+            "key": "Left",
+            "count": 1
+          },
+          {
+            "key": "Down",
+            "count": 2
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Down",
+            "count": 3
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 1
+          }
+        ]
+      },
+      "reverse": {
+        "steps": 17,
+        "runs": [
+          {
+            "key": "Down",
+            "count": 1
+          },
+          {
+            "key": "Left",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 3
+          },
+          {
+            "key": "Left",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 2
+          },
+          {
+            "key": "Right",
+            "count": 1
+          },
+          {
+            "key": "Up",
+            "count": 2
+          },
+          {
+            "key": "Left",
+            "count": 4
+          }
+        ]
+      }
+    },
+    {
+      "period": "period.morning",
+      "before": {
+        "steps": 83,
+        "runs": [
+          {
+            "key": "Up",
+            "count": 3
+          },
+          {
+            "key": "Right",
+            "count": 1
+          },
+          {
+            "key": "Up",
+            "count": 6
+          },
+          {
+            "key": "Right",
+            "count": 1
+          },
+          {
+            "key": "Up",
+            "count": 1
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 8
+          },
+          {
+            "key": "Left",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 2
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 4
+          },
+          {
+            "key": "Right",
+            "count": 7
+          },
+          {
+            "key": "Down",
+            "count": 12
+          },
+          {
+            "key": "Right",
+            "count": 3
+          },
+          {
+            "key": "Down",
+            "count": 20
+          },
+          {
+            "key": "Left",
+            "count": 3
+          },
+          {
+            "key": "Up",
+            "count": 1
+          },
+          {
+            "key": "Left",
+            "count": 4
+          },
+          {
+            "key": "Up",
+            "count": 1
+          }
+        ]
+      },
+      "after": {
+        "steps": 17,
+        "runs": [
+          {
+            "key": "Right",
+            "count": 4
+          },
+          {
+            "key": "Down",
+            "count": 2
+          },
+          {
+            "key": "Left",
+            "count": 1
+          },
+          {
+            "key": "Down",
+            "count": 2
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Down",
+            "count": 3
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 1
+          }
+        ]
+      },
+      "reverse": {
+        "steps": 17,
+        "runs": [
+          {
+            "key": "Down",
+            "count": 1
+          },
+          {
+            "key": "Left",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 3
+          },
+          {
+            "key": "Left",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 2
+          },
+          {
+            "key": "Right",
+            "count": 1
+          },
+          {
+            "key": "Up",
+            "count": 2
+          },
+          {
+            "key": "Left",
+            "count": 4
+          }
+        ]
+      }
+    },
+    {
+      "period": "period.midday",
+      "before": {
+        "steps": 83,
+        "runs": [
+          {
+            "key": "Up",
+            "count": 3
+          },
+          {
+            "key": "Right",
+            "count": 1
+          },
+          {
+            "key": "Up",
+            "count": 6
+          },
+          {
+            "key": "Right",
+            "count": 1
+          },
+          {
+            "key": "Up",
+            "count": 1
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 8
+          },
+          {
+            "key": "Left",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 2
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 4
+          },
+          {
+            "key": "Right",
+            "count": 7
+          },
+          {
+            "key": "Down",
+            "count": 12
+          },
+          {
+            "key": "Right",
+            "count": 3
+          },
+          {
+            "key": "Down",
+            "count": 20
+          },
+          {
+            "key": "Left",
+            "count": 3
+          },
+          {
+            "key": "Up",
+            "count": 1
+          },
+          {
+            "key": "Left",
+            "count": 3
+          },
+          {
+            "key": "Up",
+            "count": 1
+          },
+          {
+            "key": "Left",
+            "count": 1
+          }
+        ]
+      },
+      "after": {
+        "steps": 17,
+        "runs": [
+          {
+            "key": "Right",
+            "count": 4
+          },
+          {
+            "key": "Down",
+            "count": 2
+          },
+          {
+            "key": "Left",
+            "count": 1
+          },
+          {
+            "key": "Down",
+            "count": 2
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Down",
+            "count": 3
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 1
+          }
+        ]
+      },
+      "reverse": {
+        "steps": 17,
+        "runs": [
+          {
+            "key": "Down",
+            "count": 1
+          },
+          {
+            "key": "Left",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 3
+          },
+          {
+            "key": "Left",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 2
+          },
+          {
+            "key": "Right",
+            "count": 1
+          },
+          {
+            "key": "Up",
+            "count": 2
+          },
+          {
+            "key": "Left",
+            "count": 4
+          }
+        ]
+      }
+    },
+    {
+      "period": "period.afternoon",
+      "before": {
+        "steps": 83,
+        "runs": [
+          {
+            "key": "Up",
+            "count": 3
+          },
+          {
+            "key": "Right",
+            "count": 1
+          },
+          {
+            "key": "Up",
+            "count": 6
+          },
+          {
+            "key": "Right",
+            "count": 1
+          },
+          {
+            "key": "Up",
+            "count": 1
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 8
+          },
+          {
+            "key": "Left",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 2
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 4
+          },
+          {
+            "key": "Right",
+            "count": 7
+          },
+          {
+            "key": "Down",
+            "count": 12
+          },
+          {
+            "key": "Right",
+            "count": 3
+          },
+          {
+            "key": "Down",
+            "count": 20
+          },
+          {
+            "key": "Left",
+            "count": 3
+          },
+          {
+            "key": "Up",
+            "count": 1
+          },
+          {
+            "key": "Left",
+            "count": 4
+          },
+          {
+            "key": "Up",
+            "count": 1
+          }
+        ]
+      },
+      "after": {
+        "steps": 15,
+        "runs": [
+          {
+            "key": "Right",
+            "count": 4
+          },
+          {
+            "key": "Down",
+            "count": 2
+          },
+          {
+            "key": "Right",
+            "count": 1
+          },
+          {
+            "key": "Down",
+            "count": 5
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 1
+          }
+        ]
+      },
+      "reverse": {
+        "steps": 15,
+        "runs": [
+          {
+            "key": "Down",
+            "count": 1
+          },
+          {
+            "key": "Left",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 5
+          },
+          {
+            "key": "Left",
+            "count": 1
+          },
+          {
+            "key": "Up",
+            "count": 2
+          },
+          {
+            "key": "Left",
+            "count": 4
+          }
+        ]
+      }
+    },
+    {
+      "period": "period.dusk",
+      "before": {
+        "steps": 83,
+        "runs": [
+          {
+            "key": "Up",
+            "count": 3
+          },
+          {
+            "key": "Right",
+            "count": 1
+          },
+          {
+            "key": "Up",
+            "count": 6
+          },
+          {
+            "key": "Right",
+            "count": 1
+          },
+          {
+            "key": "Up",
+            "count": 1
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 8
+          },
+          {
+            "key": "Left",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 2
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 4
+          },
+          {
+            "key": "Right",
+            "count": 7
+          },
+          {
+            "key": "Down",
+            "count": 12
+          },
+          {
+            "key": "Right",
+            "count": 3
+          },
+          {
+            "key": "Down",
+            "count": 20
+          },
+          {
+            "key": "Left",
+            "count": 3
+          },
+          {
+            "key": "Up",
+            "count": 1
+          },
+          {
+            "key": "Left",
+            "count": 4
+          },
+          {
+            "key": "Up",
+            "count": 1
+          }
+        ]
+      },
+      "after": {
+        "steps": 15,
+        "runs": [
+          {
+            "key": "Right",
+            "count": 3
+          },
+          {
+            "key": "Down",
+            "count": 4
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Down",
+            "count": 3
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 1
+          }
+        ]
+      },
+      "reverse": {
+        "steps": 15,
+        "runs": [
+          {
+            "key": "Down",
+            "count": 1
+          },
+          {
+            "key": "Left",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 3
+          },
+          {
+            "key": "Left",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 4
+          },
+          {
+            "key": "Left",
+            "count": 3
+          }
+        ]
+      }
+    },
+    {
+      "period": "period.night",
+      "before": {
+        "steps": 83,
+        "runs": [
+          {
+            "key": "Up",
+            "count": 3
+          },
+          {
+            "key": "Right",
+            "count": 1
+          },
+          {
+            "key": "Up",
+            "count": 6
+          },
+          {
+            "key": "Right",
+            "count": 1
+          },
+          {
+            "key": "Up",
+            "count": 1
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 8
+          },
+          {
+            "key": "Left",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 2
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 4
+          },
+          {
+            "key": "Right",
+            "count": 7
+          },
+          {
+            "key": "Down",
+            "count": 12
+          },
+          {
+            "key": "Right",
+            "count": 3
+          },
+          {
+            "key": "Down",
+            "count": 20
+          },
+          {
+            "key": "Left",
+            "count": 3
+          },
+          {
+            "key": "Up",
+            "count": 1
+          },
+          {
+            "key": "Left",
+            "count": 4
+          },
+          {
+            "key": "Up",
+            "count": 1
+          }
+        ]
+      },
+      "after": {
+        "steps": 15,
+        "runs": [
+          {
+            "key": "Right",
+            "count": 3
+          },
+          {
+            "key": "Down",
+            "count": 4
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Down",
+            "count": 3
+          },
+          {
+            "key": "Right",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 1
+          }
+        ]
+      },
+      "reverse": {
+        "steps": 15,
+        "runs": [
+          {
+            "key": "Down",
+            "count": 1
+          },
+          {
+            "key": "Left",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 3
+          },
+          {
+            "key": "Left",
+            "count": 2
+          },
+          {
+            "key": "Up",
+            "count": 4
+          },
+          {
+            "key": "Left",
+            "count": 3
+          }
+        ]
+      }
+    }
+  ]
+}

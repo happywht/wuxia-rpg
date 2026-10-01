@@ -3683,32 +3683,36 @@ export class GridScene extends Phaser.Scene {
   }
 
   /** Latches eligible achievements and awards each authored reward once per save. */
-  private refreshAchievementUnlocks(): void {
+  private refreshAchievementUnlocks(): string[] {
     const set = this.world?.assembly.achievements ?? null;
     const profile = this.playerProfile;
     const character = this.playerState;
     const inventory = this.inventory;
-    if (set === null || profile === null || character === null || inventory === null) return;
+    if (set === null || profile === null || character === null || inventory === null) return [];
     const notices: string[] = [];
+    const receipts: string[] = [];
     for (let pass = 0; pass <= set.achievements.length; pass += 1) {
       const context = this.achievementEvaluationContext();
-      if (context === null) return;
+      if (context === null) return receipts;
       const result = unlockReadyAchievements(set, this.achievementState, context);
       if (result.newlyUnlocked.length === 0) break;
       this.achievementState = result.state;
       for (const achievement of result.newlyUnlocked) {
         const currency = achievement.reward.currency ?? 0;
+        const currencyBefore = inventory.currency;
         inventory.currency = Math.min(999_999_999, inventory.currency + currency);
         const experience = grantExperience(profile, character, achievement.reward.experience ?? 0);
         if (this.meridianSet !== null) {
           awardCultivationPoints(character, experience.levelsGained, this.meridianSet.resource);
         }
         notices.push(achievement.title);
+        receipts.push(`首次成就「${achievement.title}」：经验 +${(achievement.reward.experience ?? 0) - experience.discardedExperience} · 银两 +${inventory.currency - currencyBefore}`);
         console.info('[achievement] 已解锁 "%s"：经验 +%d，银两 +%d',
           achievement.id, achievement.reward.experience ?? 0, currency);
       }
     }
     if (notices.length > 0) this.showRegionNotice('成就达成：' + notices.join('、'));
+    return receipts;
   }
 
   private questItemCounts(): ReadonlyMap<string, number> {
@@ -4342,9 +4346,9 @@ export class GridScene extends Phaser.Scene {
       // Dialogue effects can alter morality, relationships, faction, knowledge,
       // or learned arts without changing a quest. Re-evaluate while this
       // conversation is still active so those achievements unlock immediately.
-      this.refreshAchievementUnlocks();
-      const feedback =
-        result.summary.lines.length > 0 ? result.summary.lines.join(' · ') : null;
+      const achievementReceipts = this.refreshAchievementUnlocks();
+      const feedbackLines = [...result.summary.lines, ...achievementReceipts];
+      const feedback = feedbackLines.length > 0 ? feedbackLines.join(' · ') : null;
       session.choose(choice.index);
       return { advanced: true, feedback };
     }
