@@ -1,0 +1,10 @@
+warning: in the working copy of 'CHANGELOG.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'DEVLOG.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'ROADMAP.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'data/base/battles/round-05-encounters.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/ARCHITECTURE.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/DATA-GUIDE.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/DEEPENING-ACCEPTANCE.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/PLAYER-GUIDE.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'tests/round107-enemy-behavior.test.ts', LF will be replaced by CRLF the next time Git touches it
+docs/PLAYER-GUIDE.md:396: new blank line at EOF.

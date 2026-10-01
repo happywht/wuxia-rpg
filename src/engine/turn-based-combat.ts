@@ -740,6 +740,14 @@ export class CombatSession {
     return this.phase === 'victory' || this.phase === 'defeat' || this.phase === 'fled';
   }
 
+  /** Read-only projection of the existing support cadence; no new counters or save fields. */
+  get companionCadence(): { name: string; kind: CompanionSupportData['kind']; power: number; everyPlayerActions: number; successfulActions: number; actionsUntilSupport: number } | null {
+    if (this.companion === undefined || this.isOver) return null;
+    const { name, support } = this.companion;
+    return { name, ...support, successfulActions: this.successfulPlayerActions,
+      actionsUntilSupport: support.everyPlayerActions - this.successfulPlayerActions % support.everyPlayerActions };
+  }
+
   get log(): readonly CombatLogEntry[] {
     return this.logEntries;
   }

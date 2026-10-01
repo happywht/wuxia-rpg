@@ -580,3 +580,7 @@ Round140继续沈柳新增复谈、关键双分支完整后果/活动失败恢�
 ## Round 141 已完成：对白天气条件与巡路提示
 
 新增对白条件 {kind:weather,weatherId}：封闭Schema/防御解析，装配校验已声明天气，未知引用只移除本选项；GridScene使用当前地区currentClimate，缺上下文失败关闭。柳寻径八种天气纯巡路分支，无效果/奖励；当前晴天实际重复与第三栏保存。未改变存档字段、资源数量或原任务/转述。实际只验证晴天，其它天气为测试可见性/结构验证；不会把测试当天气实走。作者源scripts/apply-round141-weather-dialogue.mjs幂等并拒绝覆盖已改节点。旧消费者可省weatherId/weatherIds：旧无天气条件对白仍可用，新增条件不会假定默认晴天。MOD可引用已声明天气，错引用装配警告；不新增迁移。
+
+## 截至 Round 142
+
+新增CombatSession只读伙伴援护节奏投影与战斗计量提示；资料侧复用现有battle-encounters资源增加encounter.r142-patrol-drill，无报酬可重复，不新增存档字段或manifest。作者脚本幂等且拒绝改动覆盖，保留旧遭遇原文本格式；中文日志使用高级换行。真实北境援攻9/胜利再入/正常存读见本轮verification，首栏误覆盖已记录。完整goal active。

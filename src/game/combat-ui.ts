@@ -1,3 +1,4 @@
+import { companionCadenceLabel } from './companion-cadence';
 import Phaser from 'phaser';
 import { buildCombatResultSummary } from './combat-result-summary';
 import { combatLayoutMetrics } from './combat-layout';
@@ -383,6 +384,8 @@ export class BattlePanel {
   ): number {
     const candidates = session.enemyIntent === null ? session.log.slice(-6) :
       [...session.log.slice(-5), { kind: 'enemy-intent', text: `敌方下一步：${session.enemyIntent}` }];
+    const supportHint = companionCadenceLabel(session.companionCadence);
+    if (supportHint !== null) candidates.push({ kind: 'intro', text: supportHint });
     const measured: { text: Phaser.GameObjects.Text; height: number }[] = [];
 
     // Measure from the newest entry backwards, then keep the newest prefix
@@ -408,7 +411,7 @@ export class BattlePanel {
           fontFamily: UI.fontFamily,
           fontSize: uiFontSize(12),
           color,
-          wordWrap: { width: contentWidth },
+          wordWrap: { width: contentWidth, useAdvancedWrap: true },
           lineSpacing: 3,
         })
         .setOrigin(0, 0);
