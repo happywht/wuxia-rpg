@@ -8,6 +8,8 @@ import {
   type KnowledgeRelation,
 } from '../engine/knowledge-graph';
 import { uiFontSize } from './settings';
+import { describeEncyclopediaProgress, paginateEncyclopediaSummary } from './encyclopedia-progress';
+import { wrapDialogueText } from './dialogue-layout';
 import { addPixelPanelChrome, addPixelSelection, UI_FONT_FAMILY } from './ui-theme';
 
 /** Data-driven encyclopedia overlay; only discovered details are rendered. */
@@ -78,6 +80,8 @@ export class EncyclopediaPanel {
   private model: EncyclopediaPanelModel | null = null;
   private filterIndex = 0;
   private selection = 0;
+  private summaryPage = 0;
+  private summaryPageCount = 1;
   private openState = false;
 
   constructor(scene: Phaser.Scene, options: EncyclopediaPanelOptions = {}) {
@@ -95,6 +99,7 @@ export class EncyclopediaPanel {
     this.model = model;
     this.filterIndex = 0;
     this.selection = 0;
+    this.summaryPage = 0;
     this.openState = true;
     this.container.setVisible(true);
     this.bindKeys();
@@ -129,6 +134,8 @@ export class EncyclopediaPanel {
       [codes.A, () => this.changeFilter(-1)],
       [codes.RIGHT, () => this.changeFilter(1)],
       [codes.D, () => this.changeFilter(1)],
+      [codes.PAGE_UP, () => this.changeSummaryPage(-1)],
+      [codes.PAGE_DOWN, () => this.changeSummaryPage(1)],
       [codes.ESC, () => this.close()],
     ];
     for (const [code, handler] of pairs) {
@@ -164,12 +171,19 @@ export class EncyclopediaPanel {
     const rows = this.rows;
     if (rows.length === 0) return;
     this.selection = (this.selection + delta + rows.length) % rows.length;
+    this.summaryPage = 0;
     this.render();
   }
 
   private changeFilter(delta: number): void {
     this.filterIndex = (this.filterIndex + delta + FILTERS.length) % FILTERS.length;
     this.selection = 0;
+    this.summaryPage = 0;
+    this.render();
+  }
+
+  private changeSummaryPage(delta: number): void {
+    this.summaryPage = Math.max(0, Math.min(this.summaryPageCount - 1, this.summaryPage + delta));
     this.render();
   }
 
@@ -193,7 +207,8 @@ export class EncyclopediaPanel {
     const knownCount = [...model.graph.nodes.keys()].filter((id) => model.knownNodeIds.has(id)).length;
     this.addText('江湖百科', left + 22, top + 16, 19, UI.warning);
     this.addText(`←/→ 类别：${category}　·　已知词条 ${knownCount}`, left + 22, top + 47, 11, UI.muted);
-    this.addText('↑/↓ 浏览 · K 或 Esc 关闭', left + PANEL_WIDTH - 22, top + PANEL_HEIGHT - 25, 10, UI.muted, 'right');
+    this.summaryPageCount = 1;
+    this.addText('↑/↓ 浏览 · PgUp/PgDn 正文 · K 或 Esc 关闭', left + PANEL_WIDTH - 22, top + PANEL_HEIGHT - 25, 10, UI.muted, 'right');
     this.addLine(left + 322, top + 75, left + 322, top + PANEL_HEIGHT - 46);
 
     const rows = this.rows;
@@ -238,9 +253,16 @@ export class EncyclopediaPanel {
     }
 
     const node = selected.node;
-    this.addText(KIND_LABELS[node.kind], detailX, listTop, 10, UI.warning);
+    const progress = describeEncyclopediaProgress(node, model.knownNodeIds);
+    this.addText(`${KIND_LABELS[node.kind]}${progress === undefined ? '' : ` · ${progress}`}`, detailX, listTop, 10, UI.warning);
     this.addText(node.title, detailX, listTop + 20, 18, UI.primary);
-    this.addWrappedText(node.summary, detailX, listTop + 58, detailWidth, 12, UI.primary);
+    const summaryTop = listTop + 58;
+    const summary = this.addWrappedText(node.summary, detailX, summaryTop, detailWidth, 12, UI.primary);
+    const pages = paginateEncyclopediaSummary(node.summary, detailWidth, top + 270 - summaryTop, Number.parseFloat(uiFontSize(12)) + 6, value => summary.context.measureText(value).width);
+    this.summaryPageCount = pages.length;
+    this.summaryPage = Math.min(this.summaryPage, pages.length - 1);
+    summary.setText(pages[this.summaryPage]!);
+    this.addText(`正文 ${this.summaryPage + 1}/${pages.length}`, detailX, top + 278, 10, UI.muted);
     const edges = getKnownKnowledgeEdges(model.graph, model.knownNodeIds, node.id);
     this.addText('已知关联', detailX, top + 300, 12, UI.warning);
     if (edges.length === 0) {
@@ -278,15 +300,16 @@ export class EncyclopediaPanel {
     this.container.add(node);
   }
 
-  private addWrappedText(text: string, x: number, y: number, width: number, fontSize: number, color: string): void {
+  private addWrappedText(text: string, x: number, y: number, width: number, fontSize: number, color: string): Phaser.GameObjects.Text {
     const node = this.scene.add.text(x, y, text, {
       fontFamily: UI.fontFamily,
       fontSize: uiFontSize(fontSize),
       color,
-      wordWrap: { width },
       lineSpacing: 3,
     }).setOrigin(0, 0);
+    node.setText(wrapDialogueText(text, width, value => node.context.measureText(value).width).join('\n'));
     this.container.add(node);
+    return node;
   }
 
   private addLine(x1: number, y1: number, x2: number, y2: number): void {
