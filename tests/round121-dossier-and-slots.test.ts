@@ -144,6 +144,7 @@ vi.mock('../src/game/settings', () => ({
 }));
 vi.mock('../src/engine/save-system', () => ({
   SAVE_SLOT_IDS: ['slot-1', 'slot-2', 'slot-3'],
+  SAVE_KEY_PREFIX: 'wuxia-rpg.save.',
   SAVE_SLOT_LABELS: { 'slot-1': '第一栏', 'slot-2': '第二栏', 'slot-3': '第三栏' },
   formatSavedAt: (value: string) => value,
   listSaveSlots: () => ({
@@ -151,6 +152,7 @@ vi.mock('../src/engine/save-system', () => ({
     slots: [1, 2, 3].map(index => ({ state: 'ok', displayName: `${'超长MOD侠名'.repeat(8)}${index}`, level: 10, savedAt: `第2年 青阳${index}日 04:3${index}` })),
   }),
   deleteSaveSlot: () => ({ ok: true, message: '' }),
+  parseSaveSnapshot: () => ({ ok: false, reason: 'corrupt' as const, message: '占位解析结果', errors: [] }),
 }));
 import { FactionPanel } from '../src/game/faction-ui';
 import { PauseMenuPanel } from '../src/game/pause-menu';
@@ -228,7 +230,7 @@ describe('Round121(c) UI: dossier reader and pause save page at max font on the 
     fontScale = 1.6;
     let saves = 0;
     const r = setupScene(scene => new PauseMenuPanel(scene, {
-      storage: {} as never,
+      storage: { read: () => '{"stub":true}' } as never,
       save: () => { saves += 1; return { ok: true, message: '已保存' }; },
       returnToMenu: () => {},
     }), 640, 360);
@@ -250,12 +252,23 @@ describe('Round121(c) UI: dossier reader and pause save page at max font on the 
     const selected = rows.find(t => t.text.startsWith('▸'))!;
     expect(selected.x + selected.width * (1 - selected.originX)).toBeLessThan(counter.x - counter.width * counter.originX);
     expect(counter.y + counter.height).toBeLessThanOrEqual(240);
-    // Paging the selected label never saves; Enter does, exactly once each.
+    // Paging the selected label never saves; Round 143: the non-empty slot's
+    // Enter opens the overwrite confirmation (default cancel) instead of
+    // saving blind, and only an explicit, fully-read confirm writes.
     r.press(34);
     expect(saves).toBe(0);
     r.press(33);
     expect(saves).toBe(0);
-    r.press(3);
+    r.press(3); // Enter opens the confirmation, still nothing written.
+    expect(saves).toBe(0);
+    expect(r.visible().some(t => t.text.includes('取消覆盖（默认）'))).toBe(true);
+    let guard = 0;
+    while (r.visible().some(t => t.text.includes('先读说明')) && guard < 40) {
+      r.press(34); // PgDn reads every body page until the gate unlatches.
+      guard += 1;
+    }
+    r.press(2); // ↓ to 确认覆盖.
+    r.press(3); // Enter commits — exactly once.
     expect(saves).toBe(1);
     r.press(6); // Esc back to main.
     r.press(6); // Esc closes.

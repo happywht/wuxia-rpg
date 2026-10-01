@@ -3,9 +3,13 @@
  * with Escape or the "继续" entry. Pages:
  *
  * - main — continue / save to a slot / settings / return to the main menu;
- * - save — the three slots with their current summaries; Enter overwrites
- *   the slot with a fresh snapshot of the live run (the host supplies the
- *   capture so this class never touches gameplay state);
+ * - save — the three slots with their current summaries; Enter on an empty
+ *   slot saves immediately behind a fresh storage read, while a non-empty
+ *   slot (readable or damaged) first opens the Round 143 overwrite
+ *   confirmation: exact slot label, name/level and old timestamp, default
+ *   cancel, commit only after every body page was read and the slot's raw
+ *   payload still matches the one captured at prompt time (the host supplies
+ *   the capture so this class never touches gameplay state);
  * - settings — the same six persistent settings as the main menu (volume,
  *   text scale, movement layout, gamepad, high contrast, reduced motion,
  *   rendered and adjusted through the shared settings helpers), adjusted
@@ -23,6 +27,7 @@
 import Phaser from 'phaser';
 
 import {
+  SAVE_KEY_PREFIX,
   SAVE_SLOT_IDS,
   type SaveSlotId,
   SAVE_SLOT_LABELS,
@@ -31,6 +36,16 @@ import {
   listSaveSlots,
   type SaveStorage,
 } from '../engine/save-system';
+import {
+  buildSaveOverwriteGeometry,
+  createSaveOverwriteConfirmation,
+  describeSaveOverwritePayload,
+  moveSaveOverwriteChoice,
+  type SaveOverwriteConfirmationState,
+  turnSaveOverwritePage,
+  truncateGrapheme,
+  verifySaveOverwriteTarget,
+} from './save-overwrite-confirmation';
 import {
   DEFAULT_GAME_SETTINGS,
   type GameSettings,
@@ -61,6 +76,9 @@ const UI = {
 const CURSOR_ACTIVE = '▸ ';
 const CURSOR_IDLE = '  ';
 
+/** Matches {@link buildSaveOverwriteGeometry}'s default padding. */
+const OVERWRITE_PROMPT_PADDING = 24;
+
 type PausePage = 'main' | 'save' | 'settings' | 'confirm-quit';
 
 const MAIN_ENTRIES = [
@@ -74,7 +92,12 @@ type MainEntryId = (typeof MAIN_ENTRIES)[number]['id'];
 
 export interface PauseMenuPanelOptions {
   storage: SaveStorage | null;
-  /** Captures and writes the live run into one slot; returns readable feedback. */
+  /**
+   * Captures and writes the live run into one slot; returns readable
+   * feedback. Round 143: only reached for an empty slot (behind a fresh
+   * storage read) or after the overwrite confirmation committed — the panel
+   * itself owns the guard, the callback keeps its atomic write semantics.
+   */
   save: (slotId: SaveSlotId) => { ok: boolean; message: string };
   /** Invoked after the player confirmed leaving the run. */
   returnToMenu: () => void;
@@ -101,6 +124,9 @@ export class PauseMenuPanel {
   private slotsAvailable = false;
   private slotsMessage: string | null = null;
   private settings: GameSettings = { ...DEFAULT_GAME_SETTINGS };
+  /** Round 143: live overwrite confirmation; null while no prompt shows. */
+  private overwritePrompt: SaveOverwriteConfirmationState | null = null;
+  private overwriteNotice: string | null = null;
 
   constructor(scene: Phaser.Scene, options: PauseMenuPanelOptions) {
     this.scene = scene;
@@ -122,6 +148,8 @@ export class PauseMenuPanel {
     this.page = 'main';
     this.selection = 0;
     this.feedback = null;
+    this.overwritePrompt = null; // Opening always starts without a pending confirmation.
+    this.overwriteNotice = null;
     this.container.setVisible(true);
     this.bindKeys();
     this.render();
@@ -133,6 +161,8 @@ export class PauseMenuPanel {
       return;
     }
     this.openState = false;
+    this.overwritePrompt = null; // Closing discards a pending confirmation wholesale.
+    this.overwriteNotice = null;
     this.unbindKeys();
     this.container.setVisible(false);
     this.container.removeAll(true);
@@ -195,6 +225,12 @@ export class PauseMenuPanel {
   }
 
   private moveSelection(delta: number): void {
+    // Round 143: while the overwrite prompt shows, ↑/↓ move its choice.
+    if (this.page === 'save' && this.overwritePrompt !== null) {
+      moveSaveOverwriteChoice(this.overwritePrompt, delta);
+      this.render();
+      return;
+    }
     const count = this.rowCount();
     if (count === 0) {
       return;
@@ -208,6 +244,13 @@ export class PauseMenuPanel {
   /** Round 121: on the save page, PageUp/PageDown read the selected label only. */
   private turnSlotLabelPage(step: number): void {
     if (this.page !== 'save') return;
+    // Round 143: while the overwrite prompt shows, the keys read its body.
+    if (this.overwritePrompt !== null) {
+      turnSaveOverwritePage(this.overwritePrompt, step);
+      this.overwriteNotice = null;
+      this.render();
+      return;
+    }
     const row = this.slotRows[this.selection];
     if (row === undefined || row.pages.length <= 1) return;
     const next = Math.min(row.pages.length - 1, Math.max(0, this.slotLabelPage + step));
@@ -220,6 +263,12 @@ export class PauseMenuPanel {
   private slotRows: readonly { pages: readonly string[] }[] = [];
 
   private adjustSetting(delta: number): void {
+    if (this.page === 'save' && this.overwritePrompt !== null) {
+      turnSaveOverwritePage(this.overwritePrompt, delta);
+      this.overwriteNotice = null;
+      this.render();
+      return;
+    }
     if (this.page !== 'settings') {
       return;
     }
@@ -272,18 +321,41 @@ export class PauseMenuPanel {
         return;
       }
       case 'save': {
+        // Round 143: Enter on the prompt itself (default cancel keeps the slot).
+        if (this.overwritePrompt !== null) {
+          this.confirmOverwritePrompt();
+          return;
+        }
         const slotId = SAVE_SLOT_IDS[this.selection];
         if (slotId === undefined) {
           return;
         }
-        if (!this.slotsAvailable) {
+        if (!this.slotsAvailable || this.options.storage === null) {
           this.setFeedback(this.slotsMessage ?? '浏览器本地存储不可用，无法保存', true);
+          this.render();
           return;
         }
-        const result = this.options.save(slotId);
-        this.setFeedback(`${SAVE_SLOT_LABELS[slotId]}：${result.message}`, !result.ok);
-        this.refreshSlots();
-        this.render();
+        // A fresh read decides emptiness: a slot filled since the summary was
+        // listed still opens the confirmation instead of overwriting blind.
+        let raw: string | null;
+        try {
+          raw = this.options.storage.read(`${SAVE_KEY_PREFIX}${slotId}`);
+        } catch {
+          this.refreshSlots();
+          this.setFeedback('浏览器本地存储当前不可用，无法保存', true);
+          this.render();
+          return;
+        }
+        if (raw === null) {
+          // Empty right now: save directly behind the read that proved it.
+          const result = this.options.save(slotId);
+          this.setFeedback(`${SAVE_SLOT_LABELS[slotId]}：${result.message}`, !result.ok);
+          this.refreshSlots();
+          this.render();
+          return;
+        }
+        // Non-empty (readable or damaged): confirm first, write never yet.
+        this.openOverwritePrompt(slotId, raw);
         return;
       }
       case 'settings':
@@ -326,6 +398,15 @@ export class PauseMenuPanel {
   }
 
   private back(): void {
+    // Round 143: Esc cancels a pending overwrite confirmation but keeps the
+    // save page open — the slot selection and its label page stay as they
+    // were, so the player lands back on the exact row they were reading.
+    if (this.page === 'save' && this.overwritePrompt !== null) {
+      this.overwritePrompt = null;
+      this.overwriteNotice = null;
+      this.render();
+      return;
+    }
     if (this.page === 'main') {
       this.close();
       return;
@@ -353,6 +434,98 @@ export class PauseMenuPanel {
     this.slotsAvailable = listing.ok;
     this.slotsMessage = listing.ok ? null : listing.message;
     this.slotSummaries = listing.slots;
+  }
+
+  // -------------------------------------------------------------------------
+  // Round 143: save-overwrite confirmation
+  // -------------------------------------------------------------------------
+
+  /**
+   * Enter on a non-empty slot (readable or damaged) opens the measured,
+   * paginated confirmation bound to the exact slot id and the raw payload
+   * just read. The default choice is cancel; nothing is written while the
+   * prompt shows, and the slot selection/label page are left untouched so
+   * cancelling lands back on the same row.
+   */
+  private openOverwritePrompt(slotId: SaveSlotId, raw: string): void {
+    const px = (size: number) => Number.parseInt(uiFontSize(size), 10);
+    const lineSize = (size: number) => Math.ceil(px(size) * 1.5);
+    const geometry = buildSaveOverwriteGeometry({
+      viewWidth: this.scene.scale.width,
+      viewHeight: this.scene.scale.height,
+      titleHeight: lineSize(16),
+      bodyLineHeight: lineSize(12),
+      choiceHeight: lineSize(13),
+      hintHeight: lineSize(10),
+    });
+    // Same font-synced probe contract as the save rows: the measuring Text
+    // lives on the container, so the re-render below reclaims it.
+    const probe = this.scene.add.text(-500, -500, '', { fontFamily: UI.fontFamily, fontSize: uiFontSize(12) });
+    this.container.add(probe);
+    this.overwritePrompt = createSaveOverwriteConfirmation({
+      slotId,
+      slotLabel: SAVE_SLOT_LABELS[slotId],
+      facts: describeSaveOverwritePayload(raw),
+      rawPayload: raw,
+      width: geometry.contentWidth,
+      capacity: geometry.bodyCapacity,
+      measure: (text) => probe.context.measureText(text).width,
+    });
+    this.overwriteNotice = null;
+    this.setFeedback(null, false);
+    this.render();
+  }
+
+  /**
+   * Enter on the prompt. Cancel drops it back onto the same slot (and its
+   * label page); Confirm must have read every body page, then re-reads the
+   * exact slot key and compares the captured raw payload — any change or
+   * storage error refuses the write, refreshes the slots and requires a new
+   * confirmation. The pending state is cleared *before* the save callback
+   * fires, so a repeated Enter can never write twice.
+   */
+  private confirmOverwritePrompt(): void {
+    const prompt = this.overwritePrompt;
+    if (prompt === null) {
+      return;
+    }
+    if (prompt.choice === 'cancel') {
+      this.overwritePrompt = null;
+      this.overwriteNotice = null;
+      this.setFeedback(`已取消覆盖，${prompt.slotLabel}的原存档保留`, false);
+      this.render();
+      return;
+    }
+    if (!prompt.readAllPages) {
+      this.overwriteNotice = `请先翻页读完说明（${prompt.page + 1}/${prompt.bodyPages.length}）`;
+      this.render();
+      return;
+    }
+    const storage = this.options.storage;
+    const { slotId, slotLabel } = prompt;
+    // One-shot: the pending confirmation is consumed before any side effect,
+    // so a callback failure or a replayed Enter cannot recommit the same one.
+    this.overwritePrompt = null;
+    this.overwriteNotice = null;
+    if (storage === null) {
+      this.refreshSlots();
+      this.setFeedback('浏览器本地存储不可用，无法保存', true);
+      this.render();
+      return;
+    }
+    const precheck = verifySaveOverwriteTarget(storage, prompt);
+    if (precheck.kind !== 'unchanged') {
+      // The slot changed underneath (or storage failed): nothing written,
+      // refreshed list, and only a freshly opened confirmation may commit.
+      this.refreshSlots();
+      this.setFeedback(`${slotLabel}：${precheck.message}`, true);
+      this.render();
+      return;
+    }
+    const result = this.options.save(slotId);
+    this.setFeedback(`${slotLabel}：${result.message}`, !result.ok);
+    this.refreshSlots();
+    this.render();
   }
 
   // -------------------------------------------------------------------------
@@ -399,6 +572,10 @@ export class PauseMenuPanel {
         break;
       case 'save':
         this.renderSaveEntries(top);
+        if (this.overwritePrompt !== null) {
+          this.renderOverwritePrompt();
+          return; // The confirmation owns the footer; do not overdraw it.
+        }
         break;
       case 'settings':
         this.renderSettingsEntries(top);
@@ -415,7 +592,7 @@ export class PauseMenuPanel {
             fontFamily: UI.fontFamily,
             fontSize: uiFontSize(12),
             color: this.feedbackWarn ? UI.textWarn : UI.textPrimary,
-            wordWrap: { width: panelWidth - 64 },
+            wordWrap: { width: panelWidth - 64, useAdvancedWrap: true },
             align: 'center',
           })
           .setOrigin(0.5),
@@ -568,8 +745,113 @@ export class PauseMenuPanel {
     }
   }
 
-  private renderConfirmQuit(top: number, panelWidth: number): void {
-    const width = this.scene.scale.width;
+  /**
+   * Round 143: the overwrite confirmation rides on top of the save page as
+   * an opaque sub-panel: measured title, the prompt's current body page, the
+   * two choice rows (default cancel highlighted) and a hint/notice line. The
+   * slot list stays visible around it, untouched; the raw payload is never
+   * part of any rendered text.
+   */
+  private renderOverwritePrompt(): void {
+    const prompt = this.overwritePrompt;
+    if (prompt === null) {
+      return;
+    }
+    const px = (size: number) => Number.parseInt(uiFontSize(size), 10);
+    const lineSize = (size: number) => Math.ceil(px(size) * 1.5);
+    const geometry = buildSaveOverwriteGeometry({
+      viewWidth: this.scene.scale.width,
+      viewHeight: this.scene.scale.height,
+      titleHeight: lineSize(16),
+      bodyLineHeight: lineSize(12),
+      choiceHeight: lineSize(13),
+      hintHeight: lineSize(10),
+      padding: OVERWRITE_PROMPT_PADDING,
+    });
+    // Font-synced probes for the two fit-truncated chrome lines; they live on
+    // the container, so the next re-render reclaims them.
+    const probeTitle = this.scene.add.text(-500, -500, '', { fontFamily: UI.fontFamily, fontSize: uiFontSize(16) });
+    const probeHint = this.scene.add.text(-500, -500, '', { fontFamily: UI.fontFamily, fontSize: uiFontSize(10) });
+    this.container.add(probeTitle);
+    this.container.add(probeHint);
+
+    addPixelPanelChrome(
+      this.scene,
+      this.container,
+      { x: geometry.left, y: geometry.top, width: geometry.width, height: geometry.height },
+      UI.overlayAlpha,
+    );
+
+    const title = `覆盖${prompt.slotLabel}？`;
+    this.container.add(
+      this.scene.add.text(
+        geometry.left + OVERWRITE_PROMPT_PADDING,
+        geometry.top + 16,
+        truncateGrapheme(title, geometry.contentWidth, (text) => probeTitle.context.measureText(text).width),
+        { fontFamily: UI.fontFamily, fontSize: uiFontSize(16), color: UI.textWarn },
+      ),
+    );
+
+    this.container.add(
+      this.scene.add.text(geometry.left + OVERWRITE_PROMPT_PADDING, geometry.bodyTop, prompt.bodyPages[prompt.page] ?? '', {
+        fontFamily: UI.fontFamily,
+        fontSize: uiFontSize(12),
+        lineSpacing: Math.ceil(px(12) * 0.5),
+        color: UI.textPrimary,
+      }),
+    );
+
+    const choices = [
+      {
+        selected: prompt.choice === 'cancel',
+        label: '取消覆盖（默认）',
+        color: prompt.choice === 'cancel' ? UI.textActive : UI.textIdle,
+      },
+      {
+        selected: prompt.choice === 'confirm',
+        label: prompt.readAllPages ? '确认覆盖' : '确认覆盖（先读说明）',
+        color: UI.textWarn,
+      },
+    ];
+    choices.forEach((choice, index) => {
+      const y = geometry.choiceTop + index * lineSize(13);
+      if (choice.selected) {
+        addPixelSelection(this.scene, this.container, {
+          x: geometry.left + OVERWRITE_PROMPT_PADDING,
+          y: y - 2,
+          width: geometry.width - OVERWRITE_PROMPT_PADDING * 2,
+          height: lineSize(13),
+        });
+      }
+      this.container.add(
+        this.scene.add.text(
+          geometry.left + OVERWRITE_PROMPT_PADDING,
+          y,
+          `${choice.selected ? CURSOR_ACTIVE : CURSOR_IDLE}${choice.label}`,
+          { fontFamily: UI.fontFamily, fontSize: uiFontSize(13), color: choice.color },
+        ),
+      );
+    });
+
+    // Compact page label (the full "PageUp/PageDown" legend measures past the
+    // body width at the max font scale); a notice, when present, wins the line.
+    const pagesLabel = prompt.bodyPages.length > 1
+      ? `←→/Pg翻页 ${prompt.page + 1}/${prompt.bodyPages.length} · `
+      : '';
+    const foot = this.overwriteNotice ?? `↑↓选择 · ${pagesLabel}Enter 执行 · Esc 取消`;
+    this.container.add(
+      this.scene.add
+        .text(
+          geometry.left + geometry.width - OVERWRITE_PROMPT_PADDING,
+          geometry.hintTop,
+          truncateGrapheme(foot, geometry.contentWidth, (text) => probeHint.context.measureText(text).width),
+          { fontFamily: UI.fontFamily, fontSize: uiFontSize(10), color: this.overwriteNotice === null ? UI.textMuted : UI.textWarn },
+        )
+        .setOrigin(1, 0),
+    );
+  }
+
+  private renderConfirmQuit(top: number, panelWidth: number): void {    const width = this.scene.scale.width;
     const warn = this.scene.add
       .text(width / 2, top + 120, '未保存的进度将丢失，确定返回主菜单吗？', {
         fontFamily: UI.fontFamily,
