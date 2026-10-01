@@ -13,6 +13,7 @@ export interface CompanionPanelModel {
   npcNames: ReadonlyMap<string, string>;
   social: Readonly<SocialState>;
   mapResourceId: string;
+  knowledgeTitles?: ReadonlyMap<string, string>;
   onDismiss: () => void;
   onTalk: () => void;
 }
@@ -141,7 +142,10 @@ export class CompanionPanel {
       const support = stance.combatSupport.kind === 'attack'
         ? `每 ${stance.combatSupport.everyPlayerActions} 次成功行动造成 ${stance.combatSupport.power} 点援护伤害`
         : `每 ${stance.combatSupport.everyPlayerActions} 次成功行动恢复 ${stance.combatSupport.power} 点生命`;
-      blocks.push(`${active ? '◆ 同行' : '◇ 未同行'} ${npcName} · 关系 ${getRelationship(model.social, companion.npcId)}\n【${stance.label}】${stance.description}\n${support}。`);
+      const memories = [...(model.social.npcKnowledge.get(companion.npcId) ?? [])].sort();
+      const heard = memories.length === 0 ? '尚无已记录的见闻。'
+        : `已知见闻 ${memories.length} 项：${memories.map(id => model.knowledgeTitles?.get(id) ?? id).join('、')}。`;
+      blocks.push(`${active ? '◆ 同行' : '◇ 未同行'} ${npcName} · 关系 ${getRelationship(model.social, companion.npcId)}\n【${stance.label}】${stance.description}\n${active ? '同行时，' : '未同行，不触发援护；再次同行时，'}${support}。\n${heard}\n含人物原有知识与已相告内容；传话进度以自己的见闻和接收人回应为准。`);
     }
     const text = blocks.length ? blocks.join('\n\n') : '当前世界没有可用的伙伴资料。';
     const pages = paginateDialogueBlocks(wrapDialogueText(text, contentWidth, measure), Math.max(1, Math.floor((footerTop - bodyTop - 10) / lineHeight)));

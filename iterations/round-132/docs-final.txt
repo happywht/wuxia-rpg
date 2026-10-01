@@ -1,0 +1,7 @@
+
+> wuxia-rpg@0.0.1 audit:round-48-docs
+> node scripts/audit-round-48-docs.mjs
+
+- README.md 当前进度应标记为“Round 132 已完成；下一轮 Round 133”
+- ARCHITECTURE.md 状态摘要未更新到 Round 132
+- DATA-GUIDE.md 状态摘要未更新到 Round 132

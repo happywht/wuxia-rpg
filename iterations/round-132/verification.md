@@ -1,13 +1,4 @@
-# 同行人物证据索引
-
-| 证据 | 已证明 | 仍未证明 |
-| --- | --- | --- |
-| R105人物/伙伴回归 | 六地域规则要求NPC听闻、三跨区关系双分支、NPC记忆/伙伴v1保存恢复 | 自动上下文不是真实键盘旅程 |
-| R131真实第三栏 | 顾关系0→10→15、声望+2；大陆公开更簿转述，正面护路；暂离记忆保留，重新邀请不追加奖励；江南→渡口跟随 | 北境/海路切换、顾另一立场与其疗伤援护 |
-| R131旧例管事 | 第二次成功行动9援护，四行动胜利与44经验升级；第三栏01:55:03正常读回关系/同行/记忆/资源 | 不能替代两套完整战斗成长路线 |
-| R131UI | 标准/特大字号实际一名伙伴完整可读；PgDn单页边界无动作；长中文、多伙伴分页自动回归 | 多伙伴长描述只在模拟场景验证，基础资料仍一名伙伴 |
-
-本轮证据见[计划](../iterations/round-131/plan.md)、[真实过程](../iterations/round-131/playtest.md)、[验证](../iterations/round-131/verification.md)。三组跨区关系和八人物全阶段继续逐轮实走，不以结构与测试闭环代替整体验收。
+# Round132验证
 
 ## Round 132 已完成：人物见闻说明与护航待送接续
 
@@ -18,3 +9,13 @@
 最终 `npm run build` exit0：131文件1123测试（92.95秒）、100资源Schema、默认MOD静态检查、tsc、R34/R48审计及Vite通过。入口667.88KB/Phaser1374.54KB分块警告保留，独立发行未验收。浏览器原标签连接超时；同浏览器新恢复标签正常完成以上操作，原标签未关闭、服务未重启。详见 iterations/round-132/verification.md 与截图。
 
 从Round133继续北境/海路实际地域回应、顾→季接收和其他两组关系，随后活动失败差事恢复、三章另一组完整后果、新终章及旧v1/MOD/空坏资料/授权/独立发行。完整大目标保持active，M2–M5未通过。
+
+## 命令与边界
+
+- 定向3文件42测试通过，首次两空格断言失败保留focused-first.txt。最终语义修正后round131-companions单文件14测试通过，memory-semantics-tests.txt。
+- npm run build：exit0，build-final.txt；先前build.txt也exit0，最终结果以build-final为准。
+- 实走为浏览器正常键盘/菜单操作，无runtime/localStorage读取或注入。最初memory-before.png中的口述来自NPC原有知识；修正说明见memory-corrected-before.png。
+- north-share/sea-share/source-result/third-save/memory-readback/pending-readback/resources-readback截图为实际操作。来源选项取得后变成“那番转述现在怎样了？”，并非选项数减少；读回仍10项根选项。
+- 长MOD80标题/特大字号为自动回归，本轮未实际MOD注入。设置保持标准字号，不改视口。
+
+最终文档完成状态初次审计未带“下一轮/截至”规范措辞，docs-final.txt保留失败；修正后docs-final-pass.txt exit0。

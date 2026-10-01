@@ -1,0 +1,13 @@
+
+> wuxia-rpg@0.0.1 test
+> vitest run tests/round131-companions.test.ts tests/round105-people.test.ts tests/round105-companion-ui.test.ts
+
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+
+ Test Files  3 passed (3)
+      Tests  42 passed (42)
+   Start at  02:07:13
+   Duration  951ms (tests 48%, transform 40%, import 11%, worker 1%)
+
