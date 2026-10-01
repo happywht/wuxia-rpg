@@ -1,7 +1,7 @@
 import {RegionalGuidePanel} from './regional-guide-ui';
 import {buildRegionalGuideEntries,resolveRegionalGuideDestination,REGION_GUIDE_PREFIX,REGION_ROLE_LABELS,type RegionalGuideInput,type RegionGuideEntry} from '../engine/regional-guide';
 import {buildQuestGuideEntries} from '../engine/quest-guide';
-import { nearestGuideNpc } from './quest-presentation';
+import { projectQuestTrackerLine } from './quest-presentation';
 import { estimateNavigationWalkingBudget, navigationWalkingBudgetHint } from '../engine/navigation-walking-budget';
 import { paddedWorldCameraBounds } from './world-camera-bounds';
 import Phaser from 'phaser';
@@ -2163,6 +2163,10 @@ export class GridScene extends Phaser.Scene {
     this.syncNpcVisuals(animate);
     this.refreshCompanionFollower(null);
     this.updateInteractHint();
+    // Round 117: the guide hint quotes the nearest giver's live cell, so a
+    // period change must re-project the tracker line too, not just the
+    // adjacent-interaction prompt.
+    this.updateQuestTrackerHud();
     // A period change may have moved a navigation target NPC: re-resolve.
     this.refreshNavigationGuide();
   }
@@ -2177,6 +2181,8 @@ export class GridScene extends Phaser.Scene {
     this.syncNpcVisuals(false);
     this.refreshCompanionFollower(null);
     this.updateInteractHint();
+    // Round 117: a reshuffled roster changes the nearest guide as well.
+    this.updateQuestTrackerHud();
   }
 
   private syncNpcVisuals(animate: boolean): void {
@@ -3785,36 +3791,25 @@ export class GridScene extends Phaser.Scene {
   private updateQuestTrackerHud(): void {
     const text = this.questTrackerText;
     if (text === null) return;
-    if (this.questNotice !== null) {
-      this.hudLines.quest = this.questNotice;
-      text.setColor(UI.textWarn);
-      if (this.questNoticeTimer === null) {
-        this.questNoticeTimer = this.time.delayedCall(5000, () => {
-          this.questNotice = null;
-          this.questNoticeTimer = null;
-          this.updateQuestTrackerHud();
-        });
-      }
-      this.relayoutHud();
-      return;
+    if (this.questNotice !== null && this.questNoticeTimer === null) {
+      this.questNoticeTimer = this.time.delayedCall(5000, () => {
+        this.questNotice = null;
+        this.questNoticeTimer = null;
+        this.updateQuestTrackerHud();
+      });
     }
-    const trackedId = this.questJournal.trackedQuestId;
-    const quest = trackedId === null ? undefined : this.quests.get(trackedId);
-    const state = trackedId === null ? undefined : this.questJournal.states.get(trackedId);
-    if (quest === undefined || state?.status !== 'active') {
-      const guide = nearestGuideNpc(this.placedNpcs, { col: this.playerCol, row: this.playerRow });
-      this.hudLines.quest = guide === undefined
-        ? 'Q 查看差事 · H 查看操作'
-        : `附近：${guide.record.name} (${guide.col},${guide.row}) · 相邻按 F 打听 / E 看托付 · Q 查差事`;
-      text.setColor(UI.textPrimary);
-      this.relayoutHud();
-      return;
-    }
-    const progress = quest.objectives.map((objective) =>
-      `${objective.text} ${state.objectiveCounts.get(objective.id) ?? 0}/${objective.requiredCount}`,
-    ).join(' · ');
-    this.hudLines.quest = `跟踪：${quest.name}　${progress}`;
-    text.setColor(UI.textMuted);
+    // Round 117: the line text and tone come from one pure projection, so
+    // every caller (boot, quest updates, journal navigation, region switches,
+    // schedule changes) renders the current map's live state.
+    const line = projectQuestTrackerLine({
+      npcs: this.placedNpcs,
+      position: { col: this.playerCol, row: this.playerRow },
+      quests: this.quests,
+      journal: this.questJournal,
+      notice: this.questNotice,
+    });
+    this.hudLines.quest = line.text;
+    text.setColor(line.tone === 'notice' ? UI.textWarn : line.tone === 'tracked' ? UI.textMuted : UI.textPrimary);
     this.relayoutHud();
   }
 
@@ -4549,6 +4544,11 @@ export class GridScene extends Phaser.Scene {
     this.hudLines.title = destinationMap.data.name;
     this.updateCoordsHud();
     this.advanceTime(travelMinutes);
+    // Round 117: the tracker line still names the previous map's nearby
+    // guide otherwise. advanceTime above may already have re-run the NPC
+    // schedule for the arrival period; this one call renders whatever the
+    // new map's live placements now are (including "no guide here").
+    this.updateQuestTrackerHud();
     this.refreshCompanionFollower(null);
     this.refreshNavigationGuide();
     this.showRegionNotice(`已抵达「${destinationMap.data.name}」。`);

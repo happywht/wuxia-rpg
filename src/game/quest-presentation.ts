@@ -16,3 +16,47 @@ export function nearestGuideNpc<T extends { col: number; row: number; record: { 
     return best === undefined || distance(npc) < distance(best) ? npc : best;
   }, undefined);
 }
+
+/** Tone of the tracker line; the scene maps it onto the HUD text colors. */
+export type QuestTrackerTone = 'notice' | 'guide' | 'tracked';
+
+export interface QuestTrackerInput {
+  /** Live placed NPCs of the CURRENT map, exactly as the scene walks them. */
+  npcs: readonly { col: number; row: number; record: { name: string; questGiver?: boolean } }[];
+  position: { col: number; row: number };
+  quests: ReadonlyMap<string, QuestData>;
+  journal: QuestJournal;
+  notice: string | null;
+}
+
+export interface QuestTrackerLine { text: string; tone: QuestTrackerTone }
+
+/**
+ * Round 117: the HUD quest line as one pure projection.
+ *
+ * The scene rebuilt this text only on boot, journal navigation and quest
+ * updates, so a region switch (or an NPC schedule change) kept showing the
+ * previous map's "nearby guide" hint until unrelated state happened to move.
+ * Everything the line shows — a completion notice, tracked progress, the
+ * nearest guide — derives from these live inputs, so calling the projection
+ * after any of them changes always renders the current region.
+ */
+export function projectQuestTrackerLine(input: QuestTrackerInput): QuestTrackerLine {
+  if (input.notice !== null) return { text: input.notice, tone: 'notice' };
+  const trackedId = input.journal.trackedQuestId;
+  const quest = trackedId === null ? undefined : input.quests.get(trackedId);
+  const state = trackedId === null ? undefined : input.journal.states.get(trackedId);
+  if (quest === undefined || state?.status !== 'active') {
+    const guide = nearestGuideNpc(input.npcs, input.position);
+    return {
+      text: guide === undefined
+        ? 'Q 查看差事 · H 查看操作'
+        : `附近：${guide.record.name} (${guide.col},${guide.row}) · 相邻按 F 打听 / E 看托付 · Q 查差事`,
+      tone: 'guide',
+    };
+  }
+  const progress = quest.objectives.map((objective) =>
+    `${objective.text} ${state.objectiveCounts.get(objective.id) ?? 0}/${objective.requiredCount}`,
+  ).join(' · ');
+  return { text: `跟踪：${quest.name}　${progress}`, tone: 'tracked' };
+}
