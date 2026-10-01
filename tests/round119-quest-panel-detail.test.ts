@@ -242,7 +242,9 @@ describe('Round119 QuestPanel paged CJK detail with intact row semantics', () =>
     expect(r.navigated).toEqual([tideLedger.id]);
     expect(r.visible().some(t => t.text.includes('尚缺当前调查'))).toBe(true);
     expect(r.panel.isOpen).toBe(true);
-    r.press(5); // A abandons the active task.
+    r.press(5); // A opens the Round 140 abandon confirmation (default cancel)…
+    r.press(2); // …↓ picks the explicit permanent abandon…
+    r.press(3); // …Enter commits it through the read gate.
     expect(r.state.status).toBe('failed');
     expect(r.visible().some(t => t.text.includes('已放弃'))).toBe(true);
     r.press(6); // Esc closes.

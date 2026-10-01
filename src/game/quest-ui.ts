@@ -6,7 +6,6 @@ import {
   type QuestJournal,
   type QuestStatus,
   type QuestUpdateResult,
-  abandonQuest,
   acceptQuest,
   hasQuestAccess,
   toggleTrackedQuest,
@@ -14,6 +13,16 @@ import {
 import { uiFontSize } from './settings';
 import { activeQuestProgressLabel, orderQuestRows } from './quest-presentation';
 import { buildQuestDetailBlocks, buildQuestPanelGeometry, paginateQuestDetail, questFooterColumns } from './quest-panel-layout';
+import {
+  type QuestAbandonConfirmationState,
+  buildAbandonConfirmationGeometry,
+  buildFailedQuestTerminalBlocks,
+  createQuestAbandonConfirmation,
+  moveAbandonChoice,
+  questSuccessorNames,
+  submitAbandonConfirmation,
+  turnAbandonPage,
+} from './quest-abandon-confirmation';
 import { addPixelPanelChrome, UI_FONT_FAMILY, addPixelSelection } from './ui-theme';
 
 /** Generic data-driven quest board and journal overlay. */
@@ -62,6 +71,12 @@ const LABELS = {
   abandon: 'A 放弃任务',
   hint: '↑/↓ 选择 · Enter 接取/跟踪 · N 导航 · A 放弃 · Esc 关闭',
   noSelection: '选择一项差事查看详情。',
+  abandonTitle: '放弃「{name}」？',
+  abandonKeep: '保持进行（默认）',
+  abandonCommit: '永久放弃',
+  abandonCommitLocked: '永久放弃（需先读完全部说明）',
+  abandonHint: '↑/↓ 选择 · {pages}Enter 执行 · Esc 取消',
+  abandonPageHint: 'PgDn 读说明 {page}/{count}页 · ',
 } as const;
 
 export interface QuestPanelModel {
@@ -124,6 +139,9 @@ export class QuestPanel {
   /** Round 119: complete measured detail pages for the selected row. */
   private detailPages: string[] = [''];
   private detailPage = 0;
+  /** Round 140: live A-key abandon confirmation; null while no prompt shows. */
+  private abandonPrompt: QuestAbandonConfirmationState | null = null;
+  private abandonNotice: string | null = null;
 
   constructor(scene: Phaser.Scene, options: QuestPanelOptions = {}) {
     this.scene = scene;
@@ -143,6 +161,8 @@ export class QuestPanel {
     this.selection = 0;
     this.status = null;
     this.detailPage = 0;
+    this.abandonPrompt = null;
+    this.abandonNotice = null;
     this.openState = true;
     this.container.setVisible(true);
     this.bindKeys();
@@ -156,6 +176,8 @@ export class QuestPanel {
     this.container.setVisible(false);
     this.container.removeAll(true);
     this.model = null;
+    this.abandonPrompt = null; // Q/close discards a pending prompt wholesale.
+    this.abandonNotice = null;
     this.onClose?.();
   }
 
@@ -178,7 +200,7 @@ export class QuestPanel {
       [KeyCodes.A, () => this.abandonSelected()],
       [KeyCodes.PAGE_UP, () => this.turnDetailPage(-1)],
       [KeyCodes.PAGE_DOWN, () => this.turnDetailPage(1)],
-      [KeyCodes.ESC, () => this.close()],
+      [KeyCodes.ESC, () => this.escape()],
     ];
     for (const [code, handler] of pairs) {
       const key = keyboard.addKey(code);
@@ -206,6 +228,11 @@ export class QuestPanel {
   }
 
   private moveSelection(delta: number): void {
+    if (this.abandonPrompt !== null) { // While the prompt shows, ↑/↓ move its choice.
+      moveAbandonChoice(this.abandonPrompt, delta);
+      this.render();
+      return;
+    }
     const rows = this.rows;
     if (rows.length === 0) return;
     this.selection = (this.selection + delta + rows.length) % rows.length;
@@ -216,6 +243,11 @@ export class QuestPanel {
 
   /** Round 119: PageUp/PageDown walk the selected row's detail pages linearly. */
   private turnDetailPage(step: number): void {
+    if (this.abandonPrompt !== null) { // …or the prompt's own body pages.
+      turnAbandonPage(this.abandonPrompt, step);
+      this.render();
+      return;
+    }
     if (this.detailPages.length <= 1) return;
     const next = Math.min(this.detailPages.length - 1, Math.max(0, this.detailPage + step));
     if (next === this.detailPage) return; // Already at an edge: no churn.
@@ -228,6 +260,10 @@ export class QuestPanel {
   }
 
   private confirm(): void {
+    if (this.abandonPrompt !== null) { // Enter on the prompt: default cancel, explicit Confirm commits.
+      this.confirmAbandonPrompt();
+      return;
+    }
     const model = this.model;
     const quest = this.selectedQuest();
     if (model === null || quest === undefined) return;
@@ -265,6 +301,7 @@ export class QuestPanel {
    * failure keeps the panel open with the scene's readable reason.
    */
   private navigateSelected(): void {
+    if (this.abandonPrompt !== null) return; // Navigation stays disabled while the prompt shows.
     const quest = this.selectedQuest();
     if (quest === undefined || this.onNavigateQuest === undefined) return;
     const outcome = this.onNavigateQuest(quest.id);
@@ -274,15 +311,85 @@ export class QuestPanel {
     }
   }
 
+  /**
+   * Round 140: A on an active quest opens a measured confirmation prompt
+   * (default cancel) instead of failing the quest outright. A while the
+   * prompt already shows is a no-op — repeated presses never confirm.
+   */
   private abandonSelected(): void {
+    if (this.abandonPrompt !== null) return;
     const model = this.model;
     const quest = this.selectedQuest();
     if (model === null || quest === undefined) return;
-    const result = abandonQuest(model.journal, quest.id);
-    this.status = result.ok ? `已放弃「${quest.name}」` : '只能放弃进行中的差事';
-    if (result.ok) this.onUpdate?.(result.update);
-    this.selection = Math.max(0, this.rows.findIndex(row => row.id === quest.id));
-    this.detailPage = 0; // The abandoned row's detail restarts from page one.
+    if (model.journal.states.get(quest.id)?.status !== 'active') {
+      this.status = '只能放弃进行中的差事';
+      this.render();
+      return;
+    }
+    const px = (size: number) => Number.parseInt(uiFontSize(size), 10);
+    const lineSize = (size: number) => Math.ceil(px(size) * 1.5);
+    const geometry = buildAbandonConfirmationGeometry({
+      viewWidth: this.scene.scale.width,
+      viewHeight: this.scene.scale.height,
+      titleHeight: lineSize(16),
+      bodyLineHeight: lineSize(12),
+      choiceHeight: lineSize(13),
+      hintHeight: lineSize(10),
+    });
+    // Same font-synced probe contract as the panel: the measuring Text lives
+    // on the container, so the re-render below reclaims it.
+    const probe = this.addText('', -400, -400, 12, UI.muted);
+    this.abandonPrompt = createQuestAbandonConfirmation({
+      quest,
+      successorNames: questSuccessorNames(model.quests, model.journal, quest.id),
+      width: geometry.contentWidth,
+      capacity: geometry.bodyCapacity,
+      measure: (text) => probe.context.measureText(text).width,
+    });
+    this.abandonNotice = null;
+    this.status = null;
+    this.render();
+  }
+
+  /** Esc: cancel a pending prompt but keep the journal panel open; else close. */
+  private escape(): void {
+    if (this.abandonPrompt !== null) {
+      this.abandonPrompt = null;
+      this.abandonNotice = null;
+      this.render();
+      return;
+    }
+    this.close();
+  }
+
+  /**
+   * Enter on the prompt. Cancel simply drops it; Confirm must have read every
+   * body page, then the pure submit revalidates the stored quest id and its
+   * active status through abandonQuest — firing onUpdate exactly once.
+   */
+  private confirmAbandonPrompt(): void {
+    const prompt = this.abandonPrompt!;
+    const model = this.model!;
+    const outcome = submitAbandonConfirmation(prompt, model.journal);
+    if (outcome.kind === 'not-read') {
+      this.abandonNotice = `请先用 PgDn 读完全部说明（第${prompt.page + 1}/${prompt.bodyPages.length}页）`;
+      this.render();
+      return;
+    }
+    const name = prompt.questName;
+    const questId = prompt.questId;
+    this.abandonPrompt = null;
+    this.abandonNotice = null;
+    if (outcome.kind === 'abandoned') {
+      this.status = `已放弃「${name}」，此差事永久失败`;
+      this.onUpdate?.(outcome.update);
+    } else if (outcome.kind === 'stale') {
+      this.status = `「${name}」已不在进行中，本次未放弃`;
+    } else {
+      this.status = `已保留「${name}」，差事仍在进行`;
+    }
+    this.selection = Math.max(0, this.rows.findIndex(row => row.id === questId));
+    this.detailPage = 0; // The row's terminal detail restarts from page one.
     this.render();
   }
 
@@ -381,11 +488,24 @@ export class QuestPanel {
       // Complete lossless body: description, staged objectives (live stage
       // boundary for ordered quests, live inventory beside journal counts),
       // full rewards — wrapped at the measured width and paginated to the band.
+      // Round 140: a failed row additionally explains its terminal state and
+      // the other open work, without ever promising the original retry.
+      const blocks = buildQuestDetailBlocks(selected, state, {
+        factionNames: model.factionNames,
+        knowledgeNodeTitles: model.knowledgeNodeTitles,
+      }, model.itemCounts);
+      if (state?.status === 'failed') {
+        blocks.push(...buildFailedQuestTerminalBlocks({
+          quest: selected,
+          offeredQuestNames: [...model.quests.values()]
+            .filter(other => other.id !== selected.id
+              && model.journal.states.get(other.id)?.status === 'offered'
+              && hasQuestAccess(other, model.access))
+            .map(other => other.name),
+        }));
+      }
       const pages = paginateQuestDetail(
-        buildQuestDetailBlocks(selected, state, {
-          factionNames: model.factionNames,
-          knowledgeNodeTitles: model.knowledgeNodeTitles,
-        }, model.itemCounts),
+        blocks,
         geometry.contentWidth,
         geometry.detailCapacity,
         measure,
@@ -416,6 +536,96 @@ export class QuestPanel {
     }
     const hint = this.fitGrapheme(LABELS.hint, geometry.contentWidth, measureLegend);
     this.addText(hint, left + width - PADDING, geometry.hintTop, 10, UI.muted, 'right');
+
+    if (this.abandonPrompt !== null) this.renderAbandonPrompt();
+  }
+
+  /**
+   * Round 140: the abandon confirmation rides on top of the open panel as an
+   * opaque sub-panel: measured title, the prompt's current body page, the two
+   * choice rows (default cancel highlighted) and a hint/notice line. The
+   * underlying journal stays visible around it and untouched.
+   */
+  private renderAbandonPrompt(): void {
+    const prompt = this.abandonPrompt;
+    if (prompt === null) return;
+    const px = (size: number) => Number.parseInt(uiFontSize(size), 10);
+    const lineSize = (size: number) => Math.ceil(px(size) * 1.5);
+    const geometry = buildAbandonConfirmationGeometry({
+      viewWidth: this.scene.scale.width,
+      viewHeight: this.scene.scale.height,
+      titleHeight: lineSize(16),
+      bodyLineHeight: lineSize(12),
+      choiceHeight: lineSize(13),
+      hintHeight: lineSize(10),
+    });
+    const probeTitle = this.addText('', -400, -400, 16, UI.muted);
+    const probeLegend = this.addText('', -400, -400, 10, UI.muted);
+    const measureTitle = (text: string) => probeTitle.context.measureText(text).width;
+    const measureLegend = (text: string) => probeLegend.context.measureText(text).width;
+
+    addPixelPanelChrome(this.scene, this.container, {
+      x: geometry.left,
+      y: geometry.top,
+      width: geometry.width,
+      height: geometry.height,
+    });
+
+    const title = LABELS.abandonTitle.replace('{name}', prompt.questName);
+    const titleText = this.addText(title, geometry.left + PADDING, geometry.top + 16, 16, UI.warning);
+    titleText.setText(this.fitGrapheme(title, geometry.contentWidth, measureTitle));
+
+    this.addText(prompt.bodyPages[prompt.page] ?? '', geometry.left + PADDING, geometry.bodyTop, 12, UI.primary);
+
+    const choices = [
+      {
+        selected: prompt.choice === 'cancel',
+        label: LABELS.abandonKeep,
+        color: prompt.choice === 'cancel' ? UI.active : UI.idle,
+      },
+      {
+        selected: prompt.choice === 'confirm',
+        label: prompt.readAllPages ? LABELS.abandonCommit : LABELS.abandonCommitLocked,
+        color: UI.failed,
+      },
+    ];
+    choices.forEach((choice, index) => {
+      const y = geometry.choiceTop + index * lineSize(13);
+      if (choice.selected) {
+        addPixelSelection(this.scene, this.container, {
+          x: geometry.left + PADDING,
+          y: y - 2,
+          width: geometry.width - PADDING * 2,
+          height: lineSize(13),
+        });
+      }
+      this.addText(
+        `${choice.selected ? CURSOR_ACTIVE : CURSOR_IDLE}${choice.label}`,
+        geometry.left + PADDING,
+        y,
+        13,
+        choice.color,
+      );
+    });
+
+    const notice = this.abandonNotice;
+    // Compact page label: the full "PgDn/PgUp" legend measured past the body
+    // width at the max font scale, which truncated the Esc leg mid-string.
+    const pagesLabel = prompt.bodyPages.length > 1
+      ? LABELS.abandonPageHint
+        .replace('{page}', String(prompt.page + 1))
+        .replace('{count}', String(prompt.bodyPages.length))
+      : '';
+    const foot = notice ?? LABELS.abandonHint.replace('{pages}', pagesLabel);
+    const footText = this.addText(
+      foot,
+      geometry.left + geometry.width - PADDING,
+      geometry.hintTop,
+      10,
+      notice === null ? UI.muted : UI.warning,
+      'right',
+    );
+    footText.setText(this.fitGrapheme(foot, geometry.contentWidth, measureLegend));
   }
 
   /** Grapheme-truncates with an ellipsis until the value fits the width. */
