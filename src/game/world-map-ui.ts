@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { transitionAccessReason } from '../engine/transition-access';
 import { paginateDialogueLines, wrapDialogueText } from './dialogue-layout';
 
 import { type CellPosition, type GridMap } from '../engine/grid-map';
@@ -772,8 +773,14 @@ export class WorldMapPanel {
     }
     if (waypoint.kind === 'transition') {
       const gate = worldMap?.transitions.find(candidate => `transition:${candidate.id}` === waypoint.id);
-      if (gate !== undefined && (gate.fare ?? 0) > 0) {
-        this.routeDestinationText?.setText(`乘行 ${gate.fare} 银两 · ${gate.travelMinutes ?? '依日程'} 分钟 · E 查看确认`);
+      if (gate !== undefined) {
+        const accessReason = transitionAccessReason(gate, this.knownKnowledgeNodeIds);
+        if (accessReason !== null) {
+          this.routeDistanceText?.setText('尚未开通；按 E 查看开通条件');
+          this.routeDestinationText?.setText(accessReason);
+        } else if ((gate.fare ?? 0) > 0) {
+          this.routeDestinationText?.setText(`乘行 ${gate.fare} 银两 · ${gate.travelMinutes ?? '依日程'} 分钟 · E 查看确认`);
+        }
       }
     }
     const selectedIndex = this.waypoints.findIndex((candidate) => candidate.id === id);

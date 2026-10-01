@@ -1,0 +1,31 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round126-coastal-service.test.ts (8 tests | 1 failed) 5472ms
+   ❯ Round126 discovery-gated coastal service (8)
+     × adds three idempotent directions with no gameplay effects 8ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round126-coastal-service.test.ts > Round126 discovery-gated coastal service > adds three idempotent directions with no gameplay effects
+AssertionError: expected '渡籍班船只接熟悉两港的客人：先循陆路越云岭到青帆埠，记下港口见闻，班船才开…' to contain '90分钟'
+
+Expected: "90分钟"
+Received: "渡籍班船只接熟悉两港的客人：先循陆路越云岭到青帆埠，记下港口见闻，班船才开通。雾雨渡口东侧(18,9)、青帆埠码头(88,70)各有船牌，走到邻格按E。每程30银、90世界分钟，报价读完再确认，Esc可取消；落点受阻或银两不足不扣费。原陆路照旧可走，班船没有沿路调查，也不会替你完成护网差事。"
+
+ ❯ tests/round126-coastal-service.test.ts:103:110
+    101|       expect(addCoastalServiceDirections(set)).toEqual(set);
+    102|       for(const conversation of set.conversations)for(const node of co…
+    103|         count++; expect(node.effects).toBeUndefined(); expect(node.tex…
+       |                                                                                                              ^
+    104|         expect(node.options.every((o:{effects?:unknown})=>o.effects===…
+    105|       }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 15 passed (16)
+   Start at  19:41:53
+   Duration  6.27s (tests 79%, transform 15%, import 5%)
+

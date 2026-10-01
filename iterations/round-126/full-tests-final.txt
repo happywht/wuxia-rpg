@@ -1,0 +1,48 @@
+
+> wuxia-rpg@0.0.1 test
+> vitest run
+
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/docs-audit-round-48.test.ts (11 tests | 1 failed) 294ms
+   ❯ Round 48 documentation audit (11)
+     × accepts the current repository documentation 31ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/docs-audit-round-48.test.ts > Round 48 documentation audit > accepts the current repository documentation
+AssertionError: expected { ok: false, problems: [ …(2) ] } to deeply equal { ok: true, problems: [] }
+
+- Expected
++ Received
+
+  {
+-   "ok": true,
+-   "problems": [],
++   "ok": false,
++   "problems": [
++     "README.md 当前进度应标记为“Round 125 已完成；下一轮 Round 126”",
++     "DATA-GUIDE.md 状态摘要未更新到 Round 125",
++   ],
+  }
+
+ ❯ tests/docs-audit-round-48.test.ts:69:20
+
+ Test Files  1 failed | 121 passed (122)
+      Tests  1 failed | 1033 passed (1034)
+   Start at  19:50:56
+   Duration  120.09s (tests 91%, import 6%, transform 3%)
+
+    Isolate  122 workers spawned · ~195ms startup each (spawn + environment, per file)
+             at least ~11.71s faster with isolate: false — reuses workers across files instead of one per file
+
+     67|   it('accepts the current repository documentation', async () => {
+     68|     const report = await auditRound48Docs({ root: repositoryRoot });
+     69|     expect(report).toEqual({ ok: true, problems: [] });
+       |                    ^
+     70|   });
+     71|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

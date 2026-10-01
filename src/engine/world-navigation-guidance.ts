@@ -72,8 +72,9 @@ export function resolveCellNavigationGuide(
   playerPosition: CellPosition,
   blockedCells?: ReadonlySet<string>,
   eventContext?: NavigationEventContext,
+  knownKnowledgeNodeIds: ReadonlySet<string> = eventContext?.knownKnowledgeNodeIds ?? new Set(),
 ): WorldNavigationGuide {
-  const route = findWorldTravelRoute(world, currentMapResourceId, destination.mapResourceId);
+  const route = findWorldTravelRoute(world, currentMapResourceId, destination.mapResourceId, knownKnowledgeNodeIds);
   if (route === null) return { status: 'route-broken', destinationName: destination.name };
   const destinationRegionName = world.regions.find(
     (region) => region.mapResourceId === destination.mapResourceId,
@@ -161,6 +162,7 @@ export function resolveWorldNavigationGuide(
     playerPosition,
     blockedCells,
     eventContext,
+    knownKnowledgeNodeIds,
   );
   if (guide.status === 'target-lost' || guide.status === 'route-broken' || guide.status === 'route-blocked') {
     return guide;

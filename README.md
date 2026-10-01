@@ -5,7 +5,7 @@
 - 设计文档：`docs/GDD.md`
 - 新版产品目标：[PROJECT-GOALS.md](docs/PROJECT-GOALS.md)；当前系统与内容盘点：[CURRENT-STATE-AUDIT.md](docs/CURRENT-STATE-AUDIT.md)
 - 逐轮路线图（R00–R121+）：`ROADMAP.md`
-- 当前进度：**Round 125 已完成；下一轮 Round 126**。整个产品目标仍在推进中。
+- 当前进度：**Round 126 已完成；下一轮 Round 127**。整个产品目标仍在推进中。
 - 下一阶段优先丰富、串联和细化现有 22 个区域：开局闭环、大陆/北境/海路章节、任务差异、五派成长、制作经济、人物后果与结局回响。扩地图须证明其产品价值；静态盘点可运行 `npm run audit:content-state`，该命令不代表真实旅程验收。
 
 ## 范围
@@ -240,3 +240,7 @@ npm run build exit0：100资源/默认MOD静态Schema、tsc、113文件970测试
 退派前显示钳制后的真实代价与遗忘名单；正常第三档盘舷入门、五门授艺、跨四区再次护网与复命，19:12:59保存。验证边界见 iterations/round-125/playtest.md、verification.md。M2–M5仍未通过，目标active。
 
 正常第三栏19:12:59菜单读回已逐项核对：盘舷身份/祝九弦、善恶−10/江湖8/本门15，命188/263气101/163银531、四门已学刀场武学在退派名单仍可见，回潮验缆已完成且三目标1/1。最终 npm run build exit0：121文件1024测试（88.42秒）、100资源/默认MOD静态Schema、tsc、文档审计、Vite通过；保留先前文档状态未同步引发的exit1日志。独立发行未验收。
+
+
+## Round 126 渡籍班船
+已探索青帆埠后，渡口(18,9)与青帆(88,70)可付30银/90世界分钟双向乘船。E报价确认，Esc取消；首探保持陆路，M/R只为已取得港口见闻者规划船路。真实操作与最终构建结果见 iterations/round-126/verification.md；整体目标仍active。

@@ -291,7 +291,7 @@ describe('Round 87 Southwest Isles within the expanded world atlas', () => {
   it('keeps the nine Round 86 centers fixed and pins the isle in its original atlas cell', () => {
     const world = readJson('../data/base/world/world-map.json');
     expect(world.regions).toHaveLength(22);
-    expect(world.transitions).toHaveLength(52);
+    expect(world.transitions).toHaveLength(54);
     for (const [mapResourceId, anchor] of Object.entries(round86RegionAnchors)) {
       const region = world.regions.find((entry: any) => entry.mapResourceId === mapResourceId);
       expect(region, mapResourceId).toBeDefined();

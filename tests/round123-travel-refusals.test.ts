@@ -27,6 +27,19 @@ function host(currency = 10) {
   return { scene, gate, clock, inventory, destination, assembly, notice, travel };
 }
 describe('Round123 actual scene refusal path preserves resources', () => {
+  it('rejects a locked knowledge service without spending or advancing', () => {
+    const h = host(); h.gate.requiredKnowledgeNodeId = 'place.test'; h.gate.lockedText = '先探索港口';
+    h.travel();
+    expect(h.notice).toHaveBeenCalledWith('先探索港口');
+    expect(h.inventory.currency).toBe(10); expect(h.clock.elapsedMinutes).toBe(0);
+  });
+  it('rechecks knowledge after the displayed quote before settlement', () => {
+    const h = host(); h.gate.requiredKnowledgeNodeId = 'place.test'; h.gate.lockedText = '资格已变';
+    const known = new Set(['place.test']); Object.assign(h.scene, { knownKnowledgeNodeIds: known });
+    known.clear(); h.travel();
+    expect(h.notice).toHaveBeenCalledWith('资格已变');
+    expect(h.inventory.currency).toBe(10); expect(h.clock.elapsedMinutes).toBe(0);
+  });
   it('refuses insufficient currency without advancing or spending', () => {
     const h = host(7); h.travel();
     expect(h.inventory.currency).toBe(7); expect(h.clock.elapsedMinutes).toBe(0);

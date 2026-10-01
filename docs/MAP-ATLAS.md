@@ -533,3 +533,12 @@ Round 79 新增第六块 100×100 海岛地图「东海群岛·落潮湾」，�
 | gate.r123-ferry-market-hub | 芦桥短渡·回渡口 | map.round-10-mist-ferry (58, 65) | map.round-10-mist-ferry (14, 9) | 8银/20分钟 |
 
 邻格E先显示报价，确认后核验余额和到达占位；取消/失败不扣费。原步行路保持，不绕过挑战或任务条件。来源scripts/lib/round123-ferry-service.mjs与generate-round123-ferry-service.mjs；默认端点已静态核验可通行，双向与取消实测完成。最大字号舆图侧栏仍有重叠待本轮修整，不能以通行证据代替所有界面阅读。
+
+## Round 126 渡籍班船回访
+
+| 关口ID | 起点与落点 | 资格与成本 |
+|---|---|---|
+| gate.r126-ferry-to-coast | map.round-10-mist-ferry (18, 9) → map.round-82-east-coast (87, 70) | place.r82-east-coast见闻；30银/90世界分钟 |
+| gate.r126-coast-to-ferry | map.round-82-east-coast (88, 70) → map.round-10-mist-ferry (18, 10) | 同一港口见闻；30银/90世界分钟 |
+
+首次经陆路抵达青帆埠并发现港口节点后开放；旧陆路保持。总关口54，不扩地图。数据源 world/world-map.json；正常第三档取消/往返/存读见iterations/round-126/playtest.md。班船是可选回访服务，不能替代沿途调查或自动完成战斗差事。

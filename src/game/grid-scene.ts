@@ -177,6 +177,7 @@ import { CollectionPanel } from './collection-ui';
 import { PauseMenuPanel } from './pause-menu';
 import { TravelConfirmationPanel } from './travel-confirmation';
 import { quoteTransitionCost } from '../engine/transition-cost';
+import { transitionAccessReason } from '../engine/transition-access';
 import { ControlsPanel } from './controls-ui';
 import { FactionPanel } from './faction-ui';
 import { CompanionPanel } from './companion-ui';
@@ -3214,6 +3215,8 @@ export class GridScene extends Phaser.Scene {
           row: this.playerRow,
         });
     if (gate !== null) {
+      const accessReason = transitionAccessReason(gate, this.knownKnowledgeNodeIds);
+      if (accessReason !== null) { this.hudLines.interact = `按 E 查看「${gate.name}」开通条件`; return; }
       this.hudLines.interact = (gate.fare ?? 0) > 0
         ? `按 E 查看「${gate.name}」· ${gate.fare} 银两 / ${gate.travelMinutes ?? this.clock?.calendar.actionCosts.travelMinutes ?? 0} 分钟`
         : `按 E 通过「${gate.name}」前往另一处地界`;
@@ -4189,6 +4192,8 @@ export class GridScene extends Phaser.Scene {
           row: this.playerRow,
         });
     if (gate !== null) {
+      const accessReason = transitionAccessReason(gate, this.knownKnowledgeNodeIds);
+      if (accessReason !== null) { this.showRegionNotice(accessReason); return; }
       if ((gate.fare ?? 0) > 0 && this.travelConfirmation !== null) {
         const quote = quoteTransitionCost(gate, this.clock?.calendar.actionCosts.travelMinutes ?? 0, this.inventory?.currency ?? 0);
         this.travelConfirmation.open(gate.name, quote.fare, quote.minutes, this.inventory?.currency ?? 0, () => this.switchRegion(gate));
@@ -4488,6 +4493,8 @@ export class GridScene extends Phaser.Scene {
       this.showRegionNotice('交通资料或位置已变化，请重新确认乘行。');
       return;
     }
+    const accessReason = transitionAccessReason(transition, this.knownKnowledgeNodeIds);
+    if (accessReason !== null) { this.showRegionNotice(accessReason); return; }
     const destinationMap = world?.maps.get(transition.to.mapResourceId);
     if (world === null || destinationMap === undefined) {
       this.showRegionNotice(`关口「${transition.name}」通向的地图当前不可用。`);

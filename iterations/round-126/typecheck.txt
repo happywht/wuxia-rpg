@@ -1,0 +1,7 @@
+
+> wuxia-rpg@0.0.1 typecheck
+> tsc --noEmit
+
+tests/round126-coastal-service.test.ts(65,45): error TS2339: Property 'worldMap' does not exist on type '{ ok: true; data: WorldMapData; }'.
+tests/round126-coastal-service.test.ts(88,44): error TS2345: Argument of type 'string' is not assignable to parameter of type 'RegionalGuideInput'.
+tests/round126-coastal-service.test.ts(89,44): error TS2345: Argument of type 'string' is not assignable to parameter of type 'RegionalGuideInput'.

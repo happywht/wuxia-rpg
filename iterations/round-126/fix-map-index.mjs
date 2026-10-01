@@ -1,0 +1,1 @@
+import fs from 'node:fs';const p='docs/MAP-ATLAS.md';let s=fs.readFileSync(p,'utf8');s=s.replace('雾雨渡口18,9 → 东溟海岸·青帆埠87,70','map.round-10-mist-ferry (18, 9) → map.round-82-east-coast (87, 70)').replace('东溟海岸·青帆埠88,70 → 雾雨渡口18,10','map.round-82-east-coast (88, 70) → map.round-10-mist-ferry (18, 10)');fs.writeFileSync(p,s);

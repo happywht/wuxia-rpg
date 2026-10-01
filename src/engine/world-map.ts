@@ -71,6 +71,9 @@ export interface RegionTransitionData {
   /** Optional per-service costs; old gates use the calendar default and no fare. */
   travelMinutes?: number;
   fare?: number;
+  /** Optional persistent discovery required before this service can be used. */
+  requiredKnowledgeNodeId?: string;
+  lockedText?: string;
 }
 
 export interface RegionEventData extends CellPosition {
@@ -614,14 +617,20 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
       typeof entry.travelMinutes === 'number' && Number.isSafeInteger(entry.travelMinutes) && entry.travelMinutes >= 0 && entry.travelMinutes <= 1440 ? entry.travelMinutes : null;
     const fare = entry.fare === undefined ? undefined :
       typeof entry.fare === 'number' && Number.isSafeInteger(entry.fare) && entry.fare >= 0 && entry.fare <= 1_000_000 ? entry.fare : null;
+    const requiredKnowledgeNodeId = entry.requiredKnowledgeNodeId === undefined ? undefined : nonEmpty(entry.requiredKnowledgeNodeId) ? entry.requiredKnowledgeNodeId : null;
+    const lockedText = entry.lockedText === undefined ? undefined : nonEmpty(entry.lockedText) ? entry.lockedText : null;
+    if (requiredKnowledgeNodeId === null) errors.push(`${label}.requiredKnowledgeNodeId：应为非空字符串`);
+    if (lockedText === null) errors.push(`${label}.lockedText：应为非空字符串`);
     if (travelMinutes === null) errors.push(`${label}.travelMinutes：应为0–1440整数`);
     if (fare === null) errors.push(`${label}.fare：应为0–1000000整数`);
     if (id === null) errors.push(`${label}.id：应为非空字符串`);
     if (name === null) errors.push(`${label}.name：应为非空字符串`);
-    if (id !== null && name !== null && from !== null && to !== null && travelMinutes !== null && fare !== null) {
+    if (id !== null && name !== null && from !== null && to !== null && travelMinutes !== null && fare !== null && requiredKnowledgeNodeId !== null && lockedText !== null) {
       transitions.push({ id, name, from, to,
         ...(travelMinutes === undefined ? {} : { travelMinutes }),
         ...(fare === undefined ? {} : { fare }),
+        ...(requiredKnowledgeNodeId === undefined ? {} : { requiredKnowledgeNodeId }),
+        ...(lockedText === undefined ? {} : { lockedText }),
       });
     }
   });
@@ -808,6 +817,9 @@ export function assembleWorldMap(
     const toMap = maps.get(transition.to.mapResourceId);
     const problems: string[] = [];
     if (seenTransitionIds.has(transition.id)) problems.push('id 重复');
+    if (eventReferences !== undefined && transition.requiredKnowledgeNodeId !== undefined && !eventReferences.knowledgeNodeIds.has(transition.requiredKnowledgeNodeId)) {
+      problems.push(`通行见闻未登记：${transition.requiredKnowledgeNodeId}`);
+    }
     if (!regions.some((region) => region.mapResourceId === transition.from.mapResourceId)) problems.push('来源地图不在世界图区域中');
     if (!regions.some((region) => region.mapResourceId === transition.to.mapResourceId)) problems.push('目的地图不在世界图区域中');
     if (fromMap === undefined || !fromMap.canEnter(transition.from.col, transition.from.row)) problems.push('来源坐标不可通行');

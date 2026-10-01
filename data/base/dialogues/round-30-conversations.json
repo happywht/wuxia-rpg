@@ -20,11 +20,11 @@
           "id": "r103-hanshan-letter",
           "text": "柳听澜从抄档里抽出一页：「那封信书院有抄档，与渡籍相关的一段誊给你。写信人未具名，抄本照抄，不添一笔。」"
         },
- {
+        {
           "id": "r103-hanshan-training",
           "text": "柳听澜翻开武录副本：「朱墨点腕笔，等级2、悟性11/身法10，攻击12、耗气3；点津校脉笔，等级4、悟性13/身法12，攻击16、耗气5；锋折批隙手，等级6、悟性15/定力13，攻击20、耗气7；经纶定息篇，等级6、悟性16/定力14，恢复21、耗气9；定理贯脉诀，等级10、悟性19/定力17，恢复27、耗气13。笔路只分攻、养、守三用：攻是伤敌，养是疗伤回复生命、要耗内力却不补内力，守只挡得住下一击。没有封穴制人的手段，别把话本当课业。」"
         },
- {
+        {
           "id": "r103-tingyu-field-brief",
           "text": "柳听澜把对过的时辰誊在信角：「核时辰是第一步——眼力也得练。云岭古道的云纹石阶在道西北(27,31)：由雾雨渡口北门(89,15)过关入铁嶂北道，循北麓(50,2)登上云岭古道，石阶就在左近，云栈客舍(39,43)可歇脚。去看旧索孔与刻痕如何记时序与受力，只记所见、不替它下结论——山里的刻纹，证不了江岸的声音。」"
         },
@@ -35,47 +35,93 @@
             {
               "text": "先生誊的是什么文书？",
               "nextNodeId": "papers",
-              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.ferry-passage-registry" }]
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.ferry-passage-registry"
+                }
+              ]
             },
             {
               "text": "晚辈斗胆，想请教文章。",
               "nextNodeId": "essay-talk",
               "conditions": [
-                { "kind": "npcRelationship", "npcId": "char.liu-tinglan", "maxValue": 4 }
+                {
+                  "kind": "npcRelationship",
+                  "npcId": "char.liu-tinglan",
+                  "maxValue": 4
+                }
               ],
-              "effects": [{ "kind": "adjustRelationship", "delta": 5 }]
+              "effects": [
+                {
+                  "kind": "adjustRelationship",
+                  "delta": 5
+                }
+              ]
             },
             {
               "text": "我愿拜入寒山书院。",
               "nextNodeId": "accepted",
-              "conditions": [{ "kind": "factionMembership", "isMember": false }],
+              "conditions": [
+                {
+                  "kind": "factionMembership",
+                  "isMember": false
+                }
+              ],
               "effects": [
-                { "kind": "joinFaction", "factionId": "faction.hanshan-shuyuan" },
-                { "kind": "adjustFactionRenown", "factionId": "faction.hanshan-shuyuan", "delta": 10 }
+                {
+                  "kind": "joinFaction",
+                  "factionId": "faction.hanshan-shuyuan"
+                },
+                {
+                  "kind": "adjustFactionRenown",
+                  "factionId": "faction.hanshan-shuyuan",
+                  "delta": 10
+                }
               ]
             },
             {
               "text": "门中课业可有新吩咐？",
               "nextNodeId": "tasked",
               "conditions": [
-                { "kind": "factionMembership", "factionId": "faction.hanshan-shuyuan", "isMember": true },
-                { "kind": "factionRenown", "factionId": "faction.hanshan-shuyuan", "minValue": 10 }
+                {
+                  "kind": "factionMembership",
+                  "factionId": "faction.hanshan-shuyuan",
+                  "isMember": true
+                },
+                {
+                  "kind": "factionRenown",
+                  "factionId": "faction.hanshan-shuyuan",
+                  "minValue": 10
+                }
               ]
             },
             {
               "text": "我想请先生指点书院武学。",
               "nextNodeId": "r32-lessons",
               "conditions": [
-                { "kind": "factionMembership", "factionId": "faction.hanshan-shuyuan", "isMember": true }
+                {
+                  "kind": "factionMembership",
+                  "factionId": "faction.hanshan-shuyuan",
+                  "isMember": true
+                }
               ]
             },
             {
               "text": "我想退出寒山书院。",
               "nextNodeId": "departed",
               "conditions": [
-                { "kind": "factionMembership", "factionId": "faction.hanshan-shuyuan", "isMember": true }
+                {
+                  "kind": "factionMembership",
+                  "factionId": "faction.hanshan-shuyuan",
+                  "isMember": true
+                }
               ],
-              "effects": [{ "kind": "leaveFaction" }]
+              "effects": [
+                {
+                  "kind": "leaveFaction"
+                }
+              ]
             },
             {
               "text": "我已核实「tingyu-eave-rain」所托之事。",
@@ -120,7 +166,10 @@
                 }
               ]
             },
-            { "text": "不叨扰了，先生请便。", "nextNodeId": "farewell" },
+            {
+              "text": "不叨扰了，先生请便。",
+              "nextNodeId": "farewell"
+            },
             {
               "text": "书铺的沈掌柜说，残篇的纸墨要请教先生。",
               "nextNodeId": "canpian-assessment"
@@ -129,87 +178,176 @@
               "text": "白鹭洲托我请先生誊正渡籍。",
               "nextNodeId": "r31-transcribe",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r31-ferry-ledger", "status": "active" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r31-ferry-ledger",
+                  "status": "active"
+                }
               ]
             },
             {
               "text": "先生，渡籍已经誊好了么？",
               "nextNodeId": "r31-filed",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r31-ferry-ledger", "status": "completed" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r31-ferry-ledger",
+                  "status": "completed"
+                }
               ]
             },
             {
               "text": "白鹭洲托我来对一对旧渡籍。",
               "nextNodeId": "r42-copy-mismatch",
-              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-ledger-audit", "status": "completed" }],
-              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.r42-faded-register" }]
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r42-ledger-audit",
+                  "status": "completed"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r42-faded-register"
+                }
+              ]
             },
             {
               "text": "柳教习，请将两家口述分别记下。",
               "nextNodeId": "r42-witnesses-accepted",
-              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-two-witnesses", "status": "offered" }],
-              "effects": [{ "kind": "acceptQuest", "questId": "quest.r42-two-witnesses" }]
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r42-two-witnesses",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r42-two-witnesses"
+                }
+              ]
             },
             {
               "text": "公簿已经立下，往后任人对页。",
               "nextNodeId": "r42-public-result",
-              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-open-register", "status": "completed" }],
-              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.r42-public-record-vow" }]
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r42-open-register",
+                  "status": "completed"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r42-public-record-vow"
+                }
+              ]
             },
             {
               "text": "信中时辰核对过了，接下来这一程怎么走？",
               "nextNodeId": "r103-tingyu-field-brief",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r43-tingyu-eave-rain", "status": "active" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r43-tingyu-eave-rain",
+                  "status": "active"
+                }
               ]
             },
             {
               "text": "这趟书院差事，下一步往哪里去？",
               "nextNodeId": "r103-hanshan-next",
               "conditions": [
-                { "kind": "factionMembership", "factionId": "faction.hanshan-shuyuan", "isMember": true },
-                { "kind": "questStatus", "questId": "quest.r43-hanshan-copybook", "status": "active" }
+                {
+                  "kind": "factionMembership",
+                  "factionId": "faction.hanshan-shuyuan",
+                  "isMember": true
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r43-hanshan-copybook",
+                  "status": "active"
+                }
               ]
             },
             {
               "text": "霜松谷的界刻看过了，来回禀。",
               "nextNodeId": "r103-hanshan-echo",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r43-hanshan-copybook", "status": "completed" },
-                { "kind": "knowledgeKnown", "nodeId": "event.r103-hanshan-practice" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r43-hanshan-copybook",
+                  "status": "completed"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r103-hanshan-practice"
+                }
               ]
             },
             {
               "text": "旧抄纸墨那一段先前已核明，来回话。",
               "nextNodeId": "r103-hanshan-verify",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r43-hanshan-copybook", "status": "completed" },
-                { "kind": "knowledgeKnown", "nodeId": "event.r103-hanshan-practice", "isKnown": false }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r43-hanshan-copybook",
+                  "status": "completed"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r103-hanshan-practice",
+                  "isKnown": false
+                }
               ]
             },
             {
               "text": "听说书院在查一封匿名信，能否让我也看一眼？",
               "nextNodeId": "r103-hanshan-letter",
               "conditions": [
-                { "kind": "factionMembership", "factionId": "faction.hanshan-shuyuan", "isMember": true },
-                { "kind": "knowledgeKnown", "nodeId": "event.r43-wayfarer-letter", "isKnown": false }
+                {
+                  "kind": "factionMembership",
+                  "factionId": "faction.hanshan-shuyuan",
+                  "isMember": true
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r43-wayfarer-letter",
+                  "isKnown": false
+                }
               ],
               "effects": [
-                { "kind": "discoverKnowledgeNode", "nodeId": "event.r43-wayfarer-letter" }
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r43-wayfarer-letter"
+                }
               ]
             },
             {
               "text": "书院武课的门槛与用处，请先生照实说一遍。",
               "nextNodeId": "r103-hanshan-training",
               "conditions": [
-                { "kind": "factionMembership", "factionId": "faction.hanshan-shuyuan", "isMember": true }
+                {
+                  "kind": "factionMembership",
+                  "factionId": "faction.hanshan-shuyuan",
+                  "isMember": true
+                }
               ]
             },
             {
               "text": "白鹭洲说旧桩已固，我来核对当夜潮时。",
               "nextNodeId": "r44-ledger-verified",
-              "conditions": [{ "kind": "questStatus", "questId": "quest.r44-ledger-first", "status": "completed" }]
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r44-ledger-first",
+                  "status": "completed"
+                }
+              ]
             }
           ]
         },
@@ -217,8 +355,14 @@
           "id": "papers",
           "text": "他把誊到一半的纸页晾在镇石下：「雾渡药道的轮值盟书。渡口公所立约，书院受托誊抄存档——江湖上的约，白纸黑字才立得住。你若要查章程，去渡口寻渡董白鹭洲，他掌着正本。」",
           "options": [
-            { "text": "原来书院管着这些文书。", "nextNodeId": "scribe-duty" },
-            { "text": "多谢先生，我去渡口看看。", "nextNodeId": "farewell" }
+            {
+              "text": "原来书院管着这些文书。",
+              "nextNodeId": "scribe-duty"
+            },
+            {
+              "text": "多谢先生，我去渡口看看。",
+              "nextNodeId": "farewell"
+            }
           ]
         },
         {
@@ -241,30 +385,126 @@
           "id": "r32-lessons",
           "text": "柳听澜翻开武录副本：「笔、步、气各有章法。读懂招式为何如此，再决定是否要学。」",
           "options": [
-            { "text": "请教朱墨点腕笔。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-hanshan-zhumo-bi" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-hanshan-zhumo-bi" }] },
-            { "text": "请教点津校脉笔。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-hanshan-dianjin-bi" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-hanshan-dianjin-bi" }] },
-            { "text": "请教锋折批隙手。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-hanshan-fengzhe-bi" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-hanshan-fengzhe-bi" }] },
-            { "text": "请教经纶定息篇。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-hanshan-jinglun-xinfa" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-hanshan-jinglun-xinfa" }] },
-            { "text": "请教定理贯脉诀。", "nextNodeId": "r32-taught", "conditions": [{ "kind": "martialArtEligible", "martialArtId": "skill.r32-hanshan-dingli-jue" }], "effects": [{ "kind": "learnMartialArt", "martialArtId": "skill.r32-hanshan-dingli-jue" }] },
-            { "text": "今日先到这里。", "nextNodeId": "farewell" }
+            {
+              "text": "请教朱墨点腕笔。",
+              "nextNodeId": "r32-taught",
+              "conditions": [
+                {
+                  "kind": "martialArtEligible",
+                  "martialArtId": "skill.r32-hanshan-zhumo-bi"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "learnMartialArt",
+                  "martialArtId": "skill.r32-hanshan-zhumo-bi"
+                }
+              ]
+            },
+            {
+              "text": "请教点津校脉笔。",
+              "nextNodeId": "r32-taught",
+              "conditions": [
+                {
+                  "kind": "martialArtEligible",
+                  "martialArtId": "skill.r32-hanshan-dianjin-bi"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "learnMartialArt",
+                  "martialArtId": "skill.r32-hanshan-dianjin-bi"
+                }
+              ]
+            },
+            {
+              "text": "请教锋折批隙手。",
+              "nextNodeId": "r32-taught",
+              "conditions": [
+                {
+                  "kind": "martialArtEligible",
+                  "martialArtId": "skill.r32-hanshan-fengzhe-bi"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "learnMartialArt",
+                  "martialArtId": "skill.r32-hanshan-fengzhe-bi"
+                }
+              ]
+            },
+            {
+              "text": "请教经纶定息篇。",
+              "nextNodeId": "r32-taught",
+              "conditions": [
+                {
+                  "kind": "martialArtEligible",
+                  "martialArtId": "skill.r32-hanshan-jinglun-xinfa"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "learnMartialArt",
+                  "martialArtId": "skill.r32-hanshan-jinglun-xinfa"
+                }
+              ]
+            },
+            {
+              "text": "请教定理贯脉诀。",
+              "nextNodeId": "r32-taught",
+              "conditions": [
+                {
+                  "kind": "martialArtEligible",
+                  "martialArtId": "skill.r32-hanshan-dingli-jue"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "learnMartialArt",
+                  "martialArtId": "skill.r32-hanshan-dingli-jue"
+                }
+              ]
+            },
+            {
+              "text": "今日先到这里。",
+              "nextNodeId": "farewell"
+            }
           ]
         },
         {
           "id": "r32-taught",
           "text": "柳听澜按你所选的招式逐式讲解，把每一步写在空白页边：「学武也要讲理路，明白为何出手，才知道何时收手。」",
           "options": [
-            { "text": "再请教一门。", "nextNodeId": "r32-lessons" },
-            { "text": "多谢先生，告辞。", "nextNodeId": "farewell" }
+            {
+              "text": "再请教一门。",
+              "nextNodeId": "r32-lessons"
+            },
+            {
+              "text": "多谢先生，告辞。",
+              "nextNodeId": "farewell"
+            }
           ]
         },
-        { "id": "departed", "text": "柳听澜沉默片刻，把你的名字从课业簿上圈去：「学籍除名，笔墨两清。书院的门不锁，但誊过的盟书里，不会再有你的手笔。」" },
-        { "id": "farewell", "text": "「去吧。」柳听澜重新蘸墨，「路上少说多看——见过的事，都是文章。」" },
+        {
+          "id": "departed",
+          "text": "柳听澜沉默片刻，把你的名字从课业簿上圈去：「学籍除名，笔墨两清。书院的门不锁，但誊过的盟书里，不会再有你的手笔。」"
+        },
+        {
+          "id": "farewell",
+          "text": "「去吧。」柳听澜重新蘸墨，「路上少说多看——见过的事，都是文章。」"
+        },
         {
           "id": "canpian-assessment",
           "text": "柳听澜听完转述，取出书院誊册用的样纸摆在案头：「按沈掌柜的说法，那纸是水纹纸，帘纹、分量都对得上渡口船上来往的纸——江南纸铺寻常不进这个，多半是从水路来的，可隔着转述，这层只能说像，不能说定；墨里的药气也是同理，像药栈批货记账用的。五年前书院誊盟书的样纸我留着一叠，纸性相近——但没有残页在手比对，同不同批、确切的年份，都断不得。要坐实来路，去渡口对渡籍底册——白鹭洲那边进出货都有底。至于写它的人是谁、缺的半部在哪里——纸上没写的事，我不替纸猜。」",
           "options": [
-            { "text": "（记下纸墨线索与去向）多谢先生。", "nextNodeId": "farewell" },
-            { "text": "先生方才说的盟书，可在堂中？", "nextNodeId": "papers" }
+            {
+              "text": "（记下纸墨线索与去向）多谢先生。",
+              "nextNodeId": "farewell"
+            },
+            {
+              "text": "先生方才说的盟书，可在堂中？",
+              "nextNodeId": "papers"
+            }
           ]
         },
         {
@@ -278,7 +518,12 @@
         {
           "id": "r42-copy-mismatch",
           "text": "柳听澜将两张纸举向窗前：「水痕在副本誊出之前已经干了，边角却压着新印。书院只照原页落笔，没有改这一行；要查谁搬动过正本，还须问熟悉水路与船印的人。」",
-          "options": [{ "text": "我去问顾夜尘与祝九弦。", "nextNodeId": "farewell" }]
+          "options": [
+            {
+              "text": "我去问顾夜尘与祝九弦。",
+              "nextNodeId": "farewell"
+            }
+          ]
         },
         {
           "id": "r42-witnesses-accepted",
@@ -647,6 +892,10 @@
                   "status": "completed"
                 }
               ]
+            },
+            {
+              "text": "渡口与青帆之间，有回程班船吗？",
+              "nextNodeId": "r126-coastal-service"
             }
           ]
         },
@@ -845,6 +1094,16 @@
         {
           "id": "r104-forge-legacy",
           "text": "祝九弦点头：「你旧案里的两份淬料算清过，谢仪也结了，不追补成新锻造实战。铁砧和共通配方仍在；自己备器、卸下旧器再锻，不必为旧差事再交一遍。」"
+        },
+        {
+          "id": "r126-coastal-service",
+          "text": "渡籍班船只接熟悉两港的客人：先循陆路越云岭到青帆埠，记下港口见闻，班船才开通。雾雨渡口东侧(18,9)、青帆埠码头(88,70)各有船牌，走到邻格按E。每程30银、90世界分钟，报价读完再确认，Esc可取消；落点受阻或银两不足不扣费。原陆路照旧可走，班船没有沿路调查，也不会替你完成护网差事。",
+          "options": [
+            {
+              "text": "明白了，我自行安排。",
+              "nextNodeId": "greet"
+            }
+          ]
         }
       ]
     },
@@ -863,42 +1122,84 @@
             {
               "text": "想请教渡口的通行章程。",
               "nextNodeId": "registry-talk",
-              "effects": [{ "kind": "discoverKnowledgeNode", "nodeId": "event.ferry-passage-registry" }]
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.ferry-passage-registry"
+                }
+              ]
             },
-            { "text": "渡口如今有哪些门派走动？", "nextNodeId": "factions-talk" },
+            {
+              "text": "渡口如今有哪些门派走动？",
+              "nextNodeId": "factions-talk"
+            },
             {
               "text": "我已列入门墙，渡籍上可要登记？",
               "nextNodeId": "registry-joined",
-              "conditions": [{ "kind": "factionMembership", "isMember": true }]
+              "conditions": [
+                {
+                  "kind": "factionMembership",
+                  "isMember": true
+                }
+              ]
             },
             {
               "text": "雾渡药道会盟争得先约，报与渡籍。",
               "nextNodeId": "logged-victory",
-              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-victory" }],
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.mist-pact-victory"
+                }
+              ],
               "effects": [
-                { "kind": "shareKnowledgeNode", "nodeId": "event.mist-pact-victory" }
+                {
+                  "kind": "shareKnowledgeNode",
+                  "nodeId": "event.mist-pact-victory"
+                }
               ]
             },
             {
               "text": "药道按轮值成了约，我来报备。",
               "nextNodeId": "logged-stalemate",
-              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-stalemate" }],
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.mist-pact-stalemate"
+                }
+              ],
               "effects": [
-                { "kind": "shareKnowledgeNode", "nodeId": "event.mist-pact-stalemate" }
+                {
+                  "kind": "shareKnowledgeNode",
+                  "nodeId": "event.mist-pact-stalemate"
+                }
               ]
             },
             {
               "text": "会盟没争到先约，也该记上一笔。",
               "nextNodeId": "logged-defeat",
-              "conditions": [{ "kind": "knowledgeKnown", "nodeId": "event.mist-pact-defeat" }],
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.mist-pact-defeat"
+                }
+              ],
               "effects": [
-                { "kind": "shareKnowledgeNode", "nodeId": "event.mist-pact-defeat" }
+                {
+                  "kind": "shareKnowledgeNode",
+                  "nodeId": "event.mist-pact-defeat"
+                }
               ]
             },
             {
               "text": "渡籍里记下的轮值之约，执行得如何？",
               "nextNodeId": "remembered-pact",
-              "conditions": [{ "kind": "npcKnows", "nodeId": "event.mist-pact-stalemate" }]
+              "conditions": [
+                {
+                  "kind": "npcKnows",
+                  "nodeId": "event.mist-pact-stalemate"
+                }
+              ]
             },
             {
               "text": "我已核实「panzhou-return-tide」所托之事。",
@@ -917,90 +1218,177 @@
                 }
               ]
             },
-            { "text": "都不是，随便看看。", "nextNodeId": "farewell" },
+            {
+              "text": "都不是，随便看看。",
+              "nextNodeId": "farewell"
+            },
             {
               "text": "姜百味托我带的口信已经带到了：下一批针线茶叶改走水路。",
               "nextNodeId": "r31-peddler-received",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r31-peddler-errand", "status": "completed" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r31-peddler-errand",
+                  "status": "completed"
+                }
               ]
             },
             {
               "text": "渡董，听说渡籍要补录誊正？",
               "nextNodeId": "r31-ledger-offer",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r31-ferry-ledger", "status": "offered" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r31-ferry-ledger",
+                  "status": "offered"
+                }
               ]
             },
             {
               "text": "柳教习誊正的事，我正要回镇里去办。",
               "nextNodeId": "r31-ledger-active",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r31-ferry-ledger", "status": "active" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r31-ferry-ledger",
+                  "status": "active"
+                }
               ]
             },
             {
               "text": "渡董，柳教习那边渡籍誊好了、用了印。",
               "nextNodeId": "r31-ledger-done",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r31-ferry-ledger", "status": "completed" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r31-ferry-ledger",
+                  "status": "completed"
+                }
               ]
             },
             {
               "text": "补录过的旧簿，柳教习发现了不合潮时的水痕。",
               "nextNodeId": "r42-audit-offer",
-              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-ledger-audit", "status": "offered" }]
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r42-ledger-audit",
+                  "status": "offered"
+                }
+              ]
             },
             {
               "text": "拓本已存，我愿把证据公开立册。",
               "nextNodeId": "r42-public-vow",
-              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-open-register", "status": "offered" }],
-              "effects": [{ "kind": "acceptQuest", "questId": "quest.r42-open-register" }]
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r42-open-register",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r42-open-register"
+                }
+              ]
             },
             {
               "text": "拓本已存，我想先护住作证之人。",
               "nextNodeId": "r42-protect-vow",
-              "conditions": [{ "kind": "questStatus", "questId": "quest.r42-protect-witness", "status": "offered" }],
-              "effects": [{ "kind": "acceptQuest", "questId": "quest.r42-protect-witness" }]
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r42-protect-witness",
+                  "status": "offered"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r42-protect-witness"
+                }
+              ]
             },
             {
               "text": "这桩争议，我想先照石北的法子补牢。",
               "nextNodeId": "r44-post-first-accepted",
               "conditions": [
-                { "kind": "knowledgeKnown", "nodeId": "event.r44-dock-claim" },
-                { "kind": "questStatus", "questId": "quest.r44-post-first", "status": "offered" }
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r44-dock-claim"
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r44-post-first",
+                  "status": "offered"
+                }
               ],
-              "effects": [{ "kind": "acceptQuest", "questId": "quest.r44-post-first" }]
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r44-post-first"
+                }
+              ]
             },
             {
               "text": "这桩争议，我想先依渡簿核清潮时。",
               "nextNodeId": "r44-ledger-first-accepted",
               "conditions": [
-                { "kind": "knowledgeKnown", "nodeId": "event.r44-dock-claim" },
-                { "kind": "questStatus", "questId": "quest.r44-ledger-first", "status": "offered" }
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r44-dock-claim"
+                },
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r44-ledger-first",
+                  "status": "offered"
+                }
               ],
-              "effects": [{ "kind": "acceptQuest", "questId": "quest.r44-ledger-first" }]
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r44-ledger-first"
+                }
+              ]
             },
             {
               "text": "渡董，集期赶办的摊棚，我来领章程。",
               "nextNodeId": "r58-stall-pact-charter",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r58-market-stall-pact", "status": "active" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r58-market-stall-pact",
+                  "status": "active"
+                }
               ]
             },
             {
               "text": "缆痕对清了，滩上的事怎么办？",
               "nextNodeId": "r103-panzhou-field-brief",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r43-panzhou-return-tide", "status": "active" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r43-panzhou-return-tide",
+                  "status": "active"
+                }
               ]
             },
             {
               "text": "渡董，摊棚绳带补齐，通路也报明了。",
               "nextNodeId": "r58-stall-pact-logged",
               "conditions": [
-                { "kind": "questStatus", "questId": "quest.r58-market-stall-pact", "status": "completed" }
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r58-market-stall-pact",
+                  "status": "completed"
+                }
               ]
+            },
+            {
+              "text": "渡口与青帆之间，有回程班船吗？",
+              "nextNodeId": "r126-coastal-service"
             }
           ]
         },
@@ -1008,8 +1396,14 @@
           "id": "registry-talk",
           "text": "「章程三条。」白鹭洲竖起手指，「一，药队过桥按时辰轮值，先约者先行，后约者不得抢渡；二，误时半刻，下轮让位；三，争执不下的，渡籍为凭，两家各执一份。」他把簿子翻开一页，「寒山书院誊的抄本，连墨迹深浅都校过三遍——江湖上的约，得有人肯这么记。」",
           "options": [
-            { "text": "记得这样细，渡口从不误事么？", "nextNodeId": "registry-strict" },
-            { "text": "受教了，告辞。", "nextNodeId": "farewell" }
+            {
+              "text": "记得这样细，渡口从不误事么？",
+              "nextNodeId": "registry-strict"
+            },
+            {
+              "text": "受教了，告辞。",
+              "nextNodeId": "farewell"
+            }
           ]
         },
         {
@@ -1020,8 +1414,14 @@
           "id": "factions-talk",
           "text": "白鹭洲翻开渡籍首页，一条条数给你听：「渡口眼下五家走动。听雨剑阁居中调停，不偏不倚；铁嶂派护矿队走北道，认死理也认约；云隐山庄的药队最要紧，轮值就是为它立的；寒山书院掌录文书，渡籍抄本出自他家；盘舷刀场承包护航，栈桥上的缆桩一半是他家的刀疤。」",
           "options": [
-            { "text": "五家都在，渡口倒热闹。", "nextNodeId": "factions-balance" },
-            { "text": "多谢渡董，长见识了。", "nextNodeId": "farewell" }
+            {
+              "text": "五家都在，渡口倒热闹。",
+              "nextNodeId": "factions-balance"
+            },
+            {
+              "text": "多谢渡董，长见识了。",
+              "nextNodeId": "farewell"
+            }
           ]
         },
         {
@@ -1032,7 +1432,10 @@
           "id": "registry-joined",
           "text": "「入册不问出身。」白鹭洲提笔蘸墨，「门派弟子在渡口行事，渡籍另记一行——守约的，章程庇护；坏约的，连门派一并记上。你家师门的名声，往后也在这本簿子里跟着你走。」",
           "options": [
-            { "text": "一笔一划，都记下了。", "nextNodeId": "farewell" }
+            {
+              "text": "一笔一划，都记下了。",
+              "nextNodeId": "farewell"
+            }
           ]
         },
         {
@@ -1051,7 +1454,10 @@
           "id": "remembered-pact",
           "text": "白鹭洲翻到你方才报备的那一页，指腹压住墨迹未干的「轮值成约」四字：「自今日起，两派药队按簿上时辰过桥。误时的罚则、抢渡的处置，都照章程来——你既亲历会盟，往后若见有人坏约，渡口公所随时受理。」"
         },
-        { "id": "farewell", "text": "白鹭洲把渡籍收回袖中，重新拨响算盘：「栈桥上人多，慢行。章程之外的事，渡口不问。」" },
+        {
+          "id": "farewell",
+          "text": "白鹭洲把渡籍收回袖中，重新拨响算盘：「栈桥上人多，慢行。章程之外的事，渡口不问。」"
+        },
         {
           "id": "r31-peddler-received",
           "text": "白鹭洲翻开船期簿落笔：「改走水路——记下了，替我谢姜老板。」他把簿子合上，「你既然肯替药道上的人跑腿，渡口这边的账，往后也少不了你。」"
@@ -1060,11 +1466,26 @@
           "id": "r31-ledger-offer",
           "text": "白鹭洲把一册边角泡皱的渡籍摊开：「连日阴雨，轮值半页字都洇了。要按药道会盟的新约补录，须请寒山书院的柳教习誊正一份、加盖书院印。柳教习就在镇东头的书院，从石阶渡口回镇便能到。见面把来意说明，誊好用印便算办妥。」",
           "options": [
-            { "text": "誊正的事，交给我。", "nextNodeId": "r31-ledger-accepted", "effects": [{ "kind": "acceptQuest", "questId": "quest.r31-ferry-ledger" }] },
-            { "text": "我再想想。", "nextNodeId": "farewell" }
+            {
+              "text": "誊正的事，交给我。",
+              "nextNodeId": "r31-ledger-accepted",
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r31-ferry-ledger"
+                }
+              ]
+            },
+            {
+              "text": "我再想想。",
+              "nextNodeId": "farewell"
+            }
           ]
         },
-        { "id": "r31-ledger-accepted", "text": "「有劳。」白鹭洲把泡坏的半页小心夹好，「柳教习誊好用印，这边即刻誊录归档。」" },
+        {
+          "id": "r31-ledger-accepted",
+          "text": "「有劳。」白鹭洲把泡坏的半页小心夹好，「柳教习誊好用印，这边即刻誊录归档。」"
+        },
         {
           "id": "r31-ledger-active",
           "text": "「柳教习在镇东书院。」白鹭洲头也不抬地拨着算盘，「从渡口过关回镇，照旧走石阶渡口。誊正用印的事，见面一说便成。」"
@@ -1077,23 +1498,62 @@
           "id": "r42-audit-offer",
           "text": "白鹭洲把旧册推到你面前：「此页在誊副前后各过一次手。柳教习守着书院副本，先把两页的时辰对上。纸上的水痕说不得人名，咱们先查纸，不先猜人。」",
           "options": [
-            { "text": "我去请柳教习核页。", "nextNodeId": "r42-audit-accepted", "effects": [{ "kind": "acceptQuest", "questId": "quest.r42-ledger-audit" }] },
-            { "text": "我再想想。", "nextNodeId": "farewell" }
+            {
+              "text": "我去请柳教习核页。",
+              "nextNodeId": "r42-audit-accepted",
+              "effects": [
+                {
+                  "kind": "acceptQuest",
+                  "questId": "quest.r42-ledger-audit"
+                }
+              ]
+            },
+            {
+              "text": "我再想想。",
+              "nextNodeId": "farewell"
+            }
           ]
         },
-        { "id": "r42-audit-accepted", "text": "「旧簿不急着定罪。」白鹭洲重新合上渡籍，「你把书院副本看清，回来再谈后面的事。」" },
+        {
+          "id": "r42-audit-accepted",
+          "text": "「旧簿不急着定罪。」白鹭洲重新合上渡籍，「你把书院副本看清，回来再谈后面的事。」"
+        },
         {
           "id": "r42-public-vow",
           "text": "白鹭洲听罢，把「公开誊录」四字记在新页眉：「既要给后来人看，就让证据和异议都在同一册里。你把这份意思带给柳教习。」",
-          "options": [{ "text": "我去书院交付公簿。", "nextNodeId": "r42-public-accepted" }, { "text": "明白。", "nextNodeId": "farewell" }]
+          "options": [
+            {
+              "text": "我去书院交付公簿。",
+              "nextNodeId": "r42-public-accepted"
+            },
+            {
+              "text": "明白。",
+              "nextNodeId": "farewell"
+            }
+          ]
         },
-        { "id": "r42-public-accepted", "text": "「新页不抹旧痕。」白鹭洲将空册递给你，「柳教习落笔以后，这一页便不再只属于渡口公所。」" },
+        {
+          "id": "r42-public-accepted",
+          "text": "「新页不抹旧痕。」白鹭洲将空册递给你，「柳教习落笔以后，这一页便不再只属于渡口公所。」"
+        },
         {
           "id": "r42-protect-vow",
           "text": "白鹭洲点头：「证人不必先把名字放到众目下。祝九弦守船守人有分寸，你将拓本交他封存，往后若有人问起，至少还有纸可对。」",
-          "options": [{ "text": "我去找祝师父收存。", "nextNodeId": "r42-protect-accepted" }, { "text": "我记下了。", "nextNodeId": "farewell" }]
+          "options": [
+            {
+              "text": "我去找祝师父收存。",
+              "nextNodeId": "r42-protect-accepted"
+            },
+            {
+              "text": "我记下了。",
+              "nextNodeId": "farewell"
+            }
+          ]
         },
-        { "id": "r42-protect-accepted", "text": "「渡籍仍按原章走。」白鹭洲把拓本的去向记在自己手边的私簿里，「护住证人，不等于替谁抹账。」" },
+        {
+          "id": "r42-protect-accepted",
+          "text": "「渡籍仍按原章走。」白鹭洲把拓本的去向记在自己手边的私簿里，「护住证人，不等于替谁抹账。」"
+        },
         {
           "id": "r43-resolved-panzhou-return-tide",
           "text": "白鹭洲翻过两册旧账：「是三艘运盐船先后靠岸磨出的痕，不是夜航私船。记下船次就够了，暂且不用封渡盘查。」"
@@ -1113,6 +1573,16 @@
         {
           "id": "r58-stall-pact-logged",
           "text": "白鹭洲在集册上落下摊棚一行：「绳带补齐，通路划清，集册今日起复用。药担与行船各留一条路——这条旧例，比哪条新章程都值钱。」"
+        },
+        {
+          "id": "r126-coastal-service",
+          "text": "渡籍班船只接熟悉两港的客人：先循陆路越云岭到青帆埠，记下港口见闻，班船才开通。雾雨渡口东侧(18,9)、青帆埠码头(88,70)各有船牌，走到邻格按E。每程30银、90世界分钟，报价读完再确认，Esc可取消；落点受阻或银两不足不扣费。原陆路照旧可走，班船没有沿路调查，也不会替你完成护网差事。",
+          "options": [
+            {
+              "text": "明白了，我自行安排。",
+              "nextNodeId": "greet"
+            }
+          ]
         }
       ]
     }

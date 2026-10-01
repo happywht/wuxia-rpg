@@ -3,6 +3,7 @@ import type { AssembledShop, ItemRecordData, ShopStockRuntime } from './item-sys
 import type { WorldMapAssembly } from './world-map';
 import type { NavigationDestinationCell } from './world-navigation-guidance';
 import { findWorldTravelRoute } from './world-travel';
+import { transitionAccessReason } from './transition-access';
 import { selectVisibleWorldLandmarks } from './world-map';
 import { LANDMARK_DESTINATION_PREFIX } from './world-navigation';
 
@@ -46,7 +47,7 @@ export function resolveRegionalGuideDestination(input: RegionalGuideInput, selec
       arrivalAction:input.follower?.npc.record.id === npc.record.id ? 'companion' : npc.record.shopId !== null && input.shops.get(npc.record.shopId)?.record.npcId === npc.record.id ? 'shop' : 'talk' };
   }
   if (token.startsWith('gate:')) {
-    const gate=input.worldMap.transitions.find(g=>g.id===token.slice(5));if(!gate)return null;
+    const gate=input.worldMap.transitions.find(g=>g.id===token.slice(5));if(!gate || transitionAccessReason(gate,input.knownKnowledgeNodeIds)!==null)return null;
     return {...gate.from,name:gate.name,approachRadius:1,arrivalAction:'travel'};
   }
   return null;
@@ -57,7 +58,7 @@ export function buildRegionalGuideEntries(input: RegionalGuideInput): RegionGuid
   const supplies:{entry:RegionGuideEntry;legs:number}[]=[];
   for(const shop of input.shops.values()) {
     const npc=resolveRegionGuideNpc(input,shop.record.npcId);if(!npc||npc.record.shopId!==shop.record.id)continue;
-    const route=findWorldTravelRoute(input.worldMap,input.currentMapResourceId,npc.record.mapResourceId);if(!route)continue;
+    const route=findWorldTravelRoute(input.worldMap,input.currentMapResourceId,npc.record.mapResourceId,input.knownKnowledgeNodeIds);if(!route)continue;
     const medicines=shop.stock.flatMap(stock=>{
       const item=input.items.get(stock.itemId);const remaining=input.shopStocks.get(shop.record.id)?.get(stock.itemId) ?? stock.quantity;
       if(!item?.consumable || (item.consumable.healthRestore<=0&&item.consumable.qiRestore<=0) || remaining===0)return [];
@@ -85,7 +86,8 @@ export function buildRegionalGuideEntries(input: RegionalGuideInput): RegionGuid
     const minutes = gate.travelMinutes ?? input.travelMinutes;
     const travelText=minutes===undefined?'':`过此关口按日程需 ${minutes} 分钟（不含步行）。`;
     const fareText=(gate.fare ?? 0)>0?`费用 ${gate.fare} 银两，按E先确认；也可继续步行。`:'';
-    result.push({id:'exit:'+gate.id,category:'exit',title:gate.name,detail:`(${gate.from.col},${gate.from.row}) → ${destination}。走到旁边按E；这里不会自动通过或传送。${travelText}${fareText}`,destinationId:REGION_GUIDE_PREFIX+'gate:'+gate.id});
+    const accessReason=transitionAccessReason(gate,input.knownKnowledgeNodeIds);
+    result.push({id:'exit:'+gate.id,category:'exit',title:gate.name,detail:`(${gate.from.col},${gate.from.row}) → ${destination}。走到旁边按E；这里不会自动通过或传送。${travelText}${fareText}${accessReason===null?'':'\n尚未开通：'+accessReason}`,destinationId:accessReason===null?REGION_GUIDE_PREFIX+'gate:'+gate.id:null});
   }
   for(const landmark of selectVisibleWorldLandmarks(input.worldMap.landmarks,input.knownKnowledgeNodeIds).filter(l=>l.mapResourceId===input.currentMapResourceId))result.push({id:'landmark:'+landmark.id,category:'landmark',title:landmark.name,detail:`已知地标 (${landmark.col},${landmark.row})；导航只带路，调查仍按实际事件条件。`,destinationId:LANDMARK_DESTINATION_PREFIX+landmark.id});
   return result;

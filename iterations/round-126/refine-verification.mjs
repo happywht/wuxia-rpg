@@ -1,0 +1,3 @@
+import fs from 'node:fs';
+const p='iterations/round-126/verification.md';let s=fs.readFileSync(p,'utf8');s=s.replace('- build-final.txt：最终完整构建结果将在结束后登记；包含数据静态Schema、默认MOD检查、tsc、全测试、R34/R48文档审计和Vite。静态Schema不能替代运行装配；新增装配测试是独立证据。','- build-final.txt：122文件1034测试通过（124.39秒），随后R34地图文档缺新关口ID而exit1。补表首轮map-audit.txt缺地图ID/坐标格式，按准确mapResourceId与(col, row)修正；map-audit-final.txt exit0。\n- build-complete.txt：最终完整构建正在登记；包含数据静态Schema、默认MOD检查、tsc、全测试、R34/R48文档审计和Vite。静态Schema不能替代运行装配；新增装配测试是独立证据。');
+s+='\n## 范围与格式复核\n\nsemantic-scope.txt：对照提交前HEAD，移除新班船/新指引后，世界及两个对白文件与原资料语义完全相等；round30的更多diff行是JSON排版。静态审查脚本初跑git输出超过默认1MiB缓冲区（ENOBUFS），提高到32MiB后完成，不读取运行态。source-format.txt排除原始txt日志后exit0；staged-diff-check.txt exit2只有日志末尾空行，按原样保留日志，不声称全文件格式零警告。\n';fs.writeFileSync(p,s);

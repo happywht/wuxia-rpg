@@ -1,0 +1,29 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round126-coastal-service.test.ts (8 tests | 8 skipped) 24ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round126-coastal-service.test.ts [ tests/round126-coastal-service.test.ts ]
+Error: manifest：响应不是 JSON（text/plain;charset=utf-8）
+文件：/base/manifest.json
+/base/manifest.json
+服务器可能把请求回退到了 HTML 页面（SPA fallback）。
+建议：确认请求命中的是 JSON 文件而非被服务器回退成 HTML 的页面（SPA fallback）。
+ ❯ tests/round126-coastal-service.test.ts:23:60
+     21|     catch { return new Response('not found',{status:404}); }
+     22|   });
+     23|   const loaded=await loadWorldData(); if(!loaded.ok) throw Error(loade…
+       |                                                            ^
+     24| });
+     25| afterAll(()=>{vi.unstubAllGlobals(); vi.restoreAllMocks();});
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  8 passed | 8 skipped (16)
+   Start at  19:41:40
+   Duration  1.76s (transform 64%, import 20%, tests 15%, worker 1%)
+

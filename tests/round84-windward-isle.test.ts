@@ -81,7 +81,7 @@ describe('Round 84 Windward Isle and expanded world atlas', () => {
     if (!parsed.ok || parsed.data.atlasArt === undefined) return;
     expect(parsed.data.atlasArt).toMatchObject({ columns: 768, rows: 576, tileSize: 8 });
     expect(parsed.data.regions).toHaveLength(22);
-    expect(parsed.data.transitions).toHaveLength(52);
+    expect(parsed.data.transitions).toHaveLength(54);
 
     const region = parsed.data.regions.find(({ mapResourceId }) => mapResourceId === ISLE_ID)!;
     const col = Math.round(region.atlasPosition.x / 100 * (parsed.data.atlasArt.columns - 1));

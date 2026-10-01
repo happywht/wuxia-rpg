@@ -335,8 +335,8 @@ describe('Round 59 regional dialogue echoes', () => {
     // adds five mentor practice entries and one field brief per verifier.
     const expectedBaseline: Record<string, number> = {
       'dlg.shi-bei-mentor': 18, // 9 pre-existing + 4 echoes + 5 Round 103 practice entries
-      'dlg.bai-luzhou-ferry-master': 21, // 14 pre-existing + 2 echoes + 4 Round 98 journey entries + 1 Round 103 field brief
-      'dlg.zhu-jiuxian-mentor': 23, // prior 20 + three Round104 crafting responses
+      'dlg.bai-luzhou-ferry-master': 22, // 14 pre-existing + 2 echoes + 4 Round 98 journey entries + 1 Round 103 field brief
+      'dlg.zhu-jiuxian-mentor': 24, // prior 20 + three Round104 crafting responses
       'dlg.ma-shangyi-notice-board': 5, // 3 pre-existing + 2 echoes
       'dlg.lu-zhenniang-teastall': 9, // 7 pre-existing + 2 echoes
       'dlg.jiang-baiwei-peddler': 7, // 2 pre-existing + 2 echoes + 3 Round 98 journey entries

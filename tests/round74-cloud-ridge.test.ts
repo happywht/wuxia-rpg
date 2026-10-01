@@ -106,7 +106,7 @@ describe('Round 74 cloud-ridge playable region', () => {
     if ('ok' in assembled) return;
     expect(assembled.warnings).toEqual([]);
     expect(assembled.regions).toHaveLength(22);
-    expect(assembled.transitions).toHaveLength(52);
+    expect(assembled.transitions).toHaveLength(54);
 
     const ridge = maps.get(RIDGE_ID)!;
     const cloud = maps.get(CLOUD_ID)!;

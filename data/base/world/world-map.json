@@ -1618,6 +1618,42 @@
       },
       "fare": 8,
       "travelMinutes": 20
+    },
+    {
+      "id": "gate.r126-ferry-to-coast",
+      "name": "渡籍班船·去青帆埠",
+      "from": {
+        "mapResourceId": "map.round-10-mist-ferry",
+        "col": 18,
+        "row": 9
+      },
+      "to": {
+        "mapResourceId": "map.round-82-east-coast",
+        "col": 87,
+        "row": 70
+      },
+      "fare": 30,
+      "travelMinutes": 90,
+      "requiredKnowledgeNodeId": "place.r82-east-coast",
+      "lockedText": "先经陆路抵达青帆埠，记下港口见闻后开通班船。"
+    },
+    {
+      "id": "gate.r126-coast-to-ferry",
+      "name": "渡籍班船·回雾渡",
+      "from": {
+        "mapResourceId": "map.round-82-east-coast",
+        "col": 88,
+        "row": 70
+      },
+      "to": {
+        "mapResourceId": "map.round-10-mist-ferry",
+        "col": 18,
+        "row": 10
+      },
+      "fare": 30,
+      "travelMinutes": 90,
+      "requiredKnowledgeNodeId": "place.r82-east-coast",
+      "lockedText": "先经陆路抵达青帆埠，记下港口见闻后开通班船。"
     }
   ],
   "events": [

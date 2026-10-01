@@ -147,7 +147,7 @@ describe('Round 96 south-sea reef islands and the 3-segment sea route', () => {
     if ('ok' in assembled) return;
     expect(assembled.warnings).toEqual([]);
     expect(assembled.regions).toHaveLength(22);
-    expect(assembled.transitions).toHaveLength(52);
+    expect(assembled.transitions).toHaveLength(54);
 
     for (const id of [STONE_ID, ATOLL_ID]) {
       const map = maps.get(id);

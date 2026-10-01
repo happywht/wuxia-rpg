@@ -1,0 +1,13 @@
+
+> wuxia-rpg@0.0.1 audit:round-34
+> node scripts/audit-round-34-docs.mjs
+
+Round 34 文档审计失败：8 处不一致。
+  [FAIL] docs/MAP-ATLAS.md: 关口 "gate.r126-ferry-to-coast" 所在行缺少from 地图 id "map.round-10-mist-ferry"
+  [FAIL] docs/MAP-ATLAS.md: 关口 "gate.r126-ferry-to-coast" 所在行缺少to 地图 id "map.round-82-east-coast"
+  [FAIL] docs/MAP-ATLAS.md: 关口 "gate.r126-ferry-to-coast" 所在行缺少 from 坐标 (18, 9)
+  [FAIL] docs/MAP-ATLAS.md: 关口 "gate.r126-ferry-to-coast" 所在行缺少 to 坐标 (87, 70)
+  [FAIL] docs/MAP-ATLAS.md: 关口 "gate.r126-coast-to-ferry" 所在行缺少from 地图 id "map.round-82-east-coast"
+  [FAIL] docs/MAP-ATLAS.md: 关口 "gate.r126-coast-to-ferry" 所在行缺少to 地图 id "map.round-10-mist-ferry"
+  [FAIL] docs/MAP-ATLAS.md: 关口 "gate.r126-coast-to-ferry" 所在行缺少 from 坐标 (88, 70)
+  [FAIL] docs/MAP-ATLAS.md: 关口 "gate.r126-coast-to-ferry" 所在行缺少 to 坐标 (18, 10)

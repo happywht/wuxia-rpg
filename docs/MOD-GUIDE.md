@@ -91,3 +91,7 @@ world-map可省略regionGuides；每条mapResourceId/role(hub/investigation/chal
 ## Round 119
 
 任务完整名称、描述、目标与奖励进入可翻页详情；长MOD任务文本由新增测试覆盖。无数据/Schema/存档迁移。字体宽度测量，正文行距随字号保留；支持的逻辑视口仍遵循现有UI范围，不承诺任意小屏。
+
+
+## Round 126 关口见闻门槛
+RegionTransition可选 requiredKnowledgeNodeId（图谱节点ID）、lockedText（玩家可读未开通理由），均必须非空；省略见闻字段保持旧开放行为。装配校验节点引用，坏引用仅隔离该关口并警告。通行与跨区导航共享 transitionAccessReason；确认时重验。存档沿用 knownKnowledgeNodeIds，无新存档字段；旧档缺该见闻保留陆路。最少关口数路由不保证最低银两或最少步数，作者须保留替代路线。

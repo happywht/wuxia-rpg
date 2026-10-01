@@ -1,4 +1,5 @@
 import type { RegionTransitionData, WorldMapAssembly } from './world-map';
+import { transitionAccessReason } from './transition-access';
 
 /** One declared, one-way region boundary crossed by a world travel route. */
 export interface WorldTravelLeg {
@@ -24,6 +25,7 @@ export function findWorldTravelRoute(
   world: Pick<WorldMapAssembly, 'regions' | 'transitions'>,
   fromMapResourceId: string,
   toMapResourceId: string,
+  knownKnowledgeNodeIds: ReadonlySet<string> = new Set(),
 ): WorldTravelRoute | null {
   const regions = new Map(world.regions.map((region) => [region.mapResourceId, region]));
   if (!regions.has(fromMapResourceId) || !regions.has(toMapResourceId)) return null;
@@ -34,6 +36,7 @@ export function findWorldTravelRoute(
 
   const outgoing = new Map<string, RegionTransitionData[]>();
   for (const transition of world.transitions) {
+    if (transitionAccessReason(transition, knownKnowledgeNodeIds) !== null) continue;
     if (!regions.has(transition.from.mapResourceId) || !regions.has(transition.to.mapResourceId)) continue;
     const edges = outgoing.get(transition.from.mapResourceId) ?? [];
     edges.push(transition);

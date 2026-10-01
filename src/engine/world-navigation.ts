@@ -90,8 +90,9 @@ export function buildQuestObjectiveWaypoint(
   world: WorldMapAssembly,
   currentMapResourceId: string,
   target: QuestNavigationTarget,
+  knownKnowledgeNodeIds: ReadonlySet<string> = new Set(),
 ): WorldMapWaypoint | null {
-  const route = findWorldTravelRoute(world, currentMapResourceId, target.mapResourceId);
+  const route = findWorldTravelRoute(world, currentMapResourceId, target.mapResourceId, knownKnowledgeNodeIds);
   if (route === null) return null;
   const firstLeg = route.legs[0];
   if (firstLeg === undefined) {
@@ -163,7 +164,7 @@ export function buildWorldMapWaypoints(
   const remoteRegions: WorldMapWaypoint[] = [];
   for (const region of world.regions) {
     if (region.mapResourceId === currentMapResourceId) continue;
-    const route = findWorldTravelRoute(world, currentMapResourceId, region.mapResourceId);
+    const route = findWorldTravelRoute(world, currentMapResourceId, region.mapResourceId, knownKnowledgeNodeIds);
     const firstLeg = route?.legs[0];
     if (route === null || route === undefined || firstLeg === undefined || route.legs.length !== 1) continue;
     remoteRegions.push({
@@ -181,7 +182,7 @@ export function buildWorldMapWaypoints(
   const remoteLandmarks: WorldMapWaypoint[] = [];
   for (const landmark of visibleLandmarks) {
     if (landmark.mapResourceId === currentMapResourceId) continue;
-    const route = findWorldTravelRoute(world, currentMapResourceId, landmark.mapResourceId);
+    const route = findWorldTravelRoute(world, currentMapResourceId, landmark.mapResourceId, knownKnowledgeNodeIds);
     const firstLeg = route?.legs[0];
     if (route === null || route === undefined || firstLeg === undefined) continue;
     const currentPosition = firstLeg.transition.from;
@@ -200,7 +201,7 @@ export function buildWorldMapWaypoints(
     });
   }
   const questWaypoints = supplementalQuestTargets
-    .map((target) => buildQuestObjectiveWaypoint(world, currentMapResourceId, target))
+    .map((target) => buildQuestObjectiveWaypoint(world, currentMapResourceId, target, knownKnowledgeNodeIds))
     .filter((waypoint): waypoint is WorldMapWaypoint => waypoint !== null);
   return [...currentLandmarks, ...crossings, ...remoteRegions, ...remoteLandmarks, ...questWaypoints];
 }
