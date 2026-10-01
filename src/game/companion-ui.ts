@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { wrapDialogueText } from './dialogue-layout';
+import { paginateDialogueBlocks, wrapDialogueText } from './dialogue-layout';
 
 import { resolveCompanionStance, type CompanionData } from '../engine/companion-system';
 import type { SocialState } from '../engine/social-state';
@@ -27,6 +27,8 @@ export class CompanionPanel {
   private readonly onClose?: () => void;
   private model: CompanionPanelModel | null = null;
   private openState = false;
+  private page = 0;
+  private pageCount = 1;
 
   constructor(scene: Phaser.Scene, onClose?: () => void) {
     this.scene = scene;
@@ -39,6 +41,7 @@ export class CompanionPanel {
   open(model: CompanionPanelModel): void {
     if (this.openState) return;
     this.model = model;
+    this.page = 0;
     this.openState = true;
     this.container.setVisible(true);
     this.bindKeys();
@@ -85,6 +88,17 @@ export class CompanionPanel {
     };
     talkKey.on('down', talkHandler);
     this.bindings.push({ key: talkKey, handler: talkHandler });
+    for (const [code, delta] of [[Phaser.Input.Keyboard.KeyCodes.PAGE_UP, -1], [Phaser.Input.Keyboard.KeyCodes.PAGE_DOWN, 1]] as const) {
+      const key = keyboard.addKey(code);
+      const handler = (): void => {
+        const next = Math.max(0, Math.min(this.pageCount - 1, this.page + delta));
+        if (next === this.page) return;
+        this.page = next;
+        this.render();
+      };
+      key.on('down', handler);
+      this.bindings.push({ key, handler });
+    }
   }
 
   private unbindKeys(): void {
@@ -97,19 +111,28 @@ export class CompanionPanel {
     const model = this.model;
     if (model === null) return;
     const width = Math.min(660, this.scene.scale.width - 56);
-    const height = Math.min(370, this.scene.scale.height - 56);
+    const height = Math.min(420, this.scene.scale.height - 56);
     const left = (this.scene.scale.width - width) / 2;
     const top = (this.scene.scale.height - height) / 2;
     addPixelPanelChrome(this.scene, this.container, { x: left, y: top, width, height }, 0.88);
     this.addText(left + 26, top + 20, '同行伙伴', 20, UI_PALETTE.accent);
-    this.addText(left + 28, top + 54, 'T 与同行者交谈 · Enter 暂离 · P / Esc 收起', 12, UI_PALETTE.muted);
+    const contentWidth = Math.max(1, width - 92);
+    const legend = this.addText(left + 32, top + 54, '', 12, UI_PALETTE.muted);
+    legend.setText(wrapDialogueText('T 与同行者交谈 · Enter 暂离 · P / Esc 收起', contentWidth, value => legend.context.measureText(value).width).join('\n'));
+    const bodyTop = top + 54 + legend.height + 18;
+    const footerTop = top + height - Math.ceil(Number.parseFloat(uiFontSize(11)) * 1.5) - 18;
+    const body = this.addText(left + 32, bodyTop, '', 12, UI_PALETTE.text);
+    body.setText('测');
+    const baseLineHeight = Math.max(body.height, Number.parseFloat(uiFontSize(12)));
+    const lineHeight = Math.ceil(baseLineHeight + 4);
+    body.setLineSpacing?.(lineHeight - baseLineHeight);
+    const measure = (value: string): number => body.context.measureText(value).width;
 
     const entries = [...model.companions.values()];
     if (entries.length === 0) {
-      this.addText(left + 32, top + 100, '当前世界没有可用的伙伴资料。', 14, UI_PALETTE.muted);
-      return;
+      body.setText('当前世界没有可用的伙伴资料。');
     }
-    let y = top + 100;
+    const blocks: string[] = [];
     for (const companion of entries) {
       const npcName = model.npcNames.get(companion.npcId) ?? companion.npcId;
       const active = model.activeCompanionId === companion.id;
@@ -118,29 +141,23 @@ export class CompanionPanel {
       const support = stance.combatSupport.kind === 'attack'
         ? `每 ${stance.combatSupport.everyPlayerActions} 次成功行动造成 ${stance.combatSupport.power} 点援护伤害`
         : `每 ${stance.combatSupport.everyPlayerActions} 次成功行动恢复 ${stance.combatSupport.power} 点生命`;
-      this.addText(left + 32, y, `${active ? '◆ 同行　' : '◇ 可邀　'}${npcName}　·　关系 ${getRelationship(model.social, companion.npcId)}`, 14, active ? UI_PALETTE.jade : UI_PALETTE.text);
-      y += 24;
-      const detail = this.scene.add.text(left + 50, y, `【${stance.label}】${stance.description} ${support}。`, {
-        fontFamily: UI_FONT_FAMILY,
-        fontSize: uiFontSize(12),
-        color: UI_PALETTE.muted,
-        wordWrap: { width: width - 92 },
-      }).setOrigin(0, 0);
-      detail.setText(wrapDialogueText(detail.text, width - 92, value => detail.context.measureText(value).width).join('\n'));
-      this.container.add(detail);
-      y += Math.max(28, detail.height) + 18;
+      blocks.push(`${active ? '◆ 同行' : '◇ 未同行'} ${npcName} · 关系 ${getRelationship(model.social, companion.npcId)}\n【${stance.label}】${stance.description}\n${support}。`);
     }
-    if (model.activeCompanionId !== null) {
-      this.addText(left + width - 28, top + height - 25, 'T 交谈 · Enter 暂离 · P / Esc 收起', 11, UI_PALETTE.accent, 'right');
-    }
+    const text = blocks.length ? blocks.join('\n\n') : '当前世界没有可用的伙伴资料。';
+    const pages = paginateDialogueBlocks(wrapDialogueText(text, contentWidth, measure), Math.max(1, Math.floor((footerTop - bodyTop - 10) / lineHeight)));
+    this.pageCount = pages.length;
+    this.page = Math.min(this.page, pages.length - 1);
+    body.setText(pages[this.page]!);
+    this.addText(left + 32, footerTop, `第${this.page + 1}/${pages.length}页 · PgUp/PgDn 翻页`, 11, UI_PALETTE.accent);
   }
 
-  private addText(x: number, y: number, text: string, size: number, color: string, align: 'left' | 'right' = 'left'): void {
+  private addText(x: number, y: number, text: string, size: number, color: string, align: 'left' | 'right' = 'left'): Phaser.GameObjects.Text {
     const object = this.scene.add.text(x, y, text, {
       fontFamily: UI_FONT_FAMILY,
       fontSize: uiFontSize(size),
       color,
     }).setOrigin(align === 'left' ? 0 : 1, 0);
     this.container.add(object);
+    return object;
   }
 }

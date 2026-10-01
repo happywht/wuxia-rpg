@@ -12,7 +12,7 @@ function setup(active:string|null){
  return {panel,events,texts,press:(code:number)=>{for(const fn of [...keys.get(code)??[]])fn();}};
 }
 describe('Round105 P panel keyboard callbacks (mock scene, not browser journey)',()=>{
- it('wraps Chinese stance descriptions by measured grapheme widths',()=>{const r=setup('companion.example');expect(r.texts[0]).toContain('\n');for(const line of r.texts[0]!.split('\n'))expect(line.length*12).toBeLessThanOrEqual(568);r.panel.close();});
+ it('wraps Chinese stance descriptions by measured grapheme widths',()=>{const r=setup('companion.example');const body=r.texts.find(text=>text.includes('这是一个'));expect(body).toContain('\n');for(const line of body!.split('\n'))expect(line.length*12).toBeLessThanOrEqual(568);r.panel.close();});
  it('T closes before talking and unbinds to prevent duplicate opening',()=>{const r=setup('companion.example');r.press(3);r.press(3);expect(r.events).toEqual(['closed','talked']);});
  it('T cannot talk to a nonfollowing NPC',()=>{const r=setup(null);r.press(3);expect(r.events).toEqual([]);expect(r.panel.isOpen).toBe(true);r.panel.close();});
  it('Enter retains dismissal and Esc only closes',()=>{const r=setup('companion.example');r.press(2);expect(r.events).toEqual(['dismissed','closed']);const s=setup('companion.example');s.press(1);expect(s.events).toEqual(['closed']);});

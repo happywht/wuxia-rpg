@@ -594,6 +594,23 @@
               ]
             },
             {
+              "text": "顾兄，我们再结伴走一程。",
+              "nextNodeId": "companion-joined",
+              "conditions": [
+                {
+                  "kind": "npcRelationship",
+                  "npcId": "char.gu-yechen",
+                  "minValue": 15
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "recruitCompanion",
+                  "companionId": "companion.gu-yechen"
+                }
+              ]
+            },
+            {
               "text": "问桩之后，碎岭那段怎么走？",
               "nextNodeId": "r129-gu-iron-route"
             }
@@ -628,13 +645,14 @@
               ]
             },
             {
-              "text": "顾兄，上回带的话，掌柜的已经收到了。",
+              "text": "顾兄，先前应下的话我还记着。往后可愿同路？",
               "nextNodeId": "ally",
               "conditions": [
                 {
                   "kind": "npcRelationship",
                   "npcId": "char.gu-yechen",
-                  "minValue": 10
+                  "minValue": 10,
+                  "maxValue": 14
                 }
               ],
               "effects": [
@@ -667,6 +685,13 @@
                   "kind": "adjustRelationship",
                   "delta": 10
                 }
+              ],
+              "conditions": [
+                {
+                  "kind": "npcRelationship",
+                  "npcId": "char.gu-yechen",
+                  "maxValue": 9
+                }
               ]
             }
           ]
@@ -681,7 +706,7 @@
         },
         {
           "id": "ally",
-          "text": "（顾夜尘把刀归了鞘，抱拳一礼）话带到了，账便清了。你这份信义，比许多提刀的都硬。往后雾大路黑，报我的名字，好使。",
+          "text": "顾夜尘把刀归鞘，抱拳道：「肯应下这句承诺，我记你的信义。旧账还没结清，不能说掌柜已经收到了；路上若愿互相照应，便来邀我。没当面告诉我的决定，我不会替你判断。」",
           "options": [
             {
               "text": "顾兄若愿同行，往后的路也好彼此照应。",

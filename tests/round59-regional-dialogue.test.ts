@@ -340,7 +340,7 @@ describe('Round 59 regional dialogue echoes', () => {
       'dlg.ma-shangyi-notice-board': 5, // 3 pre-existing + 2 echoes
       'dlg.lu-zhenniang-teastall': 9, // 7 pre-existing + 2 echoes
       'dlg.jiang-baiwei-peddler': 7, // 2 pre-existing + 2 echoes + 3 Round 98 journey entries
-      'dlg.gu-yechen-roadside': 25, // +1 R129 no-effect return route brief;  10 prior options + 14 Round105 stage/share/relay responses
+      'dlg.gu-yechen-roadside': 26, // R131 adds an eligible reinvitation without repeating social rewards.
     };
     for (const [dialogueId, expectedCount] of Object.entries(expectedBaseline)) {
       const conversation = dialogueAssembly.conversations.get(dialogueId)!;
