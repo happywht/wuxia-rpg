@@ -62,9 +62,12 @@ function loadRealData(): RealDataFixture {
   const items = indexItems(itemParsed.set);
   const shopParsed = parseShopSet(readJson('../data/base/shops/round-06-shops.json'));
   if (!shopParsed.ok) throw new Error(shopParsed.errors.join('\n'));
+  // The fixture intentionally loads R03 NPCs only; complete-world R112 coverage
+  // still requires every shop to assemble with no warning.
+  const placedNpcIds = new Set(baseNpcs.map((npc) => npc.record.id));
   const shopAssembly = assembleShops({
-    shopSet: shopParsed.set,
-    placedNpcIds: new Set(baseNpcs.map((npc) => npc.record.id)),
+    shopSet: { ...shopParsed.set, shops: shopParsed.set.shops.filter(shop => placedNpcIds.has(shop.npcId)) },
+    placedNpcIds,
     items: items.byId,
   });
   expect(shopAssembly.warnings).toEqual([]);

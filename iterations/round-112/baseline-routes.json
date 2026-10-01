@@ -1,0 +1,101 @@
+{
+  "baseline": "e70bd9c",
+  "boundary": "BFS static walkability with listed occupants, not actual journey or human duration",
+  "routes": [
+    {
+      "name": "night-neighbour-to-marks",
+      "from": [
+        40,
+        43
+      ],
+      "to": [
+        27,
+        31
+      ],
+      "occupied": [
+        [
+          39,
+          43
+        ]
+      ],
+      "distance": 29
+    },
+    {
+      "name": "night-neighbour-to-bridge-neighbour",
+      "from": [
+        40,
+        43
+      ],
+      "to": [
+        75,
+        42
+      ],
+      "occupied": [
+        [
+          39,
+          43
+        ],
+        [
+          76,
+          42
+        ]
+      ],
+      "distance": 38
+    },
+    {
+      "name": "south-arrival-to-night-neighbour",
+      "from": [
+        50,
+        97
+      ],
+      "to": [
+        40,
+        43
+      ],
+      "occupied": [
+        [
+          39,
+          43
+        ]
+      ],
+      "distance": 64
+    },
+    {
+      "name": "night-neighbour-to-north-exit-neighbour",
+      "from": [
+        40,
+        43
+      ],
+      "to": [
+        62,
+        3
+      ],
+      "occupied": [
+        [
+          39,
+          43
+        ]
+      ],
+      "distance": 62
+    }
+  ],
+  "occlusionProbe": {
+    "position": [
+      52,
+      41
+    ],
+    "solid": false,
+    "layers": [
+      {
+        "id": "cloud-ridge-ground",
+        "gid": 6,
+        "depthSort": "ground"
+      },
+      {
+        "id": "cloud-ridge-waystation-1",
+        "gid": 520,
+        "depthSort": "y"
+      }
+    ]
+  }
+}

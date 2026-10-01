@@ -22,7 +22,7 @@ const mapLayers = new Map([
     'round76-salt-well-and-post',
   ])],
   ['round-74-cloud-ridge.json', new Set([
-    'cloud-ridge-scree', 'cloud-ridge-pines', 'cloud-ridge-waystation-1', 'cloud-ridge-waystation-2',
+    'cloud-ridge-scree', 'cloud-ridge-pines', 'cloud-ridge-waystation-2',
     'cloud-ridge-waystation-3', 'cloud-ridge-waystation-4', 'cloud-ridge-waystation-5',
     'cloud-ridge-waystation-6', 'round76-cloud-bridge-rails',
   ])],

@@ -1,6 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { applyCloudRouteRefinement } from './lib/round112-cloud-routes.mjs';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const mapResourceId = 'map.round-74-cloud-ridge';
@@ -126,7 +127,9 @@ const waystation = { col: 33, row: 36, columns: 25, rows: 20, sourceCol: 17, sou
 const insideWaystation = (col, row) => col >= waystation.col && row >= waystation.row &&
   col < waystation.col + waystation.columns && row < waystation.row + waystation.rows;
 const waystationBlocked = Array.from({ length: rows }, () => Array(columns).fill(false));
-const waystationLayers = sourceMap.art.layers.slice(1).map(() => blank());
+// Later regional decorations belong to their own map, not this copied post.
+const waystationSourceLayers = sourceMap.art.layers.slice(1).filter(layer => !layer.id.startsWith('round76-'));
+const waystationLayers = waystationSourceLayers.map(() => blank());
 const ground = blank();
 const scree = blank();
 const pines = blank();
@@ -164,7 +167,7 @@ for (let row = waystation.row; row < waystation.row + waystation.rows; row++) {
     const sourceCol = waystation.sourceCol + col - waystation.col;
     const sourceRow = waystation.sourceRow + row - waystation.row;
     for (let layerIndex = 0; layerIndex < waystationLayers.length; layerIndex++) {
-      waystationLayers[layerIndex][row][col] = sourceMap.art.layers[layerIndex + 1]?.cells[sourceRow]?.[sourceCol] ?? 0;
+      waystationLayers[layerIndex][row][col] = waystationSourceLayers[layerIndex]?.cells[sourceRow]?.[sourceCol] ?? 0;
     }
     const sourceTile = sourceMap.grid[sourceRow]?.[sourceCol];
     waystationBlocked[row][col] = sourceTile === undefined || sourceMap.tileTypes[sourceTile]?.solid === true;
@@ -223,8 +226,8 @@ for (let row = 0; row < rows; row++) {
 }
 
 const mapGrid = grid.map((line) => line.join(''));
-function reachableCells(start) {
-  if (mapGrid[start.row]?.[start.col] === '#' || mapGrid[start.row]?.[start.col] === undefined) {
+function reachableCells(start, currentGrid = mapGrid) {
+  if (currentGrid[start.row]?.[start.col] === '#' || currentGrid[start.row]?.[start.col] === undefined) {
     throw new Error('入山出生格被阻挡或越界。');
   }
   const reached = new Set([key(start.col, start.row)]);
@@ -236,7 +239,7 @@ function reachableCells(start) {
       const col = point.col + dx;
       const row = point.row + dy;
       const next = key(col, row);
-      if (!inside(col, row) || mapGrid[row]?.[col] === '#' || reached.has(next)) continue;
+      if (!inside(col, row) || currentGrid[row]?.[col] === '#' || reached.has(next)) continue;
       reached.add(next);
       queue.push({ col, row });
     }
@@ -283,6 +286,14 @@ const output = {
   },
 };
 
+applyCloudRouteRefinement(output);
+const finalWalkableCount = output.grid.join('').split('').filter(tile => tile !== '#').length;
+const finalReached = reachableCells(playerStart, output.grid);
+for (const [cell, label] of anchors) {
+  if (!label.endsWith('邻格') && !finalReached.has(cell)) throw new Error(`细化后 ${label} 从入山点不可达：${cell}`);
+}
+const finalPineCount = pines.flat().filter(Boolean).length;
+const finalScreeCount = scree.flat().filter(Boolean).length;
 await writeFile(outputPath, `${JSON.stringify(output, null, 2)}\n`);
-console.log(`生成 ${columns}×${rows} 云岭古道：${walkableCount} 个可行格，${reached.size} 个入口可达格，${pineCount} 格松林、${massifCount} 格山脊、${output.art.layers.length} 层 CC0 图素。`);
+console.log(`生成 ${columns}×${rows} 云岭古道：${finalWalkableCount} 个可行格，${finalReached.size} 个入口可达格，${finalPineCount} 格松林、${finalScreeCount} 格山石图素、${output.art.layers.length} 层 CC0 图素。`);
 console.log(`保护并核验 ${anchors.size} 个关口/地标/事件/NPC 日程/遭遇锚点。`);

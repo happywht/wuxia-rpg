@@ -136,9 +136,12 @@ describe('Round 61 route audit against authored R58 routes', () => {
     if (!itemParsed.ok) throw new Error(itemParsed.errors.join('\n'));
     const shopParsed = parseShopSet(readJson('../data/base/shops/round-06-shops.json'));
     if (!shopParsed.ok) throw new Error(shopParsed.errors.join('\n'));
+    // This audit loads only R03 NPCs/two maps, not the complete current world.
+    // Keep strict warning checks for that fixture; R112 tests validate all shops.
+    const placedNpcIds = new Set(baseNpcs.map((npc) => npc.record.id));
     const shopAssembly = assembleShops({
-      shopSet: shopParsed.set,
-      placedNpcIds: new Set(baseNpcs.map((npc) => npc.record.id)),
+      shopSet: { ...shopParsed.set, shops: shopParsed.set.shops.filter(shop => placedNpcIds.has(shop.npcId)) },
+      placedNpcIds,
       items: indexItems(itemParsed.set).byId,
     });
     expect(shopAssembly.warnings).toEqual([]);

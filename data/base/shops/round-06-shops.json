@@ -39,6 +39,17 @@
         { "itemId": "item.r32.clam-shell", "quantity": 4 },
         { "itemId": "item.r32.marsh-amber", "quantity": 3 }
       ]
+    },
+    {
+      "id": "shop.r112-cloud-waystation",
+      "name": "云栈客舍备药匣",
+      "npcId": "char.r74-shen-yuji",
+      "greeting": "寄存备药按原价出售：膏三份、丸两份，售完不补；缺货东去青帆埠。",
+      "sellRate": 0.5,
+      "stock": [
+        { "itemId": "item.huichun-gao", "quantity": 3 },
+        { "itemId": "item.qingxin-wan", "quantity": 2 }
+      ]
     }
   ]
 }

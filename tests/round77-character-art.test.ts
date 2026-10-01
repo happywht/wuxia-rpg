@@ -12,7 +12,8 @@ const MAPS = [
   { path: '../data/base/maps/round-10-mist-ferry.json', collisionHash: '2de5414beda5988ca79b08f7ef1fabb76fa295ac4777fd243571fb9cbce6e754' },
   { path: '../data/base/maps/round-62-iron-ridge.json', collisionHash: '19198b97b771cebbbba05a52115213940d3406beedd163ae726bbe13ba60b3ff' },
   { path: '../data/base/maps/round-67-salt-road.json', collisionHash: '036340bed97f662c5b166ca94eaffbd379194e00104b6bc3511ee21a3c3353b3' },
-  { path: '../data/base/maps/round-74-cloud-ridge.json', collisionHash: '1de394f64c39ad3c6481800534c4f024a4536d3b949ef39a9331cefbc0a846ec' },
+  // R112 approves Cloud trail collision; other historical regions retain hashes.
+  { path: '../data/base/maps/round-74-cloud-ridge.json', collisionHash: '09aed5b077c9cbf3ef58cb9185bf8bdf1b0278fe3023e0c0a6c39827b4d9347b' },
 ] as const;
 
 interface RgbaPng {

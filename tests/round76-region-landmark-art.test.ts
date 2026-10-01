@@ -47,8 +47,9 @@ const MAPS = [
     file: '../data/base/maps/round-74-cloud-ridge.json',
     id: 'map.round-74-cloud-ridge',
     layer: 'round76-cloud-bridge-rails',
-    collisionHash: '1de394f64c39ad3c6481800534c4f024a4536d3b949ef39a9331cefbc0a846ec',
-    priorArtHash: 'ec60918e9c58b4dcefad4e888eaa923527c0cf65d52173a22aa2853b7a10f44c',
+    // R112 approved Cloud-only trails; all four other frozen maps stay unchanged.
+    collisionHash: '09aed5b077c9cbf3ef58cb9185bf8bdf1b0278fe3023e0c0a6c39827b4d9347b',
+    priorArtHash: '651ac5c88e1d80e9213e3a9f4e80e0a53eccdc22ddc4fde9d86bf7e034596c5a',
     start: { col: 50, row: 97 },
   },
 ] as const;
@@ -181,7 +182,7 @@ describe('Round 76 CC0 environment atlas', () => {
 });
 
 describe('Round 76 five-region art layers', () => {
-  it.each(MAPS)('$id preserves its 100×100 collision and pre-existing terrain art', (spec) => {
+  it.each(MAPS)('$id preserves its current approved 100×100 collision and terrain art', (spec) => {
     const map = loadMap(spec.file);
     const art = map.art;
     expect(map.id).toBe(spec.id);

@@ -1,0 +1,9 @@
+
+> wuxia-rpg@0.0.1 typecheck
+> tsc --noEmit
+
+tests/round112-cloud-routes-supply.test.ts(15,68): error TS7016: Could not find a declaration file for module '../scripts/lib/round112-cloud-routes.mjs'. 'D:/工作/城建院/2609/收心/wuxia-rpg/scripts/lib/round112-cloud-routes.mjs' implicitly has an 'any' type.
+tests/round112-cloud-routes-supply.test.ts(52,61): error TS2559: Type 'Set<string>' has no properties in common with type 'GridPathOptions'.
+tests/round112-cloud-routes-supply.test.ts(53,61): error TS2559: Type 'Set<string>' has no properties in common with type 'GridPathOptions'.
+tests/round112-cloud-routes-supply.test.ts(54,61): error TS2559: Type 'Set<string>' has no properties in common with type 'GridPathOptions'.
+tests/round112-cloud-routes-supply.test.ts(55,60): error TS2559: Type 'Set<string>' has no properties in common with type 'GridPathOptions'.

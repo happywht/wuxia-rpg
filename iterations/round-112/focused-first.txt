@@ -1,0 +1,51 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round112-cloud-routes-supply.test.ts (8 tests | 8 skipped) 22ms
+ ❯ tests/round106-regional-guide.test.ts (18 tests | 1 failed) 2301ms
+   ❯ Round106 default regional roles and actual live navigation facts (18)
+     × map.round-74-cloud-ridge exposes real supplies, exits and navigable destinations 7ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round112-cloud-routes-supply.test.ts [ tests/round112-cloud-routes-supply.test.ts ]
+Error: manifest：响应不是 JSON（text/plain;charset=utf-8）
+文件：/base/manifest.json
+/base/manifest.json
+服务器可能把请求回退到了 HTML 页面（SPA fallback）。
+建议：确认请求命中的是 JSON 文件而非被服务器回退成 HTML 的页面（SPA fallback）。
+ ❯ tests/round112-cloud-routes-supply.test.ts:22:58
+     20|   vi.stubGlobal('fetch',async(input:RequestInfo|URL)=>{const url=typeo…
+     21|     try{return new Response(readFileSync(join(root,'data',decodeURICom…
+     22|   const loaded=await loadWorldData();if(!loaded.ok)throw Error(loaded.…
+       |                                                          ^
+     23| });
+     24| afterAll(()=>{vi.unstubAllGlobals();vi.restoreAllMocks();});
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round106-regional-guide.test.ts > Round106 default regional roles and actual live navigation facts > map.round-74-cloud-ridge exposes real supplies, exits and navigable destinations
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/round106-regional-guide.test.ts:31:505
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 3 passed (5)
+      Tests  1 failed | 35 passed | 8 skipped (44)
+   Start at  10:28:24
+   Duration  2.96s (tests 72%, import 14%, transform 14%, worker 1%)
+
+    Isolate  5 workers spawned · ~167ms startup each (spawn + environment, per file)
+             at least ~250ms faster with isolate: false — reuses workers across files instead of one per file

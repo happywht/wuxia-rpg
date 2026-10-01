@@ -1,0 +1,31 @@
+{
+  "baseline": "e70bd9ca65aec53f284cd10a62093fec1d387bb5",
+  "unchangedMaps": [
+    "round-01-grid.json",
+    "round-10-mist-ferry.json",
+    "round-62-iron-ridge.json",
+    "round-67-salt-road.json",
+    "round-79-isles.json",
+    "round-82-east-coast.json",
+    "round-84-windward-isle.json",
+    "round-85-tide-isle.json",
+    "round-87-southwest-isles.json",
+    "round-91-cloud-north-terrace.json",
+    "round-92-north-pass.json",
+    "round-93-snow-pine-valley.json",
+    "round-94-east-gate.json",
+    "round-94-returning-sails.json",
+    "round-95-cedar-valley.json",
+    "round-95-east-harbor.json",
+    "round-95-misty-pine-gate.json",
+    "round-96-halfmoon-atoll.json",
+    "round-96-stone-reef.json",
+    "round-97-lanxin-isle.json",
+    "round-97-pilot-reef.json"
+  ],
+  "worldExceptCloudAdviceUnchanged": true,
+  "npcExceptShopBindingUnchanged": true,
+  "existingShopsUnchanged": true,
+  "manifestUnchanged": true,
+  "advice": "先看刻痕再过断索、问沈雨霁；三地对照后选北台或青帆埠。客舍备药匣由沈雨霁售少量伤药，E交易、Q差事、F交谈，售完本程不补货；循石路接调查点与北台，缺货可东去青帆埠，回关仍可原路走。"
+}

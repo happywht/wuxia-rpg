@@ -220,3 +220,9 @@ Round 38 之前 `scripts/validate-data.mjs` 在模块顶层直接执行校验（
 新增6测试加载实际Phaser4.2.1 GameObject/Container/DisplayList/Camera，复现remove重新入场后HUD钉屏，覆盖detach/adopt所有权、两次过关、相机与新角色因子；最小全局仅用于模块加载，没有完整DOM/Game/WebGL。源码guard是辅助，不以字段模拟代替真实普通/减少动态移动。主代理6文件30项专项通过。实际三次关口与普通一步、大陆调查/两战/两处当前选择回响、章末正常保存读回见iterations/round-111；完整npm run build：101文件832测试与资料/类型/文档审计及Vite通过。
 
 Round111 最终验证：npm run build exit0；101文件832测试（82.03秒）、100资源Schema、MOD 0问题、类型、R34/R48文档审计与Vite构建通过。原有大分块提示保留；独立发行包未在本轮验收。
+
+## Round 112 通路、有限补给与旧档
+
+新增8测试覆盖实际world-loader装配、地坪/前景分层、带NPC/遭遇占位的静态通路、七时段/关口/事件可达、有限成本与拒绝、v1 parse/preflight/restore、新店旧档默认库存、实际指南售罄后备、隔离生成链与非云岭保护；不是完整游戏光栅化。5文件44专项与类型检查通过，完整build结果见iterations/round-112/verification.md。真实浏览器正常E购买69银两、B用3膏、菜单保存/读回售罄与资源一致，25/36路线、北口过关和北境接取、普通动画角色可见见playtest。静态最短不冒充实际输入计数。
+
+Round 112 最终门槛：最终 npm run build exit0：100资源Schema、默认未启用MOD的静态覆盖检查、tsc、102文件840测试（2 worker）、文档34/48审计及Vite生产构建均通过；既有>500KB分块警告保留。最终日志build.txt，初次失败build-first.txt保留，未伪装首跑通过。
