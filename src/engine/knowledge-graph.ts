@@ -50,6 +50,12 @@ export const KNOWLEDGE_RELATIONS = [
 
 export type KnowledgeRelation = (typeof KNOWLEDGE_RELATIONS)[number];
 
+export interface KnowledgeProgressData {
+  completedByNodeId: string;
+  pendingLabel: string;
+  completedLabel: string;
+}
+
 export interface KnowledgeNodeData {
   id: string;
   kind: KnowledgeNodeKind;
@@ -57,6 +63,7 @@ export interface KnowledgeNodeData {
   summary: string;
   /** Whether a new run starts with this entry already known. */
   knownByDefault: boolean;
+  progress?: KnowledgeProgressData;
 }
 
 export interface KnowledgeNodeSetData {
@@ -114,7 +121,7 @@ export function parseKnowledgeNodeSet(raw: unknown): KnowledgeParseResult<Knowle
   const warnings: string[] = [];
   raw.nodes.forEach((entry, index) => {
     const label = `nodes[${index}]`;
-    if (!isObject(entry) || !hasOnlyKeys(entry, ['id', 'kind', 'title', 'summary', 'knownByDefault'])) {
+    if (!isObject(entry) || !hasOnlyKeys(entry, ['id', 'kind', 'title', 'summary', 'knownByDefault', 'progress'])) {
       warnings.push(`${label}：节点形状无效，已忽略`);
       return;
     }
@@ -127,12 +134,22 @@ export function parseKnowledgeNodeSet(raw: unknown): KnowledgeParseResult<Knowle
       warnings.push(`${label}：字段值无效，已忽略`);
       return;
     }
+    let progress: KnowledgeProgressData | undefined;
+    if (entry.progress !== undefined) {
+      const candidate = entry.progress;
+      if (isObject(candidate) && hasOnlyKeys(candidate, ['completedByNodeId', 'pendingLabel', 'completedLabel']) &&
+        isNonEmptyString(candidate.completedByNodeId, 64) && isNonEmptyString(candidate.pendingLabel, 80) &&
+        isNonEmptyString(candidate.completedLabel, 80)) {
+        progress = { completedByNodeId: candidate.completedByNodeId, pendingLabel: candidate.pendingLabel, completedLabel: candidate.completedLabel };
+      } else warnings.push(`${label}：进度说明无效，保留节点并忽略进度`);
+    }
     nodes.push({
       id: entry.id,
       kind,
       title: entry.title,
       summary: entry.summary,
       knownByDefault: entry.knownByDefault,
+      ...(progress === undefined ? {} : { progress }),
     });
   });
   return { ok: true, data: { nodes }, warnings };
@@ -196,6 +213,13 @@ export function assembleKnowledgeGraph(
     nodes.set(node.id, node);
   }
 
+  for (const [id, node] of nodes) {
+    if (node.progress !== undefined && (node.progress.completedByNodeId === id || !nodes.has(node.progress.completedByNodeId))) {
+      const { progress: _invalidProgress, ...withoutProgress } = node;
+      nodes.set(id, withoutProgress);
+      warnings.push(`知识节点 "${id}" 的进度完成引用无效，保留节点并忽略进度`);
+    }
+  }
   const edges: KnowledgeEdgeData[] = [];
   const seenEdgeIds = new Set<string>();
   for (const edge of edgeSet.edges) {
@@ -334,4 +358,13 @@ export function getKnownKnowledgeEdges(
     knownNodeIds.has(edge.toId) &&
     (nodeId === undefined || edge.fromId === nodeId || edge.toId === nodeId),
   );
+}
+
+/** Read-only projection of player progress; NPC memories are never completion evidence. */
+export function projectKnowledgeProgress(node: KnowledgeNodeData, knownNodeIds: ReadonlySet<string>): { state: 'unreceived' | 'pending' | 'completed'; label: string } | undefined {
+  const progress = node.progress;
+  if (progress === undefined) return undefined;
+  if (knownNodeIds.has(progress.completedByNodeId)) return { state: 'completed', label: progress.completedLabel };
+  if (knownNodeIds.has(node.id)) return { state: 'pending', label: progress.pendingLabel };
+  return { state: 'unreceived', label: '你尚未取得此见闻' };
 }

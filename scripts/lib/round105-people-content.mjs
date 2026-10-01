@@ -128,7 +128,7 @@ export function deepenPeopleConversation(conversation) {
   return conversation;
 }
 export const knowledgeNodes = relays.flatMap(relay => [
-  { id: `event.r105-${relay.key}-message`, kind: 'event', title: `${relay.title}待送达`, summary: relay.sourceText, knownByDefault: false },
+  { id: `event.r105-${relay.key}-message`, kind: 'event', title: `${relay.title}待送达`, summary: relay.sourceText, knownByDefault: false, progress: { completedByNodeId: `event.r105-${relay.key}-delivered`, pendingLabel: '待亲口说明', completedLabel: '已亲口说明' } },
   { id: `event.r105-${relay.key}-delivered`, kind: 'event', title: `${relay.title}已说明`, summary: '玩家亲口向另一地区人物说明，NPC记忆和单次关系后果保存；不生成实体信件，不替代实地调查。', knownByDefault: false },
 ]);
 export const knowledgeEdges = relays.flatMap(relay => [

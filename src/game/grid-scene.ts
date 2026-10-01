@@ -3463,6 +3463,8 @@ export class GridScene extends Phaser.Scene {
       mapResourceId: this.currentMapResourceId,
       npcNames: new Map((this.world?.assembly.npcs ?? []).map((npc) => [npc.record.id, npc.record.name])),
       knowledgeTitles: new Map([...(this.world?.knowledgeGraph.nodes ?? [])].map(([id, node]) => [id, node.title])),
+      knowledgeNodes: this.world?.knowledgeGraph.nodes,
+      playerKnownNodeIds: this.knownKnowledgeNodeIds,
       social: this.social,
       onDismiss: () => {
         this.companionState.activeCompanionId = null;

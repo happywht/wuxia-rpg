@@ -148,3 +148,8 @@ event.r104-medicine-practice与event.r104-forge-practice默认为未知，仅两
 ## Round 105 更新
 
 当前425节点/540边；本轮六个转述/送达节点、九边增量。静态knows/influences边不代替运行时NPC共享记忆和送达证明。
+
+## Round134进度说明元数据
+知识节点可选 `progress: { completedByNodeId, pendingLabel, completedLabel }`；引用必须存在且不指向自身。三个字符串上限64/80/80，未知字段静态拒绝。解析坏progress保留节点，装配坏引用保留节点但去掉进度并警告。
+
+`projectKnowledgeProgress`只看玩家已知集合：完成引用已知→完成标签；源节点已知→待办标签；均未知→尚未取得。完成优先，不改历史节点、NPC记忆、玩家状态或奖励。P在人物已知历史条目旁显示“玩家：状态”；旧数据/缺上下文无标注。历史“待送达”标题保持稳定，状态由独立标注表达，不依靠名称后缀猜id。旧v1只保存原见闻集合，无新增协议字段。

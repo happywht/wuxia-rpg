@@ -4,23 +4,80 @@
   "title": "知识图谱节点集",
   "type": "object",
   "additionalProperties": false,
-  "required": ["nodes"],
+  "required": [
+    "nodes"
+  ],
   "properties": {
     "nodes": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "kind", "title", "summary", "knownByDefault"],
+        "required": [
+          "id",
+          "kind",
+          "title",
+          "summary",
+          "knownByDefault"
+        ],
         "properties": {
-          "id": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
           "kind": {
             "type": "string",
-            "enum": ["character", "place", "faction", "item", "martialArt", "event", "quest", "ending"]
+            "enum": [
+              "character",
+              "place",
+              "faction",
+              "item",
+              "martialArt",
+              "event",
+              "quest",
+              "ending"
+            ]
           },
-          "title": { "type": "string", "minLength": 1, "maxLength": 80 },
-          "summary": { "type": "string", "minLength": 1, "maxLength": 600 },
-          "knownByDefault": { "type": "boolean" }
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 600
+          },
+          "knownByDefault": {
+            "type": "boolean"
+          },
+          "progress": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "completedByNodeId",
+              "pendingLabel",
+              "completedLabel"
+            ],
+            "properties": {
+              "completedByNodeId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "pendingLabel": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "completedLabel": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              }
+            }
+          }
         }
       }
     }

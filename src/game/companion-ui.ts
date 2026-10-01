@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { paginateDialogueBlocks, wrapDialogueText } from './dialogue-layout';
 
 import { resolveCompanionStance, type CompanionData } from '../engine/companion-system';
+import { projectKnowledgeProgress, type KnowledgeNodeData } from '../engine/knowledge-graph';
 import type { SocialState } from '../engine/social-state';
 import { getRelationship } from '../engine/social-state';
 import { uiFontSize } from './settings';
@@ -14,6 +15,8 @@ export interface CompanionPanelModel {
   social: Readonly<SocialState>;
   mapResourceId: string;
   knowledgeTitles?: ReadonlyMap<string, string>;
+  knowledgeNodes?: ReadonlyMap<string, KnowledgeNodeData>;
+  playerKnownNodeIds?: ReadonlySet<string>;
   onDismiss: () => void;
   onTalk: () => void;
 }
@@ -144,7 +147,12 @@ export class CompanionPanel {
         : `每 ${stance.combatSupport.everyPlayerActions} 次成功行动恢复 ${stance.combatSupport.power} 点生命`;
       const memories = [...(model.social.npcKnowledge.get(companion.npcId) ?? [])].sort();
       const heard = memories.length === 0 ? '尚无已记录的见闻。'
-        : `已知见闻 ${memories.length} 项：${memories.map(id => model.knowledgeTitles?.get(id) ?? id).join('、')}。`;
+        : `已知见闻 ${memories.length} 项：${memories.map(id => {
+          const title = model.knowledgeTitles?.get(id) ?? id;
+          const node = model.knowledgeNodes?.get(id);
+          const progress = node !== undefined && model.playerKnownNodeIds !== undefined ? projectKnowledgeProgress(node, model.playerKnownNodeIds) : undefined;
+          return progress === undefined ? title : `${title}【玩家：${progress.label}】`;
+        }).join('、')}。`;
       blocks.push(`${active ? '◆ 同行' : '◇ 未同行'} ${npcName} · 关系 ${getRelationship(model.social, companion.npcId)}\n【${stance.label}】${stance.description}\n${active ? '同行时，' : '未同行，不触发援护；再次同行时，'}${support}。\n${heard}\n含人物原有知识与已相告内容；传话进度以自己的见闻和接收人回应为准。`);
     }
     const text = blocks.length ? blocks.join('\n\n') : '当前世界没有可用的伙伴资料。';

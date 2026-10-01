@@ -2938,7 +2938,12 @@
       "kind": "event",
       "title": "更簿证词转述待送达",
       "summary": "秦素砚把笔搁下：「给聂栖雁转述：证词便于路客核查，报信人也要避处。你定过署名或隐名，原样说明，不替她先答。这是口头转述，不另给你一封实体信。」",
-      "knownByDefault": false
+      "knownByDefault": false,
+      "progress": {
+        "completedByNodeId": "event.r105-ledger-delivered",
+        "pendingLabel": "待亲口说明",
+        "completedLabel": "已亲口说明"
+      }
     },
     {
       "id": "event.r105-ledger-delivered",
@@ -2952,7 +2957,12 @@
       "kind": "event",
       "title": "云阶界刻转述待送达",
       "summary": "沈雨霁交代：「给柳寻径转述：云阶刻纹是旧索与步记的记法，各自成立。界标年代须他在霜松谷亲核；不能拿云阶的结论给前朝字样背书。不送拓片，只转述判断边界。」",
-      "knownByDefault": false
+      "knownByDefault": false,
+      "progress": {
+        "completedByNodeId": "event.r105-carving-delivered",
+        "pendingLabel": "待亲口说明",
+        "completedLabel": "已亲口说明"
+      }
     },
     {
       "id": "event.r105-carving-delivered",
@@ -2966,7 +2976,12 @@
       "kind": "event",
       "title": "同行护航转述待送达",
       "summary": "顾夜尘把刀柄递正：「给季无潮转述：护路不是让自己的熟人都顺当就完事，也得承認暂时照顾不到谁。你告诉过我的更簿选择我听了；到了澜心洲，由你亲口说明，别说我已替海路作了决定。」",
-      "knownByDefault": false
+      "knownByDefault": false,
+      "progress": {
+        "completedByNodeId": "event.r105-road-sea-delivered",
+        "pendingLabel": "待亲口说明",
+        "completedLabel": "已亲口说明"
+      }
     },
     {
       "id": "event.r105-road-sea-delivered",

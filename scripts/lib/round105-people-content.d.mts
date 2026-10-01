@@ -14,7 +14,7 @@ export const people: PersonDefinition[];
 export const relays: RelayDefinition[];
 export const sharingChoices: [string, string, string][];
 export const stanceRules: CompanionStanceRuleData[];
-export const knowledgeNodes: { id: string; kind: string; title: string; summary: string; knownByDefault: boolean }[];
+export const knowledgeNodes: { id: string; kind: string; title: string; summary: string; knownByDefault: boolean; progress?: { completedByNodeId: string; pendingLabel: string; completedLabel: string } }[];
 export const knowledgeEdges: { id: string; fromId: string; toId: string; relation: string; summary: string }[];
 export function deepenPeopleConversation(conversation: DialogueData): DialogueData;
 

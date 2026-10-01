@@ -140,3 +140,18 @@ describe('Round131 authored trust and actual stance data',()=>{
     }
   });
 });
+
+describe('Round134 companion player progress labels',()=>{
+  it('renders player status separately from NPC memory and keeps every page',()=>{
+    const node={id:'event.message',kind:'event' as const,title:'历史待送标题',summary:'资料',knownByDefault:false,progress:{completedByNodeId:'event.done',pendingLabel:'待亲口说明',completedLabel:'已亲口说明'}};
+    for(const [known,label] of [[[],'你尚未取得此见闻'],[['event.message'],'待亲口说明'],[['event.message','event.done'],'已亲口说明']] as const){
+      const r=setup(1,'c0',1.4,{npc0:['event.message']},new Map([['event.message',node.title]]));r.panel.close();r.events.length=0;
+      r.model.knowledgeNodes=new Map([[node.id,node]]);r.model.playerKnownNodeIds=new Set<string>(known);r.panel.open(r.model);
+      const pages:string[]=[];for(let i=0;i<200;i++){pages.push(r.texts[2]!.text);const count=Number(r.texts.at(-1)!.text.match(/\/(\d+)页/)[1]);if(i===count-1)break;r.press(5);}
+      expect(pages.join('').replace(/\n/g,'')).toContain(`历史待送标题【玩家：${label}】`);expect([...r.model.social.npcKnowledge.get('npc0')!]).toEqual(['event.message']);expect([...r.model.playerKnownNodeIds]).toEqual([...known]);expect(r.events).toEqual([]);r.panel.close();
+    }
+  });
+  it('does not invent a player progress status if discoveries are unavailable',()=>{
+    const r=setup(1,'c0',1,{npc0:['event.message']},new Map([['event.message','历史待送标题']]));r.panel.close();r.model.knowledgeNodes=new Map([['event.message',{id:'event.message',kind:'event',title:'历史待送标题',summary:'资料',knownByDefault:false,progress:{completedByNodeId:'event.done',pendingLabel:'待说明',completedLabel:'已说明'}}]]);r.panel.open(r.model);expect(r.texts[2]!.text).not.toContain('【玩家：');r.panel.close();
+  });
+});
