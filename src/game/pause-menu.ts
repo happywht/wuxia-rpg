@@ -42,6 +42,7 @@ import {
   uiFontSize,
 } from './settings';
 import type { StandardPadAction } from './input-settings';
+import { layoutSaveSlotRows } from './save-slot-layout';
 import { addPixelPanelChrome, addPixelSelection, UI_FONT_FAMILY } from './ui-theme';
 
 const UI = {
@@ -91,6 +92,8 @@ export class PauseMenuPanel {
 
   private page: PausePage = 'main';
   private selection = 0;
+  /** Round 121: which page of the selected slot's (paged) label is read. */
+  private slotLabelPage = 0;
   private feedback: string | null = null;
   private feedbackWarn = false;
   private openState = false;
@@ -159,6 +162,8 @@ export class PauseMenuPanel {
       [KeyCodes.S, () => this.moveSelection(1)],
       [KeyCodes.LEFT, () => this.adjustSetting(-1)],
       [KeyCodes.RIGHT, () => this.adjustSetting(1)],
+      [KeyCodes.PAGE_UP, () => this.turnSlotLabelPage(-1)],
+      [KeyCodes.PAGE_DOWN, () => this.turnSlotLabelPage(1)],
       [KeyCodes.ENTER, () => this.confirm()],
       [KeyCodes.ESC, () => this.back()],
     ];
@@ -195,8 +200,24 @@ export class PauseMenuPanel {
       return;
     }
     this.selection = (this.selection + delta + count) % count;
+    // Round 121: a newly selected slot starts its paged label from page one.
+    if (this.page === 'save') this.slotLabelPage = 0;
     this.render();
   }
+
+  /** Round 121: on the save page, PageUp/PageDown read the selected label only. */
+  private turnSlotLabelPage(step: number): void {
+    if (this.page !== 'save') return;
+    const row = this.slotRows[this.selection];
+    if (row === undefined || row.pages.length <= 1) return;
+    const next = Math.min(row.pages.length - 1, Math.max(0, this.slotLabelPage + step));
+    if (next === this.slotLabelPage) return;
+    this.slotLabelPage = next;
+    this.render();
+  }
+
+  /** The last rendered save-page row layouts (paging facts for the key handler). */
+  private slotRows: readonly { pages: readonly string[] }[] = [];
 
   private adjustSetting(delta: number): void {
     if (this.page !== 'settings') {
@@ -293,6 +314,7 @@ export class PauseMenuPanel {
     }
     this.page = id; // 'save' | 'settings'
     this.selection = 0;
+    this.slotLabelPage = 0; // Entering a page always starts its labels fresh.
     this.setFeedback(null, false);
     if (id === 'save') {
       this.refreshSlots();
@@ -310,6 +332,7 @@ export class PauseMenuPanel {
     }
     this.page = 'main';
     this.selection = 0;
+    this.slotLabelPage = 0;
     this.setFeedback(null, false);
     this.render();
   }
@@ -342,7 +365,9 @@ export class PauseMenuPanel {
     const height = this.scene.scale.height;
 
     const panelWidth = Math.min(640, width - 96);
-    const panelHeight = 380;
+    // Round 121 (correction): fit the panel inside a short viewport instead
+    // of hanging past its edges (the row region and hint follow the panel).
+    const panelHeight = Math.min(380, height - 40);
     const left = (width - panelWidth) / 2;
     const top = (height - panelHeight) / 2;
     addPixelPanelChrome(
@@ -373,7 +398,7 @@ export class PauseMenuPanel {
         this.renderMainEntries(top);
         break;
       case 'save':
-        this.renderSaveEntries(top, panelWidth);
+        this.renderSaveEntries(top);
         break;
       case 'settings':
         this.renderSettingsEntries(top);
@@ -386,7 +411,7 @@ export class PauseMenuPanel {
     if (this.feedback !== null) {
       this.container.add(
         this.scene.add
-          .text(width / 2, top + panelHeight - 52, this.feedback, {
+          .text(width / 2, top + panelHeight - 62, this.feedback, {
             fontFamily: UI.fontFamily,
             fontSize: uiFontSize(12),
             color: this.feedbackWarn ? UI.textWarn : UI.textPrimary,
@@ -399,7 +424,7 @@ export class PauseMenuPanel {
 
     const hints: Record<PausePage, string> = {
       main: '↑/↓ 选择 · Enter 确认 · Esc 继续',
-      save: '↑/↓ 选择 · Enter 覆盖保存 · Esc 返回',
+      save: '↑↓选槽 · Enter保存 · PgUp/PgDn标签 · Esc返回',
       settings: '↑/↓ 选择 · ←/→ 调整（立即保存） · Esc 返回',
       'confirm-quit': '↑/↓ 选择 · Enter 确认 · Esc 返回',
     };
@@ -438,9 +463,17 @@ export class PauseMenuPanel {
     });
   }
 
-  private renderSaveEntries(top: number, panelWidth: number): void {
+  private renderSaveEntries(top: number): void {
     const width = this.scene.scale.width;
-    SAVE_SLOT_IDS.forEach((slotId, index) => {
+    const height = this.scene.scale.height;
+    const panelHeight = Math.min(380, height - 40);
+    const px14 = Number.parseInt(uiFontSize(14), 10);
+    const lineSize14 = Math.ceil(px14 * 1.5);
+    // Round 121 (correction): measured wrapping inside a viewport-bounded row
+    // region — a fitting stack keeps natural heights, an overflowing one
+    // paginates each label into equal shares. Never pushes the last slot,
+    // the note or the hint off-screen.
+    const labels = SAVE_SLOT_IDS.map((slotId, index) => {
       const summary = this.slotSummaries[index];
       const active = index === this.selection;
       const line =
@@ -449,34 +482,53 @@ export class PauseMenuPanel {
           : summary !== undefined && summary.state === 'error'
             ? `${SAVE_SLOT_LABELS[slotId]} · 已有损坏存档（保存将覆盖）`
             : `${SAVE_SLOT_LABELS[slotId]} · 空（新建存档）`;
+      return `${active ? CURSOR_ACTIVE : CURSOR_IDLE}${line}`;
+    });
+    const probe = this.scene.add.text(-500, -500, '', { fontFamily: UI.fontFamily, fontSize: uiFontSize(14) });
+    this.container.add(probe);
+    const measure = (text: string): number => probe.context.measureText(text).width;
+    const rows = layoutSaveSlotRows({
+      labels, width: Math.min(640, width - 96) - 124, measure, lineHeight: lineSize14,
+      top: top + 76, bottom: Math.min(top + panelHeight, height) - 100,
+    });
+    this.slotRows = rows;
+    SAVE_SLOT_IDS.forEach((_slotId, index) => {
+      const active = index === this.selection;
+      const row = rows[index]!;
+      // Only the selected slot pages; every other slot shows its first page.
+      const pageIndex = active ? Math.min(this.slotLabelPage, row.pages.length - 1) : 0;
+      const shown = (row.pages[pageIndex] ?? row.pages[0] ?? '').split('\n');
       if (active) {
         addPixelSelection(this.scene, this.container, {
           x: (width - Math.min(640, width - 96)) / 2 + 20,
-          y: top + 81 + index * 48,
+          y: row.y,
           width: Math.min(640, width - 96) - 40,
-          height: 38,
+          height: row.height,
         });
       }
       this.container.add(
         this.scene.add
-          .text(width / 2, top + 96 + index * 48, `${active ? CURSOR_ACTIVE : CURSOR_IDLE}${line}`, {
+          .text(width / 2 - 30, row.y + Math.max(0, (row.height - shown.length * lineSize14) / 2), shown.join('\n'), {
             fontFamily: UI.fontFamily,
             fontSize: uiFontSize(14),
+            lineSpacing: Math.ceil(px14 * 0.4),
             color: active ? UI.textActive : UI.textIdle,
-            wordWrap: { width: panelWidth - 64 },
           })
-          .setOrigin(0.5),
+          .setOrigin(0.5, 0),
       );
+      if (active && row.paged) {
+        this.container.add(
+          this.scene.add
+            .text((width + Math.min(640, width - 96)) / 2 - 20, row.y + 4, `${pageIndex + 1}/${row.pages.length}`, {
+              fontFamily: UI.fontFamily,
+              fontSize: uiFontSize(9),
+              color: UI.textMuted,
+            })
+            .setOrigin(1, 0),
+        );
+      }
     });
-    this.container.add(
-      this.scene.add
-        .text(width / 2, top + 96 + SAVE_SLOT_IDS.length * 48 + 14, 'Enter 将以当前进度覆盖所选槽位', {
-          fontFamily: UI.fontFamily,
-          fontSize: uiFontSize(11),
-          color: UI.textMuted,
-        })
-        .setOrigin(0.5),
-    );
+
   }
 
   private renderSettingsEntries(top: number): void {

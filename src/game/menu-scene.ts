@@ -47,6 +47,7 @@ import {
 import { GamepadEdgeTracker, sampleStandardPad } from './input-settings';
 import { loadWorldData } from './world-loader';
 import { subscribeDataChanges, type UnsubscribeDataChanges } from './data-hot-reload';
+import { layoutSaveSlotRows } from './save-slot-layout';
 import { addPixelPanelChrome, addPixelSelection, UI_FONT_FAMILY } from './ui-theme';
 
 const VIEW_WIDTH = 960;
@@ -103,6 +104,10 @@ export class MenuScene extends Phaser.Scene {
   private homeSelection = 0;
   private profileSelection = 0;
   private slotSelection = 0;
+  /** Round 121: which page of the selected slot's (paged) label is read. */
+  private slotLabelPage = 0;
+  /** Last rendered slot-row layouts (paging facts for the key handler). */
+  private slotRows: readonly { pages: readonly string[] }[] = [];
   private settingsSelection = 0;
   private displayNameDraft = '';
   /** Slot id pending a delete confirmation (null = none). */
@@ -285,6 +290,8 @@ export class MenuScene extends Phaser.Scene {
       [KeyCodes.ESC, () => this.back()],
       [KeyCodes.D, () => this.requestDeleteSlot()],
       [KeyCodes.R, () => this.retryLoad()],
+      [KeyCodes.PAGE_UP, () => this.turnSlotLabelPage(-1)],
+      [KeyCodes.PAGE_DOWN, () => this.turnSlotLabelPage(1)],
     ];
     for (const [code, handler] of pairs) {
       const key = keyboard.addKey(code);
@@ -337,6 +344,7 @@ export class MenuScene extends Phaser.Scene {
         const count = SAVE_SLOT_IDS.length;
         this.slotSelection = (this.slotSelection + delta + count) % count;
         this.deleteCandidate = null;
+        this.slotLabelPage = 0; // A newly selected slot starts its label fresh.
         break;
       }
       case 'settings': {
@@ -577,8 +585,18 @@ export class MenuScene extends Phaser.Scene {
       .setOrigin(0.5);
   }
 
-  private drawHint(text: string, y = VIEW_HEIGHT - 26): void {
-    this.add
+  /** Round 121: on the slots page, PageUp/PageDown read the selected label only — never load or delete. */
+  private turnSlotLabelPage(step: number): void {
+    if (this.page !== 'slots') return;
+    const row = this.slotRows[this.slotSelection];
+    if (row === undefined || row.pages.length <= 1) return;
+    const next = Math.min(row.pages.length - 1, Math.max(0, this.slotLabelPage + step));
+    if (next === this.slotLabelPage) return;
+    this.slotLabelPage = next;
+    this.renderPage();
+  }
+
+  private drawHint(text: string, y = VIEW_HEIGHT - 26): void {    this.add
       .text(VIEW_WIDTH / 2, y, text, {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(11),
@@ -744,13 +762,15 @@ export class MenuScene extends Phaser.Scene {
       return;
     }
 
-    SAVE_SLOT_IDS.forEach((slotId, index) => {
+    // Round 121: real measured wrapping and stacking — a wrapped label owns a
+    // taller row instead of growing past its slot into the neighbours.
+    const slotLabels = SAVE_SLOT_IDS.map((slotId, index) => {
       const summary = this.slotSummaries[index];
       const active = index === this.slotSelection;
       const armed = this.deleteCandidate === slotId;
       let line: string;
       if (summary === undefined) {
-        line = SAVE_SLOT_LABELS[slotId];
+        line = SAVE_SLOT_LABELS[slotId]!;
       } else if (summary.state === 'ok') {
         line = `${SAVE_SLOT_LABELS[slotId]} · ${summary.displayName} Lv.${summary.level} · ${formatSavedAt(summary.savedAt ?? '')}`;
       } else if (summary.state === 'error') {
@@ -761,23 +781,53 @@ export class MenuScene extends Phaser.Scene {
       if (armed) {
         line += '　—— 再按 Enter 确认删除，按 D 取消';
       }
+      return `${active ? CURSOR_ACTIVE : CURSOR_IDLE}${line}`;
+    });
+    const px15 = Number.parseInt(uiFontSize(15), 10);
+    const lineSize15 = Math.ceil(px15 * 1.5);
+    const probe = this.add.text(-500, -500, '', { fontFamily: UI.fontFamily, fontSize: uiFontSize(15) });
+    const measure = (text: string): number => probe.context.measureText(text).width;
+    // Round 121 (correction): the row region is viewport-bounded; an
+    // overflowing stack paginates each label instead of pushing the last
+    // slot, the feedback line or the hint off-screen.
+    const rows = layoutSaveSlotRows({
+      labels: slotLabels, width: VIEW_WIDTH - 260, measure, lineHeight: lineSize15,
+      top: 140, bottom: VIEW_HEIGHT - 104, gap: 16,
+    });
+    this.slotRows = rows;
+    SAVE_SLOT_IDS.forEach((slotId, index) => {
+      const active = index === this.slotSelection;
+      const armed = this.deleteCandidate === slotId;
+      const row = rows[index]!;
+      // Only the selected slot pages; every other slot shows its first page.
+      const pageIndex = active ? Math.min(this.slotLabelPage, row.pages.length - 1) : 0;
+      const shown = (row.pages[pageIndex] ?? row.pages[0] ?? '').split('\n');
       this.add
         .text(
-          VIEW_WIDTH / 2,
-          160 + index * 60,
-          `${active ? CURSOR_ACTIVE : CURSOR_IDLE}${line}`,
+          VIEW_WIDTH / 2 - 30,
+          row.y + Math.max(0, (row.height - shown.length * lineSize15) / 2),
+          shown.join('\n'),
           {
             fontFamily: UI.fontFamily,
             fontSize: uiFontSize(15),
+            lineSpacing: Math.ceil(px15 * 0.4),
             color: armed ? UI.textWarn : active ? UI.textActive : UI.textIdle,
-            wordWrap: { width: VIEW_WIDTH - 200 },
           },
         )
-        .setOrigin(0.5);
+        .setOrigin(0.5, 0);
+      if (active && row.paged) {
+        this.add
+          .text(VIEW_WIDTH / 2 + (VIEW_WIDTH - 200) / 2 - 8, row.y + 4, `${pageIndex + 1}/${row.pages.length}`, {
+            fontFamily: UI.fontFamily,
+            fontSize: uiFontSize(9),
+            color: UI.textMuted,
+          })
+          .setOrigin(1, 0);
+      }
     });
 
-    this.drawFeedback(390);
-    this.drawHint('↑/↓ 选择 · Enter 读档 · D 删除存档 · Esc 返回');
+    this.drawFeedback(VIEW_HEIGHT - 66);
+    this.drawHint('↑↓选槽 · Enter读档 · D删除 · PgUp/PgDn标签 · Esc返回');
   }
 
   private renderSettingsPage(): void {

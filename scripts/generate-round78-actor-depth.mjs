@@ -4,8 +4,11 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const mapLayers = new Map([
+  // Round 121: layer-2 is the imported ground overlay (pavement frames
+  // 576-580); giving it y-depth drew the floor slice over anyone standing on
+  // a walkable pavement cell. Only the object layers occlude.
   ['round-01-grid.json', new Set([
-    'layer-2', 'layer-3', 'layer-4', 'layer-5', 'urban-street-details', 'round76-jiangnan-orchard',
+    'layer-3', 'layer-4', 'layer-5', 'urban-street-details', 'round76-jiangnan-orchard',
   ])],
   ['round-10-mist-ferry.json', new Set([
     'mist-river-woods', 'mist-willow-market-1', 'mist-willow-market-2', 'mist-willow-market-3',

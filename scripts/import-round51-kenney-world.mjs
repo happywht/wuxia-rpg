@@ -196,9 +196,14 @@ const output = {
         tileCount: 132,
       },
     ],
-    layers: layers.map((layer) => ({
+    layers: layers.map((layer, index) => ({
       id: layer.id,
       tilesetId: 'kenney.roguelike-rpg',
+      // Round 121: only the object layers (index 2+) occlude actors. Layers
+      // 0–1 are ground/ground-overlay (pavement frames included) and must
+      // bake into the non-occluding ground channel — a y flag here would draw
+      // the floor slice over anyone standing on a walkable pavement cell.
+      ...(index >= 2 ? { depthSort: 'y' } : {}),
       cells: layer.cells,
     })),
     actors: {

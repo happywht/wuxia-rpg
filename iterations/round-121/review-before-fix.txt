@@ -1,0 +1,27 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round121-dossier-and-slots.test.ts (7 tests | 1 failed) 45ms
+   ❯ Round121(c) UI: dossier reader and pause save page at max font on the narrow canvas (2)
+     × pause save page: bounded rows, label paging that never saves, Enter saves once 10ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round121-dossier-and-slots.test.ts > Round121(c) UI: dossier reader and pause save page at max font on the narrow canvas > pause save page: bounded rows, label paging that never saves, Enter saves once
+AssertionError: expected 88 to be greater than or equal to 96
+ ❯ tests/round121-dossier-and-slots.test.ts:225:21
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  16:39:07
+   Duration  431ms (transform 64%, tests 19%, import 14%, worker 3%)
+
+    223|     for (const row of rows) {
+    224|       expect(row.y + row.height).toBeLessThanOrEqual(240); // Panel to…
+    225|       expect(row.y).toBeGreaterThanOrEqual(96);
+       |                     ^
+    226|     }
+    227|     const hint = r.visible().find(t => t.text.includes('Esc'));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
