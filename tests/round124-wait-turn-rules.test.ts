@@ -1,0 +1,10 @@
+import {readFileSync} from 'node:fs';
+import {describe,it,expect} from 'vitest';
+import {CombatSession,parseBattleEncounterSet} from '../src/engine/turn-based-combat';
+import {createCharacterState,parseCharacterProfileSet,parseMartialArtSet} from '../src/engine/character-progression';
+const read=(p:string)=>JSON.parse(readFileSync(new URL('../'+p,import.meta.url),'utf8'));
+function setup(companion=false){const pp=parseCharacterProfileSet(read('data/base/characters/round-04-profiles.json')),ap=parseMartialArtSet(read('data/base/skills/round-04-martial-arts.json')),bp=parseBattleEncounterSet(read('data/base/battles/round-05-encounters.json'));if(!pp.ok||!ap.ok||!bp.ok)throw Error('base');const profile=pp.set.profiles[0]!,player=createCharacterState(profile),encounter=structuredClone(bp.set.encounters[0]!);player.martialArtIds.push('skill.yunyin-shenfa');const session=new CombatSession({encounter,profile,player,martialArts:new Map(ap.set.martialArts.map(a=>[a.id,a])),...(companion?{companion:{name:'同行者',support:{kind:'attack' as const,power:100,everyPlayerActions:2}}}: {})});return {session,player};}
+describe('Round124 waiting follows shared turn rules',()=>{
+ it('does not invent a guard and cannot reuse an already consumed guard',()=>{const {session,player}=setup();session.playerUse('skill.yunyin-shenfa');const qi=player.qi.current;session.playerWait();expect(player.qi.current).toBe(qi);expect(session.log.at(-1)?.text).not.toContain('守御抵挡');expect(session.log.some(entry=>entry.text.includes('暂缓出招'))).toBe(true);});
+ it('companion counts waiting once and can win without an extra enemy turn or duplicate reward',()=>{const {session,player}=setup(true);session.playerWait();expect(session.finalResult).toBeNull();const before=player.health.current;session.playerWait();expect(session.finalResult?.outcome).toBe('victory');expect(player.health.current).toBeGreaterThanOrEqual(before);expect(session.log.filter(e=>e.kind==='companion-action')).toHaveLength(1);const xp=player.experience;expect(session.playerWait().ok).toBe(false);expect(player.experience).toBe(xp);});
+});

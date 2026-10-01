@@ -1,4 +1,7 @@
 import Phaser from 'phaser';
+import { buildCombatResultSummary } from './combat-result-summary';
+import { combatLayoutMetrics } from './combat-layout';
+import { paginateDialogueLines, wrapDialogueText } from './dialogue-layout';
 
 import {
   type CombatantView,
@@ -50,10 +53,9 @@ const UI = {
 const PADDING = 24;
 const BAR_WIDTH = 250;
 const BAR_HEIGHT = 12;
-const BAR_GAP = 18;
 /** Vertical budget for the log block; older entries drop off first. */
 const LOG_HEIGHT_BUDGET = 128;
-const ACTION_LINE_HEIGHT = 26;
+
 const VISIBLE_ACTION_ROWS = 5;
 const CURSOR_ACTIVE = '▸ ';
 const CURSOR_IDLE = '  ';
@@ -68,6 +70,7 @@ const LABELS = {
   healKind: '恢复',
   guardKind: '守御',
   fleeAction: '撤退',
+  waitAction: '暂缓出招 · 不耗气、不回复，承受敌招',
   selectHint: '↑/↓ 滚动与选择 · Enter 确认 · Esc 撤退',
   closeHint: 'Enter / Esc 离开战场',
   insufficientQi: '内力不足，该行动无法使出',
@@ -107,6 +110,8 @@ export class BattlePanel {
 
   private session: CombatSession | null = null;
   private selection = 0;
+  private resultPage = 0;
+  private resultPages: string[] = [];
   private notice: string | null = null;
   private openState = false;
 
@@ -127,6 +132,8 @@ export class BattlePanel {
     }
     this.session = session;
     this.selection = 0;
+    this.resultPage = 0;
+    this.resultPages = [];
     this.notice = null;
     this.openState = true;
     this.container.setVisible(true);
@@ -166,6 +173,8 @@ export class BattlePanel {
       [KeyCodes.S, () => this.moveSelection(1)],
       [KeyCodes.ENTER, () => this.confirm()],
       [KeyCodes.ESC, () => this.cancel()],
+      [KeyCodes.PAGE_UP, () => this.pageResult(-1)],
+      [KeyCodes.PAGE_DOWN, () => this.pageResult(1)],
     ];
     for (const [code, handler] of pairs) {
       const key = keyboard.addKey(code);
@@ -183,7 +192,13 @@ export class BattlePanel {
 
   /** Number of selectable rows: each player action plus the flee row. */
   private get rowCount(): number {
-    return (this.session?.playerActions.length ?? 0) + 1;
+    return (this.session?.playerActions.length ?? 0) + 2;
+  }
+
+  private pageResult(delta: number): void {
+    if (!this.session?.isOver) return;
+    this.resultPage = Math.max(0, Math.min(this.resultPages.length - 1, this.resultPage + delta));
+    this.render();
   }
 
   private moveSelection(delta: number): void {
@@ -205,7 +220,8 @@ export class BattlePanel {
       return;
     }
     if (session.isOver) {
-      this.close(); // Enter on a finished battle closes the overlay.
+      if (this.resultPage < this.resultPages.length - 1) this.pageResult(1);
+      else this.close(); // Settlement executes once, only when leaving.
       return;
     }
     const action = session.playerActions[this.selection];
@@ -221,7 +237,13 @@ export class BattlePanel {
       this.render();
       return;
     }
-    // Beyond the action rows sits the flee row.
+    if (this.selection === session.playerActions.length) {
+      session.playerWait();
+      this.notice = null;
+      this.render();
+      return;
+    }
+    // The final row remains an explicit retreat.
     session.flee();
     this.notice = null;
     this.render();
@@ -263,6 +285,10 @@ export class BattlePanel {
       UI.overlayAlpha,
     );
 
+    if (session.isOver) {
+      this.renderResult(session, panelLeft, panelTop, panelWidth);
+      return;
+    }
     this.renderCombatant(session.playerView, panelLeft + PADDING + BAR_WIDTH / 2, panelTop + PADDING);
     this.renderCombatant(
       session.enemyView,
@@ -270,7 +296,8 @@ export class BattlePanel {
       panelTop + PADDING,
     );
 
-    const logBottom = this.renderLog(session, panelLeft + PADDING, panelTop + 118, contentWidth);
+    const metrics = combatLayoutMetrics(parseFloat(uiFontSize(11)), parseFloat(uiFontSize(13)));
+    const logBottom = this.renderLog(session, panelLeft + PADDING, panelTop + metrics.logOffset, contentWidth);
     if (!session.isOver) {
       this.renderActions(session.playerActions, panelLeft + PADDING + 6, logBottom + 10, contentWidth - 12);
     }
@@ -293,7 +320,7 @@ export class BattlePanel {
     this.container.add(nameText);
 
     this.renderBar(LABELS.health, view.health, centerX, top + 30, UI.barHealth);
-    this.renderBar(LABELS.qi, view.qi, centerX, top + 30 + BAR_HEIGHT + BAR_GAP, UI.barQi);
+    this.renderBar(LABELS.qi, view.qi, centerX, top + 30 + combatLayoutMetrics(parseFloat(uiFontSize(11)), parseFloat(uiFontSize(13))).resourceStride, UI.barQi);
   }
 
   /** One labeled resource bar: track, proportional fill and value text. */
@@ -315,7 +342,7 @@ export class BattlePanel {
       .setOrigin(0, 0);
     objects.push(labelText);
 
-    const barTop = top + 15;
+    const barTop = top + Math.max(15, labelText.height + 3);
     const track = this.scene.add.rectangle(
       centerX,
       barTop + BAR_HEIGHT / 2,
@@ -429,8 +456,12 @@ export class BattlePanel {
   /** Action list plus the flee row, with the cursor and affordability states. */
   private renderActions(actions: readonly PlayerActionView[], left: number, top: number, width: number): void {
     let cursorY = top;
-    const windowStart = Math.floor(this.selection / VISIBLE_ACTION_ROWS) * VISIBLE_ACTION_ROWS;
-    for (let offset = 0; offset < VISIBLE_ACTION_ROWS; offset += 1) {
+    const rowHeight = combatLayoutMetrics(parseFloat(uiFontSize(11)), parseFloat(uiFontSize(13))).actionRowHeight;
+    const panelTop = (this.scene.scale.height - PANEL_HEIGHT) / 2 + 12;
+    const visibleRows = Math.max(1, Math.min(VISIBLE_ACTION_ROWS,
+      Math.floor((panelTop + PANEL_HEIGHT - PADDING - 30 - top) / rowHeight)));
+    const windowStart = Math.floor(this.selection / visibleRows) * visibleRows;
+    for (let offset = 0; offset < visibleRows; offset += 1) {
       const index = windowStart + offset;
       const action = actions[index];
       if (action === undefined) break;
@@ -440,7 +471,7 @@ export class BattlePanel {
           x: left - 6,
           y: cursorY - 2,
           width,
-          height: ACTION_LINE_HEIGHT,
+          height: rowHeight,
         });
       }
       const line = this.scene.add
@@ -455,28 +486,35 @@ export class BattlePanel {
         })
         .setOrigin(0, 0);
       this.container.add(line);
-      cursorY += ACTION_LINE_HEIGHT;
+      cursorY += rowHeight;
     }
 
-    const fleeActive = this.selection === actions.length;
-    if (actions.length < windowStart + VISIBLE_ACTION_ROWS) {
-      if (fleeActive) {
-        addPixelSelection(this.scene, this.container, {
-          x: left - 6,
-          y: cursorY - 2,
-          width,
-          height: ACTION_LINE_HEIGHT,
-        });
-      }
-      const fleeLine = this.scene.add
-        .text(left, cursorY, `${fleeActive ? CURSOR_ACTIVE : CURSOR_IDLE}${LABELS.fleeAction}`, {
-          fontFamily: UI.fontFamily,
-          fontSize: uiFontSize(13),
-          color: fleeActive ? UI.actionActive : UI.actionIdle,
-        })
-        .setOrigin(0, 0);
-      this.container.add(fleeLine);
+    for (const [index, label] of [[actions.length, LABELS.waitAction], [actions.length + 1, LABELS.fleeAction]] as const) {
+      if (index < windowStart || index >= windowStart + visibleRows) continue;
+      const active = this.selection === index;
+      if (active) addPixelSelection(this.scene, this.container, { x: left - 6, y: cursorY - 2, width, height: rowHeight });
+      const line = this.scene.add.text(left, cursorY, `${active ? CURSOR_ACTIVE : CURSOR_IDLE}${label}`, {
+        fontFamily: UI.fontFamily, fontSize: uiFontSize(13), color: active ? UI.actionActive : UI.actionIdle,
+      }).setOrigin(0, 0);
+      this.container.add(line);
+      cursorY += rowHeight;
     }
+  }
+
+  private renderResult(session: CombatSession, left: number, top: number, width: number): void {
+    const text = this.scene.add.text(left + PADDING, top + PADDING, '', {
+      fontFamily: UI.fontFamily, fontSize: uiFontSize(13), color: UI.textPrimary,
+    }).setOrigin(0, 0);
+    text.setText('测');
+    const lineHeight = text.height + 3;
+    text.setLineSpacing(3);
+    this.resultPages = paginateDialogueLines(wrapDialogueText(buildCombatResultSummary(session), width - PADDING * 2,
+      value => { text.setText(value); return text.width; }), Math.max(1, Math.floor((PANEL_HEIGHT - 110) / lineHeight)));
+    this.resultPage = Math.min(this.resultPage, this.resultPages.length - 1);
+    text.setText(this.resultPages[this.resultPage] ?? '');
+    this.container.add(text);
+    this.renderHint(left + width - PADDING, top + PANEL_HEIGHT - PADDING,
+      `${this.resultPage + 1}/${this.resultPages.length} · PgUp/PgDn · Enter ${this.resultPage < this.resultPages.length - 1 ? '续读' : '离开'} · Esc 离开`);
   }
 
   /** Bottom-right key hint inside the panel. */

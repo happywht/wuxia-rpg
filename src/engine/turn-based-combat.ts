@@ -859,6 +859,17 @@ export class CombatSession {
     return { ok: true };
   }
 
+  /** Yield a real turn: no free healing, qi or new guard; enemy still acts. */
+  playerWait(): { ok: true } | { ok: false; reason: ActionRefusalReason } {
+    if (this.phase !== 'player-turn') return { ok: false, reason: 'not-player-turn' };
+    this.logEntries.push({ kind: 'player-action', text: `${this.playerName}暂缓出招，未回复生命或内力；仍将承受敌方行动` });
+    this.successfulPlayerActions += 1;
+    this.companionTurn();
+    if (this.enemy.health.current <= 0) this.settleVictory();
+    else this.enemyTurn();
+    return { ok: true };
+  }
+
   /** Data-authored support fires every N accepted player actions. */
   private companionTurn(): void {
     const companion = this.companion;

@@ -317,3 +317,7 @@ npm run build exit0：100资源/默认MOD静态Schema、tsc、113文件970测试
 正常第三档实走取消与双向乘行：529→521→513银，08:31→08:51→09:11；生命236/263、内力141/163、膏2不变。第三栏17:55:48正常保存/菜单读回，前两栏不动。R指南最大字号两页、收费确认一页完整；M侧栏改为测宽/字高分页，W/S遍历全部57地点，PgUp/PgDn阅读，最大字号全域和本区完整显示名称/8银/20分钟。余额不足及到达占位拒绝为正式Host测试证据，未冒充浏览器实走。
 
 最终 npm run build exit0：100资源与默认/MOD静态Schema、tsc、117文件1001测试（86.03秒）、R34/R48文档审计、Vite通过；入口659.55KB/Phaser1374.54KB分块警告保留。独立发行未验收，M2–M5仍未通过，goal active。证据 iterations/round-123/playtest.md、verification.md、build-final.txt。Round124优先剩余门派地区实践与失败恢复；其他代表地区长路节奏仍待实测优化。
+
+
+## Round 124
+专项tests/round124-combat-recovery、wait-turn-rules、combat-layout及既有UI/守御共5文件21通过；完整build-final.txt为120文件1014测试、静态资料、tsc、两文档审计、Vite exit0。正常键盘失败恢复、再战与18:42:05第三档存读见iterations/round-124/playtest.md。最大字号一页结果与行动滚动为实际截图；1800字MOD结果为回调模型测试。活动失败任务分支未实测。
