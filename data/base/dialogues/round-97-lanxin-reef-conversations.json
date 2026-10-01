@@ -240,6 +240,50 @@
               ]
             },
             {
+              "text": "再谈我当时的选择留下什么代价。",
+              "nextNodeId": "r136-road-sea-followup-0",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-road-sea-delivered"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-public"
+                },
+                {
+                  "kind": "npcKnows",
+                  "nodeId": "event.r105-road-sea-message"
+                },
+                {
+                  "kind": "npcKnows",
+                  "nodeId": "event.r102-pilot-public"
+                }
+              ]
+            },
+            {
+              "text": "再谈我当时的选择留下什么代价。",
+              "nextNodeId": "r136-road-sea-followup-1",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-road-sea-delivered"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-crew"
+                },
+                {
+                  "kind": "npcKnows",
+                  "nodeId": "event.r105-road-sea-message"
+                },
+                {
+                  "kind": "npcKnows",
+                  "nodeId": "event.r102-pilot-crew"
+                }
+              ]
+            },
+            {
               "text": "先告辞。",
               "nextNodeId": "farewell"
             }
@@ -408,6 +452,14 @@
         {
           "id": "r105-road-sea-received",
           "text": "这番转述和你说明的取舍已记下。关系后果不会重付；若查原处事实，仍应回原处核对，不拿口头转述替代实地记录。"
+        },
+        {
+          "id": "r136-road-sea-followup-0",
+          "text": "季无潮翻到散船可看的潮时：「你公开传示，散船较容易辨潮，虞星槎辨假号的负担却更重。顾夜尘提醒照顾熟人圈外的人，这层好处与代价都留下；没有替守灯人免去核号。此前认同已记过，复谈不再重付。」"
+        },
+        {
+          "id": "r136-road-sea-followup-1",
+          "text": "季无潮停在熟船名册旁：「你限定熟船传示，报码较容易核对，未入册的散船仍要等。顾夜尘提醒别只顾熟人，这与当前传示范围仍有张力；我不会把散船说成已经安置。此前关系后果已记过，复谈不再扣或补。」"
         }
       ]
     },

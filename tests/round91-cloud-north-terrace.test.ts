@@ -277,6 +277,7 @@ describe('Round 91 Cloud Ridge North Terrace', () => {
       'scripts/lib/atlas-rle.mjs',
       'scripts/lib/round101-north-content.mjs',
       'scripts/lib/round105-people-content.mjs',
+      'scripts/lib/round136-relay-followups.mjs',
       'data/base/world/world-map.json',
       'data/base/manifest.json',
       'data/base/maps/round-74-cloud-ridge.json',

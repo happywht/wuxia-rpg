@@ -228,6 +228,50 @@
               ]
             },
             {
+              "text": "再谈我当时的选择留下什么代价。",
+              "nextNodeId": "r136-ledger-followup-0",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-ledger-delivered"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-open"
+                },
+                {
+                  "kind": "npcKnows",
+                  "nodeId": "event.r105-ledger-message"
+                },
+                {
+                  "kind": "npcKnows",
+                  "nodeId": "event.r100-record-open"
+                }
+              ]
+            },
+            {
+              "text": "再谈我当时的选择留下什么代价。",
+              "nextNodeId": "r136-ledger-followup-1",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-ledger-delivered"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-record-guard"
+                },
+                {
+                  "kind": "npcKnows",
+                  "nodeId": "event.r105-ledger-message"
+                },
+                {
+                  "kind": "npcKnows",
+                  "nodeId": "event.r100-record-guard"
+                }
+              ]
+            },
+            {
               "text": "改日再谈。",
               "nextNodeId": "farewell"
             }
@@ -292,6 +336,14 @@
         {
           "id": "r105-ledger-received",
           "text": "这番转述和你说明的取舍已记下。关系后果不会重付；若查原处事实，仍应回原处核对，不拿口头转述替代实地记录。"
+        },
+        {
+          "id": "r136-ledger-followup-0",
+          "text": "聂栖雁把更簿判断另记一行：「你公开了署名，路客可据人查牌；秦素砚担心的报信人暴露也没有消失。我留这层风险，不拿雁候记录替证人的处境作保证。此前认同已记过，这次复谈不再结算。」"
+        },
+        {
+          "id": "r136-ledger-followup-1",
+          "text": "聂栖雁按住无名的一栏：「你保护了姓名，报信人少受追问，路客却不能按公开证人直接核查。秦素砚的顾虑我听过，证词缺口也仍留着；以后核牌要另问，不把隐名说成证据齐全。此前关系后果不再重记。」"
         }
       ]
     }

@@ -241,6 +241,50 @@
               ]
             },
             {
+              "text": "再谈我当时的选择留下什么代价。",
+              "nextNodeId": "r136-carving-followup-0",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-carving-delivered"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-mark-public"
+                },
+                {
+                  "kind": "npcKnows",
+                  "nodeId": "event.r105-carving-message"
+                },
+                {
+                  "kind": "npcKnows",
+                  "nodeId": "event.r101-mark-public"
+                }
+              ]
+            },
+            {
+              "text": "再谈我当时的选择留下什么代价。",
+              "nextNodeId": "r136-carving-followup-1",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r105-carving-delivered"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-mark-private"
+                },
+                {
+                  "kind": "npcKnows",
+                  "nodeId": "event.r105-carving-message"
+                },
+                {
+                  "kind": "npcKnows",
+                  "nodeId": "event.r101-mark-private"
+                }
+              ]
+            },
+            {
               "text": "改日再谈。",
               "nextNodeId": "farewell"
             }
@@ -400,6 +444,14 @@
         {
           "id": "r105-carving-received",
           "text": "这番转述和你说明的取舍已记下。关系后果不会重付；若查原处事实，仍应回原处核对，不拿口头转述替代实地记录。"
+        },
+        {
+          "id": "r136-carving-followup-0",
+          "text": "柳寻径指着碑旁注记：「你公开说明前朝屯界，外人能查年代，也会有人拿旧账争路。沈雨霁的索孔与步记各自成立，不能替谷中界标断代；巡路争执仍须我们处理。那次认同已结算，复谈只回顾后果。」"
+        },
+        {
+          "id": "r136-carving-followup-1",
+          "text": "柳寻径翻开巡簿：「你把年代说明留在私记里，眼下巡路人少卷入争执，外人却不便核看。沈雨霁的分项判断与界标证据分别保存，不混成今日疆令。此前关系已记过，这次没有额外认同。」"
         }
       ]
     }
