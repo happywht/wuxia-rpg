@@ -101,7 +101,7 @@ describe('Round 67 fourth playable region and expanded atlas', () => {
     if ('ok' in assembled) return;
     expect(assembled.warnings).toEqual([]);
     expect(assembled.regions).toHaveLength(22);
-    expect(assembled.transitions).toHaveLength(50);
+    expect(assembled.transitions).toHaveLength(52);
     expect(worldParse.data.atlasArt).toMatchObject({ columns: 768, rows: 576, tileSize: 8 });
     const salt = maps.get(SALT_ID)!;
     const saltIncoming = assembled.transitions.find(({ id }) => id === 'gate.iron-ridge-to-salt-road')!;

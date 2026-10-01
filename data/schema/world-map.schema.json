@@ -130,6 +130,12 @@
           },
           "to": {
             "$ref": "#/definitions/endpoint"
+          },
+          "travelMinutes": {
+            "type": "integer", "minimum": 0, "maximum": 1440
+          },
+          "fare": {
+            "type": "integer", "minimum": 0, "maximum": 1000000
           }
         }
       }

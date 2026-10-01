@@ -159,7 +159,7 @@ describe('large walkable regions and later atlas extensions', () => {
     if ('ok' in assembled) return;
     expect(assembled.warnings).toEqual([]);
     expect(assembled.regions).toHaveLength(22);
-    expect(assembled.transitions).toHaveLength(50);
+    expect(assembled.transitions).toHaveLength(52);
     expect(assembled.landmarks.some(({ id }) => id === 'landmark.mist-willow-market')).toBe(true);
     expect(assembled.landmarks.some(({ id }) => id === 'landmark.mist-old-sluice' && id !== undefined)).toBe(true);
     expect(assembled.events.some(({ id }) => id === 'event.r55-sluice-inscription')).toBe(true);

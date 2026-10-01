@@ -112,7 +112,7 @@ describe('Round 94 eastern and southern frontier expansion', () => {
     if (!('ok' in assembled)) {
       expect(assembled.warnings).toEqual([]);
       expect(assembled.regions).toHaveLength(22);
-      expect(assembled.transitions).toHaveLength(50);
+      expect(assembled.transitions).toHaveLength(52);
     }
   });
 

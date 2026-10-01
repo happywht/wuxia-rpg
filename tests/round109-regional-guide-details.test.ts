@@ -66,7 +66,11 @@ describe('Round109 real-data supply lines and optional live inputs',()=>{
   const gates=world.worldMap.transitions.filter(g=>g.from.mapResourceId===map);
   const exits=entries.filter(e=>e.category==='exit');
   expect(exits).toHaveLength(gates.length);
-  for(const exit of exits)expect(exit.detail).toContain(`过此关口按日程需 ${travelMinutes} 分钟（不含步行）`);
+  for(const exit of exits){
+   const gate=gates.find(g=>exit.id==='exit:'+g.id)!;
+   expect(exit.detail).toContain(`过此关口按日程需 ${gate.travelMinutes ?? travelMinutes} 分钟（不含步行）`);
+   if((gate.fare ?? 0)>0)expect(exit.detail).toContain(`费用 ${gate.fare} 银两`);
+  }
  });
 
  it('keeps every medicine on its own line for legacy callers without live inputs',()=>{
@@ -80,7 +84,11 @@ describe('Round109 real-data supply lines and optional live inputs',()=>{
       expect(entry.detail).not.toContain('现有银两');
       expect(entry.detail).not.toContain('分钟');
     }
-    for(const exit of entries.filter(e=>e.category==='exit'))expect(exit.detail).not.toContain('分钟');
+    for(const exit of entries.filter(e=>e.category==='exit')){
+     const gate=world.worldMap.transitions.find(g=>exit.id==='exit:'+g.id)!;
+     if(gate.travelMinutes===undefined)expect(exit.detail).not.toContain('分钟');
+     else expect(exit.detail).toContain(`${gate.travelMinutes} 分钟`);
+    }
   }
  });
 

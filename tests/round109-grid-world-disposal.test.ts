@@ -18,7 +18,7 @@ import {GridScene} from '../src/game/grid-scene';
 
 /** The panel fields the disposal pass owns, mirrored from the scene class. */
 const PANEL_FIELDS=['dialoguePanel','battlePanel','inventoryPanel','shopPanel','questPanel',
- 'pauseMenu','controlsPanel','factionPanel','worldMapPanel','encyclopediaPanel','modStatusPanel',
+ 'pauseMenu','travelConfirmation','controlsPanel','factionPanel','worldMapPanel','encyclopediaPanel','modStatusPanel',
  'collectionPanel','companionPanel','regionalGuidePanel','arenaPanel','factionWarPanel',
  'martialArtForgePanel','equipmentForgePanel','alchemyPanel','endingPanel','achievementPanel',
  'meridianPanel'] as const;

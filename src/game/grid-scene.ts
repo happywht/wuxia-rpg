@@ -174,6 +174,8 @@ import { WorldMapPanel } from './world-map-ui';
 import { EncyclopediaPanel } from './encyclopedia-ui';
 import { CollectionPanel } from './collection-ui';
 import { PauseMenuPanel } from './pause-menu';
+import { TravelConfirmationPanel } from './travel-confirmation';
+import { quoteTransitionCost } from '../engine/transition-cost';
 import { ControlsPanel } from './controls-ui';
 import { FactionPanel } from './faction-ui';
 import { CompanionPanel } from './companion-ui';
@@ -322,7 +324,7 @@ const UI = {
  */
 const WORLD_OVERLAY_PANEL_FIELDS = [
   'dialoguePanel', 'battlePanel', 'inventoryPanel', 'shopPanel', 'questPanel',
-  'pauseMenu', 'controlsPanel', 'factionPanel', 'worldMapPanel', 'encyclopediaPanel',
+  'pauseMenu', 'travelConfirmation', 'controlsPanel', 'factionPanel', 'worldMapPanel', 'encyclopediaPanel',
   'modStatusPanel', 'collectionPanel', 'companionPanel', 'regionalGuidePanel',
   'arenaPanel', 'factionWarPanel', 'martialArtForgePanel', 'equipmentForgePanel',
   'alchemyPanel', 'endingPanel', 'achievementPanel', 'meridianPanel',
@@ -452,6 +454,7 @@ export class GridScene extends Phaser.Scene {
   private shopPanel: ShopPanel | null = null;
   private questPanel: QuestPanel | null = null;
   private pauseMenu: PauseMenuPanel | null = null;
+  private travelConfirmation: TravelConfirmationPanel | null = null;
   private controlsPanel: ControlsPanel | null = null;
   private factionPanel: FactionPanel | null = null;
   private worldMapPanel: WorldMapPanel | null = null;
@@ -913,6 +916,7 @@ export class GridScene extends Phaser.Scene {
       },
     });
     this.controlsPanel = new ControlsPanel(this);
+    this.travelConfirmation = new TravelConfirmationPanel(this, () => this.noteOverlayClosed());
     this.factionPanel = new FactionPanel(this, () => this.noteOverlayClosed());
     this.companionPanel = new CompanionPanel(this, () => this.noteOverlayClosed());
     this.regionalGuidePanel = new RegionalGuidePanel(this, () => this.noteOverlayClosed());
@@ -1488,6 +1492,11 @@ export class GridScene extends Phaser.Scene {
       A: pad.A,
       B: pad.B,
     }));
+    if (this.travelConfirmation?.isOpen) {
+      if (edges.confirm) this.travelConfirmation.accept();
+      else if (edges.back) this.travelConfirmation.close();
+      return;
+    }
     if (this.pauseMenu?.isOpen) {
       this.pauseMenu.handleGamepadEdges(edges);
       return;
@@ -3204,7 +3213,9 @@ export class GridScene extends Phaser.Scene {
           row: this.playerRow,
         });
     if (gate !== null) {
-      this.hudLines.interact = `按 E 通过「${gate.name}」前往另一处地界`;
+      this.hudLines.interact = (gate.fare ?? 0) > 0
+        ? `按 E 查看「${gate.name}」· ${gate.fare} 银两 / ${gate.travelMinutes ?? this.clock?.calendar.actionCosts.travelMinutes ?? 0} 分钟`
+        : `按 E 通过「${gate.name}」前往另一处地界`;
       return;
     }
     const endingGate = this.world === null ? null : selectAdjacentEndingGate(
@@ -3270,6 +3281,7 @@ export class GridScene extends Phaser.Scene {
       (this.shopPanel !== null && this.shopPanel.isOpen) ||
       (this.questPanel !== null && this.questPanel.isOpen) ||
       (this.pauseMenu !== null && this.pauseMenu.isOpen) ||
+      (this.travelConfirmation !== null && this.travelConfirmation.isOpen) ||
       (this.worldMapPanel !== null && this.worldMapPanel.isOpen) ||
       (this.encyclopediaPanel !== null && this.encyclopediaPanel.isOpen) ||
       (this.modStatusPanel !== null && this.modStatusPanel.isOpen) ||
@@ -3985,6 +3997,8 @@ export class GridScene extends Phaser.Scene {
       this.questPanel = null;
       this.pauseMenu?.destroy();
       this.pauseMenu = null;
+      this.travelConfirmation?.destroy();
+      this.travelConfirmation = null;
       this.worldMapPanel?.destroy();
       this.worldMapPanel = null;
       this.encyclopediaPanel?.destroy();
@@ -4174,7 +4188,10 @@ export class GridScene extends Phaser.Scene {
           row: this.playerRow,
         });
     if (gate !== null) {
-      this.switchRegion(gate);
+      if ((gate.fare ?? 0) > 0 && this.travelConfirmation !== null) {
+        const quote = quoteTransitionCost(gate, this.clock?.calendar.actionCosts.travelMinutes ?? 0, this.inventory?.currency ?? 0);
+        this.travelConfirmation.open(gate.name, quote.fare, quote.minutes, this.inventory?.currency ?? 0, () => this.switchRegion(gate));
+      } else this.switchRegion(gate);
       return;
     }
     const endingGate = this.world === null ? null : selectAdjacentEndingGate(
@@ -4464,6 +4481,12 @@ export class GridScene extends Phaser.Scene {
   /** Travels through one validated world-map endpoint after a fresh occupancy check. */
   private switchRegion(transition: RegionTransitionData): void {
     const world = this.world;
+    if (this.dataReloading || transition.from.mapResourceId !== this.currentMapResourceId ||
+        Math.abs(transition.from.col - this.playerCol) + Math.abs(transition.from.row - this.playerRow) !== 1 ||
+        !world?.worldMap.transitions.some(current => current === transition)) {
+      this.showRegionNotice('交通资料或位置已变化，请重新确认乘行。');
+      return;
+    }
     const destinationMap = world?.maps.get(transition.to.mapResourceId);
     if (world === null || destinationMap === undefined) {
       this.showRegionNotice(`关口「${transition.name}」通向的地图当前不可用。`);
@@ -4473,7 +4496,12 @@ export class GridScene extends Phaser.Scene {
       this.showRegionNotice(`关口「${transition.name}」的落点不可通行。`);
       return;
     }
-    const travelMinutes = this.clock?.calendar.actionCosts.travelMinutes ?? 0;
+    const quote = quoteTransitionCost(transition, this.clock?.calendar.actionCosts.travelMinutes ?? 0, this.inventory?.currency ?? 0);
+    if (!quote.affordable) {
+      this.showRegionNotice(`银两不足：乘行需 ${quote.fare}，尚缺 ${quote.missingCurrency}。`);
+      return;
+    }
+    const travelMinutes = quote.minutes;
     const arrivalClock = new GameClock(world.calendar, this.clock?.elapsedMinutes ?? 0);
     arrivalClock.advance(travelMinutes);
     const arrivalPeriodId = arrivalClock.currentPeriod().id;
@@ -4493,6 +4521,9 @@ export class GridScene extends Phaser.Scene {
       this.showRegionNotice(`关口「${transition.name}」的另一端暂被挡住。`);
       return;
     }
+
+    // Only a freshly validated, accepted journey spends its fare.
+    if (this.inventory !== null) this.inventory.currency -= quote.fare;
 
     this.mapLayer?.destroy();
     // Round 111: a plain Container.remove() re-queues the marker through the

@@ -1586,6 +1586,38 @@
         "col": 90,
         "row": 90
       }
+    },
+    {
+      "id": "gate.r123-ferry-hub-market",
+      "name": "芦桥短渡·去旧例集",
+      "from": {
+        "mapResourceId": "map.round-10-mist-ferry",
+        "col": 14,
+        "row": 8
+      },
+      "to": {
+        "mapResourceId": "map.round-10-mist-ferry",
+        "col": 58,
+        "row": 66
+      },
+      "fare": 8,
+      "travelMinutes": 20
+    },
+    {
+      "id": "gate.r123-ferry-market-hub",
+      "name": "芦桥短渡·回渡口",
+      "from": {
+        "mapResourceId": "map.round-10-mist-ferry",
+        "col": 58,
+        "row": 65
+      },
+      "to": {
+        "mapResourceId": "map.round-10-mist-ferry",
+        "col": 14,
+        "row": 9
+      },
+      "fare": 8,
+      "travelMinutes": 20
     }
   ],
   "events": [

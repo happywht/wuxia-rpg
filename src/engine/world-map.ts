@@ -68,6 +68,9 @@ export interface RegionTransitionData {
   name: string;
   from: RegionEndpoint;
   to: RegionEndpoint;
+  /** Optional per-service costs; old gates use the calendar default and no fare. */
+  travelMinutes?: number;
+  fare?: number;
 }
 
 export interface RegionEventData extends CellPosition {
@@ -607,9 +610,20 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
     const name = nonEmpty(entry.name) ? entry.name : null;
     const from = parseEndpoint(entry.from, `${label}.from`, errors);
     const to = parseEndpoint(entry.to, `${label}.to`, errors);
+    const travelMinutes = entry.travelMinutes === undefined ? undefined :
+      typeof entry.travelMinutes === 'number' && Number.isSafeInteger(entry.travelMinutes) && entry.travelMinutes >= 0 && entry.travelMinutes <= 1440 ? entry.travelMinutes : null;
+    const fare = entry.fare === undefined ? undefined :
+      typeof entry.fare === 'number' && Number.isSafeInteger(entry.fare) && entry.fare >= 0 && entry.fare <= 1_000_000 ? entry.fare : null;
+    if (travelMinutes === null) errors.push(`${label}.travelMinutes：应为0–1440整数`);
+    if (fare === null) errors.push(`${label}.fare：应为0–1000000整数`);
     if (id === null) errors.push(`${label}.id：应为非空字符串`);
     if (name === null) errors.push(`${label}.name：应为非空字符串`);
-    if (id !== null && name !== null && from !== null && to !== null) transitions.push({ id, name, from, to });
+    if (id !== null && name !== null && from !== null && to !== null && travelMinutes !== null && fare !== null) {
+      transitions.push({ id, name, from, to,
+        ...(travelMinutes === undefined ? {} : { travelMinutes }),
+        ...(fare === undefined ? {} : { fare }),
+      });
+    }
   });
   const events: RegionEventData[] = [];
   if (!Array.isArray(raw.events)) errors.push('events：应为数组');

@@ -30,7 +30,7 @@ function guide(stocks=new Map([...world.assembly.shops].map(([id,s])=>[id,create
 describe('Round112 existing Cloud Ridge paths, paving and limited provisions',()=>{
   it('assembles all stable content with one shop on the existing quest NPC',()=>{
     expect(world.optionalWarnings).toEqual([]);expect(world.maps.size).toBe(22);expect(world.assembly.quests.size).toBe(65);
-    expect(world.worldMap.transitions).toHaveLength(50);
+    expect(world.worldMap.transitions).toHaveLength(52);
     const shop=world.assembly.shops.get(SHOP)!;expect(shop.record.npcId).toBe('char.r74-shen-yuji');
     expect(shop.stock).toEqual([{itemId:'item.huichun-gao',quantity:3},{itemId:'item.qingxin-wan',quantity:2}]);
     const npc=world.assembly.npcs.find(n=>n.record.id===shop.record.npcId)!;

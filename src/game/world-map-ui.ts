@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { paginateDialogueLines, wrapDialogueText } from './dialogue-layout';
 
 import { type CellPosition, type GridMap } from '../engine/grid-map';
 import { summarizePathRuns } from '../engine/grid-path';
@@ -72,6 +73,11 @@ export class WorldMapPanel {
   private mapCamera: Phaser.Cameras.Scene2D.Camera | null = null;
   private playerPin: Phaser.GameObjects.Arc | null = null;
   private readonly mapPins: MapPin[] = [];
+  private sidebarText: Phaser.GameObjects.Text | null = null;
+  private sidebarFooter: Phaser.GameObjects.Text | null = null;
+  private sidebarPages: string[] = [];
+  private sidebarPage = 0;
+  private sidebarRegion = '';
   private readonly waypointRows: { id: string; text: Phaser.GameObjects.Text }[] = [];
   private inputZone: Phaser.GameObjects.Zone | null = null;
   private routeGraphics: Phaser.GameObjects.Graphics | null = null;
@@ -113,17 +119,6 @@ export class WorldMapPanel {
   private readonly pointerDown = (pointer: Phaser.Input.Pointer): void => {
     if (!this.openState) return;
     const point = this.panelPointer(pointer);
-    if (point.x >= 672 && point.x <= 860) {
-      const index = Math.round((point.y - 224) / 19);
-      const rowY = 224 + index * 19;
-      if (index >= 0 && index < Math.min(8, this.waypoints.length) && Math.abs(point.y - rowY) <= 9) {
-        this.draggingPointerId = null;
-        this.focusWaypoint(index);
-        const waypoint = this.waypoints[index];
-        if (waypoint !== undefined) this.selectWaypoint(waypoint.id);
-        return;
-      }
-    }
     if (!this.isPointerInsideMap(point.x, point.y)) {
       this.draggingPointerId = null;
       return;
@@ -329,6 +324,15 @@ export class WorldMapPanel {
     const toggleHandler = (): void => this.toggleView();
     toggle.on('down', toggleHandler);
     this.bindings.push({ key: toggle, handler: toggleHandler });
+    for (const [code, delta] of [[codes.PAGE_UP, -1], [codes.PAGE_DOWN, 1]] as const) {
+      const key = keyboard.addKey(code);
+      const handler = (): void => {
+        this.sidebarPage = Math.max(0, Math.min(this.sidebarPages.length - 1, this.sidebarPage + delta));
+        this.renderSidebarPage();
+      };
+      key.on('down', handler);
+      this.bindings.push({ key, handler });
+    }
     const fit = keyboard.addKey(codes.HOME);
     const fitHandler = (): void => this.fitMapToViewport();
     fit.on('down', fitHandler);
@@ -456,30 +460,19 @@ export class WorldMapPanel {
     }
 
     const current = worldMap.regions.find((region) => region.mapResourceId === currentMapResourceId);
-    this.addText(672, 137, current?.name ?? currentMapResourceId, 15, COLORS.accent, 0);
-    this.addText(672, 166, current?.description ?? '当前区域', 12, COLORS.muted, 0);
-    this.addText(672, 203, `已知地点与关口 ${this.waypoints.length} 处`, 12, COLORS.text, 0);
-    this.waypoints.slice(0, 8).forEach((waypoint, index) => {
-      const y = 224 + index * 19;
-      this.addLegendSwatch(678, y, COLORS[waypoint.category]);
-      const row = this.addText(690, y, `${waypointLabel(waypoint)} · ${waypoint.name}`, 11, COLORS.text, 0);
-      const hitZone = this.scene.add.zone(777, y, 174, 18)
-        .setScrollFactor(0)
-        .setInteractive({ useHandCursor: true })
-        .on('pointerdown', () => {
-          this.focusWaypoint(index);
-          this.selectWaypoint(waypoint.id);
-        });
-      this.container.add(hitZone);
-      this.waypointRows.push({ id: waypoint.id, text: row });
-    });
-    if (this.waypoints.length > 8) {
-      this.addText(690, 373, `其余 ${this.waypoints.length - 8} 处可用 W/S 切换`, 10, COLORS.muted, 0);
-    }
-    this.selectedNameText = this.addText(672, 393, '选择地点规划步行路线', 11, COLORS.accent, 0);
-    this.routeDistanceText = this.addText(672, 415, '', 11, COLORS.text, 0);
-    this.routeDirectionsText = this.addText(672, 437, '', 10, COLORS.muted, 0);
-    this.routeDestinationText = this.addText(672, 465, '', 10, COLORS.muted, 0);
+    this.sidebarRegion = `${current?.name ?? currentMapResourceId}\n${current?.description ?? '当前区域'}`;
+    // Route labels store independently authored sections; only the measured,
+    // paginated sidebar is visible, so long names never share fixed row slots.
+    this.selectedNameText = this.addText(0, 0, '选择地点规划步行路线', 11, COLORS.accent, 0).setVisible(false);
+    this.routeDistanceText = this.addText(0, 0, '', 11, COLORS.text, 0).setVisible(false);
+    this.routeDirectionsText = this.addText(0, 0, '', 10, COLORS.muted, 0).setVisible(false);
+    this.routeDestinationText = this.addText(0, 0, '', 10, COLORS.muted, 0).setVisible(false);
+    this.sidebarText = this.scene.add.text(672, 137, '', {
+      fontFamily: UI_FONT_FAMILY, fontSize: uiFontSize(11), color: COLORS.text,
+    }).setOrigin(0, 0).setScrollFactor(0).setLineSpacing(2);
+    this.sidebarFooter = this.addText(672, 473, '', 10, COLORS.muted, 0);
+    this.container.add(this.sidebarText);
+    this.refreshSidebar();
     this.addText(48, 465, this.viewMode === 'world'
       ? `全域总图 · ${worldMap.regions.length} 个区域 · ${worldMap.data.atlasArt?.columns ?? 0}×${worldMap.data.atlasArt?.rows ?? 0} 格`
       : `${map.data.name} · 格坐标 (${this.playerCol}, ${this.playerRow})`, 11, COLORS.muted, 0);
@@ -676,9 +669,35 @@ export class WorldMapPanel {
     return false;
   }
 
+  private refreshSidebar(): void {
+    const text = this.sidebarText;
+    if (text === null) return;
+    const focused = this.waypoints[this.focusedWaypointIndex];
+    const sections = [
+      focused === undefined ? `已知地点与关口 ${this.waypoints.length} 处` :
+        `地点 ${this.focusedWaypointIndex + 1}/${this.waypoints.length}\n${waypointLabel(focused)} · ${focused.name}`,
+      'W/S 切换地点 · Enter 规划',
+      this.selectedNameText?.text ?? '', this.routeDistanceText?.text ?? '',
+      this.routeDirectionsText?.text ?? '', this.routeDestinationText?.text ?? '',
+      this.sidebarRegion,
+    ].filter(Boolean);
+    text.setText('测');
+    const capacity = Math.max(1, Math.floor(315 / (text.height + 2)));
+    this.sidebarPages = paginateDialogueLines(wrapDialogueText(sections.join('\n'), 190,
+      value => { text.setText(value); return text.width; }), capacity);
+    this.sidebarPage = 0;
+    this.renderSidebarPage();
+  }
+
+  private renderSidebarPage(): void {
+    this.sidebarText?.setText(this.sidebarPages[this.sidebarPage] ?? '');
+    this.sidebarFooter?.setText(`${this.sidebarPage + 1}/${this.sidebarPages.length} · PgUp/PgDn`);
+  }
+
   private focusWaypoint(index: number): void {
     if (this.waypoints.length === 0) return;
     this.focusedWaypointIndex = ((index % this.waypoints.length) + this.waypoints.length) % this.waypoints.length;
+    this.refreshSidebar();
     const focusedId = this.waypoints[this.focusedWaypointIndex]?.id;
     for (const row of this.waypointRows) {
       const waypoint = this.waypoints.find((candidate) => candidate.id === row.id);
@@ -751,6 +770,12 @@ export class WorldMapPanel {
       this.routeDestinationText?.setText(waypoint.destinationRegionName === undefined
         ? '' : `抵达后通往：${waypoint.destinationRegionName}`);
     }
+    if (waypoint.kind === 'transition') {
+      const gate = worldMap?.transitions.find(candidate => `transition:${candidate.id}` === waypoint.id);
+      if (gate !== undefined && (gate.fare ?? 0) > 0) {
+        this.routeDestinationText?.setText(`乘行 ${gate.fare} 银两 · ${gate.travelMinutes ?? '依日程'} 分钟 · E 查看确认`);
+      }
+    }
     const selectedIndex = this.waypoints.findIndex((candidate) => candidate.id === id);
     if (selectedIndex >= 0) this.focusWaypoint(selectedIndex);
     for (const { waypointId, pin } of this.mapPins) pin.setScale(waypointId === id ? 1.4 : 1);
@@ -819,11 +844,6 @@ export class WorldMapPanel {
   private panelPointer(pointer: Phaser.Input.Pointer): { x: number; y: number } {
     const canvas = this.scene.game.canvas;
     return normalizeWorldMapPointer(pointer, canvas.height, canvas.clientHeight);
-  }
-
-  private addLegendSwatch(x: number, y: number, color: number): void {
-    const swatch = this.scene.add.circle(x, y, 4, color).setStrokeStyle(1, 0x16202a).setScrollFactor(0);
-    this.container.add(swatch);
   }
 
   private addText(x: number, y: number, text: string, size: number, color: string, originX: number, wrapWidth = 175): Phaser.GameObjects.Text {

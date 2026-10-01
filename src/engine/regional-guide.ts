@@ -68,7 +68,7 @@ export function buildRegionalGuideEntries(input: RegionalGuideInput): RegionGuid
     // Gate minutes come from the route leg count times the calendar's declared
     // per-gate cost; transition records themselves carry no minutes field.
     const gateText=input.travelMinutes!==undefined&&route.legs.length>0
-      ?`（关口行程约 ${route.legs.length*input.travelMinutes} 分钟，不含步行）`:'';
+      ?`（关口行程约 ${route.legs.reduce((sum, leg) => sum + (leg.transition.travelMinutes ?? input.travelMinutes!), 0)} 分钟，不含步行）`:'';
     const budgetText=input.liveCurrency===undefined
       ?'价格不代表已有银两；有限库存可耗尽。'
       :`现有银两 ${input.liveCurrency}；有限库存可耗尽。`;
@@ -82,8 +82,10 @@ export function buildRegionalGuideEntries(input: RegionalGuideInput): RegionGuid
     detail:`当前 (${npc.col},${npc.row}) · ${input.follower?.npc.record.id===id?'真实同行位置':'位置随当前时段重算'}。F交谈${npc.record.shopId?'；E商铺':npc.record.questGiver?'；E查看差事名录':''}。`,destinationId:REGION_GUIDE_PREFIX+'npc:'+id});}
   for(const gate of input.worldMap.transitions.filter(g=>g.from.mapResourceId===input.currentMapResourceId)) {
     const destination=input.worldMap.regions.find(r=>r.mapResourceId===gate.to.mapResourceId)?.name??gate.to.mapResourceId;
-    const travelText=input.travelMinutes===undefined?'':`过此关口按日程需 ${input.travelMinutes} 分钟（不含步行）。`;
-    result.push({id:'exit:'+gate.id,category:'exit',title:gate.name,detail:`(${gate.from.col},${gate.from.row}) → ${destination}。走到旁边按E；这里不会自动通过或传送。${travelText}`,destinationId:REGION_GUIDE_PREFIX+'gate:'+gate.id});
+    const minutes = gate.travelMinutes ?? input.travelMinutes;
+    const travelText=minutes===undefined?'':`过此关口按日程需 ${minutes} 分钟（不含步行）。`;
+    const fareText=(gate.fare ?? 0)>0?`费用 ${gate.fare} 银两，按E先确认；也可继续步行。`:'';
+    result.push({id:'exit:'+gate.id,category:'exit',title:gate.name,detail:`(${gate.from.col},${gate.from.row}) → ${destination}。走到旁边按E；这里不会自动通过或传送。${travelText}${fareText}`,destinationId:REGION_GUIDE_PREFIX+'gate:'+gate.id});
   }
   for(const landmark of selectVisibleWorldLandmarks(input.worldMap.landmarks,input.knownKnowledgeNodeIds).filter(l=>l.mapResourceId===input.currentMapResourceId))result.push({id:'landmark:'+landmark.id,category:'landmark',title:landmark.name,detail:`已知地标 (${landmark.col},${landmark.row})；导航只带路，调查仍按实际事件条件。`,destinationId:LANDMARK_DESTINATION_PREFIX+landmark.id});
   return result;
