@@ -15,7 +15,7 @@ function setup(available=true,width=960,height=540,fontScale=1){
  const keys=new Map<number,Set<()=>void>>(),shown:{text:string;destroyed:boolean;x:number;y:number;size:number;height:number}[]=[];
  const container={setVisible(){return this},setDepth(){return this},add(){return this},removeAll(){for(const t of shown)t.destroyed=true;return this},destroy(){}};
  const scene={scale:{width,height},input:{keyboard:{addKey(code:number){if(!keys.has(code))keys.set(code,new Set());return {on(_e:string,fn:()=>void){keys.get(code)!.add(fn)},off(_e:string,fn:()=>void){keys.get(code)!.delete(fn)}};}}},add:{container:()=>container,text:(x:number,y:number,text:string,style:{fontSize:string})=>{
-  const size=Number.parseInt(style.fontSize,10),t={text,destroyed:false,x,y,size,height:size,context:{measureText:(v:string)=>({width:Array.from(v).length*size})},setOrigin(){return this},setText(v:string){this.text=v;this.height=v.split('\n').length*(size+3);return this}};shown.push(t);return t;
+  const size=Number.parseInt(style.fontSize,10),t={text,destroyed:false,x,y,size,height:size,context:{measureText:(v:string)=>({width:Array.from(v).length*size})},destroy(){this.destroyed=true},setOrigin(){return this},setText(v:string){this.text=v;this.height=v.split('\n').length*(size+3);return this}};shown.push(t);return t;
  }}} as unknown as Phaser.Scene;
  const context:EndingEvaluationContext={questStatuses:new Map(available?[['quest.r42-open-register','completed']]:[]),social:createSocialState(),factionMembership:null,knownKnowledgeNodeIds:new Set(available?['event.r42-public-record-vow']:[])};
  let closed=0,finished=0;const panel=new EndingPanel(scene,()=>closed++);

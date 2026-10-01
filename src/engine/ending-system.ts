@@ -348,6 +348,8 @@ export interface EvaluatedEnding {
   available: boolean;
   unmetHints: readonly string[];
   routes: readonly { id: string; title: string; available: boolean; unmetHints: readonly string[] }[];
+  /** The path actually adopted when available: first satisfied authored route, else the original. */
+  selectedRoute?: { id: string; title: string };
   /** Chosen path introduction plus state-resolved aftermath; pure and unsaved. */
   resolvedEpilogue: string;
 }
@@ -388,7 +390,11 @@ export function evaluateEndings(
       const unmetHints = path.conditions.filter(condition => !meetsCondition(condition, context)).map(condition => condition.hint);
       return { id: path.id, title: path.title, available: unmetHints.length === 0, unmetHints };
     });
-    const availableIndex = routes.findIndex(route => route.available);
+    // Authored unlockRoutes win in declaration order; the original path is
+    // only a fallback, so a completed three-chapter journey is never masked
+    // by an earlier still-valid legacy introduction.
+    const extensionIndex = routes.findIndex((route, index) => index > 0 && route.available);
+    const availableIndex = extensionIndex >= 0 ? extensionIndex : routes[0]!.available ? 0 : -1;
     const nearest = routes.reduce((best, route) => route.unmetHints.length < best.unmetHints.length ? route : best, routes[0]!);
     const introduction = paths[availableIndex < 0 ? 0 : availableIndex]!.epilogue;
     const sections = (ending.epilogueSections ?? []).map(section => {
@@ -396,12 +402,13 @@ export function evaluateEndings(
       return section.title + '\n' + (variant?.text ?? section.fallbackText);
     });
     return { ending, available: availableIndex >= 0, unmetHints: availableIndex >= 0 ? [] : nearest.unmetHints,
-      routes, resolvedEpilogue: [introduction, ...sections].join('\n\n') };
+      routes, ...(availableIndex >= 0 ? { selectedRoute: { id: paths[availableIndex]!.id, title: paths[availableIndex]!.title } } : {}),
+      resolvedEpilogue: [introduction, ...sections].join('\n\n') };
   });
 }
 
 export type EndingSelectionResult =
-  | { ok: true; ending: EndingData }
+  | { ok: true; ending: EndingData; route: { id: string; title: string } }
   | { ok: false; reason: string };
 
 /** Validates a UI selection against the same current-state evaluation. */
@@ -413,7 +420,8 @@ export function selectEnding(
   const evaluated = evaluateEndings(endingSet, context).find((candidate) => candidate.ending.id === endingId);
   if (evaluated === undefined) return { ok: false, reason: '该结局当前不可用' };
   if (!evaluated.available) return { ok: false, reason: evaluated.unmetHints.join('；') };
-  return { ok: true, ending: { ...evaluated.ending, epilogue: evaluated.resolvedEpilogue } };
+  const route = evaluated.selectedRoute ?? { id: 'original', title: '原有旅程' };
+  return { ok: true, ending: { ...evaluated.ending, epilogue: evaluated.resolvedEpilogue }, route };
 }
 
 /** The gate follows the world's standard four-way adjacency interaction rule. */

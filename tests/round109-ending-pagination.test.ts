@@ -87,7 +87,7 @@ function setup(available:boolean,width:number,height:number,fontScale:number,end
   return{on(_e:string,fn:()=>void){keys.get(code)!.add(fn)},off(_e:string,fn:()=>void){keys.get(code)!.delete(fn)}}}}},
   add:{container:()=>container,text:(x:number,y:number,text:string,style:{fontSize:string})=>{
    const size=Number.parseInt(style.fontSize,10),t={text,destroyed:false,x,y,size,height:size,
-    context:{measureText:(v:string)=>({width:Array.from(v).length*size})},setOrigin(){return this},setText(v:string){this.text=v;this.height=v.split('\n').length*(size+3);return this}};
+    context:{measureText:(v:string)=>({width:Array.from(v).length*size})},destroy(){this.destroyed=true},setOrigin(){return this},setText(v:string){this.text=v;this.height=v.split('\n').length*(size+3);return this}};
    shown.push(t);return t;}}} as unknown as Phaser.Scene;
  const context:EndingEvaluationContext={questStatuses:new Map(available?[['quest.r42-open-register','completed']]:[]),social:createSocialState(),factionMembership:null,
   knownKnowledgeNodeIds:new Set(available?['event.r42-public-record-vow']:[])};

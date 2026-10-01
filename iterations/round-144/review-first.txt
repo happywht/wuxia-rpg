@@ -1,0 +1,12 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+
+ Test Files  4 passed (4)
+      Tests  99 passed (99)
+   Start at  07:15:21
+   Duration  1.04s (tests 43%, transform 38%, import 17%, worker 2%)
+
+
+> wuxia-rpg@0.0.1 typecheck
+> tsc --noEmit

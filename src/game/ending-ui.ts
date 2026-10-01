@@ -30,6 +30,7 @@ export class EndingPanel {
   private openState = false;
   private selectedIndex = 0;
   private selectedEnding: EndingData | null = null;
+  private selectedRoute: { id: string; title: string } | null = null;
   private confirming = false;
   private detailPage = 0;
   private pageCount = 1;
@@ -48,6 +49,7 @@ export class EndingPanel {
     this.model = model;
     this.selectedIndex = 0;
     this.selectedEnding = null;
+    this.selectedRoute = null; // A stale route from a previous view must not leak into a new one.
     this.confirming = false;
     this.detailPage = 0;
     this.pageCount = 1; // Stale counts from a previous view must not invite a next page.
@@ -85,6 +87,7 @@ export class EndingPanel {
     this.container.removeAll(true);
     this.model = null;
     this.selectedEnding = null;
+    this.selectedRoute = null;
     this.confirming = false;
     this.onClose?.();
   }
@@ -146,8 +149,11 @@ export class EndingPanel {
     }
     if (!this.confirming) {
       this.confirming = true;
+      this.detailPage = 0;
     } else {
+      if (this.detailPage < this.pageCount - 1) { this.turnPage(1); return; }
       this.selectedEnding = result.ending;
+      this.selectedRoute = result.route;
       this.confirming = false;
       this.detailPage = 0;
     }
@@ -156,7 +162,7 @@ export class EndingPanel {
   }
 
   private turnPage(delta: number): void {
-    if (!this.openState || this.confirming) return;
+    if (!this.openState) return;
     this.detailPage = Math.max(0, Math.min(this.pageCount - 1, this.detailPage + delta));
     this.render();
   }
@@ -183,7 +189,17 @@ export class EndingPanel {
     if (this.selectedEnding !== null) {
       this.addText(left + 30, top + 24, this.selectedEnding.title, 25, UI_PALETTE.accent);
       this.addText(left + width - 24, top + 31, '终章', 12, UI_PALETTE.muted, 'right');
-      this.addPaged(this.selectedEnding.epilogue, left + 34, top + 92, width - 68, height - 174, 17, UI_PALETTE.text);
+      // Keep short receipts above the body. Long authored titles belong in
+      // the lossless pager rather than consuming an unbounded header height.
+      const routeText = this.selectedRoute === null ? '' : '采用路径：' + this.selectedRoute.title;
+      const probe = this.scene.add.text(0, 0, '', { fontFamily: UI_FONT_FAMILY, fontSize: uiFontSize(12) });
+      const routeLines = wrapDialogueText(routeText, width - 68, value => probe.context.measureText(value).width);
+      const routeLineHeight = Math.ceil(Number.parseInt(uiFontSize(12), 10) * 1.5);
+      const inlineRoute = routeLines.length * routeLineHeight <= 34;
+      probe.destroy();
+      if (routeText && inlineRoute) this.addWrapped(routeText, left + 34, top + 58, width - 68, 12, UI_PALETTE.muted);
+      const body = routeText && !inlineRoute ? routeText + '\n\n' + this.selectedEnding.epilogue : this.selectedEnding.epilogue;
+      this.addPaged(body, left + 34, top + 92, width - 68, height - 174, 17, UI_PALETTE.text);
       // The footer must match reality: a single page never offers a next
       // page, and a multi-page read distinguishes "next page" from the
       // final page's finish.
@@ -196,10 +212,14 @@ export class EndingPanel {
 
     if (this.confirming) {
       const ending = model.endingSet.endings[this.selectedIndex];
+      const route = this.evaluations()[this.selectedIndex]?.selectedRoute ?? null;
       this.addText(left + 30, top + 24, '确认此行归处', 23, UI_PALETTE.accent);
-      this.addWrapped(ending?.title ?? '', left + 34, top + 100, width - 68, 20, UI_PALETTE.jade);
-      this.addWrapped('确认后进入终章，随后结束本次旅程并返回主菜单。这里不会自动保存或覆盖存档；已有存档仍可继续。\n\nEnter 确认进入终章；Esc 取消并返回结局列表。',
-        left + 34, top + 162, width - 68, 14, UI_PALETTE.text);
+      const body = (ending?.title ?? '') + '\n采用路径：' + (route?.title ?? '原有旅程') +
+        '\n\n终章结束后返回主菜单。不会自动保存或覆盖存档；已有存档仍可继续。';
+      this.addPaged(body, left + 34, top + 90, width - 68, height - 162, 12, UI_PALETTE.text);
+      const action = this.detailPage < this.pageCount - 1 ? 'Enter读下一页' : 'Enter确认进入终章';
+      this.addWrapped(`确认 ${this.detailPage + 1}/${this.pageCount} · ←/→翻页 · ${action} · Esc取消`,
+        left + 34, top + height - 64, width - 68, 12, UI_PALETTE.jade);
       return;
     }
 
@@ -231,7 +251,8 @@ export class EndingPanel {
       const detailX = left + listWidth + 44;
       const detailWidth = width - listWidth - 76;
       this.addText(detailX, listY, selected.ending.title, 17, UI_PALETTE.jade);
-      const body = selected.available ? '此行已有归处。Enter先打开可取消的结束确认。\n\n' + selected.resolvedEpilogue :
+      const body = selected.available ? '此行已有归处（采用路径：' + (selected.selectedRoute?.title ?? '原有旅程') +
+        '）。Enter先打开可取消的结束确认。\n\n' + selected.resolvedEpilogue :
         '任一完整路径达成即可，各路径内需满足全部条件：\n\n' + selected.routes.map(route =>
           route.title + (route.available ? ' · 已达成' : '\n' + route.unmetHints.map(hint => '· ' + hint).join('\n'))).join('\n\n');
       this.addPaged(body, detailX, listY + 38, detailWidth, height - 179, 12, UI_PALETTE.text);
@@ -276,14 +297,17 @@ export class EndingPanel {
     this.container.add(text);
   }
 
-  private addWrapped(value: string, x: number, y: number, width: number, size: number, color: string): void {
+  /** Wraps and draws text, returning the measured wrapped line count. */
+  private addWrapped(value: string, x: number, y: number, width: number, size: number, color: string): number {
     const text = this.scene.add.text(x, y, value, {
       fontFamily: UI_FONT_FAMILY,
       fontSize: uiFontSize(size),
       color,
       lineSpacing: 3,
     }).setOrigin(0, 0);
-    text.setText(wrapDialogueText(value, width, content => text.context.measureText(content).width).join('\n'));
+    const lines = wrapDialogueText(value, width, content => text.context.measureText(content).width);
+    text.setText(lines.join('\n'));
     this.container.add(text);
+    return lines.length;
   }
 }
