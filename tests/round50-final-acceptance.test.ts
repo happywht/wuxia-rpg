@@ -192,6 +192,22 @@ describe('Round 50 final acceptance audit', () => {
     ).toBe(true);
   });
 
+  it('allows only the generic recovery-word collision, not an explicit authored skill literal', async () => {
+    const fixture = await makeValidFixture();
+    const martialArtsPath = path.join(fixture.root, 'data', 'base', 'martial-arts-set', 'set.json');
+    await writeFile(martialArtsPath, JSON.stringify({ martialArts: [{ name: '调息' }] }), 'utf8');
+    const enginePath = path.join(fixture.root, 'src', 'engine', 'runtime.ts');
+    await writeFile(enginePath, '`${enemy}收势调息，恢复 ${gained} 点内力`', 'utf8');
+
+    const genericReport = await auditFinalAcceptance(fixture);
+    expect(genericReport.problems).not.toContain(expect.stringContaining('调息'));
+
+    await writeFile(enginePath, "const skillName = '调息';", 'utf8');
+    const explicitNameReport = await auditFinalAcceptance(fixture);
+    expect(explicitNameReport.problems.some((problem) => problem.includes('调息') && problem.includes('runtime.ts')))
+      .toBe(true);
+  });
+
   it('returns a readable failure when the world manifest is unavailable', async () => {
     vi.stubGlobal('fetch', async () => new Response('not found', { status: 404 }));
     const outcome = await loadWorldData();

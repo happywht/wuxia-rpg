@@ -100,6 +100,12 @@ const REQUIRED_COUNTS = {
 };
 
 const LORE_FIELDS = new Set(['name', 'title', 'text', 'description', 'summary']);
+// A short generic verb can collide with an authored name inside unrelated
+// engine prose. Exempt only this exact presentation fragment; an explicit
+// skill-name literal or any other occurrence still fails the audit.
+const GENERIC_LORE_OVERLAPS = new Map([
+  ['调息', ['收势调息，恢复 ${gained} 点内力']],
+]);
 
 function addFileStrings(value, candidates) {
   if (Array.isArray(value)) {
@@ -296,7 +302,14 @@ export async function auditFinalAcceptance({ root, commitSubjects }) {
   const engineText = await Promise.all(engineFiles.map((file) => readFile(file, 'utf8')));
   const loreHits = [];
   for (const candidate of loreCandidates) {
-    const fileIndex = engineText.findIndex((source) => source.includes(candidate));
+    const fileIndex = engineText.findIndex((source) => {
+      const allowedFragments = GENERIC_LORE_OVERLAPS.get(candidate) ?? [];
+      const withoutGenericOverlap = allowedFragments.reduce(
+        (text, fragment) => text.replaceAll(fragment, ''),
+        source,
+      );
+      return withoutGenericOverlap.includes(candidate);
+    });
     if (fileIndex >= 0) loreHits.push({ value: candidate, file: path.relative(rootPath, engineFiles[fileIndex]) });
   }
   for (const hit of loreHits) {
