@@ -91,6 +91,7 @@ export function deepenSeaDialogues(set){
   const all=seaQuestIds.map(done);
   add(d,{id:'r102-sea-crosscheck',text:'虞星槎逐项对照：「回湾刻线指浅湾、风灯指向、水则记露礁、潮痕记水位、灯谱记报码节律；不是一串藏起来的暗码。残篇纸墨仍只能沿既有证据判断，作者与年岁未定。海路调查这一步有了可用的阶段答案。」'},option('六项差事核妥，海路刻痕可以合成什么？','r102-sea-crosscheck',[...all,known('event.r102-sea-crosscheck',false)],[discover('event.r102-sea-crosscheck')]));
   add(d,{id:'r102-sea-close',text:'「调查和两处决定都留下了记录。海路阶段结案，但谁承担等候、谁先得到补给不会被一声结案抹去。北行至天门关可找沈问秋核旧驿脊，南返潮生屿可看岑隐礁的回应；大陆的更簿也仍有报信人的代价。」'},option('连同两处决定，结清海路这一阶段。','r102-sea-close',[...all,known('event.r102-supply-settled'),known('event.r102-pilot-settled'),known('event.r102-sea-crosscheck'),known('event.r102-sea-close',false)],[discover('event.r102-sea-close')]));
+  add(d,{id:'r162-three-chapter-terminal',text:'「大陆、北境、海路的阶段记录都核妥了。想静观此行，可回雾雨渡口照心石(8,2)，相邻按E查看归处。R行旅切到地标，选照心石可沿实际关口导航；到石前还要由你选择并确认，问我这句话不会结束旅程。三章结案不等于每种归处都已满足，公开与有限传证仍看你之前的决定。」'},option('三章都结案以后，我去哪里静观归处？','r162-three-chapter-terminal',[known('event.r100-mainland-close'),known('event.r101-north-close'),known('event.r102-sea-close')]));
  }
  }
  return set;

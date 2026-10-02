@@ -1,0 +1,62 @@
+[
+  {
+    "id": "gate.r97-pilot-to-lanxin",
+    "name": "南返澜心洲",
+    "from": {
+      "mapResourceId": "map.round-97-pilot-reef",
+      "col": 50,
+      "row": 95
+    },
+    "to": {
+      "mapResourceId": "map.round-97-lanxin-isle",
+      "col": 64,
+      "row": 3
+    }
+  },
+  {
+    "id": "gate.r97-lanxin-to-windward",
+    "name": "西返风回岛",
+    "from": {
+      "mapResourceId": "map.round-97-lanxin-isle",
+      "col": 4,
+      "row": 40
+    },
+    "to": {
+      "mapResourceId": "map.round-84-windward-isle",
+      "col": 92,
+      "row": 55
+    }
+  },
+  {
+    "id": "gate.r84-windward-isle-to-east-coast",
+    "name": "西望归帆",
+    "from": {
+      "mapResourceId": "map.round-84-windward-isle",
+      "col": 1,
+      "row": 50
+    },
+    "to": {
+      "mapResourceId": "map.round-82-east-coast",
+      "col": 90,
+      "row": 71
+    }
+  },
+  {
+    "id": "gate.r126-coast-to-ferry",
+    "name": "渡籍班船·回雾渡",
+    "from": {
+      "mapResourceId": "map.round-82-east-coast",
+      "col": 88,
+      "row": 70
+    },
+    "to": {
+      "mapResourceId": "map.round-10-mist-ferry",
+      "col": 18,
+      "row": 10
+    },
+    "fare": 30,
+    "travelMinutes": 90,
+    "requiredKnowledgeNodeId": "place.r82-east-coast",
+    "lockedText": "先经陆路抵达青帆埠，记下港口见闻后开通班船。"
+  }
+]

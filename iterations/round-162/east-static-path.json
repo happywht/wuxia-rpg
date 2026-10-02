@@ -1,0 +1,47 @@
+{
+  "scope": "Authored terrain only; NPCs, encounters and live movement require normal UI verification. Not journey evidence.",
+  "mapId": "map.round-94-east-gate",
+  "start": [
+    50,
+    94
+  ],
+  "target": [
+    5,
+    50
+  ],
+  "length": 89,
+  "segments": [
+    {
+      "direction": "Up",
+      "count": 16
+    },
+    {
+      "direction": "Left",
+      "count": 1
+    },
+    {
+      "direction": "Up",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 1
+    },
+    {
+      "direction": "Up",
+      "count": 2
+    },
+    {
+      "direction": "Left",
+      "count": 1
+    },
+    {
+      "direction": "Up",
+      "count": 25
+    },
+    {
+      "direction": "Left",
+      "count": 42
+    }
+  ]
+}

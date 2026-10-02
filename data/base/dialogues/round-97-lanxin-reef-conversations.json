@@ -642,6 +642,24 @@
               ]
             },
             {
+              "text": "三章都结案以后，我去哪里静观归处？",
+              "nextNodeId": "r162-three-chapter-terminal",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-mainland-close"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-north-close"
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-sea-close"
+                }
+              ]
+            },
+            {
               "text": "先告辞。",
               "nextNodeId": "farewell"
             }
@@ -682,6 +700,10 @@
         {
           "id": "r102-sea-close",
           "text": "「调查和两处决定都留下了记录。海路阶段结案，但谁承担等候、谁先得到补给不会被一声结案抹去。北行至天门关可找沈问秋核旧驿脊，南返潮生屿可看岑隐礁的回应；大陆的更簿也仍有报信人的代价。」"
+        },
+        {
+          "id": "r162-three-chapter-terminal",
+          "text": "「大陆、北境、海路的阶段记录都核妥了。想静观此行，可回雾雨渡口照心石(8,2)，相邻按E查看归处。R行旅切到地标，选照心石可沿实际关口导航；到石前还要由你选择并确认，问我这句话不会结束旅程。三章结案不等于每种归处都已满足，公开与有限传证仍看你之前的决定。」"
         }
       ]
     }
