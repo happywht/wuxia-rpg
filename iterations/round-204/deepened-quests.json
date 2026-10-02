@@ -1,0 +1,20 @@
+{
+  "round": 204,
+  "status": "evidence-index-only",
+  "quests": [
+    {"id":"quest.r62-north-pass-marks","region":"大陆·铁嶂","categories":["调查","人物立场"],"implementation":"iterations/round-100/content-evidence.md","journey":"iterations/round-153/playtest.md","journeyStatus":"partial","note":"界石调查、接取及结算实走；章节另一选择/完整后续不由此证明。"},
+    {"id":"quest.r62-post-ledger","region":"大陆·铁嶂/盐道","categories":["人物立场","调查"],"implementation":"iterations/round-100/content-evidence.md","journey":"iterations/round-153/playtest.md","journeyStatus":"partial","note":"更次接取、核簿结算及公开/保护两侧有独立记录；双侧完整跨区读回仍按专项账本判断。"},
+    {"id":"quest.r62-clear-ridge-road","region":"大陆·铁嶂","categories":["战斗","人物立场"],"implementation":"iterations/round-100/content-evidence.md","journey":"iterations/round-154/playtest.md","journeyStatus":"partial","note":"实走接取及战斗/复命链的一侧记录；不可据此认定所有选择和后续均已实测。"},
+    {"id":"quest.r67-well-waterline","region":"大陆·盐道","categories":["调查","物品/补给","人物立场"],"implementation":"iterations/round-100/content-evidence.md","journey":"iterations/round-154/playtest.md","journeyStatus":"partial","note":"井壁调查、留药分支实走；援药的完整云岭回应仍缺独立完整旅程。"},
+    {"id":"quest.r74-cloud-marks","region":"大陆·云岭","categories":["调查","人物立场"],"implementation":"iterations/round-100/content-evidence.md","journey":"iterations/round-155/playtest.md","journeyStatus":"partial","note":"刻痕调查与阶段对照实走；跨章全部两侧后果未由此证明。"},
+    {"id":"quest.r74-cloud-bridge","region":"大陆·云岭","categories":["战斗","调查"],"implementation":"iterations/round-100/content-evidence.md","journey":"iterations/round-155/playtest.md","journeyStatus":"partial","note":"悬桥战斗、调查与章节结案实走；仅证明记录中的路线。"},
+    {"id":"quest.r91-goose-vigil","region":"北境·雁回崖","categories":["调查","人物立场"],"implementation":"iterations/round-101/content-evidence.md","journey":"iterations/round-156/playtest.md","journeyStatus":"partial","note":"限时雁候调查和后续传号旅程有记录；公开反向路线不由此自动成立。"},
+    {"id":"quest.r92-snow-beacon","region":"北境·照雪关","categories":["调查","战斗","人物立场"],"implementation":"iterations/round-101/content-evidence.md","journey":"iterations/round-156/playtest.md","journeyStatus":"partial","note":"烽号、代表挑战和限定传号一侧实走；公开一侧单独保留待核。"},
+    {"id":"quest.r93-boundary-mark","region":"北境·霜松谷","categories":["调查","物品/补给","人物立场"],"implementation":"iterations/round-101/content-evidence.md","journey":"iterations/round-157/playtest.md","journeyStatus":"partial","note":"旧界调查、内部留录及跨区转述有实走；公开侧与全伙伴阶段另核。"},
+    {"id":"quest.r94-homeward-lantern","region":"北境·天门关","categories":["调查"],"implementation":"iterations/round-101/content-evidence.md","journey":"iterations/round-157/playtest.md","journeyStatus":"partial","note":"旧驿线调查、复命及北境阶段对照有记录；不等于三章交付验收。"},
+    {"id":"quest.r83-net-recovery","region":"海路·青帆埠","categories":["战斗","物品/补给"],"implementation":"iterations/round-102/content-evidence.md","journey":"iterations/round-160/playtest.md","journeyStatus":"partial","note":"夺网战斗及同阶段海路旅程有记录；两条整章决定不由该任务单独证明。"},
+    {"id":"quest.r84-lantern-ledger","region":"海路·风回岛","categories":["调查","人物立场"],"implementation":"iterations/round-102/content-evidence.md","journey":"iterations/round-160/playtest.md","journeyStatus":"partial","note":"风灯调查/报告有记录；完整三章键盘闭环另验。"},
+    {"id":"quest.r85-low-tide-channel","region":"海路·潮生屿","categories":["调查","物品/补给","人物立场"],"implementation":"iterations/round-102/content-evidence.md","journey":"iterations/round-160/playtest.md","journeyStatus":"partial","note":"低潮调查、补给决定阶段有旅程记录；跨区回应和存读按后续证据逐项核。"},
+    {"id":"quest.r97-tide-ledger","region":"海路·澜心洲","categories":["调查","人物立场"],"implementation":"iterations/round-102/content-evidence.md","journey":"iterations/round-159/playtest.md","journeyStatus":"partial","note":"潮簿任务和熟船/公开传航的其中一路已有实走；第二组双结果仍待完整验收。"}
+  ]
+}

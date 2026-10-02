@@ -36,6 +36,7 @@
     "audit:round-173-six-region-evidence": "node scripts/audit-round-173-six-region-evidence.mjs",
     "audit:round-72": "node scripts/audit-round-72-chunks.mjs",
     "audit:final": "node scripts/audit-final-acceptance.mjs",
+    "audit:round-204-quest-evidence": "node scripts/audit-round-204-quest-evidence.mjs",
     "smoke:round-20": "node scripts/smoke-round-20.mjs",
     "smoke:round-21": "node scripts/smoke-round-21.mjs",
     "smoke:round-22": "node scripts/smoke-round-22.mjs",
