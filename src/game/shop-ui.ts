@@ -67,7 +67,7 @@ const LABELS = {
   sellPrice: '可得',
   stock: '存货',
   selectHint: '↑/↓ 选择 · ←/→ 买卖切换 · Enter 交易一件 · Esc 关闭',
-  stocksHidden: '……（其余条目未显示）',
+  pageIndicator: (page: number, totalPages: number) => `第 ${page}/${totalPages} 页 · ↑/↓翻看`,
 } as const;
 
 /** Everything the panel renders and operates on. */
@@ -367,13 +367,20 @@ export class ShopPanel {
           .setOrigin(0, 0);
         this.container.add(rowText);
       }
-      if (windowStart + VISIBLE_ROWS < rowCount) {
+      if (rowCount > VISIBLE_ROWS) {
+        const currentPage = Math.floor(this.selection / VISIBLE_ROWS) + 1;
+        const totalPages = Math.ceil(rowCount / VISIBLE_ROWS);
         const moreText = this.scene.add
-          .text(panelLeft + PADDING + 6, listTop + VISIBLE_ROWS * ROW_HEIGHT, LABELS.stocksHidden, {
-            fontFamily: UI.fontFamily,
-            fontSize: uiFontSize(11),
-            color: UI.textMuted,
-          })
+          .text(
+            panelLeft + PADDING + 6,
+            listTop + VISIBLE_ROWS * ROW_HEIGHT,
+            LABELS.pageIndicator(currentPage, totalPages),
+            {
+              fontFamily: UI.fontFamily,
+              fontSize: uiFontSize(11),
+              color: UI.textMuted,
+            },
+          )
           .setOrigin(0, 0);
         this.container.add(moreText);
       }
