@@ -17,6 +17,7 @@ import {
 } from '../src/engine/quest-system';
 import { assembleWorldMap, parseWorldMap, selectInteractableRegionEvent } from '../src/engine/world-map';
 import { parseDialogueSet, validateConversation } from '../src/engine/dialogue-graph';
+import { findWorldTravelRoute } from '../src/engine/world-travel';
 
 const COAST_ID = 'map.round-82-east-coast';
 const CLOUD_ID = 'map.round-74-cloud-ridge';
@@ -137,6 +138,52 @@ describe('Round 82 eastern coastline and walkable world expansion', () => {
       coast.canEnter.bind(coast),
     );
     expect(selection).toMatchObject({ event: { id: tideGauge.id }, approachDirection: 'left' });
+  });
+
+  it('keeps the new-game ferry position connected to the tide gauge across the authored route', () => {
+    const parsed = parseWorldMap(readJson('../data/base/world/world-map.json'));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+
+    const knownNodes = readJson('../data/base/knowledge_graph/nodes.json') as { nodes: { id: string }[] };
+    const calendar = readJson('../data/base/worldview/calendar.json') as { periods: { id: string }[] };
+    const climate = readJson('../data/base/worldview/climate.json') as { weathers: { id: string }[] };
+    const npcIds = manifest.resources
+      .filter(({ schema }) => schema === 'npc-set')
+      .flatMap(({ path }) => (readJson('../data/base/' + path) as { npcs: { id: string }[] }).npcs.map(({ id }) => id));
+    const assembled = assembleWorldMap(parsed.data, maps, {
+      knowledgeNodeIds: new Set(knownNodes.nodes.map(({ id }) => id)),
+      periodIds: new Set(calendar.periods.map(({ id }) => id)),
+      weatherIds: new Set(climate.weathers.map(({ id }) => id)),
+      npcIds: new Set(npcIds),
+    });
+    expect('ok' in assembled).toBe(false);
+    if ('ok' in assembled) return;
+
+    const ferryId = 'map.round-10-mist-ferry';
+    const ferryStart = { col: 1, row: 5 };
+    const tideGauge = assembled.events.find(({ id }) => id === 'event.r82-tide-gauge')!;
+    const route = findWorldTravelRoute(assembled, ferryId, tideGauge.mapResourceId);
+    expect(route?.regionMapResourceIds).toEqual([
+      ferryId,
+      'map.round-62-iron-ridge',
+      CLOUD_ID,
+      COAST_ID,
+    ]);
+
+    let mapResourceId = ferryId;
+    let position = ferryStart;
+    for (const { transition } of route!.legs) {
+      const map = maps.get(mapResourceId)!;
+      expect(map.canEnter(position.col, position.row)).toBe(true);
+      expect(findGridPath(map, position, transition.from), transition.id).not.toBeNull();
+      const nextMap = maps.get(transition.to.mapResourceId)!;
+      expect(nextMap.canEnter(transition.to.col, transition.to.row), transition.id).toBe(true);
+      mapResourceId = transition.to.mapResourceId;
+      position = { col: transition.to.col, row: transition.to.row };
+    }
+    expect(mapResourceId).toBe(COAST_ID);
+    expect(findGridPath(maps.get(COAST_ID)!, position, tideGauge)).not.toBeNull();
   });
 
   it('uses licensed pixel atlases for shoreline, market details and the local character', () => {
