@@ -1,0 +1,45 @@
+
+> wuxia-rpg@0.0.1 test
+> vitest run
+
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+round129 refused (file untouched): r129-gu-iron-route 文本被改动，请人工复核。
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-OJnqe2/scripts/lib/round129-iron-practice-brief.mjs:132
+    throw new Error(`${brief.nodeId} 文本被改动，请人工复核。`);
+          ^
+
+Error: r129-gu-iron-route 文本被改动，请人工复核。
+    at verifyApplied (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-OJnqe2/scripts/lib/round129-iron-practice-brief.mjs:132:11)
+    at addOne (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-OJnqe2/scripts/lib/round129-iron-practice-brief.mjs:88:5)
+    at addIronPracticeBriefs (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-OJnqe2/scripts/lib/round129-iron-practice-brief.mjs:59:11)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-OJnqe2/scripts/apply-round129.mjs:20:9
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:647:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.18.0
+round130 refused round-30-conversations.json (file untouched): r130-hanshan-practice-brief 文本被改动，请人工复核。
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-0iZYFB/scripts/lib/round130-hanshan-practice-brief.mjs:147
+    throw new Error(`${brief.nodeId} 文本被改动，请人工复核。`);
+          ^
+
+Error: r130-hanshan-practice-brief 文本被改动，请人工复核。
+    at verifyApplied (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-0iZYFB/scripts/lib/round130-hanshan-practice-brief.mjs:147:11)
+    at addOne (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-0iZYFB/scripts/lib/round130-hanshan-practice-brief.mjs:86:5)
+    at addHanshanBriefs (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-0iZYFB/scripts/lib/round130-hanshan-practice-brief.mjs:62:15)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-0iZYFB/scripts/apply-round130.mjs:20:11
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:647:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.18.0
+
+ Test Files  163 passed (163)
+      Tests  1451 passed (1451)
+   Start at  14:18:29
+   Duration  97.68s (tests 88%, import 9%, transform 2%)
+
+    Isolate  163 workers spawned · ~165ms startup each (spawn + environment, per file)
+             at least ~13.31s faster with isolate: false — reuses workers across files instead of one per file

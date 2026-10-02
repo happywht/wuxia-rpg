@@ -14,6 +14,8 @@ export function buildCombatResultSummary(session: Pick<CombatSession, 'finalResu
     result.outcome === 'defeat' ? '战败恢复已生效；下列为恢复后的当前资源。' : '下列为当前资源。',
     `生命 ${player.health.current}/${player.health.max} · 内力 ${player.qi.current}/${player.qi.max}`,
     `本场经验 +${result.experienceGained} · 升级 ${result.levelsGained} 次`,
+    result.outcome === 'victory' ? '本场经验已结算；相关差事后果在离开战场时结算。返回行路后按 Q 查看实际差事状态，按 R 查找后续委托。' : '',
+    result.outcome === 'fled' ? '撤退不算胜利；返回行路后按 Q 查看实际差事状态，按 B 整理补给，再决定是否重试。' : '',
     result.outcome === 'defeat' ? '战败不算胜利；相关差事后果在离开战场时结算。离开后按 B 打开背包使用补给，可退回安全处再作打算。' : '',
   ].filter(Boolean).join('\n');
 }

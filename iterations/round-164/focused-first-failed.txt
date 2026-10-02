@@ -1,0 +1,39 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round164-combat-followup.test.ts (4 tests | 2 failed) 13ms
+   ❯ Round164 combat follow-up (4)
+     × victory separates engine experience from departure consequences without awarding again 3ms
+     × retreat does not claim victory or successful quest completion 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round164-combat-followup.test.ts > Round164 combat follow-up > victory separates engine experience from departure consequences without awarding again
+TypeError: session.playerAct is not a function
+ ❯ tests/round164-combat-followup.test.ts:23:62
+     21|   it('victory separates engine experience from departure consequences …
+     22|     const session = setup();
+     23|     for (let i = 0; i < 100 && !session.isOver; i++) session.playerAct…
+       |                                                              ^
+     24|     expect(session.finalResult?.outcome).toBe('victory');
+     25|     const before = JSON.stringify({ player: session.playerView, result…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/round164-combat-followup.test.ts > Round164 combat follow-up > retreat does not claim victory or successful quest completion
+TypeError: session.playerFlee is not a function
+ ❯ tests/round164-combat-followup.test.ts:37:13
+     35|   it('retreat does not claim victory or successful quest completion', …
+     36|     const session = setup();
+     37|     session.playerFlee();
+       |             ^
+     38|     expect(session.finalResult?.outcome).toBe('fled');
+     39|     const summary = buildCombatResultSummary(session);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 8 passed (10)
+   Start at  14:17:40
+   Duration  424ms (transform 69%, import 17%, tests 12%, worker 3%)

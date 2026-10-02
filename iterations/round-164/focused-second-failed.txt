@@ -1,0 +1,33 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round164-combat-followup.test.ts (4 tests | 1 failed) 13ms
+   ❯ Round164 combat follow-up (4)
+     × victory separates engine experience from departure consequences without awarding again 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round164-combat-followup.test.ts > Round164 combat follow-up > victory separates engine experience from departure consequences without awarding again
+AssertionError: expected undefined to be 'victory' // Object.is equality
+
+- Expected:
+"victory"
+
++ Received:
+undefined
+
+ ❯ tests/round164-combat-followup.test.ts:24:42
+     22|     const session = setup();
+     23|     for (let i = 0; i < 100 && !session.isOver; i++) session.playerUse…
+     24|     expect(session.finalResult?.outcome).toBe('victory');
+       |                                          ^
+     25|     const before = JSON.stringify({ player: session.playerView, result…
+     26|     const summary = buildCombatResultSummary(session);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 9 passed (10)
+   Start at  14:17:59
+   Duration  391ms (transform 62%, import 23%, tests 12%, worker 2%)
