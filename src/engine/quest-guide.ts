@@ -18,7 +18,7 @@
  * byte-for-byte unchanged.
  */
 
-import type { DialogueData } from './dialogue-graph';
+import type { DialogueData, DialogueNodeData } from './dialogue-graph';
 import { getVisibleOptions, type DialogueRuntimeContext } from './dialogue-runtime';
 import { resolveQuestNavigationTarget, type QuestNavigationInput } from './quest-navigation';
 import { hasQuestAccess, type QuestAccessContext, type QuestData, type QuestJournal } from './quest-system';
@@ -181,6 +181,46 @@ export function buildQuestGuideEntries(input: QuestGuideInput): RegionGuideEntry
       detail: `待接取 · 委托人 ${giver.record.name} (${giver.col},${giver.row}) · ${isCompanion ? '真实同行位置' : '位置随当前时段重算'}。\n${quest.description}\n导航只带路到委托人近旁；${acceptHint}`,
       destinationId: REGION_GUIDE_PREFIX + 'npc:' + quest.giverNpcId,
     });
+  }
+  return [...entries, ...buildDialogueDecisionGuideEntries(input)];
+}
+
+/** Visible confirmation nodes reachable without first committing any effect. */
+export function reachableDialogueDecisions(conversation: Readonly<DialogueData>, context: Readonly<DialogueRuntimeContext>): DialogueNodeData[] {
+  const nodes = new Map(conversation.nodes.map(node => [node.id, node]));
+  const queue = [conversation.startNodeId], visited = new Set(queue), result: DialogueNodeData[] = [];
+  while (queue.length > 0) {
+    const node = nodes.get(queue.shift()!);
+    if (node === undefined) continue;
+    const visible = getVisibleOptions(node, context);
+    if (node.confirmEffects === true && visible.some(({option}) => (option.effects?.length ?? 0) > 0)) result.push(node);
+    for (const {option} of visible) {
+      if ((option.effects?.length ?? 0) === 0 && !visited.has(option.nextNodeId)) {
+        visited.add(option.nextNodeId); queue.push(option.nextNodeId);
+      }
+    }
+  }
+  return result;
+}
+
+/** Read-only local chapter follow-ups, including after the associated quest has completed. */
+export function buildDialogueDecisionGuideEntries(input: QuestGuideInput): RegionGuideEntry[] {
+  if (input.dialogues === undefined || input.dialogueContextFor === undefined) return [];
+  const entries: RegionGuideEntry[] = [];
+  const ids = new Set(input.guide.baseNpcs.map(npc => npc.record.id));
+  for (const id of ids) {
+    const npc = resolveRegionGuideNpc(input.guide, id);
+    if (npc === undefined || npc.record.mapResourceId !== input.guide.currentMapResourceId) continue;
+    const conversation = input.dialogues.get(npc.record.dialogueId);
+    if (conversation === undefined) continue;
+    const context = input.dialogueContextFor(id);
+    for (const node of reachableDialogueDecisions(conversation, context)) {
+      const options = getVisibleOptions(node, context).filter(({option}) => (option.effects?.length ?? 0) > 0);
+      const talk = input.guide.follower?.npc.record.id === id ? 'P再T交谈' : 'F交谈';
+      entries.push({id: `decision:${id}:${node.id}`, category: 'quest', title: `${npc.record.name}（可谈决定）`,
+        detail: `当前可谈 · ${npc.record.name} (${npc.col},${npc.row})\n${node.text}\n${options.map(({option}) => option.text).join('\n')}\n导航只带路到人物；按${talk}读完对白，再选择并确认。以抵达时条件为准，本页不结算或承诺效果一定成功。`,
+        destinationId: REGION_GUIDE_PREFIX + 'npc:' + id});
+    }
   }
   return entries;
 }
