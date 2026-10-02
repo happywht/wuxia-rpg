@@ -88,6 +88,26 @@
               ]
             },
             {
+              "text": "井药取舍已定，之后去哪里听回响？",
+              "nextNodeId": "r163-well-aid-followup",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-well-aid"
+                }
+              ]
+            },
+            {
+              "text": "井药取舍已定，之后去哪里听回响？",
+              "nextNodeId": "r163-well-reserve-followup",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r100-well-reserve"
+                }
+              ]
+            },
+            {
               "text": "先不打扰了。",
               "nextNodeId": "farewell"
             }
@@ -209,6 +229,14 @@
         {
           "id": "r100-guard-echo",
           "text": "「报信人还能在驿棚露脸，货主却仍追问是谁作证。」罗金子拨了拨秤珠，「守住一个名字，便要承受账目不够公开的疑问。」"
+        },
+        {
+          "id": "r163-well-aid-followup",
+          "text": "「你留的回春膏已收进驿棚救急份额，不用再交一次。伤者先有照应，你自己的药囊却少了一份。往东关回铁嶂，再由断云北隘入云岭，找沈雨霁问青岩带话；相邻F交谈，R行旅可查人物当前去处。听过她的回应，再把井壁、更簿与索孔分清，援药不是替残篇断年来历。」"
+        },
+        {
+          "id": "r163-well-reserve-followup",
+          "text": "「你保留了自用药，驿棚仍等后批，这个缺口不会因为井水查完就消失。往东关回铁嶂，再由断云北隘入云岭，找沈雨霁问青岩带话；相邻F交谈，R行旅可查人物当前去处。听过她的回应，再把井壁、更簿与索孔分清，别把自备说成这里也分到了药。」"
         }
       ]
     }

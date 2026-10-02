@@ -42,6 +42,8 @@ add(luo,{id:'r100-well-aid',text:'罗金子把药收入救急货担：「这份�
 add(luo,{id:'r100-well-reserve',text:'罗金子没有伸手：「自己的命也是命，只是驿棚的缺口还在。往东关回铁嶂，再过断云北隘，沈雨霁若问，我就照你今天的选择说。」'});
 add(luo,{id:'r100-open-echo',text:'罗金子压低声音：「更次摊开后，货担不用只信一张旧牌；那个署名的人却得避开陌生客。你让账好查了，也让一个人难过路。」'},option('公开更簿后，货路怎样？','r100-open-echo',[known('event.r100-record-open')]));
 add(luo,{id:'r100-guard-echo',text:'「报信人还能在驿棚露脸，货主却仍追问是谁作证。」罗金子拨了拨秤珠，「守住一个名字，便要承受账目不够公开的疑问。」'},option('遮去更簿姓名后，货路怎样？','r100-guard-echo',[known('event.r100-record-guard')]));
+add(luo,{"id":"r163-well-aid-followup","text":"「你留的回春膏已收进驿棚救急份额，不用再交一次。伤者先有照应，你自己的药囊却少了一份。往东关回铁嶂，再由断云北隘入云岭，找沈雨霁问青岩带话；相邻F交谈，R行旅可查人物当前去处。听过她的回应，再把井壁、更簿与索孔分清，援药不是替残篇断年来历。」"},option('井药取舍已定，之后去哪里听回响？','r163-well-aid-followup',[known('event.r100-well-aid')]));
+add(luo,{"id":"r163-well-reserve-followup","text":"「你保留了自用药，驿棚仍等后批，这个缺口不会因为井水查完就消失。往东关回铁嶂，再由断云北隘入云岭，找沈雨霁问青岩带话；相邻F交谈，R行旅可查人物当前去处。听过她的回应，再把井壁、更簿与索孔分清，别把自备说成这里也分到了药。」"},option('井药取舍已定，之后去哪里听回响？','r163-well-reserve-followup',[known('event.r100-well-reserve')]));
 await save('dialogues/round-67-conversations.json',salt);
 const cloud=await load('dialogues/round-74-cloud-ridge-conversations.json');const shen=cloud.conversations[0];
 shen.nodes.find(n=>n.id==='bridge-complete').text='沈雨霁在图上划掉路障：「悬桥边的拦路客已散，护索还要另行修补。你能走过这一路，不等于每个后来人都能不看脚下。」';
