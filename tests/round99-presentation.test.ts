@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { wrapDialogueText, paginateDialogueLines, dialogueConfirmAction } from '../src/game/dialogue-layout';
-import { orderQuestRows, nearestGuideNpc } from '../src/game/quest-presentation';
+import { orderQuestRows, orderQuestJournalRows, nearestGuideNpc } from '../src/game/quest-presentation';
 import { createQuestJournal, type QuestData } from '../src/engine/quest-system';
 const measure = (text: string) => Array.from(text).reduce((sum, char) => sum + (/[^\x00-\x7f]/u.test(char) ? 14 : 7), 0);
 describe('Round99 readable dialogue', () => {
@@ -51,6 +51,23 @@ describe('Round99 journal priority', () => {
     journal.trackedQuestId = 'tracked';
     expect(orderQuestRows(quests, journal).map(q => q.id)).toEqual(['tracked','first','remote','locked','done']);
     expect(quests[0]!.id).toBe('remote');
+  });
+
+  it('puts completed history ahead of unaccepted world offers only in the journal', () => {
+    const quests = ['offered','locked','done','failed','tracked','active'].map(id => ({ id } as QuestData));
+    const map = new Map(quests.map(q => [q.id, {...q, prerequisiteQuestIds: [], objectives: [], failOnEncounterIds: [], rewards: {experience:0,currency:0}} as QuestData]));
+    const journal = createQuestJournal(map);
+    journal.states.get('offered')!.status = 'offered';
+    journal.states.get('locked')!.status = 'locked';
+    journal.states.get('done')!.status = 'completed';
+    journal.states.get('failed')!.status = 'failed';
+    journal.states.get('tracked')!.status = 'active';
+    journal.states.get('active')!.status = 'active';
+    journal.trackedQuestId = 'tracked';
+
+    expect(orderQuestJournalRows(quests, journal).map(q => q.id)).toEqual(['tracked','active','done','failed','offered','locked']);
+    expect(orderQuestRows(quests, journal).map(q => q.id)).toEqual(['tracked','active','offered','locked','done','failed']);
+    expect(quests.map(q => q.id)).toEqual(['offered','locked','done','failed','tracked','active']);
   });
 });
 

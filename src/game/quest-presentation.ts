@@ -1,12 +1,27 @@
 import type { QuestData, QuestJournal, QuestStatus, QuestProgressState } from '../engine/quest-system';
 const priority: Record<QuestStatus, number> = { active: 0, offered: 1, locked: 2, completed: 3, failed: 4 };
 /** Stable priority preserves authored order within each group; tracked active task comes first. */
+function orderRows(quests: readonly QuestData[], rank: (quest: QuestData) => number): QuestData[] {
+  return [...quests].sort((a, b) => rank(a) - rank(b));
+}
+
+/** NPC boards keep offers prominent; this ordering is also the legacy default. */
 export function orderQuestRows(quests: readonly QuestData[], journal: QuestJournal): QuestData[] {
   const rank = (quest: QuestData) => {
     const status = journal.states.get(quest.id)?.status ?? 'locked';
     return status === 'active' && journal.trackedQuestId === quest.id ? -1 : priority[status];
   };
-  return [...quests].sort((a, b) => rank(a) - rank(b));
+  return orderRows(quests, rank);
+}
+
+/** The Q journal prioritizes the player's own progress over world offers. */
+export function orderQuestJournalRows(quests: readonly QuestData[], journal: QuestJournal): QuestData[] {
+  const journalPriority: Record<QuestStatus, number> = { active: 0, completed: 1, failed: 2, offered: 3, locked: 4 };
+  const rank = (quest: QuestData) => {
+    const status = journal.states.get(quest.id)?.status ?? 'locked';
+    return status === 'active' && journal.trackedQuestId === quest.id ? -1 : journalPriority[status];
+  };
+  return orderRows(quests, rank);
 }
 
 export function nearestGuideNpc<T extends { col: number; row: number; record: { name: string; questGiver?: boolean } }>(npcs: readonly T[], position: {col:number;row:number}): T | undefined {

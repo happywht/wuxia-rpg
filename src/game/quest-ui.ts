@@ -11,7 +11,7 @@ import {
   toggleTrackedQuest,
 } from '../engine/quest-system';
 import { uiFontSize } from './settings';
-import { activeQuestProgressLabel, orderQuestRows } from './quest-presentation';
+import { activeQuestProgressLabel, orderQuestJournalRows, orderQuestRows } from './quest-presentation';
 import { buildQuestDetailBlocks, buildQuestPanelGeometry, paginateQuestDetail, questFooterColumns } from './quest-panel-layout';
 import {
   type QuestAbandonConfirmationState,
@@ -224,7 +224,9 @@ export class QuestPanel {
       if (!hasQuestAccess(quest, model.access)) return false;
       return true;
     });
-    return orderQuestRows(rows, model.journal);
+    return model.giverNpcId === undefined
+      ? orderQuestJournalRows(rows, model.journal)
+      : orderQuestRows(rows, model.journal);
   }
 
   private moveSelection(delta: number): void {
