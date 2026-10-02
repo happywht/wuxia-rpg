@@ -1,6 +1,7 @@
 import { describeOralPrerequisites } from './dialogue-prerequisites';
 import { isDialogueLandingOccupied, type DialogueTeleportReadiness } from '../engine/dialogue-teleport-request';
 import {RegionalGuidePanel} from './regional-guide-ui';
+import { MartialArtsPanel } from './martial-arts-ui';
 import {buildRegionalGuideEntries,resolveRegionalGuideDestination,REGION_GUIDE_PREFIX,REGION_ROLE_LABELS,type RegionalGuideInput,type RegionGuideEntry} from '../engine/regional-guide';
 import {buildQuestGuideEntries} from '../engine/quest-guide';
 import { projectQuestTrackerLine } from './quest-presentation';
@@ -332,7 +333,7 @@ const WORLD_OVERLAY_PANEL_FIELDS = [
   'dialoguePanel', 'battlePanel', 'inventoryPanel', 'shopPanel', 'questPanel',
   'pauseMenu', 'travelConfirmation', 'controlsPanel', 'factionPanel', 'worldMapPanel', 'encyclopediaPanel',
   'modStatusPanel', 'collectionPanel', 'companionPanel', 'regionalGuidePanel',
-  'arenaPanel', 'factionWarPanel', 'martialArtForgePanel', 'equipmentForgePanel',
+  'arenaPanel', 'factionWarPanel', 'martialArtsPanel', 'martialArtForgePanel', 'equipmentForgePanel',
   'alchemyPanel', 'endingPanel', 'achievementPanel', 'meridianPanel',
 ] as const;
 
@@ -477,6 +478,7 @@ export class GridScene extends Phaser.Scene {
   private regionalGuidePanel: RegionalGuidePanel | null = null;
   private arenaPanel: ArenaPanel | null = null;
   private factionWarPanel: FactionWarPanel | null = null;
+  private martialArtsPanel: MartialArtsPanel | null = null;
   private martialArtForgePanel: MartialArtForgePanel | null = null;
   private equipmentForgePanel: EquipmentForgePanel | null = null;
   private alchemyPanel: AlchemyPanel | null = null;
@@ -940,6 +942,7 @@ export class GridScene extends Phaser.Scene {
     this.regionalGuidePanel = new RegionalGuidePanel(this, () => this.noteOverlayClosed());
     this.arenaPanel = new ArenaPanel(this, () => this.noteOverlayClosed());
     this.factionWarPanel = new FactionWarPanel(this, () => this.noteOverlayClosed());
+    this.martialArtsPanel = new MartialArtsPanel(this, () => this.noteOverlayClosed());
     this.martialArtForgePanel = new MartialArtForgePanel(this, () => this.noteOverlayClosed());
     this.equipmentForgePanel = new EquipmentForgePanel(this, () => this.noteOverlayClosed());
     this.alchemyPanel = new AlchemyPanel(this, () => this.noteOverlayClosed());
@@ -1538,6 +1541,10 @@ export class GridScene extends Phaser.Scene {
   private togglePauseMenu(): void {
     if (this.dataReloading) {
       return; // The world is being rebuilt around a hot reload right now.
+    }
+    if (this.martialArtsPanel?.isOpen) {
+      this.martialArtsPanel.close();
+      return;
     }
     if (this.factionPanel?.isOpen) {
       this.factionPanel.close();
@@ -3269,7 +3276,7 @@ export class GridScene extends Phaser.Scene {
         : 'P 同行伙伴 · 暂无可交互人物';
       return;
     }
-    this.hudLines.interact = 'N 经脉 · C 自创武学 · L 图鉴 · G 成就 · H 操作帮助 · Esc 暂停';
+    this.hudLines.interact = 'U 武学 · N 经脉 · C 自创武学 · L 图鉴 · G 成就 · H 帮助 · Esc 暂停';
   }
 
   /**
@@ -3315,6 +3322,7 @@ export class GridScene extends Phaser.Scene {
       (this.regionalGuidePanel !== null && this.regionalGuidePanel.isOpen) ||
       (this.arenaPanel !== null && this.arenaPanel.isOpen) ||
       (this.factionWarPanel !== null && this.factionWarPanel.isOpen) ||
+      (this.martialArtsPanel !== null && this.martialArtsPanel.isOpen) ||
       (this.martialArtForgePanel !== null && this.martialArtForgePanel.isOpen) ||
       (this.equipmentForgePanel !== null && this.equipmentForgePanel.isOpen) ||
       (this.alchemyPanel !== null && this.alchemyPanel.isOpen) ||
@@ -3391,6 +3399,17 @@ export class GridScene extends Phaser.Scene {
       journal: this.questJournal,
       martialArts: this.progression.martialArts,
     });
+    this.updateInteractHint();
+  }
+
+  /** U reads current ownership and learning thresholds; never grants an art. */
+  private toggleMartialArtsPanel(): void {
+    const panel = this.martialArtsPanel;
+    if (panel === null) return;
+    if (panel.isOpen) { panel.close(); return; }
+    if (this.anyOverlayOpen()) return;
+    panel.open({ character: this.playerState, factionId: this.factionState.membership?.factionId ?? null,
+      factions: this.progression.factions, martialArts: this.combatMartialArts() });
     this.updateInteractHint();
   }
 
@@ -3977,6 +3996,10 @@ export class GridScene extends Phaser.Scene {
     const onFaction = (): void => this.toggleFactionPanel();
     factionKey.on('down', onFaction);
 
+    const martialArtsKey = keyboard.addKey(KeyCodes.U);
+    const onMartialArts = (): void => this.toggleMartialArtsPanel();
+    martialArtsKey.on('down', onMartialArts);
+
     const martialArtForgeKey = keyboard.addKey(KeyCodes.C);
     const onMartialArtForge = (): void => {
       if (!this.anyOverlayOpen()) this.toggleMartialArtForge();
@@ -4018,6 +4041,7 @@ export class GridScene extends Phaser.Scene {
       modStatusKey.off('down', onModStatus);
       collectionKey.off('down', onCollection);
       factionKey.off('down', onFaction);
+      martialArtsKey.off('down', onMartialArts);
       martialArtForgeKey.off('down', onMartialArtForge);
       controlsKey.off('down', onControls);
       meridianKey.off('down', onMeridian);
@@ -4056,6 +4080,8 @@ export class GridScene extends Phaser.Scene {
       this.arenaPanel = null;
       this.factionWarPanel?.destroy();
       this.factionWarPanel = null;
+      this.martialArtsPanel?.destroy();
+      this.martialArtsPanel = null;
       this.martialArtForgePanel?.destroy();
       this.martialArtForgePanel = null;
       this.equipmentForgePanel?.destroy();
