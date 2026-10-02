@@ -1,0 +1,3 @@
+PASS regeneration 1 shared shops and sea NPC byte stability
+PASS regeneration 2 shared shops and sea NPC byte stability
+Only introduced authoring outputs verified; not a full historical story regeneration audit.

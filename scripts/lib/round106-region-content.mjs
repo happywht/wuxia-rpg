@@ -19,6 +19,6 @@ export const regionGuides = [
  ['map.round-95-east-harbor','transit','照叶港接森林与归帆洲航路，不等于已有补给摊。先问船渡去向、核已知地标；缺药查最近已装配药铺，不凭港名假定商店存在。'],
  ['map.round-96-stone-reef','investigation','千里石塘分看灯序与潮时，核实后再择雾航湾或南溟方向。无本地药铺，能到地标不代表满足见闻条件；返程以出区关口为准。'],
  ['map.round-96-halfmoon-atoll','transit','半月环礁以潮祠与东栈接续归帆洲路线，先查已知调查与出口。无本地药铺；退潮条件不足时等候，导航不改变潮位。'],
- ['map.round-97-lanxin-isle','investigation','澜心洲先核潮痕与观汐台、回季无潮报告，再去引航礁校灯谱。无本地药铺，最近补给通常在潮生屿，余量可耗尽；出区分别指风回、潮生与引航礁。'],
+ ['map.round-97-lanxin-isle','investigation','澜心洲先核潮痕与观汐台、回季无潮报告，再去引航礁校灯谱。季无潮候潮备药匣原价售膏三份、丸两份，余量可耗尽；E购药、Q查差事、F问话，售罄后查补给页去潮生屿或青帆埠；出区分别指风回、潮生与引航礁。'],
  ['map.round-97-pilot-reef','investigation','引航礁灯谱与航标各自核证，再返回澜心洲谈传航范围。这里不是补给港；出区接澜心洲或天门关，尚未满足的调查条件不会被导航跳过。'],
 ].map(([mapResourceId,role,advice])=>({mapResourceId,role,advice}));

@@ -143,6 +143,7 @@ assertNoGateConflicts(world.transitions);
 assertRouteSegments(world.transitions, MAP_IDS.east, MAP_IDS.tide, 3);
 assertRouteSegments(world.transitions, MAP_IDS.tide, MAP_IDS.east, 3);
 const npcs = createNpcs();
+npcs.find(npc => npc.id === 'char.r97-ji-wuchao').shopId = 'shop.r159-lanxin-provisions';
 const quests = createQuests();
 const dialogues = createDialogues();
 const events = createEvents();
@@ -768,3 +769,16 @@ function mergeManaged(current, additions, keyOf, anchorKey) {
 async function readJson(path) { return JSON.parse(await readFile(path, 'utf8')); }
 function readJsonSync(path) { return JSON.parse(readFileSync(path, 'utf8')); }
 async function writeJson(path, value) { await writeFile(path, `${JSON.stringify(value, null, 2)}\n`); }
+
+// Keep the existing shared shop resource authoritative on regeneration.
+const provisionPath = resolve(base, "shops/round-06-shops.json");
+const provisionSet = JSON.parse(await readFile(provisionPath, "utf8"));
+const lanxinProvision = {"id": "shop.r159-lanxin-provisions", "name": "候潮备药匣", "npcId": "char.r97-ji-wuchao", "greeting": "候潮备药按原价出售：膏三份、丸两份，售完本程不补。E购药，Q查差事，F问潮簿与传航。", "sellRate": 0.5, "stock": [{"itemId": "item.huichun-gao", "quantity": 3}, {"itemId": "item.qingxin-wan", "quantity": 2}]};
+const provisionIndex = provisionSet.shops.findIndex(shop => shop.id === lanxinProvision.id);
+if (provisionIndex < 0) provisionSet.shops.push(lanxinProvision);
+else provisionSet.shops[provisionIndex] = lanxinProvision;
+provisionSet.shops.sort((a,b) => Number(a.id === 'shop.r112-cloud-waystation') - Number(b.id === 'shop.r112-cloud-waystation'));
+const provisionRaw = await readFile(provisionPath, 'utf8');
+const provisionNewline = provisionRaw.includes('\r\n') ? '\r\n' : '\n';
+const provisionText = (JSON.stringify(provisionSet, null, 2) + '\n').replace(/\{\n          "itemId": ("[^"]+"),\n          "quantity": (-?\d+)\n        \}/g, '{ "itemId": $1, "quantity": $2 }');
+await writeFile(provisionPath, provisionText.replace(/\n/g, provisionNewline));
