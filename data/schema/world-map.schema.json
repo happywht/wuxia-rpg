@@ -186,6 +186,11 @@
             "type": "string",
             "minLength": 1
           },
+          "clueRadius": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12
+          },
           "once": {
             "type": "boolean"
           },

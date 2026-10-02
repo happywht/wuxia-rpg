@@ -46,7 +46,10 @@ describe('Round 75 region-event approach clues', () => {
       events: [{ id: 'event.a1', mapResourceId: 'map.a', col: 3, row: 3, text: '完整文本。', once: true }],
     });
     expect(legacy.ok).toBe(true);
-    if (legacy.ok) expect(legacy.data.events[0]!.approachText).toBeUndefined();
+    if (legacy.ok) {
+      expect(legacy.data.events[0]!.approachText).toBeUndefined();
+      expect(legacy.data.events[0]!.clueRadius).toBeUndefined();
+    }
 
     const withClue = parseWorldMap({
       ...legacyBase,
@@ -54,6 +57,22 @@ describe('Round 75 region-event approach clues', () => {
     });
     expect(withClue.ok).toBe(true);
     if (withClue.ok) expect(withClue.data.events[0]!.approachText).toBe('近处有痕迹。');
+
+    const expanded = parseWorldMap({
+      ...legacyBase,
+      events: [{ id: 'event.a1', mapResourceId: 'map.a', col: 12, row: 10, text: '完整文本。', approachText: '近处有痕迹。', clueRadius: 10, once: true }],
+    });
+    expect(expanded.ok).toBe(true);
+    if (expanded.ok) expect(expanded.data.events[0]!.clueRadius).toBe(10);
+
+    for (const clueRadius of [0, 13, 1.5, '10']) {
+      const invalid = parseWorldMap({
+        ...legacyBase,
+        events: [{ id: 'event.a1', mapResourceId: 'map.a', col: 3, row: 3, text: '完整文本。', clueRadius, once: true }],
+      });
+      expect(invalid.ok).toBe(false);
+      if (!invalid.ok) expect(invalid.errors.join('\n')).toContain('clueRadius');
+    }
 
     const blankClue = parseWorldMap({
       ...legacyBase,
@@ -111,6 +130,27 @@ describe('Round 75 region-event approach clues', () => {
     for (let attempt = 0; attempt < 3; attempt += 1) {
       expect(selectRegionEventApproachClue(events, at, new Set(), emptyContext)).toBe('线索-event.alpha');
     }
+  });
+
+  it('formats the direction and distance for an authored expanded clue radius', () => {
+    const event = makeEvent({ id: 'event.expanded', col: 72, row: 42, clueRadius: 10 });
+    expect(selectRegionEventApproachClue([event], { mapResourceId: 'map.a', col: 63, row: 42 }, new Set(), emptyContext))
+      .toBe('东9格：线索-event.expanded');
+    expect(selectRegionEventApproachClue([event], { mapResourceId: 'map.a', col: 61, row: 42 }, new Set(), emptyContext)).toBeNull();
+  });
+
+  it('surfaces the shipped cloud bridge clue beside the walked main route without discovering it', () => {
+    const parsed = parseWorldMap(readJson('../data/base/world/world-map.json'));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    const bridge = parsed.data.events.find(({ id }) => id === 'event.r74-cloud-bridge');
+    expect(bridge?.clueRadius).toBe(10);
+    expect(selectRegionEventApproachClue(parsed.data.events, {
+      mapResourceId: 'map.round-74-cloud-ridge', col: 63, row: 42,
+    }, new Set(), emptyContext)).toBe('东9格：断索在风里轻晃，石板上痕迹杂乱。');
+    expect(selectRegionEventApproachClue(parsed.data.events, {
+      mapResourceId: 'map.round-74-cloud-ridge', col: 63, row: 42,
+    }, new Set(), { ...emptyContext, knownKnowledgeNodeIds: new Set(['place.r74-cloud-bridge']) })).toBeNull();
   });
 
   it('applies live event conditions before surfacing a clue', () => {

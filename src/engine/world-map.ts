@@ -82,6 +82,8 @@ export interface RegionEventData extends CellPosition {
   text: string;
   /** Optional ambient notice surfaced while the player is near, not on, the cell. */
   approachText?: string;
+  /** Optional per-event Manhattan radius for surfacing the ambient notice (1–12). */
+  clueRadius?: number;
   once: boolean;
   conditions?: RegionEventConditionsData;
   discoverKnowledgeNodeId?: string;
@@ -645,6 +647,11 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
     const approachText = entry.approachText === undefined
       ? undefined
       : nonEmpty(entry.approachText) ? entry.approachText : null;
+    const clueRadius = entry.clueRadius === undefined
+      ? undefined
+      : typeof entry.clueRadius === 'number' && Number.isInteger(entry.clueRadius) && entry.clueRadius >= 1 && entry.clueRadius <= 12
+        ? entry.clueRadius
+        : null;
     const cell = parseCell(entry, label, errors);
     const once = typeof entry.once === 'boolean' ? entry.once : null;
     const conditions = entry.conditions === undefined
@@ -667,14 +674,16 @@ export function parseWorldMap(raw: unknown): WorldMapParseResult {
     if (mapResourceId === null) errors.push(`${label}.mapResourceId：应为非空字符串`);
     if (text === null) errors.push(`${label}.text：应为非空字符串`);
     if (approachText === null) errors.push(`${label}.approachText：应为非空字符串`);
+    if (clueRadius === null) errors.push(`${label}.clueRadius：应为1到12的整数`);
     if (once === null) errors.push(`${label}.once：应为布尔值`);
     if (discoverKnowledgeNodeId === null) errors.push(`${label}.discoverKnowledgeNodeId：应为非空字符串`);
-    if (id !== null && mapResourceId !== null && text !== null && approachText !== null && once !== null &&
+    if (id !== null && mapResourceId !== null && text !== null && approachText !== null && clueRadius !== null && once !== null &&
       cell !== null && conditions !== null && discoverKnowledgeNodeId !== null && interaction !== null &&
       arrivalTransitionIds !== null && !conflictingTriggers && !tooManyArrivals) {
       events.push({
         id, mapResourceId, ...cell, text, once,
         ...(approachText === undefined ? {} : { approachText }),
+        ...(clueRadius === undefined ? {} : { clueRadius }),
         ...(conditions === undefined ? {} : { conditions }),
         ...(discoverKnowledgeNodeId === undefined ? {} : { discoverKnowledgeNodeId }),
         ...(interaction === undefined ? {} : { interaction }),
@@ -1020,9 +1029,9 @@ export function selectRegionEventApproachClue(
   location: { mapResourceId: string } & CellPosition,
   completedEventIds: ReadonlySet<string>,
   context: RegionEventContext,
-  radius: number = REGION_EVENT_APPROACH_RADIUS,
+  radius?: number,
 ): string | null {
-  if (!Number.isFinite(radius) || radius < 0) return null;
+  if (radius !== undefined && (!Number.isFinite(radius) || radius < 0)) return null;
   let best: { id: string; approachText: string; distance: number } | null = null;
   for (const event of events) {
     if (event.approachText === undefined || event.mapResourceId !== location.mapResourceId) continue;
@@ -1031,13 +1040,22 @@ export function selectRegionEventApproachClue(
       context.knownKnowledgeNodeIds.has(event.discoverKnowledgeNodeId)) continue;
     if (!regionEventConditionsMet(event, context)) continue;
     const distance = Math.abs(event.col - location.col) + Math.abs(event.row - location.row);
-    if (distance <= 0 || distance > radius) continue;
+    const eventRadius = radius ?? event.clueRadius ?? REGION_EVENT_APPROACH_RADIUS;
+    if (distance <= 0 || distance > eventRadius) continue;
     if (best === null || distance < best.distance ||
       (distance === best.distance && event.id.localeCompare(best.id) < 0)) {
       best = { id: event.id, approachText: event.approachText, distance };
     }
   }
-  return best === null ? null : best.approachText;
+  if (best === null) return null;
+  const event = events.find(({ id }) => id === best!.id)!;
+  if (event.clueRadius === undefined || best.distance <= REGION_EVENT_APPROACH_RADIUS) return best.approachText;
+  const dx = event.col - location.col;
+  const dy = event.row - location.row;
+  const horizontal = dx > 0 ? `东${dx}` : dx < 0 ? `西${Math.abs(dx)}` : '';
+  const vertical = dy > 0 ? `南${dy}` : dy < 0 ? `北${Math.abs(dy)}` : '';
+  const direction = [horizontal, vertical].filter(Boolean).join('');
+  return `${direction}格：${best.approachText}`;
 }
 
 /** Bounds for the optional interaction `range`; authored distance in aligned cells. */

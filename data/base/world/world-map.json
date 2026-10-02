@@ -1837,6 +1837,7 @@
       "row": 42,
       "text": "桥索的断口被人用麻绳临时捆住，石板上留着几道新鲜靴印。悬桥另一头仍能看见被截住的山道。",
       "approachText": "断索在风里轻晃，石板上痕迹杂乱。",
+      "clueRadius": 10,
       "once": true,
       "discoverKnowledgeNodeId": "place.r74-cloud-bridge",
       "interaction": {
