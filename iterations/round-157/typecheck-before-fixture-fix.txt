@@ -1,0 +1,7 @@
+
+> wuxia-rpg@0.0.1 typecheck
+> tsc --noEmit
+
+tests/round157-dialogue-delivery-guide.test.ts(27,78): error TS2339: Property 'push' does not exist on type 'readonly DialogueEffectData[]'.
+tests/round157-dialogue-delivery-guide.test.ts(32,70): error TS2339: Property 'push' does not exist on type 'readonly DialogueConditionData[]'.
+tests/round157-dialogue-delivery-guide.test.ts(41,57): error TS2339: Property 'push' does not exist on type 'readonly DialogueEffectData[]'.

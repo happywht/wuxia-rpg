@@ -182,7 +182,7 @@ export function buildQuestGuideEntries(input: QuestGuideInput): RegionGuideEntry
       destinationId: REGION_GUIDE_PREFIX + 'npc:' + quest.giverNpcId,
     });
   }
-  return [...entries, ...buildDialogueDecisionGuideEntries(input), ...buildDialogueFollowupGuideEntries(input), ...buildDialogueAftermathGuideEntries(input)];
+  return [...entries, ...buildDialogueDecisionGuideEntries(input), ...buildDialogueFollowupGuideEntries(input), ...buildDialogueDeliveryGuideEntries(input), ...buildDialogueAftermathGuideEntries(input)];
 }
 
 /** Visible confirmation nodes reachable without first committing any effect. */
@@ -206,6 +206,35 @@ function reachableDialogueNodes(conversation: Readonly<DialogueData>, context: R
     }
   }
   return result;
+}
+
+/** Currently reachable knowledge sharing; projection never delivers or reads the answer. */
+export function buildDialogueDeliveryGuideEntries(input: QuestGuideInput): RegionGuideEntry[] {
+  if (input.dialogues === undefined || input.dialogueContextFor === undefined) return [];
+  const entries: RegionGuideEntry[] = [];
+  for (const id of new Set(input.guide.baseNpcs.map(npc => npc.record.id))) {
+    const npc = resolveRegionGuideNpc(input.guide, id);
+    if (npc === undefined || npc.record.mapResourceId !== input.guide.currentMapResourceId) continue;
+    const conversation = input.dialogues.get(npc.record.dialogueId);
+    if (conversation === undefined) continue;
+    const context = input.dialogueContextFor(id);
+    for (const node of reachableDialogueNodes(conversation, context)) {
+      if (node.confirmEffects === true) continue;
+      for (const {option, index} of getVisibleOptions(node, context)) {
+        const effects = option.effects ?? [];
+        const shared = effects.filter(effect => effect.kind === 'shareKnowledgeNode');
+        if (shared.length === 0 || shared.some(effect => !context.knownKnowledgeNodeIds.has(effect.nodeId)) ||
+          effects.some(effect => effect.kind !== 'shareKnowledgeNode' && effect.kind !== 'discoverKnowledgeNode' &&
+            effect.kind !== 'adjustRelationship')) continue;
+        const talk = input.guide.follower?.npc.record.id === id ? 'P再T交谈' : 'F交谈';
+        entries.push({id: `delivery:${id}:${node.id}:${index}`, category: 'quest',
+          title: `${npc.record.name}（可谈转述）· ${option.text}`,
+          detail: `当前可转述 · ${npc.record.name} (${npc.col},${npc.row})\n${option.text}\n此问题可分享已知见闻；导航只带路，不代替交谈或结算。按${talk}阅读上述选项，以抵达时资格为准；本页不展示接收人的答复。`,
+          destinationId: REGION_GUIDE_PREFIX + 'npc:' + id});
+      }
+    }
+  }
+  return entries;
 }
 
 /** Read-only local chapter follow-ups, including after the associated quest has completed. */
