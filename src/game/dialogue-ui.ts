@@ -62,6 +62,8 @@ export interface DialogueConfirmOutcome {
   advanced: boolean;
   /** One feedback line (gains / quest result / refusal reason) or null. */
   feedback: string | null;
+  /** Successful external action runs only after this panel has relinquished input. */
+  afterClose?: () => void;
 }
 
 /**
@@ -226,6 +228,11 @@ export class DialoguePanel {
     }
     if (this.controller !== null) {
       const outcome = this.controller.confirmOption(session, this.selection, this.displayedRawIndex);
+      if (outcome.advanced && outcome.afterClose !== undefined) {
+        this.close();
+        outcome.afterClose();
+        return;
+      }
       this.feedback = outcome.feedback;
       this.feedbackWarn = !outcome.advanced;
       this.selection = outcome.advanced ? 0 : this.selection;

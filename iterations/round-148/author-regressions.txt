@@ -1,0 +1,246 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round93-snow-pine-valley.test.ts (7 tests | 2 failed) 1361ms
+   ❯ Round 93 Snow Pine Valley (Frostpine Valley) (7)
+     × runs the patroller dialogue, boundary-mark quest, schedule and knowledge graph links 12ms
+     × re-runs the Round 93, 92, 91 and 87 generators in either chronology without drifting shipped data 729ms
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r105-QXqJb2/scripts/lib/round105-people-content.mjs:97
+  if (!greet?.options) throw new Error(`缺少人物入口 ${conversation.id}`);
+                             ^
+
+Error: 缺少人物入口 dlg.r93-liu-xunjing-rounds
+    at upsert (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r105-QXqJb2/scripts/lib/round105-people-content.mjs:97:30)
+    at deepenPeopleConversation (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r105-QXqJb2/scripts/lib/round105-people-content.mjs:107:5)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r105-QXqJb2/scripts/deepen-round105-people.mjs:19:3
+
+Node.js v22.18.0
+ ❯ tests/round105-combat-source.test.ts (3 tests | 1 failed) 256ms
+   ❯ Round105 real combat and incremental writer (3)
+     × two incremental runs are byte stable inside an isolated checked sandbox 247ms
+ ❯ tests/round92-north-pass.test.ts (7 tests | 1 failed) 1972ms
+   ❯ Round 92 North Pass (Snowlit Pass) (7)
+     × re-runs the Round 92, 93, 91 and 87 generators safely without drifting shipped data 1394ms
+ ❯ tests/round136-relay-followups.test.ts (10 tests | 3 failed) 20ms
+   ❯ Round136 remembered branch consequences (10)
+     × carving authored pure nodes preserve unrelated data and repeat exactly 5ms
+     × carving/0 requires all four actual evidence gates 1ms
+     × carving/1 requires all four actual evidence gates 0ms
+ ❯ tests/round101-north.test.ts (18 tests | 5 failed) 114ms
+   ❯ Round101 choices and records (8)
+     × old mark public is mutually exclusive, paid and heard at other passes 8ms
+     × old mark private is mutually exclusive, paid and heard at other passes 5ms
+     × absent medicines hide paid branches and refusal leaves no flags or social changes 4ms
+     × requires four reports, both decisions and crosscheck for northern stage closure 3ms
+     × actual capture/parse/preflight/restore retains costs, both decisions and filtered echoes 3ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 12 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round101-north.test.ts > Round101 choices and records > old mark public is mutually exclusive, paid and heard at other passes
+ FAIL  tests/round101-north.test.ts > Round101 choices and records > old mark private is mutually exclusive, paid and heard at other passes
+TypeError: Cannot read properties of undefined (reading 'options')
+ ❯ getVisibleOptions src/engine/dialogue-runtime.ts:396:39
+    394| ): readonly VisibleDialogueOption[] {
+    395|   const visible: VisibleDialogueOption[] = [];
+    396|   for (const [index, option] of (node.options ?? []).entries()) {
+       |                                       ^
+    397|     const met = (option.conditions ?? []).every((condition) =>
+    398|       isConditionMet(condition, context),
+ ❯ visible tests/round101-north.test.ts:33:44
+ ❯ choose tests/round101-north.test.ts:34:65
+ ❯ tests/round101-north.test.ts:82:55
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯
+
+ FAIL  tests/round101-north.test.ts > Round101 choices and records > absent medicines hide paid branches and refusal leaves no flags or social changes
+TypeError: Cannot read properties of undefined (reading 'options')
+ ❯ getVisibleOptions src/engine/dialogue-runtime.ts:396:39
+    394| ): readonly VisibleDialogueOption[] {
+    395|   const visible: VisibleDialogueOption[] = [];
+    396|   for (const [index, option] of (node.options ?? []).entries()) {
+       |                                       ^
+    397|     const met = (option.conditions ?? []).every((condition) =>
+    398|       isConditionMet(condition, context),
+ ❯ visible tests/round101-north.test.ts:33:44
+ ❯ tests/round101-north.test.ts:85:121
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯
+
+ FAIL  tests/round101-north.test.ts > Round101 choices and records > requires four reports, both decisions and crosscheck for northern stage closure
+TypeError: Cannot read properties of undefined (reading 'options')
+ ❯ getVisibleOptions src/engine/dialogue-runtime.ts:396:39
+    394| ): readonly VisibleDialogueOption[] {
+    395|   const visible: VisibleDialogueOption[] = [];
+    396|   for (const [index, option] of (node.options ?? []).entries()) {
+       |                                       ^
+    397|     const met = (option.conditions ?? []).every((condition) =>
+    398|       isConditionMet(condition, context),
+ ❯ visible tests/round101-north.test.ts:33:44
+ ❯ choose tests/round101-north.test.ts:34:65
+ ❯ tests/round101-north.test.ts:89:107
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯
+
+ FAIL  tests/round101-north.test.ts > Round101 choices and records > actual capture/parse/preflight/restore retains costs, both decisions and filtered echoes
+TypeError: Cannot read properties of undefined (reading 'options')
+ ❯ getVisibleOptions src/engine/dialogue-runtime.ts:396:39
+    394| ): readonly VisibleDialogueOption[] {
+    395|   const visible: VisibleDialogueOption[] = [];
+    396|   for (const [index, option] of (node.options ?? []).entries()) {
+       |                                       ^
+    397|     const met = (option.conditions ?? []).every((condition) =>
+    398|       isConditionMet(condition, context),
+ ❯ visible tests/round101-north.test.ts:33:44
+ ❯ choose tests/round101-north.test.ts:34:65
+ ❯ tests/round101-north.test.ts:92:126
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯
+
+ FAIL  tests/round105-combat-source.test.ts > Round105 real combat and incremental writer > two incremental runs are byte stable inside an isolated checked sandbox
+Error: Command failed: D:\nvm4w\nodejs\node.exe C:\Users\Hitao\AppData\Local\Temp\wuxia-r105-QXqJb2\scripts\deepen-round105-people.mjs
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r105-QXqJb2/scripts/lib/round105-people-content.mjs:97
+  if (!greet?.options) throw new Error(`缺少人物入口 ${conversation.id}`);
+                             ^
+
+Error: 缺少人物入口 dlg.r93-liu-xunjing-rounds
+    at upsert (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r105-QXqJb2/scripts/lib/round105-people-content.mjs:97:30)
+    at deepenPeopleConversation (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r105-QXqJb2/scripts/lib/round105-people-content.mjs:107:5)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r105-QXqJb2/scripts/deepen-round105-people.mjs:19:3
+
+Node.js v22.18.0
+
+ ❯ upsert C:/Users/Hitao/AppData/Local/Temp/wuxia-r105-QXqJb2/scripts/lib/round105-people-content.mjs:97:30
+ ❯ deepenPeopleConversation C:/Users/Hitao/AppData/Local/Temp/wuxia-r105-QXqJb2/scripts/lib/round105-people-content.mjs:107:5
+ ❯ C:/Users/Hitao/AppData/Local/Temp/wuxia-r105-QXqJb2/scripts/deepen-round105-people.mjs:19:3
+ ❯ tests/round105-combat-source.test.ts:22:810
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯
+
+ FAIL  tests/round136-relay-followups.test.ts > Round136 remembered branch consequences > carving authored pure nodes preserve unrelated data and repeat exactly
+AssertionError: expected [ '起始节点 "greet" 不存在' ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "起始节点 \"greet\" 不存在",
++ ]
+
+ ❯ tests/round136-relay-followups.test.ts:17:39
+     15|     it(`${relay.key} authored pure nodes preserve unrelated data and r…
+     16|       const c = load(relay.targetDialogueId);
+     17|       expect(validateConversation(c)).toEqual([]);
+       |                                       ^
+     18|       expect(addRelayFollowups(structuredClone(c), relays)).toEqual(c);
+     19|       expect(deepenPeopleConversation(structuredClone(c))).toEqual(c);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯
+
+ FAIL  tests/round136-relay-followups.test.ts > Round136 remembered branch consequences > carving/0 requires all four actual evidence gates
+ FAIL  tests/round136-relay-followups.test.ts > Round136 remembered branch consequences > carving/1 requires all four actual evidence gates
+TypeError: Cannot read properties of undefined (reading 'filter')
+ ❯ visible tests/round136-relay-followups.test.ts:39:101
+     37|         teachNpcKnowledge(social, relay.targetNpcId, variant.flag);
+     38|         const ctx = { social, speakerNpcId: relay.targetNpcId, knownKn…
+     39|         const visible = () => getVisibleOptions({id:'test',text:'test'…
+       |                                                                                                     ^
+     40|         expect(visible()).toEqual([id]);
+     41|         for (const key of [delivered, variant.flag]) { own.delete(key)…
+ ❯ tests/round136-relay-followups.test.ts:40:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯
+
+ FAIL  tests/round92-north-pass.test.ts > Round 92 North Pass (Snowlit Pass) > re-runs the Round 92, 93, 91 and 87 generators safely without drifting shipped data
+AssertionError: file:///C:/Users/Hitao/AppData/Local/Temp/round92-generators-LSxMgq/scripts/generate-round93-snow-pine-valley.mjs:118
+      throw new Error(label + ' 的资源身份与生成器声明冲突，拒绝覆盖。');
+            ^
+
+Error: 霜松谷对白 的资源身份与生成器声明冲突，拒绝覆盖。
+    at writeManagedJson (file:///C:/Users/Hitao/AppData/Local/Temp/round92-generators-LSxMgq/scripts/generate-round93-snow-pine-valley.mjs:118:13)
+    at async Promise.all (index 2)
+    at async file:///C:/Users/Hitao/AppData/Local/Temp/round92-generators-LSxMgq/scripts/generate-round93-snow-pine-valley.mjs:1076:1
+
+Node.js v22.18.0
+: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ writeManagedJson C:/Users/Hitao/AppData/Local/Temp/round92-generators-LSxMgq/scripts/generate-round93-snow-pine-valley.mjs:118:13
+ ❯ C:/Users/Hitao/AppData/Local/Temp/round92-generators-LSxMgq/scripts/generate-round93-snow-pine-valley.mjs:1076:1
+ ❯ tests/round92-north-pass.test.ts:439:38
+    437|       const r93 = run('scripts/generate-round93-snow-pine-valley.mjs');
+    438|       expect(r93.error).toBeUndefined();
+    439|       expect(r93.status, r93.stderr).toBe(0);
+       |                                      ^
+    440|       expect(r93.stdout).toContain('Rebuilt the Round 93 extension');
+    441|       // Then the older generators on top of Round 92/93 state: they m…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/12]⎯
+
+ FAIL  tests/round93-snow-pine-valley.test.ts > Round 93 Snow Pine Valley (Frostpine Valley) > runs the patroller dialogue, boundary-mark quest, schedule and knowledge graph links
+AssertionError: dlg.r93-liu-xunjing-rounds: expected [ '起始节点 "greet" 不存在' ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "起始节点 \"greet\" 不存在",
++ ]
+
+ ❯ tests/round93-snow-pine-valley.test.ts:355:67
+    353|     }
+    354|     for (const conversation of dialogueParse.set.conversations) {
+    355|       expect(validateConversation(conversation), conversation.id).toEq…
+       |                                                                   ^
+    356|     }
+    357|     const greeting = dialogueParse.set.conversations.find(({ id }) => …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/12]⎯
+
+ FAIL  tests/round93-snow-pine-valley.test.ts > Round 93 Snow Pine Valley (Frostpine Valley) > re-runs the Round 93, 92, 91 and 87 generators in either chronology without drifting shipped data
+AssertionError: file:///C:/Users/Hitao/AppData/Local/Temp/round93-generators-eYSzVn/scripts/generate-round93-snow-pine-valley.mjs:118
+      throw new Error(label + ' 的资源身份与生成器声明冲突，拒绝覆盖。');
+            ^
+
+Error: 霜松谷对白 的资源身份与生成器声明冲突，拒绝覆盖。
+    at writeManagedJson (file:///C:/Users/Hitao/AppData/Local/Temp/round93-generators-eYSzVn/scripts/generate-round93-snow-pine-valley.mjs:118:13)
+    at async Promise.all (index 2)
+    at async file:///C:/Users/Hitao/AppData/Local/Temp/round93-generators-eYSzVn/scripts/generate-round93-snow-pine-valley.mjs:1076:1
+
+Node.js v22.18.0
+: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ writeManagedJson C:/Users/Hitao/AppData/Local/Temp/round93-generators-eYSzVn/scripts/generate-round93-snow-pine-valley.mjs:118:13
+ ❯ C:/Users/Hitao/AppData/Local/Temp/round93-generators-eYSzVn/scripts/generate-round93-snow-pine-valley.mjs:1076:1
+ ❯ tests/round93-snow-pine-valley.test.ts:462:38
+    460|       const r93 = run('scripts/generate-round93-snow-pine-valley.mjs');
+    461|       expect(r93.error).toBeUndefined();
+    462|       expect(r93.status, r93.stderr).toBe(0);
+       |                                      ^
+    463|       expect(r93.stdout).toContain('Rebuilt the Round 93 extension');
+    464|       const r92 = run('scripts/generate-round92-north-pass.mjs');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/12]⎯
+
+
+ Test Files  5 failed | 2 passed (7)
+      Tests  12 failed | 58 passed (70)
+   Start at  08:46:41
+   Duration  5.26s (tests 72%, import 19%, transform 9%)
+
+    Isolate  7 workers spawned · ~168ms startup each (spawn + environment, per file)
+             at least ~420ms faster with isolate: false — reuses workers across files instead of one per file
+

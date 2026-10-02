@@ -419,6 +419,7 @@
           "required": ["kind"],
           "properties": { "kind": { "const": "dismissCompanion" } }
         },
+        {"type":"object","additionalProperties":false,"required":["kind","encounterId"],"properties":{"kind":{"const":"startBattle"},"encounterId":{"type":"string","minLength":1,"maxLength":64}}},
         {
           "description": "在本局变量簿记录或覆盖一个键值（Round 147）：键为字母开头、至多 64 字符的安全键（拒绝 prototype 类键名）；值为布尔、有限数或短字符串之一。变量簿至多 64 个不同键，写满后拒绝新增键、旧键仍可覆盖；与其他效果同事务提交，任一失败不写入。",
           "type": "object",

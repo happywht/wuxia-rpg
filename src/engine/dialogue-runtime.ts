@@ -78,6 +78,7 @@ import {
   type FactionMembershipState,
 } from './faction-system';
 import { dismissCompanion, recruitCompanion, type CompanionData, type CompanionState } from './companion-system';
+import { preflightDialogueBattle, type DialogueBattleReadiness } from './dialogue-battle-request';
 import {
   type DialogueVariableValue,
   DIALOGUE_VARIABLE_LEDGER_MAX_ENTRIES,
@@ -126,6 +127,7 @@ export interface DialogueRuntimeContext {
    * readable reason instead of silently dropping the write.
    */
   dialogueVariables?: Map<string, DialogueVariableValue>;
+  battleReadiness?: DialogueBattleReadiness;
 }
 
 // ---------------------------------------------------------------------------
@@ -148,6 +150,7 @@ export interface DialogueReferenceAssemblyInput {
   /** Weather ids declared by validated climate; optional for legacy consumers. */
   weatherIds?: ReadonlySet<string>;
   companionIds?: ReadonlySet<string>;
+  encounterIds?: ReadonlySet<string>;
 }
 
 export interface DialogueReferenceAssemblyResult {
@@ -168,6 +171,7 @@ function optionReferences(option: DialogueOptionData): {
   periodIds: string[];
   weatherIds: string[];
   companionIds: string[];
+  encounterIds: string[];
 } {
   const questIds: string[] = [];
   const itemIds: string[] = [];
@@ -178,6 +182,7 @@ function optionReferences(option: DialogueOptionData): {
   const periodIds: string[] = [];
   const weatherIds: string[] = [];
   const companionIds: string[] = [];
+  const encounterIds: string[] = [];
   for (const condition of option.conditions ?? []) {
     if (condition.kind === 'questStatus') questIds.push(condition.questId);
     else if (condition.kind === 'itemCount') itemIds.push(condition.itemId);
@@ -204,8 +209,9 @@ function optionReferences(option: DialogueOptionData): {
     else if (effect.kind === 'adjustFactionRenown') factionIds.push(effect.factionId);
     else if (effect.kind === 'learnMartialArt') martialArtIds.push(effect.martialArtId);
     else if (effect.kind === 'recruitCompanion') companionIds.push(effect.companionId);
+    else if (effect.kind === 'startBattle') encounterIds.push(effect.encounterId);
   }
-  return { questIds, itemIds, npcIds, knowledgeNodeIds, factionIds, martialArtIds, periodIds, weatherIds, companionIds };
+  return { questIds, itemIds, npcIds, knowledgeNodeIds, factionIds, martialArtIds, periodIds, weatherIds, companionIds, encounterIds };
 }
 
 /**
@@ -256,6 +262,9 @@ export function assembleDialogueReferences(
         }
         for (const companionId of references.companionIds) {
           if (!input.companionIds?.has(companionId)) problems.push(`引用无效伙伴 "${companionId}"`);
+        }
+        for (const encounterId of references.encounterIds) {
+          if (!input.encounterIds?.has(encounterId)) problems.push(`引用无效挑战 "${encounterId}"`);
         }
         if (problems.length > 0) {
           changed = true;
@@ -428,6 +437,8 @@ export function getVisibleOptionsForDisplay(
 
 /** Mechanical feedback line per executed effect (names come from data). */
 export interface DialogueEffectSummary {
+  /** One deferred external action; no battle is opened during staging. */
+  battleRequest?: { encounterId: string };
   lines: readonly string[];
   /** Aggregated quest transitions for HUD settlement (rewards, notices). */
   questUpdate: QuestUpdateResult;
@@ -579,6 +590,10 @@ function validateEffect(
   effect: DialogueEffectData,
   context: Readonly<DialogueRuntimeContext>,
 ): string | null {
+  if (effect.kind === 'startBattle') {
+    const result = preflightDialogueBattle(effect.encounterId, context.battleReadiness);
+    return result.ok ? null : result.reason;
+  }
   switch (effect.kind) {
     case 'acceptQuest': {
       const quest = context.quests.get(effect.questId);
@@ -727,6 +742,9 @@ export function applyDialogueEffects(
   effects: readonly DialogueEffectData[],
   context: DialogueRuntimeContext,
 ): DialogueEffectResult {
+  const battles = effects.filter(effect => effect.kind === 'startBattle');
+  if (battles.length > 1) return { ok: false, reason: '一次交谈只能发起一项挑战' };
+  let battleRequest: { encounterId: string } | undefined;
   // Run the declared sequence against an isolated working copy. Each next
   // effect sees earlier staged changes (so duplicate grants/accepts cannot
   // pass against stale state); a refusal simply discards the whole copy.
@@ -745,6 +763,9 @@ export function applyDialogueEffects(
     }
 
     switch (effect.kind) {
+      case 'startBattle':
+        battleRequest = { encounterId: effect.encounterId };
+        break;
       case 'acceptQuest': {
         const quest = staged.quests.get(effect.questId);
         const result = acceptQuest(
@@ -968,5 +989,5 @@ export function applyDialogueEffects(
   // Publish only after every staged effect and quest signal succeeded.
   commitRuntimeContext(context, staged);
 
-  return { ok: true, summary: { lines, questUpdate } };
+  return { ok: true, summary: { lines, questUpdate, ...(battleRequest === undefined ? {} : { battleRequest }) } };
 }

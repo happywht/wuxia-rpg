@@ -1,4 +1,5 @@
 import { addWeatherPatrol } from './round141-weather-dialogue.mjs';
+import { addDialogueDrill } from './round148-dialogue-drill.mjs';
 import { addRelayFollowups } from './round136-relay-followups.mjs';
 const known = (nodeId, isKnown = true) => ({ kind: 'knowledgeKnown', nodeId, ...(isKnown ? {} : { isKnown: false }) });
 const quest = (questId, status) => ({ kind: 'questStatus', questId, status });
@@ -127,7 +128,7 @@ export function deepenPeopleConversation(conversation) {
       upsert(conversation, `r105-${relay.key}-received`, '这番转述和你说明的取舍已记下。关系后果不会重付；若查原处事实，仍应回原处核对，不拿口头转述替代实地记录。', '此前转述还记得吗？', [known(delivered), { kind: 'npcKnows', nodeId: message }]);
     }
   }
-  return addWeatherPatrol(addRelayFollowups(conversation, relays));
+  return addDialogueDrill(addWeatherPatrol(addRelayFollowups(conversation, relays)));
 }
 export const knowledgeNodes = relays.flatMap(relay => [
   { id: `event.r105-${relay.key}-message`, kind: 'event', title: `${relay.title}待送达`, summary: relay.sourceText, knownByDefault: false, progress: { completedByNodeId: `event.r105-${relay.key}-delivered`, pendingLabel: '待亲口说明', completedLabel: '已亲口说明' } },

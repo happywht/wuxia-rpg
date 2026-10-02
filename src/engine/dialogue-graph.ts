@@ -100,7 +100,8 @@ export type DialogueEffectData =
   | { kind: 'learnMartialArt'; martialArtId: string }
   | { kind: 'recruitCompanion'; companionId: string }
   | { kind: 'dismissCompanion' }
-  | { kind: 'setVariable'; key: string; value: DialogueVariableValue };
+  | { kind: 'setVariable'; key: string; value: DialogueVariableValue }
+  | { kind: 'startBattle'; encounterId: string };
 
 /** One player-selectable branch leading to another node. */
 export interface DialogueOptionData {
@@ -411,6 +412,13 @@ function parseEffect(raw: unknown): DialogueEffectData | null {
     }
     case 'dismissCompanion':
       return hasOnlyKeys(source, ['kind']) ? { kind: 'dismissCompanion' } : null;
+    case 'startBattle': {
+      if (!hasOnlyKeys(source, ['kind', 'encounterId'])) return null;
+      const encounterId = requireNonEmptyString(source.encounterId);
+      return encounterId !== null && encounterId.length <= 64
+        ? { kind: 'startBattle', encounterId }
+        : null;
+    }
     case 'setVariable': {
       if (!hasOnlyKeys(source, ['kind', 'key', 'value'])) return null;
       if (!isSafeDialogueVariableKey(source.key)) return null;

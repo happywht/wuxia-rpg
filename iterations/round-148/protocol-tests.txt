@@ -1,0 +1,40 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round148-dialogue-battle-request.test.ts (18 tests | 4 failed) 19ms
+   ❯ Round148 dialogue battle authoring (6)
+     × rejects malformed effects consistently 5ms
+     × rejects malformed effects consistently 1ms
+     × rejects malformed effects consistently 0ms
+     × rejects malformed effects consistently 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round148-dialogue-battle-request.test.ts > Round148 dialogue battle authoring > rejects malformed effects consistently
+ FAIL  tests/round148-dialogue-battle-request.test.ts > Round148 dialogue battle authoring > rejects malformed effects consistently
+ FAIL  tests/round148-dialogue-battle-request.test.ts > Round148 dialogue battle authoring > rejects malformed effects consistently
+ FAIL  tests/round148-dialogue-battle-request.test.ts > Round148 dialogue battle authoring > rejects malformed effects consistently
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/round148-dialogue-battle-request.test.ts:106:51
+    104|     { kind: 'startBattle', encounterId: 'enc.test', extra: true }])('r…
+    105|     expect(validate(document(effect))).toBe(false);
+    106|     expect(parseDialogueSet(document(effect)).ok).toBe(false);
+       |                                                   ^
+    107|   });
+    108|   it('drops only the dangling option and accepts resolved encounters',…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 14 passed (18)
+   Start at  08:38:01
+   Duration  546ms (transform 54%, import 39%, tests 6%, worker 2%)
+

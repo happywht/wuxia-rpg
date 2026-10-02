@@ -1366,6 +1366,7 @@ function assembleOptionalContent(
     martialArtIds: new Set(progression.martialArts.keys()),
     timeOfDayPeriodIds,
     weatherIds,
+    encounterIds: new Set(encounters.map(encounter => encounter.record.id)),
   });
   for (const message of dialogueReferences.warnings) {
     // The message names the offending conversation id already, and talks may

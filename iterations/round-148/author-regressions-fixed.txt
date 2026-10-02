@@ -1,0 +1,106 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round105-combat-source.test.ts (3 tests | 1 failed) 430ms
+   ❯ Round105 real combat and incremental writer (3)
+     × two incremental runs are byte stable inside an isolated checked sandbox 421ms
+ ❯ tests/round136-relay-followups.test.ts (10 tests | 1 failed) 27ms
+   ❯ Round136 remembered branch consequences (10)
+     × carving authored pure nodes preserve unrelated data and repeat exactly 14ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round105-combat-source.test.ts > Round105 real combat and incremental writer > two incremental runs are byte stable inside an isolated checked sandbox
+AssertionError: expected '{\n  "conversations": [\n    {\n     …' to be '{\n  "conversations": [\n    {\n     …' // Object.is equality
+
+- Expected
++ Received
+
+@@ -542,10 +542,14 @@
+          {
+            "id": "r136-carving-followup-1",
+            "text": "柳寻径翻开巡簿：「你把年代说明留在私记里，眼下巡路人少卷入争执，外人却不便核看。沈雨霁的分项判断与界标证据分别保存，不混成今日疆令。此前关系已记过，这次没有额外认同。」"
+          },
+          {
++           "id": "r148-drill-start",
++           "text": "柳寻径收起巡簿：「只练护路时的进退，不替旧碑断代，也不拿合练当差事报酬。准备好了便动手，想歇随时示意。」"
++         },
++         {
+            "id": "r141-weather-clear",
+            "text": "柳寻径看了看谷口：「眼下霜松谷晴朗。能看清渡口踏痕和松影。晴朗不免除冰溪碰撞，仍沿主径过桥，别从溪心抄近。这里每次成功行走没有天气额外耗时；关口费用与行旅时长另算，不用这段话当成补给或通行奖励。」"
+          },
+          {
+            "id": "r141-weather-cloudy",
+@@ -572,14 +576,10 @@
+            "text": "柳寻径看了看谷口：「眼下霜松谷落雪。雪会盖住旧踏痕，行走额外费时；需要落雪的调查等到此时才可能开放，仍须核对时段和见闻。这里每次成功行走另加2世界分钟；关口费用与行旅时长另算，不用这段话当成补给或通行奖励。」"
+          },
+          {
+            "id": "r141-weather-mist",
+            "text": "柳寻径看了看谷口：「眼下霜松谷轻雾。雾里不要把近处松影当谷口。沿主径回东口可到照雪关，绕北岔只会进风口。这里每次成功行走另加1世界分钟；关口费用与行旅时长另算，不用这段话当成补给或通行奖励。」"
+-         },
+-         {
+-           "id": "r148-drill-start",
+-           "text": "柳寻径收起巡簿：「只练护路时的进退，不替旧碑断代，也不拿合练当差事报酬。准备好了便动手，想歇随时示意。」"
+          }
+        ]
+      }
+    ]
+  }
+
+ ❯ tests/round105-combat-source.test.ts:22:1557
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/round136-relay-followups.test.ts > Round136 remembered branch consequences > carving authored pure nodes preserve unrelated data and repeat exactly
+AssertionError: expected { …(3) } to deeply equal { …(3) }
+
+- Expected
++ Received
+
+@@ -539,10 +539,14 @@
+      {
+        "id": "r136-carving-followup-1",
+        "text": "柳寻径翻开巡簿：「你把年代说明留在私记里，眼下巡路人少卷入争执，外人却不便核看。沈雨霁的分项判断与界标证据分别保存，不混成今日疆令。此前关系已记过，这次没有额外认同。」",
+      },
+      {
++       "id": "r148-drill-start",
++       "text": "柳寻径收起巡簿：「只练护路时的进退，不替旧碑断代，也不拿合练当差事报酬。准备好了便动手，想歇随时示意。」",
++     },
++     {
+        "id": "r141-weather-clear",
+        "text": "柳寻径看了看谷口：「眼下霜松谷晴朗。能看清渡口踏痕和松影。晴朗不免除冰溪碰撞，仍沿主径过桥，别从溪心抄近。这里每次成功行走没有天气额外耗时；关口费用与行旅时长另算，不用这段话当成补给或通行奖励。」",
+      },
+      {
+        "id": "r141-weather-cloudy",
+@@ -569,13 +573,9 @@
+        "text": "柳寻径看了看谷口：「眼下霜松谷落雪。雪会盖住旧踏痕，行走额外费时；需要落雪的调查等到此时才可能开放，仍须核对时段和见闻。这里每次成功行走另加2世界分钟；关口费用与行旅时长另算，不用这段话当成补给或通行奖励。」",
+      },
+      {
+        "id": "r141-weather-mist",
+        "text": "柳寻径看了看谷口：「眼下霜松谷轻雾。雾里不要把近处松影当谷口。沿主径回东口可到照雪关，绕北岔只会进风口。这里每次成功行走另加1世界分钟；关口费用与行旅时长另算，不用这段话当成补给或通行奖励。」",
+-     },
+-     {
+-       "id": "r148-drill-start",
+-       "text": "柳寻径收起巡簿：「只练护路时的进退，不替旧碑断代，也不拿合练当差事报酬。准备好了便动手，想歇随时示意。」",
+      },
+    ],
+    "startNodeId": "greet",
+  }
+
+ ❯ tests/round136-relay-followups.test.ts:19:60
+     17|       expect(validateConversation(c)).toEqual([]);
+     18|       expect(addRelayFollowups(structuredClone(c), relays)).toEqual(c);
+     19|       expect(deepenPeopleConversation(structuredClone(c))).toEqual(c);
+       |                                                            ^
+     20|       const before = structuredClone(c);
+     21|       before.nodes = before.nodes.filter(n => !n.id.startsWith('r136-'…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 5 passed (7)
+      Tests  2 failed | 68 passed (70)
+   Start at  08:47:02
+   Duration  10.09s (tests 87%, import 9%, transform 4%)
+

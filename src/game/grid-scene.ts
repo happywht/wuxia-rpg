@@ -8,6 +8,7 @@ import { paddedWorldCameraBounds } from './world-camera-bounds';
 import Phaser from 'phaser';
 
 import type { Diagnostic } from '../engine/data-loader';
+import { onceDialogueBattleDispatch } from '../engine/dialogue-battle-request';
 import {
   GridMap,
   directionBetweenCells,
@@ -483,6 +484,8 @@ export class GridScene extends Phaser.Scene {
   private meridianPanel: MeridianPanel | null = null;
   private activeSession: CombatSession | null = null;
   private activeEncounter: PlacedEncounter | null = null;
+  private dialogueBattlePending = false;
+  private dialogueBattleGeneration = 0;
 
   /** Round 09 storage/settings plumbing (storage null = browser disallows it). */
   private storage: SaveStorage | null = null;
@@ -980,6 +983,8 @@ export class GridScene extends Phaser.Scene {
    */
   private disposeWorldPanels(): void {
     if (this.disposingWorldPanels) return;
+    this.dialogueBattleGeneration += 1;
+    this.dialogueBattlePending = false;
     this.disposingWorldPanels = true;
     try {
       for (const field of WORLD_OVERLAY_PANEL_FIELDS) {
@@ -3292,6 +3297,7 @@ export class GridScene extends Phaser.Scene {
   /** True while any keyboard overlay owns the input (dialogue/battle/backpack/shop/quest/pause). */
   private anyOverlayOpen(): boolean {
     return (
+      this.dialogueBattlePending ||
       (this.dialoguePanel !== null && this.dialoguePanel.isOpen) ||
       (this.battlePanel !== null && this.battlePanel.isOpen) ||
       (this.inventoryPanel !== null && this.inventoryPanel.isOpen) ||
@@ -4325,6 +4331,13 @@ export class GridScene extends Phaser.Scene {
       companions: this.companions,
       companionState: this.companionState,
       dialogueVariables: this.dialogueVariables,
+      battleReadiness: {
+        currentMapResourceId: this.currentMapResourceId,
+        targets: new Map(this.activeEncounters().map(encounter => [encounter.record.id, encounter.record])),
+        completedEncounterIds: this.completedEncounters,
+        characterReady: this.playerProfile !== null && this.playerState !== null && this.playerState.health.current > 0,
+        panelReady: this.battlePanel !== null && !this.battlePanel.isOpen && !this.dialogueBattlePending,
+      },
     };
   }
 
@@ -4369,6 +4382,22 @@ export class GridScene extends Phaser.Scene {
       const feedbackLines = [...result.summary.lines, ...achievementReceipts];
       const feedback = feedbackLines.length > 0 ? feedbackLines.join(' · ') : null;
       session.choose(choice.index);
+      if (result.summary.battleRequest !== undefined) {
+        const encounter = this.encounters.find(entry => entry.record.id === result.summary.battleRequest!.encounterId);
+        // Preflight resolved this synchronously before transaction commit.
+        if (encounter !== undefined) {
+          this.dialogueBattlePending = true;
+          const generation = this.dialogueBattleGeneration;
+          return { advanced: true, feedback, afterClose: onceDialogueBattleDispatch(() => {
+            // Defer beyond the current keyboard event to avoid an extra attack.
+            this.time.delayedCall(0, () => {
+              if (generation !== this.dialogueBattleGeneration) return;
+              this.dialogueBattlePending = false;
+              this.openEncounterBattle(encounter);
+            });
+          }) };
+        }
+      }
       return { advanced: true, feedback };
     }
     session.choose(choice.index);
@@ -4388,6 +4417,13 @@ export class GridScene extends Phaser.Scene {
     if (encounter === null || this.playerProfile === null || this.playerState === null) {
       return encounter !== null; // A foe keeps priority over a gate even without a profile.
     }
+    return this.openEncounterBattle(encounter);
+  }
+
+  /** Shared initialization and settlement for physical and authored dialogue entry. */
+  private openEncounterBattle(encounter: PlacedEncounter): boolean {
+    const battlePanel = this.battlePanel;
+    if (battlePanel === null || battlePanel.isOpen || this.playerProfile === null || this.playerState === null) return false;
     if (encounter.record.knowledgeNodeId !== undefined) {
       this.recordKnowledgeObservations({ characterIds: [encounter.record.knowledgeNodeId] });
     }

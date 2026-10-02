@@ -95,8 +95,9 @@
 | `learnMartialArt` | `martialArtId` | 授予一门当前已满足资格的武学 |
 | `recruitCompanion` | `companionId` | 邀请有效伙伴同行（队伍仅一名伙伴；见 §4.3） |
 | `dismissCompanion` | — | 让当前同行伙伴暂离（见 §4.3） |
+| `startBattle` | `encounterId`（非空，最多64字符） | 发起当前地区有效挑战；每次确认最多一项，角色/面板/动态封路/重复资格均先校验。任一效果失败则整笔回滚。成功后先关闭对白再延迟分发，战果复用正常胜败/撤退结算；不等于即时完成任务 |
 
-上表即当前 `dialogue-set` Schema `definitions.condition` / `definitions.effect` 封闭枚举的**全部** kind（条件 13 种、效果 16 种）；`npm run audit:round-34` 会从 Schema 反查本文是否逐一覆盖。
+上表与本轮新增协议说明共同覆盖当前 `dialogue-set` Schema `definitions.condition` / `definitions.effect` 封闭枚举的**全部** kind（条件 13 种、效果 17 种）；`npm run audit:round-34` 会从 Schema 反查本文是否逐一覆盖。
 
 ### 4.1 社会数值范围与调整（Round 18）
 
@@ -167,3 +168,7 @@ Round 19 以后，引用装配覆盖任务、物品、NPC、见闻、门派、�
 键长度1–64，字母开头，随后字母/数字/下划线/点/连字符，拒绝 __proto__/prototype/constructor。值只允许布尔、绝对值不超过十亿的有限数、至多200字符字符串；null、数组、对象不允许。每局最多64个不同键，满额仍可覆盖旧键。缺少变量簿的旧调用上下文可判断 missing，但拒绝写入并提供原因。
 
 沈墨涵首次闲谈写入 dlg.shen-mohan.news-asked=true，复谈按 exists 开放，无奖励，不更改章节决定。变量仅用于对白，未接入任务前置或结局条件。实际存读验证待本轮记录，不以测试冒充。
+
+## Round 148 已完成
+
+对白startBattle/encounterId协议、Schema/装配、事务预检/回滚、对白关闭后的延迟一次分发与世界销毁代次保护已接通；柳寻径复用既有无报酬巡路合练，作者生成源和历史逆序重放保持字节稳定。真实第一栏检查点北行3格，F对白完成初始不误击、撤退、四行动胜利/伙伴第二行动9援护、13次暂缓战败恢复75命47气及再次入场。没有写任何存档，三栏时间保持；正常读回第三栏08:24:26江南44,37/16日15:19，沈墨涵变量复谈仍开放。最终npm run build exit0，148文件1316测试95.00秒，100资料/tsc/文档审计/Vite通过；入口692.85KB/Phaser1374.54KB分块警告保留。证据见iterations/round-148/verification.md。teleport及另外两终章/双结果/六区节奏/两构筑/兼容发行仍待完成，goal active。
