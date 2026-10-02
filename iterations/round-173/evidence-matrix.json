@@ -55,11 +55,6 @@
       "evidence": [
         {
           "kind": "actual",
-          "source": "iterations/round-154/playtest.md",
-          "claim": "青岩调查点出发回铁嶂，再行71格入镇及44/42格调查往返，确认仍有空走待优化。"
-        },
-        {
-          "kind": "actual",
           "source": "iterations/round-146/verification.md",
           "claim": "返关108成功格抵49,96，45分钟过关入铁嶂。"
         },
@@ -145,6 +140,14 @@
         "R159旧流程重复往返与R171有序见闻新顺序有明确可比现象，但起点、时段和人物位置不相同，不能直接声称节省普遍格数。",
         "本地备药匣实际有货与售罄后最近补给路段应使用同一档状态复核。"
       ]
+    }
+  ],
+  "corrections": [
+    {
+      "formerRegion": "云岭古道·断云栈道",
+      "source": "iterations/round-154/playtest.md",
+      "correction": "Round154记录中的44格去程与42格返程是青岩井壁调查，不能作为云岭步行证据；保留原始日志，仅从云岭证据条目移出。",
+      "actualRegion": "西陲盐道·青岩驿"
     }
   ]
 }

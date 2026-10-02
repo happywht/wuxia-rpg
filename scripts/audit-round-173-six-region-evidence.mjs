@@ -20,9 +20,18 @@ for (const [index, region] of matrix.regions.entries()) {
     if (isAbsolute(rel) || rel.startsWith('..' + sep) || !existsSync(path)) errors.push(`${region.region}: missing/outside source ${item.source}`);
   }
 }
+for (const correction of matrix.corrections ?? []) {
+  if (!correction.source || !correction.formerRegion || !correction.actualRegion || !correction.correction) {
+    errors.push('correction entries require source, formerRegion, actualRegion, and correction');
+    continue;
+  }
+  const path = resolve(root, correction.source);
+  const rel = relative(root, path);
+  if (isAbsolute(rel) || rel.startsWith('..' + sep) || !existsSync(path)) errors.push(`correction: missing/outside source ${correction.source}`);
+}
 if (errors.length) {
   console.error(errors.join('\n'));
   process.exitCode = 1;
 } else {
-  console.log(`Six-region evidence index valid: ${matrix.regions.length} regions, ${matrix.regions.reduce((sum, region) => sum + region.evidence.length, 0)} traceable references; gaps remain explicit.`);
+  console.log(`Six-region evidence index valid: ${matrix.regions.length} regions, ${matrix.regions.reduce((sum, region) => sum + region.evidence.length, 0)} traceable references, ${(matrix.corrections ?? []).length} source corrections; gaps remain explicit.`);
 }
