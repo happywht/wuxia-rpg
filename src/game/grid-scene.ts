@@ -62,6 +62,7 @@ import {
   dialogueChoiceForConfirmation,
   getVisibleOptionsForDisplay,
 } from '../engine/dialogue-runtime';
+import type { DialogueVariableValue } from '../engine/dialogue-variables';
 import { GameClock } from '../engine/game-calendar';
 import { selectAdjacentEndingGate, type EndingEvaluationContext } from '../engine/ending-system';
 import {
@@ -429,6 +430,12 @@ export class GridScene extends Phaser.Scene {
   private knownKnowledgeNodeIds = new Set<string>();
   /** Historical achievements and durable activity counters belong to this save slot. */
   private achievementState: AchievementRunState = createAchievementRunState();
+  /**
+   * Run-wide dialogue decision variables (Round 147): written only through
+   * the atomic `setVariable` dialogue effect, restored from and captured
+   * into every save slot.
+   */
+  private readonly dialogueVariables: Map<string, DialogueVariableValue> = new Map();
 
   /** Round 14 in-game clock; null only before the world finished loading. */
   private clock: GameClock | null = null;
@@ -743,6 +750,7 @@ export class GridScene extends Phaser.Scene {
     this.encounterMarkers.clear();
     this.completedEncounters.clear();
     this.completedRegionalEvents.clear();
+    this.dialogueVariables.clear();
 
     if (restoredRun !== null) {
       // ---- Save path: adopt the fully restored objects atomically.
@@ -768,6 +776,9 @@ export class GridScene extends Phaser.Scene {
       }
       for (const eventId of restoredRun.completedRegionalEvents) {
         this.completedRegionalEvents.add(eventId);
+      }
+      for (const [key, value] of restoredRun.dialogueVariables) {
+        this.dialogueVariables.set(key, value);
       }
       this.playerCol = restoredRun.playerPosition.col;
       this.playerRow = restoredRun.playerPosition.row;
@@ -1283,6 +1294,7 @@ export class GridScene extends Phaser.Scene {
       factionWarRecords: this.factionWarRecords,
       customMartialArts: this.customMartialArts,
       achievementState: this.achievementState,
+      dialogueVariables: this.dialogueVariables,
     });
   }
 
@@ -4312,6 +4324,7 @@ export class GridScene extends Phaser.Scene {
       weatherId: this.currentClimate()?.weather.id,
       companions: this.companions,
       companionState: this.companionState,
+      dialogueVariables: this.dialogueVariables,
     };
   }
 

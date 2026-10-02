@@ -224,6 +224,28 @@
             "kind": { "const": "weather" },
             "weatherId": { "type": "string", "minLength": 1, "maxLength": 128 }
           }
+        },
+        {
+          "description": "对白变量条件（Round 147）：按算子查询本局变量簿。exists/missing 只查键是否存在（不得携带 value）；eq/ne 为同型严格比较，缺键时 eq 不成立、ne 成立；lt/le/gt/ge 仅数值对数值，缺键或类型不符一律不成立。键为字母开头、至多 64 字符的安全键，拒绝 prototype 类键名。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "key", "operator"],
+          "properties": {
+            "kind": { "const": "variable" },
+            "key": { "$ref": "#/definitions/variableKey" },
+            "operator": { "enum": ["exists", "missing", "eq", "ne", "lt", "le", "gt", "ge"] },
+            "value": { "$ref": "#/definitions/variableScalar" }
+          },
+          "anyOf": [
+            {
+              "properties": { "operator": { "enum": ["exists", "missing"] } },
+              "not": { "required": ["value"] }
+            },
+            {
+              "properties": { "operator": { "enum": ["eq", "ne", "lt", "le", "gt", "ge"] } },
+              "required": ["value"]
+            }
+          ]
         }
       ]
     },
@@ -396,7 +418,32 @@
           "additionalProperties": false,
           "required": ["kind"],
           "properties": { "kind": { "const": "dismissCompanion" } }
+        },
+        {
+          "description": "在本局变量簿记录或覆盖一个键值（Round 147）：键为字母开头、至多 64 字符的安全键（拒绝 prototype 类键名）；值为布尔、有限数或短字符串之一。变量簿至多 64 个不同键，写满后拒绝新增键、旧键仍可覆盖；与其他效果同事务提交，任一失败不写入。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "key", "value"],
+          "properties": {
+            "kind": { "const": "setVariable" },
+            "key": { "$ref": "#/definitions/variableKey" },
+            "value": { "$ref": "#/definitions/variableScalar" }
+          }
         }
+      ]
+    },
+    "variableKey": {
+      "description": "对白变量键：字母开头，随后为字母/数字/下划线/点/连字符，总长 1–64；显式拒绝 prototype/constructor 等危险键名。",
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,63}$",
+      "not": { "enum": ["__proto__", "prototype", "constructor"] }
+    },
+    "variableScalar": {
+      "description": "对白变量值：有限 JSON 标量——布尔、-1000000000 至 1000000000 的有限数、或至多 200 字符的字符串；null、数组与对象一律拒绝。",
+      "anyOf": [
+        { "type": "boolean" },
+        { "type": "number", "minimum": -1000000000, "maximum": 1000000000 },
+        { "type": "string", "maxLength": 200 }
       ]
     }
   }

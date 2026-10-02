@@ -96,7 +96,7 @@
 | `recruitCompanion` | `companionId` | 邀请有效伙伴同行（队伍仅一名伙伴；见 §4.3） |
 | `dismissCompanion` | — | 让当前同行伙伴暂离（见 §4.3） |
 
-上表即当前 `dialogue-set` Schema `definitions.condition` / `definitions.effect` 封闭枚举的**全部** kind（条件 11 种、效果 15 种）；`npm run audit:round-34` 会从 Schema 反查本文是否逐一覆盖。
+上表即当前 `dialogue-set` Schema `definitions.condition` / `definitions.effect` 封闭枚举的**全部** kind（条件 13 种、效果 16 种）；`npm run audit:round-34` 会从 Schema 反查本文是否逐一覆盖。
 
 ### 4.1 社会数值范围与调整（Round 18）
 
@@ -159,3 +159,11 @@ Round 19 以后，引用装配覆盖任务、物品、NPC、见闻、门派、�
 确认边界补充：界面传最后显示的原始选项index，运行时重筛条件并核对同一index；天气变化使可见位置挪动时，不执行挪入该位置的另一选项，而提示重新选择。旧控制器第三参数可省，保留接口兼容。身份变化纯测试通过；未真实注入天气变更。作者链通过round105的深化入口接入，历史生成器fixture同步复制新helper；缺d.mts曾使类型检查失败，已补类型声明，日志保留。
 
 天气示例：`{"kind":"weather","weatherId":"weather.snow"}`。weatherId须来自已校验climate.weathers；所有conditions仍按AND组合，时间/天气/任务条件各自成立才可选。确认重新筛选并核对最后显示的原始选项索引，条件变化不能把另一选项当旧选择执行。
+
+## Round 147 通用变量协议
+
+条件 kind 为 `variable`，字段 key、operator 与比较时的 value；operator 为 exists/missing/eq/ne/lt/le/gt/ge。exists/missing 仅检索键是否存在，不接受 value。eq 同类型相等且必须存在；ne 是 eq 的反面，缺失也成立；大小比较只接受两边数值。效果 `setVariable` 使用 key/value，写入或覆盖，与整组选项效果共同事务提交；后续失败不留下变量。
+
+键长度1–64，字母开头，随后字母/数字/下划线/点/连字符，拒绝 __proto__/prototype/constructor。值只允许布尔、绝对值不超过十亿的有限数、至多200字符字符串；null、数组、对象不允许。每局最多64个不同键，满额仍可覆盖旧键。缺少变量簿的旧调用上下文可判断 missing，但拒绝写入并提供原因。
+
+沈墨涵首次闲谈写入 dlg.shen-mohan.news-asked=true，复谈按 exists 开放，无奖励，不更改章节决定。变量仅用于对白，未接入任务前置或结局条件。实际存读验证待本轮记录，不以测试冒充。

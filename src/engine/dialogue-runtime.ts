@@ -78,6 +78,13 @@ import {
   type FactionMembershipState,
 } from './faction-system';
 import { dismissCompanion, recruitCompanion, type CompanionData, type CompanionState } from './companion-system';
+import {
+  type DialogueVariableValue,
+  DIALOGUE_VARIABLE_LEDGER_MAX_ENTRIES,
+  isDialogueVariableConditionMet,
+  isFiniteDialogueVariableValue,
+  isSafeDialogueVariableKey,
+} from './dialogue-variables';
 
 // ---------------------------------------------------------------------------
 // Runtime context
@@ -112,6 +119,13 @@ export interface DialogueRuntimeContext {
   /** Optional for older headless consumers; required when companion effects are authored. */
   companions?: ReadonlyMap<string, CompanionData>;
   companionState?: CompanionState;
+  /**
+   * Run-wide dialogue variable ledger (Round 147); absent in legacy consumers
+   * means no ledger — `variable` conditions then behave exactly like an empty
+   * ledger (missing semantics) and `setVariable` effects refuse with a
+   * readable reason instead of silently dropping the write.
+   */
+  dialogueVariables?: Map<string, DialogueVariableValue>;
 }
 
 // ---------------------------------------------------------------------------
@@ -348,6 +362,9 @@ export function isConditionMet(
       // The context carries the clock's current period id (reference
       // assembly removed dangling ids, so an unknown id never matches).
       return context.timeOfDayPeriodId === condition.periodId;
+    case 'variable':
+      // Missing-key semantics are total and live with the protocol itself.
+      return isDialogueVariableConditionMet(condition, context.dialogueVariables);
   }
 }
 
@@ -484,6 +501,9 @@ function cloneRuntimeContext(context: DialogueRuntimeContext): DialogueRuntimeCo
     companionState: context.companionState === undefined
       ? undefined
       : { activeCompanionId: context.companionState.activeCompanionId },
+    dialogueVariables: context.dialogueVariables === undefined
+      ? undefined
+      : new Map(context.dialogueVariables),
   };
 }
 
@@ -535,6 +555,12 @@ function commitRuntimeContext(
     : { ...staged.factionState.membership };
   if (target.companionState !== undefined && staged.companionState !== undefined) {
     target.companionState.activeCompanionId = staged.companionState.activeCompanionId;
+  }
+  if (target.dialogueVariables !== undefined && staged.dialogueVariables !== undefined) {
+    target.dialogueVariables.clear();
+    for (const [key, value] of staged.dialogueVariables) {
+      target.dialogueVariables.set(key, value);
+    }
   }
   if (target.character !== null && staged.character !== null) {
     target.character.martialArtIds.splice(
@@ -668,6 +694,21 @@ function validateEffect(
       return context.companionState?.activeCompanionId !== undefined && context.companionState.activeCompanionId !== null
         ? null
         : '当前没有伙伴同行';
+    case 'setVariable': {
+      const ledger = context.dialogueVariables;
+      if (ledger === undefined) {
+        return '当前上下文没有变量簿，无法记录这个决定';
+      }
+      // Defensive double check: parse already vetted these, but the runtime
+      // also serves hand-built contexts (tests, future callers).
+      if (!isSafeDialogueVariableKey(effect.key) || !isFiniteDialogueVariableValue(effect.value)) {
+        return `变量 "${String(effect.key)}" 的键或值不合规`;
+      }
+      if (!ledger.has(effect.key) && ledger.size >= DIALOGUE_VARIABLE_LEDGER_MAX_ENTRIES) {
+        return `变量簿已记满（至多 ${DIALOGUE_VARIABLE_LEDGER_MAX_ENTRIES} 项），无法新增 "${effect.key}"`;
+      }
+      return null;
+    }
     default:
       // adjust* effects: value ranges were pinned at parse time and explicit
       // npcIds at reference-assembly time; they can always commit.
@@ -910,6 +951,15 @@ export function applyDialogueEffects(
           ? undefined
           : staged.npcNames?.get(companion.npcId) ?? companion.npcId;
         lines.push(name === undefined ? '伙伴暂离' : `「${name}」暂离队伍`);
+        break;
+      }
+      case 'setVariable': {
+        const ledger = staged.dialogueVariables;
+        if (ledger !== undefined) {
+          const existed = ledger.has(effect.key);
+          ledger.set(effect.key, effect.value);
+          lines.push(existed ? '已改记这次交谈的决定' : '已记下这次交谈的决定');
+        }
         break;
       }
     }

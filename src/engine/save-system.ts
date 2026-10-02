@@ -86,6 +86,12 @@ import {
   isWorldSeed,
 } from './climate-system';
 import { createAchievementRunState, type AchievementRunState } from './achievement-system';
+import {
+  type DialogueVariableValue,
+  DIALOGUE_VARIABLE_LEDGER_MAX_ENTRIES,
+  isFiniteDialogueVariableValue,
+  isSafeDialogueVariableKey,
+} from './dialogue-variables';
 
 // ---------------------------------------------------------------------------
 // Protocol constants
@@ -163,6 +169,12 @@ export interface SaveNpcKnowledgeData {
   nodeIds: string[];
 }
 
+/** One dialogue-variable ledger entry; absent in pre-R147 v1 snapshots. */
+export interface SaveDialogueVariableData {
+  key: string;
+  value: DialogueVariableValue;
+}
+
 /** Everything the Round 06+ run state needs to come back identically. */
 export interface SaveSnapshotV1 {
   protocolVersion: typeof SAVE_PROTOCOL_VERSION;
@@ -230,6 +242,12 @@ export interface SaveSnapshotV1 {
   customMartialArts: MartialArtData[];
   /** Historical unlocks and monotonic activity counts; absent in older v1 saves. */
   achievementState: AchievementRunState;
+  /**
+   * Data-driven dialogue decision variables (Round 147); absent in pre-R147
+   * v1 saves means an empty ledger. Present-but-malformed entries refuse the
+   * whole snapshot (keys are bounded safe ids, values finite JSON scalars).
+   */
+  dialogueVariables?: SaveDialogueVariableData[];
 }
 
 // ---------------------------------------------------------------------------
@@ -747,6 +765,46 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
   const achievementState = parseAchievementRunState(raw.achievementState);
   if (achievementState === null) errors.push('achievementState：成就 id 或活动计数结构不合规');
 
+  // Pre-R147 v1 saves predate dialogue variables: absent means an empty
+  // ledger; present entries must satisfy the dialogue key/value protocol.
+  const dialogueVariables: SaveDialogueVariableData[] = [];
+  let dialogueVariablesValid = true;
+  if (raw.dialogueVariables !== undefined) {
+    if (
+      !Array.isArray(raw.dialogueVariables) ||
+      raw.dialogueVariables.length > DIALOGUE_VARIABLE_LEDGER_MAX_ENTRIES
+    ) {
+      dialogueVariablesValid = false;
+      errors.push(
+        `dialogueVariables：应为最多 ${DIALOGUE_VARIABLE_LEDGER_MAX_ENTRIES} 项的变量条目数组`,
+      );
+    } else {
+      const seenVariableKeys = new Set<string>();
+      for (const [index, entry] of raw.dialogueVariables.entries()) {
+        const label = `dialogueVariables[${index}]`;
+        const source = isPlainObject(entry) ? entry : null;
+        if (
+          source === null ||
+          !isSafeDialogueVariableKey(source.key) ||
+          !isFiniteDialogueVariableValue(source.value)
+        ) {
+          dialogueVariablesValid = false;
+          errors.push(
+            `${label}：应含字母开头安全 key（拒绝 prototype 类键名）与有限标量 value（布尔/有限数/短字符串）`,
+          );
+          continue;
+        }
+        if (seenVariableKeys.has(source.key)) {
+          dialogueVariablesValid = false;
+          errors.push(`${label}.key：变量 "${source.key}" 重复出现`);
+          continue;
+        }
+        seenVariableKeys.add(source.key);
+        dialogueVariables.push({ key: source.key, value: source.value });
+      }
+    }
+  }
+
   if (
     errors.length > 0 ||
     savedAt === null ||
@@ -773,6 +831,7 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     factionWarRecords === null ||
     customMartialArts === null ||
     achievementState === null ||
+    !dialogueVariablesValid ||
     completedRegionalEvents === null ||
     knownKnowledgeNodeIds === null ||
     elapsedGameMinutes === null ||
@@ -813,6 +872,7 @@ export function parseSaveSnapshot(raw: unknown): SaveParseResult {
     factionWarRecords,
     customMartialArts,
     achievementState,
+    dialogueVariables,
   };
   return { ok: true, snapshot };
 }
@@ -1086,6 +1146,8 @@ export interface CaptureInput {
   achievementState?: Readonly<AchievementRunState>;
   /** Absent in older callers/snapshots means currently unaffiliated. */
   factionMembership?: FactionMembership | null;
+  /** Run-wide dialogue decision variables; omitted means an empty ledger. */
+  dialogueVariables?: ReadonlyMap<string, DialogueVariableValue>;
   /** Injectable clock for deterministic tests. */
   now?: () => Date;
 }
@@ -1158,6 +1220,7 @@ export function captureSaveSnapshot(input: CaptureInput): SaveSnapshotV1 {
     achievementState: input.achievementState === undefined
       ? createAchievementRunState()
       : { ...input.achievementState, unlockedIds: [...input.achievementState.unlockedIds] },
+    dialogueVariables: [...(input.dialogueVariables ?? [])].map(([key, value]) => ({ key, value })),
   };
 }
 
@@ -1530,6 +1593,9 @@ export function planSnapshotRestore(
         ...snapshot.achievementState,
         unlockedIds: [...snapshot.achievementState.unlockedIds],
       },
+      // Variable keys are their own namespace (no world cross-references),
+      // so the sanitized copy just re-wraps the parsed entries.
+      dialogueVariables: (snapshot.dialogueVariables ?? []).map((entry) => ({ ...entry })),
     },
   };
 }
@@ -1564,6 +1630,8 @@ export interface RestoredRunState {
   factionWarRecords: FactionWarRecord[];
   customMartialArts: MartialArtData[];
   achievementState: AchievementRunState;
+  /** Fresh dialogue variable ledger (empty for pre-R147 v1 saves). */
+  dialogueVariables: Map<string, DialogueVariableValue>;
 }
 
 /**
@@ -1679,6 +1747,9 @@ export function restoreRunState(input: RestoreRunInput): RestoredRunState {
       ...snapshot.achievementState,
       unlockedIds: [...snapshot.achievementState.unlockedIds],
     },
+    dialogueVariables: new Map(
+      (snapshot.dialogueVariables ?? []).map((entry) => [entry.key, entry.value]),
+    ),
     customMartialArts: snapshot.customMartialArts.map((art) => ({
       ...art,
       factionIds: [...art.factionIds],

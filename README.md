@@ -5,7 +5,7 @@
 - 设计文档：`docs/GDD.md`
 - 新版产品目标：[PROJECT-GOALS.md](docs/PROJECT-GOALS.md)；当前系统与内容盘点：[CURRENT-STATE-AUDIT.md](docs/CURRENT-STATE-AUDIT.md)
 - 逐轮路线图（R00–R138+）：`ROADMAP.md`
-- 当前进度：**Round 146 已完成；下一轮 Round 147**。整个产品目标仍在推进中。
+- 当前进度：**Round 147 已完成；下一轮 Round 148**。整个产品目标仍在推进中。
 - 下一阶段优先丰富、串联和细化现有 22 个区域：开局闭环、大陆/北境/海路章节、任务差异、五派成长、制作经济、人物后果与结局回响。扩地图须证明其产品价值；静态盘点可运行 `npm run audit:content-state`，该命令不代表真实旅程验收。
 
 ## 范围
@@ -268,3 +268,5 @@ Round140继续沈柳新增复谈、关键双分支完整后果/活动失败恢�
 ## Round 141 已完成：对白天气条件与巡路提示
 
 新增对白条件 {kind:weather,weatherId}：封闭Schema/防御解析，装配校验已声明天气，未知引用只移除本选项；GridScene使用当前地区currentClimate，缺上下文失败关闭。柳寻径八种天气纯巡路分支，无效果/奖励；当前晴天实际重复与第三栏保存。未改变存档字段、资源数量或原任务/转述。最终构建/真实读回证据见iterations/round-141。变量与teleport/startBattle尚未实现；完整目标仍active。
+
+Round 147 已完成：变量协议/事务/存档兼容及实际首次闲谈→复谈→第三栏08:24:26正常存读。最终build exit0，147文件1296测试92.25秒，100资料、tsc、文档审计/Vite通过；入口690.49KB/Phaser1374.54KB警告保留，完整goal active。

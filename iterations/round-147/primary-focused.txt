@@ -1,0 +1,30 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round147-dialogue-variables.test.ts (20 tests | 1 failed) 41ms
+   ❯ Round147 runtime conditions and atomic setVariable (6)
+     × rolls the whole option back when a later effect refuses 9ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round147-dialogue-variables.test.ts > Round147 runtime conditions and atomic setVariable > rolls the whole option back when a later effect refuses
+AssertionError: expected '没有足够的「测试草药」可交付' to contain 'item.test-herb'
+
+Expected: "item.test-herb"
+Received: "没有足够的「测试草药」可交付"
+
+ ❯ tests/round147-dialogue-variables.test.ts:354:46
+    352|     expect(context.dialogueVariables?.size ?? 0).toBe(0); // atomic ro…
+    353|     expect(context.inventory?.stacks).toHaveLength(1);
+    354|     expect(result.ok ? null : result.reason).toContain(TEST_ITEM.id);
+       |                                              ^
+    355|
+    356|     // Refusal first, write later: still nothing leaks.
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 19 passed (20)
+   Start at  08:11:08
+   Duration  615ms (transform 74%, import 15%, tests 10%, worker 1%)

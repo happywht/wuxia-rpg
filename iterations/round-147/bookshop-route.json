@@ -1,0 +1,83 @@
+{
+  "scope": "Authored terrain only; NPCs, encounters and live movement require normal UI verification. Not journey evidence.",
+  "mapId": "map.round-01-grid",
+  "start": [
+    89,
+    50
+  ],
+  "target": [
+    44,
+    37
+  ],
+  "length": 64,
+  "segments": [
+    {
+      "direction": "Down",
+      "count": 3
+    },
+    {
+      "direction": "Left",
+      "count": 22
+    },
+    {
+      "direction": "Up",
+      "count": 3
+    },
+    {
+      "direction": "Left",
+      "count": 1
+    },
+    {
+      "direction": "Up",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 2
+    },
+    {
+      "direction": "Up",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 3
+    },
+    {
+      "direction": "Up",
+      "count": 2
+    },
+    {
+      "direction": "Left",
+      "count": 3
+    },
+    {
+      "direction": "Up",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 7
+    },
+    {
+      "direction": "Up",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 6
+    },
+    {
+      "direction": "Up",
+      "count": 5
+    },
+    {
+      "direction": "Left",
+      "count": 1
+    },
+    {
+      "direction": "Up",
+      "count": 2
+    }
+  ]
+}

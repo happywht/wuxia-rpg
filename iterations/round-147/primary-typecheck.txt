@@ -1,0 +1,27 @@
+
+> wuxia-rpg@0.0.1 typecheck
+> tsc --noEmit
+
+tests/round147-dialogue-variables.test.ts(72,3): error TS2322: Type '"material"' is not assignable to type 'ItemCategory'.
+tests/round147-dialogue-variables.test.ts(319,38): error TS2345: Argument of type '{ id: string; text: string; options: ({ text: string; nextNodeId: string; conditions: { kind: string; key: string; operator: "missing"; }[]; effects: { kind: string; key: string; value: boolean; }[]; } | { text: string; nextNodeId: string; conditions: { ...; }[]; effects?: undefined; })[]; }' is not assignable to parameter of type 'Readonly<DialogueNodeData>'.
+  Types of property 'options' are incompatible.
+    Type '({ text: string; nextNodeId: string; conditions: { kind: string; key: string; operator: "missing"; }[]; effects: { kind: string; key: string; value: boolean; }[]; } | { text: string; nextNodeId: string; conditions: { ...; }[]; effects?: undefined; })[]' is not assignable to type 'DialogueOptionData[]'.
+      Type '{ text: string; nextNodeId: string; conditions: { kind: string; key: string; operator: "missing"; }[]; effects: { kind: string; key: string; value: boolean; }[]; } | { text: string; nextNodeId: string; conditions: { ...; }[]; effects?: undefined; }' is not assignable to type 'DialogueOptionData'.
+        Type '{ text: string; nextNodeId: string; conditions: { kind: string; key: string; operator: "missing"; }[]; effects: { kind: string; key: string; value: boolean; }[]; }' is not assignable to type 'DialogueOptionData'.
+          Types of property 'conditions' are incompatible.
+            Type '{ kind: string; key: string; operator: "missing"; }[]' is not assignable to type 'readonly DialogueConditionData[]'.
+              Type '{ kind: string; key: string; operator: "missing"; }' is not assignable to type 'DialogueConditionData'.
+                Type '{ kind: string; key: string; operator: "missing"; }' is not assignable to type '{ kind: "variable"; key: string; operator: DialogueVariableOperator; value?: DialogueVariableValue | undefined; }'.
+                  Types of property 'kind' are incompatible.
+                    Type 'string' is not assignable to type '"variable"'.
+tests/round147-dialogue-variables.test.ts(324,37): error TS2345: Argument of type '{ id: string; text: string; options: ({ text: string; nextNodeId: string; conditions: { kind: string; key: string; operator: "missing"; }[]; effects: { kind: string; key: string; value: boolean; }[]; } | { text: string; nextNodeId: string; conditions: { ...; }[]; effects?: undefined; })[]; }' is not assignable to parameter of type 'Readonly<DialogueNodeData>'.
+  Types of property 'options' are incompatible.
+    Type '({ text: string; nextNodeId: string; conditions: { kind: string; key: string; operator: "missing"; }[]; effects: { kind: string; key: string; value: boolean; }[]; } | { text: string; nextNodeId: string; conditions: { ...; }[]; effects?: undefined; })[]' is not assignable to type 'DialogueOptionData[]'.
+      Type '{ text: string; nextNodeId: string; conditions: { kind: string; key: string; operator: "missing"; }[]; effects: { kind: string; key: string; value: boolean; }[]; } | { text: string; nextNodeId: string; conditions: { ...; }[]; effects?: undefined; }' is not assignable to type 'DialogueOptionData'.
+        Type '{ text: string; nextNodeId: string; conditions: { kind: string; key: string; operator: "missing"; }[]; effects: { kind: string; key: string; value: boolean; }[]; }' is not assignable to type 'DialogueOptionData'.
+          Types of property 'conditions' are incompatible.
+            Type '{ kind: string; key: string; operator: "missing"; }[]' is not assignable to type 'readonly DialogueConditionData[]'.
+              Type '{ kind: string; key: string; operator: "missing"; }' is not assignable to type 'DialogueConditionData'.
+                Type '{ kind: string; key: string; operator: "missing"; }' is not assignable to type '{ kind: "variable"; key: string; operator: DialogueVariableOperator; value?: DialogueVariableValue | undefined; }'.
+                  Types of property 'kind' are incompatible.
+                    Type 'string' is not assignable to type '"variable"'.

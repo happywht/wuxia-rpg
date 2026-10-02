@@ -26,6 +26,13 @@ import {
   FACTION_RENOWN_RANGE,
   RENOWN_RANGE,
 } from './social-state';
+import {
+  type DialogueVariableOperator,
+  type DialogueVariableValue,
+  DIALOGUE_VARIABLE_OPERATORS,
+  isFiniteDialogueVariableValue,
+  isSafeDialogueVariableKey,
+} from './dialogue-variables';
 
 /**
  * Condition-bound mirrors of the social ranges (single source of truth in
@@ -62,7 +69,14 @@ export type DialogueConditionData =
   | { kind: 'factionMembership'; factionId?: string; isMember: boolean }
   | { kind: 'martialArtEligible'; martialArtId: string }
   | { kind: 'timeOfDay'; periodId: string }
-  | { kind: 'weather'; weatherId: string };
+  | { kind: 'weather'; weatherId: string }
+  | {
+      kind: 'variable';
+      key: string;
+      operator: DialogueVariableOperator;
+      /** Required for comparison operators; forbidden for exists/missing. */
+      value?: DialogueVariableValue;
+    };
 
 /**
  * One effect executed when its option is confirmed. The runtime validates
@@ -85,7 +99,8 @@ export type DialogueEffectData =
   | { kind: 'leaveFaction' }
   | { kind: 'learnMartialArt'; martialArtId: string }
   | { kind: 'recruitCompanion'; companionId: string }
-  | { kind: 'dismissCompanion' };
+  | { kind: 'dismissCompanion' }
+  | { kind: 'setVariable'; key: string; value: DialogueVariableValue };
 
 /** One player-selectable branch leading to another node. */
 export interface DialogueOptionData {
@@ -292,6 +307,18 @@ function parseCondition(raw: unknown): DialogueConditionData | null {
       const periodId = requireNonEmptyString(source.periodId);
       return periodId === null ? null : { kind: 'timeOfDay', periodId };
     }
+    case 'variable': {
+      if (!hasOnlyKeys(source, ['kind', 'key', 'operator', 'value'])) return null;
+      if (!isSafeDialogueVariableKey(source.key)) return null;
+      const operator = DIALOGUE_VARIABLE_OPERATORS.find((value) => value === source.operator);
+      if (operator === undefined) return null;
+      if (operator === 'exists' || operator === 'missing') {
+        // Presence checks carry no value; a declared one is out of protocol.
+        return source.value === undefined ? { kind: 'variable', key: source.key, operator } : null;
+      }
+      const value = isFiniteDialogueVariableValue(source.value) ? source.value : null;
+      return value === null ? null : { kind: 'variable', key: source.key, operator, value };
+    }
     default:
       return null;
   }
@@ -384,6 +411,12 @@ function parseEffect(raw: unknown): DialogueEffectData | null {
     }
     case 'dismissCompanion':
       return hasOnlyKeys(source, ['kind']) ? { kind: 'dismissCompanion' } : null;
+    case 'setVariable': {
+      if (!hasOnlyKeys(source, ['kind', 'key', 'value'])) return null;
+      if (!isSafeDialogueVariableKey(source.key)) return null;
+      const value = isFiniteDialogueVariableValue(source.value) ? source.value : null;
+      return value === null ? null : { kind: 'setVariable', key: source.key, value };
+    }
     default:
       return null;
   }

@@ -291,7 +291,22 @@ describe('Round130 Hanshan practice briefs (real assembled data)', () => {
       execFileSync(process.execPath, [probe], { cwd: sandbox });
       const chained03 = rf(j(sandbox, 'data/base/dialogues/round-03-conversations.json'), 'utf8');
       const chained30 = rf(j(sandbox, 'data/base/dialogues/round-30-conversations.json'), 'utf8');
-      expect(applyRelayWaitingDirections(applyCompanionTrust(chained03)).replace(/\r\n/g, '\n')).toBe(readFileSync(join(root, 'data/base/dialogues/round-03-conversations.json'), 'utf8').replace(/\r\n/g, '\n'));
+      // R147 adds exactly two no-reward options and two terminal nodes.
+      // Keep the historical replay compared against every other authored field.
+      const current03 = JSON.parse(readFileSync(join(root, 'data/base/dialogues/round-03-conversations.json'), 'utf8'));
+      const bookshop = current03.conversations.find((entry: { id: string }) => entry.id === 'dlg.shen-mohan-bookshop');
+      expect(bookshop).toBeDefined();
+      const variableNodeIds = new Set(['news-first', 'news-repeat']);
+      expect(bookshop.nodes.filter((node: { id: string }) => variableNodeIds.has(node.id))).toHaveLength(2);
+      bookshop.nodes = bookshop.nodes.filter((node: { id: string }) => !variableNodeIds.has(node.id));
+      let removedOptions = 0;
+      for (const node of bookshop.nodes) {
+        if (!node.options) continue;
+        removedOptions += node.options.filter((option: { nextNodeId: string }) => variableNodeIds.has(option.nextNodeId)).length;
+        node.options = node.options.filter((option: { nextNodeId: string }) => !variableNodeIds.has(option.nextNodeId));
+      }
+      expect(removedOptions).toBe(2);
+      expect(JSON.parse(applyRelayWaitingDirections(applyCompanionTrust(chained03)))).toEqual(current03);
       expect(chained30.replace(/\r\n/g, '\n')).toBe(readFileSync(join(root, 'data/base/dialogues/round-30-conversations.json'), 'utf8').replace(/\r\n/g, '\n'));
       expect(chained03).toContain('r130-hanshan-paper-route');
       expect(chained03).toContain('一份十五两、自购两份共三十两'); // R128 intact.

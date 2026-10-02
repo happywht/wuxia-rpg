@@ -1,0 +1,41 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+round130 refused round-30-conversations.json (file untouched): r130-hanshan-practice-brief 文本被改动，请人工复核。
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-7WUnVk/scripts/lib/round130-hanshan-practice-brief.mjs:147
+    throw new Error(`${brief.nodeId} 文本被改动，请人工复核。`);
+          ^
+
+Error: r130-hanshan-practice-brief 文本被改动，请人工复核。
+    at verifyApplied (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-7WUnVk/scripts/lib/round130-hanshan-practice-brief.mjs:147:11)
+    at addOne (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-7WUnVk/scripts/lib/round130-hanshan-practice-brief.mjs:86:5)
+    at addHanshanBriefs (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-7WUnVk/scripts/lib/round130-hanshan-practice-brief.mjs:62:15)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-7WUnVk/scripts/apply-round130.mjs:20:11
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:647:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.18.0
+ ❯ tests/round130-hanshan-practice-brief.test.ts (9 tests | 1 failed) 716ms
+   ❯ Round130 Hanshan practice briefs (real assembled data) (9)
+     × cross-round replays from the fixed baseline keep every addition (R128→R129→R130→R103/R127) 401ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round130-hanshan-practice-brief.test.ts > Round130 Hanshan practice briefs (real assembled data) > cross-round replays from the fixed baseline keep every addition (R128→R129→R130→R103/R127)
+TypeError: Cannot read properties of undefined (reading 'find')
+ ❯ tests/round130-hanshan-practice-brief.test.ts:297:44
+    295|       // Keep the historical replay compared against every other autho…
+    296|       const current03 = JSON.parse(readFileSync(join(root, 'data/base/…
+    297|       const bookshop = current03.dialogues.find((entry: { id: string }…
+       |                                            ^
+    298|       expect(bookshop).toBeDefined();
+    299|       const variableNodeIds = new Set(['news-first', 'news-repeat']);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 28 passed (29)
+   Start at  08:15:56
+   Duration  1.21s (tests 55%, transform 37%, import 8%, worker 1%)
