@@ -249,6 +249,46 @@ describe('quest arrival actions', () => {
     expect(map.canEnter(occupied.col, occupied.row)).toBe(true);
   });
 
+  it('recalculates the Ferry return-gate route around the live ending-NPC cell', () => {
+    // Round172 observed this exact saved position: player (9,2), a scheduled
+    // NPC occupying (12,2), and the Jiangnan return gate. Keep the authored
+    // map traversable at that cell; only the live occupancy blocks it.
+    const world = makeWorld();
+    const map = world.maps.get('map.round-10-mist-ferry')!;
+    const targetMap = world.maps.get('map.round-01-grid')!;
+    const returnGate = world.worldMap.transitions.find(transition =>
+      transition.from.mapResourceId === map.data.id
+      && transition.to.mapResourceId === targetMap.data.id);
+    if (returnGate === undefined) throw new Error('the Ferry return gate must be assembled');
+    expect(map.canEnter(12, 2)).toBe(true);
+
+    const destination = {
+      mapResourceId: targetMap.data.id,
+      col: targetMap.data.playerStart.col,
+      row: targetMap.data.playerStart.row,
+      name: targetMap.data.name,
+      approachRadius: 1,
+      arrivalAction: 'travel' as const,
+    };
+    const blocked = new Set(['12,2']);
+    const route = resolveCellNavigationGuide(
+      world.worldMap, map.data.id, destination, map, { col: 9, row: 2 }, blocked,
+    );
+    expect(route).toMatchObject({ status: 'en-route', nextTransitionName: returnGate.name, arrivalAction: 'travel' });
+    if (route.status !== 'en-route') throw new Error('the return gate should remain reachable');
+    expect(route.path).toEqual([
+      { col: 9, row: 2 }, { col: 9, row: 3 }, { col: 8, row: 3 },
+      { col: 7, row: 3 }, { col: 6, row: 3 }, { col: 5, row: 3 },
+      { col: 4, row: 3 }, { col: 3, row: 3 }, { col: 2, row: 3 },
+    ]);
+    expect(route.path).not.toContainEqual({ col: 12, row: 2 });
+
+    const atGate = resolveCellNavigationGuide(
+      world.worldMap, map.data.id, destination, map, route.path.at(-1)!, blocked,
+    );
+    expect(atGate).toMatchObject({ status: 'at-gate', nextTransitionName: returnGate.name });
+  });
+
   it('keeps temporary live-occupancy blockage distinct from a broken terrain route', () => {
     const world = makeWorld();
     const map = world.maps.get('map.round-10-mist-ferry')!;

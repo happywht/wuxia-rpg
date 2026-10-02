@@ -1,0 +1,8 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  17:23:41
+   Duration  2.95s (tests 95%, transform 4%, import 1%)
