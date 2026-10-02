@@ -1,0 +1,570 @@
+
+> wuxia-rpg@0.0.1 build
+> npm run check && vite build
+
+
+> wuxia-rpg@0.0.1 check
+> npm run validate:data && npm run inspect:mods && npm run typecheck && npm test && npm run audit:round-34 && npm run audit:round-48-docs
+
+
+> wuxia-rpg@0.0.1 validate:data
+> node scripts/validate-data.mjs
+
+校验失败：dialogue.round-83-east-coast-set：[
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0/status",
+    "schemaPath": "#/oneOf/0/properties/status/enum",
+    "keyword": "enum",
+    "params": {
+      "allowedValues": [
+        "locked",
+        "offered",
+        "active",
+        "completed",
+        "failed"
+      ]
+    },
+    "message": "must be equal to one of the allowed values"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/1/required",
+    "keyword": "required",
+    "params": {
+      "missingProperty": "itemId"
+    },
+    "message": "must have required property 'itemId'"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/1/required",
+    "keyword": "required",
+    "params": {
+      "missingProperty": "minCount"
+    },
+    "message": "must have required property 'minCount'"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/1/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "questId"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/1/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "status"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0/kind",
+    "schemaPath": "#/oneOf/1/properties/kind/const",
+    "keyword": "const",
+    "params": {
+      "allowedValue": "itemCount"
+    },
+    "message": "must be equal to constant"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/2/anyOf/0/required",
+    "keyword": "required",
+    "params": {
+      "missingProperty": "minValue"
+    },
+    "message": "must have required property 'minValue'"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/2/anyOf/1/required",
+    "keyword": "required",
+    "params": {
+      "missingProperty": "maxValue"
+    },
+    "message": "must have required property 'maxValue'"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/2/anyOf",
+    "keyword": "anyOf",
+    "params": {},
+    "message": "must match a schema in anyOf"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/2/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "questId"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/2/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "status"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0/kind",
+    "schemaPath": "#/oneOf/2/properties/kind/const",
+    "keyword": "const",
+    "params": {
+      "allowedValue": "morality"
+    },
+    "message": "must be equal to constant"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/3/anyOf/0/required",
+    "keyword": "required",
+    "params": {
+      "missingProperty": "minValue"
+    },
+    "message": "must have required property 'minValue'"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/3/anyOf/1/required",
+    "keyword": "required",
+    "params": {
+      "missingProperty": "maxValue"
+    },
+    "message": "must have required property 'maxValue'"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/3/anyOf",
+    "keyword": "anyOf",
+    "params": {},
+    "message": "must match a schema in anyOf"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/3/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "questId"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/3/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "status"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0/kind",
+    "schemaPath": "#/oneOf/3/properties/kind/const",
+    "keyword": "const",
+    "params": {
+      "allowedValue": "renown"
+    },
+    "message": "must be equal to constant"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/4/anyOf/0/required",
+    "keyword": "required",
+    "params": {
+      "missingProperty": "minValue"
+    },
+    "message": "must have required property 'minValue'"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/4/anyOf/1/required",
+    "keyword": "required",
+    "params": {
+      "missingProperty": "maxValue"
+    },
+    "message": "must have required property 'maxValue'"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/4/anyOf",
+    "keyword": "anyOf",
+    "params": {},
+    "message": "must match a schema in anyOf"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/4/required",
+    "keyword": "required",
+    "params": {
+      "missingProperty": "factionId"
+    },
+    "message": "must have required property 'factionId'"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/4/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "questId"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/4/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "status"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0/kind",
+    "schemaPath": "#/oneOf/4/properties/kind/const",
+    "keyword": "const",
+    "params": {
+      "allowedValue": "factionRenown"
+    },
+    "message": "must be equal to constant"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/5/anyOf/0/required",
+    "keyword": "required",
+    "params": {
+      "missingProperty": "minValue"
+    },
+    "message": "must have required property 'minValue'"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/5/anyOf/1/required",
+    "keyword": "required",
+    "params": {
+      "missingProperty": "maxValue"
+    },
+    "message": "must have required property 'maxValue'"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/5/anyOf",
+    "keyword": "anyOf",
+    "params": {},
+    "message": "must match a schema in anyOf"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/5/required",
+    "keyword": "required",
+    "params": {
+      "missingProperty": "npcId"
+    },
+    "message": "must have required property 'npcId'"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/5/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "questId"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/5/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "status"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0/kind",
+    "schemaPath": "#/oneOf/5/properties/kind/const",
+    "keyword": "const",
+    "params": {
+      "allowedValue": "npcRelationship"
+    },
+    "message": "must be equal to constant"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/6/required",
+    "keyword": "required",
+    "params": {
+      "missingProperty": "nodeId"
+    },
+    "message": "must have required property 'nodeId'"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/6/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "questId"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/6/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "status"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0/kind",
+    "schemaPath": "#/oneOf/6/properties/kind/const",
+    "keyword": "const",
+    "params": {
+      "allowedValue": "knowledgeKnown"
+    },
+    "message": "must be equal to constant"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/7/required",
+    "keyword": "required",
+    "params": {
+      "missingProperty": "nodeId"
+    },
+    "message": "must have required property 'nodeId'"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/7/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "questId"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/7/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "status"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0/kind",
+    "schemaPath": "#/oneOf/7/properties/kind/const",
+    "keyword": "const",
+    "params": {
+      "allowedValue": "npcKnows"
+    },
+    "message": "must be equal to constant"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/8/required",
+    "keyword": "required",
+    "params": {
+      "missingProperty": "isMember"
+    },
+    "message": "must have required property 'isMember'"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/8/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "questId"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/8/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "status"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0/kind",
+    "schemaPath": "#/oneOf/8/properties/kind/const",
+    "keyword": "const",
+    "params": {
+      "allowedValue": "factionMembership"
+    },
+    "message": "must be equal to constant"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/9/required",
+    "keyword": "required",
+    "params": {
+      "missingProperty": "martialArtId"
+    },
+    "message": "must have required property 'martialArtId'"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/9/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "questId"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/9/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "status"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0/kind",
+    "schemaPath": "#/oneOf/9/properties/kind/const",
+    "keyword": "const",
+    "params": {
+      "allowedValue": "martialArtEligible"
+    },
+    "message": "must be equal to constant"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/10/required",
+    "keyword": "required",
+    "params": {
+      "missingProperty": "periodId"
+    },
+    "message": "must have required property 'periodId'"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/10/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "questId"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/10/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "status"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0/kind",
+    "schemaPath": "#/oneOf/10/properties/kind/const",
+    "keyword": "const",
+    "params": {
+      "allowedValue": "timeOfDay"
+    },
+    "message": "must be equal to constant"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/11/required",
+    "keyword": "required",
+    "params": {
+      "missingProperty": "weatherId"
+    },
+    "message": "must have required property 'weatherId'"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/11/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "questId"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/11/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "status"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0/kind",
+    "schemaPath": "#/oneOf/11/properties/kind/const",
+    "keyword": "const",
+    "params": {
+      "allowedValue": "weather"
+    },
+    "message": "must be equal to constant"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/12/required",
+    "keyword": "required",
+    "params": {
+      "missingProperty": "key"
+    },
+    "message": "must have required property 'key'"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/12/required",
+    "keyword": "required",
+    "params": {
+      "missingProperty": "operator"
+    },
+    "message": "must have required property 'operator'"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/12/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "questId"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf/12/additionalProperties",
+    "keyword": "additionalProperties",
+    "params": {
+      "additionalProperty": "status"
+    },
+    "message": "must NOT have additional properties"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0/kind",
+    "schemaPath": "#/oneOf/12/properties/kind/const",
+    "keyword": "const",
+    "params": {
+      "allowedValue": "variable"
+    },
+    "message": "must be equal to constant"
+  },
+  {
+    "instancePath": "/conversations/1/nodes/0/options/2/conditions/0",
+    "schemaPath": "#/oneOf",
+    "keyword": "oneOf",
+    "params": {
+      "passingSchemas": null
+    },
+    "message": "must match exactly one schema in oneOf"
+  }
+]

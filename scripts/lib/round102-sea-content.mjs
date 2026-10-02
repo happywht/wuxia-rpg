@@ -37,6 +37,9 @@ function echo(d,flag,label,value){add(d,{id:'r102-echo-'+flag,text:value},option
 export function deepenSeaDialogues(set){
  for(const d of set.conversations){
  if(d.id==='dlg.r83-gu-chaosheng-tide-line'){
+  text(d,'channel-accepted','「天色暗下来再找。石标背海的一面有一条刻线，灯影碰到刻线时，浅湾就能绕过外礁。若还是白日，可先由东南海口(91,71)到风回岛找阮回澜核风灯，再问谢照汀低潮礁道；调查潮生屿后回来报告，傍晚再回青帆看石标。各处潮汐和时辰仍要现场核对，行路不会自动让暮潮调查完成。」');
+  const channelOptions=d.nodes.find(n=>n.id===d.startNodeId).options;
+  if(!channelOptions.some(o=>o.text==='白日可先去哪调查，暮潮怎样回访？'))channelOptions.splice(channelOptions.findIndex(o=>o.nextNodeId==='channel-accepted'),0,option('白日可先去哪调查，暮潮怎样回访？','channel-accepted',[{kind:'questStatus',questId:'quest.r83-night-channel',status:'active'}]));
   text(d,'recovery-complete','「夺网客已退，浅滩见闻和谢仪已经结算；你身上没有新增网具，浮标也不会自动换样。接下暮潮牵标，在黄昏或入夜调查浅滩石标，再来谈沿海补给。」');
   text(d,'channel-complete','「回湾刻线已经记入见闻，谢仪结清。它说明这一段浅湾的辨向，不能凭一条线许诺全海路都安全。由青帆埠东南海口(91,71)到风回岛，再由风回岛东岸关口(97,50)往潮生屿；M舆图可查实际关口。」');
   for(const n of d.nodes)for(const o of n.options??[])if(o.nextNodeId==='recovery-complete')o.text='夺网客已经击退，浅滩见闻已记。';

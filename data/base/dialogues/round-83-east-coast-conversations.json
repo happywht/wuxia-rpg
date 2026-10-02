@@ -87,6 +87,17 @@
               ]
             },
             {
+              "text": "白日可先去哪调查，暮潮怎样回访？",
+              "nextNodeId": "channel-accepted",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r83-night-channel",
+                  "status": "active"
+                }
+              ]
+            },
+            {
               "text": "我去辨认夜里的回湾线。",
               "nextNodeId": "channel-accepted",
               "conditions": [
@@ -196,7 +207,7 @@
         },
         {
           "id": "channel-accepted",
-          "text": "「天色暗下来再找。石标背海的一面有一条刻线，灯影碰到刻线时，浅湾就能绕过外礁。」"
+          "text": "「天色暗下来再找。石标背海的一面有一条刻线，灯影碰到刻线时，浅湾就能绕过外礁。若还是白日，可先由东南海口(91,71)到风回岛找阮回澜核风灯，再问谢照汀低潮礁道；调查潮生屿后回来报告，傍晚再回青帆看石标。各处潮汐和时辰仍要现场核对，行路不会自动让暮潮调查完成。」"
         },
         {
           "id": "channel-complete",
