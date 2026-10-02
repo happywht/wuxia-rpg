@@ -22,7 +22,7 @@ export type QuestTrackerTone = 'notice' | 'guide' | 'tracked';
 
 export interface QuestTrackerInput {
   /** Live placed NPCs of the CURRENT map, exactly as the scene walks them. */
-  npcs: readonly { col: number; row: number; record: { name: string; questGiver?: boolean } }[];
+  npcs: readonly { col: number; row: number; record: { name: string; questGiver?: boolean; shopId?: string | null } }[];
   position: { col: number; row: number };
   quests: ReadonlyMap<string, QuestData>;
   journal: QuestJournal;
@@ -51,7 +51,7 @@ export function projectQuestTrackerLine(input: QuestTrackerInput): QuestTrackerL
     return {
       text: guide === undefined
         ? 'Q 查看差事 · H 查看操作'
-        : `附近：${guide.record.name} (${guide.col},${guide.row}) · 相邻按 F 打听 / E 看托付 · Q 查差事`,
+        : `附近：${guide.record.name} (${guide.col},${guide.row}) · 相邻按 F 打听 / E ${guide.record.shopId ? '看商铺' : '看托付'} · Q 查差事`,
       tone: 'guide',
     };
   }
