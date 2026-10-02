@@ -73,6 +73,17 @@ export function deepenSeaDialogues(set){
   echo(d,'keeper-aid','青帆埠的补给决定，你如何看？','「留的回春膏已记作守礁应急份额，我领这份情；岸上的伤者不是因此就都安稳了。」');
  }
  if(d.id==='dlg.r97-ji-wuchao'){
+  for(const [flag,response] of [
+   ['public','「公开辨潮记号已用厚蚌壳片2片制样，不用再交。散船可自行核看，假号客也能照学；引航礁虞星槎仍承担辨假号的余担。先记澜心观汐台灯谱，再到引航礁核准并听他的回应，传航范围不会因复谈更改。」'],
+   ['crew','「熟船值守已收清心丸1份，不用再交。队内互认省时，陌生散船仍要停下核簿；引航礁虞星槎会说谁承担等候。先记澜心观汐台灯谱，再去核准并听他的回应，传航范围不会因复谈更改。」']]){
+   const id='r171-pilot-'+flag+'-review';
+   const node={id,text:response};
+   const entry=option('传航已定，再核对范围与后续。',id,[known('event.r102-pilot-'+flag)]);
+   const ni=d.nodes.findIndex(n=>n.id===id);if(ni>=0)d.nodes[ni]=node;else{const before=d.nodes.findIndex(n=>n.id.startsWith('r102-'));d.nodes.splice(before<0?d.nodes.length:before,0,node);}
+   const opts=d.nodes.find(n=>n.id===d.startNodeId).options;
+   const oi=opts.findIndex(o=>o.nextNodeId===id);if(oi>=0)opts[oi]=entry;else{const before=opts.findIndex(o=>o.nextNodeId.startsWith('r102-'));opts.splice(before<0?opts.length-1:before,0,entry);}
+  }
+
   text(d,'accepted','「北沙脊潮痕碑(58,22)按E调查，再来复核；这处调查没有额外低潮条件，局部通路限制看提示。上午我在(50,44)、日中在(54,50)，其余时段看M人物位置；已有见闻不用重复描刻。」');
   text(d,'active','「先记潮痕碑，再报告；先前闲聊不算复命。潮时在见闻里，没有簿页物品。下一步核观汐台(46,76)灯谱，可在去引航礁前顺路记好，少一次往返。」');
   text(d,'completed','「潮簿已经核定，谢仪结清。先顺路记观汐台灯谱，再由东北关口到引航礁向虞星槎承接并报告；已有灯谱见闻会同步，不必再渡回来。澜心洲西口通风回岛、南口通潮生屿。」');

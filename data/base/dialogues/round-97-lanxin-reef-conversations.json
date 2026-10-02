@@ -52,6 +52,26 @@
               "nextNodeId": "route"
             },
             {
+              "text": "传航已定，再核对范围与后续。",
+              "nextNodeId": "r171-pilot-public-review",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-public"
+                }
+              ]
+            },
+            {
+              "text": "传航已定，再核对范围与后续。",
+              "nextNodeId": "r171-pilot-crew-review",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-pilot-crew"
+                }
+              ]
+            },
+            {
               "text": "核过的潮时传给散船，还是只传熟船队？",
               "nextNodeId": "r102-pilot-choice",
               "conditions": [
@@ -308,6 +328,14 @@
         {
           "id": "farewell",
           "text": "季无潮把潮簿揣回怀里，目光仍落在湾口的潮头上。"
+        },
+        {
+          "id": "r171-pilot-public-review",
+          "text": "「公开辨潮记号已用厚蚌壳片2片制样，不用再交。散船可自行核看，假号客也能照学；引航礁虞星槎仍承担辨假号的余担。先记澜心观汐台灯谱，再到引航礁核准并听他的回应，传航范围不会因复谈更改。」"
+        },
+        {
+          "id": "r171-pilot-crew-review",
+          "text": "「熟船值守已收清心丸1份，不用再交。队内互认省时，陌生散船仍要停下核簿；引航礁虞星槎会说谁承担等候。先记澜心观汐台灯谱，再去核准并听他的回应，传航范围不会因复谈更改。」"
         },
         {
           "id": "r102-pilot-choice",
