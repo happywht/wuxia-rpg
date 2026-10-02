@@ -86,7 +86,10 @@ import {
   type ClimateWeatherData,
 } from '../engine/climate-system';
 import { type SocialState, applySocialChange, createSocialState } from '../engine/social-state';
-import { applyQuestRewardConsequences } from '../engine/quest-consequences';
+import {
+  applyQuestRewardConsequences,
+  questKnowledgeNodeIdsToBackfill,
+} from '../engine/quest-consequences';
 import {
   NpcOccupancyIndex,
   type PlacedNpc,
@@ -846,6 +849,17 @@ export class GridScene extends Phaser.Scene {
       this.playerCol = map.playerStart.col;
       this.playerRow = map.playerStart.row;
     }
+    // Old saves can contain accepted/completed tasks from before their
+    // dialogue added an explicit knowledge-discovery effect. Recover only
+    // the matching, data-authored quest graph nodes; never reveal offered or
+    // locked tasks merely because they exist in the world catalog.
+    for (const questId of questKnowledgeNodeIdsToBackfill(
+      this.questJournal,
+      world.knowledgeGraph,
+      this.knownKnowledgeNodeIds,
+    )) {
+      this.markKnowledgeDiscovered(questId);
+    }
     this.social.npcKnowledge = mergeNpcKnowledge(world.knowledgeGraph, this.social.npcKnowledge);
     if (this.playerProfile !== null && this.playerState !== null) {
       applyMeridianEffects(
@@ -927,6 +941,11 @@ export class GridScene extends Phaser.Scene {
     this.questPanel = new QuestPanel(this, {
       onClose: () => this.noteOverlayClosed(),
       onUpdate: (update) => this.applyQuestUpdate(update),
+      onQuestAccepted: (questId) => {
+        if (this.world?.knowledgeGraph.nodes.get(questId)?.kind === 'quest') {
+          this.markKnowledgeDiscovered(questId);
+        }
+      },
       onNavigateQuest: (questId) => this.navigateQuestObjective(questId),
     });
     this.pauseMenu = new PauseMenuPanel(this, {

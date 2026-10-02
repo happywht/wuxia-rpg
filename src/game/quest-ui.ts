@@ -96,6 +96,7 @@ export interface QuestPanelModel {
 export interface QuestPanelOptions {
   onClose?: () => void;
   onUpdate?: (update: QuestUpdateResult) => void;
+  onQuestAccepted?: (questId: string) => void;
   /**
    * Round 60 N-key navigation: resolves one active quest's next unfinished
    * spatial objective. The scene answers whether navigation started (the
@@ -131,6 +132,7 @@ export class QuestPanel {
   private readonly bindings: PanelKeyBinding[] = [];
   private readonly onClose?: () => void;
   private readonly onUpdate?: (update: QuestUpdateResult) => void;
+  private readonly onQuestAccepted?: (questId: string) => void;
   private readonly onNavigateQuest?: (questId: string) => { ok: boolean; message: string };
   private model: QuestPanelModel | null = null;
   private selection = 0;
@@ -147,6 +149,7 @@ export class QuestPanel {
     this.scene = scene;
     this.onClose = options.onClose;
     this.onUpdate = options.onUpdate;
+    this.onQuestAccepted = options.onQuestAccepted;
     this.onNavigateQuest = options.onNavigateQuest;
     this.container = scene.add.container(0, 0).setVisible(false).setDepth(1200);
   }
@@ -280,6 +283,7 @@ export class QuestPanel {
       this.status = result.update.failedQuestIds.length > 0
         ? `已接取「${quest.name}」，另一条岔路就此封止`
         : `已接取「${quest.name}」`;
+      this.onQuestAccepted?.(quest.id);
       this.onUpdate?.(result.update);
     } else if (state?.status === 'active') {
       toggleTrackedQuest(model.journal, quest.id);

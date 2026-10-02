@@ -33,7 +33,10 @@ import { parseGameCalendar } from '../src/engine/game-calendar';
 import { parseClimate } from '../src/engine/climate-system';
 import { assembleWorldMap, parseWorldMap, selectInteractableRegionEvent } from '../src/engine/world-map';
 import { shouldPreferRegionalEventInteraction } from '../src/engine/interaction-priority';
-import { applyQuestRewardConsequences } from '../src/engine/quest-consequences';
+import {
+  applyQuestRewardConsequences,
+  questKnowledgeNodeIdsToBackfill,
+} from '../src/engine/quest-consequences';
 import { createSocialState } from '../src/engine/social-state';
 import {
   acceptQuest,
@@ -526,6 +529,43 @@ describe('Round 87 Southwest Isles within the expanded world atlas', () => {
       .toEqual(expect.arrayContaining(['kg.edge.r87-quest-signal', 'kg.edge.r87-quest-spring']));
     expect(applyQuestRewardConsequences(report.completed[0]!, createSocialState(), knownKnowledgeNodeIds)
       .discoveredKnowledgeNodeIds).toEqual([]);
+  });
+
+  it('backfills only encountered quest entries from older journal states', () => {
+    const nodeSet = parseKnowledgeNodeSet(readJson('../data/base/knowledge_graph/nodes.json'));
+    const edgeSet = parseKnowledgeEdgeSet(readJson('../data/base/knowledge_graph/edges.json'));
+    const questSet = parseQuestSet(readJson('../data/base/quests/round-87-southwest-isle-quests.json'));
+    expect(nodeSet.ok && edgeSet.ok && questSet.ok).toBe(true);
+    if (!nodeSet.ok || !edgeSet.ok || !questSet.ok) return;
+    const graph = assembleKnowledgeGraph(nodeSet.data, edgeSet.data);
+    const quests = assembleQuests({
+      questSet: questSet.set,
+      questGiverNpcIds: new Set([PILOT_ID]),
+      npcIds: new Set([PILOT_ID, KEEPER_ID]),
+      itemIds: new Set(), encounterIds: new Set(), factionIds: new Set(),
+      knowledgeNodeIds: new Set(graph.nodes.keys()),
+    });
+    const journal = createQuestJournal(quests.quests);
+    const known = new Set<string>([PILOT_ID]);
+    const state = journal.states.get(QUEST_ID)!;
+
+    state.status = 'offered';
+    expect(questKnowledgeNodeIdsToBackfill(journal, graph, known)).not.toContain(QUEST_ID);
+    state.status = 'locked';
+    expect(questKnowledgeNodeIdsToBackfill(journal, graph, known)).not.toContain(QUEST_ID);
+    for (const status of ['active', 'completed', 'failed'] as const) {
+      state.status = status;
+      const discovered = questKnowledgeNodeIdsToBackfill(journal, graph, known);
+      expect(discovered).toContain(QUEST_ID);
+      const projectedKnowledge = new Set([...known, ...discovered]);
+      expect(getKnownKnowledgeEdges(graph, projectedKnowledge, QUEST_ID).map(({ id }) => id))
+        .toContain('kg.edge.r87-pilot-quest');
+      expect(getKnownKnowledgeEdges(graph, projectedKnowledge, QUEST_ID).map(({ id }) => id))
+        .not.toContain('kg.edge.r87-quest-spring');
+    }
+    known.add(QUEST_ID);
+    state.status = 'completed';
+    expect(questKnowledgeNodeIdsToBackfill(journal, graph, known)).not.toContain(QUEST_ID);
   });
 
   it('closes the world travel graph across all ten regions and routes Q/N navigation both ways', () => {

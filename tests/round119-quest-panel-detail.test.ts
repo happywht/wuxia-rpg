@@ -172,8 +172,10 @@ function setupPanel(viewWidth: number, viewHeight: number) {
   } as unknown as Phaser.Scene;
   const updates: string[] = [];
   const navigated: string[] = [];
+  const accepted: string[] = [];
   const panel = new QuestPanel(scene, {
     onUpdate: () => updates.push('updated'),
+    onQuestAccepted: (id) => accepted.push(id),
     onNavigateQuest: (id) => { navigated.push(id); return { ok: false, message: '尚缺当前调查的有效落脚格' }; },
   });
   const journal = createQuestJournal(quests);
@@ -182,7 +184,7 @@ function setupPanel(viewWidth: number, viewHeight: number) {
   panel.open({ quests, journal, itemCounts: new Map(), access: { factionId: null, knownKnowledgeNodeIds: new Set() } });
   const visible = () => shown.filter((t) => !t.destroyed && t.text.length > 0 && t.x > -300);
   const press = (code: number) => { for (const fn of [...keys.get(code) ?? []]) fn(); };
-  return { panel, journal, shown, visible, press, updates, state, navigated };
+  return { panel, journal, shown, visible, press, updates, state, navigated, accepted };
 }
 
 describe('Round119 QuestPanel paged CJK detail with intact row semantics', () => {
@@ -236,6 +238,7 @@ describe('Round119 QuestPanel paged CJK detail with intact row semantics', () =>
     r.press(3); // Enter on the offered tide ledger.
     expect(r.state.status).toBe('active');
     expect(r.journal.trackedQuestId).toBe(tideLedger.id);
+    expect(r.accepted).toEqual([tideLedger.id]);
     expect(r.visible().some(t => t.text.includes('已接取'))).toBe(true);
     expect(r.updates.length).toBeGreaterThan(0);
     r.press(4); // N forwards the selected id; a readable refusal keeps the panel open.

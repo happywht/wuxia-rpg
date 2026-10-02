@@ -4,7 +4,8 @@ import {
   adjustFactionRenown,
   type SocialState,
 } from './social-state';
-import type { QuestRewardGrant } from './quest-system';
+import type { KnowledgeGraph } from './knowledge-graph';
+import type { QuestJournal, QuestRewardGrant, QuestStatus } from './quest-system';
 
 export interface QuestFactionRenownChange {
   factionId: string;
@@ -15,6 +16,25 @@ export interface QuestFactionRenownChange {
 export interface QuestRewardConsequenceResult {
   factionRenown: readonly QuestFactionRenownChange[];
   discoveredKnowledgeNodeIds: readonly string[];
+}
+
+/**
+ * Accepted tasks are knowledge the player has encountered. Older saves may
+ * predate an authored dialogue discovery effect, so recover matching quest
+ * entries from durable journal states without exposing offered/locked tasks.
+ */
+export function questKnowledgeNodeIdsToBackfill(
+  journal: Pick<QuestJournal, 'states'>,
+  graph: Pick<KnowledgeGraph, 'nodes'>,
+  knownKnowledgeNodeIds: ReadonlySet<string>,
+): string[] {
+  const discoveredStatuses = new Set<QuestStatus>(['active', 'completed', 'failed']);
+  const ids: string[] = [];
+  for (const [questId, state] of journal.states) {
+    if (!discoveredStatuses.has(state.status) || knownKnowledgeNodeIds.has(questId)) continue;
+    if (graph.nodes.get(questId)?.kind === 'quest') ids.push(questId);
+  }
+  return ids;
 }
 
 /**
