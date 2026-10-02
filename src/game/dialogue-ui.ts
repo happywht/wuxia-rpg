@@ -242,7 +242,7 @@ export class DialoguePanel {
       }
       this.displayedRawIndex = request.rawIndex;
     } else {
-      if (session.currentNode.confirmEffects === true && visible[this.selection]?.index !== this.displayedRawIndex) {
+      if (visible.length > 0 && visible[this.selection]?.index !== this.displayedRawIndex) {
         this.feedback = '选项或条件已改变，请重新选择。';
         this.feedbackWarn = true;
         this.selection = 0;
@@ -327,7 +327,7 @@ export class DialoguePanel {
     makeText(left + PADDING, top + PADDING, this.speakerName, uiFontSize(15), UI.speaker);
     const body = makeText(left + PADDING, top + PADDING + NAME_LINE_HEIGHT, '', uiFontSize(14), UI.textPrimary);
     body.setText('测'); // Initialize canvas font metrics before measuring mixed scripts.
-    const source = (this.effectConfirmation ? session.currentNode.text + '\n\n本次选择：' + this.effectConfirmation.label + '\n确认后按所列代价结算，原决定不可改选。默认先不决定。' : session.currentNode.text) + (this.feedback === null ? '' : `\n\n—— ${this.feedback}`);
+    const source = (this.effectConfirmation ? session.currentNode.text + '\n\n本次选择：' + this.effectConfirmation.label + '\n确认后按所列代价立即结算，请核对本次选择与后果。默认先不决定。' : session.currentNode.text) + (this.feedback === null ? '' : `\n\n—— ${this.feedback}`);
     this.bodyPages = paginateDialogueLines(wrapDialogueText(source, contentWidth - 8, value => body.context.measureText(value).width), Math.floor(bodyHeight / bodyLineHeight));
     this.bodyPage = Math.min(this.bodyPage, this.bodyPages.length - 1);
     body.setText(this.bodyPages[this.bodyPage]!);

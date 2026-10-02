@@ -1,0 +1,31 @@
+{
+  "scope": "Authored terrain only; NPCs, encounters and live movement require normal UI verification. Not journey evidence.",
+  "mapId": "map.round-67-salt-road",
+  "start": [
+    26,
+    28
+  ],
+  "target": [
+    48,
+    48
+  ],
+  "length": 42,
+  "segments": [
+    {
+      "direction": "Right",
+      "count": 21
+    },
+    {
+      "direction": "Down",
+      "count": 12
+    },
+    {
+      "direction": "Right",
+      "count": 1
+    },
+    {
+      "direction": "Down",
+      "count": 8
+    }
+  ]
+}

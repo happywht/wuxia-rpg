@@ -1,0 +1,95 @@
+{
+  "scope": "Authored terrain only; NPCs, encounters and live movement require normal UI verification. Not journey evidence.",
+  "mapId": "map.round-62-iron-ridge",
+  "start": [
+    4,
+    7
+  ],
+  "target": [
+    47,
+    50
+  ],
+  "length": 86,
+  "segments": [
+    {
+      "direction": "Right",
+      "count": 26
+    },
+    {
+      "direction": "Down",
+      "count": 10
+    },
+    {
+      "direction": "Right",
+      "count": 2
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Right",
+      "count": 4
+    },
+    {
+      "direction": "Down",
+      "count": 3
+    },
+    {
+      "direction": "Right",
+      "count": 5
+    },
+    {
+      "direction": "Down",
+      "count": 19
+    },
+    {
+      "direction": "Right",
+      "count": 1
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Right",
+      "count": 1
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Right",
+      "count": 1
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Right",
+      "count": 1
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Right",
+      "count": 1
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Right",
+      "count": 1
+    },
+    {
+      "direction": "Down",
+      "count": 5
+    }
+  ]
+}

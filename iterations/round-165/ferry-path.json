@@ -1,0 +1,43 @@
+{
+  "scope": "Authored terrain only; NPCs, encounters and live movement require normal UI verification. Not journey evidence.",
+  "mapId": "map.round-10-mist-ferry",
+  "start": [
+    3,
+    2
+  ],
+  "target": [
+    88,
+    15
+  ],
+  "length": 98,
+  "segments": [
+    {
+      "direction": "Right",
+      "count": 49
+    },
+    {
+      "direction": "Down",
+      "count": 11
+    },
+    {
+      "direction": "Right",
+      "count": 2
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Right",
+      "count": 4
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Right",
+      "count": 30
+    }
+  ]
+}

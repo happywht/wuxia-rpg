@@ -1,0 +1,63 @@
+{
+  "scope": "Authored terrain only; NPCs, encounters and live movement require normal UI verification. Not journey evidence.",
+  "mapId": "map.round-67-salt-road",
+  "start": [
+    48,
+    48
+  ],
+  "target": [
+    93,
+    74
+  ],
+  "length": 71,
+  "segments": [
+    {
+      "direction": "Right",
+      "count": 3
+    },
+    {
+      "direction": "Down",
+      "count": 2
+    },
+    {
+      "direction": "Right",
+      "count": 1
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Right",
+      "count": 5
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Right",
+      "count": 2
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Right",
+      "count": 2
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Right",
+      "count": 32
+    },
+    {
+      "direction": "Down",
+      "count": 20
+    }
+  ]
+}

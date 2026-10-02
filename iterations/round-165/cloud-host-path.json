@@ -1,0 +1,47 @@
+{
+  "scope": "Authored terrain only; NPCs, encounters and live movement require normal UI verification. Not journey evidence.",
+  "mapId": "map.round-74-cloud-ridge",
+  "start": [
+    50,
+    97
+  ],
+  "target": [
+    40,
+    43
+  ],
+  "length": 64,
+  "segments": [
+    {
+      "direction": "Up",
+      "count": 41
+    },
+    {
+      "direction": "Left",
+      "count": 2
+    },
+    {
+      "direction": "Up",
+      "count": 7
+    },
+    {
+      "direction": "Left",
+      "count": 2
+    },
+    {
+      "direction": "Up",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 1
+    },
+    {
+      "direction": "Up",
+      "count": 5
+    },
+    {
+      "direction": "Left",
+      "count": 5
+    }
+  ]
+}
