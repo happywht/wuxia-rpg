@@ -18,14 +18,15 @@
 
 通用leaveFaction确认默认取消，并防止动态选项替换。独立r163实际完成大陆公开署名、井药援助的云岭回应、三证与悬桥结案，最终正常保存恢复Lv7/银410。37专项及1461全量测试、build通过；首次类型检查失败修复记录保留。三新终章仍2/3，goal active，下一Round166北境公开旅程。计划/实走/验证见iterations/round-165/。R164武学字体误读已核对为翻磅劲。
 
+**当前进度：Round 189 开发中；活动goal持续推进，Round188完成但未关闭整体目标。**
+
 # wuxia-rpg —《墨痕江湖》（工作标题）
 
 一款**原创**中文武侠 RPG：数据优先架构，TypeScript + Phaser 4 + Vite。本项目受文曲星系列掌上武侠 RPG 的**广泛玩法原则**（自由探索、NPC 交互、道德选择、成长与武学）启发，是独立新作——**不包含任何原作游戏的角色、地名、对话、剧情、源代码或美术/音频素材**。对照与证据分级见 `docs/ORIGINAL-FIDELITY.md`。
 
 - 设计文档：`docs/GDD.md`
 - 新版产品目标：[PROJECT-GOALS.md](docs/PROJECT-GOALS.md)；当前系统与内容盘点：[CURRENT-STATE-AUDIT.md](docs/CURRENT-STATE-AUDIT.md)
-- 逐轮路线图（R00–R138+）：`ROADMAP.md`
-- 当前进度：**Round 157 已完成；下一轮 Round 158**。整个产品目标仍在推进中。
+- 逐轮路线图（R00–R189+）：`ROADMAP.md`
 - 下一阶段优先丰富、串联和细化现有 22 个区域：开局闭环、大陆/北境/海路章节、任务差异、五派成长、制作经济、人物后果与结局回响。扩地图须证明其产品价值；静态盘点可运行 `npm run audit:content-state`，该命令不代表真实旅程验收。
 
 ## 范围
