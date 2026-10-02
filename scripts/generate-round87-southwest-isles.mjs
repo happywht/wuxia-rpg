@@ -643,7 +643,10 @@ const dialogues = {
             text: '这趟雾航我接了。',
             nextNodeId: 'accepted',
             conditions: [{ kind: 'questStatus', questId, status: 'offered' }],
-            effects: [{ kind: 'acceptQuest', questId }],
+            effects: [
+              { kind: 'acceptQuest', questId },
+              { kind: 'discoverKnowledgeNode', nodeId: questId },
+            ],
           },
           {
             text: '雾信已经验回来了。',

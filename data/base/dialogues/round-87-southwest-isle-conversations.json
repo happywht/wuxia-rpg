@@ -22,6 +22,10 @@
                 {
                   "kind": "acceptQuest",
                   "questId": "quest.r87-fog-pilot-ledger"
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "quest.r87-fog-pilot-ledger"
                 }
               ]
             },

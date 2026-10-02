@@ -22,12 +22,19 @@ import { describe, expect, it } from 'vitest';
 import { parseDialogueSet, validateConversation } from '../src/engine/dialogue-graph';
 import { parseGridMap, type GridMap } from '../src/engine/grid-map';
 import { findGridPath } from '../src/engine/grid-path';
-import { parseKnowledgeNodeSet } from '../src/engine/knowledge-graph';
+import {
+  assembleKnowledgeGraph,
+  getKnownKnowledgeEdges,
+  parseKnowledgeEdgeSet,
+  parseKnowledgeNodeSet,
+} from '../src/engine/knowledge-graph';
 import { parseNpcSet, type PlacedNpc } from '../src/engine/npc-placement';
 import { parseGameCalendar } from '../src/engine/game-calendar';
 import { parseClimate } from '../src/engine/climate-system';
 import { assembleWorldMap, parseWorldMap, selectInteractableRegionEvent } from '../src/engine/world-map';
 import { shouldPreferRegionalEventInteraction } from '../src/engine/interaction-priority';
+import { applyQuestRewardConsequences } from '../src/engine/quest-consequences';
+import { createSocialState } from '../src/engine/social-state';
 import {
   acceptQuest,
   applyQuestSignal,
@@ -473,13 +480,18 @@ describe('Round 87 Southwest Isles within the expanded world atlas', () => {
       expect(validateConversation(conversation), conversation.id).toEqual([]);
     }
     const giverConversation = dialogueSet.set.conversations.find(({ id }) => id === pilot.dialogueId)!;
-    expect(giverConversation.nodes.find(({ id }) => id === 'greet')?.options?.some(({ effects }) =>
-      effects?.some((effect) => effect.kind === 'acceptQuest' && effect.questId === QUEST_ID))).toBe(true);
+    const acceptOption = giverConversation.nodes.find(({ id }) => id === 'greet')?.options?.find(({ effects }) =>
+      effects?.some((effect) => effect.kind === 'acceptQuest' && effect.questId === QUEST_ID));
+    expect(acceptOption?.effects).toContainEqual({ kind: 'discoverKnowledgeNode', nodeId: QUEST_ID });
     expect(giverConversation.nodes.find(({ id }) => id === 'greet')?.options?.some(({ conditions }) =>
       conditions?.some((condition) => condition.kind === 'questStatus' && condition.questId === QUEST_ID && condition.status === 'active'))).toBe(true);
     expect(dialogueSet.set.conversations.some(({ id }) => id === keeper.dialogueId)).toBe(true);
 
     const knowledgeNodeIds = new Set(knowledgeSet.data.nodes.map(({ id }) => id));
+    const knowledgeEdgeSet = parseKnowledgeEdgeSet(readJson('../data/base/knowledge_graph/edges.json'));
+    expect(knowledgeEdgeSet.ok).toBe(true);
+    if (!knowledgeEdgeSet.ok) return;
+    const knowledgeGraph = assembleKnowledgeGraph(knowledgeSet.data, knowledgeEdgeSet.data);
     const quests = assembleQuests({
       questSet: questSet.set,
       questGiverNpcIds: new Set([PILOT_ID]),
@@ -494,13 +506,26 @@ describe('Round 87 Southwest Isles within the expanded world atlas', () => {
 
     const journal = createQuestJournal(quests.quests);
     expect(acceptQuest(quests.quests, journal, QUEST_ID).ok).toBe(true);
+    const knownKnowledgeNodeIds = new Set<string>([ISLE_NODE, PILOT_ID]);
+    for (const effect of acceptOption?.effects ?? []) {
+      if (effect.kind === 'discoverKnowledgeNode') knownKnowledgeNodeIds.add(effect.nodeId);
+    }
+    expect(getKnownKnowledgeEdges(knowledgeGraph, knownKnowledgeNodeIds, QUEST_ID).map(({ id }) => id))
+      .toContain('kg.edge.r87-pilot-quest');
     const landing = applyQuestSignal(quests.quests, journal, { type: 'knowledge-discovery', nodeId: ISLE_NODE });
     expect(landing.completed).toEqual([]);
     const survey = applyQuestSignal(quests.quests, journal, { type: 'knowledge-discovery', nodeId: SIGNAL_NODE });
     expect(survey.completed).toEqual([]);
+    knownKnowledgeNodeIds.add(SIGNAL_NODE);
     const report = applyQuestSignal(quests.quests, journal, { type: 'npc-talk', npcId: PILOT_ID });
     expect(report.completed.map(({ questId }) => questId)).toEqual([QUEST_ID]);
     expect(report.completed[0]?.discoverKnowledgeNodeIds).toContain(SPRING_NODE);
+    const consequence = applyQuestRewardConsequences(report.completed[0]!, createSocialState(), knownKnowledgeNodeIds);
+    expect(consequence.discoveredKnowledgeNodeIds).toEqual([SPRING_NODE]);
+    expect(getKnownKnowledgeEdges(knowledgeGraph, knownKnowledgeNodeIds, QUEST_ID).map(({ id }) => id))
+      .toEqual(expect.arrayContaining(['kg.edge.r87-quest-signal', 'kg.edge.r87-quest-spring']));
+    expect(applyQuestRewardConsequences(report.completed[0]!, createSocialState(), knownKnowledgeNodeIds)
+      .discoveredKnowledgeNodeIds).toEqual([]);
   });
 
   it('closes the world travel graph across all ten regions and routes Q/N navigation both ways', () => {
