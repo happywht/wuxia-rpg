@@ -116,6 +116,8 @@ export interface DialogueOptionData {
 
 /** A dialogue node; omitted or empty `options` marks an end node. */
 export interface DialogueNodeData {
+  /** Explicit player confirmation before an effectful option. */
+  confirmEffects?: boolean;
   id: string;
   text: string;
   options?: DialogueOptionData[];
@@ -575,10 +577,11 @@ export function parseDialogueSet(raw: unknown): DialogueSetParseResult {
         problems.push(`${nodeLabel}：应为对象`);
         return;
       }
-      if (!hasOnlyKeys(node, ['id', 'text', 'options'])) {
+      if (!hasOnlyKeys(node, ['id', 'text', 'options', 'confirmEffects'])) {
         problems.push(`${nodeLabel}：含有未声明字段`);
         return;
       }
+      if (node.confirmEffects !== undefined && typeof node.confirmEffects !== 'boolean') { problems.push(`${nodeLabel}.confirmEffects：应为布尔值`); return; }
       const nodeId = requireNonEmptyString(node.id);
       const text = requireNonEmptyString(node.text);
       const options = parseOptions(node.options);
@@ -598,7 +601,7 @@ export function parseDialogueSet(raw: unknown): DialogueSetParseResult {
         return;
       }
 
-      nodes.push(options === undefined ? { id: nodeId, text } : { id: nodeId, text, options });
+      nodes.push({ id: nodeId, text, ...(options === undefined ? {} : { options }), ...(node.confirmEffects === undefined ? {} : { confirmEffects: node.confirmEffects }) });
     });
 
     if (problems.length > 0) {

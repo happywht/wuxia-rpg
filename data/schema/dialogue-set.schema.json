@@ -46,6 +46,7 @@
                   "minLength": 1,
                   "maxLength": 500
                 },
+                "confirmEffects": { "type": "boolean", "description": "带效果选项须二次确认，默认取消；省略沿用旧操作。" },
                 "options": {
                   "type": "array",
                   "description": "玩家可选分支；省略或空数组表示结束节点。",

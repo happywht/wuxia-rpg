@@ -30,7 +30,7 @@ export function deepenSeaQuests(set){
 function choice(d,id,prompt,gate,branches){
  if(!d.nodes.some(n=>n.id==='farewell'))d.nodes.push({id:'farewell',text:'你暂且收住话头，先去筹备要用的物资。'});
  const settled='event.r102-'+id+'-settled';
- add(d,{id:'r102-'+id+'-choice',text:prompt,options:[...branches.map(b=>option(b.label,'r102-'+b.flag,[known(settled,false),has(b.item,b.quantity??1)],[take(b.item,b.quantity??1),...b.effects,discover('event.r102-'+b.flag),discover(settled)])),option('先备好物资，再作决定。','farewell')]},option(prompt,'r102-'+id+'-choice',[...gate,known(settled,false)]));
+ add(d,{id:'r102-'+id+'-choice',confirmEffects:true,text:prompt,options:[...branches.map(b=>option(b.label,'r102-'+b.flag,[known(settled,false),has(b.item,b.quantity??1)],[take(b.item,b.quantity??1),...b.effects,discover('event.r102-'+b.flag),discover(settled)])),option('先备好物资，再作决定。','farewell')]},option(prompt,'r102-'+id+'-choice',[...gate,known(settled,false)]));
  for(const b of branches)add(d,{id:'r102-'+b.flag,text:b.response});
 }
 function echo(d,flag,label,value){add(d,{id:'r102-echo-'+flag,text:value},option(label,'r102-echo-'+flag,[known('event.r102-'+flag)]));}

@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { DIALOGUE_CONFIRMATION_OPTIONS, requestDialogueEffectConfirmation, resolveDialogueEffectConfirmation, type DialogueEffectConfirmation } from './dialogue-effect-confirmation';
 
 import {
   type DialogueData,
@@ -92,6 +93,7 @@ export class DialoguePanel {
   private controller: DialogueHostController | null = null;
   private speakerName = '';
   private selection = 0;
+  private effectConfirmation: DialogueEffectConfirmation | null = null;
   private feedback: string | null = null;
   private feedbackWarn = false;
   private openState = false;
@@ -124,6 +126,7 @@ export class DialoguePanel {
     if (this.openState) {
       return;
     }
+    this.effectConfirmation = null;
     this.session = new DialogueSession(conversation);
     this.controller = controller;
     this.speakerName = speakerName;
@@ -147,6 +150,7 @@ export class DialoguePanel {
     this.unbindKeys();
     this.container.setVisible(false);
     this.container.removeAll(true);
+    this.effectConfirmation = null;
     this.session = null;
     this.controller = null;
     this.feedback = null;
@@ -175,7 +179,7 @@ export class DialoguePanel {
       [KeyCodes.PAGE_DOWN, () => this.changePage(1, false)],
       [KeyCodes.LEFT, () => this.changePage(-1, true)],
       [KeyCodes.RIGHT, () => this.changePage(1, true)],
-      [KeyCodes.TAB, () => { if (this.session && this.controller?.oralPrerequisites) { this.feedback = this.controller.oralPrerequisites(this.session.currentNode); this.feedbackWarn = false; this.bodyPage = 0; this.renderNode(); } }],
+      [KeyCodes.TAB, () => { if (!this.effectConfirmation && this.session && this.controller?.oralPrerequisites) { this.feedback = this.controller.oralPrerequisites(this.session.currentNode); this.feedbackWarn = false; this.bodyPage = 0; this.renderNode(); } }],
       [KeyCodes.ESC, () => this.close()],
     ];
     for (const [code, handler] of pairs) {
@@ -205,7 +209,7 @@ export class DialoguePanel {
   }
 
   private moveSelection(delta: number): void {
-    const count = this.visibleOptions().length;
+    const count = this.effectConfirmation ? 2 : this.visibleOptions().length;
     if (count === 0) {
       return;
     }
@@ -222,6 +226,41 @@ export class DialoguePanel {
     const action = dialogueConfirmAction(this.bodyPage, this.bodyPages.length, this.optionPage, this.optionPages.length);
     if (action !== 'confirm') { this.changePage(1, action === 'option'); return; }
     const visible = this.visibleOptions();
+    if (this.effectConfirmation !== null) {
+      const request = this.effectConfirmation;
+      const accepted = this.selection === 1;
+      this.effectConfirmation = null;
+      this.bodyPage = 0;
+      this.optionPage = 0;
+      const freshIndex = resolveDialogueEffectConfirmation(request, session.currentNode, visible);
+      this.selection = freshIndex ?? 0;
+      if (!accepted || freshIndex === null) {
+        this.feedback = accepted ? '选项或条件已改变，请重新选择。' : null;
+        this.feedbackWarn = accepted;
+        this.renderNode();
+        return;
+      }
+      this.displayedRawIndex = request.rawIndex;
+    } else {
+      if (session.currentNode.confirmEffects === true && visible[this.selection]?.index !== this.displayedRawIndex) {
+        this.feedback = '选项或条件已改变，请重新选择。';
+        this.feedbackWarn = true;
+        this.selection = 0;
+        this.bodyPage = 0;
+        this.optionPage = 0;
+        this.renderNode();
+        return;
+      }
+      const request = requestDialogueEffectConfirmation(session.currentNode, visible[this.selection]);
+      if (request !== null) {
+        this.effectConfirmation = request;
+        this.selection = 0;
+        this.bodyPage = 0;
+        this.optionPage = 0;
+        this.renderNode();
+        return;
+      }
+    }
     if (visible.length === 0) {
       this.close(); // Enter on an (effectively) option-less node ends the talk.
       return;
@@ -270,7 +309,7 @@ export class DialoguePanel {
     const left = (width - panelWidth) / 2;
     const top = height - 24 - panelHeight;
     const contentWidth = panelWidth - PADDING * 2;
-    const visible = this.visibleOptions();
+    const visible: readonly VisibleDialogueOption[] = this.effectConfirmation ? DIALOGUE_CONFIRMATION_OPTIONS.map((option, index) => ({ option, index })) : this.visibleOptions();
     this.selection = Math.min(this.selection, Math.max(0, visible.length - 1));
     const bodyFont = Number.parseInt(uiFontSize(14), 10);
     const optionFont = Number.parseInt(uiFontSize(13), 10);
@@ -288,7 +327,7 @@ export class DialoguePanel {
     makeText(left + PADDING, top + PADDING, this.speakerName, uiFontSize(15), UI.speaker);
     const body = makeText(left + PADDING, top + PADDING + NAME_LINE_HEIGHT, '', uiFontSize(14), UI.textPrimary);
     body.setText('测'); // Initialize canvas font metrics before measuring mixed scripts.
-    const source = session.currentNode.text + (this.feedback === null ? '' : `\n\n—— ${this.feedback}`);
+    const source = (this.effectConfirmation ? session.currentNode.text + '\n\n本次选择：' + this.effectConfirmation.label + '\n确认后按所列代价结算，原决定不可改选。默认先不决定。' : session.currentNode.text) + (this.feedback === null ? '' : `\n\n—— ${this.feedback}`);
     this.bodyPages = paginateDialogueLines(wrapDialogueText(source, contentWidth - 8, value => body.context.measureText(value).width), Math.floor(bodyHeight / bodyLineHeight));
     this.bodyPage = Math.min(this.bodyPage, this.bodyPages.length - 1);
     body.setText(this.bodyPages[this.bodyPage]!);

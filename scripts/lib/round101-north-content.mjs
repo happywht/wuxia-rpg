@@ -39,7 +39,7 @@ export function deepenNorthDialogues(set){
   setText(d,'accepted','「只走冰河中渡踏痕。落雪日的黄昏、入夜或子夜，到东北燧台按E点验。然后去燧台东南(62,25)击退冒号客，最后找我报告。若先前已赢过这伙人，记录仍作数，不必再找消失的敌人。」');
   setText(d,'active','「先点验再清扰号，最后复命；没核清时的闲聊不算报告。晨光/日中我在石屋(50,26)，暮时在燧台南(58,24)，夜与子夜在(51,27)，午后在(52,28)，黎明也在燧台南。天气或时辰不符，烽台提示会说明。」');
   setText(d,'completed','谷照雪把你记的烽号与册上相核：「这一回点验与复核记妥了，谢仪已结。若仍见冒号客，也可另外清扰，但本回谢仪不再结第二次。纸墨的旧案不能凭这季火号定年，更不能凭旧碑越界。」');
-  add(d,{id:'r101-code-choice',text:'「一烽平安、二烽客至、三烽有事，是现行报码。」谷照雪把册压住，「公开番号，过路人看得懂，也有人能假传；限定报码，真假可核，却让客商多一次询问。传话与护号都要药品备夜路，定了便不能改选。」',options:[
+  add(d,{id:'r101-code-choice',confirmEffects:true,text:'「一烽平安、二烽客至、三烽有事，是现行报码。」谷照雪把册压住，「公开番号，过路人看得懂，也有人能假传；限定报码，真假可核，却让客商多一次询问。传话与护号都要药品备夜路，定了便不能改选。」',options:[
    option('公开番号（清心丸−1，谷关系−4、聂关系+3、声望+2）。','r101-code-open',[known('event.r101-code-settled',false),has(focus)],[take(focus),relation(gu,-4),relation(nie,3),{kind:'adjustRenown',delta:2},discover('event.r101-code-open'),discover('event.r101-code-settled')]),
    option('限定报码（回春膏−1，谷关系+4、聂关系−3、声望−2）。','r101-code-limited',[known('event.r101-code-settled',false),has(aid)],[take(aid),relation(gu,4),relation(nie,-3),{kind:'adjustRenown',delta:-2},discover('event.r101-code-limited'),discover('event.r101-code-settled')]),option('先筹备药品，稍后再定。','farewell')
   ]},option('烽号核妥，番号要传给所有过路人吗？','r101-code-choice',[done('quest.r92-snow-beacon'),known('event.r101-code-settled',false)]));
@@ -53,7 +53,7 @@ export function deepenNorthDialogues(set){
   setText(d,'greet','柳寻径烘着旧裹脚：「谷西有块前朝屯垦界标。我巡的是旧路，不是替前朝复立疆界。去核碑阳刻文，回来报告，谢仪照经验和银两结；不发烈酒或拓纸物品。」');
   setText(d,'accepted','「沿主径过冰溪踏痕，向西南找界标。在石下按E记刻文，见闻自会留住；无需取纸或背回一块碑。核过之后再找我报告。」');
   setText(d,'completed','柳寻径听你复述：「北墉屯界，西至松谷，是前朝屯垦的旧刻，不是大雍的新界令。报告已核，谢仪已结；北界碑与谷界文都要注明时代，不能拿它们给残篇认作者。」');
-  add(d,{id:'r101-mark-choice',text:'柳寻径把旧刻记录放在窗边：「可让人公开张贴前朝注记，免得外人误把旧屯界当今界；也可只留巡路内部，少惹争执，但来人仍要逐个问。传话人要清心丸，护卷人要回春膏，定了不可改选。」',options:[
+  add(d,{id:'r101-mark-choice',confirmEffects:true,text:'柳寻径把旧刻记录放在窗边：「可让人公开张贴前朝注记，免得外人误把旧屯界当今界；也可只留巡路内部，少惹争执，但来人仍要逐个问。传话人要清心丸，护卷人要回春膏，定了不可改选。」',options:[
    option('公开前朝注记（清心丸−1，柳关系−4、声望+3）。','r101-mark-public',[known('event.r101-mark-settled',false),has(focus)],[take(focus),relation(liu,-4),{kind:'adjustRenown',delta:3},discover('event.r101-mark-public'),discover('event.r101-mark-settled')]),
    option('内部留录（回春膏−1，柳关系+4、沈问秋关系−3、声望−2）。','r101-mark-private',[known('event.r101-mark-settled',false),has(aid)],[take(aid),relation(liu,4),relation(shen,-3),{kind:'adjustRenown',delta:-2},discover('event.r101-mark-private'),discover('event.r101-mark-settled')]),option('暂不定夺，先筹备。','farewell')
   ]},option('旧界文该怎样说明它的时代？','r101-mark-choice',[done('quest.r93-boundary-mark'),known('event.r101-mark-settled',false)]));

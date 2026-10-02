@@ -19,7 +19,7 @@ const [shao,qin] = ridge.conversations;
 shao.nodes.find(n=>n.id==='north-mark').text='邵长庚把水尺刻线与门楼图并排看：「先到碎岭旧道核界石，再来我这里接驿镇更次，找秦素砚对簿。只认你见到的凿痕，不必带一块石头回来。」';
 shao.nodes.find(n=>n.id==='pass-active').text='「旧制是三短一长，界石若被挪过，凿痕还在。」邵长庚指向北坡，「核过刻痕，差事便记妥；下一程到驿镇找秦素砚。」';
 qin.nodes.find(n=>n.id==='ledger-checked').text='秦素砚敲了敲桌上的石片：「三短一长，是换更记法，不是纸龄。你这一问已把更次核妥，谢仪照簿结清；不必再交一页不存在的字据。下一步在邵长庚处接碎岭清道。」';
-add(qin,{id:'r100-record-choice',text:'秦素砚把名字一栏遮住：「旧簿指向有人借错牌占路，可报信人也在山中。公开更次能让路客自查，却会让报信人暴露；只报刻线，查路的人便少一份可公开的证词，还得留一份回春膏给他避路救急。选定后记入见闻，不能改选。」',options:[
+add(qin,{id:'r100-record-choice',confirmEffects:true,text:'秦素砚把名字一栏遮住：「旧簿指向有人借错牌占路，可报信人也在山中。公开更次能让路客自查，却会让报信人暴露；只报刻线，查路的人便少一份可公开的证词，还得留一份回春膏给他避路救急。选定后记入见闻，不能改选。」',options:[
 option('公开更次与署名（秦素砚关系−4，江湖声望+3）。','r100-record-open',[known('event.r100-record-settled',false)],[relation('char.qin-suyan',-4),{kind:'adjustRenown',delta:3},discover('event.r100-record-open'),discover('event.r100-record-settled')]),
 option('隐去姓名并留回春膏×1（消耗药品，声望−2、秦素砚关系+4）。','r100-record-guard',[known('event.r100-record-settled',false),{kind:'itemCount',itemId:'item.huichun-gao',minCount:1}],[{kind:'takeItem',itemId:'item.huichun-gao',quantity:1},{kind:'adjustRenown',delta:-2},relation('char.qin-suyan',4),discover('event.r100-record-guard'),discover('event.r100-record-settled')]),
 option('暂不定夺。','farewell')
@@ -33,7 +33,7 @@ add(shao,{id:'r100-road-links',text:'「石脊西道在铁嶂南端，通青岩�
 await save('dialogues/round-62-conversations.json',ridge);
 const salt=await load('dialogues/round-67-conversations.json');const luo=salt.conversations[0];
 luo.nodes.find(n=>n.id==='completed').text='罗金子听完井壁刻痕：「刻线是旧货担记水份的秤记，井咸不能全怪盐天。看过水线，差事已结，回来说话只是复核，不另领一次谢仪。去云岭找沈雨霁，查石阶第三道刻纹究竟指路还是指索。」';
-add(luo,{id:'r100-well-choice',text:'「井水发苦，过路人要多备药。」罗金子指着货担，「你可留一份回春膏作救急，也可自己带着继续走山路。我会照实告诉云岭的人，不替你装好人。选定后不可改选。」',options:[
+add(luo,{id:'r100-well-choice',confirmEffects:true,text:'「井水发苦，过路人要多备药。」罗金子指着货担，「你可留一份回春膏作救急，也可自己带着继续走山路。我会照实告诉云岭的人，不替你装好人。选定后不可改选。」',options:[
 option('留下回春膏×1（消耗药品，善恶+2、罗金子关系+4）。','r100-well-aid',[known('event.r100-well-settled',false),{kind:'itemCount',itemId:'item.huichun-gao',minCount:1}],[{kind:'takeItem',itemId:'item.huichun-gao',quantity:1},{kind:'adjustMorality',delta:2},relation('char.luo-jinzi',4),discover('event.r100-well-aid'),discover('event.r100-well-settled')]),
 option('保留药品给自己的山路（罗金子关系−4，江湖声望−2）。','r100-well-reserve',[known('event.r100-well-settled',false)],[relation('char.luo-jinzi',-4),{kind:'adjustRenown',delta:-2},discover('event.r100-well-reserve'),discover('event.r100-well-settled')]),
 option('我先筹备，稍后再定。','farewell')

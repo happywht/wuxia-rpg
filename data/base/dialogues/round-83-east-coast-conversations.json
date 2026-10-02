@@ -188,6 +188,7 @@
         },
         {
           "id": "r102-supply-choice",
+          "confirmEffects": true,
           "text": "这份补给给岸上救伤，还是留给守标人？",
           "options": [
             {
