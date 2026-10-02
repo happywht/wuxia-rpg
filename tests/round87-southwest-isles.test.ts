@@ -31,7 +31,12 @@ import {
 import { parseNpcSet, type PlacedNpc } from '../src/engine/npc-placement';
 import { parseGameCalendar } from '../src/engine/game-calendar';
 import { parseClimate } from '../src/engine/climate-system';
-import { assembleWorldMap, parseWorldMap, selectInteractableRegionEvent } from '../src/engine/world-map';
+import {
+  assembleWorldMap,
+  parseWorldMap,
+  selectInteractableRegionEvent,
+  selectNewRegionEventKnowledgeIds,
+} from '../src/engine/world-map';
 import { shouldPreferRegionalEventInteraction } from '../src/engine/interaction-priority';
 import {
   applyQuestRewardConsequences,
@@ -566,6 +571,32 @@ describe('Round 87 Southwest Isles within the expanded world atlas', () => {
     known.add(QUEST_ID);
     state.status = 'completed';
     expect(questKnowledgeNodeIdsToBackfill(journal, graph, known)).not.toContain(QUEST_ID);
+  });
+
+  it('reveals the real spring event graph edge only after its regional event triggers', () => {
+    const parsedWorld = parseWorldMap(readJson('../data/base/world/world-map.json'));
+    const nodeSet = parseKnowledgeNodeSet(readJson('../data/base/knowledge_graph/nodes.json'));
+    const edgeSet = parseKnowledgeEdgeSet(readJson('../data/base/knowledge_graph/edges.json'));
+    expect(parsedWorld.ok && nodeSet.ok && edgeSet.ok).toBe(true);
+    if (!parsedWorld.ok || !nodeSet.ok || !edgeSet.ok) return;
+
+    const graph = assembleKnowledgeGraph(nodeSet.data, edgeSet.data);
+    const event = parsedWorld.data.events.find(({ id }) => id === 'event.r87-spring-hollow')!;
+    const known = new Set<string>([SPRING_NODE]); // The quest reward may reveal the spring before it is visited.
+    const edgeBeforeArrival = getKnownKnowledgeEdges(graph, known).map(({ id }) => id);
+    expect(edgeBeforeArrival).not.toContain('kg.edge.r87-spring-event');
+    expect(known.has(event.id)).toBe(false);
+
+    const triggeredDiscoveries = selectNewRegionEventKnowledgeIds(
+      [event], known, new Set(graph.nodes.keys()),
+    );
+    expect(triggeredDiscoveries).toEqual([event.id]);
+    for (const id of triggeredDiscoveries) known.add(id);
+
+    expect(known.has(event.id)).toBe(true);
+    expect(known.has(SPRING_NODE)).toBe(true);
+    expect(getKnownKnowledgeEdges(graph, known).map(({ id }) => id)).toContain('kg.edge.r87-spring-event');
+    expect(selectNewRegionEventKnowledgeIds([event], known, new Set(graph.nodes.keys()))).toEqual([]);
   });
 
   it('closes the world travel graph across all ten regions and routes Q/N navigation both ways', () => {
