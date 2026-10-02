@@ -385,8 +385,9 @@ describe('Round 92 North Pass (Snowlit Pass)', () => {
   it('re-runs the Round 92, 93, 91 and 87 generators safely without drifting shipped data', async () => {
     const sandbox = await mkdtemp(path.join(os.tmpdir(), 'round92-generators-'));
     const directories = ['scripts/lib', 'data/base/world', 'data/base/maps', 'data/base/characters',
-      'data/base/dialogues', 'data/base/quests', 'data/base/knowledge_graph'];
+      'data/base/dialogues', 'data/base/quests', 'data/base/shops', 'data/base/knowledge_graph'];
     const files = [
+      'data/base/shops/round-06-shops.json',
       'scripts/generate-round87-southwest-isles.mjs',
       'scripts/generate-round91-cloud-north-terrace.mjs',
       'scripts/generate-round92-north-pass.mjs',

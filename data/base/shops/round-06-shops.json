@@ -41,6 +41,17 @@
       ]
     },
     {
+      "id": "shop.r158-north-provisions",
+      "name": "守烽备药匣",
+      "npcId": "char.r92-gu-zhaoxue",
+      "greeting": "守烽备药按原价出售：膏三份、丸两份，售完本程不补。E购药，Q查差事，F仍可问话。",
+      "sellRate": 0.5,
+      "stock": [
+        { "itemId": "item.huichun-gao", "quantity": 3 },
+        { "itemId": "item.qingxin-wan", "quantity": 2 }
+      ]
+    },
+    {
       "id": "shop.r112-cloud-waystation",
       "name": "云栈客舍备药匣",
       "npcId": "char.r74-shen-yuji",

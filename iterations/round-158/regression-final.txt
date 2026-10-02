@@ -1,0 +1,86 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round92-north-pass.test.ts (7 tests | 1 failed) 1304ms
+   ❯ Round 92 North Pass (Snowlit Pass) (7)
+     × re-runs the Round 92, 93, 91 and 87 generators safely without drifting shipped data 725ms
+ ❯ tests/round93-snow-pine-valley.test.ts (7 tests | 1 failed) 2067ms
+   ❯ Round 93 Snow Pine Valley (Frostpine Valley) (7)
+     × re-runs the Round 93, 92, 91 and 87 generators in either chronology without drifting shipped data 1436ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round92-north-pass.test.ts > Round 92 North Pass (Snowlit Pass) > re-runs the Round 92, 93, 91 and 87 generators safely without drifting shipped data
+AssertionError: node:internal/fs/promises:639
+  return new FileHandle(await PromisePrototypeThen(
+                        ^
+
+Error: ENOENT: no such file or directory, open 'C:\Users\Hitao\AppData\Local\Temp\round92-generators-N34eCF\data\base\shops\round-06-shops.json'
+    at async open (node:internal/fs/promises:639:25)
+    at async readFile (node:internal/fs/promises:1243:14)
+    at async file:///C:/Users/Hitao/AppData/Local/Temp/round92-generators-N34eCF/scripts/generate-round92-north-pass.mjs:1016:33 {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Hitao\\AppData\\Local\\Temp\\round92-generators-N34eCF\\data\\base\\shops\\round-06-shops.json'
+}
+
+Node.js v22.18.0
+: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/round92-north-pass.test.ts:435:38
+
+    433|       const r92 = run('scripts/generate-round92-north-pass.mjs');
+    434|       expect(r92.error).toBeUndefined();
+    435|       expect(r92.status, r92.stderr).toBe(0);
+       |                                      ^
+ Test Files  2 failed | 2 passed (4)
+      Tests  2 failed | 34 passed (36)
+   Start at  12:45:30
+    436|       expect(r92.stdout).toContain('Rebuilt the Round 92 extension');
+   Duration  5.04s (tests 80%, import 12%, transform 8%)
+    437|       const r93 = run('scripts/generate-round93-snow-pine-valley.mjs');
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/round93-snow-pine-valley.test.ts > Round 93 Snow Pine Valley (Frostpine Valley) > re-runs the Round 93, 92, 91 and 87 generators in either chronology without drifting shipped data
+AssertionError: node:internal/fs/promises:639
+  return new FileHandle(await PromisePrototypeThen(
+                        ^
+
+Error: ENOENT: no such file or directory, open 'C:\Users\Hitao\AppData\Local\Temp\round93-generators-dPy9pz\data\base\shops\round-06-shops.json'
+    at async open (node:internal/fs/promises:639:25)
+    at async readFile (node:internal/fs/promises:1243:14)
+    at async file:///C:/Users/Hitao/AppData/Local/Temp/round93-generators-dPy9pz/scripts/generate-round92-north-pass.mjs:1016:33 {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Hitao\\AppData\\Local\\Temp\\round93-generators-dPy9pz\\data\\base\\shops\\round-06-shops.json'
+}
+
+Node.js v22.18.0
+: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/round93-snow-pine-valley.test.ts:466:38
+    464|       const r92 = run('scripts/generate-round92-north-pass.mjs');
+    465|       expect(r92.error).toBeUndefined();
+    466|       expect(r92.status, r92.stderr).toBe(0);
+       |                                      ^
+    467|       expect(r92.stdout).toContain('Rebuilt the Round 92 extension');
+    468|       const r91 = run('scripts/generate-round91-cloud-north-terrace.mj…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

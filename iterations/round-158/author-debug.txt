@@ -1,0 +1,34 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round92-north-pass.test.ts (7 tests | 1 failed) 3541ms
+   ❯ Round 92 North Pass (Snowlit Pass) (7)
+     × re-runs the Round 92, 93, 91 and 87 generators safely without drifting shipped data 3004ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round92-north-pass.test.ts > Round 92 North Pass (Snowlit Pass) > re-runs the Round 92, 93, 91 and 87 generators safely without drifting shipped data
+AssertionError: shipped data/base/characters/round-92-north-pass-npcs.json: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/round92-north-pass.test.ts:455:90
+    453|       for (const file of outputs) {
+    454|         const after = await readFile(path.join(sandbox, file));
+    455|         expect(after.equals(readFileSync(path.join(repoRoot, file))), …
+       |                                                                                          ^
+    456|       }
+    457|       // A second full pass over the sandbox stays byte-stable as well.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  12:46:44
+   Duration  4.29s (tests 86%, import 9%, transform 5%)
+

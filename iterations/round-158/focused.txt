@@ -1,0 +1,244 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round112-cloud-routes-supply.test.ts (8 tests | 1 failed) 1873ms
+   ❯ Round112 existing Cloud Ridge paths, paving and limited provisions (8)
+     × incremental replay and R74→R76→R78 regeneration preserve the current cloud output and other maps 710ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round112-cloud-routes-supply.test.ts > Round112 existing Cloud Ridge paths, paving and limited provisions > incremental replay and R74→R76→R78 regeneration preserve the current cloud output and other maps
+AssertionError: shops/round-06-shops.json: expected '{\r\n  "shops": [\r\n    {\r\n      "…' to be '{\r\n  "shops": [\r\n    {\r\n      "…' // Object.is equality
+
+- Expected
++ Received
+
+@@ -5,168 +5,63 @@
+        "name": "姜百味百宝担",
+        "npcId": "char.jiang-baiwei",
+        "greeting": "客官留步——伤药丸散、防身的家伙什，担子里百样俱全，童叟无欺！看中哪样，言语一声便是。",
+        "sellRate": 0.6,
+        "stock": [
+-         {
+-           "itemId": "item.huichun-gao",
+-           "quantity": -1
+-         },
++         { "itemId": "item.huichun-gao", "quantity": -1 },
+-         {
+-           "itemId": "item.qingxin-wan",
+-           "quantity": 5
+-         },
++         { "itemId": "item.qingxin-wan", "quantity": 5 },
+-         {
+-           "itemId": "item.wuji-dan",
+-           "quantity": 2
+-         },
++         { "itemId": "item.wuji-dan", "quantity": 2 },
+-         {
+-           "itemId": "item.qingtong-bijian",
+-           "quantity": -1
+-         },
++         { "itemId": "item.qingtong-bijian", "quantity": -1 },
+-         {
+-           "itemId": "item.fanbu-duanhe",
+-           "quantity": 2
+-         },
++         { "itemId": "item.fanbu-duanhe", "quantity": 2 },
+-         {
+-           "itemId": "item.suwen-yupei",
+-           "quantity": 1
+-         },
++         { "itemId": "item.suwen-yupei", "quantity": 1 },
+-         {
+-           "itemId": "item.iron-sand",
+-           "quantity": -1
+-         },
++         { "itemId": "item.iron-sand", "quantity": -1 },
+-         {
+-           "itemId": "item.tough-leather",
+-           "quantity": -1
+-         },
++         { "itemId": "item.tough-leather", "quantity": -1 },
+-         {
+-           "itemId": "item.jade-polish",
+-           "quantity": -1
+-         },
++         { "itemId": "item.jade-polish", "quantity": -1 },
+-         {
+-           "itemId": "item.hanzhu-cao",
+-           "quantity": -1
+-         },
++         { "itemId": "item.hanzhu-cao", "quantity": -1 },
+-         {
+-           "itemId": "item.cangya-gen",
+-           "quantity": -1
+-         },
++         { "itemId": "item.cangya-gen", "quantity": -1 },
+-         {
+-           "itemId": "item.luodie-hua",
+-           "quantity": -1
+-         },
++         { "itemId": "item.luodie-hua", "quantity": -1 },
+-         {
+-           "itemId": "item.r32.songzhen-xuesan",
+-           "quantity": 3
+-         },
++         { "itemId": "item.r32.songzhen-xuesan", "quantity": 3 },
+-         {
+-           "itemId": "item.r32.ouling-huqitang",
+-           "quantity": 3
+-         },
++         { "itemId": "item.r32.ouling-huqitang", "quantity": 3 },
+-         {
+-           "itemId": "item.r32.shuanglu-fuhe-san",
+-           "quantity": 3
+-         },
++         { "itemId": "item.r32.shuanglu-fuhe-san", "quantity": 3 },
+-         {
+-           "itemId": "item.r32.jiangxin-buqi-wan",
+-           "quantity": 2
+-         },
++         { "itemId": "item.r32.jiangxin-buqi-wan", "quantity": 2 },
+-         {
+-           "itemId": "item.r32.yushen-huoxue-gao",
+-           "quantity": 2
+-         },
++         { "itemId": "item.r32.yushen-huoxue-gao", "quantity": 2 },
+-         {
+-           "itemId": "item.r32.changqing-yangqi-dan",
+-           "quantity": 2
+-         },
++         { "itemId": "item.r32.changqing-yangqi-dan", "quantity": 2 },
+-         {
+-           "itemId": "item.r32.luwei-shengji-dan",
+-           "quantity": 2
+-         },
++         { "itemId": "item.r32.luwei-shengji-dan", "quantity": 2 },
+-         {
+-           "itemId": "item.r32.yunhe-wuhua-dan",
+-           "quantity": 1
+-         },
++         { "itemId": "item.r32.yunhe-wuhua-dan", "quantity": 1 },
+-         {
+-           "itemId": "item.r32.willow-switch-sword",
+-           "quantity": 1
+-         },
++         { "itemId": "item.r32.willow-switch-sword", "quantity": 1 },
+-         {
+-           "itemId": "item.r32.rain-shed-coat",
+-           "quantity": 1
+-         },
++         { "itemId": "item.r32.rain-shed-coat", "quantity": 1 },
+-         {
+-           "itemId": "item.r32.river-copper",
+-           "quantity": 5
+-         },
++         { "itemId": "item.r32.river-copper", "quantity": 5 },
+-         {
+-           "itemId": "item.r32.moon-leaf-iron",
+-           "quantity": 4
+-         },
++         { "itemId": "item.r32.moon-leaf-iron", "quantity": 4 },
+-         {
+-           "itemId": "item.r32.blue-slate",
+-           "quantity": 6
+-         },
++         { "itemId": "item.r32.blue-slate", "quantity": 6 },
+-         {
+-           "itemId": "item.r32.black-silk-thread",
+-           "quantity": 5
+-         },
++         { "itemId": "item.r32.black-silk-thread", "quantity": 5 },
+-         {
+-           "itemId": "item.r32.reed-cloth",
+-           "quantity": 4
+-         },
++         { "itemId": "item.r32.reed-cloth", "quantity": 4 },
+-         {
+-           "itemId": "item.r32.cloud-wool",
+-           "quantity": 4
+-         },
++         { "itemId": "item.r32.cloud-wool", "quantity": 4 },
+-         {
+-           "itemId": "item.r32.ash-bark",
+-           "quantity": 4
+-         },
++         { "itemId": "item.r32.ash-bark", "quantity": 4 },
+-         {
+-           "itemId": "item.r32.clam-shell",
+-           "quantity": 4
+-         },
++         { "itemId": "item.r32.clam-shell", "quantity": 4 },
+-         {
+-           "itemId": "item.r32.marsh-amber",
+-           "quantity": 3
+-         }
++         { "itemId": "item.r32.marsh-amber", "quantity": 3 }
+        ]
+      },
+      {
+-       "id": "shop.r112-cloud-waystation",
++       "id": "shop.r158-north-provisions",
+-       "name": "云栈客舍备药匣",
++       "name": "守烽备药匣",
+-       "npcId": "char.r74-shen-yuji",
++       "npcId": "char.r92-gu-zhaoxue",
+-       "greeting": "寄存备药按原价出售：膏三份、丸两份，售完不补；缺货东去青帆埠。",
++       "greeting": "守烽备药按原价出售：膏三份、丸两份，售完本程不补。E购药，Q查差事，F仍可问话。",
+        "sellRate": 0.5,
+        "stock": [
+-         {
+-           "itemId": "item.huichun-gao",
+-           "quantity": 3
+-         },
++         { "itemId": "item.huichun-gao", "quantity": 3 },
+-         {
+-           "itemId": "item.qingxin-wan",
+-           "quantity": 2
+-         }
++         { "itemId": "item.qingxin-wan", "quantity": 2 }
+        ]
+      },
+      {
+-       "id": "shop.r158-north-provisions",
++       "id": "shop.r112-cloud-waystation",
+-       "name": "守烽备药匣",
++       "name": "云栈客舍备药匣",
+-       "npcId": "char.r92-gu-zhaoxue",
++       "npcId": "char.r74-shen-yuji",
+-       "greeting": "守烽备药按原价出售：膏三份、丸两份，售完本程不补。E购药，Q查差事，F仍可问话。",
++       "greeting": "寄存备药按原价出售：膏三份、丸两份，售完不补；缺货东去青帆埠。",
+        "sellRate": 0.5,
+        "stock": [
+-         {
+-           "itemId": "item.huichun-gao",
+-           "quantity": 3
+-         },
++         { "itemId": "item.huichun-gao", "quantity": 3 },
+-         {
+-           "itemId": "item.qingxin-wan",
+-           "quantity": 2
+-         }
++         { "itemId": "item.qingxin-wan", "quantity": 2 }
+        ]
+      }
+    ]
+  }
+
+
+ ❯ tests/round112-cloud-routes-supply.test.ts:116:95
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 10 passed (11)
+   Start at  12:42:46
+   Duration  2.69s (tests 72%, transform 22%, import 6%)
+
+    114|       const frozen=new Map([...world.maps.keys()].filter(id=>id!==CLOU…
+    115|       for(let i=0;i<2;i++)execFileSync(process.execPath,[join(temp,'sc…
+    116|       for(const file of targets)expect(readFileSync(join(temp,'data/ba…
+       |                                                                                               ^
+    117|       for(const name of ['generate-round74-cloud-ridge.mjs','generate-…
+    118|         execFileSync(process.execPath,[join(temp,'scripts',name)],{cwd…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

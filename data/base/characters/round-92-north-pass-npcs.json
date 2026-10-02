@@ -3,6 +3,7 @@
     {
       "id": "char.r92-gu-zhaoxue",
       "name": "谷照雪",
+      "shopId": "shop.r158-north-provisions",
       "mapResourceId": "map.round-92-north-pass",
       "position": {
         "col": 50,
