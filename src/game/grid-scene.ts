@@ -3352,6 +3352,11 @@ export class GridScene extends Phaser.Scene {
       ...buildRegionalGuideEntries(input),
       ...buildQuestGuideEntries({guide:input,quests:this.quests,journal:this.questJournal,
         access:{factionId:this.factionState.membership?.factionId??null,knownKnowledgeNodeIds:this.knownKnowledgeNodeIds},
+        // Round 151: the admission hint reads the giver's assembled F
+        // conversation against the same live context the F panel evaluates,
+        // so shop-first E keys and dialogue-only acceptances are described
+        // truthfully instead of advertising a board E that opens a store.
+        dialogues:this.dialogues,dialogueContextFor:(npcId)=>this.dialogueContextFor(npcId),
         encounters:loaded.assembly.encounters,
         craftingStations:[...loaded.assembly.equipmentForges,...loaded.assembly.alchemyStations],
         knowledgeNodeTitles:new Map([...loaded.knowledgeGraph.nodes].map(([id,node])=>[id,node.title]))}),

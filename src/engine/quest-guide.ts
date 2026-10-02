@@ -8,8 +8,18 @@
  * live region-guide NPC selector. Acceptance stays in the existing board,
  * journal or dialogue flow — this helper only points the way, so a locked or inaccessible task
  * is filtered out instead of being advertised as acceptable.
+ *
+ * Round 151 admission hints: when assembled conversations plus a live
+ * per-giver dialogue context are supplied, the offer row also explains the
+ * giver's real E/F entry points — E opens the board only for a plain
+ * non-shop giver (a shopkeeper's E opens the store first), while the F
+ * conversation is checked generically for a currently reachable
+ * accept-quest option. Without those inputs the historical hints stay
+ * byte-for-byte unchanged.
  */
 
+import type { DialogueData } from './dialogue-graph';
+import { getVisibleOptions, type DialogueRuntimeContext } from './dialogue-runtime';
 import { resolveQuestNavigationTarget, type QuestNavigationInput } from './quest-navigation';
 import { hasQuestAccess, type QuestAccessContext, type QuestData, type QuestJournal } from './quest-system';
 import { REGION_GUIDE_PREFIX, resolveRegionGuideNpc, type RegionGuideEntry, type RegionalGuideInput } from './regional-guide';
@@ -25,6 +35,56 @@ export interface QuestGuideInput {
   encounters: QuestNavigationInput['encounters'];
   craftingStations?: QuestNavigationInput['craftingStations'];
   knowledgeNodeTitles?: QuestNavigationInput['knowledgeNodeTitles'];
+  /** Assembled giver conversations by id; enables dialogue-aware admission hints. */
+  dialogues?: ReadonlyMap<string, DialogueData>;
+  /** Live dialogue context per giver NPC (the same facts the F panel evaluates). */
+  dialogueContextFor?: (npcId: string) => Readonly<DialogueRuntimeContext>;
+}
+
+/** What the giver's assembled conversation says about accepting one quest. */
+export type DialogueAcceptanceReach = 'absent' | 'exists' | 'now';
+
+/**
+ * Classifies one quest's acceptance option inside one assembled conversation.
+ * `now` holds only when the F panel opened this minute can reach a visible
+ * acceptance option purely by following effect-free visible transitions —
+ * every hop is guaranteed playable without committing any side effect, so the
+ * promise never overstates live reachability. `exists` marks an authored
+ * acceptance option today's conditions (or a side-effect chain) do not
+ * surface; callers must stay qualified about it instead of promising a path.
+ */
+export function dialogueAcceptanceReach(
+  conversation: Readonly<DialogueData> | undefined,
+  questId: string,
+  context: Readonly<DialogueRuntimeContext> | undefined,
+): DialogueAcceptanceReach {
+  if (conversation === undefined) return 'absent';
+  let exists = false;
+  for (const node of conversation.nodes) {
+    for (const option of node.options ?? []) {
+      if ((option.effects ?? []).some((effect) => effect.kind === 'acceptQuest' && effect.questId === questId)) {
+        exists = true;
+        break;
+      }
+    }
+  }
+  if (!exists || context === undefined) return exists ? 'exists' : 'absent';
+  const byId = new Map(conversation.nodes.map((node) => [node.id, node] as const));
+  const queue: string[] = [conversation.startNodeId];
+  const visited = new Set(queue);
+  while (queue.length > 0) {
+    const node = byId.get(queue.shift()!);
+    if (node === undefined) continue; // Defensive: graph validation guarantees resolution.
+    for (const { option } of getVisibleOptions(node, context)) {
+      const effects = option.effects ?? [];
+      if (effects.some((effect) => effect.kind === 'acceptQuest' && effect.questId === questId)) return 'now';
+      if (effects.length === 0 && !visited.has(option.nextNodeId)) {
+        visited.add(option.nextNodeId);
+        queue.push(option.nextNodeId);
+      }
+    }
+  }
+  return 'exists';
 }
 
 /**
@@ -81,14 +141,39 @@ export function buildQuestGuideEntries(input: QuestGuideInput): RegionGuideEntry
     const giver = resolveRegionGuideNpc(guide, quest.giverNpcId);
     if (giver === undefined || giver.record.mapResourceId !== guide.currentMapResourceId) continue;
     // The acceptance entry point follows the giver's real identity: E is the
-    // board only for a plain non-shop quest giver standing here, while a
-    // shopkeeper's E opens the store and a companion is reached through P
-    // then T — both route acceptance through the Q journal instead.
+    // board only for a plain non-shop quest giver standing here (GridScene
+    // resolves an adjacent NPC's E to the shop first, then the board), while
+    // a shopkeeper's E opens the store and a companion is reached through P
+    // then T. Round 151 additionally checks the giver's assembled F
+    // conversation for a live acceptance option, so a reachable
+    // accept-quest choice is promised only when its conditions currently
+    // hold; an authored-but-hidden one keeps a qualified wording.
     const isCompanion = follower?.npc.record.id === quest.giverNpcId;
     const ownsShop = giver.record.shopId !== null && guide.shops.get(giver.record.shopId)?.record.npcId === quest.giverNpcId;
+    const dialogueAware = input.dialogues !== undefined && input.dialogueContextFor !== undefined;
+    const reach = dialogueAware
+      ? dialogueAcceptanceReach(
+          input.dialogues!.get(giver.record.dialogueId),
+          quest.id,
+          input.dialogueContextFor!(giver.record.id),
+        )
+      : 'absent';
+    const talkKey = isCompanion ? 'P再T交谈' : 'F交谈';
     const acceptHint = giver.record.questGiver && !ownsShop && !isCompanion
-      ? '走到近旁按E打开差事名录，Enter接取；F交谈。'
-      : `接取可在Q日志选中本差事后Enter；${isCompanion ? '交谈按P再T' : 'F交谈'}。`;
+      ? reach === 'now'
+        ? '走到近旁按E打开差事名录，Enter接取；或F交谈，对话里选接取。'
+        : reach === 'exists'
+          ? '走到近旁按E打开差事名录，Enter接取；F交谈（接取选项须满足条件才出现）。'
+          : '走到近旁按E打开差事名录，Enter接取；F交谈。'
+      : reach === 'now'
+        ? ownsShop
+          ? '按E开的是铺面交易；接取按F交谈，对话里选接取；Q日志选中本差事后Enter亦可。'
+          : `接取按${talkKey}，对话里选接取；Q日志选中本差事后Enter亦可。`
+        : reach === 'exists'
+          ? ownsShop
+            ? '按E开的是铺面交易；接取可在Q日志选中本差事后Enter；F交谈的接取选项须满足条件才出现。'
+            : `接取可在Q日志选中本差事后Enter；${talkKey}的接取选项须满足条件才出现。`
+          : `接取可在Q日志选中本差事后Enter；${isCompanion ? '交谈按P再T' : 'F交谈'}。`;
     entries.push({
       id: 'offer:' + quest.id,
       category: 'quest',
