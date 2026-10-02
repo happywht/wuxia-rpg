@@ -1,0 +1,69 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round109-hud-geometry.test.ts (9 tests | 3 failed) 31ms
+   ❯ Round109 measured HUD geometry (8)
+     × retains the actual at-gate action when both authored names are very long 19ms
+     × at the maximum scale 1.6 with a long CJK MOD name every band still separates 2ms
+   ❯ Round156 readable route numbers (1)
+     × uses 13px live font and measured bands at every supported text scale 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round109-hud-geometry.test.ts > Round109 measured HUD geometry > retains the actual at-gate action when both authored names are very long
+AssertionError: expected '行路「目的地目的地目的地目的地目的…」· 已到「关口关口关口关口关口关口关…' to contain '按 E 通过'
+
+- Expected
++ Received
+
+- 按 E 通过
++ 行路「目的地目的地目的地目的地目的…」· 已到「关口关口关口关口关口关口关口…」旁，按 
++ E 通过。
+
+ ❯ tests/round109-hud-geometry.test.ts:142:28
+    140|     Object.assign(I,{map:{pixelWidth:100,pixelHeight:100},world:{},nav…
+    141|     (I.refreshNavigationGuide as ()=>void).call(scene);
+    142|     expect(texts.nav.text).toContain('按 E 通过');
+       |                            ^
+    143|     expect(texts.nav.text).toContain('…');
+    144|     expect(texts.nav.lines.length).toBeLessThanOrEqual(3);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/round109-hud-geometry.test.ts > Round109 measured HUD geometry > at the maximum scale 1.6 with a long CJK MOD name every band still separates
+AssertionError: expected 201 to be less than or equal to 200
+ ❯ tests/round109-hud-geometry.test.ts:208:31
+    206|     // this worst-case headroom is ~30% above the real-browser stack.
+    207|     expect(hudTopRect.height).toBeGreaterThanOrEqual(nav.bottom);
+    208|     expect(hudTopRect.height).toBeLessThanOrEqual(200);
+       |                               ^
+    209|   });
+    210|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/round109-hud-geometry.test.ts > Round156 readable route numbers > uses 13px live font and measured bands at every supported text scale
+AssertionError: expected 9 to be 11 // Object.is equality
+
+- Expected
++ Received
+
+- 11
++ 9
+
+ ❯ tests/round109-hud-geometry.test.ts:305:29
+    303|   for(let scale=0;scale<TEXT_SCALE_STEPS.length;scale++){
+    304|    const {texts,hudTopRect}=seedHud(scale,{nav:'行路「断云北隘」· 北29→东1→北7 · …
+    305|    expect(texts.nav.fontPx).toBe(Number.parseFloat(uiFontSize(13)));
+       |                             ^
+    306|    expect(texts.nav.lines.length).toBeLessThanOrEqual(3);
+    307|    const nav=rectOf(texts.nav);expect(nav.top).toBeGreaterThanOrEqual(…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  3 failed | 25 passed (28)
+   Start at  11:47:52
+   Duration  1.61s (transform 80%, import 17%, tests 2%, worker 1%)
+

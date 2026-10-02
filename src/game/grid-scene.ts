@@ -2413,11 +2413,11 @@ export class GridScene extends Phaser.Scene {
     this.navigationHintText = this.registerScaledText(this.add
       .text(16, 65, '', {
         fontFamily: UI.fontFamily,
-        fontSize: uiFontSize(10),
+        fontSize: uiFontSize(13),
         color: UI.textWarn,
       })
       .setOrigin(0, 0)
-      .setDepth(HUD_TEXT_DEPTH), 10);
+      .setDepth(HUD_TEXT_DEPTH), 13);
 
     this.mapNameText = this.registerScaledText(this.add
       .text(VIEW_WIDTH / 2, 14, '', {
@@ -2683,7 +2683,8 @@ export class GridScene extends Phaser.Scene {
 
     // ---- Navigation gets its own full-width band below BOTH columns; it
     // keeps the actionable route copy (up to three measured lines).
-    const navBase = 10;
+    const navBase = 13;
+    nav.setFontSize(uiFontSize(navBase));
     const navTop = Math.max(questBottom, rightBottom) + gap;
     const navLineCount = wrapLeftColumn(nav, this.hudLines.nav, navBase, rightX - leftX, 3);
     nav.setOrigin(0, 0).setPosition(leftX, navTop);
@@ -2726,21 +2727,21 @@ export class GridScene extends Phaser.Scene {
     if (guide.status === 'route-blocked') {
       // Keep the selector: NPC schedules and battle outcomes can reopen this
       // route, and the next world refresh will rebuild its local path.
-      this.hudLines.nav = `行路「${this.ellipsizeHudText(guide.destinationName, VIEW_WIDTH / 3, 10)}」暂被人物或遭遇堵住，通路变化后将自动重算。`;
+      this.hudLines.nav = `行路「${this.ellipsizeHudText(guide.destinationName, VIEW_WIDTH / 3, 13)}」暂被人物或遭遇堵住，通路变化后将自动重算。`;
       this.relayoutHud();
       return;
     }
     if (guide.status === 'route-broken') {
       this.navigationDestinationId = null;
-      this.hudLines.nav = `行路「${this.ellipsizeHudText(guide.destinationName, VIEW_WIDTH / 3, 10)}」当前无可行路线；可在 M 舆图重新规划。`;
+      this.hudLines.nav = `行路「${this.ellipsizeHudText(guide.destinationName, VIEW_WIDTH / 3, 13)}」当前无可行路线；可在 M 舆图重新规划。`;
       this.relayoutHud();
       return;
     }
 
     // Compact only labels; reserve room for the actual route/action suffix.
-    const destinationName = this.ellipsizeHudText(guide.destinationName, VIEW_WIDTH / 3, 10);
+    const destinationName = this.ellipsizeHudText(guide.destinationName, VIEW_WIDTH / 3, 13);
     const transitionName = guide.nextTransitionName === null ? null
-      : this.ellipsizeHudText(guide.nextTransitionName, VIEW_WIDTH / 3, 10);
+      : this.ellipsizeHudText(guide.nextTransitionName, VIEW_WIDTH / 3, 13);
     const directionNames = { north: '北', east: '东', south: '南', west: '西' } as const;
     const runs = summarizePathRuns(guide.path).slice(0, 3)
       .map((run) => `${directionNames[run.direction]}${run.steps}`);

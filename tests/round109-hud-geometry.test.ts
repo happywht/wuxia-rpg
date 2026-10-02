@@ -139,7 +139,7 @@ describe('Round109 measured HUD geometry', () => {
     const guide={status:'at-gate',destinationName:'目的地'.repeat(60),nextTransitionName:'关口'.repeat(80),path:[]};
     Object.assign(I,{map:{pixelWidth:100,pixelHeight:100},world:{},navigationDestinationId:'test',resolveNavigationGuide:()=>guide});
     (I.refreshNavigationGuide as ()=>void).call(scene);
-    expect(texts.nav.text).toContain('按 E 通过');
+    expect(texts.nav.text.replace(/\n/g,'')).toContain('按 E 通过');
     expect(texts.nav.text).toContain('…');
     expect(texts.nav.lines.length).toBeLessThanOrEqual(3);
     expect(guide.destinationName).toBe('目的地'.repeat(60));
@@ -203,9 +203,10 @@ describe('Round109 measured HUD geometry', () => {
     expect(texts.quest.lines.every((l) => l.length * texts.quest.fontPx <= climate.left - 14 - 16)).toBe(true);
     // The opaque band grows only as far as the measured stack needs. The
     // mock measures EVERY grapheme at full CJK width (ASCII included), so
-    // this worst-case headroom is ~30% above the real-browser stack.
+    // reserve bounded headroom for the 13px route font while retaining the
+    // three-line cap, width bounds and backing coverage assertions.
     expect(hudTopRect.height).toBeGreaterThanOrEqual(nav.bottom);
-    expect(hudTopRect.height).toBeLessThanOrEqual(200);
+    expect(hudTopRect.height).toBeLessThanOrEqual(220);
   });
 
   it('caps quest notices at two measured lines with an ellipsis, keeping the head', () => {
@@ -296,4 +297,17 @@ describe('Round109 measured HUD geometry', () => {
     expect(small.texts.title.text).toBe(longTitle); // full name restored from the raw line
     expect(small.texts.coords.text).toContain('极长名字的侠客测试角色');
   });
+});
+
+describe('Round156 readable route numbers',()=>{
+ it('uses 13px live font and measured bands at every supported text scale',()=>{
+  for(let scale=0;scale<TEXT_SCALE_STEPS.length;scale++){
+   const {texts,hudTopRect}=seedHud(scale,{nav:'行路「断云北隘」· 北29→东1→北7 · 104格。\n本区步行估计104分（当前天气，不含过关）；时段与天气变化会重算'});
+   expect(texts.nav.fontPx).toBe(Number.parseFloat(uiFontSize(13)));
+   expect(texts.nav.lines.length).toBeLessThanOrEqual(3);
+   const nav=rectOf(texts.nav);expect(nav.top).toBeGreaterThanOrEqual(rectOf(texts.quest).bottom);
+   expect(nav.right).toBeLessThanOrEqual(VIEW_WIDTH-14);expect(hudTopRect.height).toBeGreaterThanOrEqual(nav.bottom);
+   expect(texts.nav.text).toContain('北29→东1→北7');
+  }
+ });
 });

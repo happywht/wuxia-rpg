@@ -248,7 +248,7 @@ export function buildDialogueFollowupGuideEntries(input: QuestGuideInput): Regio
           effects.length === 0 || effects.some(effect => effect.kind !== 'discoverKnowledgeNode') ||
           !effects.some(effect => effect.kind === 'discoverKnowledgeNode' && !context.knownKnowledgeNodeIds.has(effect.nodeId))) continue;
         const talk = input.guide.follower?.npc.record.id === id ? 'P再T交谈' : 'F交谈';
-        entries.push({id: `followup:${id}:${node.id}:${index}`, category: 'quest', title: `${npc.record.name}（调查续谈）`,
+        entries.push({id: `followup:${id}:${node.id}:${index}`, category: 'quest', title: `${npc.record.name}（调查续谈）· ${option.text}`,
           detail: `当前可续谈 · ${npc.record.name} (${npc.col},${npc.row})\n${option.text}\n差事完成后仍有尚未记入的调查见闻；本页不展示答案或判定章节已经结案。导航只带路到人物，按${talk}找到上述选项并阅读，以抵达时资格为准。`,
           destinationId: REGION_GUIDE_PREFIX + 'npc:' + id});
       }
@@ -273,7 +273,7 @@ export function buildDialogueAftermathGuideEntries(input: QuestGuideInput): Regi
         if ((option.effects?.length ?? 0) > 0 || !(option.conditions ?? []).some(condition =>
           condition.kind === 'knowledgeKnown' && condition.isKnown !== false && context.knownKnowledgeNodeIds.has(condition.nodeId))) continue;
         const talk = input.guide.follower?.npc.record.id === id ? 'P再T交谈' : 'F交谈';
-        entries.push({id: `aftermath:${id}:${node.id}:${index}`, category: 'quest', title: `${npc.record.name}（可谈回响）`,
+        entries.push({id: `aftermath:${id}:${node.id}:${index}`, category: 'quest', title: `${npc.record.name}（可谈回响）· ${option.text}`,
           detail: `当前可询问 · ${npc.record.name} (${npc.col},${npc.row})\n${option.text}\n已有见闻使这个问题可谈；本页只列问题，不展示答复或执行效果。导航到人物后按${talk}选择上述问题，以抵达时资格为准；已读答复仍可复谈。`,
           destinationId: REGION_GUIDE_PREFIX + 'npc:' + id});
       }

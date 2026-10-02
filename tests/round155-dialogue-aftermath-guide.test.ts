@@ -23,3 +23,12 @@ describe('Round155 known-choice response guide',()=>{
  it('leaves state unchanged and allows pure response replay',()=>{const c=context();c.knownKnowledgeNodeIds.add('choice');const i=input(graph(),c),before=JSON.stringify([[...c.knownKnowledgeNodeIds],[...c.journal.states],c.social,[...i.dialogues!]]);expect(buildDialogueAftermathGuideEntries(i)).toEqual(buildDialogueAftermathGuideEntries(i));expect(JSON.stringify([[...c.knownKnowledgeNodeIds],[...c.journal.states],c.social,[...i.dialogues!]])).toBe(before);});
  it('real cloud reserve and aid replies are mutually exclusive and no answer is leaked',()=>{const set=JSON.parse(readFileSync('data/base/dialogues/round-74-cloud-ridge-conversations.json','utf8'));const g:DialogueData=set.conversations[0],c=context();c.knownKnowledgeNodeIds.add('event.r100-well-reserve');let rows=buildDialogueAftermathGuideEntries(input(g,c));expect(rows.filter(r=>r.detail.includes('青岩驿有人带话'))).toHaveLength(1);for(const node of g.nodes.filter(node=>node.id==='r100-reserve-echo'||node.id==='r100-aid-echo'))expect(rows.map(r=>r.detail).join('')).not.toContain(node.text);const reserveId=rows.find(r=>r.detail.includes('青岩驿有人带话'))!.id;c.knownKnowledgeNodeIds.delete('event.r100-well-reserve');c.knownKnowledgeNodeIds.add('event.r100-well-aid');rows=buildDialogueAftermathGuideEntries(input(g,c));expect(rows.filter(r=>r.detail.includes('青岩驿有人带话'))).toHaveLength(1);expect(rows.find(r=>r.detail.includes('青岩驿有人带话'))!.id).not.toBe(reserveId);});
 });
+describe('Round156 distinguish same-person questions',()=>{
+ it('shows each original question in the list without changing target or raw index',()=>{
+  const c=context();c.knownKnowledgeNodeIds.add('choice');const g=graph();
+  g.nodes[0]!.options!.push({text:'另一个回响问题',nextNodeId:'answer',conditions:[{kind:'knowledgeKnown',nodeId:'choice'}]});
+  const rows=buildDialogueAftermathGuideEntries(input(g,c));expect(rows).toHaveLength(2);
+  expect(rows[0]!.title).toContain('核对记录');expect(rows[1]!.title).toContain('另一个回响问题');
+  expect(rows[0]!.destinationId).toBe(rows[1]!.destinationId);expect(rows.map(r=>r.id)).toEqual(['aftermath:npc:start:0','aftermath:npc:start:1']);
+ });
+});
