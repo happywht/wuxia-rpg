@@ -72,9 +72,9 @@ describe('Round117 HUD quest-line projection across regions and schedules', () =
     // switchRegion, then calls the tracker refresh — the old guide's name and
     // cell must be gone from the line in the same frame.
     const before = project([ferryGuide], { col: 63, row: 63 }, createQuestJournal(quests));
-    expect(before.text).toBe('附近：渡口老丈 (63,61) · 相邻按 F 打听 / E 看托付 · Q 查差事');
+    expect(before.text).toBe('人物线索：渡口老丈 (63,61) · 相距2格，走到相邻再 F / E · Q 查差事');
     const after = project([ridgeGuide], { col: 40, row: 43 }, createQuestJournal(quests));
-    expect(after.text).toBe('附近：岭上樵夫 (40,45) · 相邻按 F 打听 / E 看托付 · Q 查差事');
+    expect(after.text).toBe('人物线索：岭上樵夫 (40,45) · 相距2格，走到相邻再 F / E · Q 查差事');
     expect(after.text).not.toContain('渡口老丈');
     // And a destination with no guide at all says so instead of naming the old one.
     expect(project([], { col: 40, row: 43 }, createQuestJournal(quests)).text).toBe('Q 查看差事 · H 查看操作');

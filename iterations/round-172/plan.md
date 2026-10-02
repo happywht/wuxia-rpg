@@ -9,4 +9,4 @@
 - 涉及文件：src/game/quest-presentation.ts、src/game/grid-scene.ts（按定位结果）、tests/round172-*、本轮证据、目标与验收文档、CHANGELOG.md、DEVLOG.md、ROADMAP.md。
 - 风险：NPC日程与阻挡可能改变路线；既有存档需保持；公开终章只算局部验收，不能提前关闭整体目标。
 - 验证：专项及全量测试、生产构建、文档审核、正常 UI 移动/互动/保存/恢复；禁止运行时注入。
-- 状态：计划已启动，实现与旅程尚未完成。
+- 状态：代码、全量构建、实际公开终章和正常读档验证完成，见playtest.md与verification.md。

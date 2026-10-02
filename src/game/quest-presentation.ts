@@ -48,10 +48,13 @@ export function projectQuestTrackerLine(input: QuestTrackerInput): QuestTrackerL
   const state = trackedId === null ? undefined : input.journal.states.get(trackedId);
   if (quest === undefined || state?.status !== 'active') {
     const guide = nearestGuideNpc(input.npcs, input.position);
+    const distance = guide === undefined ? 0 : Math.abs(guide.col - input.position.col) + Math.abs(guide.row - input.position.row);
     return {
       text: guide === undefined
         ? 'Q 查看差事 · H 查看操作'
-        : `附近：${guide.record.name} (${guide.col},${guide.row}) · 相邻按 F 打听 / E ${guide.record.shopId ? '看商铺' : '看托付'} · Q 查差事`,
+        : distance !== 1
+          ? `人物线索：${guide.record.name} (${guide.col},${guide.row}) · 相距${distance}格，走到相邻再 F / E · Q 查差事`
+          : `附近：${guide.record.name} (${guide.col},${guide.row}) · 相邻按 F 打听 / E ${guide.record.shopId ? '看商铺' : '看托付'} · Q 查差事`,
       tone: 'guide',
     };
   }
