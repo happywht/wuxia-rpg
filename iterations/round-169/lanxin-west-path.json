@@ -1,0 +1,23 @@
+{
+  "scope": "Authored terrain only; NPCs, encounters and live movement require normal UI verification. Not journey evidence.",
+  "mapId": "map.round-97-lanxin-isle",
+  "start": [
+    64,
+    3
+  ],
+  "target": [
+    5,
+    40
+  ],
+  "length": 96,
+  "segments": [
+    {
+      "direction": "Down",
+      "count": 37
+    },
+    {
+      "direction": "Left",
+      "count": 59
+    }
+  ]
+}

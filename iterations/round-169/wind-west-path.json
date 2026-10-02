@@ -1,0 +1,51 @@
+{
+  "scope": "Authored terrain only; NPCs, encounters and live movement require normal UI verification. Not journey evidence.",
+  "mapId": "map.round-84-windward-isle",
+  "start": [
+    92,
+    55
+  ],
+  "target": [
+    2,
+    50
+  ],
+  "length": 95,
+  "segments": [
+    {
+      "direction": "Left",
+      "count": 16
+    },
+    {
+      "direction": "Up",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 6
+    },
+    {
+      "direction": "Up",
+      "count": 2
+    },
+    {
+      "direction": "Left",
+      "count": 4
+    },
+    {
+      "direction": "Up",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 4
+    },
+    {
+      "direction": "Up",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 60
+    }
+  ]
+}

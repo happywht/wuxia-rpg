@@ -70,7 +70,7 @@ export function deepenNorthDialogues(set){
  if(d.id==='dlg.r94-shen-wenqiu'){
   setText(d,'accepted','「沿东脊核东望烽台。只记正对山口那三道短线，不把刻记当这季火号；见闻记下后再回来报告，不需要携带拓本物品。」');
   setText(d,'completed','沈问秋听完刻记：「三道短线，一道向海，两道回山，是旧驿路向；它不等同照雪关现行火号。报告与谢仪已结，只有经验、银两和云窗见闻，不另发暖石。」');
-  add(d,{id:'r101-north-close',text:'沈问秋将四地记录分栏：「北境这一程能坐实用途与时代：雁候、今烽、前朝屯界、旧驿线各不相同。残篇水纹纸药墨的出处仍待船货核实，不认作者。番号和旧界注记怎样传，你付的药、各家的态度都记着。天门关南走雾杉关、听杉谷、照叶港可往归帆洲；归帆洲再接潮生屿，继续海路调查。」'},option('四地复核与立场都已定，下一章怎样接海路？','r101-north-close',[done('quest.r91-goose-vigil'),done('quest.r92-snow-beacon'),done('quest.r93-boundary-mark'),done('quest.r94-snowline-signal'),known('event.r101-code-settled'),known('event.r101-mark-settled'),known('event.r101-north-crosscheck')],[discover('event.r101-north-close')]));
+  add(d,{id:'r101-north-close',text:'沈问秋将四地记录分栏：「北境这一程能坐实用途与时代：雁候、今烽、前朝屯界、旧驿线各不相同。残篇水纹纸药墨的出处仍待船货核实，不认作者。番号和旧界注记怎样传，你付的药、各家的态度都记着。天门关南走雾杉关、听杉谷、照叶港可往归帆洲；归帆洲再接潮生屿，继续海路调查。若要向散船公开传潮时，先到青帆埠金云帆补给摊筹厚蚌壳片2片；只传熟船队则需清心丸1份。这是澜心洲复核之后的用料，备齐不等于已传航，船货纸墨与各处潮灯仍须亲查。」'},option('四地复核与立场都已定，下一章怎样接海路？','r101-north-close',[done('quest.r91-goose-vigil'),done('quest.r92-snow-beacon'),done('quest.r93-boundary-mark'),done('quest.r94-snowline-signal'),known('event.r101-code-settled'),known('event.r101-mark-settled'),known('event.r101-north-crosscheck')],[discover('event.r101-north-close')]));
   add(d,{id:'r101-private-echo',text:'「谷里的旧刻只留内部。」沈问秋把驿牒翻给你，「保护了巡路人的安静，却让后来者难查旧路。我不满意的是记录不易查，不是要用前朝碑文替今朝划界。」'},option('柳寻径选择内部留录，你怎样看？','r101-private-echo',[known('event.r101-mark-private')]));
   add(d,{id:'r101-public-echo',text:'沈问秋指向新注记：「注明时代，比只画一道界线公允。旧路能查，现行关防仍须另核；柳寻径承受的争执也不能当作没有。」'},option('柳寻径公开前朝注记，你怎样看？','r101-public-echo',[known('event.r101-mark-public')]));
  }

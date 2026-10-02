@@ -1,0 +1,183 @@
+{
+  "scope": "Authored terrain only; NPCs, encounters and live movement require normal UI verification. Not journey evidence.",
+  "mapId": "map.round-97-pilot-reef",
+  "start": [
+    90,
+    90
+  ],
+  "target": [
+    50,
+    94
+  ],
+  "length": 68,
+  "segments": [
+    {
+      "direction": "Up",
+      "count": 2
+    },
+    {
+      "direction": "Left",
+      "count": 1
+    },
+    {
+      "direction": "Up",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 1
+    },
+    {
+      "direction": "Up",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 1
+    },
+    {
+      "direction": "Up",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 1
+    },
+    {
+      "direction": "Up",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 1
+    },
+    {
+      "direction": "Up",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 1
+    },
+    {
+      "direction": "Up",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 1
+    },
+    {
+      "direction": "Up",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 1
+    },
+    {
+      "direction": "Up",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 1
+    },
+    {
+      "direction": "Up",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 1
+    },
+    {
+      "direction": "Up",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 5
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 1
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 2
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 1
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 2
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 2
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 3
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 3
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 5
+    },
+    {
+      "direction": "Down",
+      "count": 1
+    },
+    {
+      "direction": "Left",
+      "count": 5
+    },
+    {
+      "direction": "Down",
+      "count": 7
+    },
+    {
+      "direction": "Left",
+      "count": 1
+    }
+  ]
+}

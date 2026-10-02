@@ -1,0 +1,21 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round169-sea-preparation.test.ts (4 tests | 1 failed) 113ms
+   ❯ Round169 sea preparation remains actionable and evidence bounded (4)
+     × matches real public and limited supplies and merchant 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round169-sea-preparation.test.ts > Round169 sea preparation remains actionable and evidence bounded > matches real public and limited supplies and merchant
+TypeError: Cannot read properties of undefined (reading 'stock')
+ ❯ tests/round169-sea-preparation.test.ts:6:252
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 3 passed (4)
+   Start at  15:48:35
+   Duration  386ms (tests 54%, transform 36%, import 8%, worker 2%)
