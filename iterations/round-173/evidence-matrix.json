@@ -1,0 +1,150 @@
+{
+  "round": 173,
+  "scope": "six representative regions; actual evidence remains distinct from authored geometry",
+  "regions": [
+    {
+      "region": "江南道·七镇行旅",
+      "evidence": [
+        {
+          "kind": "actual",
+          "source": "iterations/round-106/playtest.md",
+          "claim": "起点至本地补给三格，实际购买并正常保存读回；仅证明起点补给闭环。"
+        },
+        {
+          "kind": "actual",
+          "source": "iterations/round-147/verification.md",
+          "claim": "渡口关口到江南后实走64格至44,37并复谈，正常第三栏读回。"
+        },
+        {
+          "kind": "actual",
+          "source": "iterations/round-149/verification.md",
+          "claim": "沈墨涵确认引路后一次到渡口2,5，120分钟；关口返江南89,50再成功一步。"
+        }
+      ],
+      "gaps": [
+        "实际导师/公所/补给/出镇闭环的同一连续新游戏尚无本轮证据。",
+        "静态67格石阶出口不能替代指定状态的重复真实路线。"
+      ]
+    },
+    {
+      "region": "雾雨渡口",
+      "evidence": [
+        {
+          "kind": "actual",
+          "source": "iterations/round-109/playtest.md",
+          "claim": "渡口(8,3)至北口(88,15)92次成功移动及45分钟关口，12:19抵铁嶂并保存。"
+        },
+        {
+          "kind": "actual",
+          "source": "iterations/round-146/verification.md",
+          "claim": "回江南路径成功98格后NPC占位受阻，换南邻格再成功4格过关。"
+        },
+        {
+          "kind": "actual",
+          "source": "iterations/round-172/playtest.md",
+          "claim": "渡口返照心石90+绕行6成功格，NPC占位四次失败输入不计成功。"
+        }
+      ],
+      "gaps": [
+        "同区北口/南渡入口按统一起点、时段、补给的一对实走尚缺。",
+        "无药铺长路须与本地药队关卡选择整体核验。"
+      ]
+    },
+    {
+      "region": "云岭古道·断云栈道",
+      "evidence": [
+        {
+          "kind": "actual",
+          "source": "iterations/round-154/playtest.md",
+          "claim": "青岩调查点出发回铁嶂，再行71格入镇及44/42格调查往返，确认仍有空走待优化。"
+        },
+        {
+          "kind": "actual",
+          "source": "iterations/round-146/verification.md",
+          "claim": "返关108成功格抵49,96，45分钟过关入铁嶂。"
+        },
+        {
+          "kind": "actual",
+          "source": "iterations/round-172/playtest.md",
+          "claim": "北台关后云岭坐标63,2，以108成功格到49,96，再过关抵铁嶂。"
+        }
+      ],
+      "gaps": [
+        "R154最初280格未保存，最终有效274格，不混计；完整优化复走仍待。",
+        "北台长路与实际人物/路段的意图密度没有统一量度。"
+      ]
+    },
+    {
+      "region": "东溟海岸·青帆埠",
+      "evidence": [
+        {
+          "kind": "actual",
+          "source": "iterations/round-117/playtest.md",
+          "claim": "青帆口27成功格到90,71，45分钟过关抵风回；HUD随图更新。"
+        },
+        {
+          "kind": "actual",
+          "source": "iterations/round-169/playtest.md",
+          "claim": "过境青帆实际走69格到补给并买有限药材。"
+        },
+        {
+          "kind": "actual",
+          "source": "iterations/round-170/playtest.md",
+          "claim": "黄昏暮潮路线完成；低潮另有一次真实V候时120分钟，暮潮未候时。"
+        }
+      ],
+      "gaps": [
+        "现有海路跨区串联较强，青帆本地区任务、店铺及出镇的一次完整循环仍需抽出比较。",
+        "不可把R160低潮V等候外推为同一固定等待。"
+      ]
+    },
+    {
+      "region": "北境·照雪关",
+      "evidence": [
+        {
+          "kind": "actual",
+          "source": "iterations/round-115/playtest.md",
+          "claim": "南归60成功格+雪地180分钟，关口45分钟到雁回；回关后北33格及绕桥56格调查并在黄昏候时。"
+        },
+        {
+          "kind": "actual",
+          "source": "iterations/round-114/playtest.md",
+          "claim": "照雪关同一真实第三栏两种互斥传号代价分别正常读入验证。"
+        },
+        {
+          "kind": "actual",
+          "source": "iterations/round-167/playtest.md",
+          "claim": "实际购药、完成核烽战斗、复命及公开传号并核正常存读。"
+        }
+      ],
+      "gaps": [
+        "雪、白昼和黄昏门控影响确有真实成本；候时/天气分账在不同轮次口径不完全统一。",
+        "本地有限补给和北口长路需要带补给预算整体复测。"
+      ]
+    },
+    {
+      "region": "东溟·澜心洲",
+      "evidence": [
+        {
+          "kind": "actual",
+          "source": "iterations/round-159/playtest.md",
+          "claim": "完整623格+五关口旅程；同区调药后30+30调查往返，完成差事、传航及灯谱88格复命，后正常读档。"
+        },
+        {
+          "kind": "actual",
+          "source": "iterations/round-171/playtest.md",
+          "claim": "新一轮从南入口先走21格调查观汐台，再32格至季接任务；后续同趟引航复命，不再渡回澜心。"
+        },
+        {
+          "kind": "actual",
+          "source": "iterations/round-169/playtest.md",
+          "claim": "实际跨澜心访问及出区45分钟关口，旅程逐段有账。"
+        }
+      ],
+      "gaps": [
+        "R159旧流程重复往返与R171有序见闻新顺序有明确可比现象，但起点、时段和人物位置不相同，不能直接声称节省普遍格数。",
+        "本地备药匣实际有货与售罄后最近补给路段应使用同一档状态复核。"
+      ]
+    }
+  ]
+}

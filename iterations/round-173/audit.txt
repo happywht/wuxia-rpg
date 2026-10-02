@@ -1,0 +1,5 @@
+
+> wuxia-rpg@0.0.1 audit:round-173-six-region-evidence
+> node scripts/audit-round-173-six-region-evidence.mjs
+
+Six-region evidence index valid: 6 regions, 18 traceable references; gaps remain explicit.

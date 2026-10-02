@@ -33,6 +33,7 @@
     "content:import": "node scripts/content-package.mjs import",
     "audit:round-34": "node scripts/audit-round-34-docs.mjs",
     "audit:round-48-docs": "node scripts/audit-round-48-docs.mjs",
+    "audit:round-173-six-region-evidence": "node scripts/audit-round-173-six-region-evidence.mjs",
     "audit:round-72": "node scripts/audit-round-72-chunks.mjs",
     "audit:final": "node scripts/audit-final-acceptance.mjs",
     "smoke:round-20": "node scripts/smoke-round-20.mjs",
