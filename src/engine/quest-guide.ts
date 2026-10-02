@@ -182,18 +182,23 @@ export function buildQuestGuideEntries(input: QuestGuideInput): RegionGuideEntry
       destinationId: REGION_GUIDE_PREFIX + 'npc:' + quest.giverNpcId,
     });
   }
-  return [...entries, ...buildDialogueDecisionGuideEntries(input)];
+  return [...entries, ...buildDialogueDecisionGuideEntries(input), ...buildDialogueFollowupGuideEntries(input)];
 }
 
 /** Visible confirmation nodes reachable without first committing any effect. */
 export function reachableDialogueDecisions(conversation: Readonly<DialogueData>, context: Readonly<DialogueRuntimeContext>): DialogueNodeData[] {
+  return reachableDialogueNodes(conversation, context).filter(node => node.confirmEffects === true &&
+    getVisibleOptions(node, context).some(({option}) => (option.effects?.length ?? 0) > 0));
+}
+
+function reachableDialogueNodes(conversation: Readonly<DialogueData>, context: Readonly<DialogueRuntimeContext>): DialogueNodeData[] {
   const nodes = new Map(conversation.nodes.map(node => [node.id, node]));
   const queue = [conversation.startNodeId], visited = new Set(queue), result: DialogueNodeData[] = [];
   while (queue.length > 0) {
     const node = nodes.get(queue.shift()!);
     if (node === undefined) continue;
     const visible = getVisibleOptions(node, context);
-    if (node.confirmEffects === true && visible.some(({option}) => (option.effects?.length ?? 0) > 0)) result.push(node);
+    result.push(node);
     for (const {option} of visible) {
       if ((option.effects?.length ?? 0) === 0 && !visited.has(option.nextNodeId)) {
         visited.add(option.nextNodeId); queue.push(option.nextNodeId);
@@ -220,6 +225,33 @@ export function buildDialogueDecisionGuideEntries(input: QuestGuideInput): Regio
       entries.push({id: `decision:${id}:${node.id}`, category: 'quest', title: `${npc.record.name}（可谈决定）`,
         detail: `当前可谈 · ${npc.record.name} (${npc.col},${npc.row})\n${node.text}\n${options.map(({option}) => option.text).join('\n')}\n导航只带路到人物；按${talk}读完对白，再选择并确认。以抵达时条件为准，本页不结算或承诺效果一定成功。`,
         destinationId: REGION_GUIDE_PREFIX + 'npc:' + id});
+    }
+  }
+  return entries;
+}
+
+/** Task-completion-dependent knowledge follow-ups; never reads the destination answer. */
+export function buildDialogueFollowupGuideEntries(input: QuestGuideInput): RegionGuideEntry[] {
+  if (input.dialogues === undefined || input.dialogueContextFor === undefined) return [];
+  const entries: RegionGuideEntry[] = [];
+  for (const id of new Set(input.guide.baseNpcs.map(npc => npc.record.id))) {
+    const npc = resolveRegionGuideNpc(input.guide, id);
+    if (npc === undefined || npc.record.mapResourceId !== input.guide.currentMapResourceId) continue;
+    const conversation = input.dialogues.get(npc.record.dialogueId);
+    if (conversation === undefined) continue;
+    const context = input.dialogueContextFor(id);
+    for (const node of reachableDialogueNodes(conversation, context)) {
+      if (node.confirmEffects === true) continue;
+      for (const {option, index} of getVisibleOptions(node, context)) {
+        const effects = option.effects ?? [];
+        if (!(option.conditions ?? []).some(condition => condition.kind === 'questStatus' && condition.status === 'completed') ||
+          effects.length === 0 || effects.some(effect => effect.kind !== 'discoverKnowledgeNode') ||
+          !effects.some(effect => effect.kind === 'discoverKnowledgeNode' && !context.knownKnowledgeNodeIds.has(effect.nodeId))) continue;
+        const talk = input.guide.follower?.npc.record.id === id ? 'P再T交谈' : 'F交谈';
+        entries.push({id: `followup:${id}:${node.id}:${index}`, category: 'quest', title: `${npc.record.name}（调查续谈）`,
+          detail: `当前可续谈 · ${npc.record.name} (${npc.col},${npc.row})\n${option.text}\n差事完成后仍有尚未记入的调查见闻；本页不展示答案或判定章节已经结案。导航只带路到人物，按${talk}找到上述选项并阅读，以抵达时资格为准。`,
+          destinationId: REGION_GUIDE_PREFIX + 'npc:' + id});
+      }
     }
   }
   return entries;
