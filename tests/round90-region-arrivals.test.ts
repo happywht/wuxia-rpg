@@ -275,8 +275,20 @@ describe('Round 90 cross-region arrival roaming events', () => {
     )).toBeNull();
 
     const arrival = arrivalEvents.find(({ id }) => id === ARRIVAL_EVENT_ID)!;
-    expect(selectNewRegionEventKnowledgeIds([arrival], new Set())).toEqual([ARRIVAL_EVENT_ID]);
-    expect(selectNewRegionEventKnowledgeIds([arrival], new Set([ARRIVAL_EVENT_ID]))).toEqual([]);
+    const graphEventNodes = new Set(arrivalEvents.map(({ id }) => id));
+    expect(selectNewRegionEventKnowledgeIds([arrival], new Set(), graphEventNodes)).toEqual([ARRIVAL_EVENT_ID]);
+    expect(selectNewRegionEventKnowledgeIds([arrival], new Set([ARRIVAL_EVENT_ID]), graphEventNodes)).toEqual([]);
+
+    const springEvent = { id: 'event.r87-spring-hollow', discoverKnowledgeNodeId: 'place.r87-spring-hollow' };
+    const springGraphNodes = new Set([springEvent.id, springEvent.discoverKnowledgeNodeId]);
+    expect(selectNewRegionEventKnowledgeIds([springEvent], new Set(), springGraphNodes))
+      .toEqual([springEvent.id, springEvent.discoverKnowledgeNodeId]);
+    expect(selectNewRegionEventKnowledgeIds([springEvent], new Set([springEvent.discoverKnowledgeNodeId]), springGraphNodes))
+      .toEqual([springEvent.id]);
+    expect(selectNewRegionEventKnowledgeIds([springEvent], new Set(), new Set([springEvent.discoverKnowledgeNodeId])))
+      .toEqual([springEvent.discoverKnowledgeNodeId]);
+    expect(selectNewRegionEventKnowledgeIds([springEvent], new Set([springEvent.id, springEvent.discoverKnowledgeNodeId]), springGraphNodes))
+      .toEqual([]);
   });
 
   it('round-trips one-shot arrivals and the pending return through a v1 save', { timeout: 20_000 }, async () => {

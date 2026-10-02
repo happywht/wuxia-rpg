@@ -4896,7 +4896,8 @@ export class GridScene extends Phaser.Scene {
       notices.push(event.text);
     }
     const newlyDiscoveredTitles = new Set<string>();
-    for (const nodeId of selectNewRegionEventKnowledgeIds(events, this.knownKnowledgeNodeIds)) {
+    const eventKnowledgeNodeIds = new Set(world.knowledgeGraph.nodes.keys());
+    for (const nodeId of selectNewRegionEventKnowledgeIds(events, this.knownKnowledgeNodeIds, eventKnowledgeNodeIds)) {
       const node = world.knowledgeGraph.nodes.get(nodeId);
       if (node === undefined) continue;
       if (!this.markKnowledgeDiscovered(nodeId)) continue;

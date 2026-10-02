@@ -1129,16 +1129,22 @@ export function selectInteractableRegionEvent(
 
 /** Returns first-time node discoveries for a ready batch without mutating the save state. */
 export function selectNewRegionEventKnowledgeIds(
-  events: readonly { discoverKnowledgeNodeId?: string }[],
+  events: readonly { id: string; discoverKnowledgeNodeId?: string }[],
   knownKnowledgeNodeIds: ReadonlySet<string>,
+  eventKnowledgeNodeIds: ReadonlySet<string> = new Set(),
 ): string[] {
   const seen = new Set(knownKnowledgeNodeIds);
   const discoveries: string[] = [];
   for (const event of events) {
-    const nodeId = event.discoverKnowledgeNodeId;
-    if (nodeId === undefined || seen.has(nodeId)) continue;
-    seen.add(nodeId);
-    discoveries.push(nodeId);
+    const nodeIds = [
+      ...(eventKnowledgeNodeIds.has(event.id) ? [event.id] : []),
+      ...(event.discoverKnowledgeNodeId === undefined ? [] : [event.discoverKnowledgeNodeId]),
+    ];
+    for (const nodeId of nodeIds) {
+      if (seen.has(nodeId)) continue;
+      seen.add(nodeId);
+      discoveries.push(nodeId);
+    }
   }
   return discoveries;
 }
