@@ -22,6 +22,7 @@ import {
   type SaveStorage,
   createMemorySaveStorage,
   formatSavedAt,
+  parseSaveSnapshot,
   writeSaveSlot,
 } from '../src/engine/save-system';
 import {
@@ -71,10 +72,26 @@ const makeSnapshot = (displayName: string, level: number, savedAt: string): Save
   arenaRecords: [],
   factionWarRecords: [],
   customMartialArts: [],
-  achievementState: { unlockedIds: [], battleVictories: 0, equipmentCrafts: 0, alchemyCrafts: 0 },
+  achievementState: { unlockedIds: [], battleVictories: 0, equipmentCrafts: 0, alchemyCrafts: 0, discoveredKnowledge: 0 },
 });
 
 const slotKey = (slotId: SaveSlotId): string => `${SAVE_KEY_PREFIX}${slotId}`;
+
+describe('Round190 knowledge discovery save compatibility', () => {
+  it('round-trips the discovery counter and defaults legacy saves to zero', () => {
+    const current = makeSnapshot('新档', 1, '2026-10-03T00:00:00.000Z');
+    current.achievementState.discoveredKnowledge = 16;
+    const parsedCurrent = parseSaveSnapshot(JSON.parse(JSON.stringify(current)));
+    expect(parsedCurrent.ok).toBe(true);
+    if (parsedCurrent.ok) expect(parsedCurrent.snapshot.achievementState.discoveredKnowledge).toBe(16);
+
+    const legacy = JSON.parse(JSON.stringify(makeSnapshot('旧档', 1, '2026-10-03T00:00:00.000Z'))) as Record<string, any>;
+    delete legacy.achievementState.discoveredKnowledge;
+    const parsedLegacy = parseSaveSnapshot(legacy);
+    expect(parsedLegacy.ok).toBe(true);
+    if (parsedLegacy.ok) expect(parsedLegacy.snapshot.achievementState.discoveredKnowledge).toBe(0);
+  });
+});
 
 /** Single-page confirmation state bound to one raw payload (wide, roomy). */
 const makeState = (rawPayload: string | null, slotId: SaveSlotId = 'slot-1') =>

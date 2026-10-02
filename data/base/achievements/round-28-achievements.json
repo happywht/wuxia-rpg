@@ -34,10 +34,10 @@
     {
       "id": "achievement.river-of-stories",
       "title": "江湖百闻",
-      "description": "把沿途听来的消息，一条条辨成自己的见识。",
+      "description": "把沿途新发现的消息，一条条辨成自己的见识。",
       "priority": 88,
       "conditions": [
-        { "kind": "knownKnowledgeCount", "minCount": 16, "hint": "发现至少 16 条江湖见闻" }
+        { "kind": "discoveredKnowledgeCount", "minCount": 16, "hint": "旅途中首次发现至少 16 条江湖见闻" }
       ],
       "reward": { "experience": 40, "currency": 25 }
     },

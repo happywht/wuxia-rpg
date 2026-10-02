@@ -728,6 +728,12 @@ export class GridScene extends Phaser.Scene {
       world.knowledgeGraph,
       restoredRun?.knownKnowledgeNodeIds ?? [],
     );
+    // Older saves predate the explicit discovery counter. Backfill from the
+    // persisted run facts while excluding public entries known at game start.
+    this.achievementState.discoveredKnowledge = Math.max(
+      this.achievementState.discoveredKnowledge,
+      [...this.knownKnowledgeNodeIds].filter((id) => !world.knowledgeGraph.nodes.get(id)?.knownByDefault).length,
+    );
     this.factionState = createFactionMembershipState(restoredRun?.factionMembership ?? null);
     this.currentMapResourceId = restoredRun?.mapResourceId ?? world.mapResourceId;
     const activeMap = world.maps.get(this.currentMapResourceId) ?? map;
@@ -3666,6 +3672,13 @@ export class GridScene extends Phaser.Scene {
 
   /** Advances matching one-time quest objectives for actual first discoveries. */
   private progressKnowledgeDiscoveries(nodeIds: readonly string[]): void {
+    if (nodeIds.length > 0) {
+      this.achievementState = recordAchievementCounter(
+        this.achievementState,
+        'discoveredKnowledge',
+        nodeIds.length,
+      );
+    }
     for (const nodeId of nodeIds) {
       this.applyQuestUpdate(applyQuestSignal(this.quests, this.questJournal, {
         type: 'knowledge-discovery',

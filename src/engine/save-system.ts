@@ -314,9 +314,12 @@ function parseAchievementRunState(raw: unknown): AchievementRunState | null {
   const alchemyCrafts = raw.alchemyCrafts === undefined
     ? 0
     : requireIntegerInRange(raw.alchemyCrafts, 0, 999_999_999);
+  const discoveredKnowledge = raw.discoveredKnowledge === undefined
+    ? 0
+    : requireIntegerInRange(raw.discoveredKnowledge, 0, 999_999_999);
   if (unlockedIds === null || battleVictories === null ||
-    equipmentCrafts === null || alchemyCrafts === null) return null;
-  return { unlockedIds, battleVictories, equipmentCrafts, alchemyCrafts };
+    equipmentCrafts === null || alchemyCrafts === null || discoveredKnowledge === null) return null;
+  return { unlockedIds, battleVictories, equipmentCrafts, alchemyCrafts, discoveredKnowledge };
 }
 
 /**

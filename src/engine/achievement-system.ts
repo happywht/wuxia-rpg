@@ -15,6 +15,7 @@ export type AchievementConditionData =
   | (ConditionBase & { kind: 'playerLevel'; minLevel: number })
   | (ConditionBase & MinimumCount & { kind: 'completedQuestCount' })
   | (ConditionBase & MinimumCount & { kind: 'knownKnowledgeCount' })
+  | (ConditionBase & MinimumCount & { kind: 'discoveredKnowledgeCount' })
   | (ConditionBase & { kind: 'knowledgeKnown'; nodeId: string })
   | (ConditionBase & { kind: 'morality'; minValue?: number; maxValue?: number })
   | (ConditionBase & { kind: 'renown'; minValue?: number; maxValue?: number })
@@ -52,13 +53,15 @@ export interface AchievementRunState {
   battleVictories: number;
   equipmentCrafts: number;
   alchemyCrafts: number;
+  /** First-time discoveries made during play, excluding public starting lore. */
+  discoveredKnowledge: number;
 }
 
 export function createAchievementRunState(): AchievementRunState {
-  return { unlockedIds: [], battleVictories: 0, equipmentCrafts: 0, alchemyCrafts: 0 };
+  return { unlockedIds: [], battleVictories: 0, equipmentCrafts: 0, alchemyCrafts: 0, discoveredKnowledge: 0 };
 }
 
-export type AchievementCounter = 'battleVictories' | 'equipmentCrafts' | 'alchemyCrafts';
+export type AchievementCounter = 'battleVictories' | 'equipmentCrafts' | 'alchemyCrafts' | 'discoveredKnowledge';
 
 /** Monotonic and saturating counter update; the input state is not mutated. */
 export function recordAchievementCounter(
@@ -120,6 +123,7 @@ function parseCondition(raw: unknown): AchievementConditionData | null {
       return integer(raw.minLevel, 1, 99) ? { kind: 'playerLevel', hint, minLevel: raw.minLevel } : null;
     case 'completedQuestCount':
     case 'knownKnowledgeCount':
+    case 'discoveredKnowledgeCount':
     case 'battleVictories':
     case 'arenaChampionships':
     case 'meridianNodes':
@@ -128,6 +132,7 @@ function parseCondition(raw: unknown): AchievementConditionData | null {
     case 'alchemyCrafts': {
       const maximum = raw.kind === 'completedQuestCount' ? 256
         : raw.kind === 'knownKnowledgeCount' ? 4096
+          : raw.kind === 'discoveredKnowledgeCount' ? 4096
           : raw.kind === 'arenaChampionships' ? 99_999
             : raw.kind === 'meridianNodes' ? 64
               : raw.kind === 'customMartialArts' ? 128
@@ -325,6 +330,8 @@ function evaluateCondition(
       );
     case 'knownKnowledgeCount':
       return countProgress(context.knownKnowledgeNodeIds.size, condition.minCount);
+    case 'discoveredKnowledgeCount':
+      return countProgress(context.state.discoveredKnowledge, condition.minCount);
     case 'knowledgeKnown': {
       const known = context.knownKnowledgeNodeIds.has(condition.nodeId);
       return {
