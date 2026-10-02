@@ -4542,7 +4542,11 @@ export class GridScene extends Phaser.Scene {
     const baseStepMinutes = this.clock?.calendar.actionCosts.stepMinutes ?? 0;
     const weatherStepMinutes = this.currentClimate()?.weather.stepMinutes ?? 0;
     this.advanceTime(baseStepMinutes + weatherStepMinutes);
-    // Quote the remaining walk against the new time and local weather.
+    // A step can cross a period boundary. Refresh schedules even for maps
+    // whose step cost is zero, then rebuild the guide against live blockers.
+    // advanceTime already performs this when the clock actually advances.
+    if (baseStepMinutes + weatherStepMinutes <= 0) this.syncNpcSchedule(false);
+    // Quote the remaining walk against the new time, live occupancy and weather.
     // This also refreshes zero-time movement, where advanceTime is a no-op.
     this.refreshNavigationGuide();
 

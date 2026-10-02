@@ -2,6 +2,9 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import { parseGridMap } from '../src/engine/grid-map';
+import { compileNpcSchedules, resolveNpcPlacementsForPlayer } from '../src/engine/npc-schedule';
+import { parseGameCalendar } from '../src/engine/game-calendar';
+import { parseNpcSet } from '../src/engine/npc-placement';
 import { assembleWorldMap, parseWorldMap } from '../src/engine/world-map';
 import {
   arrivalActionHint,
@@ -32,6 +35,38 @@ function makeWorld() {
 }
 
 describe('cross-region landmark guidance', () => {
+  it('rebuilds the local player route from the live scheduled NPC cells after a step', () => {
+    const world = makeWorld();
+    const map = world.maps.get('map.round-01-grid')!;
+    const npcsParsed = parseNpcSet(JSON.parse(readFileSync(new URL('../data/base/characters/round-03-npcs.json', import.meta.url), 'utf8')));
+    if (!npcsParsed.ok) throw new Error(npcsParsed.errors.join('\n'));
+    const calendarParsed = parseGameCalendar(JSON.parse(readFileSync(new URL('../data/base/worldview/calendar.json', import.meta.url), 'utf8')));
+    if (!calendarParsed.ok) throw new Error(calendarParsed.errors.join('\n'));
+    const compiled = compileNpcSchedules({
+      npcs: npcsParsed.set.npcs.map(record => ({ record, col: record.position.col, row: record.position.row })), periods: calendarParsed.calendar.periods,
+      maps: world.maps,
+    });
+    const live = resolveNpcPlacementsForPlayer({
+      baseNpcs: npcsParsed.set.npcs.map(record => ({ record, col: record.position.col, row: record.position.row })),
+      periodNpcs: compiled.placementsByPeriod.get('period.midday')!,
+      mapResourceId: map.data.id, map, playerPosition: { col: 44, row: 32 },
+    });
+    const blockers = new Set(live.map(npc => `${npc.col},${npc.row}`));
+    const stale = resolveWorldNavigationGuide(
+      world.worldMap, map.data.id, 'landmark.mist-willow-market', new Set(['place.mist-willow-market']),
+      map, { col: 43, row: 37 },
+    );
+    const fresh = resolveWorldNavigationGuide(
+      world.worldMap, map.data.id, 'landmark.mist-willow-market', new Set(['place.mist-willow-market']),
+      map, { col: 44, row: 32 }, blockers,
+    );
+    expect(stale.status).toBe('en-route');
+    expect(fresh.status).toBe('en-route');
+    if (stale.status !== 'en-route' || fresh.status !== 'en-route') throw new Error('expected open routes');
+    expect(fresh.path).not.toEqual(stale.path);
+    for (const cell of fresh.path.slice(1)) expect(blockers.has(`${cell.col},${cell.row}`)).toBe(false);
+  });
+
   it('projects one stable landmark id from the first-region gate to the destination map', () => {
     const world = makeWorld();
     const startingMap = world.maps.get('map.round-01-grid')!;

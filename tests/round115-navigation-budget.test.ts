@@ -72,6 +72,8 @@ describe('Round115 current-region walking budget', () => {
     expect(source).toContain('navigationWalkingBudgetHint(budget)');
     const move = source.slice(source.indexOf('private tryMove('), source.indexOf('private updatePlayerActorFrame('));
     expect(move.indexOf('this.refreshNavigationGuide()')).toBeGreaterThan(move.indexOf('this.advanceTime(baseStepMinutes + weatherStepMinutes)'));
+    expect(move).toContain('if (baseStepMinutes + weatherStepMinutes <= 0) this.syncNpcSchedule(false)');
+    expect(move.indexOf('this.refreshNavigationGuide()')).toBeGreaterThan(move.indexOf('this.syncNpcSchedule(false)'));
     const wait = source.slice(source.indexOf('private handleWait('), source.indexOf('private updateTimeHud('));
     expect(wait.indexOf('this.refreshNavigationGuide()')).toBeGreaterThan(wait.indexOf('this.advanceTime(minutes)'));
   });
