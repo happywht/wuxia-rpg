@@ -161,6 +161,26 @@
               ]
             },
             {
+              "text": "补给已交，岸上与守礁人接下来怎样？",
+              "nextNodeId": "r102-echo-shore-aid",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-shore-aid"
+                }
+              ]
+            },
+            {
+              "text": "补给已交，岸上与守礁人接下来怎样？",
+              "nextNodeId": "r102-echo-keeper-aid",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r102-keeper-aid"
+                }
+              ]
+            },
+            {
               "text": "先说说这片潮沟。",
               "nextNodeId": "tidal-flat"
             }
@@ -310,6 +330,14 @@
         {
           "id": "farewell",
           "text": "你暂且收住话头，先去筹备要用的物资。"
+        },
+        {
+          "id": "r102-echo-shore-aid",
+          "text": "「岸上那份海盐敷膏已经交妥，不用再给。风回岛阮回澜能说岸伤的变化，潮生屿岑隐礁则还缺急药。由青帆埠东南海口(91,71)到风回岛，再由东岸(97,50)渡潮生屿；听两边回应，再向引航礁虞星槎对照六项差事。别把补给选择说成两边都得到了药。」"
+        },
+        {
+          "id": "r102-echo-keeper-aid",
+          "text": "「守礁药囊那份回春膏已经交妥，不用再给。风回岛阮回澜会说岸上仍等后批，潮生屿岑隐礁可核应急份额。由青帆埠东南海口(91,71)到风回岛，再由东岸(97,50)渡潮生屿；听两边回应，再向引航礁虞星槎对照六项差事。结案也不会让没拿到药的人凭空痊愈。」"
         }
       ]
     }

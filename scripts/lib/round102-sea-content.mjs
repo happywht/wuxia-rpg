@@ -43,6 +43,8 @@ export function deepenSeaDialogues(set){
   choice(d,'supply','这份补给给岸上救伤，还是留给守标人？',[done('quest.r83-night-channel')],[
    {flag:'shore-aid',label:'给岸上救伤留海盐敷膏1罐（顾+4、岑−3、声望+2）',item:'item.r83-sea-salt-ointment',effects:[relation(GU,4),relation(CEN,-3),{kind:'adjustRenown',delta:2}],response:'顾潮生收下海盐敷膏交给岸上伤者：「船回埠有人照应了，守礁人的缺药却得另想办法。」'},
    {flag:'keeper-aid',label:'给守礁药囊留回春膏1份（顾−3、岑+4、声望−1）',item:'item.huichun-gao',effects:[relation(GU,-3),relation(CEN,4),{kind:'adjustRenown',delta:-1}],response:'顾潮生收下回春膏，记在守礁药囊名下：「岛上应急多一份，岸上的人却要等下一批。」'}]);
+  echo(d,'shore-aid','补给已交，岸上与守礁人接下来怎样？','「岸上那份海盐敷膏已经交妥，不用再给。风回岛阮回澜能说岸伤的变化，潮生屿岑隐礁则还缺急药。由青帆埠东南海口(91,71)到风回岛，再由东岸(97,50)渡潮生屿；听两边回应，再向引航礁虞星槎对照六项差事。别把补给选择说成两边都得到了药。」');
+  echo(d,'keeper-aid','补给已交，岸上与守礁人接下来怎样？','「守礁药囊那份回春膏已经交妥，不用再给。风回岛阮回澜会说岸上仍等后批，潮生屿岑隐礁可核应急份额。由青帆埠东南海口(91,71)到风回岛，再由东岸(97,50)渡潮生屿；听两边回应，再向引航礁虞星槎对照六项差事。结案也不会让没拿到药的人凭空痊愈。」');
   add(d,{id:'r102-mainland-link',text:'「更簿、井壁、索孔都不是水则；海上也要分清回湾线、风灯向和潮位层。先到风回岛问阮回澜与谢照汀，再调查潮生屿。海盐敷膏在金云帆摊上按价买，别把谢仪当成药已经到手。」'},option('大陆的刻痕对照，对海路有何用？','r102-mainland-link',[known('event.r100-paper-crosscheck')]));
   echo(d,'pilot-public','澜心洲的传航办法如何？','「散船能看到核过的潮时了，假号也会照学；虞星槎的辨号差事比从前重。」');
   echo(d,'pilot-crew','澜心洲的传航办法如何？','「熟船队好互认，散船还得找人核簿。海路秩序省下的麻烦，换成了陌生人的等候。」');
