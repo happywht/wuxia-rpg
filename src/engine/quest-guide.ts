@@ -182,7 +182,7 @@ export function buildQuestGuideEntries(input: QuestGuideInput): RegionGuideEntry
       destinationId: REGION_GUIDE_PREFIX + 'npc:' + quest.giverNpcId,
     });
   }
-  return [...entries, ...buildDialogueDecisionGuideEntries(input), ...buildDialogueFollowupGuideEntries(input)];
+  return [...entries, ...buildDialogueDecisionGuideEntries(input), ...buildDialogueFollowupGuideEntries(input), ...buildDialogueAftermathGuideEntries(input)];
 }
 
 /** Visible confirmation nodes reachable without first committing any effect. */
@@ -250,6 +250,31 @@ export function buildDialogueFollowupGuideEntries(input: QuestGuideInput): Regio
         const talk = input.guide.follower?.npc.record.id === id ? 'P再T交谈' : 'F交谈';
         entries.push({id: `followup:${id}:${node.id}:${index}`, category: 'quest', title: `${npc.record.name}（调查续谈）`,
           detail: `当前可续谈 · ${npc.record.name} (${npc.col},${npc.row})\n${option.text}\n差事完成后仍有尚未记入的调查见闻；本页不展示答案或判定章节已经结案。导航只带路到人物，按${talk}找到上述选项并阅读，以抵达时资格为准。`,
+          destinationId: REGION_GUIDE_PREFIX + 'npc:' + id});
+      }
+    }
+  }
+  return entries;
+}
+
+/** Known-choice responses: only the original question is projected, never its answer. */
+export function buildDialogueAftermathGuideEntries(input: QuestGuideInput): RegionGuideEntry[] {
+  if (input.dialogues === undefined || input.dialogueContextFor === undefined) return [];
+  const entries: RegionGuideEntry[] = [];
+  for (const id of new Set(input.guide.baseNpcs.map(npc => npc.record.id))) {
+    const npc = resolveRegionGuideNpc(input.guide, id);
+    if (npc === undefined || npc.record.mapResourceId !== input.guide.currentMapResourceId) continue;
+    const conversation = input.dialogues.get(npc.record.dialogueId);
+    if (conversation === undefined) continue;
+    const context = input.dialogueContextFor(id);
+    for (const node of reachableDialogueNodes(conversation, context)) {
+      if (node.confirmEffects === true) continue;
+      for (const {option, index} of getVisibleOptions(node, context)) {
+        if ((option.effects?.length ?? 0) > 0 || !(option.conditions ?? []).some(condition =>
+          condition.kind === 'knowledgeKnown' && condition.isKnown !== false && context.knownKnowledgeNodeIds.has(condition.nodeId))) continue;
+        const talk = input.guide.follower?.npc.record.id === id ? 'P再T交谈' : 'F交谈';
+        entries.push({id: `aftermath:${id}:${node.id}:${index}`, category: 'quest', title: `${npc.record.name}（可谈回响）`,
+          detail: `当前可询问 · ${npc.record.name} (${npc.col},${npc.row})\n${option.text}\n已有见闻使这个问题可谈；本页只列问题，不展示答复或执行效果。导航到人物后按${talk}选择上述问题，以抵达时资格为准；已读答复仍可复谈。`,
           destinationId: REGION_GUIDE_PREFIX + 'npc:' + id});
       }
     }

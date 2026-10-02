@@ -1,0 +1,2 @@
+tests/round155-dialogue-aftermath-guide.test.ts(15,10): error TS6133: 'ready' is declared but its value is never read.
+tests/round155-dialogue-aftermath-guide.test.ts(19,191): error TS2339: Property 'push' does not exist on type 'readonly DialogueConditionData[]'.
