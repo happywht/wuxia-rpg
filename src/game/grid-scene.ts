@@ -76,6 +76,7 @@ import {
   type AchievementRunState,
 } from '../engine/achievement-system';
 import { resolveNpcPlacementsForPlayer } from '../engine/npc-schedule';
+import { shouldPreferRegionalEventInteraction } from '../engine/interaction-priority';
 import {
   ClimateRuntime,
   DEFAULT_WORLD_SEED,
@@ -4118,9 +4119,10 @@ export class GridScene extends Phaser.Scene {
   }
 
   /**
-   * E key: the four-way adjacent NPC opens its shop when it keeps a valid
-   * one (nearest, id tie-break), then opens a quest board, and otherwise
-   * talks; next comes a four-way adjacent encounter, then a data-driven gate.
+   * E reaches a ready map inspection before a talk-only NPC if they share
+   * the approach cell. Dedicated shops/quest boards retain priority; F is
+   * always available for conversation. Remaining targets keep their legacy
+   * order: NPC, encounter, arena, faction war, crafting, event, then gate.
    */
   private handleInteraction(): void {
     if (this.anyOverlayOpen() || this.dataReloading) {
@@ -4130,27 +4132,38 @@ export class GridScene extends Phaser.Scene {
       col: this.playerCol,
       row: this.playerRow,
     });
+    const mapEvent = this.interactableRegionEventTarget();
+    const targetShop = target?.record.shopId === null || target === null
+      ? undefined
+      : this.shops.get(target.record.shopId);
+    const targetStock = targetShop === undefined ? undefined : this.shopStocks.get(targetShop.record.id);
+    const targetHasQuests = target !== null && [...this.quests.values()].some(
+      (quest) => quest.giverNpcId === target.record.id,
+    );
+    const npcHasDedicatedInteraction = target !== null && (
+      (targetShop !== undefined && targetStock !== undefined && this.inventory !== null) ||
+      (target.record.questGiver && targetHasQuests && this.inventory !== null && this.questPanel !== null)
+    );
+    if (shouldPreferRegionalEventInteraction(mapEvent !== null, npcHasDedicatedInteraction)) {
+      this.faceInteractionCell(mapEvent!.event);
+      this.presentRegionEvents([mapEvent!.event]);
+      return;
+    }
     if (target !== null) {
       this.faceInteractionTarget(target);
       this.recordKnowledgeObservations({ characterIds: [target.record.id] });
-      const shop =
-        target.record.shopId === null ? undefined : this.shops.get(target.record.shopId);
-      const stock = shop === undefined ? undefined : this.shopStocks.get(shop.record.id);
-      if (shop !== undefined && stock !== undefined && this.inventory !== null) {
+      if (targetShop !== undefined && targetStock !== undefined && this.inventory !== null) {
         this.shopPanel?.open({
-          shop,
-          stock,
+          shop: targetShop,
+          stock: targetStock,
           inventory: this.inventory,
           items: this.items,
         });
         this.updateInteractHint();
         return;
       }
-      const hasQuests = [...this.quests.values()].some(
-        (quest) => quest.giverNpcId === target.record.id,
-      );
       if (
-        target.record.questGiver && hasQuests && this.inventory !== null &&
+        target.record.questGiver && targetHasQuests && this.inventory !== null &&
         this.questPanel !== null
       ) {
         this.questPanel.open({
@@ -4254,7 +4267,6 @@ export class GridScene extends Phaser.Scene {
       this.updateInteractHint();
       return;
     }
-    const mapEvent = this.interactableRegionEventTarget();
     if (mapEvent !== null) {
       this.faceInteractionCell(mapEvent.event);
       this.presentRegionEvents([mapEvent.event]);

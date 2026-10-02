@@ -26,7 +26,8 @@ import { parseKnowledgeNodeSet } from '../src/engine/knowledge-graph';
 import { parseNpcSet, type PlacedNpc } from '../src/engine/npc-placement';
 import { parseGameCalendar } from '../src/engine/game-calendar';
 import { parseClimate } from '../src/engine/climate-system';
-import { assembleWorldMap, parseWorldMap } from '../src/engine/world-map';
+import { assembleWorldMap, parseWorldMap, selectInteractableRegionEvent } from '../src/engine/world-map';
+import { shouldPreferRegionalEventInteraction } from '../src/engine/interaction-priority';
 import {
   acceptQuest,
   applyQuestSignal,
@@ -413,6 +414,34 @@ describe('Round 87 Southwest Isles within the expanded world atlas', () => {
       expect(isle.canEnter(event.col, event.row), event.id).toBe(true);
     }
     expect(events.find(({ id }: { id: string }) => id === 'event.r87-arrival').discoverKnowledgeNodeId).toBe(ISLE_NODE);
+  });
+
+  it('lets the ready mist survey take E when its talk-only keeper shares the approach cell', () => {
+    const parsed = parseWorldMap(readJson('../data/base/world/world-map.json'));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    const isle = maps.get(ISLE_ID)!;
+    const signal = parsed.data.events.find(({ id }) => id === 'event.r87-mist-signal')!;
+    const selection = selectInteractableRegionEvent(
+      [signal],
+      { mapResourceId: ISLE_ID, col: 79, row: 36 },
+      new Set(),
+      {
+        knownKnowledgeNodeIds: new Set(),
+        periodId: 'period.dawn',
+        weatherId: 'weather.mist',
+        nearbyNpcIds: new Set([KEEPER_ID]),
+      },
+      (col, row) => isle.canEnter(col, row),
+    );
+
+    // At (79,36), both the signal at (78,36) and keeper at (80,36) are
+    // adjacent. The keeper is talk-only, so E must dispatch the signal;
+    // dedicated shop/quest actions retain their direct E behavior.
+    expect(selection?.event.id).toBe('event.r87-mist-signal');
+    expect(shouldPreferRegionalEventInteraction(selection !== null, false)).toBe(true);
+    expect(shouldPreferRegionalEventInteraction(selection !== null, true)).toBe(false);
+    expect(shouldPreferRegionalEventInteraction(false, false)).toBe(false);
   });
 
   it('runs the fog-pilot quest from the isles dialogue through both discoveries', () => {
