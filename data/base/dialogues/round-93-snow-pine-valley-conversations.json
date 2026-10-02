@@ -66,6 +66,26 @@
               "nextNodeId": "patroller"
             },
             {
+              "text": "旧界文的处理已定，我想再核对代价与后果。",
+              "nextNodeId": "r168-public-review",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-mark-public"
+                }
+              ]
+            },
+            {
+              "text": "旧界文的处理已定，我想再核对代价与后果。",
+              "nextNodeId": "r168-private-review",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r101-mark-private"
+                }
+              ]
+            },
+            {
               "text": "旧界文该怎样说明它的时代？",
               "nextNodeId": "r101-mark-choice",
               "conditions": [
@@ -403,6 +423,14 @@
         {
           "id": "farewell",
           "text": "柳寻径重新裹上脚，背起雪铲出门，向着谷西的方向走进松影里，靴声很快被落雪吃掉。"
+        },
+        {
+          "id": "r168-public-review",
+          "text": "柳寻径指着公开注记：「你交的清心丸已经给了传话人，复谈不再收药或付谢仪。前朝屯垦与当朝关防分开写，来人能查年代，我也得接住旧账争执。关里谷照雪与天门沈问秋各有回应，去亲口问；云阶刻纹消息还须先听沈雨霁说明再转述，不能把这页注记当作他已托话。」"
+        },
+        {
+          "id": "r168-private-review",
+          "text": "柳寻径合上内部巡簿：「你交的回春膏已留给护卷人，复谈不再收药或付谢仪。巡路人少些争执，过客却不便自行核看。关里谷照雪与天门沈问秋各有回应，去亲口问；云阶刻纹消息还须先听沈雨霁说明再转述，不能把这页巡簿当作他已托话。」"
         },
         {
           "id": "r101-mark-choice",
