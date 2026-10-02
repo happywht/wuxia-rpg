@@ -79,6 +79,7 @@ import {
 } from './faction-system';
 import { dismissCompanion, recruitCompanion, type CompanionData, type CompanionState } from './companion-system';
 import { preflightDialogueBattle, type DialogueBattleReadiness } from './dialogue-battle-request';
+import { preflightDialogueTeleport, type DialogueTeleportRequest, type DialogueTeleportReadiness } from './dialogue-teleport-request';
 import {
   type DialogueVariableValue,
   DIALOGUE_VARIABLE_LEDGER_MAX_ENTRIES,
@@ -128,6 +129,7 @@ export interface DialogueRuntimeContext {
    */
   dialogueVariables?: Map<string, DialogueVariableValue>;
   battleReadiness?: DialogueBattleReadiness;
+  teleportReadiness?: DialogueTeleportReadiness;
 }
 
 // ---------------------------------------------------------------------------
@@ -151,6 +153,7 @@ export interface DialogueReferenceAssemblyInput {
   weatherIds?: ReadonlySet<string>;
   companionIds?: ReadonlySet<string>;
   encounterIds?: ReadonlySet<string>;
+  isTeleportDestinationWalkable?: (mapResourceId: string, col: number, row: number) => boolean;
 }
 
 export interface DialogueReferenceAssemblyResult {
@@ -236,6 +239,11 @@ export function assembleDialogueReferences(
       for (const option of node.options) {
         const references = optionReferences(option);
         const problems: string[] = [];
+        for (const effect of option.effects ?? []) {
+          if (effect.kind === 'teleport' && !input.isTeleportDestinationWalkable?.(effect.mapResourceId, effect.col, effect.row)) {
+            problems.push('引路目的地区或落点不可通行');
+          }
+        }
         for (const questId of references.questIds) {
           if (!input.quests.has(questId)) problems.push(`引用无效任务 "${questId}"`);
         }
@@ -439,6 +447,7 @@ export function getVisibleOptionsForDisplay(
 export interface DialogueEffectSummary {
   /** One deferred external action; no battle is opened during staging. */
   battleRequest?: { encounterId: string };
+  teleportRequest?: DialogueTeleportRequest;
   lines: readonly string[];
   /** Aggregated quest transitions for HUD settlement (rewards, notices). */
   questUpdate: QuestUpdateResult;
@@ -590,6 +599,10 @@ function validateEffect(
   effect: DialogueEffectData,
   context: Readonly<DialogueRuntimeContext>,
 ): string | null {
+  if (effect.kind === 'teleport') {
+    const result = preflightDialogueTeleport(effect, context.teleportReadiness, context.companionState?.activeCompanionId ?? null);
+    return result.ok ? null : result.reason;
+  }
   if (effect.kind === 'startBattle') {
     const result = preflightDialogueBattle(effect.encounterId, context.battleReadiness);
     return result.ok ? null : result.reason;
@@ -742,9 +755,9 @@ export function applyDialogueEffects(
   effects: readonly DialogueEffectData[],
   context: DialogueRuntimeContext,
 ): DialogueEffectResult {
-  const battles = effects.filter(effect => effect.kind === 'startBattle');
-  if (battles.length > 1) return { ok: false, reason: '一次交谈只能发起一项挑战' };
+  if (effects.filter(effect => effect.kind === 'teleport' || effect.kind === 'startBattle').length > 1) return { ok: false, reason: '一次交谈只能发起一项挑战或引路' };
   let battleRequest: { encounterId: string } | undefined;
+  let teleportRequest: DialogueTeleportRequest | undefined;
   // Run the declared sequence against an isolated working copy. Each next
   // effect sees earlier staged changes (so duplicate grants/accepts cannot
   // pass against stale state); a refusal simply discards the whole copy.
@@ -763,6 +776,9 @@ export function applyDialogueEffects(
     }
 
     switch (effect.kind) {
+      case 'teleport':
+        teleportRequest = { mapResourceId: effect.mapResourceId, col: effect.col, row: effect.row, travelMinutes: effect.travelMinutes };
+        break;
       case 'startBattle':
         battleRequest = { encounterId: effect.encounterId };
         break;
@@ -987,7 +1003,11 @@ export function applyDialogueEffects(
   }
 
   // Publish only after every staged effect and quest signal succeeded.
+  if (teleportRequest !== undefined) {
+    const result = preflightDialogueTeleport(teleportRequest, staged.teleportReadiness, staged.companionState?.activeCompanionId ?? null);
+    if (!result.ok) return result;
+  }
   commitRuntimeContext(context, staged);
 
-  return { ok: true, summary: { lines, questUpdate, ...(battleRequest === undefined ? {} : { battleRequest }) } };
+  return { ok: true, summary: { lines, questUpdate, ...(battleRequest === undefined ? {} : { battleRequest }), ...(teleportRequest === undefined ? {} : { teleportRequest }) } };
 }

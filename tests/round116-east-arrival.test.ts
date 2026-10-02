@@ -88,7 +88,9 @@ describe('Round116 actual eastern entry discovery', () => {
   });
   it('keeps generation source and runtime actual map-switch event delivery aligned', () => {
     expect(readFileSync('scripts/generate-round94-frontiers.mjs', 'utf8')).toContain("arrivalTransitionIds: ['gate.r94-terrace-to-east']");
-    expect(readFileSync('src/game/grid-scene.ts', 'utf8')).toContain("this.triggerRegionEvents('', false, transition.id)");
+    const scene = readFileSync('src/game/grid-scene.ts', 'utf8');
+    expect(scene).toContain('this.arriveAtMap(transition.to.mapResourceId, transition.to.col, transition.to.row, travelMinutes, arrivalPeriodId, transition.id)');
+    expect(scene).toContain("this.triggerRegionEvents('', false, arrivalTransitionId)");
   });
 });
 

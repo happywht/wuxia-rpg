@@ -1,4 +1,5 @@
 import { describeOralPrerequisites } from './dialogue-prerequisites';
+import { isDialogueLandingOccupied, type DialogueTeleportReadiness } from '../engine/dialogue-teleport-request';
 import {RegionalGuidePanel} from './regional-guide-ui';
 import {buildRegionalGuideEntries,resolveRegionalGuideDestination,REGION_GUIDE_PREFIX,REGION_ROLE_LABELS,type RegionalGuideInput,type RegionGuideEntry} from '../engine/regional-guide';
 import {buildQuestGuideEntries} from '../engine/quest-guide';
@@ -4338,6 +4339,7 @@ export class GridScene extends Phaser.Scene {
         characterReady: this.playerProfile !== null && this.playerState !== null && this.playerState.health.current > 0,
         panelReady: this.battlePanel !== null && !this.battlePanel.isOpen && !this.dialogueBattlePending,
       },
+      teleportReadiness: this.buildDialogueTeleportReadiness(),
     };
   }
 
@@ -4382,6 +4384,22 @@ export class GridScene extends Phaser.Scene {
       const feedbackLines = [...result.summary.lines, ...achievementReceipts];
       const feedback = feedbackLines.length > 0 ? feedbackLines.join(' · ') : null;
       session.choose(choice.index);
+      if (result.summary.teleportRequest !== undefined) {
+        const request = result.summary.teleportRequest;
+        const generation = this.dialogueBattleGeneration;
+        this.dialogueBattlePending = true;
+        return { advanced: true, feedback, afterClose: onceDialogueBattleDispatch(() => {
+          this.time.delayedCall(0, () => {
+            if (generation !== this.dialogueBattleGeneration) return;
+            this.dialogueBattlePending = false;
+            const world = this.world;
+            if (world === null) return;
+            const arrivalClock = new GameClock(world.calendar, this.clock?.elapsedMinutes ?? 0);
+            arrivalClock.advance(request.travelMinutes);
+            this.arriveAtMap(request.mapResourceId, request.col, request.row, request.travelMinutes, arrivalClock.currentPeriod().id, null);
+          });
+        }) };
+      }
       if (result.summary.battleRequest !== undefined) {
         const encounter = this.encounters.find(entry => entry.record.id === result.summary.battleRequest!.encounterId);
         // Preflight resolved this synchronously before transaction commit.
@@ -4546,6 +4564,42 @@ export class GridScene extends Phaser.Scene {
     );
   }
 
+  /** Check actual arrival-period occupancy before publishing a dialogue journey. */
+  private buildDialogueTeleportReadiness(): DialogueTeleportReadiness {
+    const world = this.world;
+    return {
+      characterReady: this.playerState !== null && this.playerProfile !== null && this.playerState.health.current > 0,
+      panelReady: world !== null && !this.dataReloading && !this.moving && !this.dialogueBattlePending && !(this.battlePanel?.isOpen ?? false),
+      canEnter: (mapResourceId, col, row) => world?.maps.get(mapResourceId)?.canEnter(col, row) ?? false,
+      landingBlocked: (request, activeCompanionId) => {
+        if (world === null) return true;
+        const arrivalClock = new GameClock(world.calendar, this.clock?.elapsedMinutes ?? 0);
+        arrivalClock.advance(request.travelMinutes);
+        const npcs = world.assembly.npcsByPeriod.get(arrivalClock.currentPeriod().id) ?? world.assembly.npcs;
+        const companionNpcId = activeCompanionId === null ? null : world.assembly.companions.get(activeCompanionId)?.npcId ?? null;
+        const tideId = this.climateRuntime?.tideForStamp(arrivalClock.snapshot())?.id ?? null;
+        const facilities = [
+          ...world.assembly.arenas.map(entry => entry.record),
+          ...world.assembly.factionWars.map(entry => entry.record),
+          ...world.assembly.equipmentForges.map(entry => entry.record),
+          ...world.assembly.alchemyStations.map(entry => entry.record),
+        ];
+        const endingGate = world.assembly.endings?.gate;
+        return isDialogueLandingOccupied(request, {
+          npcs: npcs.map(npc => ({ id: npc.record.id, mapResourceId: npc.record.mapResourceId, col: npc.col, row: npc.row })),
+          activeCompanionNpcId: companionNpcId,
+          encounters: world.assembly.encounters.filter(encounter => encounterMatchesTide(encounter.record, tideId)).map(encounter => ({ id: encounter.record.id, repeatable: encounter.record.repeatable, mapResourceId: encounter.record.mapResourceId, col: encounter.col, row: encounter.row })),
+          completedEncounterIds: this.completedEncounters,
+          markers: [
+            ...facilities.map(entry => ({ mapResourceId: entry.mapResourceId, ...entry.position })),
+            ...(endingGate ? [{ mapResourceId: endingGate.mapResourceId, ...endingGate.position }] : []),
+            ...world.worldMap.transitions.map(transition => transition.from),
+          ],
+        });
+      },
+    };
+  }
+
   /** Travels through one validated world-map endpoint after a fresh occupancy check. */
   private switchRegion(transition: RegionTransitionData): void {
     const world = this.world;
@@ -4595,6 +4649,14 @@ export class GridScene extends Phaser.Scene {
     // Only a freshly validated, accepted journey spends its fare.
     if (this.inventory !== null) this.inventory.currency -= quote.fare;
 
+    this.arriveAtMap(transition.to.mapResourceId, transition.to.col, transition.to.row, travelMinutes, arrivalPeriodId, transition.id);
+  }
+
+  /** Shared map rendering, discovery, camera, clock and companion handoff. */
+  private arriveAtMap(mapResourceId: string, col: number, row: number, travelMinutes: number, arrivalPeriodId: string, arrivalTransitionId: string | null): void {
+    const world = this.world;
+    const destinationMap = world?.maps.get(mapResourceId);
+    if (world === null || destinationMap === undefined) return;
     this.mapLayer?.destroy();
     // Round 111: a plain Container.remove() re-queues the marker through the
     // scene display list, and the scene-wide ADDED_TO_SCENE HUD pin there
@@ -4612,11 +4674,11 @@ export class GridScene extends Phaser.Scene {
     this.companionFollower = null;
     this.encounterMarkers.clear();
 
-    this.currentMapResourceId = transition.to.mapResourceId;
+    this.currentMapResourceId = mapResourceId;
     this.recordKnowledgeObservations({ placeIds: [this.currentMapResourceId] });
     this.map = destinationMap;
-    this.playerCol = transition.to.col;
-    this.playerRow = transition.to.row;
+    this.playerCol = col;
+    this.playerRow = row;
     this.encounters = world.assembly.encounters.filter(
       (encounter) => encounter.record.mapResourceId === this.currentMapResourceId,
     );
@@ -4662,7 +4724,7 @@ export class GridScene extends Phaser.Scene {
     // Round 90: the arrival cause is handed over only here — every blocked or
     // refused gate above has already returned, so arrival roaming events see
     // the actual travelled transition id after the switch truly completed.
-    this.triggerRegionEvents('', false, transition.id);
+    this.triggerRegionEvents('', false, arrivalTransitionId);
   }
 
   /** Fires ready events authored for the exact current cell. */

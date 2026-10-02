@@ -1,4 +1,5 @@
 import { baseRecipeIds } from './support/base-recipe-ids';
+import { baseMapCanEnter } from './support/base-map-walkability';
 /**
  * Round 98: 开局对白串联（江南—渡口）与大雍/大梁设定统一的回归测试。
  *
@@ -174,6 +175,7 @@ function loadRuntimeWorld(): RuntimeWorld {
     ).companions.map((companion) => companion.id),
   );
   const referenced = assembleDialogueReferences({
+    isTeleportDestinationWalkable: baseMapCanEnter,
     conversations,
     quests: questAssembly.quests,
     items,

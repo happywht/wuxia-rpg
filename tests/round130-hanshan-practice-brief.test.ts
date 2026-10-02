@@ -15,6 +15,7 @@
  * d3dcfe1 出发的 R128→R129→R130→R103/R127 跨轮重放保全。
  */
 import { readFileSync } from 'node:fs';
+import { escortNode, escortArrived, escortOption } from '../scripts/lib/round149-bookshop-escort.mjs';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -306,6 +307,13 @@ describe('Round130 Hanshan practice briefs (real assembled data)', () => {
         node.options = node.options.filter((option: { nextNodeId: string }) => !variableNodeIds.has(option.nextNodeId));
       }
       expect(removedOptions).toBe(2);
+      // R149's independent layer is checked exactly before isolating it from the R130 golden.
+      expect(bookshop.nodes.find((node: { id: string }) => node.id === escortNode.id)).toEqual(escortNode);
+      expect(bookshop.nodes.find((node: { id: string }) => node.id === escortArrived.id)).toEqual(escortArrived);
+      const bookshopGreet = bookshop.nodes.find((node: { id: string }) => node.id === bookshop.startNodeId);
+      expect(bookshopGreet.options.filter((option: { nextNodeId: string }) => option.nextNodeId === escortNode.id)).toEqual([escortOption]);
+      bookshopGreet.options = bookshopGreet.options.filter((option: { nextNodeId: string }) => option.nextNodeId !== escortNode.id);
+      bookshop.nodes = bookshop.nodes.filter((node: { id: string }) => node.id !== escortNode.id && node.id !== escortArrived.id);
       expect(JSON.parse(applyRelayWaitingDirections(applyCompanionTrust(chained03)))).toEqual(current03);
       expect(chained30.replace(/\r\n/g, '\n')).toBe(readFileSync(join(root, 'data/base/dialogues/round-30-conversations.json'), 'utf8').replace(/\r\n/g, '\n'));
       expect(chained03).toContain('r130-hanshan-paper-route');

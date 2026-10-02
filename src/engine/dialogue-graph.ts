@@ -101,7 +101,8 @@ export type DialogueEffectData =
   | { kind: 'recruitCompanion'; companionId: string }
   | { kind: 'dismissCompanion' }
   | { kind: 'setVariable'; key: string; value: DialogueVariableValue }
-  | { kind: 'startBattle'; encounterId: string };
+  | { kind: 'startBattle'; encounterId: string }
+  | { kind: 'teleport'; mapResourceId: string; col: number; row: number; travelMinutes: number };
 
 /** One player-selectable branch leading to another node. */
 export interface DialogueOptionData {
@@ -412,6 +413,15 @@ function parseEffect(raw: unknown): DialogueEffectData | null {
     }
     case 'dismissCompanion':
       return hasOnlyKeys(source, ['kind']) ? { kind: 'dismissCompanion' } : null;
+    case 'teleport': {
+      if (!hasOnlyKeys(source, ['kind', 'mapResourceId', 'col', 'row', 'travelMinutes'])) return null;
+      const mapResourceId = requireNonEmptyString(source.mapResourceId);
+      const col = requireIntegerInRange(source.col, 0, 4095);
+      const row = requireIntegerInRange(source.row, 0, 4095);
+      const travelMinutes = requireIntegerInRange(source.travelMinutes, 0, 10080);
+      return mapResourceId !== null && mapResourceId.length <= 64 && col !== null && row !== null && travelMinutes !== null
+        ? { kind: 'teleport', mapResourceId, col, row, travelMinutes } : null;
+    }
     case 'startBattle': {
       if (!hasOnlyKeys(source, ['kind', 'encounterId'])) return null;
       const encounterId = requireNonEmptyString(source.encounterId);

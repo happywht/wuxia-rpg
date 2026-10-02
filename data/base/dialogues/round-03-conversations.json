@@ -68,6 +68,16 @@
               "conditions": [
                 { "kind": "variable", "key": "dlg.shen-mohan.news-asked", "operator": "exists" }
               ]
+            },
+            {
+              "text": "掌柜可否托人带路到雾雨渡口？（120分钟，无银费，先确认）",
+              "nextNodeId": "r149-escort-confirm",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "map.round-10-mist-ferry"
+                }
+              ]
             }
           ]
         },
@@ -154,6 +164,33 @@
         {
           "id": "news-repeat",
           "text": "（他笑一笑，把账簿翻回同一页）馄饨挑子夜里多摆一个时辰，渡口换了新缆、放过鞭炮——老事讲第二遍就不新鲜了。少侠若还想听新的，过几日再来，我这铺子里总有人路过说话。"
+        },
+        {
+          "id": "r149-escort-confirm",
+          "text": "沈墨涵指了指铺外的路：「可托熟识的行脚人带你到雾雨渡口西口旁（2,5），全程两小时，不收银两；只带路，不替你交差、打斗或断定抄本来历。想好再答应，不走也无妨。」",
+          "options": [
+            {
+              "text": "先不走，继续在镇上办事。",
+              "nextNodeId": "greet"
+            },
+            {
+              "text": "请带我到雾雨渡口西口旁（耗时120分钟，无银费）。",
+              "nextNodeId": "r149-escort-arrived",
+              "effects": [
+                {
+                  "kind": "teleport",
+                  "mapResourceId": "map.round-10-mist-ferry",
+                  "col": 2,
+                  "row": 5,
+                  "travelMinutes": 120
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "r149-escort-arrived",
+          "text": "行脚人送你到了雾雨渡口西口旁。原有差事与同行仍待你亲自处理，回镇可从西口乘行。"
         }
       ]
     },

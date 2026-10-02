@@ -1,4 +1,5 @@
 import { baseRecipeIds } from './support/base-recipe-ids';
+import { baseMapCanEnter } from './support/base-map-walkability';
 /**
  * Round 59: regional quest echoes in the seven NPCs' condition-gated
  * dialogue. Everything runs against the real base quest/dialogue data —
@@ -121,6 +122,7 @@ for (const source of dialogueSources) {
 }
 
 const dialogueAssembly = assembleDialogueReferences({
+  isTeleportDestinationWalkable: baseMapCanEnter,
   conversations: rawConversations,
   quests: questAssembly.quests,
   items,

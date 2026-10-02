@@ -1367,6 +1367,7 @@ function assembleOptionalContent(
     timeOfDayPeriodIds,
     weatherIds,
     encounterIds: new Set(encounters.map(encounter => encounter.record.id)),
+    isTeleportDestinationWalkable: (mapResourceId, col, row) => maps.get(mapResourceId)?.canEnter(col, row) ?? false,
   });
   for (const message of dialogueReferences.warnings) {
     // The message names the offending conversation id already, and talks may

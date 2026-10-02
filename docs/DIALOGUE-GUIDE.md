@@ -95,9 +95,10 @@
 | `learnMartialArt` | `martialArtId` | 授予一门当前已满足资格的武学 |
 | `recruitCompanion` | `companionId` | 邀请有效伙伴同行（队伍仅一名伙伴；见 §4.3） |
 | `dismissCompanion` | — | 让当前同行伙伴暂离（见 §4.3） |
+| `teleport` | `mapResourceId`（非空≤64字符）、`col`/`row`（整数0–4095）、`travelMinutes`（整数0–10080） | 资料驱动引路，按目的地图实际边界/碰撞装配；抵达时段人物、活跃遭遇、设施/关口/终章落点运行期拒绝。同组选项仅一个外部动作，不可与startBattle混用；先关闭对白再切换，本效果不扣银、不发奖励 |
 | `startBattle` | `encounterId`（非空，最多64字符） | 发起当前地区有效挑战；每次确认最多一项，角色/面板/动态封路/重复资格均先校验。任一效果失败则整笔回滚。成功后先关闭对白再延迟分发，战果复用正常胜败/撤退结算；不等于即时完成任务 |
 
-上表与本轮新增协议说明共同覆盖当前 `dialogue-set` Schema `definitions.condition` / `definitions.effect` 封闭枚举的**全部** kind（条件 13 种、效果 17 种）；`npm run audit:round-34` 会从 Schema 反查本文是否逐一覆盖。
+上表与本轮新增协议说明共同覆盖当前 `dialogue-set` Schema `definitions.condition` / `definitions.effect` 封闭枚举的**全部** kind（条件 13 种、效果 18 种）；`npm run audit:round-34` 会从 Schema 反查本文是否逐一覆盖。
 
 ### 4.1 社会数值范围与调整（Round 18）
 
@@ -172,3 +173,7 @@ Round 19 以后，引用装配覆盖任务、物品、NPC、见闻、门派、�
 ## Round 148 已完成
 
 对白startBattle/encounterId协议、Schema/装配、事务预检/回滚、对白关闭后的延迟一次分发与世界销毁代次保护已接通；柳寻径复用既有无报酬巡路合练，作者生成源和历史逆序重放保持字节稳定。真实第一栏检查点北行3格，F对白完成初始不误击、撤退、四行动胜利/伙伴第二行动9援护、13次暂缓战败恢复75命47气及再次入场。没有写任何存档，三栏时间保持；正常读回第三栏08:24:26江南44,37/16日15:19，沈墨涵变量复谈仍开放。最终npm run build exit0，148文件1316测试95.00秒，100资料/tsc/文档审计/Vite通过；入口692.85KB/Phaser1374.54KB分块警告保留。证据见iterations/round-148/verification.md。teleport及另外两终章/双结果/六区节奏/两构筑/兼容发行仍待完成，goal active。
+
+## Round 149 对白引路
+
+`teleport`与`startBattle`共用外部动作数量限制、先关闭再延迟一次分发及世界销毁保护。预检在独立事务中执行，并在最终暂存伙伴状态下复核落点；拒绝不提交普通效果或请求。静态地图不可走则装配只移除所在选项，动态占格在确认时给可读理由。传送共用区域到达渲染/镜头/HUD/时钟/地图发现/伙伴，未伪造关口transitionId，按正常区域进入规则处理事件，不自动操作战斗或终章。沈墨涵引路只向已经知晓渡口的玩家提供，默认取消，确认后120世界分钟到渡口2,5；无银费且不代交差。实际默认取消、确认引路、主菜单存读和原关口回镇已完成，证据见iterations/round-149/verification.md。

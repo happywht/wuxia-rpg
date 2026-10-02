@@ -100,7 +100,9 @@ describe('Round117 HUD quest-line projection across regions and schedules', () =
     // re-projecting the line (the Round 117 regression).
     const source = readFileSync(join(fileURLToPath(new URL('../', import.meta.url)), 'src/game/grid-scene.ts'), 'utf8');
     const switchRegionBody = source.slice(source.indexOf('  private switchRegion(')).split(/\n  private /)[0]!;
-    expect(switchRegionBody).toContain('this.updateQuestTrackerHud()');
+    expect(switchRegionBody).toContain('this.arriveAtMap(');
+    const arrivalBody = source.slice(source.indexOf('  private arriveAtMap(')).split(/\n  private /)[0]!;
+    expect(arrivalBody).toContain('this.updateQuestTrackerHud()');
     const syncNpcScheduleBody = source.slice(source.indexOf('  private syncNpcSchedule(')).split(/\n  private /)[0]!;
     expect(syncNpcScheduleBody).toContain('this.updateQuestTrackerHud()');
     const refreshNpcPlacementsBody = source.slice(source.indexOf('  private refreshNpcPlacements(')).split(/\n  private /)[0]!;
