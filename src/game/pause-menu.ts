@@ -491,7 +491,7 @@ export class PauseMenuPanel {
     if (prompt.choice === 'cancel') {
       this.overwritePrompt = null;
       this.overwriteNotice = null;
-      this.setFeedback(`已取消覆盖，${prompt.slotLabel}的原存档保留`, false);
+      this.setFeedback(`已取消覆盖，${SAVE_SLOT_LABELS[prompt.slotId]}的原存档保留`, false);
       this.render();
       return;
     }
@@ -501,7 +501,8 @@ export class PauseMenuPanel {
       return;
     }
     const storage = this.options.storage;
-    const { slotId, slotLabel } = prompt;
+    const { slotId } = prompt;
+    const slotLabel = SAVE_SLOT_LABELS[slotId];
     // One-shot: the pending confirmation is consumed before any side effect,
     // so a callback failure or a replayed Enter cannot recommit the same one.
     this.overwritePrompt = null;
@@ -781,7 +782,7 @@ export class PauseMenuPanel {
       UI.overlayAlpha,
     );
 
-    const title = `覆盖${prompt.slotLabel}？`;
+    const title = `覆盖${SAVE_SLOT_LABELS[prompt.slotId]}？`;
     this.container.add(
       this.scene.add.text(
         geometry.left + OVERWRITE_PROMPT_PADDING,

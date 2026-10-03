@@ -39,7 +39,6 @@ export interface SaveOverwritePayloadFacts {
 export interface SaveOverwriteConfirmationState {
   /** Stored at prompt time; the commit recheck targets exactly this slot. */
   readonly slotId: SaveSlotId;
-  readonly slotLabel: string;
   readonly facts: SaveOverwritePayloadFacts;
   /**
    * Opaque raw slot text captured at prompt time. In-memory only: it feeds
@@ -156,7 +155,6 @@ export function createSaveOverwriteConfirmation(input: {
   measure: (text: string) => number;
 }): SaveOverwriteConfirmationState {
   const lines: string[] = [];
-  const slotLabel = SAVE_SLOT_LABELS[input.slotId];
   const blocks = buildSaveOverwriteBlocks({ slotId: input.slotId, facts: input.facts });
   for (const [index, block] of blocks.entries()) {
     if (index > 0) lines.push(''); // Blank separators feed the block pager.
@@ -165,7 +163,6 @@ export function createSaveOverwriteConfirmation(input: {
   const pages = paginateDialogueBlocks(lines, input.capacity);
   return {
     slotId: input.slotId,
-    slotLabel,
     facts: input.facts,
     rawPayload: input.rawPayload,
     bodyPages: pages,

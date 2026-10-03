@@ -423,6 +423,26 @@ describe('Round143 PauseMenuPanel overwrite confirmation flow', () => {
     },
   );
 
+  it.each(['slot-1', 'slot-2', 'slot-3'] as const)(
+    '%s confirmation renders and commits the slot id without a cached label field',
+    (slotId) => {
+      fontScale = 1;
+      const raw = JSON.stringify(makeSnapshot('同槽写入核验侠', 4, SAVED_AT));
+      const r = setupPauseMenu(960, 540, new Map([[slotKey(slotId), raw]]));
+      r.enterSavePage();
+      for (let index = 0; index < SAVE_SLOT_IDS.indexOf(slotId); index += 1) r.press(2);
+      r.press(3);
+      const prompt = promptTexts(r.visible);
+      expect(prompt.some(t => t.text === `覆盖${SAVE_SLOT_LABELS[slotId]}？`)).toBe(true);
+      expect(prompt.map(t => t.text).join('\n')).toContain(`拟覆盖存档：${SAVE_SLOT_LABELS[slotId]}`);
+      r.press(2); // Explicitly move from the safe default to confirmation.
+      r.press(3);
+      expect(r.saves).toEqual([slotId]);
+      expect(r.visible().some(t => t.text.includes(`${SAVE_SLOT_LABELS[slotId]}：已保存`))).toBe(true);
+      r.panel.destroy();
+    },
+  );
+
   it('confirmation owns the footer and failed saves consume the old confirmation', () => {
     fontScale = 1;
     const raw = rawSlot1();
