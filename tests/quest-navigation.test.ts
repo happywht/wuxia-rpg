@@ -338,6 +338,36 @@ describe('Round 60 quest objective navigation', () => {
     });
   });
 
+  it('routes caravan departure-time discovery to Bai Luzhou after the pill is ready', () => {
+    const parsed = parseQuestSet(readJson('../data/base/quests/round-07-quests.json'));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    const quest = parsed.set.quests.find((entry) => entry.id === 'quest.r31-caravan-provisioning');
+    expect(quest).toBeDefined();
+    if (quest === undefined) return;
+    const result = resolveQuestNavigationTarget(makeInput({
+      quests: new Map([[quest.id, quest]]),
+      questId: quest.id,
+      journal: makeJournal([quest], {}, {
+        [quest.id]: { 'objective.r31-caravan-pill': 1 },
+      }),
+      baseNpcs: [makeNpc('char.bai-luzhou', '白鹭洲', FERRY_MAP, 5, 5)],
+    }));
+    expect(result).toMatchObject({
+      status: 'target',
+      target: {
+        objectiveId: 'objective.r31-caravan-ferry-time',
+        kind: 'discoverKnowledge',
+        name: '白鹭洲',
+        mapResourceId: FERRY_MAP,
+        col: 5,
+        row: 5,
+        approachRadius: 1,
+        arrivalAction: 'talk',
+      },
+    });
+  });
+
   it('reports unresolved-target when the referenced spatial data is missing', () => {
     const quest = makeQuest([
       { id: 'obj-talk', kind: 'talkToNpc', targetId: 'char.nobody' },

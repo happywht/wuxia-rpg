@@ -244,6 +244,7 @@
           "kind": "discoverKnowledge",
           "targetId": "event.r31-caravan-time-agreed",
           "requiredCount": 1,
+          "navigationNpcId": "char.bai-luzhou",
           "text": "备好无极丹后，与白鹭洲敲定药队起运时辰"
         }
       ],
