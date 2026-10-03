@@ -265,7 +265,7 @@
         }
       ],
       "failOnEncounterIds": ["encounter.ferry-reed-ambush"],
-      "rewards": { "experience": 40, "currency": 30 }
+      "rewards": { "experience": 40, "currency": 30, "discoverKnowledgeNodeIds": ["event.r31-caravan-escorted"] }
     },
     {
       "id": "quest.r31-mend-the-pier",
@@ -290,7 +290,7 @@
           "text": "备齐两捆韧皮料捆扎"
         }
       ],
-      "rewards": { "experience": 35, "currency": 38 }
+      "rewards": { "experience": 35, "currency": 38, "discoverKnowledgeNodeIds": ["event.r31-pier-reinforced"] }
     },
     {
       "id": "quest.r31-caravan-gratitude",

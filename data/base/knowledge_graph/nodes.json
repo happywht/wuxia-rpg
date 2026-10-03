@@ -2927,6 +2927,20 @@
       "knownByDefault": false
     },
     {
+      "id": "event.r31-caravan-escorted",
+      "kind": "event",
+      "title": "药队已护过雾桥",
+      "summary": "玩家击退芦苇水路伏兵，护送药队平安过雾桥；仅完成「先保药队」后记录，并由此开放药队答谢。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r31-pier-reinforced",
+      "kind": "event",
+      "title": "栈桥已修牢待通渡",
+      "summary": "玩家备齐熟铁砂与韧皮料，完成栈桥加固；仅完成「先修栈桥」后记录，并由此开放栈桥通渡。",
+      "knownByDefault": false
+    },
+    {
       "id": "event.r104-medicine-practice",
       "kind": "event",
       "title": "药炉疗伤实践",

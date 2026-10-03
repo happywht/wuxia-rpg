@@ -1158,6 +1158,20 @@
               ]
             },
             {
+              "text": "药队已护过雾桥，来渡籍报个平安。",
+              "nextNodeId": "r31-caravan-escorted",
+              "conditions": [
+                { "kind": "knowledgeKnown", "nodeId": "event.r31-caravan-escorted" }
+              ]
+            },
+            {
+              "text": "栈桥已修牢，药队改走旱桥了。",
+              "nextNodeId": "r31-pier-reinforced",
+              "conditions": [
+                { "kind": "knowledgeKnown", "nodeId": "event.r31-pier-reinforced" }
+              ]
+            },
+            {
               "text": "想请教渡口的通行章程。",
               "nextNodeId": "registry-talk",
               "effects": [
@@ -1630,6 +1644,20 @@
               "text": "记下时辰，去告示板看看两条安排。",
               "nextNodeId": "greet"
             }
+          ]
+        },
+        {
+          "id": "r31-caravan-escorted",
+          "text": "白鹭洲在护送簿上添了「雾桥已过」：「石北押住了队尾，伏兵也没能截下药箱。闻姑娘备的谢仪会送到渡口，你们得空再去领；这一路的人情，两边都记着。」",
+          "options": [
+            { "text": "我去听闻姑娘说谢仪的事。", "nextNodeId": "greet" }
+          ]
+        },
+        {
+          "id": "r31-pier-reinforced",
+          "text": "白鹭洲摸了摸新换的桩脚：「熟铁砂补了根，韧皮也勒紧了，药队走旱桥稳当。桥心那伙索银人却盯上了新木料；先把桥头清干净，渡口才能重新开闸。」",
+          "options": [
+            { "text": "我去查查桥头的动静。", "nextNodeId": "greet" }
           ]
         }
       ]

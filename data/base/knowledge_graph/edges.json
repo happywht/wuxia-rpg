@@ -1196,6 +1196,20 @@
       "summary": "药队答谢接在先保药队之后，平安过桥才有人情可谢。"
     },
     {
+      "id": "kg.edge.guard-caravan-rewards-escorted-event",
+      "fromId": "quest.r31-guard-the-caravan",
+      "toId": "event.r31-caravan-escorted",
+      "relation": "rewards",
+      "summary": "击退伏兵并完成护送后，渡籍记下药队已平安过雾桥。"
+    },
+    {
+      "id": "kg.edge.mend-pier-rewards-reinforced-event",
+      "fromId": "quest.r31-mend-the-pier",
+      "toId": "event.r31-pier-reinforced",
+      "relation": "rewards",
+      "summary": "备齐补桩与捆扎材料、完成修桥后，渡籍记下栈桥已加固。"
+    },
+    {
       "id": "kg.edge.pier-toll-requires-mend-pier",
       "fromId": "quest.r31-pier-toll-clearing",
       "toId": "quest.r31-mend-the-pier",
