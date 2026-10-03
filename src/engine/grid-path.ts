@@ -149,6 +149,16 @@ export function summarizePathRuns(path: readonly CellPosition[]): PathRun[] {
   return runs;
 }
 
+/** Returns a compact run prefix and makes omitted later turns explicit. */
+export function summarizePathRunPrefix(
+  path: readonly CellPosition[],
+  maxRuns = 3,
+): { runs: PathRun[]; hasMore: boolean } {
+  const allRuns = summarizePathRuns(path);
+  const limit = Number.isFinite(maxRuns) ? Math.max(0, Math.trunc(maxRuns)) : 3;
+  return { runs: allRuns.slice(0, limit), hasMore: allRuns.length > limit };
+}
+
 /** Walkable cells the route may end on: the goal itself, or its approach ring. */
 function collectStopTargets(map: GridPathSurface, goal: CellPosition, radius: number): Set<number> {
   const targets = new Set<number>();

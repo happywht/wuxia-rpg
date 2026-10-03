@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 import { type CellPosition, GridMap, parseGridMap } from '../src/engine/grid-map';
-import { findGridPath, findGridPathToAdjacentCell, summarizePathRuns } from '../src/engine/grid-path';
+import { findGridPath, findGridPathToAdjacentCell, summarizePathRunPrefix, summarizePathRuns } from '../src/engine/grid-path';
 
 const TILE_TYPES = {
   '.': { color: '#000000', solid: false },
@@ -216,5 +216,15 @@ describe('deterministic four-way grid pathfinding', () => {
       { direction: 'south', steps: 2, from: { col: 2, row: 0 }, to: { col: 2, row: 2 } },
     ]);
     expect(summarizePathRuns([{ col: 3, row: 3 }])).toEqual([]);
+  });
+
+  it('marks when the compact route prefix omits later turns', () => {
+    const path = [
+      { col: 0, row: 0 }, { col: 0, row: -1 },
+      { col: 1, row: -1 }, { col: 1, row: 0 },
+      { col: 0, row: 0 }, { col: 0, row: 1 },
+    ];
+    expect(summarizePathRunPrefix(path, 3).hasMore).toBe(true);
+    expect(summarizePathRunPrefix(path, 5)).toMatchObject({ hasMore: false, runs: expect.any(Array) });
   });
 });

@@ -223,7 +223,7 @@ import {
   createTransitionGateMarkers,
   type TransitionMarkerRenderer,
 } from './transition-markers';
-import { summarizePathRuns } from '../engine/grid-path';
+import { summarizePathRunPrefix } from '../engine/grid-path';
 import {
   QUEST_NAVIGATION_ID_PREFIX,
   type QuestNavigationNoTargetReason,
@@ -2769,9 +2769,10 @@ export class GridScene extends Phaser.Scene {
     const transitionName = guide.nextTransitionName === null ? null
       : this.ellipsizeHudText(guide.nextTransitionName, VIEW_WIDTH / 3, 13);
     const directionNames = { north: '北', east: '东', south: '南', west: '西' } as const;
-    const runs = summarizePathRuns(guide.path).slice(0, 3)
+    const routePrefix = summarizePathRunPrefix(guide.path, 3);
+    const runs = routePrefix.runs
       .map((run) => `${directionNames[run.direction]}${run.steps}`);
-    const direction = runs.length > 0 ? `${runs.join('→')} · ` : '';
+    const direction = runs.length > 0 ? `${runs.join('→')}${routePrefix.hasMore ? '→…' : ''} · ` : '';
     const steps = Math.max(0, guide.path.length - 1);
     if (guide.status === 'at-gate') {
       this.hudLines.nav = `行路「${destinationName}」· 已到「${transitionName ?? '关口'}」旁，按 E 通过。`;
