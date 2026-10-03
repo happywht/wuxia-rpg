@@ -44,7 +44,7 @@
           "kind": "collectItem",
           "targetId": "item.hanzhu-cao",
           "requiredCount": 4,
-          "text": "采备四株寒珠草"
+          "text": "备齐四株寒珠草（可采集，也可向江南姜百味采买）"
         }
       ],
       "rewards": { "experience": 18, "currency": 15 }

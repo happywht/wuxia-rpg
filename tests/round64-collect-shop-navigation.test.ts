@@ -133,6 +133,35 @@ describe('Round 64 collect objectives against assembled real data', () => {
     });
   });
 
+  it('explains the tea-stall item can be gathered or bought from its live seller', () => {
+    const quest = fixture.questsById.get('quest.r31-teastall-herbal-water');
+    expect(quest).toBeDefined();
+    const objective = quest!.objectives[0];
+    expect(objective?.text).toContain('可采集');
+    expect(objective?.text).toContain('姜百味采买');
+
+    const resolution = resolveQuestNavigationTarget({
+      quests: fixture.questsById as RealDataFixture['quests'],
+      journal: activeJournal(fixture.questsById, 'quest.r31-teastall-herbal-water'),
+      questId: 'quest.r31-teastall-herbal-water',
+      worldMap: fixture.world,
+      baseNpcs: fixture.baseNpcs,
+      periodNpcs: fixture.baseNpcs,
+      encounters: [],
+      shops: fixture.shops,
+    });
+    expect(resolution.status).toBe('target');
+    if (resolution.status !== 'target') throw new Error('expected the herb seller target');
+    expect(resolution.target).toMatchObject({
+      kind: 'collectItem',
+      name: '姜百味百宝担',
+      objectiveText: '备齐四株寒珠草（可采集，也可向江南姜百味采买）',
+      col: 45,
+      row: 39,
+      arrivalAction: 'shop',
+    });
+  });
+
   it('reports the unstocked seal-rubbing item precisely instead of a coordinate', () => {
     const resolution = resolveQuestNavigationTarget({
       quests: fixture.questsById as RealDataFixture['quests'],
