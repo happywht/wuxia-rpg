@@ -11,7 +11,7 @@
           "kind": "collectItem",
           "targetId": "item.huichun-gao",
           "requiredCount": 3,
-          "text": "备齐三份回春膏"
+          "text": "备齐三份回春膏（可在江南姜百味处采买）"
         }
       ],
       "rewards": { "experience": 15, "currency": 18 }

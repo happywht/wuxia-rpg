@@ -126,11 +126,13 @@ describe('Round 64 collect objectives against assembled real data', () => {
     expect(resolution.target).toMatchObject({
       kind: 'collectItem',
       mapResourceId: 'map.round-01-grid',
+      name: '姜百味百宝担',
       col: 45,
       row: 39,
       approachRadius: 1,
       arrivalAction: 'shop',
     });
+    expect(resolution.target.objectiveText).toContain('姜百味处采买');
   });
 
   it('explains the tea-stall item can be gathered or bought from its live seller', () => {
