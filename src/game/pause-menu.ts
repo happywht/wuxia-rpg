@@ -851,9 +851,10 @@ export class PauseMenuPanel {
     );
   }
 
-  private renderConfirmQuit(top: number, panelWidth: number): void {    const width = this.scene.scale.width;
+  private renderConfirmQuit(top: number, panelWidth: number): void {
+    const width = this.scene.scale.width;
     const warn = this.scene.add
-      .text(width / 2, top + 120, '未保存的进度将丢失，确定返回主菜单吗？', {
+      .text(width / 2, top + 108, '未保存进度会丢失\n已存档可继续读取', {
         fontFamily: UI.fontFamily,
         fontSize: uiFontSize(14),
         color: UI.textWarn,

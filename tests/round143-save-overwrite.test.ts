@@ -443,6 +443,19 @@ describe('Round143 PauseMenuPanel overwrite confirmation flow', () => {
     },
   );
 
+  it('quit confirmation distinguishes unsaved progress from saved slots', () => {
+    fontScale = 1;
+    const r = setupPauseMenu(960, 540, new Map([[slotKey('slot-1'), rawSlot1()]]));
+    r.press(2); r.press(2); r.press(2); // Select 返回主菜单.
+    r.press(3);
+    const text = r.visible().map(node => node.text).join('\n');
+    expect(text).toContain('未保存进度会丢失');
+    expect(text).toContain('已存档可继续读取');
+    expect(text).not.toContain('未保存的进度将丢失');
+    r.press(6);
+    r.panel.destroy();
+  });
+
   it('confirmation owns the footer and failed saves consume the old confirmation', () => {
     fontScale = 1;
     const raw = rawSlot1();
