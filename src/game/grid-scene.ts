@@ -4,7 +4,7 @@ import {RegionalGuidePanel} from './regional-guide-ui';
 import { MartialArtsPanel } from './martial-arts-ui';
 import {buildRegionalGuideEntries,resolveRegionalGuideDestination,REGION_GUIDE_PREFIX,REGION_ROLE_LABELS,type RegionalGuideInput,type RegionGuideEntry} from '../engine/regional-guide';
 import {buildQuestGuideEntries} from '../engine/quest-guide';
-import { projectQuestTrackerLine } from './quest-presentation';
+import { nearestOfferedQuestId, projectQuestTrackerLine } from './quest-presentation';
 import { estimateNavigationWalkingBudget, navigationWalkingBudgetHint } from '../engine/navigation-walking-budget';
 import { paddedWorldCameraBounds } from './world-camera-bounds';
 import Phaser from 'phaser';
@@ -3591,6 +3591,16 @@ export class GridScene extends Phaser.Scene {
     panel.open({
       quests: this.quests,
       journal: this.questJournal,
+      recommendedQuestId: nearestOfferedQuestId(
+        this.quests,
+        this.questJournal,
+        {
+          factionId: this.factionState.membership?.factionId ?? null,
+          knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
+        },
+        this.placedNpcs,
+        { col: this.playerCol, row: this.playerRow },
+      ),
       itemCounts: this.questItemCounts(),
       factionNames: new Map([...this.progression.factions].map(([id, faction]) => [id, faction.name])),
       knowledgeNodeTitles: new Map([...(this.world?.knowledgeGraph.nodes ?? new Map())]

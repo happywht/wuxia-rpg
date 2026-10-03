@@ -91,6 +91,8 @@ export interface QuestPanelModel {
   access: QuestAccessContext;
   factionNames?: ReadonlyMap<string, string>;
   knowledgeNodeTitles?: ReadonlyMap<string, string>;
+  /** Q-journal only: nearest eligible offer to focus on a fresh local start. */
+  recommendedQuestId?: string;
 }
 
 export interface QuestPanelOptions {
@@ -122,7 +124,8 @@ function questStatusText(model: QuestPanelModel, quest: QuestData): string {
 
 function questRow(model: QuestPanelModel, quest: QuestData): string {
   const state = model.journal.states.get(quest.id);
-  if (state?.status !== 'active') return `${quest.name}　［${questStatusText(model, quest)}］`;
+  const recommended = model.recommendedQuestId === quest.id ? '　【就近可接】' : '';
+  if (state?.status !== 'active') return `${quest.name}　［${questStatusText(model, quest)}］${recommended}`;
   return `${quest.name}　${activeQuestProgressLabel(quest, state)}　［${LABELS.status.active}］`;
 }
 
@@ -162,6 +165,10 @@ export class QuestPanel {
     if (this.openState) return;
     this.model = model;
     this.selection = 0;
+    if (model.recommendedQuestId !== undefined) {
+      const recommended = this.rows.findIndex(quest => quest.id === model.recommendedQuestId);
+      if (recommended >= 0) this.selection = recommended;
+    }
     this.status = null;
     this.detailPage = 0;
     this.abandonPrompt = null;

@@ -1,4 +1,4 @@
-import type { QuestData, QuestJournal, QuestStatus, QuestProgressState } from '../engine/quest-system';
+import { hasQuestAccess, type QuestAccessContext, type QuestData, type QuestJournal, type QuestStatus, type QuestProgressState } from '../engine/quest-system';
 const priority: Record<QuestStatus, number> = { active: 0, offered: 1, locked: 2, completed: 3, failed: 4 };
 /** Stable priority preserves authored order within each group; tracked active task comes first. */
 function orderRows(quests: readonly QuestData[], rank: (quest: QuestData) => number): QuestData[] {
@@ -30,6 +30,23 @@ export function nearestGuideNpc<T extends { col: number; row: number; record: { 
     const distance = (entry: T) => Math.abs(entry.col - position.col) + Math.abs(entry.row - position.row);
     return best === undefined || distance(npc) < distance(best) ? npc : best;
   }, undefined);
+}
+
+/** First-run Q opens on the closest eligible local offer when no task is active. */
+export function nearestOfferedQuestId(
+  quests: ReadonlyMap<string, QuestData>,
+  journal: QuestJournal,
+  access: QuestAccessContext,
+  npcs: readonly { col: number; row: number; record: { id: string; name: string; questGiver?: boolean } }[],
+  position: { col: number; row: number },
+): string | undefined {
+  if ([...journal.states.values()].some(state => state.status === 'active')) return undefined;
+  const offers = [...quests.values()].filter(quest =>
+    journal.states.get(quest.id)?.status === 'offered' && hasQuestAccess(quest, access),
+  );
+  const localGiverIds = new Set(offers.map(quest => quest.giverNpcId));
+  const giver = nearestGuideNpc(npcs.filter(npc => localGiverIds.has(npc.record.id)), position);
+  return giver === undefined ? undefined : offers.find(quest => quest.giverNpcId === giver.record.id)?.id;
 }
 
 /** Tone of the tracker line; the scene maps it onto the HUD text colors. */
