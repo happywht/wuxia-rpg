@@ -88,6 +88,8 @@ export function buildQuestPanelGeometry(input: QuestPanelGeometryInput): QuestPa
 export interface QuestDetailNameMaps {
   factionNames?: ReadonlyMap<string, string>;
   knowledgeNodeTitles?: ReadonlyMap<string, string>;
+  prerequisiteQuestNames?: ReadonlyMap<string, string>;
+  unfinishedQuestIds?: ReadonlySet<string>;
 }
 
 /**
@@ -152,6 +154,13 @@ export function buildQuestDetailBlocks(
   liveItemCounts?: ReadonlyMap<string, number>,
 ): string[] {
   const blocks: string[] = [quest.name, quest.description];
+  if (state?.status === 'locked' && quest.prerequisiteQuestIds.length > 0) {
+    const unfinished = quest.prerequisiteQuestIds.filter((id) =>
+      maps.unfinishedQuestIds === undefined || maps.unfinishedQuestIds.has(id));
+    if (unfinished.length > 0) {
+      blocks.push(`未完成前置差事：${unfinished.map((id) => maps.prerequisiteQuestNames?.get(id) ?? id).join('、')}`);
+    }
+  }
   if (state !== undefined) {
     blocks.push(buildQuestObjectiveStageLines({ quest, state, liveItemCounts }).join('\n'));
   }

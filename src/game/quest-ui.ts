@@ -499,6 +499,10 @@ export class QuestPanel {
       const blocks = buildQuestDetailBlocks(selected, state, {
         factionNames: model.factionNames,
         knowledgeNodeTitles: model.knowledgeNodeTitles,
+        prerequisiteQuestNames: new Map([...model.quests.values()].map(quest => [quest.id, quest.name])),
+        unfinishedQuestIds: new Set([...model.journal.states.values()]
+          .filter(progress => progress.status !== 'completed')
+          .map(progress => progress.questId)),
       }, model.itemCounts);
       if (state?.status === 'failed') {
         blocks.push(...buildFailedQuestTerminalBlocks({

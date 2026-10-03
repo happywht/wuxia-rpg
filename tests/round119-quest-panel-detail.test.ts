@@ -24,6 +24,8 @@ const questParse = parseQuestSet(read('data/base/quests/round-97-lanxin-reef-que
 if (!questParse.ok) throw Error(questParse.errors.join('\n'));
 const tideLedger = questParse.set.quests.find((quest) => quest.id === 'quest.r97-tide-ledger')!;
 const quests = new Map(questParse.set.quests.map((quest) => [quest.id, quest]));
+const round07Parse = parseQuestSet(read('data/base/quests/round-07-quests.json'));
+if (!round07Parse.ok) throw Error(round07Parse.errors.join('\n'));
 
 const measure = (text: string, px = 12): number => Array.from(text).reduce((sum, char) => sum + (/[一-鿿]/.test(char) ? px : px * 0.6), 0);
 
@@ -105,6 +107,42 @@ describe('Round119 complete lossless detail body (real R97 task and long MOD)', 
     expect(paged.split('逐页核对潮簿刻线').length - 1).toBe(60);
     expect(pages.length).toBeGreaterThan(10);
     expect(pages.every((page) => page.split('\n').length <= 3)).toBe(true);
+  });
+});
+
+describe('Round248 locked quest prerequisite clarity', () => {
+  it('shows the immediate locked prerequisite on the mentor review', () => {
+    const all = new Map(round07Parse.set.quests.map((quest) => [quest.id, quest]));
+    const mentorReview = all.get('quest.r31-mentor-review')!;
+    const journal = createQuestJournal(all);
+    const state = journal.states.get(mentorReview.id)!;
+    const prerequisiteQuestNames = new Map([...all.values()].map(quest => [quest.id, quest.name]));
+    const unfinishedQuestIds = new Set([...journal.states.values()]
+      .filter(progress => progress.status !== 'completed')
+      .map(progress => progress.questId));
+    const detail = buildQuestDetailBlocks(mentorReview, state, {
+      prerequisiteQuestNames,
+      unfinishedQuestIds,
+    }).join('\n');
+    expect(detail).toContain('未完成前置差事：药队启程');
+  });
+
+  it('omits already completed tasks when a multi-prerequisite chain is partly done', () => {
+    const all = new Map(round07Parse.set.quests.map((quest) => [quest.id, quest]));
+    const provisioning = all.get('quest.r31-caravan-provisioning')!;
+    const journal = createQuestJournal(all);
+    const state = journal.states.get(provisioning.id)!;
+    journal.states.get('quest.r31-herbal-stocktaking')!.status = 'completed';
+    const prerequisiteQuestNames = new Map([...all.values()].map(quest => [quest.id, quest.name]));
+    const unfinishedQuestIds = new Set([...journal.states.values()]
+      .filter(progress => progress.status !== 'completed')
+      .map(progress => progress.questId));
+    const detail = buildQuestDetailBlocks(provisioning, state, {
+      prerequisiteQuestNames,
+      unfinishedQuestIds,
+    }).join('\n');
+    expect(detail).toContain('未完成前置差事：雾夜巡岸');
+    expect(detail).not.toContain('未完成前置差事：药材盘点');
   });
 });
 
