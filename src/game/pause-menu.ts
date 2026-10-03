@@ -464,7 +464,6 @@ export class PauseMenuPanel {
     this.container.add(probe);
     this.overwritePrompt = createSaveOverwriteConfirmation({
       slotId,
-      slotLabel: SAVE_SLOT_LABELS[slotId],
       facts: describeSaveOverwritePayload(raw),
       rawPayload: raw,
       width: geometry.contentWidth,

@@ -16,6 +16,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   SAVE_KEY_PREFIX,
   SAVE_PROTOCOL_VERSION,
+  SAVE_SLOT_IDS,
   SAVE_SLOT_LABELS,
   type SaveSnapshotV1,
   type SaveSlotId,
@@ -97,7 +98,6 @@ describe('Round190 knowledge discovery save compatibility', () => {
 const makeState = (rawPayload: string | null, slotId: SaveSlotId = 'slot-1') =>
   createSaveOverwriteConfirmation({
     slotId,
-    slotLabel: SAVE_SLOT_LABELS[slotId],
     facts: rawPayload === null
       ? { displayName: null, level: null, savedAtText: null, damageNote: null }
       : describeSaveOverwritePayload(rawPayload),
@@ -156,7 +156,7 @@ describe('Round143 payload facts and confirmation blocks', () => {
 
   it('blocks carry the exact slot label, name/level/timestamp and permanence', () => {
     const blocks = buildSaveOverwriteBlocks({
-      slotLabel: SAVE_SLOT_LABELS['slot-2'],
+      slotId: 'slot-2',
       facts: describeSaveOverwritePayload(raw),
     }).join('\n');
     expect(blocks).toContain(`拟覆盖存档：${SAVE_SLOT_LABELS['slot-2']}`);
@@ -170,7 +170,7 @@ describe('Round143 payload facts and confirmation blocks', () => {
 
   it('damaged payloads describe the replacement instead of naming ghosts', () => {
     const blocks = buildSaveOverwriteBlocks({
-      slotLabel: SAVE_SLOT_LABELS['slot-3'],
+      slotId: 'slot-3',
       facts: describeSaveOverwritePayload('not-json{{{'),
     }).join('\n');
     expect(blocks).toContain(`拟覆盖存档：${SAVE_SLOT_LABELS['slot-3']}`);
@@ -192,7 +192,6 @@ describe('Round143 pure confirmation state machine', () => {
   it('a genuinely paged body starts unread and gates on the final page', () => {
     const state = createSaveOverwriteConfirmation({
       slotId: 'slot-1',
-      slotLabel: SAVE_SLOT_LABELS['slot-1'],
       facts: describeSaveOverwritePayload(JSON.stringify(makeSnapshot(LONG_NAME, 10, '2026-09-30T21:30:00.000Z'))),
       rawPayload: 'raw',
       width: 220,
@@ -225,11 +224,11 @@ describe('Round143 pure confirmation state machine', () => {
   it('pagination is lossless: every character survives across the pages', () => {
     const facts = describeSaveOverwritePayload(JSON.stringify(makeSnapshot(LONG_NAME, 10, '2026-09-30T21:30:00.000Z')));
     const state = createSaveOverwriteConfirmation({
-      slotId: 'slot-1', slotLabel: SAVE_SLOT_LABELS['slot-1'], facts, rawPayload: 'raw',
+      slotId: 'slot-1', facts, rawPayload: 'raw',
       width: 220, capacity: 2, measure: (text) => measure(text, 12),
     });
     expect(state.bodyPages.join('\n').replace(/\n/g, '')).toBe(
-      buildSaveOverwriteBlocks({ slotLabel: SAVE_SLOT_LABELS['slot-1'], facts }).join('\n').replace(/\n/g, ''),
+      buildSaveOverwriteBlocks({ slotId: 'slot-1', facts }).join('\n').replace(/\n/g, ''),
     );
   });
 });
@@ -402,6 +401,28 @@ const SAVED_AT = '2026-09-30T21:30:00.000Z';
 const rawSlot1 = (): string => JSON.stringify(makeSnapshot('云隐弟子', 10, SAVED_AT));
 
 describe('Round143 PauseMenuPanel overwrite confirmation flow', () => {
+  it.each(['slot-1', 'slot-2', 'slot-3'] as const)(
+    '%s derives title, body, cancel feedback and target identity from one slot id',
+    (slotId) => {
+      fontScale = 1;
+      const raw = JSON.stringify(makeSnapshot('槽位核对侠', 7, SAVED_AT));
+      const r = setupPauseMenu(960, 540, new Map([[slotKey(slotId), raw]]));
+      r.enterSavePage();
+      for (let index = 0; index < SAVE_SLOT_IDS.indexOf(slotId); index += 1) r.press(2);
+      r.press(3);
+      const prompt = promptTexts(r.visible);
+      expect(prompt.some(t => t.text === `覆盖${SAVE_SLOT_LABELS[slotId]}？`)).toBe(true);
+      expect(prompt.map(t => t.text).join('\n')).toContain(`拟覆盖存档：${SAVE_SLOT_LABELS[slotId]}`);
+      expect(prompt.map(t => t.text).join('\n')).toContain('槽位核对侠');
+      r.press(3); // Default cancel reports the same slot and performs no write.
+      expect(r.saves).toEqual([]);
+      expect(r.rawOf(slotId)).toBe(raw);
+      expect(r.visible().some(t => t.text.includes(`已取消覆盖，${SAVE_SLOT_LABELS[slotId]}的原存档保留`))).toBe(true);
+      r.press(6);
+      r.panel.destroy();
+    },
+  );
+
   it('confirmation owns the footer and failed saves consume the old confirmation', () => {
     fontScale = 1;
     const raw = rawSlot1();

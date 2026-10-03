@@ -17,6 +17,7 @@
  */
 import {
   SAVE_KEY_PREFIX,
+  SAVE_SLOT_LABELS,
   formatSavedAt,
   parseSaveSnapshot,
   type SaveSlotId,
@@ -128,11 +129,11 @@ export function describeSaveOverwritePayload(raw: string): SaveOverwritePayloadF
 
 /** Assembles the confirmation body blocks losslessly for the measured pager. */
 export function buildSaveOverwriteBlocks(input: {
-  slotLabel: string;
+  slotId: SaveSlotId;
   facts: SaveOverwritePayloadFacts;
 }): string[] {
   const { facts } = input;
-  const blocks = [`拟覆盖存档：${input.slotLabel}`];
+  const blocks = [`拟覆盖存档：${SAVE_SLOT_LABELS[input.slotId]}`];
   if (facts.damageNote !== null) {
     blocks.push(`该槽现有无法读取的存档（${facts.damageNote}）。保存会替换这些数据。`);
   } else {
@@ -148,7 +149,6 @@ export function buildSaveOverwriteBlocks(input: {
 /** Wraps and paginates the blocks at the real measured width and capacity. */
 export function createSaveOverwriteConfirmation(input: {
   slotId: SaveSlotId;
-  slotLabel: string;
   facts: SaveOverwritePayloadFacts;
   rawPayload: string | null;
   width: number;
@@ -156,7 +156,8 @@ export function createSaveOverwriteConfirmation(input: {
   measure: (text: string) => number;
 }): SaveOverwriteConfirmationState {
   const lines: string[] = [];
-  const blocks = buildSaveOverwriteBlocks({ slotLabel: input.slotLabel, facts: input.facts });
+  const slotLabel = SAVE_SLOT_LABELS[input.slotId];
+  const blocks = buildSaveOverwriteBlocks({ slotId: input.slotId, facts: input.facts });
   for (const [index, block] of blocks.entries()) {
     if (index > 0) lines.push(''); // Blank separators feed the block pager.
     lines.push(...wrapDialogueText(block, Math.max(1, input.width), input.measure));
@@ -164,7 +165,7 @@ export function createSaveOverwriteConfirmation(input: {
   const pages = paginateDialogueBlocks(lines, input.capacity);
   return {
     slotId: input.slotId,
-    slotLabel: input.slotLabel,
+    slotLabel,
     facts: input.facts,
     rawPayload: input.rawPayload,
     bodyPages: pages,
