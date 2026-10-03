@@ -202,6 +202,36 @@ describe('cross-region landmark guidance', () => {
 });
 
 describe('quest arrival actions', () => {
+  it('keeps the Jiangnan mentor route out of the real terrain and scheduled NPC cells', () => {
+    const world = makeWorld();
+    const map = world.maps.get('map.round-01-grid')!;
+    const npcsParsed = parseNpcSet(readJson('../data/base/characters/round-03-npcs.json'));
+    const calendarParsed = parseGameCalendar(readJson('../data/base/worldview/calendar.json'));
+    if (!npcsParsed.ok) throw new Error(npcsParsed.errors.join('\n'));
+    if (!calendarParsed.ok) throw new Error(calendarParsed.errors.join('\n'));
+    const baseNpcs = npcsParsed.set.npcs.map(record => ({ record, col: record.position.col, row: record.position.row }));
+    const schedules = compileNpcSchedules({ npcs: baseNpcs, periods: calendarParsed.calendar.periods, maps: world.maps });
+    const liveNpcs = resolveNpcPlacementsForPlayer({
+      baseNpcs,
+      periodNpcs: schedules.placementsByPeriod.get('period.night')!,
+      mapResourceId: map.data.id,
+      map,
+      playerPosition: { col: 44, row: 38 },
+    });
+    const blockers = new Set(liveNpcs.map(npc => `${npc.col},${npc.row}`));
+    const guide = resolveCellNavigationGuide(world.worldMap, map.data.id, {
+      mapResourceId: map.data.id, col: 39, row: 37, name: '测试师父', approachRadius: 1, arrivalAction: 'talk',
+    }, map, { col: 44, row: 38 }, blockers);
+    expect(guide.status).toBe('en-route');
+    if (guide.status !== 'en-route') throw new Error('expected the mentor route to remain reachable');
+    const next = guide.path[1];
+    expect(next).toBeDefined();
+    if (next === undefined) throw new Error('expected a next step');
+    expect(next).toEqual({ col: 44, row: 37 });
+    expect(map.canEnter(next.col, next.row)).toBe(true);
+    expect(blockers.has(`${next.col},${next.row}`)).toBe(false);
+  });
+
   it('names the existing control for each arrival action without claiming it happened', () => {
     // F talks directly; E serves an adjacent NPC (shop or quest board)
     // before its encounter; discovery fires on arrival but may wait on
