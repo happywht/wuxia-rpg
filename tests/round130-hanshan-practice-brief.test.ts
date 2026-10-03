@@ -315,7 +315,15 @@ describe('Round130 Hanshan practice briefs (real assembled data)', () => {
       bookshopGreet.options = bookshopGreet.options.filter((option: { nextNodeId: string }) => option.nextNodeId !== escortNode.id);
       bookshop.nodes = bookshop.nodes.filter((node: { id: string }) => node.id !== escortNode.id && node.id !== escortArrived.id);
       expect(JSON.parse(applyRelayWaitingDirections(applyCompanionTrust(chained03)))).toEqual(current03);
-      expect(chained30.replace(/\r\n/g, '\n')).toBe(readFileSync(join(root, 'data/base/dialogues/round-30-conversations.json'), 'utf8').replace(/\r\n/g, '\n'));
+      // R254/R255 extend the ferry-master conversation after this historical R130 replay baseline.
+      const current30 = JSON.parse(readFileSync(join(root, 'data/base/dialogues/round-30-conversations.json'), 'utf8'));
+      const ferryMaster = current30.conversations.find((entry: { id: string }) => entry.id === 'dlg.bai-luzhou-ferry-master');
+      expect(ferryMaster).toBeDefined();
+      const laterNodeIds = new Set(['r31-caravan-time-agreed', 'r31-caravan-escorted', 'r31-pier-reinforced']);
+      ferryMaster.nodes = ferryMaster.nodes.filter((node: { id: string }) => !laterNodeIds.has(node.id));
+      const ferryGreet = ferryMaster.nodes.find((node: { id: string }) => node.id === ferryMaster.startNodeId);
+      ferryGreet.options = ferryGreet.options.filter((option: { nextNodeId: string }) => !laterNodeIds.has(option.nextNodeId));
+      expect(JSON.parse(chained30)).toEqual(current30);
       expect(chained03).toContain('r130-hanshan-paper-route');
       expect(chained03).toContain('一份十五两、自购两份共三十两'); // R128 intact.
       expect(chained03).toContain('r129-tiezhang-practice-brief'); // R129 intact.

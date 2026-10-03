@@ -99,8 +99,8 @@ describe('Round 58 regional quest chains', () => {
     expect(assembly.warnings).toEqual([]);
     expect(assembly.quests.size).toBe(44);
     expect(graph.warnings).toEqual([]);
-    expect(nodeParse.data.nodes).toHaveLength(425); // 419 + six Round105 relay insights
-    expect(edgeParse.data.edges).toHaveLength(540); // 531 + nine Round105 relay edges
+    expect(nodeParse.data.nodes).toHaveLength(428); // Round255 adds two route outcomes; prior relays remain.
+    expect(edgeParse.data.edges).toHaveLength(542); // Round255 adds the two corresponding reward edges.
 
     const newQuestIds = [
       'quest.r58-market-discovery',

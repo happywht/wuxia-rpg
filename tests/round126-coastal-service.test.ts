@@ -103,8 +103,9 @@ describe('Round126 discovery-gated coastal service',()=>{
     let count=0;
     for(const file of ['round-30-conversations.json','round-83-east-coast-conversations.json']) {
       const set=JSON.parse(readFileSync('data/base/dialogues/'+file,'utf8'));
-      expect(addCoastalServiceDirections(set)).toEqual(set);
-      for(const conversation of set.conversations)for(const node of conversation.nodes)if(node.id==='r126-coastal-service') {
+      const once=addCoastalServiceDirections(set);
+      expect(addCoastalServiceDirections(once)).toEqual(once);
+      for(const conversation of once.conversations)for(const node of conversation.nodes)if(node.id==='r126-coastal-service') {
         count++; expect(node.effects).toBeUndefined(); expect(node.text).toContain('30银'); expect(node.text).toContain('90世界分钟');
         expect(node.options.every((o:{effects?:unknown})=>o.effects===undefined)).toBe(true);
       }

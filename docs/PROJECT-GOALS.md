@@ -1,3 +1,8 @@
+## Round257最新检查点（完整目标继续active）
+全量 `npm run build` 第二轮通过：177个测试文件/1529项全部通过，Schema/MOD 100资源检查、TypeScript与Round34/Round48文档审计通过。`npm run package:release`及Round72/47发布审计通过；发行归档164个内容文件哈希一致，在`/preview/wuxia-rpg/`可加载基础资料、Schema、MOD、图集和授权声明。5204恢复后只看到标题菜单，没有打开槽位列表；本人Slot1是否可读仍未知，本轮没有存档读写。发行烟测不是玩家旅程或存读档验收。完整大目标保持active。证据：`iterations/round-257/playtest.md`。
+## Round257 最新检查点（大目标继续 active）
+本轮恢复5204同源Vite服务，页面重新打开后显示游戏标题菜单；只凭截图无法证明Round254 Slot1存在或可读，未读写任何存档。全量build第一轮的100资源Schema/MOD/TypeScript通过，但Vitest有5个旧断言文件6项失败（1523通过）；已修订Round126幂等测试、Round58/59计数、Round130历史回放对比边界以及当前轮文档状态，待重跑验证。具体证据 iterations/round-257/playtest.md。发行包、真实章节旅程及所有完整验收继续未完成，桌面Goal维持active。
+
 # 新的大目标：串联既有江湖并交付完整可发行版本（2026-10-03 更新）
 
 ## Round255 最新检查点（完整目标继续 active）
