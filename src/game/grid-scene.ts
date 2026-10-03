@@ -180,6 +180,7 @@ import { BattlePanel } from './combat-ui';
 import { InventoryPanel } from './inventory-ui';
 import { ShopPanel } from './shop-ui';
 import { QuestPanel } from './quest-ui';
+import { QuestSessionFeedback } from './quest-feedback';
 import { WorldMapPanel } from './world-map-ui';
 import { EncyclopediaPanel } from './encyclopedia-ui';
 import { CollectionPanel } from './collection-ui';
@@ -489,6 +490,12 @@ export class GridScene extends Phaser.Scene {
   private endingPanel: EndingPanel | null = null;
   private achievementPanel: AchievementPanel | null = null;
   private meridianPanel: MeridianPanel | null = null;
+  /**
+   * Round 269: what quest completions actually paid THIS run — in-memory only,
+   * no save schema. Re-adopting a world (restart, restored save, data reload)
+   * resets it, so receipts never outlive the run that earned them.
+   */
+  private questFeedback = new QuestSessionFeedback();
   private activeSession: CombatSession | null = null;
   private activeEncounter: PlacedEncounter | null = null;
   private dialogueBattlePending = false;
@@ -698,6 +705,7 @@ export class GridScene extends Phaser.Scene {
     this.scaledTextTargets.length = 0;
     this.world = world;
     this.navigationDestinationId = null;
+    this.questFeedback.reset(); // Round 269: receipts belong to the run that earned them.
     this.achievementState = restoredRun?.achievementState ?? createAchievementRunState();
     this.arenaRecords.clear();
     for (const record of restoredRun?.arenaRecords ?? []) {
@@ -3588,9 +3596,14 @@ export class GridScene extends Phaser.Scene {
       return;
     }
     if (this.anyOverlayOpen() || this.quests.size === 0 || this.inventory === null) return;
+    // Round 269: the next open after an in-session completion focuses that
+    // quest ONCE — consumed here, so NPC boards never spend it and later opens
+    // fall back to the normal active/nearest-offer initial selection.
+    const focusQuestId = this.questFeedback.peekPendingFocusQuestId();
     panel.open({
       quests: this.quests,
       journal: this.questJournal,
+      focusQuestId: focusQuestId ?? undefined,
       recommendedQuestId: nearestOfferedQuestId(
         this.quests,
         this.questJournal,
@@ -3605,11 +3618,13 @@ export class GridScene extends Phaser.Scene {
       factionNames: new Map([...this.progression.factions].map(([id, faction]) => [id, faction.name])),
       knowledgeNodeTitles: new Map([...(this.world?.knowledgeGraph.nodes ?? new Map())]
         .map(([id, node]) => [id, node.title])),
+      questReceiptOf: (questId) => this.questFeedback.receiptOf(questId),
       access: {
         factionId: this.factionState.membership?.factionId ?? null,
         knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,
       },
     });
+    if (panel.isOpen) this.questFeedback.takePendingFocusQuestId();
     this.updateInteractHint();
   }
 
@@ -3873,6 +3888,8 @@ export class GridScene extends Phaser.Scene {
         const paidExperience = reward.experience - experience.discardedExperience;
         this.inventory.currency += reward.currency;
         const cultivationText = cultivation > 0 ? ` · 修为 +${cultivation}` : '';
+        const renownBefore = new Map((reward.factionRenown ?? []).map(change =>
+          [change.factionId, this.social.factionRenown.get(change.factionId) ?? 0] as const));
         const consequences = applyQuestRewardConsequences(
           reward,
           this.social,
@@ -3893,6 +3910,21 @@ export class GridScene extends Phaser.Scene {
           });
           completed.push(...chained.completed);
         }
+        // Round 269: record what this grant ACTUALLY paid (the level cap may
+        // discard experience; consequences already applied above). Storing
+        // only — the real rewards were granted by the lines before this.
+        this.questFeedback.recordCompletion({
+          questId: reward.questId,
+          paidExperience,
+          discardedExperience: experience.discardedExperience,
+          currency: reward.currency,
+          cultivation,
+          factionRenown: [...renownBefore].map(([factionId, before]) => ({
+            factionId,
+            delta: (this.social.factionRenown.get(factionId) ?? 0) - before,
+          })),
+          discoveredKnowledgeNodeIds: consequences.discoveredKnowledgeNodeIds,
+        });
         const consequenceText = [...factionText, ...knowledgeText].join(' · ');
         const rewardText = consequenceText.length > 0 ? ` · ${consequenceText}` : '';
         const notice = quest === undefined
@@ -4214,6 +4246,9 @@ export class GridScene extends Phaser.Scene {
           factionNames: new Map([...this.progression.factions].map(([id, faction]) => [id, faction.name])),
           knowledgeNodeTitles: new Map([...(this.world?.knowledgeGraph.nodes ?? new Map())]
             .map(([id, node]) => [id, node.title])),
+          // Round 269: boards may SHOW a receipt (honest data), but never
+          // consume or override the pending completion focus.
+          questReceiptOf: (questId) => this.questFeedback.receiptOf(questId),
           access: {
             factionId: this.factionState.membership?.factionId ?? null,
             knownKnowledgeNodeIds: this.knownKnowledgeNodeIds,

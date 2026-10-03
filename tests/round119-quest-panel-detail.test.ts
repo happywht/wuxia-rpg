@@ -254,7 +254,9 @@ describe('Round119 QuestPanel paged CJK detail with intact row semantics', () =>
     const r = setupPanel(640, 360);
     const height = Math.min(440, 360 - 40), top = (360 - height) / 2;
     const rows = r.visible().filter(t => t.text.startsWith('▸') || t.text.startsWith('  '));
-    const body = r.visible().filter(t => t.lines.length > 1 && !t.text.startsWith('▸'));
+    // Round 269: identity stays in the subtitle; find the primary-color body
+    // regardless of the number of lines in its current page.
+    const body = r.visible().filter(t => t.color === '#d8dee9');
     const legend = r.visible().filter(t => t.text.includes('Esc 关闭') || t.text.includes('接取/跟踪'));
     expect(rows.length).toBeGreaterThanOrEqual(1);
     expect(body.length).toBeGreaterThanOrEqual(1);

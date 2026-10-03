@@ -229,8 +229,8 @@ describe('Round122 quest UI shows the live stage on the real Yunyin errand', () 
     const totalPages = Number.parseInt(pageHint().split('/')[1] ?? '1', 10);
     // Walk every detail page (the tiny band holds ~2 lines per page) and
     // collect the whole body before asserting the staged presentation.
-    const bodyText = (t: Shown): boolean => !t.text.startsWith('▸') && !t.text.startsWith('  ') &&
-      !t.text.includes('任务日志') && !t.text.includes('Esc') && !/详情\d+\/\d+页/.test(t.text) && !t.text.includes('自动更新');
+    // Repeated page identity is chrome; only join the actual detail body.
+    const bodyText = (t: Shown): boolean => t.color === '#d8dee9';
     const whole: string[] = [];
     for (let page = 0; page < totalPages; page += 1) {
       whole.push(visible().filter(bodyText).map(t => t.text).join('\n'));

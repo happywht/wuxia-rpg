@@ -13,6 +13,7 @@ import {
 import { uiFontSize } from './settings';
 import { activeQuestProgressLabel, orderQuestJournalRows, orderQuestRows } from './quest-presentation';
 import { buildQuestDetailBlocks, buildQuestPanelGeometry, paginateQuestDetail, questFooterColumns } from './quest-panel-layout';
+import { type QuestSessionReceipt, questSettlementBlocks } from './quest-feedback';
 import {
   type QuestAbandonConfirmationState,
   buildAbandonConfirmationGeometry,
@@ -98,6 +99,14 @@ export interface QuestPanelModel {
   knowledgeNodeTitles?: ReadonlyMap<string, string>;
   /** Q-journal only: nearest eligible offer to focus on a fresh local start. */
   recommendedQuestId?: string;
+  /**
+   * Round 269 Q-journal only: the most recent in-session completion, consumed
+   * by this one open. It outranks the nearest offer once; a stale/unknown id
+   * falls back to the normal initial selection without suppressing offers.
+   */
+  focusQuestId?: string;
+  /** Round 269: in-session receipt lookup for completed rows' settlement line. */
+  questReceiptOf?: (questId: string) => QuestSessionReceipt | undefined;
 }
 
 export interface QuestPanelOptions {
@@ -174,7 +183,15 @@ export class QuestPanel {
     if (this.openState) return;
     this.model = model;
     this.selection = 0;
-    if (model.recommendedQuestId !== undefined) {
+    // Round 269: a just-completed quest takes the initial focus once (the
+    // caller consumes the pending completion); otherwise the fresh-local-start
+    // nearest offer keeps its behaviour. A stale focus id just falls through.
+    const focused = model.giverNpcId === undefined && model.focusQuestId !== undefined
+      ? this.rows.findIndex(quest => quest.id === model.focusQuestId)
+      : -1;
+    if (focused >= 0) {
+      this.selection = focused;
+    } else if (model.recommendedQuestId !== undefined) {
       const recommended = this.rows.findIndex(quest => quest.id === model.recommendedQuestId);
       if (recommended >= 0) this.selection = recommended;
     }
@@ -479,6 +496,7 @@ export class QuestPanel {
     this.container.removeAll(true);
     const rows = this.rows;
     this.selection = rows.length === 0 ? 0 : Math.min(this.selection, rows.length - 1);
+    const selected = rows[this.selection];
 
     // Round 119 measured geometry: the panel fits the real canvas, every band
     // derives from live text heights, and the footer (hint + status) is
@@ -522,8 +540,16 @@ export class QuestPanel {
       : LABELS.journal;
     const titleText = this.addText(title, left + PADDING, top + 16, 18, UI.warning);
     titleText.setText(this.fitGrapheme(title, geometry.contentWidth, measureTitle));
-    this.addText(isBoard ? '接取差事后可按 Q 随时查看日志' : '差事进度随物品、交谈与战斗自动更新',
-      left + PADDING, top + 16 + lineSize(18) + 6, 11, UI.muted);
+    // Use the reserved subtitle band so identity never consumes body capacity.
+    const measureIdentity = measureAt(probe(11));
+    let subtitle = isBoard ? '接取差事后可按 Q 随时查看日志' : '差事进度随物品、交谈与战斗自动更新';
+    if (selected !== undefined) {
+      const tail = `」［${questStatusText(model, selected)}］`;
+      const name = this.fitGrapheme(selected.name,
+        geometry.contentWidth - measureIdentity(`「${tail}`), measureIdentity);
+      subtitle = `「${name}${tail}`;
+    }
+    this.addText(subtitle, left + PADDING, top + 16 + lineSize(18) + 6, 11, UI.muted);
 
     if (rows.length === 0) {
       this.addText(isBoard ? LABELS.emptyBoard : LABELS.emptyJournal, left + PADDING, geometry.listTop, 13, UI.muted);
@@ -558,7 +584,6 @@ export class QuestPanel {
       }
     }
 
-    const selected = rows[this.selection];
     const state = selected === undefined ? undefined : model.journal.states.get(selected.id);
     if (selected === undefined) {
       this.detailPages = [''];
@@ -570,6 +595,8 @@ export class QuestPanel {
       // full rewards — wrapped at the measured width and paginated to the band.
       // Round 140: a failed row additionally explains its terminal state and
       // the other open work, without ever promising the original retry.
+      // Round 269: the reward line is followed by its honest settlement —
+      // unpaid preview, no-record wording, or the actual in-session receipt.
       const blocks = buildQuestDetailBlocks(selected, state, {
         factionNames: model.factionNames,
         knowledgeNodeTitles: model.knowledgeNodeTitles,
@@ -577,7 +604,11 @@ export class QuestPanel {
         unfinishedQuestIds: new Set([...model.journal.states.values()]
           .filter(progress => progress.status !== 'completed')
           .map(progress => progress.questId)),
-      }, model.itemCounts);
+      }, model.itemCounts, questSettlementBlocks({
+        status: state?.status,
+        receipt: model.questReceiptOf?.(selected.id),
+        maps: { factionNames: model.factionNames, knowledgeNodeTitles: model.knowledgeNodeTitles },
+      }));
       if (state?.status === 'failed') {
         blocks.push(...buildFailedQuestTerminalBlocks({
           quest: selected,
@@ -588,12 +619,15 @@ export class QuestPanel {
             .map(other => other.name),
         }));
       }
-      const pages = paginateQuestDetail(
+      // Identity stays in the subtitle on every page. Filter separator-only
+      // pages when a narrow view has room for just one body line.
+      const paged = paginateQuestDetail(
         blocks,
         geometry.contentWidth,
         geometry.detailCapacity,
         measure,
-      );
+      ).filter((page) => page.length > 0);
+      const pages = paged.length > 0 ? paged : [''];
       this.detailPages = pages;
       this.detailPage = Math.min(this.detailPage, pages.length - 1);
       this.addText(pages[this.detailPage] ?? '', left + PADDING, geometry.detailTop, 12, UI.primary);

@@ -593,13 +593,17 @@ describe('Round140 measured paging gate and NPC-board behaviour', () => {
     expect(r.journal.states.get(tideLedger.id)!.status).toBe('failed');
     let guard = 0;
     const detailOf = () => r.visible().filter(t => t.color === '#d8dee9');
+    const collectedPages: string[] = [];
     while (guard < 40) { // Page through the failed row's whole detail body.
       const detail = detailOf().map(t => t.text).join('\n');
+      collectedPages.push(detail);
       if (detail.includes('另接其他已开放的差事') && detail.includes(other.name)) break;
       r.press(34);
       guard += 1;
     }
-    const pagedDetail = detailOf().map(t => t.text).join('\n');
+    // Round 269: the per-page identity header reserves a body line, so the
+    // terminal clauses may spread across pages — assert on the whole body.
+    const pagedDetail = collectedPages.join('\n');
     expect(pagedDetail).toContain('已终止为失败');
     expect(pagedDetail).toContain('无法重新接取原差事');
     expect(pagedDetail).toContain(other.name);

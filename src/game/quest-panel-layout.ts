@@ -146,12 +146,15 @@ export function buildQuestObjectiveStageLines(input: {
  * the authored description, every objective with its live progress, and the
  * full reward line (experience, silver, faction renown, discoveries). Pure
  * and lossless — long MOD text is returned verbatim for the measured wrapper.
+ * Round 269: callers may append settlement blocks (unpaid preview / no-record
+ * / actual in-session receipt) so the reward line never masquerades as paid.
  */
 export function buildQuestDetailBlocks(
   quest: QuestData,
   state: QuestProgressState | undefined,
   maps: QuestDetailNameMaps = {},
   liveItemCounts?: ReadonlyMap<string, number>,
+  settlementBlocks?: readonly string[],
 ): string[] {
   const blocks: string[] = [quest.name, quest.description];
   if (state?.status === 'locked' && quest.prerequisiteQuestIds.length > 0) {
@@ -172,7 +175,10 @@ export function buildQuestDetailBlocks(
     ...(quest.rewards.discoverKnowledgeNodeIds ?? []).map((nodeId) =>
       `见闻「${maps.knowledgeNodeTitles?.get(nodeId) ?? nodeId}」`),
   ];
-  blocks.push(`报酬：${rewards.join(' · ')}`);
+  const rewardLabel = state?.status === 'completed' || state?.status === 'failed'
+    ? '约定报酬' : '预计报酬';
+  blocks.push(`${rewardLabel}：${rewards.join(' · ')}${rewardLabel === '预计报酬' ? '（未结算）' : ''}`);
+  if (settlementBlocks !== undefined) blocks.push(...settlementBlocks);
   return blocks;
 }
 
