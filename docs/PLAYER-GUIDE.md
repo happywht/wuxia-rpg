@@ -2,7 +2,7 @@
 
 ### 开发预览可操作性说明（Round263）
 
-5208隔离页能显示游戏画布，但本轮Windows窗口输入辅助返回`Trusted RPC service is not configured`，未能通过该辅助操作存档或推进角色。此为开发会话环境限制，不代表游戏按键失效；请通过普通浏览器直接打开隔离预览继续手动验证。Round263的实机状态以`iterations/round-263/playtest.md`记录为准。
+本轮旧IAB句柄失效且Windows窗口输入辅助返回`Trusted RPC service is not configured`；新建5208可见浏览器标签后，游戏画布可正常接收方向键与交互键。若旧标签不可操作，可在普通浏览器重新打开本地隔离预览，再确认标题Continue的存档摘要。实机旅程、槽位和读回证据见`iterations/round-263/playtest.md`。
 
 ### Round262 槽一读回与河灯任务
 
