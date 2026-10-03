@@ -240,10 +240,10 @@
         },
         {
           "id": "objective.r31-caravan-ferry-time",
-          "kind": "talkToNpc",
-          "targetId": "char.bai-luzhou",
+          "kind": "discoverKnowledge",
+          "targetId": "event.r31-caravan-time-agreed",
           "requiredCount": 1,
-          "text": "与白鹭洲敲定药队起运时辰"
+          "text": "备好无极丹后，与白鹭洲敲定药队起运时辰"
         }
       ],
       "rewards": { "experience": 28, "currency": 24 }

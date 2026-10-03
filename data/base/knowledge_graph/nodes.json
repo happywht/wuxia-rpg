@@ -2920,6 +2920,13 @@
       "knownByDefault": false
     },
     {
+      "id": "event.r31-caravan-time-agreed",
+      "kind": "event",
+      "title": "药队起运时辰已约",
+      "summary": "无极丹已备妥，并由玩家亲自与白鹭洲约定药队起运时辰。普通寒暄和查阅渡口章程不构成约定。",
+      "knownByDefault": false
+    },
+    {
       "id": "event.r104-medicine-practice",
       "kind": "event",
       "title": "药炉疗伤实践",

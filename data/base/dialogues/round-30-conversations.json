@@ -1136,6 +1136,28 @@
           "text": "渡口公所的檐下，白鹭洲正把一册翻旧的船票簿合上。他把算盘拨了一颗，抬眼道：「渡籍在此。要过桥的问班次，要讲理的查章程——你是哪一种？」",
           "options": [
             {
+              "text": "无极丹已备妥，请渡董定下药队起运时辰。",
+              "nextNodeId": "r31-caravan-time-agreed",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r31-caravan-provisioning",
+                  "status": "active"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r31-caravan-time-agreed"
+                },
+                {
+                  "kind": "takeItem",
+                  "itemId": "item.wuji-dan",
+                  "quantity": 1
+                }
+              ]
+            },
+            {
               "text": "想请教渡口的通行章程。",
               "nextNodeId": "registry-talk",
               "effects": [
@@ -1596,6 +1618,16 @@
           "options": [
             {
               "text": "明白了，我自行安排。",
+              "nextNodeId": "greet"
+            }
+          ]
+        },
+        {
+          "id": "r31-caravan-time-agreed",
+          "text": "白鹭洲接过无极丹，先验封泥，再在渡籍边上添记药队的班次：「丹药封箱，时辰也定下了。照章过桥，晚半刻便顺延下一班。石北那边可以开始押运了——往后是先保药队过雾桥，还是先修牢栈桥，你们在告示板上再议。」",
+          "options": [
+            {
+              "text": "记下时辰，去告示板看看两条安排。",
               "nextNodeId": "greet"
             }
           ]
