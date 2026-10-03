@@ -6,7 +6,10 @@ import { describe, expect, it } from 'vitest';
 import { projectAtlasPosition } from '../src/engine/world-atlas-view';
 import { parseDialogueSet, validateConversation } from '../src/engine/dialogue-graph';
 import { parseGridMap, type GridMap } from '../src/engine/grid-map';
-import { findGridPath } from '../src/engine/grid-path';
+import { findGridPath, findGridPathToAdjacentCell } from '../src/engine/grid-path';
+import { findRegionEventInteractionPath } from '../src/engine/region-event-navigation';
+import { resolveCellNavigationGuide } from '../src/engine/world-navigation-guidance';
+import { findWorldTravelRoute } from '../src/engine/world-travel';
 import { parseKnowledgeNodeSet } from '../src/engine/knowledge-graph';
 import { parseNpcSet } from '../src/engine/npc-placement';
 import {
@@ -16,7 +19,7 @@ import {
   createQuestJournal,
   parseQuestSet,
 } from '../src/engine/quest-system';
-import { assembleWorldMap, parseWorldMap } from '../src/engine/world-map';
+import { assembleWorldMap, parseWorldMap, selectInteractableRegionEvent, type RegionEventData } from '../src/engine/world-map';
 
 const ISLES_ID = 'map.round-79-isles';
 const QUEST_ID = 'quest.r79-tide-chart';
@@ -100,9 +103,25 @@ describe('Round 79 sixth coastal region and movable world atlas', () => {
     const isles = maps.get(ISLES_ID)!;
     const outbound = assembled.transitions.find(({ id }) => id === 'gate.r79-ferry-to-isles')!;
     const homebound = assembled.transitions.find(({ id }) => id === 'gate.r79-isles-to-ferry')!;
+    expect(findWorldTravelRoute(assembled, ferry.data.id, ISLES_ID)?.legs.map(({ transition }) => transition.id)).toEqual([outbound.id]);
+    expect(findWorldTravelRoute(assembled, ISLES_ID, ferry.data.id)?.legs.map(({ transition }) => transition.id)).toEqual([homebound.id]);
+    expect(findGridPathToAdjacentCell(ferry, ferry.playerStart, outbound.from)?.at(-1)).toMatchObject({ col: outbound.from.col, row: outbound.from.row - 1 });
     expect(findGridPath(ferry, ferry.playerStart, outbound.from)).not.toBeNull();
     expect(outbound.to).toEqual({ mapResourceId: ISLES_ID, ...isles.playerStart });
     expect(findGridPath(isles, isles.playerStart, homebound.from)).not.toBeNull();
+    const giver = readJson('../data/base/characters/round-79-isles-npcs.json') as { npcs: { id: string; position: { col: number; row: number } }[] };
+    const tideGiver = giver.npcs.find(({ id }) => id === NPC_ID)!;
+    const beacon = readJson('../data/base/world/world-map.json') as { events: RegionEventData[] };
+    const beaconEvent = beacon.events.find(({ id }) => id === 'event.r79-white-beacon')!;
+    const beaconPath = findRegionEventInteractionPath(isles, tideGiver.position, beaconEvent);
+    expect(beaconPath).not.toBeNull();
+    const beaconApproach = beaconPath?.at(-1)!;
+    const destination = { mapResourceId: ISLES_ID, col: beaconEvent.col, row: beaconEvent.row, name: '白沙灯标', approachRadius: 0, arrivalAction: 'discover' as const };
+    const guide = resolveCellNavigationGuide(assembled, ISLES_ID, destination, isles, tideGiver.position);
+    expect(guide.status).toBe('en-route');
+    expect(guide.status === 'en-route' ? guide.path.at(-1) : null).toEqual(beaconApproach);
+    expect(selectInteractableRegionEvent([beaconEvent], { ...beaconApproach, mapResourceId: ISLES_ID }, new Set(), { knownKnowledgeNodeIds: new Set(), periodId: null, weatherId: null }, isles.canEnter.bind(isles))?.event.id).toBe(beaconEvent.id);
+    expect(findGridPath(isles, beaconApproach, homebound.from)).not.toBeNull();
     expect(findGridPath(ferry, homebound.to, outbound.from)).not.toBeNull();
 
     const knownLandmarks = parsed.data.landmarks.filter(({ mapResourceId }) => mapResourceId === ISLES_ID);
