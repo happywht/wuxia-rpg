@@ -42,6 +42,7 @@ describe('Round267 师门勘验双NPC任务链', () => {
     expect(journal.states.get(quest!.id)?.status).toBe('completed');
     expect(journal.states.get(quest!.id)?.objectiveCounts.get('objective.r31-review-escort')).toBe(1);
     expect(completed.completed.map((reward) => reward.questId)).toContain(quest!.id);
+    expect(completed.completed.find((reward) => reward.questId === quest!.id)).toMatchObject({ experience: 40, currency: 35 });
     expect(journal.states.get(escort!.id)?.status).toBe('offered');
     expect(journal.states.get(pier!.id)?.status).toBe('offered');
   });
