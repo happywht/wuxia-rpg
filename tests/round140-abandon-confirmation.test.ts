@@ -232,7 +232,7 @@ describe('Round140 failed-row terminal detail blocks', () => {
 });
 
 // ── UI layer with a measured mock scene ─────────────────────────────────────
-vi.mock('phaser', () => ({ default: { Input: { Keyboard: { KeyCodes: { UP: 1, DOWN: 2, ENTER: 3, N: 4, A: 5, ESC: 6, W: 7, S: 8, PAGE_UP: 33, PAGE_DOWN: 34 } } } } }));
+vi.mock('phaser', () => ({ default: { Input: { Keyboard: { KeyCodes: { UP: 1, DOWN: 2, ENTER: 3, N: 4, A: 5, ESC: 6, W: 7, S: 8, PAGE_UP: 33, PAGE_DOWN: 34, LEFT: 9, RIGHT: 10 } } } } }));
 vi.mock('../src/game/ui-theme', () => ({
   addPixelPanelChrome: () => {},
   addPixelSelection: () => {},
@@ -255,6 +255,7 @@ interface SetupResult {
   updates: string[];
   navigated: string[];
   promptTexts: () => Shown[];
+  keys: Map<number, Set<() => void>>;
 }
 
 /** Choice rows alone carry a cursor prefix; body lines never do. */
@@ -320,8 +321,53 @@ function setupAbandonPanel(
     || /放弃「.+」？/.test(t.text)
     || t.text.includes('Esc 取消')
     || t.text.includes('读完全部说明'));
-  return { panel, journal, shown, visible, press, updates, navigated, promptTexts };
+  return { panel, journal, shown, visible, press, updates, navigated, promptTexts, keys };
 }
+
+describe('Round266 exclusive quest acceptance confirmation', () => {
+  it('requires a deliberate confirmation before closing an offered sibling branch', () => {
+    fontScale = 1;
+    const branch = makeQuest('quest.round266-branch-a', '护送药队');
+    const sibling = { ...makeQuest('quest.round266-branch-b', '修复栈桥'), exclusiveGroupId: 'round266-route' };
+    const first = { ...branch, exclusiveGroupId: 'round266-route' };
+    const quests = new Map([[first.id, first], [sibling.id, sibling]]);
+    const r = setupAbandonPanel(960, 540, quests, '');
+    r.press(3); // First Enter opens a default-cancel prompt.
+    expect(r.journal.states.get(first.id)?.status).toBe('offered');
+    expect(r.journal.states.get(sibling.id)?.status).toBe('offered');
+    expect(r.updates).toEqual([]);
+    expect(r.visible().some(t => t.text.includes('永久封止'))).toBe(true);
+    expect(r.visible().some(t => t.text.includes('先不接取（默认）') && t.text.startsWith('▸'))).toBe(true);
+    r.press(3); // Enter on default cancel closes without changing state.
+    expect(r.journal.states.get(first.id)?.status).toBe('offered');
+    expect(r.journal.states.get(sibling.id)?.status).toBe('offered');
+    expect(r.updates).toEqual([]);
+    r.press(3); // Open confirmation again.
+    r.press(10); // Explicit Right selects confirmation.
+    expect(r.visible().some(t => t.text.includes('确认接取') && t.text.startsWith('▸'))).toBe(true);
+    r.press(3); // First Enter arms the explicit confirmation.
+    expect(r.journal.states.get(first.id)?.status).toBe('offered');
+    r.press(3); // Second Enter commits the armed choice.
+    expect(r.journal.states.get(first.id)?.status).toBe('active');
+    expect(r.journal.states.get(sibling.id)?.status).toBe('failed');
+    expect(r.updates).toEqual(['updated']);
+    r.panel.destroy();
+  });
+
+  it('Escape cancels the branch prompt without changing either quest', () => {
+    fontScale = 1;
+    const first = { ...makeQuest('quest.round266-cancel-a', '护送药队'), exclusiveGroupId: 'round266-cancel' };
+    const sibling = { ...makeQuest('quest.round266-cancel-b', '修复栈桥'), exclusiveGroupId: 'round266-cancel' };
+    const r = setupAbandonPanel(960, 540, new Map([[first.id, first], [sibling.id, sibling]]), '');
+    r.press(3);
+    r.press(6);
+    expect(r.journal.states.get(first.id)?.status).toBe('offered');
+    expect(r.journal.states.get(sibling.id)?.status).toBe('offered');
+    expect(r.updates).toEqual([]);
+    expect(r.panel.isOpen).toBe(true);
+    r.panel.destroy();
+  });
+});
 
 describe('Round140 QuestPanel A-key abandon confirmation flow', () => {
   it('A on an active quest opens the prompt on cancel with the exact name and warnings', () => {

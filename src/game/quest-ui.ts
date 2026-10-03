@@ -65,6 +65,11 @@ const LABELS = {
   experience: '经验',
   currency: '银两',
   accept: 'Enter 接取',
+  branchConfirmTitle: '确认选择「{name}」？',
+  branchConfirmBody: '接取后，同一岔路组的其他差事会永久封止，之后无法改选。',
+  branchConfirmKeep: '先不接取（默认）',
+  branchConfirmCommit: '确认接取',
+  branchConfirmHint: '←/→ 选择 · Enter 确认 · Esc 取消',
   track: 'Enter 跟踪此差事',
   untrack: 'Enter 取消跟踪',
   navigate: 'N 导航至目标',
@@ -147,6 +152,10 @@ export class QuestPanel {
   /** Round 140: live A-key abandon confirmation; null while no prompt shows. */
   private abandonPrompt: QuestAbandonConfirmationState | null = null;
   private abandonNotice: string | null = null;
+  /** A mutually exclusive route must receive an explicit second confirmation. */
+  private branchConfirmQuestId: string | null = null;
+  private branchConfirmChoice: 'cancel' | 'confirm' = 'cancel';
+  private branchConfirmArmed = false;
 
   constructor(scene: Phaser.Scene, options: QuestPanelOptions = {}) {
     this.scene = scene;
@@ -173,6 +182,8 @@ export class QuestPanel {
     this.detailPage = 0;
     this.abandonPrompt = null;
     this.abandonNotice = null;
+    this.branchConfirmQuestId = null;
+    this.branchConfirmArmed = false;
     this.openState = true;
     this.container.setVisible(true);
     this.bindKeys();
@@ -188,6 +199,8 @@ export class QuestPanel {
     this.model = null;
     this.abandonPrompt = null; // Q/close discards a pending prompt wholesale.
     this.abandonNotice = null;
+    this.branchConfirmQuestId = null;
+    this.branchConfirmArmed = false;
     this.onClose?.();
   }
 
@@ -206,6 +219,8 @@ export class QuestPanel {
       [KeyCodes.DOWN, () => this.moveSelection(1)],
       [KeyCodes.S, () => this.moveSelection(1)],
       [KeyCodes.ENTER, () => this.confirm()],
+      [KeyCodes.LEFT, () => this.moveBranchChoice(-1)],
+      [KeyCodes.RIGHT, () => this.moveBranchChoice(1)],
       [KeyCodes.N, () => this.navigateSelected()],
       [KeyCodes.A, () => this.abandonSelected()],
       [KeyCodes.PAGE_UP, () => this.turnDetailPage(-1)],
@@ -240,6 +255,7 @@ export class QuestPanel {
   }
 
   private moveSelection(delta: number): void {
+    if (this.branchConfirmQuestId !== null) return;
     if (this.abandonPrompt !== null) { // While the prompt shows, ↑/↓ move its choice.
       moveAbandonChoice(this.abandonPrompt, delta);
       this.render();
@@ -272,6 +288,26 @@ export class QuestPanel {
   }
 
   private confirm(): void {
+    if (this.branchConfirmQuestId !== null) {
+      if (this.branchConfirmChoice === 'cancel') {
+        this.branchConfirmQuestId = null;
+        this.branchConfirmArmed = false;
+        this.status = '已取消选择，差事与岔路均未改变';
+        this.render();
+        return;
+      }
+      if (!this.branchConfirmArmed) {
+        this.branchConfirmArmed = true;
+        this.status = '已选确认接取，再按 Enter 才会封止另一条岔路';
+        this.render();
+        return;
+      }
+      const questId = this.branchConfirmQuestId;
+      this.branchConfirmQuestId = null;
+      this.branchConfirmArmed = false;
+      this.acceptOfferedQuest(questId);
+      return;
+    }
     if (this.abandonPrompt !== null) { // Enter on the prompt: default cancel, explicit Confirm commits.
       this.confirmAbandonPrompt();
       return;
@@ -281,17 +317,14 @@ export class QuestPanel {
     if (model === null || quest === undefined) return;
     const state = model.journal.states.get(quest.id);
     if (state?.status === 'offered') {
-      const result = acceptQuest(model.quests, model.journal, quest.id, model.itemCounts, model.access);
-      if (!result.ok) {
-        this.status = `无法接取：${result.reason}`;
-        this.render();
-        return;
+      if (quest.exclusiveGroupId !== undefined) {
+        this.branchConfirmQuestId = quest.id;
+        this.branchConfirmChoice = 'cancel';
+        this.branchConfirmArmed = false;
+        this.status = null;
+      } else {
+        this.acceptOfferedQuest(quest.id);
       }
-      this.status = result.update.failedQuestIds.length > 0
-        ? `已接取「${quest.name}」，另一条岔路就此封止`
-        : `已接取「${quest.name}」`;
-      this.onQuestAccepted?.(quest.id);
-      this.onUpdate?.(result.update);
     } else if (state?.status === 'active') {
       toggleTrackedQuest(model.journal, quest.id);
       this.status = model.journal.trackedQuestId === quest.id
@@ -308,13 +341,40 @@ export class QuestPanel {
     this.render();
   }
 
+  private acceptOfferedQuest(questId: string): void {
+    const model = this.model;
+    const quest = model?.quests.get(questId);
+    if (model === null || model === undefined || quest === undefined) return;
+    const result = acceptQuest(model.quests, model.journal, quest.id, model.itemCounts, model.access);
+    if (!result.ok) {
+      this.status = `无法接取：${result.reason}`;
+      this.render();
+      return;
+    }
+    this.status = result.update.failedQuestIds.length > 0
+      ? `已接取「${quest.name}」，另一条岔路就此封止`
+      : `已接取「${quest.name}」`;
+    this.onQuestAccepted?.(quest.id);
+    this.onUpdate?.(result.update);
+    this.selection = Math.max(0, this.rows.findIndex(row => row.id === quest.id));
+    this.detailPage = 0;
+    this.render();
+  }
+
+  private moveBranchChoice(delta: number): void {
+    if (this.branchConfirmQuestId === null) return;
+    if (delta !== 0) this.branchConfirmChoice = this.branchConfirmChoice === 'cancel' ? 'confirm' : 'cancel';
+    this.branchConfirmArmed = false;
+    this.render();
+  }
+
   /**
    * N key: hand the selected active quest to the scene's objective resolver.
    * A successful answer closes this panel (the world map takes over); a
    * failure keeps the panel open with the scene's readable reason.
    */
   private navigateSelected(): void {
-    if (this.abandonPrompt !== null) return; // Navigation stays disabled while the prompt shows.
+    if (this.abandonPrompt !== null || this.branchConfirmQuestId !== null) return;
     const quest = this.selectedQuest();
     if (quest === undefined || this.onNavigateQuest === undefined) return;
     const outcome = this.onNavigateQuest(quest.id);
@@ -330,7 +390,7 @@ export class QuestPanel {
    * prompt already shows is a no-op — repeated presses never confirm.
    */
   private abandonSelected(): void {
-    if (this.abandonPrompt !== null) return;
+    if (this.abandonPrompt !== null || this.branchConfirmQuestId !== null) return;
     const model = this.model;
     const quest = this.selectedQuest();
     if (model === null || quest === undefined) return;
@@ -366,6 +426,13 @@ export class QuestPanel {
 
   /** Esc: cancel a pending prompt but keep the journal panel open; else close. */
   private escape(): void {
+    if (this.branchConfirmQuestId !== null) {
+      this.branchConfirmQuestId = null;
+      this.branchConfirmArmed = false;
+      this.status = '已取消选择，差事与岔路均未改变';
+      this.render();
+      return;
+    }
     if (this.abandonPrompt !== null) {
       this.abandonPrompt = null;
       this.abandonNotice = null;
@@ -555,6 +622,33 @@ export class QuestPanel {
     this.addText(hint, left + width - PADDING, geometry.hintTop, 10, UI.muted, 'right');
 
     if (this.abandonPrompt !== null) this.renderAbandonPrompt();
+    if (this.branchConfirmQuestId !== null) this.renderBranchConfirm();
+  }
+
+  private renderBranchConfirm(): void {
+    const quest = this.model?.quests.get(this.branchConfirmQuestId ?? '');
+    if (quest === undefined) return;
+    const width = Math.min(560, this.scene.scale.width - 80);
+    const height = Math.min(230, this.scene.scale.height - 80);
+    const left = Math.round((this.scene.scale.width - width) / 2);
+    const top = Math.round((this.scene.scale.height - height) / 2);
+    addPixelPanelChrome(this.scene, this.container, { x: left, y: top, width, height });
+    const title = LABELS.branchConfirmTitle.replace('{name}', quest.name);
+    const body = this.addText(title, left + PADDING, top + 24, 16, UI.warning);
+    body.setText(this.fitGrapheme(title, width - PADDING * 2, (text) => body.context.measureText(text).width));
+    this.addText(LABELS.branchConfirmBody, left + PADDING, top + 74, 12, UI.primary);
+    const choices = [
+      { key: 'cancel', text: LABELS.branchConfirmKeep },
+      { key: 'confirm', text: LABELS.branchConfirmCommit },
+    ] as const;
+    choices.forEach((choice, index) => {
+      const selected = this.branchConfirmChoice === choice.key;
+      const y = top + 136 + index * 24;
+      if (selected) addPixelSelection(this.scene, this.container, { x: left + PADDING, y: y - 2, width: width - PADDING * 2, height: 21 });
+      this.addText(`${selected ? CURSOR_ACTIVE : CURSOR_IDLE}${choice.text}`, left + PADDING, y, 12, selected ? UI.active : UI.idle);
+    });
+    const hint = this.branchConfirmArmed ? 'Enter 再确认一次 · Esc 取消' : LABELS.branchConfirmHint;
+    this.addText(hint, left + width - PADDING, top + height - 20, 10, UI.muted, 'right');
   }
 
   /**
