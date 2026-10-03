@@ -5,6 +5,9 @@ import { describe, expect, it } from 'vitest';
 import { parseDialogueSet } from '../src/engine/dialogue-graph';
 import { parseKnowledgeEdgeSet, parseKnowledgeNodeSet } from '../src/engine/knowledge-graph';
 import { acceptQuest, applyQuestSignal, createQuestJournal, parseQuestSet } from '../src/engine/quest-system';
+import { getVisibleOptions, type DialogueRuntimeContext } from '../src/engine/dialogue-runtime';
+import { createFactionMembershipState } from '../src/engine/faction-system';
+import { createSocialState } from '../src/engine/social-state';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const read = (path: string): unknown => JSON.parse(readFileSync(join(root, path), 'utf8'));
@@ -79,6 +82,50 @@ describe('Round255 药队路线后果', () => {
     expect(parsedEdges.data.edges).toEqual(expect.arrayContaining([
       expect.objectContaining({ fromId: ids.guard, toId: ids.escorted, relation: 'rewards' }),
       expect.objectContaining({ fromId: ids.pier, toId: ids.reinforced, relation: 'rewards' }),
+    ]));
+
+    const { quests, journal } = readyJournal();
+    const context: DialogueRuntimeContext = {
+      quests,
+      journal,
+      items: new Map(),
+      inventory: null,
+      social: createSocialState(),
+      speakerNpcId: 'char.bai-luzhou',
+      knownKnowledgeNodeIds: new Set(),
+      knowledgeNodes: new Map(parsedNodes.data.nodes.map((node) => [node.id, node])),
+      character: null,
+      factions: new Map(),
+      martialArts: new Map(),
+      factionState: createFactionMembershipState(),
+      timeOfDayPeriodId: 'day',
+    };
+    const visibleResponses = () => getVisibleOptions(greet, context)
+      .map(({ option }) => option.nextNodeId)
+      .filter((id) => id === 'r31-caravan-escorted' || id === 'r31-pier-reinforced');
+    expect(visibleResponses()).toEqual([]);
+    context.knownKnowledgeNodeIds.add(ids.escorted);
+    expect(visibleResponses()).toEqual(['r31-caravan-escorted']);
+    context.knownKnowledgeNodeIds.delete(ids.escorted);
+    context.knownKnowledgeNodeIds.add(ids.reinforced);
+    expect(visibleResponses()).toEqual(['r31-pier-reinforced']);
+    context.knownKnowledgeNodeIds.add(ids.escorted);
+    expect(visibleResponses()).toEqual(['r31-caravan-escorted', 'r31-pier-reinforced']);
+  });
+
+  it('后续任务的领取角色、前置任务与知识图谱关系一致', () => {
+    const graphEdges = parsedEdges.data.edges;
+    const gratitude = questSet.quests.find((quest) => quest.id === ids.gratitude)!;
+    const toll = questSet.quests.find((quest) => quest.id === ids.toll)!;
+    expect(gratitude.giverNpcId).toBe('char.wen-suxin');
+    expect(gratitude.prerequisiteQuestIds).toEqual([ids.guard]);
+    expect(toll.giverNpcId).toBe('char.bai-luzhou');
+    expect(toll.prerequisiteQuestIds).toEqual([ids.pier]);
+    expect(graphEdges).toEqual(expect.arrayContaining([
+      expect.objectContaining({ fromId: ids.gratitude, toId: ids.guard, relation: 'requires' }),
+      expect.objectContaining({ fromId: ids.toll, toId: ids.pier, relation: 'requires' }),
+      expect.objectContaining({ fromId: 'char.wen-suxin', toId: ids.gratitude, relation: 'participatesIn' }),
+      expect.objectContaining({ fromId: 'char.bai-luzhou', toId: ids.toll, relation: 'participatesIn' }),
     ]));
   });
 });
