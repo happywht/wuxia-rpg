@@ -8,6 +8,7 @@ import { parseQuestSet, applyQuestSignal, createQuestJournal, type QuestData } f
 import { createFactionMembershipState } from '../src/engine/faction-system';
 import { createSocialState } from '../src/engine/social-state';
 import type { KnowledgeNodeData } from '../src/engine/knowledge-graph';
+import { captureSaveSnapshot, parseSaveSnapshot, restoreRunState } from '../src/engine/save-system';
 
 const read = (path: string): unknown => JSON.parse(readFileSync(new URL(`../data/base/${path}`, import.meta.url), 'utf8'));
 const questSet = (() => { const result = parseQuestSet(read('quests/round-07-quests.json')); if (!result.ok) throw new Error(result.errors.join('\n')); return result.set; })();
@@ -75,5 +76,54 @@ describe('Round261 河灯船位必须由明确对白约定', () => {
     expect(context.knownKnowledgeNodeIds.has(eventId)).toBe(true);
     expect(conversation.nodes.find((node) => node.id === 'r31-river-lantern-time-agreed')?.text)
       .toContain('时辰');
+  });
+
+  it('persists the completed appointment, objective counts, and flower inventory through a v1 save readback', () => {
+    const context = runtime();
+    const quest = context.quests.get(questId)!;
+    applyQuestSignal(context.quests, context.journal, {
+      type: 'item-count',
+      itemId: 'item.luodie-hua',
+      quantity: 3,
+    });
+    const appointmentChoice = greet.options?.find((choice) => choice.nextNodeId === 'r31-river-lantern-time-agreed')!;
+    expect(applyDialogueEffects(appointmentChoice.effects ?? [], context).ok).toBe(true);
+    expect(context.journal.states.get(questId)?.status).toBe('completed');
+
+    const snapshot = captureSaveSnapshot({
+      displayName: '河灯读回',
+      mapResourceId: 'map.round-10-mist-ferry',
+      playerCol: 3,
+      playerRow: 4,
+      character: context.character!,
+      inventory: context.inventory!,
+      journal: context.journal,
+      social: context.social,
+      shopStocks: new Map(),
+      completedEncounters: new Set(),
+      completedRegionalEvents: new Set(),
+      knownKnowledgeNodeIds: context.knownKnowledgeNodeIds,
+      elapsedGameMinutes: 0,
+      worldSeed: 261,
+    });
+    const parsed = parseSaveSnapshot(JSON.parse(JSON.stringify(snapshot)));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+
+    const restored = restoreRunState({
+      snapshot: parsed.snapshot,
+      profile: profileSet.profiles[0]!,
+      items: context.items,
+      quests: context.quests,
+      shops: new Map(),
+    });
+    const restoredState = restored.journal.states.get(questId)!;
+
+    expect(restoredState.status).toBe('completed');
+    expect(restoredState.objectiveCounts.get('objective.r31-lantern-petals')).toBe(3);
+    expect(restoredState.objectiveCounts.get('objective.r31-lantern-appointment')).toBe(1);
+    expect(restored.knownKnowledgeNodeIds).toContain(eventId);
+    expect(restored.inventory.stacks).toContainEqual({ itemId: 'item.luodie-hua', quantity: 3 });
+    expect(quest.objectives).toHaveLength(2);
   });
 });
