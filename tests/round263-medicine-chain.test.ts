@@ -39,8 +39,13 @@ describe('Round263 药队共同前置链', () => {
   it('does not let out-of-order recipe, healing, or report signals skip the medicine checklist', () => {
     const quest = quests.get(questIds.stocktaking)!;
     const journal = createQuestJournal(quests);
-    for (const prerequisiteId of quest.prerequisiteQuestIds) journal.states.get(prerequisiteId)!.status = 'completed';
+    const inquiry = quests.get(questIds.inquiry)!;
+    for (const prerequisiteId of inquiry.prerequisiteQuestIds) journal.states.get(prerequisiteId)!.status = 'completed';
+    const inquiryState = journal.states.get(inquiry.id)!;
+    inquiryState.status = 'active';
     applyQuestSignal(quests, journal, { type: 'npc-talk', npcId: 'char.rong-su-qing' });
+    applyQuestSignal(quests, journal, { type: 'item-count', itemId: 'item.cangya-gen', quantity: 3 });
+    expect(inquiryState.status).toBe('completed');
     expect(journal.states.get(quest.id)?.status).toBe('offered');
     expect(acceptQuest(quests, journal, quest.id).ok).toBe(true);
     const later = quest.objectives.slice(1);
@@ -53,6 +58,19 @@ describe('Round263 药队共同前置链', () => {
     expect(journal.states.get(quest.id)?.status).toBe('active');
     expect(quest.objectives.map((objective) => journal.states.get(quest.id)?.objectiveCounts.get(objective.id) ?? 0))
       .toEqual([0, 0, 0, 0, 0]);
+  });
+
+  it('requires the actual prowler victory; a retreat leaves the caravan prerequisite locked', () => {
+    const journal = createQuestJournal(quests);
+    const watch = quests.get(questIds.watch)!;
+    const provisioning = quests.get(questIds.provisioning)!;
+    journal.states.get(questIds.stocktaking)!.status = 'completed';
+    applyQuestSignal(quests, journal, { type: 'npc-talk', npcId: 'char.wen-suxin' });
+    expect(journal.states.get(watch.id)?.status).toBe('offered');
+    expect(acceptQuest(quests, journal, watch.id).ok).toBe(true);
+    applyQuestSignal(quests, journal, { type: 'encounter-defeat', encounterId: 'encounter.mist-shore-prowler' });
+    expect(journal.states.get(watch.id)?.status).toBe('failed');
+    expect(journal.states.get(provisioning.id)?.status).toBe('locked');
   });
 
   it('keeps the medicine encounter at its authored location reachable and nonrepeatable', () => {
