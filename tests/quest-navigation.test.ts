@@ -52,6 +52,7 @@ interface ObjectiveSpec {
   kind: QuestObjectiveKind;
   targetId: string;
   requiredCount?: number;
+  navigationNpcId?: string;
 }
 
 function makeQuest(objectives: ObjectiveSpec[], id = 'quest.r60-test'): QuestData {
@@ -67,6 +68,7 @@ function makeQuest(objectives: ObjectiveSpec[], id = 'quest.r60-test'): QuestDat
       targetId: spec.targetId,
       requiredCount: spec.requiredCount ?? 1,
       text: `目标 ${spec.id}`,
+      ...(spec.navigationNpcId === undefined ? {} : { navigationNpcId: spec.navigationNpcId }),
     })),
     failOnEncounterIds: [],
     rewards: { experience: 1, currency: 1 },
@@ -277,6 +279,32 @@ describe('Round 60 quest objective navigation', () => {
     expect(reedResult.target).toMatchObject({ mapResourceId: FERRY_MAP, col: 5, row: 4 });
     expect(reedResult.target.approachRadius).toBe(0);
     expect(reedResult.target.landmarkId).toBeUndefined();
+  });
+
+  it('routes dialogue-backed discovery objectives to their authored NPC waypoint', () => {
+    const quest = makeQuest([{
+      id: 'obj-appointment',
+      kind: 'discoverKnowledge',
+      targetId: 'event.test-appointment',
+      navigationNpcId: 'char.test-ferryman',
+    }]);
+    const result = resolveQuestNavigationTarget(makeInput({
+      quests: new Map([[quest.id, quest]]),
+      journal: makeJournal([quest]),
+      baseNpcs: [makeNpc('char.test-ferryman', '测试渡董', FERRY_MAP, 10, 10)],
+    }));
+    expect(result).toMatchObject({
+      status: 'target',
+      target: {
+        kind: 'discoverKnowledge',
+        name: '测试渡董',
+        mapResourceId: FERRY_MAP,
+        col: 10,
+        row: 10,
+        approachRadius: 1,
+        arrivalAction: 'talk',
+      },
+    });
   });
 
   it('reports unresolved-target when the referenced spatial data is missing', () => {

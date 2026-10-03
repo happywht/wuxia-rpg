@@ -2927,6 +2927,13 @@
       "knownByDefault": false
     },
     {
+      "id": "event.r31-river-lantern-time-agreed",
+      "kind": "event",
+      "title": "河灯船位时辰已约",
+      "summary": "玩家备齐三束落蝶花灯材后，亲自与白鹭洲敲定放灯船位及潮前时辰；普通交谈不构成约定。",
+      "knownByDefault": false
+    },
+    {
       "id": "event.r31-caravan-escorted",
       "kind": "event",
       "title": "药队已护过雾桥",

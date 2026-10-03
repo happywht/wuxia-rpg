@@ -1158,6 +1158,28 @@
               ]
             },
             {
+              "text": "三束落蝶花灯材已备齐，请渡董定下放灯船位时辰。",
+              "nextNodeId": "r31-river-lantern-time-agreed",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r31-river-lantern-promise",
+                  "status": "active"
+                },
+                {
+                  "kind": "itemCount",
+                  "itemId": "item.luodie-hua",
+                  "minCount": 3
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r31-river-lantern-time-agreed"
+                }
+              ]
+            },
+            {
               "text": "药队已护过雾桥，来渡籍报个平安。",
               "nextNodeId": "r31-caravan-escorted",
               "conditions": [
@@ -1642,6 +1664,16 @@
           "options": [
             {
               "text": "记下时辰，去告示板看看两条安排。",
+              "nextNodeId": "greet"
+            }
+          ]
+        },
+        {
+          "id": "r31-river-lantern-time-agreed",
+          "text": "白鹭洲在船票簿上记下三盏落蝶花灯的船位：「潮前这一班给你们留着，三盏灯沿东侧缓水放，莫挤到药队的渡时。陆贞娘若问起，渡口已把时辰和船位一并记牢。」",
+          "options": [
+            {
+              "text": "记下船位和时辰，回去告诉陆贞娘。",
               "nextNodeId": "greet"
             }
           ]

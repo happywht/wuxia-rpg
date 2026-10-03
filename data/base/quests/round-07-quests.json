@@ -350,8 +350,9 @@
         },
         {
           "id": "objective.r31-lantern-appointment",
-          "kind": "talkToNpc",
-          "targetId": "char.bai-luzhou",
+          "kind": "discoverKnowledge",
+          "targetId": "event.r31-river-lantern-time-agreed",
+          "navigationNpcId": "char.bai-luzhou",
           "requiredCount": 1,
           "text": "与白鹭洲约下放灯的船位时辰"
         }

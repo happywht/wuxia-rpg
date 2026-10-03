@@ -238,6 +238,9 @@
           "type": "string",
           "minLength": 1,
           "maxLength": 160
+        },
+        "navigationNpcId": {
+          "$ref": "#/definitions/id"
         }
       }
     },

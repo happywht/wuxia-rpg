@@ -16,6 +16,20 @@
       "summary": "渡口传闻将顾夜尘的行踪指向芦苇深处。"
     },
     {
+      "id": "kg.edge.r31-river-lantern-time",
+      "fromId": "quest.r31-river-lantern-promise",
+      "toId": "event.r31-river-lantern-time-agreed",
+      "relation": "rewards",
+      "summary": "完成落蝶花灯材并由白鹭洲明确约定船位时辰后，记下河灯船期。"
+    },
+    {
+      "id": "kg.edge.r31-river-lantern-time-at-wharf",
+      "fromId": "event.r31-river-lantern-time-agreed",
+      "toId": "char.bai-luzhou",
+      "relation": "locatedAt",
+      "summary": "河灯船位与时辰由雾雨渡口的白鹭洲亲自登记。"
+    },
+    {
       "id": "kg.edge.traces-at-reedbank",
       "fromId": "event.old-footprints",
       "toId": "place.reedbank",

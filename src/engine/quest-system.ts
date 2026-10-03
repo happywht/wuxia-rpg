@@ -18,6 +18,8 @@ export interface QuestObjectiveData {
   alternativeTargetIds?: string[];
   /** Optional victory equipment gate; historical victories cannot prove it. */
   requiredEquippedItemId?: string;
+  /** Optional NPC waypoint for dialogue-backed discovery events. */
+  navigationNpcId?: string;
 }
 
 export interface QuestRewardsData {
@@ -237,6 +239,10 @@ function parseObjective(raw: unknown, label: string, errors: string[]): QuestObj
   if (raw.requiredEquippedItemId !== undefined && (kind !== 'defeatEncounter' || string(raw.requiredEquippedItemId) === null)) {
     problems.push('requiredEquippedItemId 仅用于战胜目标且应为非空ID');
   }
+  const navigationNpcId = raw.navigationNpcId === undefined ? undefined : string(raw.navigationNpcId);
+  if (raw.navigationNpcId !== undefined && (kind !== 'discoverKnowledge' || navigationNpcId === null)) {
+    problems.push('navigationNpcId 仅用于发现见闻目标且应为非空NPC ID');
+  }
   if (id === null) problems.push('id 应为非空字符串');
   if (!OBJECTIVE_KINDS.includes(kind as QuestObjectiveKind)) {
     problems.push(`kind 必须是 ${OBJECTIVE_KINDS.join(' 或 ')}`);
@@ -252,6 +258,7 @@ function parseObjective(raw: unknown, label: string, errors: string[]): QuestObj
   }
   return { id, kind: kind as QuestObjectiveKind, targetId, requiredCount, text,
     ...(raw.requiredEquippedItemId === undefined ? {} : { requiredEquippedItemId: raw.requiredEquippedItemId as string }),
+    ...(navigationNpcId === undefined ? {} : { navigationNpcId: navigationNpcId! }),
     ...(raw.alternativeTargetIds === undefined ? {} : { alternativeTargetIds: alternativeTargetIds! }) };
 }
 

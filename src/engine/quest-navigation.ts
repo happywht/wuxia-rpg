@@ -361,6 +361,26 @@ export function resolveQuestNavigationTarget(input: QuestNavigationInput): Quest
       },
     };
   }
+  if (objective.navigationNpcId !== undefined) {
+    const npc = resolveNpcPosition(input, objective.navigationNpcId);
+    if (npc === null) return { status: 'no-target', reason: 'unresolved-target' };
+    return {
+      status: 'target',
+      target: {
+        id,
+        questId: quest.id,
+        objectiveId: objective.id,
+        kind: objective.kind,
+        name: npc.name,
+        objectiveText: objective.text,
+        mapResourceId: npc.mapResourceId,
+        col: npc.col,
+        row: npc.row,
+        approachRadius: 1,
+        arrivalAction: 'talk',
+      },
+    };
+  }
   const knowledge = resolveKnowledgePosition(input, objective.targetId);
   if (knowledge === null) return { status: 'no-target', reason: 'unresolved-target' };
   return {
