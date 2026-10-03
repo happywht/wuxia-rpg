@@ -3189,8 +3189,9 @@ export class GridScene extends Phaser.Scene {
       return;
     }
 
-    // Adjacent NPCs win the prompt; otherwise an adjacent encounter shows
-    // its data-driven approach line.
+    // Match handleInteraction: ready map events take E from talk-only NPCs,
+    // while dedicated shops and quest boards retain their direct action.
+    const mapEventTarget = this.interactableRegionEventTarget();
     const npcTarget =
       this.map === null
         ? null
@@ -3198,15 +3199,25 @@ export class GridScene extends Phaser.Scene {
             col: this.playerCol,
             row: this.playerRow,
           });
+    const npcShop = npcTarget?.record.shopId === null || npcTarget === null
+      ? undefined
+      : this.shops.get(npcTarget.record.shopId);
+    const npcStock = npcShop === undefined ? undefined : this.shopStocks.get(npcShop.record.id);
+    const npcHasQuests = npcTarget !== null && [...this.quests.values()].some(
+      (quest) => quest.giverNpcId === npcTarget.record.id,
+    );
+    const npcHasDedicatedInteraction = npcTarget !== null && (
+      (npcShop !== undefined && npcStock !== undefined && this.inventory !== null) ||
+      (npcTarget.record.questGiver && npcHasQuests && this.inventory !== null && this.questPanel !== null)
+    );
+    if (shouldPreferRegionalEventInteraction(mapEventTarget !== null, npcHasDedicatedInteraction)) {
+      this.hudLines.interact = `按 E · ${mapEventTarget!.prompt}`;
+      return;
+    }
     if (npcTarget !== null) {
-      const keepsShop =
-        npcTarget.record.shopId !== null && this.shops.has(npcTarget.record.shopId);
-      const keepsQuests =
-        npcTarget.record.questGiver &&
-        [...this.quests.values()].some((quest) => quest.giverNpcId === npcTarget.record.id);
-      const prompt = keepsShop
+      const prompt = npcShop !== undefined && npcStock !== undefined && this.inventory !== null
         ? `按 E 与「${npcTarget.record.name}」交易 · F 交谈`
-        : keepsQuests
+        : npcTarget.record.questGiver && npcHasQuests && this.inventory !== null && this.questPanel !== null
           ? `按 E 向「${npcTarget.record.name}」查看差事 · F 交谈`
           : `按 E 与「${npcTarget.record.name}」交谈`;
       this.hudLines.interact = prompt;
@@ -3257,7 +3268,6 @@ export class GridScene extends Phaser.Scene {
       this.hudLines.interact = `按 E 在「${alchemyTarget.record.name}」炼药 · 已识药方 ${known}/${alchemyTarget.recipes.length}`;
       return;
     }
-    const mapEventTarget = this.interactableRegionEventTarget();
     if (mapEventTarget !== null) {
       this.hudLines.interact = `按 E · ${mapEventTarget.prompt}`;
       return;
@@ -4141,8 +4151,7 @@ export class GridScene extends Phaser.Scene {
   /**
    * E reaches a ready map inspection before a talk-only NPC if they share
    * the approach cell. Dedicated shops/quest boards retain priority; F is
-   * always available for conversation. Remaining targets keep their legacy
-   * order: NPC, encounter, arena, faction war, crafting, event, then gate.
+   * always available for conversation. The HUD uses the same priority rule.
    */
   private handleInteraction(): void {
     if (this.anyOverlayOpen() || this.dataReloading) {
