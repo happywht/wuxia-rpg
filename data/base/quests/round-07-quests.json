@@ -135,6 +135,7 @@
           "kind": "discoverKnowledge",
           "targetId": "event.formula-shengji-san",
           "requiredCount": 1,
+          "navigationNpcId": "char.rong-su-qing",
           "text": "向容素青请教生肌散的炼法"
         },
         {

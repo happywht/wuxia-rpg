@@ -17,6 +17,7 @@ import type {
   QuestObjectiveKind,
   QuestStatus,
 } from '../src/engine/quest-system';
+import { parseQuestSet } from '../src/engine/quest-system';
 import type { BattleEncounterData, PlacedEncounter } from '../src/engine/turn-based-combat';
 import { assembleWorldMap, parseWorldMap, type WorldMapAssembly } from '../src/engine/world-map';
 import { buildQuestObjectiveWaypoint, buildWorldMapWaypoints } from '../src/engine/world-navigation';
@@ -301,6 +302,36 @@ describe('Round 60 quest objective navigation', () => {
         mapResourceId: FERRY_MAP,
         col: 10,
         row: 10,
+        approachRadius: 1,
+        arrivalAction: 'talk',
+      },
+    });
+  });
+
+  it('routes the herbal formula stage to Rong Suqing after the roots are collected', () => {
+    const parsed = parseQuestSet(readJson('../data/base/quests/round-07-quests.json'));
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    const quest = parsed.set.quests.find((entry) => entry.id === 'quest.r31-herbal-stocktaking');
+    expect(quest).toBeDefined();
+    if (quest === undefined) return;
+    const result = resolveQuestNavigationTarget(makeInput({
+      quests: new Map([[quest.id, quest]]),
+      questId: quest.id,
+      journal: makeJournal([quest], {}, {
+        [quest.id]: { 'objective.r31-root-stock': 3 },
+      }),
+      baseNpcs: [makeNpc('char.rong-su-qing', '容素青', FERRY_MAP, 12, 2)],
+    }));
+    expect(result).toMatchObject({
+      status: 'target',
+      target: {
+        objectiveId: 'objective.r104-formula',
+        kind: 'discoverKnowledge',
+        name: '容素青',
+        mapResourceId: FERRY_MAP,
+        col: 12,
+        row: 2,
         approachRadius: 1,
         arrivalAction: 'talk',
       },
