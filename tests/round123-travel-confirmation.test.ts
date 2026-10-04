@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-vi.mock('phaser', () => ({ default: { Input: { Keyboard: { KeyCodes: { ENTER: 1, ESC: 2, PAGE_UP: 3 } } } } }));
+vi.mock('phaser', () => ({ default: { Input: { Keyboard: { KeyCodes: { ENTER: 1, ESC: 2, PAGE_UP: 3, UP: 4, DOWN: 5 } } } } }));
 vi.mock('../src/game/settings', () => ({ uiFontSize: (value: number) => value }));
 vi.mock('../src/game/ui-theme', () => ({ UI_FONT_FAMILY: 'test', addPixelPanelChrome: () => {} }));
 import { TravelConfirmationPanel } from '../src/game/travel-confirmation';
@@ -30,7 +30,44 @@ describe('Round123 confirmation ownership and paging', () => {
     const total = Number(h.texts[1]!.text.split('/')[1]!.split(' ')[0]);
     expect(total).toBeGreaterThan(1);
     for (let page = 0; page < total - 1; page++) { h.panel.accept(); expect(h.commit).not.toHaveBeenCalled(); }
+    h.bindings.get(5)!.forEach(fn => fn()); // Explicit purchase selection after reading.
     h.panel.accept(); h.panel.accept();
     expect(h.commit).toHaveBeenCalledTimes(1); expect(order).toEqual(['commit', 'close']); expect(h.panel.isOpen).toBe(false);
+  });
+  it('Round278 final Enter defaults to cancellation', () => {
+    const h = harness(); h.panel.open('北岸舟', 8, 20, 10, h.commit);
+    while (h.panel.isOpen) h.panel.accept();
+    expect(h.commit).not.toHaveBeenCalled(); expect(h.close).toHaveBeenCalledTimes(1);
+  });
+  it('Round278 cannot select purchase before reading the last page', () => {
+    const h = harness(); h.panel.open('未读票据'.repeat(50), 8, 20, 10, h.commit);
+    h.bindings.get(5)!.forEach(fn => fn());
+    while (h.panel.isOpen) h.panel.accept();
+    expect(h.commit).not.toHaveBeenCalled();
+  });
+  it('Round278 paging back clears purchase selection', () => {
+    const h = harness(); h.panel.open('分页票据'.repeat(50), 8, 20, 10, h.commit);
+    const total = Number(h.texts[1]!.text.split('/')[1]!.split(' ')[0]);
+    for (let page = 1; page < total; page++) h.panel.accept();
+    h.bindings.get(5)!.forEach(fn => fn()); h.bindings.get(3)!.forEach(fn => fn());
+    h.panel.accept(); h.panel.accept();
+    expect(h.commit).not.toHaveBeenCalled(); expect(h.panel.isOpen).toBe(false);
+  });
+  it('Round278 Up restores cancellation', () => {
+    const h = harness(); h.panel.open('短舟', 8, 20, 10, h.commit);
+    const total = Number(h.texts[1]!.text.split('/')[1]!.split(' ')[0]);
+    for (let page = 1; page < total; page++) h.panel.accept();
+    h.bindings.get(5)!.forEach(fn => fn()); h.bindings.get(4)!.forEach(fn => fn());
+    h.panel.accept(); expect(h.commit).not.toHaveBeenCalled();
+  });
+  it('Round278 reopening resets choice and releases every binding', () => {
+    const h = harness(); h.panel.open('短舟', 8, 20, 10, h.commit);
+    const total = Number(h.texts[1]!.text.split('/')[1]!.split(' ')[0]);
+    for (let page = 1; page < total; page++) h.panel.accept();
+    h.bindings.get(5)!.forEach(fn => fn()); h.panel.close();
+    h.panel.open('短舟', 8, 20, 10, h.commit);
+    while (h.panel.isOpen) h.panel.accept();
+    expect(h.commit).not.toHaveBeenCalled(); expect(h.close).toHaveBeenCalledTimes(2);
+    expect([...h.bindings.values()].every(set => set.size === 0)).toBe(true);
   });
 });

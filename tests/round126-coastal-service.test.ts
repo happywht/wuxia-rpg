@@ -51,7 +51,7 @@ describe('Round126 discovery-gated coastal service',()=>{
   });
   it('loads the existing world and keeps both endpoints free in every NPC period',()=>{
     expect(world.optionalWarnings).toEqual([]); expect(world.maps.size).toBe(22);
-    expect(world.assembly.quests.size).toBe(65); expect(world.worldMap.transitions).toHaveLength(54);
+    expect(world.assembly.quests.size).toBe(65); expect(world.worldMap.transitions).toHaveLength(56); // incl. two R278 shore-boat gates
     expect(world.knowledgeGraph.nodes.has(COASTAL_SERVICE_KNOWLEDGE)).toBe(true);
     for(const service of COASTAL_SERVICES)for(const point of [service.from,service.to]) {
       expect(world.maps.get(point.mapResourceId)!.canEnter(point.col,point.row)).toBe(true);
@@ -65,7 +65,7 @@ describe('Round126 discovery-gated coastal service',()=>{
     const parsed=parseWorldMap(broken); if(!parsed.ok)throw Error('fixture');
     const assembled=assembleWorldMap(parsed.data,world.maps,{knowledgeNodeIds:new Set(world.knowledgeGraph.nodes.keys()),periodIds:new Set(),weatherIds:new Set()});
     if('ok' in assembled)throw Error('assembly');
-    expect(assembled.transitions).toHaveLength(53);
+    expect(assembled.transitions).toHaveLength(55); // 56 minus the isolated broken gate
     expect(assembled.transitions.some(g=>g.id===COASTAL_SERVICES[0]!.id)).toBe(true);
     expect(assembled.warnings.join('\n')).toContain('通行见闻未登记：place.missing');
   });
@@ -93,10 +93,10 @@ describe('Round126 discovery-gated coastal service',()=>{
     expect(resolveRegionalGuideDestination(guide(),unlocked.destinationId!)).toBeNull();
     expect(resolveRegionalGuideDestination(guide(true),unlocked.destinationId!)).not.toBeNull();
   });
-  it('regenerates without replacing any of the previous 52 gates',()=>{
+  it('regenerates without replacing any of the previous 54 gates',()=>{
     expect(addCoastalService(raw)).toEqual(raw); expect(addCoastalService(addCoastalService(raw))).toEqual(raw);
     const previous={...raw,transitions:raw.transitions.filter((g:{id:string})=>!g.id.startsWith('gate.r126-'))};
-    expect(addCoastalService(previous).transitions.slice(0,52)).toEqual(previous.transitions);
+    expect(addCoastalService(previous).transitions.slice(0,54)).toEqual(previous.transitions); // 52 through R123 + two R278 gates
     expect({...addCoastalService(previous),transitions:[]}).toEqual({...previous,transitions:[]});
   });
   it('adds three idempotent directions with no gameplay effects',()=>{

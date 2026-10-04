@@ -1,0 +1,74 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r278-cli-kAx2GM/scripts/lib/round278-shore-boat.mjs:105
+    if (existing.length > 0) throw new Error(`关口 ${gate.id} 已存在但内容不符，请人工复核。`);
+                                   ^
+
+Error: 关口 gate.r278-ferry-north-boat-return 已存在但内容不符，请人工复核。
+    at repairWorldMapRaw (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r278-cli-kAx2GM/scripts/lib/round278-shore-boat.mjs:105:36)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r278-cli-kAx2GM/scripts/apply-round278.mjs:22:19
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:647:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.18.0
+···········x··x·······x···
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round123-travel-confirmation.test.ts > Round123 confirmation ownership and paging > requires reading every page before a single commit and notifies close after commit
+AssertionError: expected "vi.fn()" to be called 1 times, but got 0 times
+ ❯ tests/round123-travel-confirmation.test.ts:34:22
+     32|     for (let page = 0; page < total - 1; page++) { h.panel.accept(); e…
+     33|     h.panel.accept(); h.panel.accept();
+     34|     expect(h.commit).toHaveBeenCalledTimes(1); expect(order).toEqual([…
+       |                      ^
+     35|   });
+     36| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/round278-shore-boat.test.ts > Round278 驿舟数据形状与地形占用（真实资料实证） > source 邻格无 NPC（基础与日程位），E 键不会被相邻人物吃掉
+AssertionError: expected 5 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 5
+
+ ❯ tests/round278-shore-boat.test.ts:106:121
+    104|     }
+    105|     // 白鹭洲 (4,4) 与 source (6,4) 相距两格，互不相邻。
+    106|     expect(Math.abs(4 - R278_SHORE_BOAT_EXPECTATION.source.col) + Math…
+       |                                                                                                                         ^
+    107|   });
+    108|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/round278-shore-boat.test.ts > Round278 驿舟数据形状与地形占用（真实资料实证） > 真实场景事务：足银同图换乘扣8银/进20分钟/落在(87,15)；银不足零扣零时
+AssertionError: expected 10 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 10
+
+ ❯ tests/round278-shore-boat.test.ts:181:37
+    179|     // arriveAtMap(87,15, 20分钟) 收尾（时钟由 arriveAtMap→advanceTime 统一
+    180|     // 推进，属 R123 同图短渡既有线上路径；其后仍须步行到北口按 E 过铁嶂）。
+    181|     expect(paid.inventory.currency).toBe(2);
+       |                                     ^
+    182|     expect(paid.arrive).toHaveBeenCalledTimes(1);
+    183|     expect(paid.arrive).toHaveBeenCalledWith(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  2 failed | 1 passed (3)
+      Tests  3 failed | 23 passed (26)
+   Start at  13:37:59
+   Duration  10.96s (tests 86%, transform 10%, import 4%)

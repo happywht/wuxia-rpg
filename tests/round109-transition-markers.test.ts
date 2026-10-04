@@ -91,7 +91,7 @@ function deepFreeze<T>(value: T): T {
 describe('Round109 pure gate projection over the real base world', () => {
   it('locks the real-data premise: 22 regions, 50 transitions, no dangling destinations', () => {
     expect(worldData.regions).toHaveLength(22);
-    expect(worldData.transitions).toHaveLength(54);
+    expect(worldData.transitions).toHaveLength(56); // 54 through R126 + two R278 shore-boat gates
     for (const transition of worldData.transitions) {
       expect(regionNames.has(transition.to.mapResourceId)).toBe(true);
     }
@@ -198,7 +198,7 @@ describe('Round109 pure gate projection over the real base world', () => {
       mapOrigin: { x: 120, y: 40 },
       playerCell: { col: 88, row: 15 },
     });
-    expect(projections.length).toBe(6);
+    expect(projections.length).toBe(8); // 6 through R126 + two R278 shore-boat gates
     expect(frozen.transitions.map((t) => t.id).sort()).toEqual(
       [...transitionsBefore.map((t) => t.id)].sort(),
     );
@@ -218,7 +218,7 @@ describe('Round109 pure gate projection over the real base world', () => {
         seen.set(projection.transitionId, projection);
       }
     }
-    expect(seen.size).toBe(54);
+    expect(seen.size).toBe(56);
     for (const transition of worldData.transitions) {
       const projection = seen.get(transition.id);
       expect(projection).toBeDefined();
@@ -361,10 +361,10 @@ describe('Round109 gate marker renderer on a mock scene', () => {
     expect(rec.containers).toHaveLength(1);
     expect(rec.containers[0]!.x).toBe(0);
     expect(rec.containers[0]!.y).toBe(0);
-    // 3 gates × (5 badge rects + 1 glyph square + 1 glyph key + 1 label) + container.
-    expect(rec.rectangles).toHaveLength(6 * 6);
-    expect(rec.texts).toHaveLength(6 * 2);
-    expect(rec.scrollFactorValues).toHaveLength(6 * 8 + 1);
+    // gates × (5 badge rects + 1 glyph square + 1 glyph key + 1 label) + container; 8 since R278.
+    expect(rec.rectangles).toHaveLength(8 * 6);
+    expect(rec.texts).toHaveLength(8 * 2);
+    expect(rec.scrollFactorValues).toHaveLength(8 * 8 + 1);
     expect(rec.scrollFactorValues.every((value) => value === 1)).toBe(true);
 
     // Gate order is the projection order: north (89,15), west (2,4), south (97,90).
@@ -372,11 +372,11 @@ describe('Round109 gate marker renderer on a mock scene', () => {
     const northX = 120 + 89.5 * 48;
     const northY = 40 + 15.5 * 48;
     const badgePosts = rec.rectangles.filter((r) => r.color === UI_PALETTE.frame);
-    expect(badgePosts).toHaveLength(12); // two posts per gate
+    expect(badgePosts).toHaveLength(16); // 8 gates since R278 // two posts per gate
     expect(badgePosts[0]!.x).toBe(northX - 7.5);
     expect(badgePosts[1]!.x).toBe(northX + 7.5);
-    expect(rec.rectangles.filter((r) => r.color === UI_PALETTE.frameLight)).toHaveLength(6); // lintels
-    expect(rec.rectangles.filter((r) => r.strokeCalls === 1)).toHaveLength(6); // E-glyph squares
+    expect(rec.rectangles.filter((r) => r.color === UI_PALETTE.frameLight)).toHaveLength(8); // lintels (8 gates since R278)
+    expect(rec.rectangles.filter((r) => r.strokeCalls === 1)).toHaveLength(8); // E-glyph squares
     expect(rec.rectangles.some((r) => r.color === UI_PALETTE.selected)).toBe(true); // passage dot
     expect(rec.rectangles.some((r) => r.x === northX && r.y === northY)).toBe(true); // dot at gate centre
 
@@ -397,8 +397,8 @@ describe('Round109 gate marker renderer on a mock scene', () => {
     const { renderer, rec } = setupRender(null);
     const labels = rec.texts.filter((t) => t.text !== 'E');
     const eKeys = rec.texts.filter((t) => t.text === 'E');
-    expect(labels).toHaveLength(6);
-    expect(eKeys).toHaveLength(6);
+    expect(labels).toHaveLength(8);
+    expect(eKeys).toHaveLength(8);
     expect(labels.every((label) => !label.visible)).toBe(true);
     expect(eKeys.every((key) => !key.visible)).toBe(true);
 
@@ -483,7 +483,7 @@ describe('Round109 gate marker renderer on a mock scene', () => {
     expect(flattened).toContain('雾雨渡口以北的极长关口名'.repeat(12).slice(0, 100)); // full MOD name kept
     expect(flattened).toContain('铁嶂北道·岩关驿镇'); // still the authored destination
     expect(flattened).not.toContain('…'); // wrapping preserves text; it never truncates
-    expect(rec.containers[0]!.children.length).toBe(6 * 8); // bounded object count, one row of parts per gate
+    expect(rec.containers[0]!.children.length).toBe(8 * 8); // bounded object count, one row of parts per gate (8 gates since R278)
   });
 
   it('refreshFonts re-applies the resolved size and re-wraps without rebuilding any object', () => {

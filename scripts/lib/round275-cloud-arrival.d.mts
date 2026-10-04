@@ -1,5 +1,5 @@
 import type { DialogueNodeData, DialogueOptionData } from '../../src/engine/dialogue-graph';
-export const guidePatches: { id: string; before: string; after: string }[];
+export const guidePatches: { id: string; before: string; after: string; later?: string[] }[];
 export const eventPatches: { id: string; before: string; after: string }[];
 export const arrivalNodes: DialogueNodeData[];
 export const arrivalOptions: DialogueOptionData[];

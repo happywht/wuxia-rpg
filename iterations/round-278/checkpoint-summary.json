@@ -1,0 +1,123 @@
+[
+  {
+    "file": "iterations/round-278/escort-boat-iron-arrival.json",
+    "bytes": 37050,
+    "sha256": "0E576360314D7DC6F33E9D3C29CAAD1F1EAB31EA46064E578B81AC3C7CAC248D",
+    "qaRun": "journey-20261004-ride-escort",
+    "candidate": "round278-worktree-on-270ad8d",
+    "stage": "escort-boat-iron-arrival",
+    "sourceSlotId": "slot-2",
+    "savedAt": "2026-10-04T05:55:55.259Z",
+    "exportedAt": "2026-10-04T05:59:29.344Z",
+    "map": "map.round-62-iron-ridge",
+    "position": {
+      "col": 4,
+      "row": 7
+    },
+    "level": 7,
+    "experience": 686,
+    "currency": 343,
+    "health": 165,
+    "qi": 110,
+    "elapsed": 480,
+    "delta": {
+      "xp": 40,
+      "silver": 17,
+      "worldMinutes": 73,
+      "health": 0,
+      "qi": 0
+    },
+    "inventoryUnchanged": true,
+    "addedKnown": [
+      "map.round-62-iron-ridge",
+      "event.r62-ridge-arrival"
+    ],
+    "newAchievements": [
+      "achievement.river-of-stories"
+    ],
+    "discoveredKnowledge": 17,
+    "parentDiscoveredKnowledge": 15,
+    "questsUnchanged": true,
+    "dialogueVariablesUnchanged": true
+  },
+  {
+    "file": "iterations/round-278/repair-free-north-before-return.json",
+    "bytes": 37198,
+    "sha256": "A79368A07AAB0CB48B1714E2DC2AC7F2ED0C5478D32913ED47D67185548680F0",
+    "qaRun": "journey-20261004-ride-repair",
+    "candidate": "round278-worktree-on-270ad8d",
+    "stage": "repair-free-north-before-return",
+    "sourceSlotId": "slot-3",
+    "savedAt": "2026-10-04T05:59:13.559Z",
+    "exportedAt": "2026-10-04T06:00:35.662Z",
+    "map": "map.round-10-mist-ferry",
+    "position": {
+      "col": 88,
+      "row": 15
+    },
+    "level": 7,
+    "experience": 674,
+    "currency": 326,
+    "health": 163,
+    "qi": 110,
+    "elapsed": 3689,
+    "delta": {
+      "xp": 0,
+      "silver": 0,
+      "worldMinutes": 94,
+      "health": 0,
+      "qi": 0
+    },
+    "inventoryUnchanged": true,
+    "addedKnown": [
+      "event.r56-north-water-gauge",
+      "place.mist-north-cap"
+    ],
+    "newAchievements": [],
+    "discoveredKnowledge": 20,
+    "parentDiscoveredKnowledge": 18,
+    "questsUnchanged": true,
+    "dialogueVariablesUnchanged": true
+  },
+  {
+    "file": "iterations/round-278/repair-boat-iron-arrival.json",
+    "bytes": 37288,
+    "sha256": "FE645DEF4CDD2A168DD004E9DD3A8E4CF007CC5BCC61ACF1255557ED8E9F4675",
+    "qaRun": "journey-20261004-ride-repair",
+    "candidate": "round278-worktree-on-270ad8d",
+    "stage": "repair-boat-iron-arrival",
+    "sourceSlotId": "slot-2",
+    "savedAt": "2026-10-04T06:07:50.981Z",
+    "exportedAt": "2026-10-04T06:08:52.757Z",
+    "map": "map.round-62-iron-ridge",
+    "position": {
+      "col": 4,
+      "row": 7
+    },
+    "level": 7,
+    "experience": 674,
+    "currency": 310,
+    "health": 163,
+    "qi": 110,
+    "elapsed": 3776,
+    "delta": {
+      "xp": 0,
+      "silver": -16,
+      "worldMinutes": 181,
+      "health": 0,
+      "qi": 0
+    },
+    "inventoryUnchanged": true,
+    "addedKnown": [
+      "event.r56-north-water-gauge",
+      "place.mist-north-cap",
+      "map.round-62-iron-ridge",
+      "event.r62-ridge-arrival"
+    ],
+    "newAchievements": [],
+    "discoveredKnowledge": 22,
+    "parentDiscoveredKnowledge": 18,
+    "questsUnchanged": true,
+    "dialogueVariablesUnchanged": true
+  }
+]

@@ -40,6 +40,7 @@ import {
   PIER_QUEST_ID, PIER_REINFORCED_EVENT_ID, R273_PIER_DELIVERY_EXPECTATION,
   repairDialoguesRaw, repairDialogueSchemaRaw, repairKnowledgeGraph, repairQuestsRaw,
 } from '../scripts/lib/round273-pier-delivery.mjs';
+import { repairDialoguesRaw as applyShoreBoat } from '../scripts/lib/round278-shore-boat.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const read = (path: string): unknown => JSON.parse(readFileSync(join(root, path), 'utf8'));
@@ -498,7 +499,7 @@ describe('Round273 场景最小接线与作者源', () => {
     conversation.nodes = conversation.nodes.filter((node: { id: string }) =>
       ![SPECS.confirmNode.id, SPECS.progressNode.id, SPECS.deliveredNode.id].includes(node.id));
     const pristineDialogues = JSON.stringify(dialogueDoc, null, 2);
-    expect(JSON.parse(applyFerryChoice(repairDialoguesRaw(pristineDialogues)))).toEqual(JSON.parse(readRaw('data/base/dialogues/round-30-conversations.json')));
+    expect(JSON.parse(applyShoreBoat(applyFerryChoice(repairDialoguesRaw(pristineDialogues))))).toEqual(JSON.parse(readRaw('data/base/dialogues/round-30-conversations.json')));
     expect(repairDialoguesRaw(readRaw('data/base/dialogues/round-30-conversations.json'))).toBe(readRaw('data/base/dialogues/round-30-conversations.json'));
     // Schema：幂等 + 锚点漂移拒绝。
     const schemaRaw = readRaw('data/schema/dialogue-set.schema.json');
@@ -557,6 +558,9 @@ describe('Round273 场景最小接线与作者源', () => {
       mkdirSync(join(workspace, 'data/base/battles'), { recursive: true });
       cpSync(resolve(root, 'data/base/battles/round-05-encounters.json'), join(workspace, 'data/base/battles/round-05-encounters.json'));
       expect(() => run('apply-round274.mjs')).not.toThrow();
+      // 链末再应用 R278 的对白增量（内存转换；其 CLI 还需 world-map/round106 源）。
+      const sandboxDialogue = join(workspace, 'data/base/dialogues/round-30-conversations.json');
+      writeFileSync(sandboxDialogue, applyShoreBoat(readFileSync(sandboxDialogue, 'utf8')));
       for (const name of ['round-07-quests.json']) {
         expect(JSON.parse(readFileSync(join(workspace, 'data/base/quests', name), 'utf8')))
           .toEqual(JSON.parse(readRaw('data/base/quests/' + name)));

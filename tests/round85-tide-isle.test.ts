@@ -174,7 +174,7 @@ describe('Round 85 Tide Isle and the expanded 768×576 atlas', () => {
   it('keeps all eight old region centers in the same atlas pixels after rebasing', () => {
     const world = readJson('../data/base/world/world-map.json');
     expect(world.regions).toHaveLength(22);
-    expect(world.transitions).toHaveLength(54);
+    expect(world.transitions.filter((g: {id:string}) => !['gate.r278-ferry-north-boat','gate.r278-ferry-north-boat-return'].includes(g.id))).toHaveLength(54); // Preserve the original 54 gates; R278 pair tested separately.
     for (const [mapResourceId, anchor] of Object.entries(round84RegionAnchors)) {
       const region = world.regions.find((entry: any) => entry.mapResourceId === mapResourceId);
       expect(region, mapResourceId).toBeDefined();

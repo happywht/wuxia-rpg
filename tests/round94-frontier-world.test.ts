@@ -112,7 +112,7 @@ describe('Round 94 eastern and southern frontier expansion', () => {
     if (!('ok' in assembled)) {
       expect(assembled.warnings).toEqual([]);
       expect(assembled.regions).toHaveLength(22);
-      expect(assembled.transitions).toHaveLength(54);
+      expect(assembled.transitions.filter((g: {id:string}) => !['gate.r278-ferry-north-boat','gate.r278-ferry-north-boat-return'].includes(g.id))).toHaveLength(54); // Preserve the original 54 gates; R278 pair tested separately.
     }
   });
 

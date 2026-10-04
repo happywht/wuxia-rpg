@@ -132,7 +132,13 @@ describe('Round274 explicit differing supply and persistent consequences',()=>{
 describe('Round274 pure authoring',()=>{
   it('roundtrips baseline and LF/CRLF idempotence; drift and duplicates refuse',()=>{
     const baseline=execFileSync('git',['show','baa5ebe:data/base/dialogues/round-30-conversations.json'],{encoding:'utf8'});
-    expect(JSON.parse(repairDialoguesRaw(baseline))).toEqual(parse('data/base/dialogues/round-30-conversations.json'));
+    // R278 之后 current 还带驿舟提示条目；按链式惯例从 current 剥离后对比。
+    const current=parse('data/base/dialogues/round-30-conversations.json');
+    const boatTalk=current.conversations.find((c:{id:string})=>c.id==='dlg.bai-luzhou-ferry-master')!;
+    const boatGreet=boatTalk.nodes.find((n:{id:string})=>n.id===boatTalk.startNodeId)!;
+    boatGreet.options=boatGreet.options.filter((o:{nextNodeId:string})=>o.nextNodeId!=='r278-shore-boat-info');
+    boatTalk.nodes=boatTalk.nodes.filter((n:{id:string})=>n.id!=='r278-shore-boat-info');
+    expect(JSON.parse(repairDialoguesRaw(baseline))).toEqual(current);
     for(const eol of ['\n','\r\n']){const current=raw('data/base/dialogues/round-30-conversations.json').replace(/\r?\n/g,eol);expect(repairDialoguesRaw(current)).toBe(current);}
     const changed=parse('data/base/dialogues/round-30-conversations.json');const bai=changed.conversations.find((c:{id:string})=>c.id===dialogue.id);bai.nodes.push({...supplyNodes[0],text:'重复漂移'});
     expect(()=>repairDialoguesRaw(JSON.stringify(changed))).toThrow('漂移');

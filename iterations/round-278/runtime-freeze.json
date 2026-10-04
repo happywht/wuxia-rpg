@@ -1,0 +1,20 @@
+{
+  "baseline": "270ad8d",
+  "candidate": "round278-worktree-on-270ad8d",
+  "createdAt": "2026-10-04T05:51:51.034Z",
+  "files": [
+    {
+      "file": "src/game/travel-confirmation.ts",
+      "sha256": "A147DF80CFD97EFDC4D5B41A98C7EC34C1043F839B1241330FA7FCF1A568F61F"
+    },
+    {
+      "file": "data/base/world/world-map.json",
+      "sha256": "3D19046111B622CF5130C1CC6B316BE15C7CD8E27441769DD38BE604A3A199D5"
+    },
+    {
+      "file": "data/base/dialogues/round-30-conversations.json",
+      "sha256": "C8B514E4657A55F4EF860F7EA52FC5995854688F17F918AEAF6DCB2C34BAE779"
+    }
+  ],
+  "note": "Final full code test195files1748 passed; subsequent documentation-only repair and production build pending; QA starts after all component gates."
+}

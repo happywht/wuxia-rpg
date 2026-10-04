@@ -1,0 +1,27 @@
+{
+  "checkedAt": "2026-10-04T06:12:29.794Z",
+  "runtimeFreezeUnchanged": true,
+  "rows": [
+    {
+      "file": "iterations/round-278/escort-boat-iron-arrival.json",
+      "download": "C:/Users/Hitao/Downloads/qa-checkpoint-journey-20261004-ride-escort-escort-boat-iron-arrival-slot-2.json",
+      "bytes": 37050,
+      "sha256": "0E576360314D7DC6F33E9D3C29CAAD1F1EAB31EA46064E578B81AC3C7CAC248D",
+      "downloadEqualsDiskEqualsIndex": true
+    },
+    {
+      "file": "iterations/round-278/repair-free-north-before-return.json",
+      "download": "C:/Users/Hitao/Downloads/qa-checkpoint-journey-20261004-ride-repair-repair-free-north-before-return-slot-3.json",
+      "bytes": 37198,
+      "sha256": "A79368A07AAB0CB48B1714E2DC2AC7F2ED0C5478D32913ED47D67185548680F0",
+      "downloadEqualsDiskEqualsIndex": true
+    },
+    {
+      "file": "iterations/round-278/repair-boat-iron-arrival.json",
+      "download": "C:/Users/Hitao/Downloads/qa-checkpoint-journey-20261004-ride-repair-repair-boat-iron-arrival-slot-2.json",
+      "bytes": 37288,
+      "sha256": "FE645DEF4CDD2A168DD004E9DD3A8E4CF007CC5BCC61ACF1255557ED8E9F4675",
+      "downloadEqualsDiskEqualsIndex": true
+    }
+  ]
+}

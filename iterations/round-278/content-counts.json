@@ -1,0 +1,66 @@
+{
+  "basis": "Round273 unchanged registered category counts; Round278 world/battle read-only recount; structural facts, not gameplay acceptance",
+  "counts": {
+    "resources": 100,
+    "maps": 22,
+    "hundredByHundredMaps": 22,
+    "npcs": 38,
+    "factions": 5,
+    "quests": 65,
+    "items": 52,
+    "martialArts": 30,
+    "endings": 7,
+    "knowledgeNodes": 431,
+    "knowledgeEdges": 548,
+    "encounters": 14,
+    "shops": 6,
+    "companions": 1,
+    "forgeRecipes": 9,
+    "alchemyRecipes": 3,
+    "arenas": 1,
+    "factionWars": 1,
+    "achievements": 14,
+    "meridianNodes": 6,
+    "regions": 22,
+    "directedTransitions": 56,
+    "landmarks": 78,
+    "fixedEvents": 70,
+    "randomEvents": 4,
+    "atlas": {
+      "columns": 768,
+      "rows": 576,
+      "layers": 65
+    }
+  },
+  "ordinaryBehaviorCycles": [
+    {
+      "id": "encounter.alley-blade-bully",
+      "steps": 3
+    },
+    {
+      "id": "encounter.mist-shore-prowler",
+      "steps": 3
+    },
+    {
+      "id": "encounter.ferry-reed-ambush",
+      "steps": 3
+    },
+    {
+      "id": "encounter.pier-toll-robber",
+      "steps": 3
+    },
+    {
+      "id": "encounter.r58-market-toll-claimer",
+      "steps": 3
+    },
+    {
+      "id": "encounter.r74-cloud-bridge-bandits",
+      "steps": 3
+    },
+    {
+      "id": "encounter.r101-beacon-raider",
+      "steps": 5
+    }
+  ],
+  "ferryOutgoing": 8
+}

@@ -81,7 +81,7 @@ describe('Round 84 Windward Isle and expanded world atlas', () => {
     if (!parsed.ok || parsed.data.atlasArt === undefined) return;
     expect(parsed.data.atlasArt).toMatchObject({ columns: 768, rows: 576, tileSize: 8 });
     expect(parsed.data.regions).toHaveLength(22);
-    expect(parsed.data.transitions).toHaveLength(54);
+    expect(parsed.data.transitions.filter((g: {id:string}) => !['gate.r278-ferry-north-boat','gate.r278-ferry-north-boat-return'].includes(g.id))).toHaveLength(54); // Preserve the original 54 gates; R278 pair tested separately.
 
     const region = parsed.data.regions.find(({ mapResourceId }) => mapResourceId === ISLE_ID)!;
     const col = Math.round(region.atlasPosition.x / 100 * (parsed.data.atlasArt.columns - 1));

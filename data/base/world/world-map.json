@@ -1620,6 +1620,38 @@
       "travelMinutes": 20
     },
     {
+      "id": "gate.r278-ferry-north-boat",
+      "from": {
+        "mapResourceId": "map.round-10-mist-ferry",
+        "col": 0,
+        "row": 3
+      },
+      "to": {
+        "mapResourceId": "map.round-10-mist-ferry",
+        "col": 87,
+        "row": 15
+      },
+      "fare": 8,
+      "travelMinutes": 20,
+      "name": "雾岬驿舟·去北岸"
+    },
+    {
+      "id": "gate.r278-ferry-north-boat-return",
+      "from": {
+        "mapResourceId": "map.round-10-mist-ferry",
+        "col": 87,
+        "row": 16
+      },
+      "to": {
+        "mapResourceId": "map.round-10-mist-ferry",
+        "col": 0,
+        "row": 4
+      },
+      "fare": 8,
+      "travelMinutes": 20,
+      "name": "雾岬驿舟·回渡口"
+    },
+    {
       "id": "gate.r126-ferry-to-coast",
       "name": "渡籍班船·去青帆埠",
       "from": {
@@ -40632,7 +40664,7 @@
     {
       "mapResourceId": "map.round-10-mist-ferry",
       "role": "hub",
-      "advice": "药路先问容素青：清点苍崖根×3，生肌散另耗寒珠草×2、根×1和18银；问方、炼成后可先巡岸，伤后用药再复核。药队封箱另交无极丹×1并专门约时。若考虑修桥，另备铁砂×3、韧皮×2（56银），渡口无料铺。渡口无药铺，缺料回镇找姜百味；缺急救药先查R补给页。公所续差事，Q核目标、F问话。药队一事定下后，上山去核云阶旧索的方向：R出区选雾岬北口，到铁嶂后选断云北隘，再到云岭客舍问沈雨霁。此路没有直达传送；铁嶂调查可顺路记下，不必全做才过境。云隐药路余香另指西陲苦井，不把它当云岭必修。"
+      "advice": "药路先问容素青：清点苍崖根×3，生肌散另耗寒珠草×2、根×1和18银。修桥另备铁砂×3、韧皮×2（56银），渡口无料铺；封箱另交无极丹×1并约时。渡口无药铺，缺药回镇找姜百味，R补给页可查；Q核目标、F问话。上北岸可步行，也可芦岸登船点北侧(0,3)旁按E乘驿舟：8银/20分钟，只到北岸，铁嶂两关仍自过，水尺见闻乘舟略过。到铁嶂选断云北隘，再到云岭客舍问沈雨霁；此路没有直达传送。云隐药路余香另指西陲苦井。"
     },
     {
       "mapResourceId": "map.round-62-iron-ridge",

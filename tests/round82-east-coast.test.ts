@@ -52,7 +52,7 @@ describe('Round 82 eastern coastline and walkable world expansion', () => {
     if (!parsed.ok) return;
 
     expect(parsed.data.regions).toHaveLength(22);
-    expect(parsed.data.transitions).toHaveLength(54);
+    expect(parsed.data.transitions.filter((g: {id:string}) => !['gate.r278-ferry-north-boat','gate.r278-ferry-north-boat-return'].includes(g.id))).toHaveLength(54); // Preserve the original 54 gates; R278 pair tested separately.
     expect(maps.size).toBe(22);
     expect(maps.has(COAST_ID)).toBe(true);
 

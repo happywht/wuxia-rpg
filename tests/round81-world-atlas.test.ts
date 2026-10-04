@@ -151,7 +151,7 @@ describe('Round 81–85 expanded movable atlas', () => {
     expect(cells('world-r81-expanse-land').some((row, y) => y < 144 && row.slice(224).some((gid) => gid > 0))).toBe(true);
     expect(cells('world-r81-expanse-land').slice(144).some((row) => row.some((gid) => gid > 0))).toBe(true);
     expect(data.regions).toHaveLength(22);
-    expect(data.transitions).toHaveLength(54);
+    expect(data.transitions.filter((g: {id:string}) => !['gate.r278-ferry-north-boat','gate.r278-ferry-north-boat-return'].includes(g.id))).toHaveLength(54); // Preserve the original 54 gates; R278 pair tested separately.
   });
 
   it('keeps the six Round 80 region centers plus every old gate, landmark and player projection in the same atlas pixels', () => {

@@ -1,0 +1,24 @@
+{
+  "baselineCommit": "270ad8d102837d116ec5721502a93141b3f33356",
+  "parents": [
+    {
+      "branch": "escort",
+      "file": "iterations/round-274/f2-escort.json",
+      "bytes": 36891,
+      "sha256": "AACEF4EAE0F765B00504D25D5504A2B7A6A283B2139DAB9393EB96BBF5CF454D",
+      "byteExactToCommitted": true
+    },
+    {
+      "branch": "repair",
+      "file": "iterations/round-274/f2-repair.json",
+      "bytes": 37065,
+      "sha256": "B0A5C4D94D593CEA6CA52BDE8277FE2CE4C5F41692CC14325D34F71AD47806D3",
+      "byteExactToCommitted": true
+    }
+  ],
+  "qaRuns": {
+    "escort": "journey-20261004-ride-escort",
+    "repair": "journey-20261004-ride-repair"
+  },
+  "status": "Original F2 imported through F8 to independent empty slot1; actual travel and save/read pending"
+}

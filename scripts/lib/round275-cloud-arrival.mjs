@@ -3,7 +3,8 @@ export const guidePatches = [
   {
     "id": "map.round-10-mist-ferry",
     "before": "药路先问容素青：清点苍崖根×3，生肌散另耗寒珠草×2、根×1和18银；问方、炼成后可先巡岸，伤后用药再复核。药队封箱另交无极丹×1并专门约时。若考虑修桥，另备铁砂×3、韧皮×2（56银），渡口无料铺。渡口无药铺，缺料回镇找姜百味；缺急救药先查R补给页。公所续差事，Q核目标、F问话。",
-    "after": "药路先问容素青：清点苍崖根×3，生肌散另耗寒珠草×2、根×1和18银；问方、炼成后可先巡岸，伤后用药再复核。药队封箱另交无极丹×1并专门约时。若考虑修桥，另备铁砂×3、韧皮×2（56银），渡口无料铺。渡口无药铺，缺料回镇找姜百味；缺急救药先查R补给页。公所续差事，Q核目标、F问话。药队一事定下后，上山去核云阶旧索的方向：R出区选雾岬北口，到铁嶂后选断云北隘，再到云岭客舍问沈雨霁。此路没有直达传送；铁嶂调查可顺路记下，不必全做才过境。云隐药路余香另指西陲苦井，不把它当云岭必修。"
+    "after": "药路先问容素青：清点苍崖根×3，生肌散另耗寒珠草×2、根×1和18银；问方、炼成后可先巡岸，伤后用药再复核。药队封箱另交无极丹×1并专门约时。若考虑修桥，另备铁砂×3、韧皮×2（56银），渡口无料铺。渡口无药铺，缺料回镇找姜百味；缺急救药先查R补给页。公所续差事，Q核目标、F问话。药队一事定下后，上山去核云阶旧索的方向：R出区选雾岬北口，到铁嶂后选断云北隘，再到云岭客舍问沈雨霁。此路没有直达传送；铁嶂调查可顺路记下，不必全做才过境。云隐药路余香另指西陲苦井，不把它当云岭必修。",
+    "later": ["药路先问容素青：清点苍崖根×3，生肌散另耗寒珠草×2、根×1和18银。修桥另备铁砂×3、韧皮×2（56银），渡口无料铺；封箱另交无极丹×1并约时。渡口无药铺，缺药回镇找姜百味，R补给页可查；Q核目标、F问话。上北岸可步行，也可芦岸登船点北侧(0,3)旁按E乘驿舟：8银/20分钟，只到北岸，铁嶂两关仍自过，水尺见闻乘舟略过。到铁嶂选断云北隘，再到云岭客舍问沈雨霁；此路没有直达传送。云隐药路余香另指西陲苦井。"]
   },
   {
     "id": "map.round-62-iron-ridge",
@@ -65,6 +66,12 @@ export const arrivalOptions = [
 const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 function unique(array,predicate){const found=array.filter(predicate);if(found.length!==1)throw Error('受管条目不唯一，请人工复核');return found[0];}
 function replaceToken(raw,before,after){const oldCount=raw.split(before).length-1,newCount=raw.split(after).length-1;if(newCount===1&&oldCount===0)return raw;if(oldCount!==1||newCount!==0)throw Error('文本已漂移或重复，请人工复核');return raw.replace(before,after);}
-export function repairWorldRaw(raw){let next=raw;const doc=JSON.parse(raw);for(const p of guidePatches){const guide=unique(doc.regionGuides,g=>g.mapResourceId===p.id);if(![p.before,p.after].includes(guide.advice))throw Error('指南已漂移，请人工复核');next=replaceToken(next,JSON.stringify(p.before),JSON.stringify(p.after));}for(const p of eventPatches){const event=unique(doc.events,e=>e.id===p.id);if(![p.before,p.after].includes(event.text))throw Error('入境已漂移，请人工复核');next=replaceToken(next,JSON.stringify(p.before),JSON.stringify(p.after));}JSON.parse(next);return next;}
-export function repairRegionSourceRaw(raw){let next=raw;for(const p of guidePatches){if(p.before.includes("'")||p.after.includes("'"))throw Error('不支持的作者引号');next=replaceToken(next,"'"+p.before+"'","'"+p.after+"'");}return next;}
+export function repairWorldRaw(raw){let next=raw;const doc=JSON.parse(raw);for(const p of guidePatches){const guide=unique(doc.regionGuides,g=>g.mapResourceId===p.id);
+// Round 278 rewrote the ferry advice to fit the paid shore boat; `later`
+// chains that approved wording so an R275 replay neither reverts it nor
+// refuses (same convention as the R263→R104 navigationNpcId carry-over).
+if(![p.before,p.after,...(p.later??[])].includes(guide.advice))throw Error('指南已漂移，请人工复核');if(guide.advice===p.before)next=replaceToken(next,JSON.stringify(p.before),JSON.stringify(p.after));}for(const p of eventPatches){const event=unique(doc.events,e=>e.id===p.id);if(![p.before,p.after].includes(event.text))throw Error('入境已漂移，请人工复核');next=replaceToken(next,JSON.stringify(p.before),JSON.stringify(p.after));}JSON.parse(next);return next;}
+export function repairRegionSourceRaw(raw){let next=raw;for(const p of guidePatches){if(p.before.includes("'")||p.after.includes("'"))throw Error('不支持的作者引号');
+// Round 278 链：源内已是 later 串时跳过（同 repairWorldRaw 的 later 约定）。
+const forms=[p.before,p.after,...(p.later??[])];const counts=forms.map(s=>next.split("'"+s+"'").length-1);if(counts.reduce((a,b)=>a+b,0)!==1)throw Error("作者指南已漂移或重复，请人工复核");if(counts.slice(2).some(c=>c===1))continue;next=replaceToken(next,"'"+p.before+"'","'"+p.after+"'");}return next;}
 export function repairArrivalRaw(raw){const doc=JSON.parse(raw);const conversation=unique(doc.conversations,c=>c.id==='dlg.r74-shen-yuji-cloud-ridge');const greet=unique(conversation.nodes,n=>n.id===conversation.startNodeId);const touchedNodes=conversation.nodes.filter(n=>arrivalNodes.some(w=>w.id===n.id)),touchedOptions=greet.options.filter(o=>arrivalOptions.some(w=>w.nextNodeId===o.nextNodeId));if(same(touchedNodes,arrivalNodes)&&same(touchedOptions,arrivalOptions))return raw;if(touchedNodes.length||touchedOptions.length)throw Error('到达回响已漂移或重复，请人工复核');conversation.nodes.push(...structuredClone(arrivalNodes));greet.options.push(...structuredClone(arrivalOptions));const eol=raw.includes('\r\n')?'\r\n':'\n';return(JSON.stringify(doc,null,2)+'\n').replace(/\n/g,eol);}

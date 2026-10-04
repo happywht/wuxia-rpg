@@ -61,3 +61,11 @@ Round270：`iterations/round-270/j0-opening.json` 来自QA `journey-20261004` �
 独立journey-20261004-nav槽一保留原护送C0，最终源码冻结后正常25格刻痕→25格沈雨霁→F接取/Q首次断索/N38格到挑战旁，途中E实查断口；空槽二保存/标题Continue读回/BQ N核对。nav-bridge-before-battle.json，candidate round277-worktree-on-42d98c6，source-slot2，原始37565字节/SHA7FD8EF97C5FBC44046491CC63220230B0511661D2DF73FA1619120213103828F。
 
 Lv8/XP714/371银/208命121气/75,42/elapsed1027；膏1丸1根2残篇1，云阶completed、断索active0/1，胜场仍3。导航目的已到，不自动挑战结案；原Round276 C1是已挑战的不同检查点。源码HMR自动重载前的第一次记录未保存，保留过程但不当正常存读证据，导出只来自重走后的真实槽二。
+
+## Round278 渡口路线决策与铁嶂到达
+
+独立journey-20261004-ride-escort/repair均槽一保留原Round274 F2，candidate round278-worktree-on-270ad8d。护送付费去北岸→E原关口→空槽二存读，escort-boat-iron-arrival.json：4格73世界分钟，票价8，到达成就40XP25银分账，Lv7/XP686/343银/165命110气/铁嶂4,7/elapsed480，膏2丸1根2残篇1。略过水尺，未赠见闻。
+
+修桥免费94格→北口88,15，空槽三存读，repair-free-north-before-return.json：Lv7/XP674/326银/163命110气/elapsed3689，实际水尺与北岬两见闻，无重复成就。由槽三读回再实际付8银返渡口、付8银再北上、E原关口→空槽二存读，repair-boat-iron-arrival.json：XP674/310银/163命110气/铁嶂4,7/elapsed3776，膏1丸2根2铁1残篇1。任务和对白变量不变，不把环行说免费。
+
+全部F8原下载字节/SHA/sourceSlotId/时间见round-278/checkpoint-summary.json，原文件-text保存，原下载=disk=index另检；派生摘要不代原载荷。只验渡口受影响段；原C0/C1保留历史版本，下一轮可从本轮铁嶂正常Continue续行。

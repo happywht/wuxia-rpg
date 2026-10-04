@@ -10,6 +10,7 @@ import { createSocialState } from '../src/engine/social-state';
 import { createFactionMembershipState } from '../src/engine/faction-system';
 import { dialoguePatches as challengePatches, repairDialogueRaw as applyCloudChallenge } from '../scripts/lib/round276-cloud-challenge.mjs';
 import { regionGuides } from '../scripts/lib/round106-region-content.mjs';
+import { repairWorldMapRaw as applyShoreBoatWorld, repairRegionGuideSourceRaw as applyShoreBoatGuide } from '../scripts/lib/round278-shore-boat.mjs';
 import { guidePatches, eventPatches, arrivalNodes, arrivalOptions, repairWorldRaw, repairRegionSourceRaw, repairArrivalRaw } from '../scripts/lib/round275-cloud-arrival.mjs';
 const root=resolve('.');
 const worldPath='data/base/world/world-map.json', arrivalPath='data/base/dialogues/round-74-cloud-ridge-conversations.json', regionPath='scripts/lib/round106-region-content.mjs';
@@ -56,6 +57,8 @@ describe('Round275 branch-aware arrival using real quest status',()=>{
 describe('Round275 actual world guidance',()=>{
   it('keeps all maps, gates, arrival coordinates, event rules and art unchanged',()=>{
     const restored=structuredClone(world), original=JSON.parse(baseline(worldPath));
+    // R278 的两条驿舟门是后续链增量，对比前从当前侧剥离。
+    restored.transitions=restored.transitions.filter((t:{id:string})=>!t.id.startsWith('gate.r278-'));
     for(const p of guidePatches)restored.regionGuides.find((g:{mapResourceId:string})=>g.mapResourceId===p.id).advice=p.before;
     for(const p of eventPatches)restored.events.find((e:{id:string})=>e.id===p.id).text=p.before;
     expect(restored).toEqual(original);
@@ -75,7 +78,8 @@ describe('Round275 actual world guidance',()=>{
 describe('Round275 surgical authoring',()=>{
   for(const [path,repair] of [[worldPath,repairWorldRaw],[arrivalPath,repairArrivalRaw],[regionPath,repairRegionSourceRaw]] as const)it(path+' baseline replay, LF/CRLF and byte-idempotence',()=>{
     const repaired=repair(baseline(path));
-    const next=path===arrivalPath?applyCloudChallenge(repaired):repaired;
+    // 链式重放：arrival 挂 R276，世界/指南源再挂 R278 驿舟增量，恰得当前字节。
+    const next=path===arrivalPath?applyCloudChallenge(repaired):(path===worldPath?applyShoreBoatWorld(repaired):path===regionPath?applyShoreBoatGuide(repaired):repaired);
     expect(next.replace(/\r\n/g,'\n')).toBe(raw(path).replace(/\r\n/g,'\n'));
     for(const eol of ['\n','\r\n']){const input=raw(path).replace(/\r?\n/g,eol);expect(repair(input)).toBe(input);}
   });
@@ -90,18 +94,23 @@ describe('Round275 surgical authoring',()=>{
   it('duplicate/drifted arrival layer and source text refuse',()=>{
     const changed=JSON.parse(raw(arrivalPath));changed.conversations[0].nodes.push({...arrivalNodes[0]});
     expect(()=>repairArrivalRaw(JSON.stringify(changed))).toThrow('漂移');
-    expect(()=>repairRegionSourceRaw(raw(regionPath).replace(guidePatches[0]!.after,'漂移'))).toThrow('漂移');
+    expect(()=>repairRegionSourceRaw(raw(regionPath).replace((guidePatches[0] as {later?:string[]}).later![0]!,'漂移'))).toThrow('漂移'); // R278 后源内是 later 串
   });
   it('CLI preflights all three resources before writing and is cwd-independent',()=>{
     const temp=mkdtempSync(join(tmpdir(),'wuxia-r275-'));
     try {
       for(const dir of ['scripts/lib','data/base/world','data/base/dialogues'])mkdirSync(join(temp,dir),{recursive:true});
-      for(const p of ['scripts/apply-round275.mjs','scripts/lib/round275-cloud-arrival.mjs'])cpSync(join(root,p),join(temp,p));
+      // R278 链末 CLI 还读写渡口对白（dlg.bai-luzhou-ferry-master）。
+      cpSync(join(root,'data/base/dialogues/round-30-conversations.json'),join(temp,'data/base/dialogues/round-30-conversations.json'));
+      for(const p of ['scripts/apply-round275.mjs','scripts/lib/round275-cloud-arrival.mjs','scripts/apply-round278.mjs','scripts/lib/round278-shore-boat.mjs'])cpSync(join(root,p),join(temp,p));
       for(const p of [worldPath,regionPath,arrivalPath])writeFileSync(join(temp,p),baseline(p));
       const before=readFileSync(join(temp,worldPath));writeFileSync(join(temp,arrivalPath),'{}');
       const run=()=>execFileSync(process.execPath,[join(temp,'scripts/apply-round275.mjs')],{cwd:tmpdir(),stdio:'pipe'});
       expect(run).toThrow();expect(readFileSync(join(temp,worldPath))).toEqual(before);
-      writeFileSync(join(temp,arrivalPath),baseline(arrivalPath));run();const after=readFileSync(join(temp,worldPath));run();expect(readFileSync(join(temp,worldPath))).toEqual(after);
+      writeFileSync(join(temp,arrivalPath),baseline(arrivalPath));run();
+      execFileSync(process.execPath,[join(temp,'scripts/apply-round278.mjs')],{cwd:tmpdir(),stdio:'pipe'});
+      const after=readFileSync(join(temp,worldPath));run();execFileSync(process.execPath,[join(temp,'scripts/apply-round278.mjs')],{cwd:tmpdir(),stdio:'pipe'});
+      expect(readFileSync(join(temp,worldPath))).toEqual(after);
       expect(JSON.parse(after.toString())).toEqual(world);
     }finally {if(!resolve(temp).startsWith(resolve(tmpdir())+sep+'wuxia-r275-'))throw Error('unsafe sandbox');rmSync(temp,{recursive:true,force:true});}
   },20000); // Full atlas bytes and three isolated CLI launches need a bounded I/O allowance.

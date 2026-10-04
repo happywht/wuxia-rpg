@@ -1,0 +1,39 @@
+{
+  "sessionId": "2f5684ea-462e-4aba-ac9e-73e85a3b2ccf",
+  "exitCode": 0,
+  "durationMs": 1768877,
+  "reportedCostUsd": 24.86796099999999,
+  "usage": {
+    "input_tokens": 861234,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 37716032,
+    "output_tokens": 68151,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "",
+    "iterations": [],
+    "speed": "standard"
+  },
+  "reportedTests": {
+    "files": 23,
+    "tests": 222
+  },
+  "acceptedWithoutReview": false,
+  "primaryCorrections": [
+    "dock location and approach E priority",
+    "default-cancel purchase selection",
+    "strict author drift and EOL boundaries",
+    "full historical replay/count regressions"
+  ],
+  "sourceLog": "C:/Users/Hitao/.codex/claude-delegation/round278/result.json"
+}

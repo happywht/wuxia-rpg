@@ -7,7 +7,7 @@ const map = JSON.parse(readFileSync('data/base/maps/round-10-mist-ferry.json', '
 describe('Round123 authored optional ferry service', () => {
   it('keeps all 50 inter-region gates and adds only two local priced services', () => {
     const parsed = parseWorldMap(world); expect(parsed.ok).toBe(true);
-    const old = world.transitions.filter((gate: { id: string }) => !gate.id.startsWith('gate.r123-') && !gate.id.startsWith('gate.r126-'));
+    const old = world.transitions.filter((gate: { id: string }) => !gate.id.startsWith('gate.r123-') && !gate.id.startsWith('gate.r126-') && !gate.id.startsWith('gate.r278-')); // R278 adds the two priced north-shore boat gates
     expect(old).toHaveLength(50);
     expect(old.every((gate: { fare?: number }) => gate.fare === undefined)).toBe(true);
     const added = world.transitions.filter((gate: { id: string }) => gate.id.startsWith('gate.r123-'));
