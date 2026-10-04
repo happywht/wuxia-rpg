@@ -1,0 +1,1 @@
+First attempt used an unobserved writer anchor and threw before saving any edited file; following two-file35-test run used unchanged code. Read actual await writeFile(outputPath) anchor, then successfully moved validation before write and added two boundary cases.

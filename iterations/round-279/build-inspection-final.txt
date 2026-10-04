@@ -1,0 +1,345 @@
+
+> wuxia-rpg@0.0.1 build
+> npm run check && vite build
+
+
+> wuxia-rpg@0.0.1 check
+> npm run validate:data && npm run inspect:mods && npm run typecheck && npm test && npm run audit:round-34 && npm run audit:round-48-docs
+
+
+> wuxia-rpg@0.0.1 validate:data
+> node scripts/validate-data.mjs
+
+通过：manifest Schema 与 102 个基础资源 Schema。
+
+> wuxia-rpg@0.0.1 inspect:mods
+> node scripts/inspect-mods.mjs
+
+启用 MOD：未启用任何 MOD
+资源 102 项 · 问题 0 条
+
+[1/102] map.round-01-grid（maps/round-01-grid.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[2/102] map.round-10-mist-ferry（maps/round-10-mist-ferry.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[3/102] map.round-62-iron-ridge（maps/round-62-iron-ridge.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[4/102] map.round-67-salt-road（maps/round-67-salt-road.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[5/102] map.round-74-cloud-ridge（maps/round-74-cloud-ridge.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[6/102] npc.round-79-isles-set（characters/round-79-isles-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[7/102] dialogue.round-79-isles-set（dialogues/round-79-isles-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[8/102] quest.round-79-isles-set（quests/round-79-isles-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[9/102] map.round-79-isles（maps/round-79-isles.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[10/102] map.round-82-east-coast（maps/round-82-east-coast.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[11/102] npc.round-82-east-coast-set（characters/round-82-east-coast-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[12/102] dialogue.round-82-east-coast-set（dialogues/round-82-east-coast-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[13/102] quest.round-82-east-coast-set（quests/round-82-east-coast-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[14/102] npc.round-83-east-coast-set（characters/round-83-east-coast-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[15/102] dialogue.round-83-east-coast-set（dialogues/round-83-east-coast-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[16/102] quest.round-83-east-coast-set（quests/round-83-east-coast-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[17/102] item.round-83-east-coast-set（items/round-83-east-coast-items.json，schema：items-set）
+  基础层 ✓ 通过
+  最终来源：base
+[18/102] shop.round-83-east-coast-set（shops/round-83-east-coast-shops.json，schema：shops-set）
+  基础层 ✓ 通过
+  最终来源：base
+[19/102] encounter.round-83-east-coast-set（battles/round-83-east-coast-encounters.json，schema：battle-encounters）
+  基础层 ✓ 通过
+  最终来源：base
+[20/102] map.round-84-windward-isle（maps/round-84-windward-isle.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[21/102] npc.round-84-windward-isle-set（characters/round-84-windward-isle-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[22/102] dialogue.round-84-windward-isle-set（dialogues/round-84-windward-isle-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[23/102] quest.round-84-windward-isle-set（quests/round-84-windward-isle-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[24/102] map.round-85-tide-isle（maps/round-85-tide-isle.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[25/102] npc.round-85-tide-isle-set（characters/round-85-tide-isle-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[26/102] dialogue.round-85-tide-isle-set（dialogues/round-85-tide-isle-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[27/102] quest.round-85-tide-isle-set（quests/round-85-tide-isle-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[28/102] map.round-87-southwest-isles（maps/round-87-southwest-isles.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[29/102] npc.round-87-southwest-isles-set（characters/round-87-southwest-isles-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[30/102] dialogue.round-87-southwest-isle-set（dialogues/round-87-southwest-isle-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[31/102] quest.round-87-southwest-isle-set（quests/round-87-southwest-isle-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[32/102] npc.round-89-southwest-isles-set（characters/round-89-southwest-isles-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[33/102] dialogue.round-89-southwest-isle-set（dialogues/round-89-southwest-isle-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[34/102] quest.round-89-cross-region-set（quests/round-89-cross-region-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[35/102] map.round-91-cloud-north-terrace（maps/round-91-cloud-north-terrace.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[36/102] npc.round-91-cloud-north-terrace-set（characters/round-91-cloud-north-terrace-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[37/102] dialogue.round-91-cloud-north-terrace-set（dialogues/round-91-cloud-north-terrace-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[38/102] quest.round-91-cloud-north-terrace-set（quests/round-91-cloud-north-terrace-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[39/102] map.round-92-north-pass（maps/round-92-north-pass.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[40/102] npc.round-92-north-pass-set（characters/round-92-north-pass-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[41/102] dialogue.round-92-north-pass-set（dialogues/round-92-north-pass-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[42/102] quest.round-92-north-pass-set（quests/round-92-north-pass-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[43/102] map.round-93-snow-pine-valley（maps/round-93-snow-pine-valley.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[44/102] npc.round-93-snow-pine-valley-set（characters/round-93-snow-pine-valley-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[45/102] dialogue.round-93-snow-pine-valley-set（dialogues/round-93-snow-pine-valley-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[46/102] quest.round-93-snow-pine-valley-set（quests/round-93-snow-pine-valley-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[47/102] map.round-94-east-gate（maps/round-94-east-gate.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[48/102] map.round-94-returning-sails（maps/round-94-returning-sails.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[49/102] npc.round-94-frontiers-set（characters/round-94-frontiers-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[50/102] dialogue.round-94-frontiers-set（dialogues/round-94-frontiers-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[51/102] quest.round-94-frontiers-set（quests/round-94-frontiers-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[52/102] world.atlas（world/world-map.json，schema：world-map）
+  基础层 ✓ 通过
+  最终来源：base
+[53/102] map.round-97-lanxin-isle（maps/round-97-lanxin-isle.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[54/102] map.round-97-pilot-reef（maps/round-97-pilot-reef.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[55/102] npc.round-97-lanxin-reef-set（characters/round-97-lanxin-reef-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[56/102] dialogue.round-97-lanxin-reef-set（dialogues/round-97-lanxin-reef-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[57/102] quest.round-97-lanxin-reef-set（quests/round-97-lanxin-reef-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[58/102] map.round-96-stone-reef（maps/round-96-stone-reef.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[59/102] map.round-96-halfmoon-atoll（maps/round-96-halfmoon-atoll.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[60/102] npc.round-96-south-reef-set（characters/round-96-south-reef-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[61/102] dialogue.round-96-south-reef-set（dialogues/round-96-south-reef-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[62/102] quest.round-96-south-reef-set（quests/round-96-south-reef-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[63/102] map.round-95-misty-pine-gate（maps/round-95-misty-pine-gate.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[64/102] map.round-95-cedar-valley（maps/round-95-cedar-valley.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[65/102] map.round-95-east-harbor（maps/round-95-east-harbor.json，schema：grid-map）
+  基础层 ✓ 通过
+  最终来源：base
+[66/102] npc.round-95-east-woodland-set（characters/round-95-east-woodland-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[67/102] dialogue.round-95-east-woodland-set（dialogues/round-95-east-woodland-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[68/102] quest.round-95-east-woodland-set（quests/round-95-east-woodland-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[69/102] calendar.base（worldview/calendar.json，schema：game-calendar）
+  基础层 ✓ 通过
+  最终来源：base
+[70/102] climate.base（worldview/climate.json，schema：climate）
+  基础层 ✓ 通过
+  最终来源：base
+[71/102] npc.round-03-set（characters/round-03-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[72/102] npc.round-74-cloud-ridge-set（characters/round-74-cloud-ridge-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[73/102] companion.round-19-set（companions/round-19-companions.json，schema：companion-set）
+  基础层 ✓ 通过
+  最终来源：base
+[74/102] dialogue.round-03-set（dialogues/round-03-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[75/102] dialogue.round-30-set（dialogues/round-30-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[76/102] dialogue.round-62-set（dialogues/round-62-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[77/102] dialogue.round-67-set（dialogues/round-67-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[78/102] dialogue.round-74-cloud-ridge-set（dialogues/round-74-cloud-ridge-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[79/102] character-profile.round-04-set（characters/round-04-profiles.json，schema：character-profiles）
+  基础层 ✓ 通过
+  最终来源：base
+[80/102] faction.round-04-set（factions/round-04-factions.json，schema：faction-set）
+  基础层 ✓ 通过
+  最终来源：base
+[81/102] martial-art.round-04-set（skills/round-04-martial-arts.json，schema：martial-arts-set）
+  基础层 ✓ 通过
+  最终来源：base
+[82/102] martial-art-components.round-22-set（skills/round-22-components.json，schema：martial-art-components）
+  基础层 ✓ 通过
+  最终来源：base
+[83/102] meridian.round-23-set（meridians/round-23-meridians.json，schema：meridian-set）
+  基础层 ✓ 通过
+  最终来源：base
+[84/102] equipment-forge.round-24-set（forges/round-24-equipment-forges.json，schema：equipment-forge-set）
+  基础层 ✓ 通过
+  最终来源：base
+[85/102] alchemy.round-25-set（alchemy/round-25-alchemy.json，schema：alchemy-set）
+  基础层 ✓ 通过
+  最终来源：base
+[86/102] ending.round-27-set（endings/round-27-endings.json，schema：ending-set）
+  基础层 ✓ 通过
+  最终来源：base
+[87/102] achievement.round-28-set（achievements/round-28-achievements.json，schema：achievement-set）
+  基础层 ✓ 通过
+  最终来源：base
+[88/102] encounter.round-05-set（battles/round-05-encounters.json，schema：battle-encounters）
+  基础层 ✓ 通过
+  最终来源：base
+[89/102] arena.round-20-set（arenas/round-20-arenas.json，schema：arena-set）
+  基础层 ✓ 通过
+  最终来源：base
+[90/102] faction-war.round-21-set（faction_wars/round-21-wars.json，schema：faction-war-set）
+  基础层 ✓ 通过
+  最终来源：base
+[91/102] item.round-06-set（items/round-06-items.json，schema：items-set）
+  基础层 ✓ 通过
+  最终来源：base
+[92/102] shop.round-06-set（shops/round-06-shops.json，schema：shops-set）
+  基础层 ✓ 通过
+  最终来源：base
+[93/102] quest.round-07-set（quests/round-07-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[94/102] quest.round-74-cloud-ridge-set（quests/round-74-cloud-ridge-quests.json，schema：quest-set）
+  基础层 ✓ 通过
+  最终来源：base
+[95/102] knowledge.round-11-nodes（knowledge_graph/nodes.json，schema：knowledge-nodes）
+  基础层 ✓ 通过
+  最终来源：base
+[96/102] knowledge.round-11-edges（knowledge_graph/edges.json，schema：knowledge-edges）
+  基础层 ✓ 通过
+  最终来源：base
+[97/102] npc.round-86-tide-isle-set（characters/round-86-tide-isle-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[98/102] dialogue.round-86-tide-isle-set（dialogues/round-86-tide-isle-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+[99/102] shop.round-86-tide-isle-set（shops/round-86-tide-isle-shops.json，schema：shops-set）
+  基础层 ✓ 通过
+  最终来源：base
+[100/102] encounter.round-86-tide-isle-set（battles/round-86-tide-isle-encounters.json，schema：battle-encounters）
+  基础层 ✓ 通过
+  最终来源：base
+[101/102] npc.round-279-iron-ridge-set（characters/round-279-iron-ridge-npcs.json，schema：npc-set）
+  基础层 ✓ 通过
+  最终来源：base
+[102/102] dialogue.round-279-road-keeper-set（dialogues/round-279-road-keeper-conversations.json，schema：dialogue-set）
+  基础层 ✓ 通过
+  最终来源：base
+
+说明：覆盖为整文件替换：后声明且校验通过的层获胜，被拒绝的覆盖不改变上一有效来源。
+说明：跨资源语义校验（引用闭合、坐标/占格、历法分区等）由游戏运行时加载器在装配时执行，本命令仅静态校验 JSON 与 schema。
+
+> wuxia-rpg@0.0.1 typecheck
+> tsc --noEmit
+
+tests/round279-inspection-art.test.ts(15,53): error TS2345: Argument of type 'ForkSignRecord & { text: string; approachText: string; once: boolean; interaction: { prompt: string; approachDirections: string[]; }; }' is not assignable to parameter of type 'RegionEventData'.
+  The types of 'interaction.approachDirections' are incompatible between these types.
+    Type 'string[]' is not assignable to type '("down" | "left" | "right" | "up")[]'.
+      Type 'string' is not assignable to type '"down" | "left" | "right" | "up"'.
+tests/round279-inspection-art.test.ts(23,53): error TS2345: Argument of type '{ id: string; text: string; mapResourceId: string; col: number; row: number; approachText: string; once: boolean; interaction: { prompt: string; approachDirections: string[]; }; }' is not assignable to parameter of type 'RegionEventData'.
+  The types of 'interaction.approachDirections' are incompatible between these types.
+    Type 'string[]' is not assignable to type '("down" | "left" | "right" | "up")[]'.
+      Type 'string' is not assignable to type '"down" | "left" | "right" | "up"'.
+tests/round279-inspection-art.test.ts(24,12): error TS2532: Object is possibly 'undefined'.
+tests/round279-inspection-art.test.ts(25,12): error TS2532: Object is possibly 'undefined'.
+tests/round279-inspection-art.test.ts(26,12): error TS2532: Object is possibly 'undefined'.
+tests/round279-inspection-art.test.ts(46,12): error TS2532: Object is possibly 'undefined'.

@@ -884,6 +884,14 @@
       "name": "望雁口",
       "category": "other",
       "discoveryNodeId": "place.r97-goose-window"
+    },
+    {
+      "id": "landmark.r279-cloud-fork-sign",
+      "mapResourceId": "map.round-74-cloud-ridge",
+      "col": 50,
+      "row": 59,
+      "name": "云岭南岔指路牌",
+      "category": "route"
     }
   ],
   "transitions": [
@@ -2662,6 +2670,24 @@
           "left",
           "right",
           "down"
+        ]
+      }
+    },
+    {
+      "id": "event.r279-cloud-fork-sign",
+      "mapResourceId": "map.round-74-cloud-ridge",
+      "col": 50,
+      "row": 59,
+      "text": "新削的松木牌写着：「北上至(50,56)岔口须先折西，沿石路到四十列，再向北到客舍前道。屋墙挡道，别照直线穿屋；R人物查沈雨霁当下所在，走相邻再F交谈、E交易。回关可沿原路，不需为读口信另返渡口。」",
+      "approachText": "岔口前的松木牌在山风里轻叩桩响。",
+      "once": false,
+      "interaction": {
+        "prompt": "细看南坡岔口的新指路牌",
+        "approachDirections": [
+          "up",
+          "down",
+          "left",
+          "right"
         ]
       }
     }
@@ -40679,7 +40705,7 @@
     {
       "mapResourceId": "map.round-74-cloud-ridge",
       "role": "investigation",
-      "advice": "先看刻痕再过断索、问沈雨霁；三地对照后选北台或青帆埠。客舍备药匣由沈雨霁售少量伤药，E交易、Q差事、F交谈，售完本程不补货；循石路接调查点与北台，缺货可东去青帆埠，回关仍可原路走。初到客舍先核渡口来路，再接云阶辨刻；刻痕确认后才接断索清桥。两件本地事可先完成，不必为残篇三地对照立即回渡口；清桥只是清退拦路客，不等于修好断索。"
+      "advice": "先看刻痕再过断索、问沈雨霁；三地对照后选北台或青帆埠。客舍备药匣少量伤药，E交易、Q差事、F交谈，售完本程不补货；缺货可东去青帆埠，回关原路走。南坡(50,59)指路牌E可读：先折西到40列再北行至客舍前(40,43)，R人物核当期位置，不可穿墙。初到客舍先核渡口来路，再接云阶辨刻；刻痕确认后才接断索清桥。两件本地事先完成，不必为残篇三地对照立即回渡口；清桥只是清退拦路客，不等于修好断索。"
     },
     {
       "mapResourceId": "map.round-79-isles",

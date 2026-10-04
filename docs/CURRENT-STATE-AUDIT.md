@@ -1,12 +1,12 @@
-# 当前版本规模与产品判断
+# Round271历史规模盘点与产品判断
 
-2026-10-04 / Round271工作版。当前验收只在[CURRENT-ACCEPTANCE](CURRENT-ACCEPTANCE.md)维护，行动顺序见[五阶段执行方案](PRODUCT-POLISH-PLAN.md)。本页盘点不等于体验通过；历史Round97及后续调查移至DEVLOG链接的历史归档。
+2026-10-04 / Round271历史快照（后续数字和缺口不在本页更新）。当前状态与验收只在[CURRENT-ACCEPTANCE](CURRENT-ACCEPTANCE.md)维护，行动顺序见[五阶段执行方案](PRODUCT-POLISH-PLAN.md)。本页盘点不等于体验通过；历史Round97及后续调查移至DEVLOG链接的历史归档。
 
 ## Manifest真实规模
 
 来源：`node scripts/audit-content-state.mjs`，输出[Round271盘点](../iterations/round-271/content-inventory.json)。
 
-| 领域 | 当前规模 |
+| 领域 | Round271当时规模 |
 | --- | --- |
 | 世界 | 22张100×100地图，54有向关口，78地标，70固定/4随机事件 |
 | 舆图 | 768×576格、65层，可拖动、缩放、键盘平移和导航 |

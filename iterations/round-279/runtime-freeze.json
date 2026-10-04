@@ -1,0 +1,891 @@
+{
+  "frozenAt": "2026-10-04T07:44:36.044Z",
+  "candidate": "round279-final-inspection-on-51f3355",
+  "parentCommit": "51f3355aed421f166f451bcbc0392ad058583f0e",
+  "files": [
+    {
+      "path": "data/base/achievements/round-28-achievements.json",
+      "sha256": "c856c7d7d21433c3f87903edd75074cbc7776e3cbea2f028f6c9009fe3575aa2"
+    },
+    {
+      "path": "data/base/alchemy/round-25-alchemy.json",
+      "sha256": "05f13795ef9efa5c9a1e3c49ec0d7f69a99de075e0a68666511b78d89749d0e1"
+    },
+    {
+      "path": "data/base/arenas/round-20-arenas.json",
+      "sha256": "bbb7c9806e92a6e6c3bdd978b2f8029314228b41cb67fda9ee2e10f32fc75c9b"
+    },
+    {
+      "path": "data/base/battles/round-05-encounters.json",
+      "sha256": "38d85ef70ccf7abfd4f7ef3e13f5171f4ea22c40d24898d8a89f7cbd38f3af6d"
+    },
+    {
+      "path": "data/base/battles/round-83-east-coast-encounters.json",
+      "sha256": "68f0b468ea2738cec9e17ae0a0442fc81b2b800576e8689dd68d8b023d1ed1a0"
+    },
+    {
+      "path": "data/base/battles/round-86-tide-isle-encounters.json",
+      "sha256": "22ab496bdb786340dbeac7474b452bb34a2631c609b42a3901c8953b51b805cb"
+    },
+    {
+      "path": "data/base/characters/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "data/base/characters/round-03-npcs.json",
+      "sha256": "5fbd7ac42ff766df44eefb76a91b0b643c71ef5d07e842d905be8a791152add2"
+    },
+    {
+      "path": "data/base/characters/round-04-profiles.json",
+      "sha256": "8dd890242a9ce261d4b8b0e880cac7f8a29be5d80d9dad6cfdb460b9ec34dec4"
+    },
+    {
+      "path": "data/base/characters/round-74-cloud-ridge-npcs.json",
+      "sha256": "48e5df010b9427205c1f1b4c09da325fc8a9fcebc6775c81c2d34f4e1d2e914e"
+    },
+    {
+      "path": "data/base/characters/round-79-isles-npcs.json",
+      "sha256": "930ca4794ca7333a942c48803c58afef5de6609e489d4072be1762ed03a12c85"
+    },
+    {
+      "path": "data/base/characters/round-82-east-coast-npcs.json",
+      "sha256": "61900703053c4824b0a5df8134059f10d58e94431bcba1ad0f3c100c3fb2d580"
+    },
+    {
+      "path": "data/base/characters/round-83-east-coast-npcs.json",
+      "sha256": "95493cfdc080c43a985f865acb149af6500c0af6c8adae59ed927a5ee471bed5"
+    },
+    {
+      "path": "data/base/characters/round-84-windward-isle-npcs.json",
+      "sha256": "81a8c86ef5d6a429a45e1b0b7bd19a6b11a69df8f05d1201d07d69d15acecfc1"
+    },
+    {
+      "path": "data/base/characters/round-85-tide-isle-npcs.json",
+      "sha256": "59f2d6cba0c0f2a89059c6ed13d5ab95e0bb4eefd1a600faad84d13fed48aabb"
+    },
+    {
+      "path": "data/base/characters/round-86-tide-isle-npcs.json",
+      "sha256": "376375330a22560c8432b7d3f6a75a1d2d5b86bb126446f404eb86578915097f"
+    },
+    {
+      "path": "data/base/characters/round-87-southwest-isles-npcs.json",
+      "sha256": "f8c858ffbb1f28f5145c46c33112957ad9250e782d33252d99071927d031e543"
+    },
+    {
+      "path": "data/base/characters/round-89-southwest-isles-npcs.json",
+      "sha256": "07be0fa0a145167bf4f1fc246ab973d7f7408aa691290fe8d71dae7c1c60cec1"
+    },
+    {
+      "path": "data/base/characters/round-91-cloud-north-terrace-npcs.json",
+      "sha256": "8fd27079877b00f26ae280f4752b002e48e027a861eb1a0a41db246fb99948a6"
+    },
+    {
+      "path": "data/base/characters/round-92-north-pass-npcs.json",
+      "sha256": "7505e98ab8d4b04884a61eca27b14582ffb1372d0ea0b317bfce53fd539a283d"
+    },
+    {
+      "path": "data/base/characters/round-93-snow-pine-valley-npcs.json",
+      "sha256": "03292e967cf811ebe91c5ecddfe1f6620101b57f39e2d0c8519267e26761c694"
+    },
+    {
+      "path": "data/base/characters/round-94-frontiers-npcs.json",
+      "sha256": "3ee236fdb1cc42f83e90989c88632807977dfa4966a00f72d731548d114d81b5"
+    },
+    {
+      "path": "data/base/characters/round-95-east-woodland-npcs.json",
+      "sha256": "649771d910daa558cda0e9cd4f938b17703b72c3d4af3c98a942a3c30c5f1a9f"
+    },
+    {
+      "path": "data/base/characters/round-96-south-reef-npcs.json",
+      "sha256": "d6329342b659e3498d2bdf40c8f0a2391f6423cd1f5faeb4d1d3bc1e54f5242d"
+    },
+    {
+      "path": "data/base/characters/round-97-lanxin-reef-npcs.json",
+      "sha256": "ec4fa358a5256d165fa5f42cb53d14a129eeee69a7c93684e826c371ef0280f3"
+    },
+    {
+      "path": "data/base/companions/round-19-companions.json",
+      "sha256": "d5d5b68e924acb00898df55f42f462f94f47824eec4bad29bafa2cb4c1d57fda"
+    },
+    {
+      "path": "data/base/dialogues/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "data/base/dialogues/round-03-conversations.json",
+      "sha256": "0ce3a2cd5279abaf44bda53dbd63badce867106e38d84751dc31f7e9ea5b6754"
+    },
+    {
+      "path": "data/base/dialogues/round-30-conversations.json",
+      "sha256": "c8b514e4657a55f4ef860f7ea52fc5995854688f17f918aeaf6dcb2c34bae779"
+    },
+    {
+      "path": "data/base/dialogues/round-62-conversations.json",
+      "sha256": "d3c2cf3c483cfda90baa12077d45a9c578a14802b482b4b91101d393c039c5a3"
+    },
+    {
+      "path": "data/base/dialogues/round-67-conversations.json",
+      "sha256": "76b772b25477398664af21515914ebb44054b94427c2a5186967027bedc0e3e9"
+    },
+    {
+      "path": "data/base/dialogues/round-74-cloud-ridge-conversations.json",
+      "sha256": "eeaa928a4e4361b00b88ee9552de0ad58a75962259f9c9d9c8f4b35e91673bb2"
+    },
+    {
+      "path": "data/base/dialogues/round-79-isles-conversations.json",
+      "sha256": "653c7bb9e95a8c3871e94286ebf75b61259f4c4cd93be8a7b6f898ca82c8946c"
+    },
+    {
+      "path": "data/base/dialogues/round-82-east-coast-conversations.json",
+      "sha256": "dabec70b2e085876c1f745f7d7fcfd3706979ba6666d61dc19dfe497ffc0962f"
+    },
+    {
+      "path": "data/base/dialogues/round-83-east-coast-conversations.json",
+      "sha256": "c8c8440b814db610fdd0b05c9202e0dc097f509ae7b73aec40da4cca9100e7f6"
+    },
+    {
+      "path": "data/base/dialogues/round-84-windward-isle-conversations.json",
+      "sha256": "6543665e864a7b124c2ce10ee235a348dc7cdef50669f34af2ed1717c0ee156e"
+    },
+    {
+      "path": "data/base/dialogues/round-85-tide-isle-conversations.json",
+      "sha256": "908dc47242e629b598175f8e2e1e68060bce679be1476f9e4b16b95ed79fcfa6"
+    },
+    {
+      "path": "data/base/dialogues/round-86-tide-isle-conversations.json",
+      "sha256": "3acc05ebfc9ef8bf0a9ebb3f98a3d28a564805df8629c56bfdc57446010f3434"
+    },
+    {
+      "path": "data/base/dialogues/round-87-southwest-isle-conversations.json",
+      "sha256": "da8f47324ebf8db799e52fd66af4c8c96a3f64894af008d2eb1f6f7c7da22822"
+    },
+    {
+      "path": "data/base/dialogues/round-89-southwest-isle-conversations.json",
+      "sha256": "f34c0f4cc049c856d61fa2b9bcf9b1107e6befd1a237d9729e20af8057550b63"
+    },
+    {
+      "path": "data/base/dialogues/round-91-cloud-north-terrace-conversations.json",
+      "sha256": "ff45205c473b3cbfeb9c539d35cb9fd15dd8d035720135e2784ad99e884cda17"
+    },
+    {
+      "path": "data/base/dialogues/round-92-north-pass-conversations.json",
+      "sha256": "89822513520b62c5ec6cb3ad765003669e01b7a3023e23e659209981385cb5bc"
+    },
+    {
+      "path": "data/base/dialogues/round-93-snow-pine-valley-conversations.json",
+      "sha256": "fe1c459eced77fde65c715f3f2e0d418db84cecaa911a30dd44f007b06c9f80f"
+    },
+    {
+      "path": "data/base/dialogues/round-94-frontiers-conversations.json",
+      "sha256": "349dec3d84df25ecf9bcb99b2a671824e8ea433f982d31b9822935c53671cdfa"
+    },
+    {
+      "path": "data/base/dialogues/round-95-east-woodland-conversations.json",
+      "sha256": "ee4b3b6e346f21e2ce18305d2b6cb53e9d4fd06c099006cfa8f144d1d6d97c7b"
+    },
+    {
+      "path": "data/base/dialogues/round-96-south-reef-conversations.json",
+      "sha256": "e138f86719ccd288a1bf31c901ebb2451c109d2db88a0421ff915aa7ac6b9b5a"
+    },
+    {
+      "path": "data/base/dialogues/round-97-lanxin-reef-conversations.json",
+      "sha256": "7e9826a3984e6d025a7a41a405d78f84dc67c15c136fd0e6e89629edfcfb584b"
+    },
+    {
+      "path": "data/base/endings/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "data/base/endings/round-27-endings.json",
+      "sha256": "bf283cf86fd0cac6e82f2b24ad67ebfdd8e62a7dd416b9af0cca8ac8a74ccbe3"
+    },
+    {
+      "path": "data/base/faction_wars/round-21-wars.json",
+      "sha256": "b528bf29a5f4d897b9e0ea96b2406e8592b62debbad0a5fbcd2e6f26b131ff7f"
+    },
+    {
+      "path": "data/base/factions/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "data/base/factions/round-04-factions.json",
+      "sha256": "15d9c749c1d24e9a4dc049e1033989861e9df72901008c6cc04473dfcf3b42f3"
+    },
+    {
+      "path": "data/base/forges/round-24-equipment-forges.json",
+      "sha256": "7ebe7bd4d7605a7c7c74336cfff4862263275d80a33d0a1c49227bfdf6c73af5"
+    },
+    {
+      "path": "data/base/items/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "data/base/items/round-06-items.json",
+      "sha256": "8907cbb97d54b1efba303d2223d388cf470fb84fb12c05ef75f64b1a623fdf53"
+    },
+    {
+      "path": "data/base/items/round-83-east-coast-items.json",
+      "sha256": "59bb8079ed8d6301e919991a7fe61dea2641dac2832d14f744777e79b8044e48"
+    },
+    {
+      "path": "data/base/knowledge_graph/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "data/base/knowledge_graph/edges.json",
+      "sha256": "bddd12d648d014c44955d17879f58f5acd7a427d9062ad307a65c6598554ff86"
+    },
+    {
+      "path": "data/base/knowledge_graph/nodes.json",
+      "sha256": "222df0e41aeb292ea273c7701f69ba858ad4f2c90c286895c7161328b43a4d74"
+    },
+    {
+      "path": "data/base/manifest.json",
+      "sha256": "913e35871b0feef6c55095861c46030c2dfc1d16c152c8a3f937d1271f7d87b0"
+    },
+    {
+      "path": "data/base/maps/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "data/base/maps/round-01-grid.json",
+      "sha256": "b97a02c069c2a655611e9f9d1628d656426a07f4c0979d64e8a3570d9d2d4b7a"
+    },
+    {
+      "path": "data/base/maps/round-10-mist-ferry.json",
+      "sha256": "7725901296bca78b82c8ead50b71fb704ba5a898bbc0f5366a06b4cf2150dc0b"
+    },
+    {
+      "path": "data/base/maps/round-62-iron-ridge.json",
+      "sha256": "c8043965d24d46afaa3a82d865fbf85c4ca0b3ee77bf2f5086acc68968c9062d"
+    },
+    {
+      "path": "data/base/maps/round-67-salt-road.json",
+      "sha256": "785d43e93b448ff3eb2184086ab88d379312461fb940d8ad34c30f3fa5369c1d"
+    },
+    {
+      "path": "data/base/maps/round-74-cloud-ridge.json",
+      "sha256": "26183329715c6999c615688f9343b992b32a1c084f67d8d6dbc3528259d66229"
+    },
+    {
+      "path": "data/base/maps/round-79-isles.json",
+      "sha256": "487a6f886ab26fd6f097df3090cdc7fd096e19a95368dd7f7439984616cf7ce1"
+    },
+    {
+      "path": "data/base/maps/round-82-east-coast.json",
+      "sha256": "7e75538fbe859ca140ee9832b26243468626666b907c01b494a6b241baba5a1c"
+    },
+    {
+      "path": "data/base/maps/round-84-windward-isle.json",
+      "sha256": "9080f6b872c625ccc3b853ecf73dcd6fb8a387d599259dc9e35e5606522a6ebe"
+    },
+    {
+      "path": "data/base/maps/round-85-tide-isle.json",
+      "sha256": "19f824dbf83dbd19c51dc974810aace1b3ca8d81a2c08d668d68a8e304848811"
+    },
+    {
+      "path": "data/base/maps/round-87-southwest-isles.json",
+      "sha256": "7672c55cd935b5163a95c166d0ff60ca5b9139ca6a07cd91a70b8f015ff754a4"
+    },
+    {
+      "path": "data/base/maps/round-91-cloud-north-terrace.json",
+      "sha256": "888da5af756b0221e0ba0f13fcb23d0d5ab1888fea33640ee43a404950d394ee"
+    },
+    {
+      "path": "data/base/maps/round-92-north-pass.json",
+      "sha256": "868ec7675f6dc77d0bff2644f0999087f48edce6992fed0adf2c2f4552964bbe"
+    },
+    {
+      "path": "data/base/maps/round-93-snow-pine-valley.json",
+      "sha256": "24faa5100ab276f7394b7e81453e1d1b40fcebed0eb893415c2ed70ca1cd0c67"
+    },
+    {
+      "path": "data/base/maps/round-94-east-gate.json",
+      "sha256": "e761cd5e0dd42c00cfb9ebcca6cc5b653528b788a5503bd6211741205bc98b34"
+    },
+    {
+      "path": "data/base/maps/round-94-returning-sails.json",
+      "sha256": "8d7f5057941ee4f45c16cc995c26e2da0dd06f770ba347878efed62a52df143c"
+    },
+    {
+      "path": "data/base/maps/round-95-cedar-valley.json",
+      "sha256": "5483a2d9057cdc802886cb36a9e20dd50088c48d735b0798f27bd44aef16ee01"
+    },
+    {
+      "path": "data/base/maps/round-95-east-harbor.json",
+      "sha256": "c701c0fb831c9d8a46d269fd4e79743373ad1c6b238333f18182bae9c3cebda0"
+    },
+    {
+      "path": "data/base/maps/round-95-misty-pine-gate.json",
+      "sha256": "9fb78fc5a29ac014d605a8ef05695beb4863596788cb2cbf371ca4bffc2f29be"
+    },
+    {
+      "path": "data/base/maps/round-96-halfmoon-atoll.json",
+      "sha256": "23765d58abde8dedf70fe39fef8ac0b10da05da655354af31bac36729f15727c"
+    },
+    {
+      "path": "data/base/maps/round-96-stone-reef.json",
+      "sha256": "4433ba39651b87b2efcd849e23057f38f555b9237cebe3fb2f783794b17676a0"
+    },
+    {
+      "path": "data/base/maps/round-97-lanxin-isle.json",
+      "sha256": "1a7d78d21684f3a6b51a97daeaca002bc2013f4f2f6cdea8a06aa34b1d91d65b"
+    },
+    {
+      "path": "data/base/maps/round-97-pilot-reef.json",
+      "sha256": "d44213bb06f45d6f51914fa7b745114bb8b0b421f82f33cda40818d2c029078d"
+    },
+    {
+      "path": "data/base/meridians/round-23-meridians.json",
+      "sha256": "b02ea4c7b9cad54d576d0e9658719f7bd4db7f1ff651461d3d4204f617604e11"
+    },
+    {
+      "path": "data/base/quests/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "data/base/quests/round-07-quests.json",
+      "sha256": "96be73dd5415e9de1fc14e518176101a27705d1caf576cb81cf408c778270272"
+    },
+    {
+      "path": "data/base/quests/round-74-cloud-ridge-quests.json",
+      "sha256": "2aca3eaa5c94f2c2022ea04d14714ca99160298378f87cc3c86851f86d36a677"
+    },
+    {
+      "path": "data/base/quests/round-79-isles-quests.json",
+      "sha256": "ad520f8beab67bdd32b103766b3e0454cdc5cd7b4d0fdb67fec5aefc88e9f44d"
+    },
+    {
+      "path": "data/base/quests/round-82-east-coast-quests.json",
+      "sha256": "d5a294197fe9f90604b745a5034a2c8bbb8d374eaa0c16c93b02150a494998dc"
+    },
+    {
+      "path": "data/base/quests/round-83-east-coast-quests.json",
+      "sha256": "2afa588fb067622c7bb59c77e05fc089874771ef2f3b3175b4f2cb163cfc5a74"
+    },
+    {
+      "path": "data/base/quests/round-84-windward-isle-quests.json",
+      "sha256": "bff22cb99b9a43177107b0a6706ad23f86607649e400485c8ef3dd320166b0ef"
+    },
+    {
+      "path": "data/base/quests/round-85-tide-isle-quests.json",
+      "sha256": "bbc4f4ccbc148a38331147dfba6d8e9100d75443bde98511301d589982370f52"
+    },
+    {
+      "path": "data/base/quests/round-87-southwest-isle-quests.json",
+      "sha256": "6aa2f542e702cd28345ebe8b04997c326b097375ff4e8399f49ccc785722aa0c"
+    },
+    {
+      "path": "data/base/quests/round-89-cross-region-quests.json",
+      "sha256": "160c44bc05ee25e71cf0d419d726c7e9b48288f120d0e80e40a226141c97b59c"
+    },
+    {
+      "path": "data/base/quests/round-91-cloud-north-terrace-quests.json",
+      "sha256": "8fa59faf88b1efa722a010b25001397fa1a906873f200c2e3f436d8dea492db9"
+    },
+    {
+      "path": "data/base/quests/round-92-north-pass-quests.json",
+      "sha256": "396eb29fc83a6892c4248ff5d995c31b630eaefafc9b76744df1fa2c19e70c04"
+    },
+    {
+      "path": "data/base/quests/round-93-snow-pine-valley-quests.json",
+      "sha256": "3cd6d4eace565693ea7baba6f4c71eeedd46b871018648b9e5a1d636e882c9da"
+    },
+    {
+      "path": "data/base/quests/round-94-frontiers-quests.json",
+      "sha256": "9785c834f3abbef0fd44295b3b5469c3c5250e07580ba5166d4f63402d92351d"
+    },
+    {
+      "path": "data/base/quests/round-95-east-woodland-quests.json",
+      "sha256": "e257455e864a68eeee1fff72ef3255758ba252ba368a13e4a377e7ae39c15640"
+    },
+    {
+      "path": "data/base/quests/round-96-south-reef-quests.json",
+      "sha256": "fe7e72036af8eeba1f785ddfe03fb2956b4f9f7ad90d1eaed107879b273eb426"
+    },
+    {
+      "path": "data/base/quests/round-97-lanxin-reef-quests.json",
+      "sha256": "abf1b691034314399fb3b0627852120db4e9d7ac0487e524d268df934c6ba0d0"
+    },
+    {
+      "path": "data/base/shops/round-06-shops.json",
+      "sha256": "f24c8762cf4a5d1c98bf4ab8a2a5ab90f7f35997f60433dc16635cda45120dee"
+    },
+    {
+      "path": "data/base/shops/round-83-east-coast-shops.json",
+      "sha256": "1005542d723a2a64f0bca2fbefd75329c08f421fc24daf521efe06770ba4242a"
+    },
+    {
+      "path": "data/base/shops/round-86-tide-isle-shops.json",
+      "sha256": "a73f07635b01a8d443fdb2f1ad35e148a78bc66711e285cb6829e3d8418e861c"
+    },
+    {
+      "path": "data/base/skills/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "data/base/skills/round-04-martial-arts.json",
+      "sha256": "dbbbdf29f8c63786b71b306ad9df0fdc00dd22713240f53e0cc0449ff3804558"
+    },
+    {
+      "path": "data/base/skills/round-22-components.json",
+      "sha256": "d794b53ae1cb8e45c18fda1aaecfa07c6e90c85bd7d23860279ff761ad7f939f"
+    },
+    {
+      "path": "data/base/world/world-map.json",
+      "sha256": "d321c774a14ce8bbd5f9118e168265930808918787c8801cb5965f2c0d7d36be"
+    },
+    {
+      "path": "data/base/worldview/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "data/base/worldview/calendar.json",
+      "sha256": "5bf54d8926616abef1b2489a84ba7b8da0cb7018133f7f2ed4591295fd6f8786"
+    },
+    {
+      "path": "data/base/worldview/climate.json",
+      "sha256": "50ae308ff87520b4e71db37aaa652054fa2d91648bcc924688582fb9aaf616cc"
+    },
+    {
+      "path": "src/engine/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "src/engine/achievement-system.ts",
+      "sha256": "7f0cb8217f08dc25c7784a417c91de1bb0b9f6e16e9dfec423d4aaad26be335c"
+    },
+    {
+      "path": "src/engine/alchemy-system.ts",
+      "sha256": "8c6f1a4153992daf9235242cfb93ef7dce6f1538f76d1c89003f37fdb268ff70"
+    },
+    {
+      "path": "src/engine/arena-challenge.ts",
+      "sha256": "102027dc33ee56defc2b8ee646b9416f29cda05baca31008a23ed7ed62abf991"
+    },
+    {
+      "path": "src/engine/character-progression.ts",
+      "sha256": "9613420e6811acb39cbd9a15e66ea7b48857ec97ca4714e8ee3238e0b8fc3907"
+    },
+    {
+      "path": "src/engine/climate-system.ts",
+      "sha256": "e89efe3e92c2ce6c344c323df746bb60bb17e6d28387a564f1ff330791516381"
+    },
+    {
+      "path": "src/engine/companion-system.ts",
+      "sha256": "0613d0e247e4bbd4eeafbd34e3a3064a27a2b355e8db0b195a9a865d8d4953ff"
+    },
+    {
+      "path": "src/engine/data-loader.ts",
+      "sha256": "ca9fd06958713f2956a8572ee5ec9f12a9be8ffd5b1b55d0e8e82fc5d893fb33"
+    },
+    {
+      "path": "src/engine/dialogue-battle-request.ts",
+      "sha256": "cada6d786ad16f97e9e8b95cce311e74605e594182e4ab266fe0275a60a717cc"
+    },
+    {
+      "path": "src/engine/dialogue-graph.ts",
+      "sha256": "ee2e0376d31e9bad19bbb4c68beef47455617e6ffa9d11d9fca8dd345e62d73a"
+    },
+    {
+      "path": "src/engine/dialogue-runtime.ts",
+      "sha256": "1406e96954dd5d62b65e7108e316189d79708c088f95ac40d9b80b16d480e3ba"
+    },
+    {
+      "path": "src/engine/dialogue-teleport-request.ts",
+      "sha256": "b61d230765abc0231e6145602522d1e218a5b7ee09489e009977799c0ea1f1d5"
+    },
+    {
+      "path": "src/engine/dialogue-time-request.ts",
+      "sha256": "611617781eb780ca758a69432dda14cc6a135020073abf28ad6dadd6263f9f1b"
+    },
+    {
+      "path": "src/engine/dialogue-variables.ts",
+      "sha256": "574cba2ad0226eeca9a82281f5cf10f88b2cc3bc3e6e16fa4bd56e987b5ff3a5"
+    },
+    {
+      "path": "src/engine/ending-system.ts",
+      "sha256": "094745c3a2ed1f49b9a84b0d40f08b4131e83e2d91ce6781da26dbc168e18052"
+    },
+    {
+      "path": "src/engine/equipment-forge.ts",
+      "sha256": "0bb87a1780efc4960be9dfc4dcbf45998ba646d750e9afe8c1ec9851de1109ea"
+    },
+    {
+      "path": "src/engine/event-bus.ts",
+      "sha256": "c88b680525a2d68765d5a49971fe32eb8dfdba031a1a80ba2f33c5069f8cc265"
+    },
+    {
+      "path": "src/engine/faction-admission-preview.ts",
+      "sha256": "46b8f01c3c9595a3aaf1ffb4a8a935dc777c6ebc7475140176ee8c82367366b1"
+    },
+    {
+      "path": "src/engine/faction-departure.ts",
+      "sha256": "dff58dbb73dce91263493233a084c0005196938577c8c08d24b322373e86aa64"
+    },
+    {
+      "path": "src/engine/faction-system.ts",
+      "sha256": "f678c3a3537ee24e89ed2fe3754b8aa6b4c13241dcf9c8a5ce2eed7da9e97c24"
+    },
+    {
+      "path": "src/engine/faction-war.ts",
+      "sha256": "c39ebf2cb4194b73583fa4174154937ad9ffe57b821e1afa7c30a3761e7ee95f"
+    },
+    {
+      "path": "src/engine/game-calendar.ts",
+      "sha256": "7bf87ad85d18f52454b5018c5c319ad58e6b34dddd4b534670a1586c587cfd74"
+    },
+    {
+      "path": "src/engine/grid-map-renderer.ts",
+      "sha256": "e77e352198e037af4d4929204784d6c73910434f8f3bcf35d5a777178e67addb"
+    },
+    {
+      "path": "src/engine/grid-map.ts",
+      "sha256": "09c5d6475b4cf26c9a9066b23b41a72bbad421fdbc835801dab9d3f52df20f75"
+    },
+    {
+      "path": "src/engine/grid-path.ts",
+      "sha256": "1709759e27f98b75e376f8105858b387b51d3d9709aa60fa2e84eb6cafb02554"
+    },
+    {
+      "path": "src/engine/interaction-priority.ts",
+      "sha256": "db0bf1e60d54e078c41920349628421c782b3ff9f772f8c66f40a24a1a7ca913"
+    },
+    {
+      "path": "src/engine/item-system.ts",
+      "sha256": "f905b1f208535e10927b6edbcc35ee542ad074a8165dda78e6f7829deed314c4"
+    },
+    {
+      "path": "src/engine/knowledge-graph.ts",
+      "sha256": "85293e277a0290cc71aa01d7a52e79638cbeec93289d3bbc892cc211e5866da2"
+    },
+    {
+      "path": "src/engine/map-viewport.ts",
+      "sha256": "2aa20e3defde4a7f67f277b84180b28acacec11a8b2399a3c83af0eb1c53995c"
+    },
+    {
+      "path": "src/engine/martial-art-forge.ts",
+      "sha256": "0f64323b77b554e9fa08521c7716c3bb81a5cdac451f6d1e6b2ccb1f674567b9"
+    },
+    {
+      "path": "src/engine/martial-arts-dossier.ts",
+      "sha256": "c429c65f910db3c0fa2ae11034a8f6241d841f565d0b09eeb3b9f3c903d0a0d6"
+    },
+    {
+      "path": "src/engine/meridian-system.ts",
+      "sha256": "7bd0b7df5093230948ba5c144af9396caf2d99e78733de7fa6475d691a8ce206"
+    },
+    {
+      "path": "src/engine/mod-diagnostics.ts",
+      "sha256": "4d06ca500ece00c1a671f3b8e50b2e12afb6d2d99c9f116b95fddfaf770f2e4d"
+    },
+    {
+      "path": "src/engine/navigation-walking-budget.ts",
+      "sha256": "99cf176965b29b0f30819d52e3234098be5ae2c38a19d98728fd864f441bc502"
+    },
+    {
+      "path": "src/engine/npc-placement.ts",
+      "sha256": "d36eb97c9c525d62765e9a45632ffb346052ff7b11b8fcbb9c45ad698fe977c4"
+    },
+    {
+      "path": "src/engine/npc-schedule.ts",
+      "sha256": "882636ec630512d87d56504166efc265c167276dbf512bfcf3d47033da3cf225"
+    },
+    {
+      "path": "src/engine/quest-consequences.ts",
+      "sha256": "d1eebe8a16303670ba22f9805846d32d56a8d91cd2d06a3ce884557a1109033d"
+    },
+    {
+      "path": "src/engine/quest-guide.ts",
+      "sha256": "10a055c233f2fab9243deed05895dfed3d4677cc792704fa13df1a654e35de91"
+    },
+    {
+      "path": "src/engine/quest-navigation.ts",
+      "sha256": "6ba3e0c79fcaab86c1f56e60a3c5659d14f776e37f199ca88e36a8e40658569d"
+    },
+    {
+      "path": "src/engine/quest-system.ts",
+      "sha256": "8d4d8b6062257d5fee68f249eb62339b8d308462037916c468017df8a5d33c39"
+    },
+    {
+      "path": "src/engine/region-event-navigation.ts",
+      "sha256": "0a6a0804e90c7f9be5e4cb850b01609aa5406596edb4a383b7552b380777f6dc"
+    },
+    {
+      "path": "src/engine/regional-guide.ts",
+      "sha256": "7a52a77996bf9cc902fd8c7ec3bdffc69cae35d72b1375bcc5ea498beb580177"
+    },
+    {
+      "path": "src/engine/save-system.ts",
+      "sha256": "5f13ca1b23b3e9591fbffbf6d36c68c9fa107238d28f465b1d0536f244282e81"
+    },
+    {
+      "path": "src/engine/social-state.ts",
+      "sha256": "81877d35dacb193ae482ec27910c3afd5233cc2ca05f46c8ed90040afc6b0f3f"
+    },
+    {
+      "path": "src/engine/transition-access.ts",
+      "sha256": "6baea6a7725737ca9f4d42bbe030a5cc7e028a6991762a4d8dd599abe4ac98d5"
+    },
+    {
+      "path": "src/engine/transition-cost.ts",
+      "sha256": "31bb01d67a4b201a83bc621f2c3e9a628325e04043f9703ef48043b624d478c4"
+    },
+    {
+      "path": "src/engine/turn-based-combat.ts",
+      "sha256": "658bbef698108ef284b8b3d92c9df761d28a8a1bd10d9937246f6050356875f6"
+    },
+    {
+      "path": "src/engine/world-atlas-view.ts",
+      "sha256": "4b1828048fa673b3d158e98d64b69fbd0cab1a6247944e4814f7a3cb3179b0bc"
+    },
+    {
+      "path": "src/engine/world-map.ts",
+      "sha256": "496d148e4289adb5d760adf536ab5d4c65517d62e2c08a2695989b728dd06aeb"
+    },
+    {
+      "path": "src/engine/world-navigation-guidance.ts",
+      "sha256": "d342973443f940a294c09ae8d48e7f2d58fae2e98207883db63e0144715ee9b5"
+    },
+    {
+      "path": "src/engine/world-navigation.ts",
+      "sha256": "135d42576c87f196de7fe6aae92112c79ab3defc232d6ada4d19415802d08e0b"
+    },
+    {
+      "path": "src/engine/world-travel.ts",
+      "sha256": "880bdac3c24f1f304de8c1bf46d8577064ccd3f274e2c528bcb33afad441a8ed"
+    },
+    {
+      "path": "src/game/.gitkeep",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "src/game/achievement-ui.ts",
+      "sha256": "7f1f2dbd9a0c4da8bccbd4e367d7f1cf621055915ae61eb6079289228eafb4c5"
+    },
+    {
+      "path": "src/game/alchemy-ui.ts",
+      "sha256": "96f99265cfd87c20015fac660a3f75d39dd6ca0fa0c870d4fda8bf17b53e7ee3"
+    },
+    {
+      "path": "src/game/arena-ui.ts",
+      "sha256": "c0aad5561b7861f1a4315639a981992320083ddd6321fab69b777fefe6f51841"
+    },
+    {
+      "path": "src/game/collection-ui.ts",
+      "sha256": "1e16b021e60f250f0a493f35f60f5ae6a108d81cbba6b23c4c4613e9cf04fc0d"
+    },
+    {
+      "path": "src/game/combat-layout.ts",
+      "sha256": "cfe88621373e30356cd05a4b9dcb1bcd7662c083d4e8c88fe7f6db190ca22cc3"
+    },
+    {
+      "path": "src/game/combat-result-summary.ts",
+      "sha256": "35f01da7d9168adcd80b44962453a2210fc750dd60076d4380b1dd1d1ecdf397"
+    },
+    {
+      "path": "src/game/combat-ui.ts",
+      "sha256": "9ebad8c484ba6638b2c83d1be16a65dec02541e8c3c761f216296f06b466f64d"
+    },
+    {
+      "path": "src/game/companion-cadence.ts",
+      "sha256": "dcf7c59956e69e4d6bc55ef9518236b7db21845adcad12734a1c80e0b29c3064"
+    },
+    {
+      "path": "src/game/companion-ui.ts",
+      "sha256": "b7025110dea7c2c4e1dde11701eafa515df37b04295ac38210b2c74b495d18e1"
+    },
+    {
+      "path": "src/game/controls-ui.ts",
+      "sha256": "47fc1b3bfe56957180490899ca43cc1a3c7b0714262de9aa60154ec31d15e5fa"
+    },
+    {
+      "path": "src/game/crafting-panel-layout.ts",
+      "sha256": "288f2fee0560d7fcba48afdaec216e2d21a694506ed9e2aa871394efc5c6a0ee"
+    },
+    {
+      "path": "src/game/data-hot-reload.ts",
+      "sha256": "c86a794b2a93404cb88c3327b1d8eb662389918d7e4188309d1e0dfd9f7bdfdf"
+    },
+    {
+      "path": "src/game/dialogue-effect-confirmation.ts",
+      "sha256": "f503d9b97156c99485e38107a1d62bd59b0642366c335a7e5352469031495869"
+    },
+    {
+      "path": "src/game/dialogue-layout.ts",
+      "sha256": "c78fb735168f4c5be9369bd3790c01765346a1334ef9d36a6a7a12a07e6b1b25"
+    },
+    {
+      "path": "src/game/dialogue-prerequisites.ts",
+      "sha256": "abfcabaf93144604c7a11637c47269dc3d163511e327d65bdc144cd995899a74"
+    },
+    {
+      "path": "src/game/dialogue-ui.ts",
+      "sha256": "cbc0df3cb1558dec1b09f0f4fb683a27a8ee8d44b2212fbc33ce3ef56b5a0ecc"
+    },
+    {
+      "path": "src/game/encyclopedia-progress.ts",
+      "sha256": "20bc2200636fc8ec002811e2702c8927bfd7bfa86b010fac3fe4eb3023ef3b5c"
+    },
+    {
+      "path": "src/game/encyclopedia-ui.ts",
+      "sha256": "1cfa23ad0c1e7970cb7b1bf73af350a00625f472db7b5a10a40c5fbdfe255632"
+    },
+    {
+      "path": "src/game/ending-ui.ts",
+      "sha256": "9a51f68eb39f79239ea8f09bd106f4baa770d8c9424448412554047bdd4a3534"
+    },
+    {
+      "path": "src/game/equipment-forge-ui.ts",
+      "sha256": "befc06fdae472a40922f42c64a9b392a6af03e87f2681ea59f19d2c9b243a4bc"
+    },
+    {
+      "path": "src/game/faction-panel-layout.ts",
+      "sha256": "72a5a9e7a8e14758251f148ed633c08f5b29092ed0bb459dcc3a359ee26c63d1"
+    },
+    {
+      "path": "src/game/faction-ui.ts",
+      "sha256": "6b326fccb070b0fc2d959bed08fd0862b64cf7c7298d4e497adb48a4637931c1"
+    },
+    {
+      "path": "src/game/faction-war-ui.ts",
+      "sha256": "db2a3d54900c870cd5a7b1a0e857f0affac9510085a8e9b956b6d6107a5c646b"
+    },
+    {
+      "path": "src/game/game-storage.ts",
+      "sha256": "6821bd7b5fa5affcdc76e250c7ae6627e2a2c478c8404f7708a848b1c27f9d8f"
+    },
+    {
+      "path": "src/game/grid-scene.ts",
+      "sha256": "ef530dfb785c1ea5e1a287b06b7700e334b17d5ced48cb5c5f2e8574c4204487"
+    },
+    {
+      "path": "src/game/input-settings.ts",
+      "sha256": "969d9a80902c559c38e0240ae89f9466db8e4d928c71bd460fcdb08f02988ca1"
+    },
+    {
+      "path": "src/game/inventory-ui.ts",
+      "sha256": "71058563c25f1a1a73c314608ef530a79a984a5bce647d1e312c744648c6966f"
+    },
+    {
+      "path": "src/game/martial-art-forge-ui.ts",
+      "sha256": "5fe3c922b12fc2d658c7ae9f3d03c14c852860a2d13414c866a3d5b199b632f8"
+    },
+    {
+      "path": "src/game/martial-arts-ui.ts",
+      "sha256": "f2fffda3d22ae74a5c1a9566a76a18ddd304faf1ab6eff2553405b17ce91a9ee"
+    },
+    {
+      "path": "src/game/menu-scene.ts",
+      "sha256": "fa89f3962b2f0568c6f7388ce7693b3f64c8ef45e4f358670ec1f6c237d5fb97"
+    },
+    {
+      "path": "src/game/meridian-ui.ts",
+      "sha256": "6e5c745ee6a39dcb266e9b478cc1180f31a0426b91ec464005792a9c4a6acf3b"
+    },
+    {
+      "path": "src/game/mod-status-ui.ts",
+      "sha256": "b9c0729321b0c10bfde11d56024a48d3297bb450760d85e134ba8280ba4604f3"
+    },
+    {
+      "path": "src/game/pause-menu.ts",
+      "sha256": "c5d8b0c0f5f8769ecb711d769cf8f498c85bd11e03a22c516cdc40c2edbd6abc"
+    },
+    {
+      "path": "src/game/qa-checkpoint.ts",
+      "sha256": "fb431c7e67807e349ba1d04d4b50bceadba004a40dbb2b41d5ded53d72ad1d9e"
+    },
+    {
+      "path": "src/game/qa-workbench.ts",
+      "sha256": "e69454e93eddc0dc46ac6502c315b115d5992e5cf4fb08d96e6d3b1f19a1796c"
+    },
+    {
+      "path": "src/game/quest-abandon-confirmation.ts",
+      "sha256": "852897293b664b33a8f5f6fb703a306be22655eff330c9c5b9cecaef20831181"
+    },
+    {
+      "path": "src/game/quest-feedback.ts",
+      "sha256": "23b0e1989c8f548bea33c392fd1a134261c2c68db4e6787792916573ad82df73"
+    },
+    {
+      "path": "src/game/quest-panel-layout.ts",
+      "sha256": "d05a9b7b1f04ac322adfe6d3b6b13ac13a8cfccc65a30a0e241538368244bdce"
+    },
+    {
+      "path": "src/game/quest-presentation.ts",
+      "sha256": "0bc49d0a0e189f06bd1c9997e6d52523837fca5caf1d3fed7e087d5297adbb3d"
+    },
+    {
+      "path": "src/game/quest-ui.ts",
+      "sha256": "911fcb9993889d676cee10c505584a699cac9ddab7486c20b14db3df92199b30"
+    },
+    {
+      "path": "src/game/regional-guide-ui.ts",
+      "sha256": "4eaa7278a71e52b7b3b47f7f6f9a01c9f1914057f2ac72cccd7c8aa572cae432"
+    },
+    {
+      "path": "src/game/save-overwrite-confirmation.ts",
+      "sha256": "a1caf04386030e8a1268ea12306ccb153b895f48043592764786122db52ba61a"
+    },
+    {
+      "path": "src/game/save-slot-layout.ts",
+      "sha256": "470b347824167f11d7bf0e03f9fbfeaeab30288277c3d04d38fecf8e4df2328f"
+    },
+    {
+      "path": "src/game/settings.ts",
+      "sha256": "f5367b7d518d8e6d25aa8edc01a510ab08640aff8e518f5c124b107b4d59c03b"
+    },
+    {
+      "path": "src/game/shop-ui.ts",
+      "sha256": "f822c43fbc0442ec607bc5973e35ee1f94d70c1ca32d334c4356168b8664f76c"
+    },
+    {
+      "path": "src/game/transition-markers.ts",
+      "sha256": "a382b73d10a3886447e56aaccae62a2bb6934b73d19e8260b1ee9ddeaaaf016d"
+    },
+    {
+      "path": "src/game/travel-confirmation.ts",
+      "sha256": "a147df80cfd97efdc4d5b41a98c7ec34c1043f839b1241330fa7fcf1a568f61f"
+    },
+    {
+      "path": "src/game/ui-theme.ts",
+      "sha256": "4bebf5bdaebef0c6a953fda913bb1929b0fc79edef920e40992ea3107eb82f41"
+    },
+    {
+      "path": "src/game/world-camera-bounds.ts",
+      "sha256": "7226e76cef51ff28289c1288673daa4f3b1bd04412a896a8b038ef931ec47acd"
+    },
+    {
+      "path": "src/game/world-loader.ts",
+      "sha256": "48aa4480207a077c237e98e1ace35b630eb488c62781e4f4aac603738f2d6c29"
+    },
+    {
+      "path": "src/game/world-map-ui.ts",
+      "sha256": "b626bd083bc2589e3c4476e4b9d28b0fc120578115c5b8e957ac89e81875bd85"
+    },
+    {
+      "path": "src/main.ts",
+      "sha256": "fa3b782e251fcc87c6e7c78208de1d6f54860ca861fa0b388edeb429db8f0c47"
+    },
+    {
+      "path": "src/style.css",
+      "sha256": "edeb9589a5073b10746a673499077759b0bb21044781cb8a45cfa11e743a0d32"
+    },
+    {
+      "path": "src/vite-env.d.ts",
+      "sha256": "2797bcd345c17de4210b645d6636fbf9f6bdbd483af5ca9b0f22e490387a2479"
+    },
+    {
+      "path": "src/game/region-inspection.ts",
+      "sha256": "f04d0afb441d6b0a6924809cad53b7ca22ff9a6fc510da2d8b7b8bf40c5672d5"
+    },
+    {
+      "path": "data/base/characters/round-279-iron-ridge-npcs.json",
+      "sha256": "dacd83e1eb8bca07b1885e8affae3f5d9048ce7e892a8950db1659c0c55481d3"
+    },
+    {
+      "path": "data/base/dialogues/round-279-road-keeper-conversations.json",
+      "sha256": "5d8a34eebf13ca92f6b1e0373fed1c7d6dd6669d2aa715139ce5bd8de9a10f07"
+    }
+  ]
+}

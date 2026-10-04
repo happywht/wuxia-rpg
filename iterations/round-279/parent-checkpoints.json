@@ -1,0 +1,57 @@
+{
+  "baselineCommit": "51f3355aed421f166f451bcbc0392ad058583f0e",
+  "rows": [
+    {
+      "branch": "escort",
+      "file": "iterations/round-278/escort-boat-iron-arrival.json",
+      "candidate": "round278-worktree-on-270ad8d",
+      "qaRun": "journey-20261004-ride-escort",
+      "sourceSlotId": "slot-2",
+      "bytes": 37050,
+      "sha256": "0E576360314D7DC6F33E9D3C29CAAD1F1EAB31EA46064E578B81AC3C7CAC248D",
+      "byteExactToCommitted": true,
+      "importTargetRun": "journey-20261004-road-escort",
+      "importTargetSlot": "slot-1",
+      "method": "Actual F8 file chooser, cross-run review/confirm to empty slot1; title Continue awaits final code freeze",
+      "player": {
+        "level": 7,
+        "xp": 686,
+        "silver": 343,
+        "health": 165,
+        "qi": 110
+      },
+      "map": "map.round-62-iron-ridge",
+      "position": {
+        "col": 4,
+        "row": 7
+      },
+      "elapsed": 480
+    },
+    {
+      "branch": "repair",
+      "file": "iterations/round-278/repair-boat-iron-arrival.json",
+      "candidate": "round278-worktree-on-270ad8d",
+      "qaRun": "journey-20261004-ride-repair",
+      "sourceSlotId": "slot-2",
+      "bytes": 37288,
+      "sha256": "FE645DEF4CDD2A168DD004E9DD3A8E4CF007CC5BCC61ACF1255557ED8E9F4675",
+      "byteExactToCommitted": true,
+      "importTargetRun": "journey-20261004-road-repair",
+      "importTargetSlot": "slot-1",
+      "method": "Actual F8 file chooser, cross-run review/confirm to empty slot1; title Continue awaits final code freeze",
+      "player": {
+        "level": 7,
+        "xp": 674,
+        "silver": 310,
+        "health": 163,
+        "qi": 110
+      },
+      "map": "map.round-62-iron-ridge",
+      "position": {
+        "col": 4,
+        "row": 7
+      },
+      "elapsed": 3776
+    }
+  ]
+}

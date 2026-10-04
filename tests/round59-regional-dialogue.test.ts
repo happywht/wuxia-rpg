@@ -274,7 +274,7 @@ function visibleStartTargets(conversation: DialogueData, context: DialogueRuntim
 describe('Round 59 regional dialogue echoes', () => {
   it('parses real base data and assembles quests and dialogue references without warnings', () => {
     expect(graph.warnings).toEqual([]);
-    expect(graph.nodes.size).toBe(431); // R255 caravan-route outcomes + R271 two hand-delivery events + the R261 river-lantern appointment event.
+    expect(graph.nodes.size).toBe(432); // R255 caravan-route outcomes + R271 two hand-delivery events + the R261 river-lantern appointment event + the R279 roadside keeper.
     expect(graph.nodes.has('event.r31-river-lantern-time-agreed')).toBe(true); // Stable id anchors the R261 addition.
     expect(questAssembly.warnings).toEqual([]);
     expect(questAssembly.quests.size).toBe(44);

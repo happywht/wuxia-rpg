@@ -1,0 +1,517 @@
+{
+  "baseline": "51f3355",
+  "mode": "read-only actual terrain audit; no gameplay inputs or save evidence",
+  "ironPath": {
+    "start": {
+      "col": 4,
+      "row": 7
+    },
+    "finish": {
+      "col": 50,
+      "row": 3
+    },
+    "successfulCells": 50,
+    "cells": [
+      {
+        "col": 4,
+        "row": 7
+      },
+      {
+        "col": 4,
+        "row": 6
+      },
+      {
+        "col": 4,
+        "row": 5
+      },
+      {
+        "col": 4,
+        "row": 4
+      },
+      {
+        "col": 4,
+        "row": 3
+      },
+      {
+        "col": 5,
+        "row": 3
+      },
+      {
+        "col": 6,
+        "row": 3
+      },
+      {
+        "col": 7,
+        "row": 3
+      },
+      {
+        "col": 8,
+        "row": 3
+      },
+      {
+        "col": 9,
+        "row": 3
+      },
+      {
+        "col": 10,
+        "row": 3
+      },
+      {
+        "col": 11,
+        "row": 3
+      },
+      {
+        "col": 12,
+        "row": 3
+      },
+      {
+        "col": 13,
+        "row": 3
+      },
+      {
+        "col": 14,
+        "row": 3
+      },
+      {
+        "col": 15,
+        "row": 3
+      },
+      {
+        "col": 16,
+        "row": 3
+      },
+      {
+        "col": 17,
+        "row": 3
+      },
+      {
+        "col": 18,
+        "row": 3
+      },
+      {
+        "col": 19,
+        "row": 3
+      },
+      {
+        "col": 20,
+        "row": 3
+      },
+      {
+        "col": 21,
+        "row": 3
+      },
+      {
+        "col": 22,
+        "row": 3
+      },
+      {
+        "col": 23,
+        "row": 3
+      },
+      {
+        "col": 24,
+        "row": 3
+      },
+      {
+        "col": 25,
+        "row": 3
+      },
+      {
+        "col": 26,
+        "row": 3
+      },
+      {
+        "col": 27,
+        "row": 3
+      },
+      {
+        "col": 28,
+        "row": 3
+      },
+      {
+        "col": 29,
+        "row": 3
+      },
+      {
+        "col": 30,
+        "row": 3
+      },
+      {
+        "col": 31,
+        "row": 3
+      },
+      {
+        "col": 32,
+        "row": 3
+      },
+      {
+        "col": 33,
+        "row": 3
+      },
+      {
+        "col": 34,
+        "row": 3
+      },
+      {
+        "col": 35,
+        "row": 3
+      },
+      {
+        "col": 36,
+        "row": 3
+      },
+      {
+        "col": 37,
+        "row": 3
+      },
+      {
+        "col": 38,
+        "row": 3
+      },
+      {
+        "col": 39,
+        "row": 3
+      },
+      {
+        "col": 40,
+        "row": 3
+      },
+      {
+        "col": 41,
+        "row": 3
+      },
+      {
+        "col": 42,
+        "row": 3
+      },
+      {
+        "col": 43,
+        "row": 3
+      },
+      {
+        "col": 44,
+        "row": 3
+      },
+      {
+        "col": 45,
+        "row": 3
+      },
+      {
+        "col": 46,
+        "row": 3
+      },
+      {
+        "col": 47,
+        "row": 3
+      },
+      {
+        "col": 48,
+        "row": 3
+      },
+      {
+        "col": 49,
+        "row": 3
+      },
+      {
+        "col": 50,
+        "row": 3
+      }
+    ]
+  },
+  "cloudPath": {
+    "start": {
+      "col": 50,
+      "row": 97
+    },
+    "finish": {
+      "col": 40,
+      "row": 43
+    },
+    "successfulCells": 64,
+    "cells": [
+      {
+        "col": 50,
+        "row": 97
+      },
+      {
+        "col": 50,
+        "row": 96
+      },
+      {
+        "col": 50,
+        "row": 95
+      },
+      {
+        "col": 50,
+        "row": 94
+      },
+      {
+        "col": 50,
+        "row": 93
+      },
+      {
+        "col": 50,
+        "row": 92
+      },
+      {
+        "col": 50,
+        "row": 91
+      },
+      {
+        "col": 50,
+        "row": 90
+      },
+      {
+        "col": 50,
+        "row": 89
+      },
+      {
+        "col": 50,
+        "row": 88
+      },
+      {
+        "col": 50,
+        "row": 87
+      },
+      {
+        "col": 50,
+        "row": 86
+      },
+      {
+        "col": 50,
+        "row": 85
+      },
+      {
+        "col": 50,
+        "row": 84
+      },
+      {
+        "col": 50,
+        "row": 83
+      },
+      {
+        "col": 50,
+        "row": 82
+      },
+      {
+        "col": 50,
+        "row": 81
+      },
+      {
+        "col": 50,
+        "row": 80
+      },
+      {
+        "col": 50,
+        "row": 79
+      },
+      {
+        "col": 50,
+        "row": 78
+      },
+      {
+        "col": 50,
+        "row": 77
+      },
+      {
+        "col": 50,
+        "row": 76
+      },
+      {
+        "col": 50,
+        "row": 75
+      },
+      {
+        "col": 50,
+        "row": 74
+      },
+      {
+        "col": 50,
+        "row": 73
+      },
+      {
+        "col": 50,
+        "row": 72
+      },
+      {
+        "col": 50,
+        "row": 71
+      },
+      {
+        "col": 50,
+        "row": 70
+      },
+      {
+        "col": 50,
+        "row": 69
+      },
+      {
+        "col": 50,
+        "row": 68
+      },
+      {
+        "col": 50,
+        "row": 67
+      },
+      {
+        "col": 50,
+        "row": 66
+      },
+      {
+        "col": 50,
+        "row": 65
+      },
+      {
+        "col": 50,
+        "row": 64
+      },
+      {
+        "col": 50,
+        "row": 63
+      },
+      {
+        "col": 50,
+        "row": 62
+      },
+      {
+        "col": 50,
+        "row": 61
+      },
+      {
+        "col": 50,
+        "row": 60
+      },
+      {
+        "col": 50,
+        "row": 59
+      },
+      {
+        "col": 50,
+        "row": 58
+      },
+      {
+        "col": 50,
+        "row": 57
+      },
+      {
+        "col": 50,
+        "row": 56
+      },
+      {
+        "col": 49,
+        "row": 56
+      },
+      {
+        "col": 48,
+        "row": 56
+      },
+      {
+        "col": 47,
+        "row": 56
+      },
+      {
+        "col": 46,
+        "row": 56
+      },
+      {
+        "col": 45,
+        "row": 56
+      },
+      {
+        "col": 44,
+        "row": 56
+      },
+      {
+        "col": 43,
+        "row": 56
+      },
+      {
+        "col": 42,
+        "row": 56
+      },
+      {
+        "col": 41,
+        "row": 56
+      },
+      {
+        "col": 40,
+        "row": 56
+      },
+      {
+        "col": 40,
+        "row": 55
+      },
+      {
+        "col": 40,
+        "row": 54
+      },
+      {
+        "col": 40,
+        "row": 53
+      },
+      {
+        "col": 40,
+        "row": 52
+      },
+      {
+        "col": 40,
+        "row": 51
+      },
+      {
+        "col": 40,
+        "row": 50
+      },
+      {
+        "col": 40,
+        "row": 49
+      },
+      {
+        "col": 40,
+        "row": 48
+      },
+      {
+        "col": 40,
+        "row": 47
+      },
+      {
+        "col": 40,
+        "row": 46
+      },
+      {
+        "col": 40,
+        "row": 45
+      },
+      {
+        "col": 40,
+        "row": 44
+      },
+      {
+        "col": 40,
+        "row": 43
+      }
+    ]
+  },
+  "proposedNpc": {
+    "col": 26,
+    "row": 4,
+    "tile": ".",
+    "walkable": true,
+    "directApproach": {
+      "col": 26,
+      "row": 3
+    }
+  },
+  "cloudFork": {
+    "at": {
+      "col": 50,
+      "row": 56
+    },
+    "northBlocked": true,
+    "westRouteKnown": true,
+    "signProposal": {
+      "col": 50,
+      "row": 59
+    },
+    "warning": "Shen live timetable changes; static fork sign must send player to R人物 for final approach, never promise fixed NPC cell at all periods."
+  }
+}

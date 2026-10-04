@@ -10,7 +10,7 @@
 
 当前状态以 [验收矩阵](CURRENT-ACCEPTANCE.md) 为准；下文协议与历史轮次说明保留作参考。本轮 QA 流程见 [检查点指南](QA-CHECKPOINTS.md)。
 
-- 状态：当前候选与产品缺口见验收矩阵；manifest 有 100 项资源、24 个资源 Schema 家族，data/schema 含 26 份 draft-07 JSON Schema。探索世界由数据装配；二十二张100×100区域地图和768×576、65层RLE舆图仍使用既有协议。
+- 状态：当前候选与产品缺口见验收矩阵；manifest 有 102 项资源、24 个资源 Schema 家族，data/schema 含 26 份 draft-07 JSON Schema。探索世界由数据装配；二十二张100×100区域地图和768×576、65层RLE舆图仍使用既有协议。
 - 关联：`docs/ADR.md`（技术选型依据）、`docs/DATA-GUIDE.md`（数据面细节）
 
 ## Round269 任务结算反馈边界
@@ -588,3 +588,7 @@ Q下一次成功打开消费最近接取或完成焦点；到账收据不会因�
 两程驿舟使用既有world-map transition的fare/travelMinutes，不向GridScene加地点或故事特判。TravelConfirmationPanel只新增通用末页选择：默认取消，上下切换，完整阅读后显式购票；返回上页/重开清选择，先关闭面板再同步预检提交、最后通知重载，维持原事务时序。
 
 资料作者整批预检/幂等后写，canonical指南同步；R275仅接受精确声明的later文本并拒绝重复/混合token，不用任意字符串放宽漂移。NPC/关口冲突验证以玩家可走靠近格为中心，所有时段与实际E选择同验。旧v1/MOD没有新字段或迁移；现有付费交通的确认方式统一增加显式选择，重验其共有面板和拒绝路径。
+
+## Round279 交互检查阅读装配
+
+region-inspection.ts将已校验区域事件正文投影为无选项/无效果终止对白，复用DialoguePanel分页、字号、Enter/Esc及键盘占用。GridScene只在E调查正常presentRegionEvents结算后打开阅读窗口，不移动自动事件到新流程，不重复奖见闻；没有新存档字段或事件ID特判。地图木牌通过作者资料独立图层和已登记CC0图块表达，R74/R78生成源同步，旧碰撞/出生点/图层保持；完整测试和实际存读证据以当前矩阵为准。

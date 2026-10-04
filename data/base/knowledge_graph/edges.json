@@ -3840,6 +3840,20 @@
       "toId": "char.lu-zhenniang",
       "relation": "locatedAt",
       "summary": "寒珠草在茶棚当面交到陆贞娘手上。"
+    },
+    {
+      "id": "kg.edge.r279-danggui-located",
+      "fromId": "char.r279-xin-danggui",
+      "toId": "map.round-62-iron-ridge",
+      "relation": "locatedAt",
+      "summary": "辛当归在铁嶂北行路中段(26,3)道旁留守药担。"
+    },
+    {
+      "id": "kg.edge.r279-danggui-knows-shibei",
+      "fromId": "char.r279-xin-danggui",
+      "toId": "char.shi-bei",
+      "relation": "knows",
+      "summary": "辛当归替石北的药队留守中段山路，换药存根与渡口药簿对账。"
     }
   ]
 }

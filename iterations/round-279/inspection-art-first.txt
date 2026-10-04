@@ -1,0 +1,87 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+stderr | tests/round112-cloud-routes-supply.test.ts > Round112 existing Cloud Ridge paths, paving and limited provisions > incremental replay and R74→R76→R78 regeneration preserve the current cloud output and other maps
+Regeneration differences: map.art.layers.10.depthSort: "y"→undefined
+
+ ❯ tests/round112-cloud-routes-supply.test.ts (8 tests | 1 failed) 3048ms
+   ❯ Round112 existing Cloud Ridge paths, paving and limited provisions (8)
+     × incremental replay and R74→R76→R78 regeneration preserve the current cloud output and other maps 1735ms
+ ❯ tests/round279-inspection-art.test.ts (8 tests | 2 failed) 250ms
+   ❯ R279 persistent inspection and licensed nonblocking sign (8)
+     × creates a valid terminal read-only conversation with all original text 6ms
+     × refuses moved or blocked sign cells, never alters inputs 8ms
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r279-cli-WzMqc5/scripts/lib/round279-road-exchange.mjs:254
+  if (existing.length > 0) throw new Error(`图谱节点 ${GRAPH_NODE.id} 已存在但内容不符，请人工复核。`);
+                                 ^
+
+Error: 图谱节点 char.r279-xin-danggui 已存在但内容不符，请人工复核。
+    at repairGraphNodesRaw (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r279-cli-WzMqc5/scripts/lib/round279-road-exchange.mjs:254:34)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r279-cli-WzMqc5/scripts/apply-round279.mjs:55:15
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:647:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.18.0
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r279-cli-WzMqc5/scripts/lib/round279-road-exchange.mjs:322
+  throw new Error(`${label} 已存在但与定稿字节不符，请人工复核。`);
+        ^
+
+Error: 新人物文件 已存在但与定稿字节不符，请人工复核。
+    at staticResourceState (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r279-cli-WzMqc5/scripts/lib/round279-road-exchange.mjs:322:9)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r279-cli-WzMqc5/scripts/apply-round279.mjs:59:18
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:647:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.18.0
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round112-cloud-routes-supply.test.ts > Round112 existing Cloud Ridge paths, paving and limited provisions > incremental replay and R74→R76→R78 regeneration preserve the current cloud output and other maps
+AssertionError: expected { Object (id, name, ...) } to deeply equal { Object (id, name, ...) }
+
+- Expected
++ Received
+
+@@ -66954,5 +66954,5 @@
+    "playerStart": [Object],
+    "rows": 100,
+    "tileSize": 48,
+    "tileTypes": [Object],
+  }
+
+ ❯ tests/round112-cloud-routes-supply.test.ts:133:27
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/round279-inspection-art.test.ts > R279 persistent inspection and licensed nonblocking sign > creates a valid terminal read-only conversation with all original text
+TypeError: session.currentNode is not a function
+ ❯ tests/round279-inspection-art.test.ts:18:20
+     16|     expect(parseDialogueSet({conversations:[conversation]}).ok).toBe(t…
+     17|     const session=new DialogueSession(conversation);
+     18|     expect(session.currentNode().text).toBe(FORK_SIGN_EVENT.text);
+       |                    ^
+     19|     expect(conversation.nodes).toEqual([{id:'read',text:FORK_SIGN_EVEN…
+     20|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/round279-inspection-art.test.ts > R279 persistent inspection and licensed nonblocking sign > refuses moved or blocked sign cells, never alters inputs
+TypeError: Cannot assign to read only property '50' of string '#........##.###....,##........,.....,..........,.,...............,.....,......,....#.#.#####.....,.#'
+ ❯ tests/round279-inspection-art.test.ts:69:58
+     67|     const moved=structuredClone(world); moved.landmarks.find(x=>x.id==…
+     68|     expect(()=>applyCloudForkSignArt(map,moved)).toThrow('坐标漂移');
+     69|     const blocked=structuredClone(map); blocked.grid[59][50]='#';
+       |                                                          ^
+     70|     const original=structuredClone(blocked);
+     71|     expect(()=>applyCloudForkSignArt(blocked,world)).toThrow('不可通行');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  2 failed | 2 passed (4)
+      Tests  3 failed | 47 passed (50)
+   Start at  15:21:33
+   Duration  13.86s (tests 93%, transform 4%, import 3%)

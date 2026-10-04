@@ -124,6 +124,7 @@ describe('Round 52 data-driven map landmarks', () => {
       'landmark.r97-reef-causeway',
       'landmark.r97-beacon-tower',
       'landmark.r97-goose-window',
+      'landmark.r279-cloud-fork-sign',
     ]);
     // Legacy direct callers pass no reference ids, so the discovery gate on
     // the reedbank landing must not be validated (and not hide the landmark).
@@ -368,7 +369,7 @@ describe('Round 53 landmark discovery gating', () => {
     expect('ok' in assembled).toBe(false);
     if ('ok' in assembled) return;
     expect(assembled.landmarks.map(({ id }) => id)).not.toContain('landmark.reedbank-landing');
-    expect(assembled.landmarks).toHaveLength(77);
+    expect(assembled.landmarks).toHaveLength(78); // R279 adds the ungated cloud fork sign.
     expect(assembled.events.map(({ id }) => id)).not.toContain('event.reedbank-traces');
     const joined = assembled.warnings.join('\n');
     expect(joined).toContain('landmark.reedbank-landing');
@@ -402,7 +403,7 @@ describe('Round 53 landmark discovery gating', () => {
 
     const undiscovered = selectVisibleWorldLandmarks(assembled.landmarks, new Set());
     const undiscoveredJson = JSON.stringify(undiscovered);
-    expect(undiscovered).toHaveLength(19);
+    expect(undiscovered).toHaveLength(20); // R279 fork sign has no discovery gate.
     expect(undiscoveredJson).not.toContain('芦岸登船点');
     expect(undiscoveredJson).not.toContain('landmark.reedbank-landing');
     expect(undiscoveredJson).not.toContain('place.reedbank');
@@ -415,7 +416,7 @@ describe('Round 53 landmark discovery gating', () => {
     expect(undiscoveredJson).not.toContain('南麓聚落');
 
     const discovered = selectVisibleWorldLandmarks(assembled.landmarks, new Set(['place.reedbank']));
-    expect(discovered).toHaveLength(20);
+    expect(discovered).toHaveLength(21);
     expect(discovered.find(({ id }) => id === 'landmark.reedbank-landing')?.name).toBe('芦岸登船点');
 
     const brineWellDiscovered = selectVisibleWorldLandmarks(
@@ -428,7 +429,7 @@ describe('Round 53 landmark discovery gating', () => {
       assembled.landmarks,
       new Set(['place.reedbank', 'place.mist-north-cap', 'place.mist-south-pool']),
     );
-    expect(bothNewSurveySites).toHaveLength(22);
+    expect(bothNewSurveySites).toHaveLength(23);
     expect(bothNewSurveySites.map(({ id }) => id)).toContain('landmark.mist-north-cap');
     expect(bothNewSurveySites.map(({ id }) => id)).toContain('landmark.mist-south-pool');
   });

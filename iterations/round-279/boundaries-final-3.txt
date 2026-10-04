@@ -1,0 +1,32 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r279-cli-05mZ7v/scripts/lib/round279-road-exchange.mjs:254
+  if (existing.length > 0) throw new Error(`图谱节点 ${GRAPH_NODE.id} 已存在但内容不符，请人工复核。`);
+                                 ^
+
+Error: 图谱节点 char.r279-xin-danggui 已存在但内容不符，请人工复核。
+    at repairGraphNodesRaw (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r279-cli-05mZ7v/scripts/lib/round279-road-exchange.mjs:254:34)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r279-cli-05mZ7v/scripts/apply-round279.mjs:51:15
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:647:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.18.0
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r279-cli-05mZ7v/scripts/lib/round279-road-exchange.mjs:322
+  throw new Error(`${label} 已存在但与定稿字节不符，请人工复核。`);
+        ^
+
+Error: 新人物文件 已存在但与定稿字节不符，请人工复核。
+    at staticResourceState (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r279-cli-05mZ7v/scripts/lib/round279-road-exchange.mjs:322:9)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r279-cli-05mZ7v/scripts/apply-round279.mjs:55:18
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:647:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.18.0
+
+ Test Files  2 passed (2)
+      Tests  37 passed (37)
+   Start at  15:10:18
+   Duration  13.10s (tests 94%, transform 4%, import 1%)

@@ -1,0 +1,117 @@
+{
+  "columns": 512,
+  "rows": 384,
+  "tileSize": 16,
+  "layers": {
+    "world-ocean": "be918b7fe0aee1dfcb256a0474165ec8394ed0457abda1f850141c40572560bf",
+    "world-land": "6e466696ce376361b5b0d376a95800f78b91c9a2b168ba74c639ac9e12303d1e",
+    "world-coast": "c06b1c9bcd49af8cbcdb4ad335d982b5c772c5c6dd22355656ff982a179aba22",
+    "world-forest": "acaa78160d359ef0d3b8994fe503d98579a243cb26f2c364c48e3f12788f7e1f",
+    "world-relief": "78fa5a7bee220645702c6adb274c3c20773d5d8907f3967ca14be85ae1bc26af",
+    "world-roads": "11048172346d2a0fde60431ccfe118584c934cd55ee613b2e6cfcf654f79c561",
+    "world-settlements": "8cb492e5a6efb027e46df1ccea6e656cf3f01c4c1e65f94d6fb6eb1f928523bc",
+    "world-r79-shoal-water": "7bab9dae8ad0e298222278b5143fde838b742e68dfe28959380726509bfbfc78",
+    "world-r79-shoal-sand": "9c5d4690f2f5b3de3e482c635c6422ff1e5226ba6fb362d5f67055d4c7f63697",
+    "world-r79-shoal-land": "c949b0ff55f5f7dc2d536fb386e2ab752a44ee2da13949fcec995bfb4691c650",
+    "world-r79-shoal-pines": "9bdb02f82aa2b68057ebd835d1162617689fc32627c469dca45f3a86d4523610",
+    "world-r79-gate-routes": "40d0d6f85e1bb30d1984e64f7805a705b88afb306dfa530c3a548c5e32f63615",
+    "world-r81-expanse-water": "8f0f9c907fd7f68f8e4e16acc7139ee85e828e292186e9eb60c2118fd45a44b8",
+    "world-r81-expanse-sand": "c9875c542d10d2673935bbf1f6744e4d884d376593a0ebc5cccf7d1ab755b2ec",
+    "world-r81-expanse-land": "c1308f60716d52c9cb2402146f87c99285c3b28054f4935a8436ae8b50f09bcc",
+    "world-r81-expanse-pines": "0b498e66efb00738f0369b2492080bbaad7e1aed600bf6fddbf509e123c1b140",
+    "world-r84-expanse-water": "a0dca5222f86cd2410f446899c926720f5f23ce6d3e619ec31d0ac21e0b22b84",
+    "world-r84-expanse-sand": "ee0b774cb4385ce77a05b813a5ed7571c52b592488260b0862dd01c903f5f0a8",
+    "world-r84-expanse-land": "d4e34faad0167138a00ed5e525f37d6f83dc99c952ac83b11a24f9fb9537a286",
+    "world-r84-expanse-pines": "00347e59eb041774ea8f07a1f947672a0ab66c5255bfc18badb7b8b954dee45d",
+    "world-r85-expanse-water": "2d7b1e2310a8329a9e46e02a57c27b26013c881d79c372855136ff3a9a89c1f9",
+    "world-r85-expanse-sand": "a732dad1c2eecb5a94b1d8ed64a98a2416e28c95fa5a40dc32680737ec4f6ecb",
+    "world-r85-expanse-land": "d34d09b657693bf51754f82f0a1f4fb0cefc2fe500a256ffa0c33021e37a57e0",
+    "world-r85-expanse-pines": "874478e6d039ebca21a65995c6f4b6961cdba67709e8718887a30493b0dbd39e",
+    "world-r87-expanse-water": "7826963dd3ea7da37a0ce2d7e614c1116775094b44aaafc7193cbeaf63905062",
+    "world-r87-expanse-sand": "7bfdc677cf0dc51d9b0bdf0d687abe2afb9f2c169605aef9e9172952445b1864",
+    "world-r87-expanse-land": "7b0ddd7adfc89d10442958794988f24849fa78f3cd0959775a08cf6ffc6534c3",
+    "world-r87-expanse-pines": "b29f61de8dd4966e8df942a3554115f6da76b340c47aee48000e213c03a834d1"
+  },
+  "regions": {
+    "map.round-01-grid": {
+      "percent": {
+        "x": 8.10176106,
+        "y": 15.25326376
+      },
+      "col": 41.9,
+      "row": 58.92
+    },
+    "map.round-10-mist-ferry": {
+      "percent": {
+        "x": 25.92563611,
+        "y": 20.22715398
+      },
+      "col": 132.98,
+      "row": 77.97
+    },
+    "map.round-62-iron-ridge": {
+      "percent": {
+        "x": 25.92563611,
+        "y": 8.62140989
+      },
+      "col": 132.98,
+      "row": 33.52
+    },
+    "map.round-67-salt-road": {
+      "percent": {
+        "x": 8.10176106,
+        "y": 20.22715398
+      },
+      "col": 41.9,
+      "row": 77.97
+    },
+    "map.round-74-cloud-ridge": {
+      "percent": {
+        "x": 34.83757321,
+        "y": 16.91122704
+      },
+      "col": 178.52,
+      "row": 65.27
+    },
+    "map.round-79-isles": {
+      "percent": {
+        "x": 21.81996086,
+        "y": 33.22976501
+      },
+      "col": 112,
+      "row": 127.77
+    },
+    "map.round-82-east-coast": {
+      "percent": {
+        "x": 55.72407045,
+        "y": 25.61879896
+      },
+      "col": 285.25,
+      "row": 98.62
+    },
+    "map.round-84-windward-isle": {
+      "percent": {
+        "x": 69.47162427,
+        "y": 32.63707572
+      },
+      "col": 355.5,
+      "row": 125.5
+    },
+    "map.round-85-tide-isle": {
+      "percent": {
+        "x": 79.25636008,
+        "y": 73.10704961
+      },
+      "col": 405.5,
+      "row": 280.5
+    },
+    "map.round-87-southwest-isles": {
+      "percent": {
+        "x": 13.69863014,
+        "y": 90.07832898
+      },
+      "col": 70.5,
+      "row": 345.5
+    }
+  }
+}

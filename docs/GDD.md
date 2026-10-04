@@ -1,6 +1,6 @@
 # 游戏设计文档（GDD）— 初稿（持续修订）
 
-- 状态：当前实现基线为 Round 97；22 张 100×100 地图、768×576 可移动舆图和主要江湖系统已落地。2026-09-30 起优先丰富、串联与细化既有内容；新版目标和验收以 [PROJECT-GOALS.md](PROJECT-GOALS.md) 为准，现状证据见 [CURRENT-STATE-AUDIT.md](CURRENT-STATE-AUDIT.md)。系统存在不等于完整旅程体验已经验收。
+- 当前推进与验收见 [CURRENT-ACCEPTANCE.md](CURRENT-ACCEPTANCE.md)，目标见 [PROJECT-GOALS.md](PROJECT-GOALS.md)，严格按 [五阶段执行方案](PRODUCT-POLISH-PLAN.md) 开发。本文保留原型设计与历史系统说明；22张100×100地图和可移动舆图的存在不表示完整旅程已验收。旧规模盘点见历史 [CURRENT-STATE-AUDIT.md](CURRENT-STATE-AUDIT.md)，不作为当前状态来源。
 - 上游文档：`iterations/round-00/plan.md`、`docs/ORIGINAL-FIDELITY.md`（本作与原作系列体验的对照及证据分级）
 - 本文档描述的是**原创作品**：不包含、不搬用、不改编任何原作游戏的角色、地名、对话、剧情、源代码或美术/音频素材
 

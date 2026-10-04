@@ -3031,6 +3031,13 @@
       "title": "茶棚寒珠草已当面交付",
       "summary": "玩家备齐四株寒珠草后，回茶棚与陆贞娘按F交谈、当面点清交付；仅此一次交付结案凉汤差事，普通交谈与只采买持有都不构成交付。",
       "knownByDefault": false
+    },
+    {
+      "id": "char.r279-xin-danggui",
+      "kind": "character",
+      "title": "辛当归",
+      "summary": "铁嶂北行道旁的药队留守人，替石北看顾中段山路的药担，清心丸或熟铁砂任选一种换膏，总计一次。",
+      "knownByDefault": false
     }
   ]
 }

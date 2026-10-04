@@ -67,7 +67,7 @@ describe('Round 74 cloud-ridge playable region', () => {
     const cloud = maps.get(CLOUD_ID)!;
     expect(cloud.columns).toBe(100);
     expect(cloud.rows).toBe(100);
-    expect(cloud.data.art?.layers).toHaveLength(11);
+    expect(cloud.data.art?.layers).toHaveLength(12);
     expect(cloud.data.art?.layers.every((layer) =>
       layer.cells.length === cloud.rows && layer.cells.every((row) => row.length === cloud.columns),
     )).toBe(true);
@@ -166,8 +166,8 @@ describe('Round 74 cloud-ridge playable region', () => {
       expect(cloud.canEnter(anchor.col, anchor.row), `${anchor.id} is walkable`).toBe(true);
       expect(findGridPath(cloud, incoming, anchor), `${anchor.id} is reachable from the Cloud Ridge gate`).not.toBeNull();
     }
-    expect(world.landmarks.filter(({ mapResourceId }) => mapResourceId === CLOUD_ID)).toHaveLength(4);
-    expect(world.events.filter(({ mapResourceId }) => mapResourceId === CLOUD_ID)).toHaveLength(3);
+    expect(world.landmarks.filter(({ mapResourceId }) => mapResourceId === CLOUD_ID)).toHaveLength(5);
+    expect(world.events.filter(({ mapResourceId }) => mapResourceId === CLOUD_ID)).toHaveLength(4);
     expect(cloudNpcRecords).toHaveLength(1);
     expect(cloudEncounters).toHaveLength(1);
 

@@ -1,3 +1,4 @@
+import { applyCloudForkSignArt } from './lib/round279-sign-art.mjs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -50,6 +51,12 @@ for (const resource of manifest.resources ?? []) {
 }
 
 const anchors = new Map();
+// Plain wayfinding scenery must not repaint the terrain under an already authored road.
+const presentationAnchors = new Map();
+function notePresentationAnchor(label, point) {
+  if (!inside(point.col, point.row)) throw new Error(`${label} 坐标越界`);
+  presentationAnchors.set(key(point.col, point.row), label);
+}
 function addAnchor(label, point, buffer = 1) {
   if (!inside(point.col, point.row)) throw new Error(`${label} 坐标越界：(${point.col}, ${point.row})`);
   anchors.set(key(point.col, point.row), label);
@@ -67,10 +74,14 @@ for (const transition of regionTransitions) {
   }
 }
 for (const landmark of world.landmarks ?? []) {
-  if (landmark.mapResourceId === mapResourceId) addAnchor(`地标 ${landmark.id}`, landmark);
+  if (landmark.mapResourceId !== mapResourceId) continue;
+  if (landmark.category === 'route' && landmark.discoveryNodeId === undefined) notePresentationAnchor(`地标 ${landmark.id}`, landmark);
+  else addAnchor(`地标 ${landmark.id}`, landmark);
 }
 for (const event of world.events ?? []) {
-  if (event.mapResourceId === mapResourceId) addAnchor(`事件 ${event.id}`, event);
+  if (event.mapResourceId !== mapResourceId) continue;
+  if (event.interaction !== undefined && event.discoverKnowledgeNodeId === undefined) notePresentationAnchor(`事件 ${event.id}`, event);
+  else addAnchor(`事件 ${event.id}`, event);
 }
 for (const npc of npcRecords) {
   if (npc.mapResourceId !== mapResourceId) continue;
@@ -294,6 +305,10 @@ for (const [cell, label] of anchors) {
 }
 const finalPineCount = pines.flat().filter(Boolean).length;
 const finalScreeCount = scree.flat().filter(Boolean).length;
-await writeFile(outputPath, `${JSON.stringify(output, null, 2)}\n`);
+for (const [cell, label] of presentationAnchors) {
+  const [col, row] = cell.split(',').map(Number);
+  if (output.tileTypes[output.grid[row]?.[col]]?.solid !== false) throw new Error(`${label} 不能放在不可通行格，指示牌不自动改碰撞`);
+}
+await writeFile(outputPath, `${JSON.stringify(applyCloudForkSignArt(output, world), null, 2)}\n`);
 console.log(`生成 ${columns}×${rows} 云岭古道：${finalWalkableCount} 个可行格，${finalReached.size} 个入口可达格，${finalPineCount} 格松林、${finalScreeCount} 格山石图素、${output.art.layers.length} 层 CC0 图素。`);
 console.log(`保护并核验 ${anchors.size} 个关口/地标/事件/NPC 日程/遭遇锚点。`);

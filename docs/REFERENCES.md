@@ -114,3 +114,7 @@ Kenney 的许可 FAQ 明确说明 Kenney.nl 提供的素材可在 CC0 条款下�
 ### Round 97 素材用途扩展
 
 - 本轮未下载或新增第三方素材。东溟·澜心洲、东溟·引航礁两张地图及 768×576 总图新增的四层水域/岛陆像素继续复用本文件已登记的 Shade Puny World CC0 图集；季无潮、虞星槎复用 Shade Puny Characters CC0 朝向帧。原来源 URL、CC0 授权文本、`NOTICE.txt` 与发行白名单沿用现有条目；运行时不依赖远程素材。
+
+### Round279 既有合法素材续用
+
+辛当归方向帧144/152/160/168复用上表Shade Puny Characters CC0人物合成图集；云岭岔牌复用上表Kenney Tiny Town CC0告示牌帧84（地图GID85），本地图新增独立一格像素遮挡层，保留原License.txt，无新增下载或原作素材。人物故事、换药文本与指路文本为项目原创资料。

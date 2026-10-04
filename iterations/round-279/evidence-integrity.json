@@ -1,0 +1,38 @@
+{
+  "candidate": "round279-final-inspection-on-51f3355",
+  "freezeMatches": true,
+  "files": [
+    {
+      "path": "iterations/round-279/escort-road-exchange.json",
+      "download": "qa-checkpoint-journey-20261004-road-escort-road-exchange-qingxin-slot-2.json",
+      "bytes": 37206,
+      "sha256": "eca84e209def02d4973031a296d0a195f010a6f7963c4bc4e57fbf049bea63a2",
+      "downloadMatches": true,
+      "indexMatches": true
+    },
+    {
+      "path": "iterations/round-279/repair-road-exchange.json",
+      "download": "qa-checkpoint-journey-20261004-road-repair-road-exchange-iron-slot-2.json",
+      "bytes": 37441,
+      "sha256": "ed9fa7ae051de3047a9b008ba710a048512d40f9dfce7bf48844ed30b8e104fc",
+      "downloadMatches": true,
+      "indexMatches": true
+    },
+    {
+      "path": "iterations/round-279/escort-final-c0-arrival.json",
+      "download": "qa-checkpoint-journey-20261004-road-escort-road-c0-escort-arrival-slot-3.json",
+      "bytes": 37394,
+      "sha256": "f650df4e823d073ae09a5b321c28a29913ca3069fde9cb1e13118847a29789e9",
+      "downloadMatches": true,
+      "indexMatches": true
+    },
+    {
+      "path": "iterations/round-279/repair-final-c0-arrival.json",
+      "download": "qa-checkpoint-journey-20261004-road-repair-road-c0-repair-arrival-slot-3.json",
+      "bytes": 37632,
+      "sha256": "93748fa936d304a028d5d6c2a4e55541858be58ac9a4c6e49df1650c0c6bc217",
+      "downloadMatches": true,
+      "indexMatches": true
+    }
+  ]
+}

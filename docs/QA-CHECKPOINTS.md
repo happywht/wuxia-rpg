@@ -69,3 +69,7 @@ Lv8/XP714/371银/208命121气/75,42/elapsed1027；膏1丸1根2残篇1，云阶co
 修桥免费94格→北口88,15，空槽三存读，repair-free-north-before-return.json：Lv7/XP674/326银/163命110气/elapsed3689，实际水尺与北岬两见闻，无重复成就。由槽三读回再实际付8银返渡口、付8银再北上、E原关口→空槽二存读，repair-boat-iron-arrival.json：XP674/310银/163命110气/铁嶂4,7/elapsed3776，膏1丸2根2铁1残篇1。任务和对白变量不变，不把环行说免费。
 
 全部F8原下载字节/SHA/sourceSlotId/时间见round-278/checkpoint-summary.json，原文件-text保存，原下载=disk=index另检；派生摘要不代原载荷。只验渡口受影响段；原C0/C1保留历史版本，下一轮可从本轮铁嶂正常Continue续行。
+
+## Round279 核验状态
+
+两侧最新 C0 位于 iterations/round-279/escort-final-c0-arrival.json 与 repair-final-c0-arrival.json；独立 road-escort/road-repair QA、最终候选 round279-final-inspection-on-51f3355、来源槽三，正常保存与标题读回，不覆盖原槽一二。

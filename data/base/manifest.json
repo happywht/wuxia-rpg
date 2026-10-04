@@ -499,6 +499,16 @@
       "id": "encounter.round-86-tide-isle-set",
       "path": "battles/round-86-tide-isle-encounters.json",
       "schema": "battle-encounters"
+    },
+    {
+      "id": "npc.round-279-iron-ridge-set",
+      "path": "characters/round-279-iron-ridge-npcs.json",
+      "schema": "npc-set"
+    },
+    {
+      "id": "dialogue.round-279-road-keeper-set",
+      "path": "dialogues/round-279-road-keeper-conversations.json",
+      "schema": "dialogue-set"
     }
   ],
   "enabledMods": []

@@ -1,0 +1,21 @@
+{
+  "npcs": [
+    {
+      "id": "char.r279-xin-danggui",
+      "name": "辛当归",
+      "mapResourceId": "map.round-62-iron-ridge",
+      "dialogueId": "dlg.r279-xin-danggui-road-keeper",
+      "position": {
+        "col": 26,
+        "row": 4
+      },
+      "spriteFrame": 160,
+      "spriteFrames": {
+        "down": 144,
+        "right": 152,
+        "up": 160,
+        "left": 168
+      }
+    }
+  ]
+}

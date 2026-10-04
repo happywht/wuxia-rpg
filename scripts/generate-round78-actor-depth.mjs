@@ -44,7 +44,7 @@ for (const [file, depthLayerIds] of mapLayers) {
   const map = readJson(relativePath);
   const found = new Set();
   for (const layer of map.art.layers) {
-    if (depthLayerIds.has(layer.id)) {
+    if (depthLayerIds.has(layer.id) || layer.id === 'round279-cloud-fork-sign') {
       layer.depthSort = 'y';
       found.add(layer.id);
     } else {

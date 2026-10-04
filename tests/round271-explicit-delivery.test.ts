@@ -1,3 +1,4 @@
+import { GRAPH_NODE as R279_NODE, GRAPH_EDGES as R279_EDGES, repairGraphNodesRaw as applyR279Nodes, repairGraphEdgesRaw as applyR279Edges } from '../scripts/lib/round279-road-exchange.mjs';
 /**
  * Round 271 — 巷口送药/茶棚凉汤的显式当面交付回归（真实资料+真实引擎）。
  *
@@ -450,9 +451,11 @@ describe('Round271 作者源与legacy链沙盒重放', () => {
     expect(JSON.parse(repairDialoguesRaw(pristineDialogues()))).toEqual(JSON.parse(readRaw('data/base/dialogues/round-03-conversations.json')));
     const pristineNodes = JSON.parse(readRaw('data/base/knowledge_graph/nodes.json'));
     const pristineEdges = JSON.parse(readRaw('data/base/knowledge_graph/edges.json'));
-    pristineNodes.nodes = pristineNodes.nodes.filter((node: { id: string }) => !DELIVERY_NODES.some((wanted) => wanted.id === node.id));
-    pristineEdges.edges = pristineEdges.edges.filter((edge: { id: string }) => !DELIVERY_EDGES.some((wanted) => wanted.id === edge.id));
+    pristineNodes.nodes = pristineNodes.nodes.filter((node: { id: string }) => !DELIVERY_NODES.some((wanted) => wanted.id === node.id) && node.id !== R279_NODE.id);
+    pristineEdges.edges = pristineEdges.edges.filter((edge: { id: string }) => !DELIVERY_EDGES.some((wanted) => wanted.id === edge.id) && !R279_EDGES.some(wanted => wanted.id === edge.id));
     repairKnowledgeGraph(pristineNodes, pristineEdges);
+    Object.assign(pristineNodes, JSON.parse(applyR279Nodes(JSON.stringify(pristineNodes))));
+    Object.assign(pristineEdges, JSON.parse(applyR279Edges(JSON.stringify(pristineEdges))));
     expect(pristineNodes).toEqual(JSON.parse(readRaw('data/base/knowledge_graph/nodes.json')));
     expect(pristineEdges).toEqual(JSON.parse(readRaw('data/base/knowledge_graph/edges.json')));
     // 幂等：对当前数据二次修复是字节级无操作。

@@ -1,0 +1,9 @@
+
+> wuxia-rpg@0.0.1 audit:round-48-docs
+> node scripts/audit-round-48-docs.mjs
+
+- ARCHITECTURE.md 资源计数应与 manifest 登记的 102 项资源一致
+- DATA-GUIDE.md 缺少与基础资料一致的计数：39 名 NPC
+- DATA-GUIDE.md 缺少与基础资料一致的计数：432 个图谱节点
+- DATA-GUIDE.md 缺少与基础资料一致的计数：550 条边
+- DATA-GUIDE.md 图谱汇总应为 432 个图谱节点/550 条边

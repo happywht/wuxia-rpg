@@ -1,3 +1,4 @@
+* text=auto eol=lf
 # Preserve exact downloaded QA evidence bytes, including line endings.
 iterations/round-270/j0-opening.json -text
 iterations/round-271/j0-delivery.json -text
@@ -18,3 +19,11 @@ iterations/round-277/nav-bridge-before-battle.json -text
 iterations/round-278/escort-boat-iron-arrival.json -text
 iterations/round-278/repair-free-north-before-return.json -text
 iterations/round-278/repair-boat-iron-arrival.json -text
+
+iterations/round-279/escort-road-exchange.json -text
+
+iterations/round-279/repair-road-exchange.json -text
+
+iterations/round-279/escort-final-c0-arrival.json -text
+
+iterations/round-279/repair-final-c0-arrival.json -text

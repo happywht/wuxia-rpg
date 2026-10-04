@@ -1,0 +1,82 @@
+6	    if (cells[row][col] !== 0) throw new Error(`${map.id} 存在重叠图素：${cellKey(col, row)}`);
+97	    cells[row][col] = gid;
+98	  }
+99	  return { id: spec.id, tilesetId: ROUND76_TILESET.id, cells };
+100	}
+101
+102	async function readJson(filePath) {
+103	  return JSON.parse(await readFile(filePath, 'utf8'));
+104	}
+105
+106	async function collectProtectedCells() {
+107	  const protectedByMap = new Map(maps.map(({ id }) => [id, new Set()]));
+108	  const add = (mapId, point) => {
+109	    if (mapId === undefined || point === undefined || !protectedByMap.has(mapId)) return;
+110	    if (Number.isInteger(point.col) && Number.isInteger(point.row)) {
+111	      protectedByMap.get(mapId).add(cellKey(point.col, point.row));
+112	    }
+113	  };
+114
+115	  const [world, manifest] = await Promise.all([
+116	    readJson(resolve(repoRoot, 'data/base/world/world-map.json')),
+117	    readJson(resolve(repoRoot, 'data/base/manifest.json')),
+118	  ]);
+119	  for (const item of [...(world.landmarks ?? []), ...(world.events ?? [])]) {
+120	    add(item.mapResourceId, item);
+121	  }
+122	  for (const transition of world.transitions ?? []) {
+123	    add(transition.from?.mapResourceId, transition.from);
+124	    add(transition.to?.mapResourceId, transition.to);
+125	  }
+126	  for (const { id, file } of maps) {
+127	    const map = await readJson(resolve(repoRoot, 'data/base/maps', file));
+128	    add(id, map.playerStart);
+129	  }
+130
+131	  for (const resource of manifest.resources ?? []) {
+132	    if (resource.schema !== 'npc-set' && resource.schema !== 'battle-encounters') continue;
+133	    const data = await readJson(resolve(repoRoot, 'data/base', resource.path));
+134	    for (const npc of data.npcs ?? []) {
+
+scripts/deepen-round112-cloud.mjs:31:const worldPath='data/base/world/world-map.json',world=read(worldPath),guide=world.regionGuides.find(g=>g.mapResourceId==='map.round-74-cloud-ridge');
+scripts/generate-round74-cloud-ridge.mjs:10:const worldPath = resolve(repoRoot, 'data/base/world/world-map.json');
+scripts/generate-round74-cloud-ridge.mjs:69:for (const landmark of world.landmarks ?? []) {
+scripts/generate-round74-cloud-ridge.mjs:70:  if (landmark.mapResourceId === mapResourceId) addAnchor(`地标 ${landmark.id}`, landmark);
+
+ResourceId === mapResourceId) addAnchor(`事件 ${event.id}`, event);
+74	}
+75	for (const npc of npcRecords) {
+76	  if (npc.mapResourceId !== mapResourceId) continue;
+77	  addAnchor(`人物 ${npc.id}`, npc.position);
+78	  for (const schedule of npc.schedule ?? []) addAnchor(`日程 ${npc.id}/${schedule.periodId}`, schedule.position);
+79	}
+80	for (const encounter of encounters) {
+81	  if (encounter.mapResourceId === mapResourceId) addAnchor(`遭遇 ${encounter.id}`, encounter.position);
+82	}
+83
+84	const hashCell = (col, row, salt = 0) => {
+85	  let value = Math.imul(col + 101, 0x45d9f3b) ^ Math.imul(row + 307, 0x119de1f3) ^ salt;
+86	  value = Math.imul(value ^ (value >>> 16), 0x45d9f3b);
+87	  value = Math.imul(value ^ (value >>> 16), 0x45d9f3b);
+88	  return (value ^ (value >>> 16)) >>> 0;
+89	};
+90
+91	const roads = new Set();
+92	function addRoadSegment(from, to) {
+93	  const steps = Math.max(Math.abs(to.col - from.col), Math.abs(to.row - from.row));
+94	  for (let step = 0; step <= steps; step++) {
+95	    const ratio = steps === 0 ? 0 : step / steps;
+96	    const col = Math.round(from.col + (to.col - from.col) * ratio);
+97	    const row = Math.round(from.row + (to.row - from.row) * ratio);
+98	    for (const [dx, dy] of [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]]) {
+99	      if (inside(col + dx, row + dy)) roads.add(key(col + dx, row + dy));
+100	    }
+101	  }
+102	}
+103	function addRoad(points) {
+104	  for (let index = 1; index < points.length; index++) addRoadSegment(points[index - 1], points[index]);
+105	}
+106
+107	// The south pass opens onto a winding route through the cloud ridge and its old waystation.
+108	addRoad([
+109	  { col: 50, row: 97 }, { col: 50, row: 87 }, { col: 43, row: 77 },

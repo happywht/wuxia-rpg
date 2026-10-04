@@ -1,0 +1,171 @@
+{
+  "conversations": [
+    {
+      "id": "dlg.r279-xin-danggui-road-keeper",
+      "startNodeId": "greet",
+      "nodes": [
+        {
+          "id": "greet",
+          "text": "辛当归把药担往道旁又挪了半尺，让开北行的路面：「我替石北留守这中段药担。北关还有二十多格上坡——身上带的清心丸或熟铁砂，匀一样出来，我换你一贴现熬的回春膏，另费八分钟火候。两种只换一次；留着丸路上调息、留着砂锻器备料，也都是正经打算，不勉强。」",
+          "options": [
+            {
+              "text": "拿一丸清心丸，换一贴回春膏。",
+              "nextNodeId": "r279-qingxin-detail",
+              "conditions": [
+                {
+                  "kind": "variable",
+                  "key": "r279.road-exchange",
+                  "operator": "missing"
+                },
+                {
+                  "kind": "itemCount",
+                  "itemId": "item.qingxin-wan",
+                  "minCount": 1
+                }
+              ]
+            },
+            {
+              "text": "拿一份熟铁砂，换一贴回春膏。",
+              "nextNodeId": "r279-iron-detail",
+              "conditions": [
+                {
+                  "kind": "variable",
+                  "key": "r279.road-exchange",
+                  "operator": "missing"
+                },
+                {
+                  "kind": "itemCount",
+                  "itemId": "item.iron-sand",
+                  "minCount": 1
+                }
+              ]
+            },
+            {
+              "text": "核对换药的存根。",
+              "nextNodeId": "r279-exchange-record",
+              "conditions": [
+                {
+                  "kind": "variable",
+                  "key": "r279.road-exchange",
+                  "operator": "exists"
+                }
+              ]
+            },
+            {
+              "text": "先赶路要紧，回头再说。",
+              "nextNodeId": "r279-farewell"
+            }
+          ]
+        },
+        {
+          "id": "r279-qingxin-detail",
+          "confirmEffects": true,
+          "text": "辛当归拈起那丸清心丸对着光看了看：「一丸清心丸，换回春膏一贴，再等我八分钟熬上药。换了，路上气短就没得含的了——步云履那一段费内力，你自家掂量。」",
+          "options": [
+            {
+              "text": "就按这个换。",
+              "nextNodeId": "r279-exchange-receipt",
+              "conditions": [
+                {
+                  "kind": "variable",
+                  "key": "r279.road-exchange",
+                  "operator": "missing"
+                },
+                {
+                  "kind": "itemCount",
+                  "itemId": "item.qingxin-wan",
+                  "minCount": 1
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "takeItem",
+                  "itemId": "item.qingxin-wan",
+                  "quantity": 1
+                },
+                {
+                  "kind": "giveItem",
+                  "itemId": "item.huichun-gao",
+                  "quantity": 1
+                },
+                {
+                  "kind": "advanceTime",
+                  "minutes": 8
+                },
+                {
+                  "kind": "setVariable",
+                  "key": "r279.road-exchange",
+                  "value": "qingxin-wan"
+                }
+              ]
+            },
+            {
+              "text": "再想想，先不换。",
+              "nextNodeId": "greet"
+            }
+          ]
+        },
+        {
+          "id": "r279-iron-detail",
+          "confirmEffects": true,
+          "text": "辛当归捏了捏袋口的熟铁砂：「一份熟铁砂，换回春膏一贴，也等八分钟。这砂留着，往后锻器备料用得上；换出去，就是把余料押在伤药上。换成不成，你说了算。」",
+          "options": [
+            {
+              "text": "就按这个换。",
+              "nextNodeId": "r279-exchange-receipt",
+              "conditions": [
+                {
+                  "kind": "variable",
+                  "key": "r279.road-exchange",
+                  "operator": "missing"
+                },
+                {
+                  "kind": "itemCount",
+                  "itemId": "item.iron-sand",
+                  "minCount": 1
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "takeItem",
+                  "itemId": "item.iron-sand",
+                  "quantity": 1
+                },
+                {
+                  "kind": "giveItem",
+                  "itemId": "item.huichun-gao",
+                  "quantity": 1
+                },
+                {
+                  "kind": "advanceTime",
+                  "minutes": 8
+                },
+                {
+                  "kind": "setVariable",
+                  "key": "r279.road-exchange",
+                  "value": "iron-sand"
+                }
+              ]
+            },
+            {
+              "text": "再想想，先不换。",
+              "nextNodeId": "greet"
+            }
+          ]
+        },
+        {
+          "id": "r279-farewell",
+          "text": "辛当归把药担让到道边：「北关还在前头，赶路也留心脚下。有伤再敷膏，气短才用丸，原路回来不必特地再换药。」"
+        },
+        {
+          "id": "r279-exchange-receipt",
+          "text": "纸包还带着熬药的余温。辛当归把存根上的麻绳打了个结：「回春膏一贴收好，B键背包里查看，伤后再敷，按实际伤势用药。这笔换过了，我这担药不收第二回——原路回渡口时路过，打个招呼就行。」"
+        },
+        {
+          "id": "r279-exchange-record",
+          "text": "辛当归翻开指边的麻绳存根：「你这笔早换过了。回春膏伤后敷；真缺药，客舍沈雨霁有少量药匣，或原路回渡口再想办法。没有第二贴，也不收退换。」"
+        }
+      ]
+    }
+  ]
+}

@@ -99,8 +99,8 @@ describe('Round 58 regional quest chains', () => {
     expect(assembly.warnings).toEqual([]);
     expect(assembly.quests.size).toBe(44);
     expect(graph.warnings).toEqual([]);
-    expect(nodeParse.data.nodes).toHaveLength(431); // R255 route outcomes + R261 river-lantern appointment event + the two R271 hand-delivery events.
-    expect(edgeParse.data.edges).toHaveLength(548); // R255 reward edges + the two R261 river-lantern appointment edges + the four R271 delivery edges.
+    expect(nodeParse.data.nodes).toHaveLength(432); // R255 route outcomes + R261 river-lantern appointment event + the two R271 hand-delivery events + the R279 roadside keeper.
+    expect(edgeParse.data.edges).toHaveLength(550); // R255 reward edges + the two R261 river-lantern appointment edges + the four R271 delivery edges + the two R279 keeper edges.
     // Stable ids anchor the R261 appointment addition instead of trusting the count alone.
     expect(nodeParse.data.nodes.map((node) => node.id)).toContain('event.r31-river-lantern-time-agreed');
     const edgeIds = edgeParse.data.edges.map((edge) => edge.id);

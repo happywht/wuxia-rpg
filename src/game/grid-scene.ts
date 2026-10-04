@@ -1,3 +1,4 @@
+import { regionInspectionConversation } from './region-inspection';
 import { describeOralPrerequisites } from './dialogue-prerequisites';
 import { isDialogueLandingOccupied, type DialogueTeleportReadiness } from '../engine/dialogue-teleport-request';
 import {RegionalGuidePanel} from './regional-guide-ui';
@@ -4228,6 +4229,8 @@ export class GridScene extends Phaser.Scene {
     if (shouldPreferRegionalEventInteraction(mapEvent !== null, npcHasDedicatedInteraction)) {
       this.faceInteractionCell(mapEvent!.event);
       this.presentRegionEvents([mapEvent!.event]);
+      this.dialoguePanel?.open(regionInspectionConversation(mapEvent!.event, this.regionNotice ?? mapEvent!.event.text), mapEvent!.event.interaction!.prompt);
+      this.updateInteractHint();
       return;
     }
     if (target !== null) {

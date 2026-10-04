@@ -557,3 +557,14 @@ Round 79 新增第六块 100×100 海岛地图「东海群岛·落潮湾」，�
 | --- | --- | --- |
 | `gate.r278-ferry-north-boat` | `map.round-10-mist-ferry` (0, 3) → `map.round-10-mist-ferry` (87, 15) | 8银 / 20世界分钟 |
 | `gate.r278-ferry-north-boat-return` | `map.round-10-mist-ferry` (87, 16) → `map.round-10-mist-ferry` (0, 4) | 8银 / 20世界分钟 |
+
+## Round279 北行药担与云岭岔牌
+
+铁嶂(26,4)人物站在原北行50格路线旁，26,3可F/E交谈；原38人物、56关口、全部旧碰撞/地图尺寸不变。世界现79地标、71固定事件，1个无奖励可反复E阅读的岔牌。云岭50,56北侧墙保留，先西折到40列再北行至客舍前道，R人物核当前时段位置；不按静态坐标保证沈雨霁总在那里。
+
+| 条目ID | 地图 | 坐标 | 内容 | 一次性 |
+| --- | --- | --- | --- | --- |
+| landmark.r279-cloud-fork-sign | map.round-74-cloud-ridge | (50, 59) | 云岭南岔指路牌 / route | 不适用 |
+| event.r279-cloud-fork-sign | map.round-74-cloud-ridge | (50, 59) | 四向相邻E主动读；无见闻、奖励、生命消耗；往返可复读 | 否 |
+
+云岭地图当前12层：原11层完整保留，新增round279-cloud-fork-sign一格Kenney Tiny Town木牌(GID85/源帧84)，y遮挡；tilesets追加同一已登记图集规格，100×100碰撞/出生点完全不改。E调查经正常事件结算后进入可分页、主动关闭的文字窗口；R74→R76→R78→R112重生成须保留新增图层及深度，不用路牌锚点擅自重铺地形。

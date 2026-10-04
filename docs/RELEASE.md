@@ -43,3 +43,7 @@ Round 50 另提供仓库验收命令 `npm run audit:final`。它需要完整 Git
 ## 取消或回滚
 
 重新运行部署 workflow 可把默认分支上的新构建发布到 Pages。要停止继续发布，在仓库 Pages 设置中改回其他发布源或关闭 Pages，并禁用 `deploy-pages.yml` workflow；删除当前站点需在仓库 Pages 设置中执行。该操作会影响公开站点，本地开发脚本不会替维护者执行。
+
+## Round279 核验状态
+
+GitHub https://github.com/happywht/wuxia-rpg 已上传至 Round278（51f3355）；round278-baseline 为预发布源码基线，未部署 Pages。初次隔离发行验证失败，后续证实原始LF七组130/132通过，两个遗漏历史基线核验补入后12/12通过。尚需完整干净 package:release，不能声称稳定包通过。
