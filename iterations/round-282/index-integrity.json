@@ -1,0 +1,26 @@
+{
+  "checkedAt": "2026-10-04T11:10:25.397Z",
+  "rawFiles": [
+    {
+      "path": "iterations/round-282/j-new-game.json",
+      "sha256": "1fb3ae47b366102b8dff15b24a56452251554e8125530f9f08dabf5c20268fae",
+      "bytes": 35217
+    },
+    {
+      "path": "iterations/round-282/j0-delivery.json",
+      "sha256": "194649a8236a0cf7b7d3176caa28915605702ced4e36b202c70afaa4fa0470ab",
+      "bytes": 35611
+    },
+    {
+      "path": "iterations/round-282/f0-common.json",
+      "sha256": "6fce18a5a22f68f3f20ae49219bd2558cdfe4dd63829919d5e96a722e83db07e",
+      "bytes": 36807
+    },
+    {
+      "path": "iterations/round-282/f1-common-before-choice.json",
+      "sha256": "a07c3420e17399fc3bf9209b67dfb575067341575d25055f2750db293d022d93",
+      "bytes": 36804
+    }
+  ],
+  "protectedFilesStaged": false
+}

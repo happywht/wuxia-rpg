@@ -2,6 +2,10 @@
 
 当前状态唯一入口：[验收矩阵](docs/CURRENT-ACCEPTANCE.md)。开发严格按「代表旅程 → 12项差事 → 成长路线与制作 → 信息与美术 → 持续QA与同版交付」推进，见 [执行方案](docs/PRODUCT-POLISH-PLAN.md) 与 [项目目标](docs/PROJECT-GOALS.md)。历史证据见 [DEVLOG](DEVLOG.md)，不能用数量或旧测试通过代替当前产品验收。
 
+## 公开验证版本
+
+[GitHub 仓库](https://github.com/happywht/wuxia-rpg) · [Round281 验证预发布与游戏包](https://github.com/happywht/wuxia-rpg/releases/tag/round281-verification)。这是固定候选的验证版本；完整旅程和真人时长仍按验收矩阵推进，尚非稳定发行。
+
 ## 启动
 
 ```powershell

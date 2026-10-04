@@ -1,0 +1,65 @@
+{
+  "candidate": "bf0e8d70f608816c7ed0127e540c39a0d4cc0268",
+  "verifiedAt": "2026-10-04T11:04:16.299Z",
+  "runtimeFilesChecked": 272,
+  "runtimeMismatches": [],
+  "rawDownloadsIdentical": true,
+  "files": [
+    {
+      "path": "iterations/round-282/j-new-game.json",
+      "bytes": 35217,
+      "sha256": "1fb3ae47b366102b8dff15b24a56452251554e8125530f9f08dabf5c20268fae",
+      "download": "C:\\Users\\Hitao\\Downloads\\qa-checkpoint-journey-20261004-r282-common-j-new-game-slot-1.json",
+      "candidate": "bf0e8d70f608816c7ed0127e540c39a0d4cc0268",
+      "stage": "j-new-game",
+      "sourceSlotId": "slot-1",
+      "savedAt": "2026-10-04T10:26:10.585Z",
+      "exportedAt": "2026-10-04T10:26:18.936Z",
+      "currency": 120,
+      "experience": 0,
+      "elapsedGameMinutes": 0
+    },
+    {
+      "path": "iterations/round-282/j0-delivery.json",
+      "bytes": 35611,
+      "sha256": "194649a8236a0cf7b7d3176caa28915605702ced4e36b202c70afaa4fa0470ab",
+      "download": "C:\\Users\\Hitao\\Downloads\\qa-checkpoint-journey-20261004-r282-common-j0-delivery-slot-2.json",
+      "candidate": "bf0e8d70f608816c7ed0127e540c39a0d4cc0268",
+      "stage": "j0-delivery",
+      "sourceSlotId": "slot-2",
+      "savedAt": "2026-10-04T10:32:10.097Z",
+      "exportedAt": "2026-10-04T10:32:22.739Z",
+      "currency": 171,
+      "experience": 178,
+      "elapsedGameMinutes": 48
+    },
+    {
+      "path": "iterations/round-282/f0-common.json",
+      "bytes": 36807,
+      "sha256": "6fce18a5a22f68f3f20ae49219bd2558cdfe4dd63829919d5e96a722e83db07e",
+      "download": "C:\\Users\\Hitao\\Downloads\\qa-checkpoint-journey-20261004-r282-common-f0-common-slot-3.json",
+      "candidate": "bf0e8d70f608816c7ed0127e540c39a0d4cc0268",
+      "stage": "f0-common",
+      "sourceSlotId": "slot-3",
+      "savedAt": "2026-10-04T10:54:44.160Z",
+      "exportedAt": "2026-10-04T10:54:58.990Z",
+      "currency": 161,
+      "experience": 436,
+      "elapsedGameMinutes": 335
+    },
+    {
+      "path": "iterations/round-282/f1-common-before-choice.json",
+      "bytes": 36804,
+      "sha256": "a07c3420e17399fc3bf9209b67dfb575067341575d25055f2750db293d022d93",
+      "download": "C:\\Users\\Hitao\\Downloads\\qa-checkpoint-journey-20261004-r282-common-f1-common-before-choice-slot-2.json",
+      "candidate": "bf0e8d70f608816c7ed0127e540c39a0d4cc0268",
+      "stage": "f1-common-before-choice",
+      "sourceSlotId": "slot-2",
+      "savedAt": "2026-10-04T10:59:25.456Z",
+      "exportedAt": "2026-10-04T10:59:35.270Z",
+      "currency": 185,
+      "experience": 464,
+      "elapsedGameMinutes": 371
+    }
+  ]
+}

@@ -1,0 +1,368 @@
+{
+  "tool": "audit-journey-ledger",
+  "ledgerFormat": "wuxia-rpg.journey-ledger",
+  "ledgerVersion": 1,
+  "expectedCandidate": "bf0e8d70f608816c7ed0127e540c39a0d4cc0268",
+  "files": [
+    {
+      "path": "iterations/round-282/j-new-game.json",
+      "bytes": 35217,
+      "sha256": "1fb3ae47b366102b8dff15b24a56452251554e8125530f9f08dabf5c20268fae",
+      "envelopeMetadata": {
+        "format": "wuxia-rpg.qa-checkpoint",
+        "version": 1,
+        "qaRun": "journey-20261004-r282-common",
+        "candidate": "bf0e8d70f608816c7ed0127e540c39a0d4cc0268",
+        "stage": "j-new-game",
+        "exportedAt": "2026-10-04T10:26:18.936Z",
+        "sourceSlotId": "slot-1"
+      }
+    },
+    {
+      "path": "iterations/round-282/j0-delivery.json",
+      "bytes": 35611,
+      "sha256": "194649a8236a0cf7b7d3176caa28915605702ced4e36b202c70afaa4fa0470ab",
+      "envelopeMetadata": {
+        "format": "wuxia-rpg.qa-checkpoint",
+        "version": 1,
+        "qaRun": "journey-20261004-r282-common",
+        "candidate": "bf0e8d70f608816c7ed0127e540c39a0d4cc0268",
+        "stage": "j0-delivery",
+        "exportedAt": "2026-10-04T10:32:22.739Z",
+        "sourceSlotId": "slot-2"
+      }
+    }
+  ],
+  "ledger": {
+    "format": "wuxia-rpg.journey-ledger",
+    "version": 1,
+    "ok": true,
+    "checkpointCount": 2,
+    "expectedCandidate": "bf0e8d70f608816c7ed0127e540c39a0d4cc0268",
+    "observed": {
+      "candidates": [
+        "bf0e8d70f608816c7ed0127e540c39a0d4cc0268"
+      ],
+      "qaRuns": [
+        "journey-20261004-r282-common"
+      ],
+      "stages": [
+        "j-new-game",
+        "j0-delivery"
+      ],
+      "sourceSlotIds": [
+        "slot-1",
+        "slot-2"
+      ],
+      "slotTransitions": [
+        {
+          "fromIndex": 0,
+          "toIndex": 1,
+          "fromSlot": "slot-1",
+          "toSlot": "slot-2"
+        }
+      ],
+      "worldSeeds": [
+        655203956
+      ],
+      "profileIds": [
+        "char.scribe-apprentice"
+      ]
+    },
+    "violations": [],
+    "warnings": [
+      {
+        "code": "SOURCE_SLOT_CHANGED",
+        "message": "source slot changed between checkpoint 0 and 1; consequences may be masked by a different slot",
+        "fromIndex": 0,
+        "toIndex": 1,
+        "fromSlot": "slot-1",
+        "toSlot": "slot-2"
+      }
+    ],
+    "guardrails": {
+      "measuredDifferencesOnly": true,
+      "infersGameplayFromTaskCounts": false,
+      "claimsJourneyCompletion": false,
+      "claimsHumanPlaytime": false,
+      "note": "Deltas are measured snapshot differences only. elapsedGameMinutes is in-world time and is NOT evidence of human play duration; P1 human 60-90 minute acceptance still requires separate human evidence."
+    },
+    "metadataUsage": {
+      "validationOnly": [
+        "format",
+        "version",
+        "candidate",
+        "qaRun",
+        "sourceSlotId",
+        "snapshot.savedAt",
+        "snapshot.elapsedGameMinutes",
+        "snapshot.worldSeed",
+        "snapshot.profileId"
+      ],
+      "evidenceOnly": "deltas come exclusively from snapshot gameplay fields",
+      "note": "Envelope stage/exportedAt/displayName are echoed as raw metadata and never generate gameplay deltas or completion claims."
+    },
+    "deltas": {
+      "time": {
+        "elapsedGameMinutes": [
+          {
+            "fromIndex": 0,
+            "toIndex": 1,
+            "from": 0,
+            "to": 48,
+            "delta": 48
+          }
+        ],
+        "savedAt": [
+          {
+            "fromIndex": 0,
+            "toIndex": 1,
+            "from": "2026-10-04T10:26:10.585Z",
+            "to": "2026-10-04T10:32:10.097Z",
+            "deltaMs": 359512
+          }
+        ],
+        "totals": {
+          "elapsedGameMinutes": 48,
+          "savedAtMs": 359512
+        }
+      },
+      "resources": {
+        "currency": [
+          {
+            "fromIndex": 0,
+            "toIndex": 1,
+            "from": 120,
+            "to": 171,
+            "delta": 51,
+            "change": "changed"
+          }
+        ],
+        "stats": [
+          {
+            "stat": "level",
+            "fromIndex": 0,
+            "toIndex": 1,
+            "from": 1,
+            "to": 3,
+            "delta": 2,
+            "change": "changed"
+          },
+          {
+            "stat": "experience",
+            "fromIndex": 0,
+            "toIndex": 1,
+            "from": 0,
+            "to": 178,
+            "delta": 178,
+            "change": "changed"
+          },
+          {
+            "stat": "healthCurrent",
+            "fromIndex": 0,
+            "toIndex": 1,
+            "from": 83,
+            "to": 110,
+            "delta": 27,
+            "change": "changed"
+          },
+          {
+            "stat": "qiCurrent",
+            "fromIndex": 0,
+            "toIndex": 1,
+            "from": 53,
+            "to": 75,
+            "delta": 22,
+            "change": "changed"
+          },
+          {
+            "stat": "cultivationPoints",
+            "fromIndex": 0,
+            "toIndex": 1,
+            "from": 2,
+            "to": 4,
+            "delta": 2,
+            "change": "changed"
+          }
+        ],
+        "inventory": [
+          {
+            "itemId": "item.huichun-gao",
+            "fromIndex": 0,
+            "toIndex": 1,
+            "from": 2,
+            "to": null,
+            "delta": -2,
+            "change": "removed"
+          }
+        ]
+      },
+      "quests": {
+        "statuses": [
+          {
+            "questId": "quest.round-07-medicine-run",
+            "fromIndex": 0,
+            "toIndex": 1,
+            "fromStatus": "offered",
+            "toStatus": "completed"
+          },
+          {
+            "questId": "quest.round-07-clear-alley",
+            "fromIndex": 0,
+            "toIndex": 1,
+            "fromStatus": "offered",
+            "toStatus": "completed"
+          },
+          {
+            "questId": "quest.r31-teastall-herbal-water",
+            "fromIndex": 0,
+            "toIndex": 1,
+            "fromStatus": "offered",
+            "toStatus": "completed"
+          },
+          {
+            "questId": "quest.r31-herbal-inquiry",
+            "fromIndex": 0,
+            "toIndex": 1,
+            "fromStatus": "locked",
+            "toStatus": "offered"
+          },
+          {
+            "questId": "quest.r31-river-lantern-promise",
+            "fromIndex": 0,
+            "toIndex": 1,
+            "fromStatus": "locked",
+            "toStatus": "offered"
+          },
+          {
+            "questId": "quest.r58-south-hamlet-survey",
+            "fromIndex": 0,
+            "toIndex": 1,
+            "fromStatus": "locked",
+            "toStatus": "offered"
+          }
+        ],
+        "objectives": [
+          {
+            "questId": "quest.round-07-medicine-run",
+            "objectiveId": "objective.round-07-three-ointments",
+            "fromIndex": 0,
+            "toIndex": 1,
+            "from": 0,
+            "to": 3,
+            "delta": 3,
+            "change": "changed"
+          },
+          {
+            "questId": "quest.round-07-medicine-run",
+            "objectiveId": "objective.r271-medicine-delivery",
+            "fromIndex": 0,
+            "toIndex": 1,
+            "from": 0,
+            "to": 1,
+            "delta": 1,
+            "change": "changed"
+          },
+          {
+            "questId": "quest.round-07-clear-alley",
+            "objectiveId": "objective.round-07-defeat-blade",
+            "fromIndex": 0,
+            "toIndex": 1,
+            "from": 0,
+            "to": 1,
+            "delta": 1,
+            "change": "changed"
+          },
+          {
+            "questId": "quest.r31-teastall-herbal-water",
+            "objectiveId": "objective.r31-teastall-herbs",
+            "fromIndex": 0,
+            "toIndex": 1,
+            "from": 0,
+            "to": 4,
+            "delta": 4,
+            "change": "changed"
+          },
+          {
+            "questId": "quest.r31-teastall-herbal-water",
+            "objectiveId": "objective.r271-teastall-delivery",
+            "fromIndex": 0,
+            "toIndex": 1,
+            "from": 0,
+            "to": 1,
+            "delta": 1,
+            "change": "changed"
+          }
+        ]
+      },
+      "knowledge": {
+        "knownNodeIds": [
+          {
+            "nodeId": "event.r271-teastall-delivered",
+            "change": "added",
+            "fromIndex": 0,
+            "toIndex": 1
+          },
+          {
+            "nodeId": "event.r271-medicine-delivered",
+            "change": "added",
+            "fromIndex": 0,
+            "toIndex": 1
+          },
+          {
+            "nodeId": "char.alley-blade",
+            "change": "added",
+            "fromIndex": 0,
+            "toIndex": 1
+          }
+        ],
+        "npcKnowledge": []
+      },
+      "relationships": {
+        "values": [
+          {
+            "npcId": "char.lu-zhenniang",
+            "fromIndex": 0,
+            "toIndex": 1,
+            "from": null,
+            "to": 3,
+            "delta": 3,
+            "change": "added"
+          },
+          {
+            "npcId": "char.gu-yechen",
+            "fromIndex": 0,
+            "toIndex": 1,
+            "from": null,
+            "to": 2,
+            "delta": 2,
+            "change": "added"
+          },
+          {
+            "npcId": "char.ma-shangyi",
+            "fromIndex": 0,
+            "toIndex": 1,
+            "from": null,
+            "to": 3,
+            "delta": 3,
+            "change": "added"
+          }
+        ],
+        "factionRenown": [],
+        "scalars": []
+      },
+      "variables": [],
+      "encounters": {
+        "completedEncounters": [
+          {
+            "encounterId": "encounter.alley-blade-bully",
+            "change": "added",
+            "fromIndex": 0,
+            "toIndex": 1
+          }
+        ],
+        "completedRegionalEvents": []
+      }
+    }
+  }
+}

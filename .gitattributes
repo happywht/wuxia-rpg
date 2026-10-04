@@ -30,3 +30,8 @@ iterations/round-279/repair-final-c0-arrival.json -text
 
 iterations/round-280/escort-c1-return.json -text
 iterations/round-280/repair-c1-return.json -text
+
+iterations/round-282/j-new-game.json -text
+iterations/round-282/j0-delivery.json -text
+iterations/round-282/f0-common.json -text
+iterations/round-282/f1-common-before-choice.json -text

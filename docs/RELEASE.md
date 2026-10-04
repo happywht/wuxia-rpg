@@ -18,7 +18,7 @@ npm run package:release
 - 包内 `release-manifest.json`：格式版本、游戏版本、CI 源码提交（本地包为 `null`）以及每个被打包文件的字节数和 SHA-256。
 - 根目录 `THIRD-PARTY-NOTICES.md`：从锁定 production dependency 树收集包名、版本、license 标识与其发行包随附的 LICENSE/NOTICE 正文。Pages workflow 将此文件一并上传，因此静态站点也在 `/THIRD-PARTY-NOTICES.md` 提供许可文本。
 
-Round 50 另提供仓库验收命令 `npm run audit:final`。它需要完整 Git 历史以检查 R00–R50 的逐轮计划与提交，不是静态版本包构建前置项，也不进入适配浅克隆的 `npm run check`；最终表格与本机实际结果见 [`FINAL-ACCEPTANCE.md`](FINAL-ACCEPTANCE.md)。
+Round 50 另提供仓库验收命令 `npm run audit:final`。它需要完整 Git 历史以检查 R00–R50 的逐轮计划与提交，不是静态版本包构建前置项，也不进入 `npm run check`；当前check中的历史迁移保护同样要求完整Git历史；最终表格与本机实际结果见 [`FINAL-ACCEPTANCE.md`](FINAL-ACCEPTANCE.md)。
 
 版本包从临时 staging 目录构成，文件白名单只允许构建后的 `index.html`、JS/CSS、基础资料、Schema、示例 MOD、第三方 notices、README 和发布/参考/原作边界/玩家/MOD 指南。包内发布说明也列出 [`PLAYER-GUIDE.md`](PLAYER-GUIDE.md) 与 [`MOD-GUIDE.md`](MOD-GUIDE.md)。打包器拒绝符号链接、遗漏运行文件、危险路径或清单外包内文件。不会把源代码、测试、依赖、Git 历史、本机 `.env` 或 `.serena/` 放进版本包。每个版本只覆盖 `release/` 中同版本的归档和 checksum；该输出目录不进入 Git。
 
@@ -30,7 +30,7 @@ Round 50 另提供仓库验收命令 `npm run audit:final`。它需要完整 Git
 - 构建使用相对资源基址，支持域名根路径和仓库子路径；主机须原样保留目录结构与 `.json` 文件。
 - 存档、设置和其他玩家状态保存在当前浏览器的 `localStorage`，不会随换浏览器或清除站点数据迁移。
 - 本构建随包提供基础资料与 `mods/example/` 样例。浏览器静态版不允许用户在服务器上安装新 MOD；需要重新构建并部署 MOD 资料。
-- Phaser 输出目前包含约 1.9 MB 的主 JS chunk；Vite 500 kB 提示不会阻止运行，后续可单独做分块优化。
+- Round281生产输出主 JS 约726 kB、独立 Phaser chunk 约1.375 MB；Vite 500 kB 提示不会阻止运行，后续可单独做分块优化。
 
 ## GitHub Pages 部署
 
@@ -44,7 +44,7 @@ Round 50 另提供仓库验收命令 `npm run audit:final`。它需要完整 Git
 
 重新运行部署 workflow 可把默认分支上的新构建发布到 Pages。要停止继续发布，在仓库 Pages 设置中改回其他发布源或关闭 Pages，并禁用 `deploy-pages.yml` workflow；删除当前站点需在仓库 Pages 设置中执行。该操作会影响公开站点，本地开发脚本不会替维护者执行。
 
-## Round279 核验状态
+## Round279 历史核验状态
 
 GitHub https://github.com/happywht/wuxia-rpg 已上传至 Round278（51f3355）；round278-baseline 为预发布源码基线，未部署 Pages。初次隔离发行验证失败，后续证实原始LF七组130/132通过，两个遗漏历史基线核验补入后12/12通过。尚需完整干净 package:release，不能声称稳定包通过。
 
@@ -52,7 +52,7 @@ GitHub https://github.com/happywht/wuxia-rpg 已上传至 Round278（51f3355）�
 
 完整回归包含历史迁移保护，构建需完整Git历史；裸源码归档及默认浅克隆不能代替干净Git checkout。CI两工作流设置fetch-depth: 0。先git clone、checkout完整候选SHA、npm ci；设置GITHUB_SHA为同一SHA后执行npm run package:release。打包成功后将tgz解包到独立目录，执行 `node scripts/verify-release-candidate.mjs <package目录> <完整候选SHA>`，独立核对来源SHA、全部文件字节数与哈希、额外文件及关键运行文件。不能信任仅显示版本号的包；本地默认sourceCommit=null的便捷包不满足锁定候选验收。
 
-本轮先验证2280b58候选；自动校验通过仍须HTTP独立实启和正常存读，完整旅程未验不得宣布稳定发行。
+当前冻结发行候选为bf0e8d70f608816c7ed0127e540c39a0d4cc0268；Round281已独立解包实启及开局存读，Round282已从正常新游戏实走至F1共同父。完整同候选双侧后程与真人时长未验，不得宣布稳定发行。
 
 ## Round281 当前增量证据
 

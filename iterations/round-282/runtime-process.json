@@ -1,0 +1,6 @@
+{
+  "port": 5312,
+  "processId": 53080,
+  "executable": "D:\\nvm4w\\nodejs\\node.exe",
+  "commandLine": "\"node\"   \"D:\\工作\\城建院\\2609\\收心\\wuxia-clean-git-round281\\node_modules\\.bin\\\\..\\vite\\bin\\vite.js\" --host 127.0.0.1 --port 5312 --strictPort"
+}
