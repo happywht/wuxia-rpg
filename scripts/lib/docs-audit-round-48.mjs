@@ -54,7 +54,29 @@ export async function auditRound48Docs({ root }) {
   const currentRound = activeRound !== null && (lastCompletedRound === null || activeRound > lastCompletedRound)
     ? activeRound
     : lastCompletedRound;
-  if (currentRound === null) {
+  // A maintained current matrix replaces repeated round headings in core manuals.
+  // Legacy packages and fixtures retain the original roadmap-based contract.
+  let currentMatrix = null;
+  try {
+    currentMatrix = await readFile(path.join(root, 'docs/CURRENT-ACCEPTANCE.md'), 'utf8');
+  } catch (error) {
+    if (error?.code !== 'ENOENT') problems.push('无法读取 docs/CURRENT-ACCEPTANCE.md');
+  }
+  if (currentMatrix !== null) {
+    for (const [name, text] of [['README.md', readme], ['ARCHITECTURE.md', architecture],
+      ['DATA-GUIDE.md', dataGuide], ['PLAYER-GUIDE.md', playerGuide], ['ROADMAP.md', roadmap]]) {
+      if (!text.includes('CURRENT-ACCEPTANCE.md')) problems.push(`${name} 未链接唯一当前验收矩阵`);
+    }
+    if (!/^更新：[^\r\n]+\/ Round\s*\d+/m.test(currentMatrix)) problems.push('当前验收矩阵缺少带轮次的更新依据');
+    if (!currentMatrix.includes('五阶段门槛') || !currentMatrix.includes('代表旅程检查点')) {
+      problems.push('当前验收矩阵缺少阶段门槛或真实旅程检查点');
+    }
+    const matrixRound = currentMatrix.match(/^更新：[^\r\n]+\/ Round\s*(\d+)/m)?.[1];
+    const roundRecord = new RegExp(`Round\\s*${matrixRound}\\b`);
+    if (matrixRound && (!roundRecord.test(changelog) || !roundRecord.test(devlog))) {
+      problems.push('CHANGELOG.md 与 DEVLOG.md 未记录当前验收矩阵轮次');
+    }
+  } else if (currentRound === null) {
     problems.push('ROADMAP.md 没有任何带验收摘要的已完成轮次');
   } else {
     const currentLabel = `Round ${String(currentRound).padStart(2, '0')}`;

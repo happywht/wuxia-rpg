@@ -1,0 +1,647 @@
+{
+  "basis": "Registered base JSON at command time; read-only static inventory, not runtime or human playtest acceptance",
+  "counts": {
+    "resources": 100,
+    "maps": 22,
+    "hundredByHundredMaps": 22,
+    "npcs": 38,
+    "factions": 5,
+    "quests": 65,
+    "items": 52,
+    "martialArts": 30,
+    "endings": 7,
+    "knowledgeNodes": 429,
+    "knowledgeEdges": 544,
+    "encounters": 14,
+    "shops": 6,
+    "companions": 1,
+    "forgeRecipes": 9,
+    "alchemyRecipes": 3,
+    "arenas": 1,
+    "factionWars": 1,
+    "achievements": 14,
+    "meridianNodes": 6,
+    "regions": 22,
+    "directedTransitions": 54,
+    "landmarks": 78,
+    "fixedEvents": 70,
+    "randomEvents": 4,
+    "atlas": {
+      "columns": 768,
+      "rows": 576,
+      "layers": 65
+    }
+  },
+  "questStructure": {
+    "roots": 31,
+    "withPrerequisites": 34,
+    "maxPrerequisiteDepth": 7,
+    "exclusiveGroups": {
+      "branch.ferry-priority": 2,
+      "branch.r42-ferry-record": 2,
+      "branch.r44-ferry-dispute": 2
+    },
+    "objectiveKinds": {
+      "collectItem": 14,
+      "craftRecipe": 2,
+      "defeatEncounter": 13,
+      "discoverKnowledge": 38,
+      "equipItem": 1,
+      "talkToNpc": 46,
+      "useItem": 1
+    },
+    "objectiveCombinations": {
+      "collectItem": 5,
+      "collectItem + collectItem": 1,
+      "collectItem + craftRecipe + equipItem + defeatEncounter + talkToNpc": 1,
+      "collectItem + discoverKnowledge": 2,
+      "collectItem + discoverKnowledge + craftRecipe + useItem + talkToNpc": 1,
+      "collectItem + talkToNpc": 2,
+      "defeatEncounter": 9,
+      "discoverKnowledge": 11,
+      "discoverKnowledge + discoverKnowledge + defeatEncounter + talkToNpc": 1,
+      "discoverKnowledge + discoverKnowledge + talkToNpc": 6,
+      "discoverKnowledge + talkToNpc": 7,
+      "talkToNpc": 10,
+      "talkToNpc + defeatEncounter + talkToNpc": 2,
+      "talkToNpc + discoverKnowledge + collectItem + talkToNpc": 1,
+      "talkToNpc + discoverKnowledge + talkToNpc": 2,
+      "talkToNpc + talkToNpc": 4
+    },
+    "factionGated": 5,
+    "rewardFactionRenown": 8,
+    "rewardKnowledge": 29,
+    "laterMapGiverQuests": 19,
+    "laterMapObjectiveCombinations": {
+      "defeatEncounter": 1,
+      "discoverKnowledge": 4,
+      "discoverKnowledge + discoverKnowledge + defeatEncounter + talkToNpc": 1,
+      "discoverKnowledge + discoverKnowledge + talkToNpc": 6,
+      "discoverKnowledge + talkToNpc": 7
+    },
+    "cycles": [],
+    "missingPrerequisites": []
+  },
+  "dialogue": {
+    "conversations": 38,
+    "conditionKinds": {
+      "factionMembership": 39,
+      "factionRenown": 2,
+      "itemCount": 14,
+      "knowledgeKnown": 166,
+      "martialArtEligible": 29,
+      "morality": 3,
+      "npcKnows": 19,
+      "npcRelationship": 9,
+      "questStatus": 219,
+      "renown": 1,
+      "variable": 2,
+      "weather": 8
+    },
+    "effectKinds": {
+      "abandonQuest": 1,
+      "acceptQuest": 38,
+      "adjustFactionRenown": 5,
+      "adjustMorality": 4,
+      "adjustRelationship": 35,
+      "adjustRenown": 14,
+      "discoverKnowledgeNode": 68,
+      "giveItem": 2,
+      "joinFaction": 5,
+      "learnMartialArt": 29,
+      "leaveFaction": 5,
+      "recruitCompanion": 2,
+      "setVariable": 1,
+      "shareKnowledgeNode": 22,
+      "startBattle": 1,
+      "takeItem": 14,
+      "teleport": 1
+    }
+  },
+  "endingQuestDependencies": [
+    {
+      "id": "ending.river-lantern",
+      "quests": [
+        "quest.round-07-medicine-run"
+      ]
+    },
+    {
+      "id": "ending.tingyu-oath",
+      "quests": [
+        "quest.round-07-clear-alley"
+      ]
+    },
+    {
+      "id": "ending.tiezhang-foundation",
+      "quests": [
+        "quest.round-07-clear-alley"
+      ]
+    },
+    {
+      "id": "ending.yunyin-healer",
+      "quests": [
+        "quest.round-07-medicine-run"
+      ]
+    },
+    {
+      "id": "ending.open-water",
+      "quests": []
+    },
+    {
+      "id": "ending.r42-open-register",
+      "quests": [
+        "quest.r42-open-register"
+      ]
+    },
+    {
+      "id": "ending.r42-sheltered-witness",
+      "quests": [
+        "quest.r42-protect-witness"
+      ]
+    }
+  ],
+  "regions": [
+    {
+      "id": "map.round-01-grid",
+      "name": "江南道·七镇行旅",
+      "dimensions": [
+        100,
+        100
+      ],
+      "reachableByDeclaredTransitions": true,
+      "walkableCells": 7998,
+      "npcs": 7,
+      "questGivers": 7,
+      "questsByGiver": 18,
+      "encounters": 2,
+      "shops": 1,
+      "craftingStations": 0,
+      "mentors": 2,
+      "arenas": 1,
+      "factionWars": 0,
+      "events": 2,
+      "outgoingTransitions": 1
+    },
+    {
+      "id": "map.round-10-mist-ferry",
+      "name": "雾雨渡口·河湾旧道",
+      "dimensions": [
+        100,
+        100
+      ],
+      "reachableByDeclaredTransitions": true,
+      "walkableCells": 7340,
+      "npcs": 5,
+      "questGivers": 5,
+      "questsByGiver": 22,
+      "encounters": 4,
+      "shops": 0,
+      "craftingStations": 2,
+      "mentors": 3,
+      "arenas": 0,
+      "factionWars": 1,
+      "events": 6,
+      "outgoingTransitions": 6
+    },
+    {
+      "id": "map.round-62-iron-ridge",
+      "name": "铁嶂北道·岩关驿镇",
+      "dimensions": [
+        100,
+        100
+      ],
+      "reachableByDeclaredTransitions": true,
+      "walkableCells": 7818,
+      "npcs": 2,
+      "questGivers": 2,
+      "questsByGiver": 3,
+      "encounters": 2,
+      "shops": 0,
+      "craftingStations": 0,
+      "mentors": 0,
+      "arenas": 0,
+      "factionWars": 0,
+      "events": 4,
+      "outgoingTransitions": 3
+    },
+    {
+      "id": "map.round-67-salt-road",
+      "name": "西陲盐道·青岩驿",
+      "dimensions": [
+        100,
+        100
+      ],
+      "reachableByDeclaredTransitions": true,
+      "walkableCells": 8525,
+      "npcs": 1,
+      "questGivers": 1,
+      "questsByGiver": 1,
+      "encounters": 1,
+      "shops": 0,
+      "craftingStations": 0,
+      "mentors": 0,
+      "arenas": 0,
+      "factionWars": 0,
+      "events": 2,
+      "outgoingTransitions": 1
+    },
+    {
+      "id": "map.round-74-cloud-ridge",
+      "name": "云岭古道·断云栈道",
+      "dimensions": [
+        100,
+        100
+      ],
+      "reachableByDeclaredTransitions": true,
+      "walkableCells": 7850,
+      "npcs": 1,
+      "questGivers": 1,
+      "questsByGiver": 2,
+      "encounters": 1,
+      "shops": 1,
+      "craftingStations": 0,
+      "mentors": 0,
+      "arenas": 0,
+      "factionWars": 0,
+      "events": 3,
+      "outgoingTransitions": 3
+    },
+    {
+      "id": "map.round-79-isles",
+      "name": "东海群岛·落潮湾",
+      "dimensions": [
+        100,
+        100
+      ],
+      "reachableByDeclaredTransitions": true,
+      "walkableCells": 5871,
+      "npcs": 2,
+      "questGivers": 2,
+      "questsByGiver": 2,
+      "encounters": 0,
+      "shops": 0,
+      "craftingStations": 0,
+      "mentors": 0,
+      "arenas": 0,
+      "factionWars": 0,
+      "events": 3,
+      "outgoingTransitions": 2
+    },
+    {
+      "id": "map.round-82-east-coast",
+      "name": "东溟海岸·青帆埠",
+      "dimensions": [
+        100,
+        100
+      ],
+      "reachableByDeclaredTransitions": true,
+      "walkableCells": 5108,
+      "npcs": 3,
+      "questGivers": 2,
+      "questsByGiver": 3,
+      "encounters": 1,
+      "shops": 1,
+      "craftingStations": 0,
+      "mentors": 0,
+      "arenas": 0,
+      "factionWars": 0,
+      "events": 5,
+      "outgoingTransitions": 3
+    },
+    {
+      "id": "map.round-84-windward-isle",
+      "name": "东溟外海·风回岛",
+      "dimensions": [
+        100,
+        100
+      ],
+      "reachableByDeclaredTransitions": true,
+      "walkableCells": 5176,
+      "npcs": 2,
+      "questGivers": 2,
+      "questsByGiver": 2,
+      "encounters": 0,
+      "shops": 0,
+      "craftingStations": 0,
+      "mentors": 0,
+      "arenas": 0,
+      "factionWars": 0,
+      "events": 3,
+      "outgoingTransitions": 3
+    },
+    {
+      "id": "map.round-85-tide-isle",
+      "name": "南溟·潮生屿",
+      "dimensions": [
+        100,
+        100
+      ],
+      "reachableByDeclaredTransitions": true,
+      "walkableCells": 4168,
+      "npcs": 2,
+      "questGivers": 0,
+      "questsByGiver": 0,
+      "encounters": 1,
+      "shops": 1,
+      "craftingStations": 0,
+      "mentors": 0,
+      "arenas": 0,
+      "factionWars": 0,
+      "events": 4,
+      "outgoingTransitions": 3
+    },
+    {
+      "id": "map.round-87-southwest-isles",
+      "name": "西南列岛·雾航湾",
+      "dimensions": [
+        100,
+        100
+      ],
+      "reachableByDeclaredTransitions": true,
+      "walkableCells": 4838,
+      "npcs": 2,
+      "questGivers": 1,
+      "questsByGiver": 1,
+      "encounters": 0,
+      "shops": 0,
+      "craftingStations": 0,
+      "mentors": 0,
+      "arenas": 0,
+      "factionWars": 0,
+      "events": 4,
+      "outgoingTransitions": 2
+    },
+    {
+      "id": "map.round-91-cloud-north-terrace",
+      "name": "云岭北台·雁回崖",
+      "dimensions": [
+        100,
+        100
+      ],
+      "reachableByDeclaredTransitions": true,
+      "walkableCells": 7116,
+      "npcs": 1,
+      "questGivers": 1,
+      "questsByGiver": 1,
+      "encounters": 0,
+      "shops": 0,
+      "craftingStations": 0,
+      "mentors": 0,
+      "arenas": 0,
+      "factionWars": 0,
+      "events": 4,
+      "outgoingTransitions": 3
+    },
+    {
+      "id": "map.round-92-north-pass",
+      "name": "北境·照雪关",
+      "dimensions": [
+        100,
+        100
+      ],
+      "reachableByDeclaredTransitions": true,
+      "walkableCells": 7740,
+      "npcs": 1,
+      "questGivers": 1,
+      "questsByGiver": 1,
+      "encounters": 1,
+      "shops": 1,
+      "craftingStations": 0,
+      "mentors": 0,
+      "arenas": 0,
+      "factionWars": 0,
+      "events": 4,
+      "outgoingTransitions": 2
+    },
+    {
+      "id": "map.round-93-snow-pine-valley",
+      "name": "北境·霜松谷",
+      "dimensions": [
+        100,
+        100
+      ],
+      "reachableByDeclaredTransitions": true,
+      "walkableCells": 6426,
+      "npcs": 1,
+      "questGivers": 1,
+      "questsByGiver": 1,
+      "encounters": 1,
+      "shops": 0,
+      "craftingStations": 0,
+      "mentors": 0,
+      "arenas": 0,
+      "factionWars": 0,
+      "events": 4,
+      "outgoingTransitions": 1
+    },
+    {
+      "id": "map.round-94-east-gate",
+      "name": "东隅·天门关",
+      "dimensions": [
+        100,
+        100
+      ],
+      "reachableByDeclaredTransitions": true,
+      "walkableCells": 5684,
+      "npcs": 1,
+      "questGivers": 1,
+      "questsByGiver": 1,
+      "encounters": 0,
+      "shops": 0,
+      "craftingStations": 0,
+      "mentors": 0,
+      "arenas": 0,
+      "factionWars": 0,
+      "events": 2,
+      "outgoingTransitions": 3
+    },
+    {
+      "id": "map.round-94-returning-sails",
+      "name": "南溟·归帆洲",
+      "dimensions": [
+        100,
+        100
+      ],
+      "reachableByDeclaredTransitions": true,
+      "walkableCells": 5225,
+      "npcs": 1,
+      "questGivers": 1,
+      "questsByGiver": 1,
+      "encounters": 0,
+      "shops": 0,
+      "craftingStations": 0,
+      "mentors": 0,
+      "arenas": 0,
+      "factionWars": 0,
+      "events": 2,
+      "outgoingTransitions": 3
+    },
+    {
+      "id": "map.round-97-lanxin-isle",
+      "name": "东溟·澜心洲",
+      "dimensions": [
+        100,
+        100
+      ],
+      "reachableByDeclaredTransitions": true,
+      "walkableCells": 7205,
+      "npcs": 1,
+      "questGivers": 1,
+      "questsByGiver": 1,
+      "encounters": 0,
+      "shops": 1,
+      "craftingStations": 0,
+      "mentors": 0,
+      "arenas": 0,
+      "factionWars": 0,
+      "events": 3,
+      "outgoingTransitions": 3
+    },
+    {
+      "id": "map.round-97-pilot-reef",
+      "name": "东溟·引航礁",
+      "dimensions": [
+        100,
+        100
+      ],
+      "reachableByDeclaredTransitions": true,
+      "walkableCells": 4737,
+      "npcs": 1,
+      "questGivers": 1,
+      "questsByGiver": 1,
+      "encounters": 0,
+      "shops": 0,
+      "craftingStations": 0,
+      "mentors": 0,
+      "arenas": 0,
+      "factionWars": 0,
+      "events": 3,
+      "outgoingTransitions": 2
+    },
+    {
+      "id": "map.round-96-stone-reef",
+      "name": "中溟·千里石塘",
+      "dimensions": [
+        100,
+        100
+      ],
+      "reachableByDeclaredTransitions": true,
+      "walkableCells": 6389,
+      "npcs": 1,
+      "questGivers": 1,
+      "questsByGiver": 1,
+      "encounters": 0,
+      "shops": 0,
+      "craftingStations": 0,
+      "mentors": 0,
+      "arenas": 0,
+      "factionWars": 0,
+      "events": 3,
+      "outgoingTransitions": 2
+    },
+    {
+      "id": "map.round-96-halfmoon-atoll",
+      "name": "南溟·半月环礁",
+      "dimensions": [
+        100,
+        100
+      ],
+      "reachableByDeclaredTransitions": true,
+      "walkableCells": 6445,
+      "npcs": 1,
+      "questGivers": 1,
+      "questsByGiver": 1,
+      "encounters": 0,
+      "shops": 0,
+      "craftingStations": 0,
+      "mentors": 0,
+      "arenas": 0,
+      "factionWars": 0,
+      "events": 3,
+      "outgoingTransitions": 2
+    },
+    {
+      "id": "map.round-95-misty-pine-gate",
+      "name": "东境·雾杉关",
+      "dimensions": [
+        100,
+        100
+      ],
+      "reachableByDeclaredTransitions": true,
+      "walkableCells": 6835,
+      "npcs": 1,
+      "questGivers": 1,
+      "questsByGiver": 1,
+      "encounters": 0,
+      "shops": 0,
+      "craftingStations": 0,
+      "mentors": 0,
+      "arenas": 0,
+      "factionWars": 0,
+      "events": 2,
+      "outgoingTransitions": 2
+    },
+    {
+      "id": "map.round-95-cedar-valley",
+      "name": "东境·听杉谷",
+      "dimensions": [
+        100,
+        100
+      ],
+      "reachableByDeclaredTransitions": true,
+      "walkableCells": 7986,
+      "npcs": 0,
+      "questGivers": 0,
+      "questsByGiver": 0,
+      "encounters": 0,
+      "shops": 0,
+      "craftingStations": 0,
+      "mentors": 0,
+      "arenas": 0,
+      "factionWars": 0,
+      "events": 2,
+      "outgoingTransitions": 2
+    },
+    {
+      "id": "map.round-95-east-harbor",
+      "name": "东溟·照叶港",
+      "dimensions": [
+        100,
+        100
+      ],
+      "reachableByDeclaredTransitions": true,
+      "walkableCells": 7558,
+      "npcs": 1,
+      "questGivers": 1,
+      "questsByGiver": 1,
+      "encounters": 0,
+      "shops": 0,
+      "craftingStations": 0,
+      "mentors": 0,
+      "arenas": 0,
+      "factionWars": 0,
+      "events": 2,
+      "outgoingTransitions": 2
+    }
+  ],
+  "coverage": {
+    "mapsWithEncounters": 9,
+    "mapsWithShops": 6,
+    "mapsWithCrafting": 1,
+    "mapsWithMentors": 2,
+    "mapsWithoutNpcs": [
+      "map.round-95-cedar-valley"
+    ],
+    "unreachableByDeclaredTransitions": []
+  },
+  "integrity": {
+    "missingQuestGivers": [],
+    "duplicateIds": {
+      "maps": [],
+      "npcs": [],
+      "quests": [],
+      "encounters": [],
+      "shops": []
+    }
+  }
+}

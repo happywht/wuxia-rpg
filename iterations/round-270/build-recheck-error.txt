@@ -1,0 +1,32 @@
+round129 refused (file untouched): r129-gu-iron-route 文本被改动，请人工复核。
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-gkyQ5E/scripts/lib/round129-iron-practice-brief.mjs:132
+    throw new Error(`${brief.nodeId} 文本被改动，请人工复核。`);
+          ^
+
+Error: r129-gu-iron-route 文本被改动，请人工复核。
+    at verifyApplied (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-gkyQ5E/scripts/lib/round129-iron-practice-brief.mjs:132:11)
+    at addOne (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-gkyQ5E/scripts/lib/round129-iron-practice-brief.mjs:88:5)
+    at addIronPracticeBriefs (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-gkyQ5E/scripts/lib/round129-iron-practice-brief.mjs:59:11)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-gkyQ5E/scripts/apply-round129.mjs:20:9
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:647:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.18.0
+round130 refused round-30-conversations.json (file untouched): r130-hanshan-practice-brief 文本被改动，请人工复核。
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-UeMBS6/scripts/lib/round130-hanshan-practice-brief.mjs:147
+    throw new Error(`${brief.nodeId} 文本被改动，请人工复核。`);
+          ^
+
+Error: r130-hanshan-practice-brief 文本被改动，请人工复核。
+    at verifyApplied (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-UeMBS6/scripts/lib/round130-hanshan-practice-brief.mjs:147:11)
+    at addOne (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-UeMBS6/scripts/lib/round130-hanshan-practice-brief.mjs:86:5)
+    at addHanshanBriefs (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-UeMBS6/scripts/lib/round130-hanshan-practice-brief.mjs:62:15)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-UeMBS6/scripts/apply-round130.mjs:20:11
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:647:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.18.0
+Round 34 文档审计失败：1 处不一致。
+  [FAIL] docs/QUESTS.md: 任务 "河灯之约" 同一总表行缺少：河灯船位时辰已约

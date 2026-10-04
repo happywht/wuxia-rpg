@@ -274,7 +274,8 @@ function visibleStartTargets(conversation: DialogueData, context: DialogueRuntim
 describe('Round 59 regional dialogue echoes', () => {
   it('parses real base data and assembles quests and dialogue references without warnings', () => {
     expect(graph.warnings).toEqual([]);
-    expect(graph.nodes.size).toBe(428); // Includes the two Round255 caravan-route outcome events.
+    expect(graph.nodes.size).toBe(429); // R255 caravan-route outcomes + the R261 river-lantern appointment event.
+    expect(graph.nodes.has('event.r31-river-lantern-time-agreed')).toBe(true); // Stable id anchors the R261 addition.
     expect(questAssembly.warnings).toEqual([]);
     expect(questAssembly.quests.size).toBe(44);
     expect(dialogueAssembly.warnings).toEqual([]);
@@ -337,7 +338,7 @@ describe('Round 59 regional dialogue echoes', () => {
     // adds five mentor practice entries and one field brief per verifier.
     const expectedBaseline: Record<string, number> = {
       'dlg.shi-bei-mentor': 19, // +1 R129 no-effect complete route brief;  9 pre-existing + 4 echoes + 5 Round 103 practice entries
-      'dlg.bai-luzhou-ferry-master': 25, // Prior 22 + Round254 appointment + two Round255 route responses.
+      'dlg.bai-luzhou-ferry-master': 26, // Prior 22 + R254 appointment + two R255 route responses + R261 river-lantern appointment.
       'dlg.zhu-jiuxian-mentor': 24, // prior 20 + three Round104 crafting responses
       'dlg.ma-shangyi-notice-board': 5, // 3 pre-existing + 2 echoes
       'dlg.lu-zhenniang-teastall': 9, // 7 pre-existing + 2 echoes

@@ -315,11 +315,11 @@ describe('Round130 Hanshan practice briefs (real assembled data)', () => {
       bookshopGreet.options = bookshopGreet.options.filter((option: { nextNodeId: string }) => option.nextNodeId !== escortNode.id);
       bookshop.nodes = bookshop.nodes.filter((node: { id: string }) => node.id !== escortNode.id && node.id !== escortArrived.id);
       expect(JSON.parse(applyRelayWaitingDirections(applyCompanionTrust(chained03)))).toEqual(current03);
-      // R254/R255 extend the ferry-master conversation after this historical R130 replay baseline.
+      // R254/R255/R261 extend the ferry-master conversation after this historical R130 replay baseline.
       const current30 = JSON.parse(readFileSync(join(root, 'data/base/dialogues/round-30-conversations.json'), 'utf8'));
       const ferryMaster = current30.conversations.find((entry: { id: string }) => entry.id === 'dlg.bai-luzhou-ferry-master');
       expect(ferryMaster).toBeDefined();
-      const laterNodeIds = new Set(['r31-caravan-time-agreed', 'r31-caravan-escorted', 'r31-pier-reinforced']);
+      const laterNodeIds = new Set(['r31-caravan-time-agreed', 'r31-caravan-escorted', 'r31-pier-reinforced', 'r31-river-lantern-time-agreed']);
       ferryMaster.nodes = ferryMaster.nodes.filter((node: { id: string }) => !laterNodeIds.has(node.id));
       const ferryGreet = ferryMaster.nodes.find((node: { id: string }) => node.id === ferryMaster.startNodeId);
       ferryGreet.options = ferryGreet.options.filter((option: { nextNodeId: string }) => !laterNodeIds.has(option.nextNodeId));

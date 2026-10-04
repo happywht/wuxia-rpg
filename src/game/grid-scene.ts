@@ -165,13 +165,13 @@ import {
   type SaveSnapshotV1,
   type SaveStorage,
   captureSaveSnapshot,
-  createBrowserSaveStorage,
   planSnapshotRestore,
   readSaveSlot,
   type RestoredRunState,
   restoreRunState,
   writeSaveSlot,
 } from '../engine/save-system';
+import { resolveGameStorageForRuntime } from './game-storage';
 import {
   type DialogueConfirmOutcome,
   DialoguePanel,
@@ -607,7 +607,9 @@ export class GridScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.events.off(Phaser.Scenes.Events.ADDED_TO_SCENE, pinScreenObject);
     });
-    this.storage = createBrowserSaveStorage();
+    // Round 270 storage seam: same rules as the menu — QA runs stay in the
+    // QA namespace, refused queries degrade to "storage unavailable".
+    this.storage = resolveGameStorageForRuntime().storage;
     this.settings = loadGameSettings(this.storage ?? unavailableStorage());
     applyGameSettings(this.game, this.settings);
 

@@ -6,6 +6,7 @@
   "description": "原创中文武侠 RPG（数据优先架构；受文曲星系列掌上 RPG 广泛玩法原则启发的独立新作，不含任何原作内容）",
   "scripts": {
     "dev": "vite",
+    "dev:qa": "vite --host 127.0.0.1 --port 5310 --strictPort",
     "check": "npm run validate:data && npm run inspect:mods && npm run typecheck && npm test && npm run audit:round-34 && npm run audit:round-48-docs",
     "build": "npm run check && vite build",
     "preview": "vite preview",

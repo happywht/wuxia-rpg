@@ -104,7 +104,9 @@ describe('Round152 martial arts ownership and growth reader', () => {
     scale = 1;
   });
   it('scene connects U, shared overlay gating, replacement and shutdown ownership', () => {
-    const scene = readFileSync('src/game/grid-scene.ts', 'utf8');
+    // Windows checkouts ship CRLF; normalize so the assertion below checks
+    // the source's structure, not the platform's line endings.
+    const scene = readFileSync('src/game/grid-scene.ts', 'utf8').replaceAll('\r\n', '\n');
     expect(scene).toContain("'martialArtsPanel', 'martialArtForgePanel'");
     expect(scene).toContain('keyboard.addKey(KeyCodes.U)');
     expect(scene).toContain("martialArtsKey.off('down', onMartialArts)");

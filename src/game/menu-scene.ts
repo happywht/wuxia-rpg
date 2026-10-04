@@ -25,13 +25,13 @@ import {
   SAVE_SLOT_IDS,
   type SaveSlotId,
   SAVE_SLOT_LABELS,
-  createBrowserSaveStorage,
   deleteSaveSlot,
   formatSavedAt,
   listSaveSlots,
   type SaveSlotSummary,
   type SaveStorage,
 } from '../engine/save-system';
+import { resolveGameStorageForRuntime } from './game-storage';
 import {
   DEFAULT_GAME_SETTINGS,
   type GameSettings,
@@ -133,7 +133,11 @@ export class MenuScene extends Phaser.Scene {
   }
 
   create(): void {
-    this.storage = createBrowserSaveStorage();
+    // Round 270 storage seam: normal runs keep the engine behaviour; a valid
+    // DEV `?qa=` run gets QA-prefixed storage; a refused query yields null
+    // (the existing "storage unavailable" paths take over — never a player
+    // namespace fallback).
+    this.storage = resolveGameStorageForRuntime().storage;
     this.settings = loadGameSettings(this.storage ?? unavailableStorage());
     applyGameSettings(this.game, this.settings);
 

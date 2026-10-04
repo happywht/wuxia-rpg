@@ -74,6 +74,25 @@ describe('Round 48 documentation audit', () => {
     expect(report).toEqual({ ok: true, problems: [] });
   });
 
+  it('uses one maintained current matrix while preserving historical roadmap rounds', async () => {
+    const root = await makeFixture();
+    for (const name of ['README.md', 'docs/ARCHITECTURE.md', 'docs/DATA-GUIDE.md', 'docs/PLAYER-GUIDE.md', 'ROADMAP.md']) {
+      const file = path.join(root, name);
+      await writeFile(file, `${await readFile(file, 'utf8')}\n[当前](docs/CURRENT-ACCEPTANCE.md)`);
+    }
+    await writeFile(path.join(root, 'docs/CURRENT-ACCEPTANCE.md'),
+      '更新：2026-10-04 / Round270工作版\n## 五阶段门槛\n## 代表旅程检查点');
+    for (const name of ['CHANGELOG.md', 'DEVLOG.md']) {
+      const file = path.join(root, name);
+      await writeFile(file, `${await readFile(file, 'utf8')}\n## Round 270`);
+    }
+    expect(await auditRound48Docs({ root })).toEqual({ ok: true, problems: [] });
+    await writeFile(path.join(root, 'docs/CURRENT-ACCEPTANCE.md'), '已全部完成');
+    const broken = await auditRound48Docs({ root });
+    expect(broken.problems.some((problem) => problem.includes('更新依据'))).toBe(true);
+    expect(broken.problems.some((problem) => problem.includes('阶段门槛'))).toBe(true);
+  });
+
   it('recognizes the in-progress roadmap round as the current documentation state', async () => {
     const root = await makeFixture();
     const updates: Record<string, (text: string) => string> = {

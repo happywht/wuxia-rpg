@@ -99,8 +99,13 @@ describe('Round 58 regional quest chains', () => {
     expect(assembly.warnings).toEqual([]);
     expect(assembly.quests.size).toBe(44);
     expect(graph.warnings).toEqual([]);
-    expect(nodeParse.data.nodes).toHaveLength(428); // Round255 adds two route outcomes; prior relays remain.
-    expect(edgeParse.data.edges).toHaveLength(542); // Round255 adds the two corresponding reward edges.
+    expect(nodeParse.data.nodes).toHaveLength(429); // R255 route outcomes + R261 river-lantern appointment event; prior relays remain.
+    expect(edgeParse.data.edges).toHaveLength(544); // R255 reward edges + the two R261 river-lantern appointment edges.
+    // Stable ids anchor the R261 appointment addition instead of trusting the count alone.
+    expect(nodeParse.data.nodes.map((node) => node.id)).toContain('event.r31-river-lantern-time-agreed');
+    const edgeIds = edgeParse.data.edges.map((edge) => edge.id);
+    expect(edgeIds).toContain('kg.edge.r31-river-lantern-time');
+    expect(edgeIds).toContain('kg.edge.r31-river-lantern-time-at-wharf');
 
     const newQuestIds = [
       'quest.r58-market-discovery',

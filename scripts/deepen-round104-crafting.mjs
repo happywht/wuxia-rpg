@@ -11,7 +11,18 @@ export const loops = [
     nodeId: 'event.r104-medicine-practice', title: '药炉疗伤实践',
     description: '先备三根苍崖根，留下路上备用；向容素青问生肌散药方，用寒珠草两份和苍崖根一份在渡口药炉炼制，工钱18。接下来的三档成药都能用于伤后恢复，没有可恢复损耗不必服药。确实用过再来核对药案。材料不向药庐缴纳。',
     objectives: [
-      objective('formula', 'discoverKnowledge', 'event.formula-shengji-san', '向容素青请教生肌散的炼法'),
+      // Round 263 added navigationNpcId to the first discoverKnowledge step
+      // (herbal stocktaking navigates to Rong Suqing). The canonical shape
+      // below carries it — field order matches the shipped record so a
+      // replay stays byte-identical and the later improvement survives.
+      {
+        id: 'objective.r104-formula',
+        kind: 'discoverKnowledge',
+        targetId: 'event.formula-shengji-san',
+        requiredCount: 1,
+        navigationNpcId: 'char.rong-su-qing',
+        text: '向容素青请教生肌散的炼法',
+      },
       objective('brew', 'craftRecipe', 'alchemy.recipe.shengji-san', '备寒珠草×2、苍崖根×1与18银两，去渡口药炉炼生肌散'),
       objective('heal', 'useItem', 'item.shengji-san-cu', '损耗后按I打开背包，实际使用一剂生肌散（任意品质；无恢复收益会保留药）', {
         alternativeTargetIds: ['item.shengji-san-zhong', 'item.shengji-san-shang'],

@@ -1,3 +1,5 @@
+> 历史验收：本页只记录 Round50 当时的候选，不是当前产品目标完成声明。当前状态见 [验收矩阵](CURRENT-ACCEPTANCE.md)。
+
 # 最终交付验收（Round 50）
 
 本表以目标文件的硬性要求为准，区分自动化证据、浏览器实玩结果和外部环境边界。`npm run audit:final` 是仓库结构/数量/轮次静态审计；完整资料 Schema 校验仍由 `npm run validate:data` 执行，MOD 优先级与坏覆盖回退由 `npm run smoke:round-35` 执行。静态扫描不能替代源码审查或玩家体验判断。
