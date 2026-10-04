@@ -1,5 +1,5 @@
 /**
- * Round 269: in-session quest completion receipts and the one-shot journal focus.
+ * Round 269: in-session quest receipts and the one-shot latest-action journal focus.
  *
  * A completed quest's authored rewards say what was PROMISED, not what was
  * PAID: experience past the level cap is discarded by grantExperience, and a
@@ -16,7 +16,16 @@
  *   (never a fabricated payout) for completions that predate this session.
  */
 
-import type { QuestStatus } from '../engine/quest-system';
+import type { QuestJournal, QuestStatus } from '../engine/quest-system';
+import type { DialogueEffectData } from '../engine/dialogue-graph';
+
+/** Capture only explicit acceptance candidates before the atomic transaction. */
+export function captureQuestAcceptanceStatuses(
+  effects: readonly DialogueEffectData[], journal: QuestJournal,
+): ReadonlyMap<string, QuestStatus | undefined> {
+  return new Map(effects.flatMap(effect => effect.kind === 'acceptQuest'
+    ? [[effect.questId, journal.states.get(effect.questId)?.status] as const] : []));
+}
 
 /** What one completed quest actually paid out — this session only. */
 export interface QuestSessionReceipt {
@@ -50,6 +59,18 @@ export class QuestSessionFeedback {
   recordCompletion(receipt: QuestSessionReceipt): void {
     this.receiptMap.set(receipt.questId, receipt);
     this.pendingFocus = receipt.questId;
+  }
+
+  /** A committed new active task supersedes an older completion focus, not its receipt. */
+  recordAcceptance(questId: string, status: QuestStatus | undefined): void {
+    if (status === 'active') this.pendingFocus = questId;
+  }
+
+  /** Call after successful commit/settlement only; instant completions keep their receipt focus. */
+  recordAcceptances(before: ReadonlyMap<string, QuestStatus | undefined>, journal: QuestJournal): void {
+    for (const [questId, previous] of before) {
+      if (previous !== 'active') this.recordAcceptance(questId, journal.states.get(questId)?.status);
+    }
   }
 
   receiptOf(questId: string): QuestSessionReceipt | undefined {

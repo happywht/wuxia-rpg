@@ -1,0 +1,27 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+····························stdout | tests/round269-quest-completion-feedback.test.ts > Round269 GridScene grant path records in-session receipts > stores what was actually paid, with consequences, and arms the focus
+[quest] 任务 "quest.r97-beacon-relight" 完成：经验 +56，银两 +48 · faction.r269-hearthwatch声望 +2
+
+stdout | tests/round269-quest-completion-feedback.test.ts > Round269 GridScene grant path records in-session receipts > a maxed character records zero paid experience with the full discard
+[quest] 任务 "quest.r97-beacon-relight" 完成：经验 +0，银两 +48 · faction.r269-hearthwatch声望 +2
+
+stdout | tests/round269-quest-completion-feedback.test.ts > Round269 GridScene grant path records in-session receipts > receipts record the clamped faction change rather than promised renown
+[quest] 任务 "quest.r97-beacon-relight" 完成：经验 +56，银两 +48 · faction.r269-hearthwatch声望 +2
+
+stdout | tests/round269-quest-completion-feedback.test.ts > Round269 GridScene grant path records in-session receipts > the world adoption boundary clears the ledger (no receipts across a reload)
+[quest] 任务 "quest.r97-beacon-relight" 完成：经验 +56，银两 +48 · faction.r269-hearthwatch声望 +2
+
+stdout | tests/round269-quest-completion-feedback.test.ts > Round269 GridScene journal focus consumption > toggleQuestJournal spends the pending completion focus exactly once
+[quest] 任务 "quest.r97-beacon-relight" 完成：经验 +56，银两 +48 · faction.r269-hearthwatch声望 +2
+
+stdout | tests/round269-quest-completion-feedback.test.ts > Round269 GridScene journal focus consumption > an NPC board open neither spends nor overrides the pending focus
+[quest] 任务 "quest.r97-beacon-relight" 完成：经验 +56，银两 +48 · faction.r269-hearthwatch声望 +2
+
+···························
+
+ Test Files  3 passed (3)
+      Tests  55 passed (55)
+   Start at  12:42:06
+   Duration  3.18s (tests 64%, transform 27%, import 9%)

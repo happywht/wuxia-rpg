@@ -183,8 +183,8 @@ export class QuestPanel {
     if (this.openState) return;
     this.model = model;
     this.selection = 0;
-    // Round 269: a just-completed quest takes the initial focus once (the
-    // caller consumes the pending completion); otherwise the fresh-local-start
+    // The latest committed acceptance/completion takes the initial focus once
+    // (the caller consumes it); otherwise the fresh-local-start
     // nearest offer keeps its behaviour. A stale focus id just falls through.
     const focused = model.giverNpcId === undefined && model.focusQuestId !== undefined
       ? this.rows.findIndex(quest => quest.id === model.focusQuestId)

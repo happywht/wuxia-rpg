@@ -1,0 +1,41 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+stdout | tests/round269-quest-completion-feedback.test.ts > Round269 GridScene grant path records in-session receipts > stores what was actually paid, with consequences, and arms the focus
+[quest] 任务 "quest.r97-beacon-relight" 完成：经验 +56，银两 +48 · faction.r269-hearthwatch声望 +2
+
+stdout | tests/round269-quest-completion-feedback.test.ts > Round269 GridScene grant path records in-session receipts > a maxed character records zero paid experience with the full discard
+[quest] 任务 "quest.r97-beacon-relight" 完成：经验 +0，银两 +48 · faction.r269-hearthwatch声望 +2
+
+stdout | tests/round269-quest-completion-feedback.test.ts > Round269 GridScene grant path records in-session receipts > receipts record the clamped faction change rather than promised renown
+[quest] 任务 "quest.r97-beacon-relight" 完成：经验 +56，银两 +48 · faction.r269-hearthwatch声望 +2
+
+stdout | tests/round269-quest-completion-feedback.test.ts > Round269 GridScene grant path records in-session receipts > the world adoption boundary clears the ledger (no receipts across a reload)
+[quest] 任务 "quest.r97-beacon-relight" 完成：经验 +56，银两 +48 · faction.r269-hearthwatch声望 +2
+
+stdout | tests/round269-quest-completion-feedback.test.ts > Round269 GridScene journal focus consumption > toggleQuestJournal spends the pending completion focus exactly once
+[quest] 任务 "quest.r97-beacon-relight" 完成：经验 +56，银两 +48 · faction.r269-hearthwatch声望 +2
+
+stdout | tests/round269-quest-completion-feedback.test.ts > Round269 GridScene journal focus consumption > an NPC board open neither spends nor overrides the pending focus
+[quest] 任务 "quest.r97-beacon-relight" 完成：经验 +56，银两 +48 · faction.r269-hearthwatch声望 +2
+
+·························------------··················
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round277-quest-action-focus.test.ts [ tests/round277-quest-action-focus.test.ts ]
+Error: manifest：响应不是 JSON（text/plain;charset=utf-8）
+文件：/base/manifest.json
+/base/manifest.json
+服务器可能把请求回退到了 HTML 页面（SPA fallback）。
+建议：确认请求命中的是 JSON 文件而非被服务器回退成 HTML 的页面（SPA fallback）。
+ ❯ tests/round277-quest-action-focus.test.ts:22:57
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  43 passed | 12 skipped (55)
+   Start at  12:41:14
+   Duration  3.29s (tests 57%, transform 32%, import 11%)

@@ -55,3 +55,9 @@ Round270：`iterations/round-270/j0-opening.json` 来自QA `journey-20261004` �
 同一两个cloud QA-run，保留槽一F2与槽二C0，正常调查/挑战/伤后用药/报告→保存空槽三→标题Continue读回→B资源/F复谈/E库存→F8导出。candidate round276-worktree-on-2a5941e，文件iterations/round-276/c1-escort-local-journey.json与c1-repair-local-journey.json，stage分别c1-escort-local-journey/c1-repair-local-journey。
 
 护送Lv8/XP806/403银/209命130气、无膏无丸/elapsed1063；修桥Lv8/XP794/348银/209命130气、丸1铁1无膏/elapsed4017。两侧根2残篇1，实际战胜计数4、云阶/断索completed、原互斥失败端及出发变量保留。药铺护送膏3丸2，修桥膏1丸2，读回不补库存。下载=disk=index字节核对与SHA见本轮记录。C1仅本地收束，后续同候选全段及体验计时仍待。
+
+## Round277 当前导航段（不冒充已挑战）
+
+独立journey-20261004-nav槽一保留原护送C0，最终源码冻结后正常25格刻痕→25格沈雨霁→F接取/Q首次断索/N38格到挑战旁，途中E实查断口；空槽二保存/标题Continue读回/BQ N核对。nav-bridge-before-battle.json，candidate round277-worktree-on-42d98c6，source-slot2，原始37565字节/SHA7FD8EF97C5FBC44046491CC63220230B0511661D2DF73FA1619120213103828F。
+
+Lv8/XP714/371银/208命121气/75,42/elapsed1027；膏1丸1根2残篇1，云阶completed、断索active0/1，胜场仍3。导航目的已到，不自动挑战结案；原Round276 C1是已挑战的不同检查点。源码HMR自动重载前的第一次记录未保存，保留过程但不当正常存读证据，导出只来自重走后的真实槽二。

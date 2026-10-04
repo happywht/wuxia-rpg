@@ -180,7 +180,7 @@ import { BattlePanel } from './combat-ui';
 import { InventoryPanel } from './inventory-ui';
 import { ShopPanel } from './shop-ui';
 import { QuestPanel } from './quest-ui';
-import { QuestSessionFeedback } from './quest-feedback';
+import { captureQuestAcceptanceStatuses, QuestSessionFeedback } from './quest-feedback';
 import { WorldMapPanel } from './world-map-ui';
 import { EncyclopediaPanel } from './encyclopedia-ui';
 import { CollectionPanel } from './collection-ui';
@@ -950,6 +950,7 @@ export class GridScene extends Phaser.Scene {
       onClose: () => this.noteOverlayClosed(),
       onUpdate: (update) => this.applyQuestUpdate(update),
       onQuestAccepted: (questId) => {
+        this.questFeedback.recordAcceptance(questId, this.questJournal.states.get(questId)?.status);
         if (this.world?.knowledgeGraph.nodes.get(questId)?.kind === 'quest') {
           this.markKnowledgeDiscovered(questId);
         }
@@ -3605,8 +3606,8 @@ export class GridScene extends Phaser.Scene {
       return;
     }
     if (this.anyOverlayOpen() || this.quests.size === 0 || this.inventory === null) return;
-    // Round 269: the next open after an in-session completion focuses that
-    // quest ONCE — consumed here, so NPC boards never spend it and later opens
+    // The latest committed acceptance or completion focuses its quest ONCE
+    // — consumed here, so NPC boards never spend it and later opens
     // fall back to the normal active/nearest-offer initial selection.
     const focusQuestId = this.questFeedback.peekPendingFocusQuestId();
     panel.open({
@@ -4506,6 +4507,7 @@ export class GridScene extends Phaser.Scene {
     const effects = choice.option.effects ?? [];
     if (effects.length > 0) {
       const companionBefore = this.companionState.activeCompanionId;
+      const acceptancesBefore = captureQuestAcceptanceStatuses(effects, context.journal);
       const result = applyDialogueEffects(effects, context);
       if (!result.ok) {
         console.info('[dialogue] 效果被拒绝：%s', result.reason);
@@ -4526,6 +4528,7 @@ export class GridScene extends Phaser.Scene {
         this.refreshNpcPlacements();
       }
       this.syncKnowledgeFromRunFacts();
+      this.questFeedback.recordAcceptances(acceptancesBefore, this.questJournal);
       // Dialogue effects can alter morality, relationships, faction, knowledge,
       // or learned arts without changing a quest. Re-evaluate while this
       // conversation is still active so those achievements unlock immediately.

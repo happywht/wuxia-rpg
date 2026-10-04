@@ -1,0 +1,2 @@
+tests/round277-quest-action-focus.test.ts(30,196): error TS2353: Object literal may only specify known properties, and 'amount' does not exist in type '{ kind: "adjustRenown"; delta: number; }'.
+tests/round277-quest-action-focus.test.ts(44,144): error TS2353: Object literal may only specify known properties, and 'amount' does not exist in type '{ kind: "adjustRenown"; delta: number; }'.

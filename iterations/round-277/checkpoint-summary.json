@@ -1,0 +1,115 @@
+{
+  "qaRun": "journey-20261004-nav",
+  "candidate": "round277-worktree-on-42d98c6",
+  "stage": "nav-bridge-before-battle",
+  "sourceSlotId": "slot-2",
+  "savedAt": "2026-10-04T04:53:07.920Z",
+  "exportedAt": "2026-10-04T04:54:21.208Z",
+  "bytes": 37565,
+  "sha256": "7FD8EF97C5FBC44046491CC63220230B0511661D2DF73FA1619120213103828F",
+  "position": {
+    "col": 75,
+    "row": 42
+  },
+  "map": "map.round-74-cloud-ridge",
+  "player": {
+    "level": 8,
+    "experience": 714,
+    "baseAttributes": {
+      "body": 23,
+      "force": 20,
+      "agility": 14,
+      "insight": 15,
+      "resolve": 14
+    },
+    "healthCurrent": 208,
+    "qiCurrent": 121,
+    "martialArtIds": [
+      "skill.jianghu-sanshou",
+      "skill.tuna-yangqi-jue",
+      "skill.r32-yunyin-caomu-xinfa",
+      "skill.r32-yunyin-buyun-lu"
+    ],
+    "factionMembership": {
+      "factionId": "faction.yunyin-shanzhuang",
+      "masterNpcId": "char.wen-suxin"
+    },
+    "cultivationPoints": 9,
+    "unlockedMeridianNodeIds": []
+  },
+  "inventory": {
+    "currency": 371,
+    "capacity": 12,
+    "stacks": [
+      {
+        "itemId": "item.xisui-canpian",
+        "quantity": 1
+      },
+      {
+        "itemId": "item.qingxin-wan",
+        "quantity": 1
+      },
+      {
+        "itemId": "item.huichun-gao",
+        "quantity": 1
+      },
+      {
+        "itemId": "item.cangya-gen",
+        "quantity": 2
+      }
+    ],
+    "equipped": {}
+  },
+  "elapsed": 1027,
+  "quests": [
+    {
+      "questId": "quest.r74-cloud-marks",
+      "status": "completed",
+      "objectiveCounts": [
+        {
+          "id": "objective.r74-cloud-marks",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "questId": "quest.r74-cloud-bridge",
+      "status": "active",
+      "objectiveCounts": [
+        {
+          "id": "objective.r74-cloud-bridge",
+          "value": 0
+        }
+      ]
+    }
+  ],
+  "trackedQuestId": "quest.r74-cloud-bridge",
+  "delta": {
+    "successfulCells": 88,
+    "elapsed": 110,
+    "experience": 28,
+    "currency": 20
+  },
+  "newKnowledgeNodes": [
+    "quest.r74-cloud-marks",
+    "event.r74-cloud-inscription",
+    "place.r74-cloud-markers",
+    "event.r74-cloud-bridge",
+    "place.r74-cloud-bridge"
+  ],
+  "achievement": {
+    "unlockedIds": [
+      "achievement.first-promise",
+      "achievement.first-breath",
+      "achievement.footprints-known",
+      "achievement.first-elixir",
+      "achievement.find-a-home",
+      "achievement.first-victories",
+      "achievement.river-of-stories"
+    ],
+    "battleVictories": 3,
+    "equipmentCrafts": 0,
+    "alchemyCrafts": 1,
+    "discoveredKnowledge": 28
+  }
+}
