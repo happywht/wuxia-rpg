@@ -121,7 +121,10 @@
       "id": "encounter.ferry-reed-ambush",
       "name": "芦苇水路伏兵",
       "mapResourceId": "map.round-10-mist-ferry",
-      "position": { "col": 6, "row": 6 },
+      "position": {
+        "col": 6,
+        "row": 6
+      },
       "profileId": "char.scribe-apprentice",
       "enemy": {
         "name": "苇荡水匪",
@@ -134,10 +137,33 @@
         },
         "health": 54,
         "qi": 6,
-        "martialArtIds": ["skill.jianghu-sanshou", "skill.lanmen-daofa"]
+        "martialArtIds": [
+          "skill.jianghu-sanshou",
+          "skill.lanmen-daofa"
+        ],
+        "behavior": [
+          {
+            "kind": "art",
+            "artId": "skill.lanmen-daofa",
+            "cue": "伏兵抬桨掩身，刀锋将至"
+          },
+          {
+            "kind": "art",
+            "artId": "skill.jianghu-sanshou",
+            "cue": "伏兵贴船逼近，准备短打"
+          },
+          {
+            "kind": "recoverQi",
+            "amount": 4,
+            "cue": "伏兵稳船换气，暂露空隙"
+          }
+        ]
       },
       "victoryExperience": 42,
-      "defeatRecovery": { "healthRatio": 0.6, "qiRatio": 0.6 },
+      "defeatRecovery": {
+        "healthRatio": 0.6,
+        "qiRatio": 0.6
+      },
       "repeatable": false,
       "texts": {
         "approach": "苇荡深处橹声一停，芦苇水路伏兵按 E 迎战",
@@ -151,7 +177,10 @@
       "id": "encounter.pier-toll-robber",
       "name": "栈桥索银人",
       "mapResourceId": "map.round-10-mist-ferry",
-      "position": { "col": 10, "row": 6 },
+      "position": {
+        "col": 10,
+        "row": 6
+      },
       "profileId": "char.scribe-apprentice",
       "enemy": {
         "name": "索银的扁担汉",
@@ -164,10 +193,35 @@
         },
         "health": 50,
         "qi": 10,
-        "martialArtIds": ["skill.tiezhang-zhuanggong"]
+        "martialArtIds": [
+          "skill.tiezhang-zhuanggong",
+          "skill.jianghu-sanshou"
+        ],
+        "behavior": [
+          {
+            "kind": "art",
+            "artId": "skill.tiezhang-zhuanggong",
+            "powerBonus": 8,
+            "guardDisruptsBonus": true,
+            "cue": "索银人沉肩抡担，准备重击"
+          },
+          {
+            "kind": "art",
+            "artId": "skill.jianghu-sanshou",
+            "cue": "索银人横扫扁担，逼你退步"
+          },
+          {
+            "kind": "recoverQi",
+            "amount": 8,
+            "cue": "索银人拄担换气，暂露空隙"
+          }
+        ]
       },
       "victoryExperience": 38,
-      "defeatRecovery": { "healthRatio": 0.6, "qiRatio": 0.6 },
+      "defeatRecovery": {
+        "healthRatio": 0.6,
+        "qiRatio": 0.6
+      },
       "repeatable": false,
       "texts": {
         "approach": "桥心横着根扁担，栈桥索银人按 E 拆招",

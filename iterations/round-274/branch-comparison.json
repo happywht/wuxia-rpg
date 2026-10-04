@@ -1,0 +1,335 @@
+{
+  "candidate": "round274-worktree-on-baa5ebe",
+  "source": "actual UI saves, no state injection",
+  "common": {
+    "file": "../round-273/f1-common-before-choice-baseline.json",
+    "candidate": "round273-f1-baseline-on-c600752"
+  },
+  "branches": {
+    "repair": {
+      "qaRun": "journey-20261004-repair",
+      "sourceSlot": "slot-3",
+      "savedAt": "2026-10-04T03:12:45.344Z",
+      "exportedAt": "2026-10-04T03:13:35.359Z",
+      "position": {
+        "col": 5,
+        "row": 4
+      },
+      "elapsed": 3595,
+      "deltaMinutes": 3240,
+      "player": {
+        "level": 7,
+        "experience": 674,
+        "baseAttributes": {
+          "body": 21,
+          "force": 18,
+          "agility": 13,
+          "insight": 14,
+          "resolve": 13
+        },
+        "healthCurrent": 163,
+        "qiCurrent": 110,
+        "martialArtIds": [
+          "skill.jianghu-sanshou",
+          "skill.tuna-yangqi-jue",
+          "skill.r32-yunyin-caomu-xinfa",
+          "skill.r32-yunyin-buyun-lu"
+        ],
+        "factionMembership": {
+          "factionId": "faction.yunyin-shanzhuang",
+          "masterNpcId": "char.wen-suxin"
+        },
+        "cultivationPoints": 8,
+        "unlockedMeridianNodeIds": []
+      },
+      "inventory": {
+        "currency": 326,
+        "capacity": 12,
+        "stacks": [
+          {
+            "itemId": "item.xisui-canpian",
+            "quantity": 1
+          },
+          {
+            "itemId": "item.qingxin-wan",
+            "quantity": 2
+          },
+          {
+            "itemId": "item.huichun-gao",
+            "quantity": 1
+          },
+          {
+            "itemId": "item.cangya-gen",
+            "quantity": 2
+          },
+          {
+            "itemId": "item.iron-sand",
+            "quantity": 1
+          }
+        ],
+        "equipped": {}
+      },
+      "achievementState": {
+        "unlockedIds": [
+          "achievement.first-promise",
+          "achievement.first-breath",
+          "achievement.footprints-known",
+          "achievement.first-elixir",
+          "achievement.find-a-home",
+          "achievement.river-of-stories",
+          "achievement.first-victories"
+        ],
+        "battleVictories": 3,
+        "equipmentCrafts": 0,
+        "alchemyCrafts": 1,
+        "discoveredKnowledge": 18
+      },
+      "dialogueVariables": [
+        {
+          "key": "r274.ferry.departure-supply",
+          "value": "repair"
+        }
+      ],
+      "relationships": [
+        {
+          "id": "char.lu-zhenniang",
+          "value": 3
+        },
+        {
+          "id": "char.gu-yechen",
+          "value": 2
+        },
+        {
+          "id": "char.ma-shangyi",
+          "value": 3
+        },
+        {
+          "id": "char.bai-luzhou",
+          "value": 3
+        },
+        {
+          "id": "char.zhu-jiuxian",
+          "value": 1
+        },
+        {
+          "id": "char.wen-suxin",
+          "value": 1
+        }
+      ],
+      "quests": [
+        {
+          "questId": "quest.r31-guard-the-caravan",
+          "status": "failed",
+          "objectiveCounts": [
+            {
+              "id": "objective.r31-caravan-ambush",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "questId": "quest.r31-mend-the-pier",
+          "status": "completed",
+          "objectiveCounts": [
+            {
+              "id": "objective.r31-pier-ironsand",
+              "value": 3
+            },
+            {
+              "id": "objective.r31-pier-leather",
+              "value": 2
+            },
+            {
+              "id": "objective.r273-pier-delivery",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "questId": "quest.r31-caravan-gratitude",
+          "status": "locked",
+          "objectiveCounts": [
+            {
+              "id": "objective.r31-gratitude-escort",
+              "value": 0
+            },
+            {
+              "id": "objective.r31-gratitude-ferryman",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "questId": "quest.r31-pier-toll-clearing",
+          "status": "completed",
+          "objectiveCounts": [
+            {
+              "id": "objective.r31-pier-robber",
+              "value": 1
+            }
+          ]
+        }
+      ]
+    },
+    "escort": {
+      "qaRun": "journey-20261004-escort",
+      "sourceSlot": "slot-2",
+      "savedAt": "2026-10-04T03:17:29.924Z",
+      "exportedAt": "2026-10-04T03:18:20.367Z",
+      "position": {
+        "col": 4,
+        "row": 3
+      },
+      "elapsed": 407,
+      "deltaMinutes": 52,
+      "player": {
+        "level": 7,
+        "experience": 646,
+        "baseAttributes": {
+          "body": 21,
+          "force": 18,
+          "agility": 13,
+          "insight": 14,
+          "resolve": 13
+        },
+        "healthCurrent": 165,
+        "qiCurrent": 110,
+        "martialArtIds": [
+          "skill.jianghu-sanshou",
+          "skill.tuna-yangqi-jue",
+          "skill.r32-yunyin-caomu-xinfa",
+          "skill.r32-yunyin-buyun-lu"
+        ],
+        "factionMembership": {
+          "factionId": "faction.yunyin-shanzhuang",
+          "masterNpcId": "char.wen-suxin"
+        },
+        "cultivationPoints": 8,
+        "unlockedMeridianNodeIds": []
+      },
+      "inventory": {
+        "currency": 326,
+        "capacity": 12,
+        "stacks": [
+          {
+            "itemId": "item.xisui-canpian",
+            "quantity": 1
+          },
+          {
+            "itemId": "item.qingxin-wan",
+            "quantity": 1
+          },
+          {
+            "itemId": "item.huichun-gao",
+            "quantity": 2
+          },
+          {
+            "itemId": "item.cangya-gen",
+            "quantity": 2
+          }
+        ],
+        "equipped": {}
+      },
+      "achievementState": {
+        "unlockedIds": [
+          "achievement.first-promise",
+          "achievement.first-breath",
+          "achievement.footprints-known",
+          "achievement.first-elixir",
+          "achievement.find-a-home",
+          "achievement.first-victories"
+        ],
+        "battleVictories": 3,
+        "equipmentCrafts": 0,
+        "alchemyCrafts": 1,
+        "discoveredKnowledge": 15
+      },
+      "dialogueVariables": [
+        {
+          "key": "r274.ferry.departure-supply",
+          "value": "escort"
+        }
+      ],
+      "relationships": [
+        {
+          "id": "char.lu-zhenniang",
+          "value": 3
+        },
+        {
+          "id": "char.gu-yechen",
+          "value": 2
+        },
+        {
+          "id": "char.ma-shangyi",
+          "value": 3
+        },
+        {
+          "id": "char.bai-luzhou",
+          "value": 2
+        },
+        {
+          "id": "char.zhu-jiuxian",
+          "value": 1
+        },
+        {
+          "id": "char.wen-suxin",
+          "value": 1
+        }
+      ],
+      "quests": [
+        {
+          "questId": "quest.r31-guard-the-caravan",
+          "status": "completed",
+          "objectiveCounts": [
+            {
+              "id": "objective.r31-caravan-ambush",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "questId": "quest.r31-mend-the-pier",
+          "status": "failed",
+          "objectiveCounts": [
+            {
+              "id": "objective.r31-pier-ironsand",
+              "value": 0
+            },
+            {
+              "id": "objective.r31-pier-leather",
+              "value": 0
+            },
+            {
+              "id": "objective.r273-pier-delivery",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "questId": "quest.r31-caravan-gratitude",
+          "status": "completed",
+          "objectiveCounts": [
+            {
+              "id": "objective.r31-gratitude-escort",
+              "value": 1
+            },
+            {
+              "id": "objective.r31-gratitude-ferryman",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "questId": "quest.r31-pier-toll-clearing",
+          "status": "locked",
+          "objectiveCounts": [
+            {
+              "id": "objective.r31-pier-robber",
+              "value": 0
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

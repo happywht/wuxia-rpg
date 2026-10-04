@@ -11,6 +11,7 @@
  * pristine 重建/幂等/漂移拒绝/沙盒重放；场景最小接线源码断言。
  */
 import { execFileSync } from 'node:child_process';
+import { repairDialoguesRaw as applyFerryChoice } from '../scripts/lib/round274-ferry-choice.mjs';
 import { cpSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve, sep } from 'node:path';
@@ -299,7 +300,7 @@ describe('Round273 修桥显式交料与两日工期（真实资料+真实引擎
     // 重复：入口与确认均不可再见；重复发现不重发；再扣料被拒。
     expect(optionBy(context, greetOf(SPECS.conversationId).id, SPECS.readyOption.text)).toBeUndefined();
     expect(optionBy(context, greetOf(SPECS.conversationId).id, SPECS.progressOption.text)).toBeUndefined();
-    expect(optionBy(context, greetOf(SPECS.conversationId).id, '栈桥已修牢，药队改走旱桥了。')).toBeDefined();
+    expect(optionBy(context, greetOf(SPECS.conversationId).id, '栈桥已加固，我来核对桥头是否通渡。')).toBeDefined();
     expect(applyQuestSignal(quests, journal, { type: 'knowledge-discovery', nodeId: EVENT }).completed).toEqual([]);
     const replay = applyDialogueEffects(commit.effects!, context);
     expect(replay.ok).toBe(false);
@@ -489,7 +490,7 @@ describe('Round273 场景最小接线与作者源', () => {
     drifted.quests.find((quest: { id: string }) => quest.id === PIER).objectives[2].text = '被篡改';
     expect(() => repairQuestsRaw(JSON.stringify(drifted, null, 2).replace(/\n/g, '\r\n'))).toThrow('请人工复核');
     // 对白：反向构造 pristine（去 R273 选项/节点）。
-    const dialogueDoc = JSON.parse(readRaw('data/base/dialogues/round-30-conversations.json'));
+    const dialogueDoc = JSON.parse(execFileSync('git', ['show', 'baa5ebe:data/base/dialogues/round-30-conversations.json'], { encoding: 'utf8' }));
     const conversation = dialogueDoc.conversations.find((entry: { id: string }) => entry.id === SPECS.conversationId);
     const greet = conversation.nodes.find((node: { id: string }) => node.id === conversation.startNodeId);
     greet.options = greet.options.filter((option: { text: string }) =>
@@ -497,7 +498,7 @@ describe('Round273 场景最小接线与作者源', () => {
     conversation.nodes = conversation.nodes.filter((node: { id: string }) =>
       ![SPECS.confirmNode.id, SPECS.progressNode.id, SPECS.deliveredNode.id].includes(node.id));
     const pristineDialogues = JSON.stringify(dialogueDoc, null, 2);
-    expect(JSON.parse(repairDialoguesRaw(pristineDialogues))).toEqual(JSON.parse(readRaw('data/base/dialogues/round-30-conversations.json')));
+    expect(JSON.parse(applyFerryChoice(repairDialoguesRaw(pristineDialogues)))).toEqual(JSON.parse(readRaw('data/base/dialogues/round-30-conversations.json')));
     expect(repairDialoguesRaw(readRaw('data/base/dialogues/round-30-conversations.json'))).toBe(readRaw('data/base/dialogues/round-30-conversations.json'));
     // Schema：幂等 + 锚点漂移拒绝。
     const schemaRaw = readRaw('data/schema/dialogue-set.schema.json');
@@ -532,7 +533,7 @@ describe('Round273 场景最小接线与作者源', () => {
       delete pier.orderedObjectives;
       pier.description = '白鹭洲不赞成硬闯：旧栈桥的桩脚早就酥了，重载药队一上去便是塌。他要用熟铁砂补桩、韧皮捆扎，先把桥修牢，药队宁可等两日走旱桥。备齐三份熟铁砂与两捆韧皮料，工钱他出。';
       writeFileSync(join(workspace, 'data/base/quests/round-07-quests.json'), JSON.stringify(questDoc, null, 2).replace(/\n/g, '\r\n'));
-      const dialogueDoc = JSON.parse(readRaw('data/base/dialogues/round-30-conversations.json'));
+      const dialogueDoc = JSON.parse(execFileSync('git', ['show', 'baa5ebe:data/base/dialogues/round-30-conversations.json'], { encoding: 'utf8' }));
       const conversation = dialogueDoc.conversations.find((entry: { id: string }) => entry.id === SPECS.conversationId);
       const greet = conversation.nodes.find((node: { id: string }) => node.id === conversation.startNodeId);
       greet.options = greet.options.filter((option: { text: string }) =>
@@ -551,6 +552,11 @@ describe('Round273 场景最小接线与作者源', () => {
       cpSync(resolve(root, 'data/base/knowledge_graph/edges.json'), join(workspace, 'data/base/knowledge_graph/edges.json'));
       const run = (script: string) => execFileSync(process.execPath, [join(workspace, 'scripts', script)], { cwd: tmpdir(), encoding: 'utf8' });
       expect(() => run('apply-round273.mjs')).not.toThrow();
+      cpSync(resolve(root, 'scripts/apply-round274.mjs'), join(workspace, 'scripts/apply-round274.mjs'));
+      cpSync(resolve(root, 'scripts/lib/round274-ferry-choice.mjs'), join(workspace, 'scripts/lib/round274-ferry-choice.mjs'));
+      mkdirSync(join(workspace, 'data/base/battles'), { recursive: true });
+      cpSync(resolve(root, 'data/base/battles/round-05-encounters.json'), join(workspace, 'data/base/battles/round-05-encounters.json'));
+      expect(() => run('apply-round274.mjs')).not.toThrow();
       for (const name of ['round-07-quests.json']) {
         expect(JSON.parse(readFileSync(join(workspace, 'data/base/quests', name), 'utf8')))
           .toEqual(JSON.parse(readRaw('data/base/quests/' + name)));

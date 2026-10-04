@@ -742,12 +742,10 @@ export class GridScene extends Phaser.Scene {
       world.knowledgeGraph,
       restoredRun?.knownKnowledgeNodeIds ?? [],
     );
-    // Older saves predate the explicit discovery counter. Backfill from the
-    // persisted run facts while excluding public entries known at game start.
-    this.achievementState.discoveredKnowledge = Math.max(
-      this.achievementState.discoveredKnowledge,
-      [...this.knownKnowledgeNodeIds].filter((id) => !world.knowledgeGraph.nodes.get(id)?.knownByDefault).length,
-    );
+    // The persisted discovery counter records actual first discoveries. The
+    // known catalog can also contain starting/legacy entries: counting it on
+    // load would invent progress and award currency merely for reloading.
+    // Legacy missing counters already default to zero in the save parser.
     this.factionState = createFactionMembershipState(restoredRun?.factionMembership ?? null);
     this.currentMapResourceId = restoredRun?.mapResourceId ?? world.mapResourceId;
     const activeMap = world.maps.get(this.currentMapResourceId) ?? map;

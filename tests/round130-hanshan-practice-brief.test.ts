@@ -18,6 +18,7 @@ import { readFileSync } from 'node:fs';
 import { repairDialoguesRaw as applyJourneyDelivery } from '../scripts/lib/round271-journey-delivery.mjs';
 import { repairDialogueFacts } from '../scripts/lib/round272-journey-facts.mjs';
 import { repairDialoguesRaw as applyPierDelivery } from '../scripts/lib/round273-pier-delivery.mjs';
+import { supplyNodes, supplyOptions } from '../scripts/lib/round274-ferry-choice.mjs';
 import { escortNode, escortArrived, escortOption } from '../scripts/lib/round149-bookshop-escort.mjs';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
@@ -323,6 +324,12 @@ describe('Round130 Hanshan practice briefs (real assembled data)', () => {
       const current30 = JSON.parse(readFileSync(join(root, 'data/base/dialogues/round-30-conversations.json'), 'utf8'));
       const ferryMaster = current30.conversations.find((entry: { id: string }) => entry.id === 'dlg.bai-luzhou-ferry-master');
       expect(ferryMaster).toBeDefined();
+      // Verify the independent R274 layer exactly before isolating this historical replay.
+      expect(ferryMaster.nodes.filter((node: { id: string }) => supplyNodes.some(wanted => wanted.id === node.id))).toEqual(supplyNodes);
+      const laterGreet = ferryMaster.nodes.find((node: { id: string }) => node.id === ferryMaster.startNodeId);
+      expect(laterGreet.options.filter((option: { nextNodeId: string }) => supplyOptions.some(wanted => wanted.nextNodeId === option.nextNodeId))).toEqual(supplyOptions);
+      ferryMaster.nodes = ferryMaster.nodes.filter((node: { id: string }) => !supplyNodes.some(wanted => wanted.id === node.id));
+      laterGreet.options = laterGreet.options.filter((option: { nextNodeId: string }) => !supplyOptions.some(wanted => wanted.nextNodeId === option.nextNodeId));
       const laterNodeIds = new Set(['r31-caravan-time-agreed', 'r31-caravan-escorted', 'r31-pier-reinforced', 'r31-river-lantern-time-agreed']);
       ferryMaster.nodes = ferryMaster.nodes.filter((node: { id: string }) => !laterNodeIds.has(node.id));
       const ferryGreet = ferryMaster.nodes.find((node: { id: string }) => node.id === ferryMaster.startNodeId);

@@ -37,3 +37,9 @@ F8工作台使用DOM表单，打开时暂停活动场景并阻止游戏输入；
 Round270：`iterations/round-270/j0-opening.json` 来自QA `journey-20261004` 正常槽一，候选 `round270-worktree-on-87271e1`，阶段 `j0-opening`。已在独立 `journey-20261004-copycheck` 导入并正常读回。其任务包含误接的可选「南麓寻村」，保留事实，不删除或改造测试状态。详情与局限见本轮 playtest/verification；后续资料变化若影响开场交付条件，应补走新的真实QA起点。
 
 - Round273修桥成本：iterations/round-273/f2-repair-cost-before-toll.json，独立journey-20261004-repair从F1复制，正常采购、交料、两日施工、保存空槽二并标题读回；尚未清桥头或认定F2完整。
+
+## Round274 两侧完整F2
+
+独立journey-20261004-escort槽二与journey-20261004-repair槽三，均候选round274-worktree-on-baa5ebe，从同一F1续验；原下载字节/hash见本轮playtest。文件iterations/round-274/f2-escort.json与f2-repair.json可恢复，上山应另设空槽或新运行，保留共同点与成本点。
+
+当前发现计数来自已保存的实际首次发现，启动不得据已知目录数补高。实际曾发现护送载荷15而目录非公开16，旧启动会多发40XP/25银；修复后重新标题读回326银与646XP。旧档缺计数按现有v1协议0继续，已解锁成就仍保留，真实后续首次发现可正常计数。

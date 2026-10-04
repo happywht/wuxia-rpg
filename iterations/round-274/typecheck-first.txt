@@ -1,0 +1,17 @@
+
+> wuxia-rpg@0.0.1 typecheck
+> tsc --noEmit
+
+tests/round274-ferry-choice.test.ts(17,82): error TS6133: 'supplyOptions' is declared but its value is never read.
+tests/round274-ferry-choice.test.ts(38,46): error TS2339: Property 'set' does not exist on type 'BattleEncounterSetParseResult'.
+  Property 'set' does not exist on type '{ ok: false; errors: string[]; }'.
+tests/round274-ferry-choice.test.ts(38,66): error TS7006: Parameter 'e' implicitly has an 'any' type.
+tests/round274-ferry-choice.test.ts(47,88): error TS2339: Property 'nextNodeId' does not exist on type 'VisibleDialogueOption'.
+tests/round274-ferry-choice.test.ts(93,38): error TS2339: Property 'nextNodeId' does not exist on type 'VisibleDialogueOption'.
+tests/round274-ferry-choice.test.ts(97,40): error TS2339: Property 'effects' does not exist on type 'VisibleDialogueOption'.
+tests/round274-ferry-choice.test.ts(100,48): error TS2339: Property 'effects' does not exist on type 'VisibleDialogueOption'.
+tests/round274-ferry-choice.test.ts(101,38): error TS2339: Property 'nextNodeId' does not exist on type 'VisibleDialogueOption'.
+tests/round274-ferry-choice.test.ts(127,89): error TS2345: Argument of type '{ character: CharacterState; inventory: InventoryState; shopStocks: Map<string, ShopStockRuntime>; ... 27 more ...; clock?: DialogueClockPort; }' is not assignable to parameter of type 'DialogueRuntimeContext'.
+  Types of property 'knownKnowledgeNodeIds' are incompatible.
+    Type 'string[]' is missing the following properties from type 'Set<string>': add, clear, delete, has, and 2 more.
+tests/round274-ferry-choice.test.ts(127,105): error TS2339: Property 'nextNodeId' does not exist on type 'VisibleDialogueOption'.

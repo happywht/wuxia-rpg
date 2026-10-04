@@ -1183,14 +1183,20 @@
               "text": "药队已护过雾桥，来渡籍报个平安。",
               "nextNodeId": "r31-caravan-escorted",
               "conditions": [
-                { "kind": "knowledgeKnown", "nodeId": "event.r31-caravan-escorted" }
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r31-caravan-escorted"
+                }
               ]
             },
             {
-              "text": "栈桥已修牢，药队改走旱桥了。",
+              "text": "栈桥已加固，我来核对桥头是否通渡。",
               "nextNodeId": "r31-pier-reinforced",
               "conditions": [
-                { "kind": "knowledgeKnown", "nodeId": "event.r31-pier-reinforced" }
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r31-pier-reinforced"
+                }
               ]
             },
             {
@@ -1500,6 +1506,49 @@
                   "status": "active"
                 }
               ]
+            },
+            {
+              "text": "药队已过雾桥，领一份上山伤药。",
+              "nextNodeId": "r274-ferry-supply-escort",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r31-guard-the-caravan",
+                  "status": "completed"
+                },
+                {
+                  "kind": "variable",
+                  "key": "r274.ferry.departure-supply",
+                  "operator": "missing"
+                }
+              ]
+            },
+            {
+              "text": "桥头已清，领一份上山调息药。",
+              "nextNodeId": "r274-ferry-supply-pier",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r31-pier-toll-clearing",
+                  "status": "completed"
+                },
+                {
+                  "kind": "variable",
+                  "key": "r274.ferry.departure-supply",
+                  "operator": "missing"
+                }
+              ]
+            },
+            {
+              "text": "核对已经领取的出发补给。",
+              "nextNodeId": "r274-ferry-supply-collected",
+              "conditions": [
+                {
+                  "kind": "variable",
+                  "key": "r274.ferry.departure-supply",
+                  "operator": "exists"
+                }
+              ]
             }
           ]
         },
@@ -1719,14 +1768,20 @@
           "id": "r31-caravan-escorted",
           "text": "白鹭洲在护送簿上添了「雾桥已过」：「石北押住了队尾，伏兵也没能截下药箱。闻姑娘备的谢仪会送到渡口，你们得空再去领；这一路的人情，两边都记着。」",
           "options": [
-            { "text": "我去听闻姑娘说谢仪的事。", "nextNodeId": "greet" }
+            {
+              "text": "我去听闻姑娘说谢仪的事。",
+              "nextNodeId": "greet"
+            }
           ]
         },
         {
           "id": "r31-pier-reinforced",
-          "text": "白鹭洲摸了摸新换的桩脚：「熟铁砂补了根，韧皮也勒紧了，药队走旱桥稳当。桥心那伙索银人却盯上了新木料；先把桥头清干净，渡口才能重新开闸。」",
+          "text": "白鹭洲摸了摸新换的桩脚：「桥身已经稳了；能否放药担过桥，还得看桥心那伙索银人。若还未清开，先去处理；若已清开，就把通渡结果登记，我备一份上山调息药给你。」",
           "options": [
-            { "text": "我去查查桥头的动静。", "nextNodeId": "greet" }
+            {
+              "text": "我去查查桥头的动静。",
+              "nextNodeId": "greet"
+            }
           ]
         },
         {
@@ -1771,6 +1826,102 @@
         {
           "id": "r273-pier-delivered",
           "text": "两日后，白鹭洲在渡籍上勾了「栈桥已加固」：「砂补了桩，韧皮也扎紧了，桥身稳了。只是桥头那伙索银人还没走；把他们清开，旱桥才好通药担。你的谢仪先结清。」"
+        },
+        {
+          "id": "r274-ferry-supply-escort",
+          "confirmEffects": true,
+          "text": "白鹭洲合上护送簿：「药队及时过了雾桥，你也挨了这一程。石北托我留一份回春膏，给你上山备着。收下这份伤药，我也记住你押队的情义。」",
+          "options": [
+            {
+              "text": "收下出发补给，记住这份人情。",
+              "nextNodeId": "r274-ferry-supply-receipt",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r31-guard-the-caravan",
+                  "status": "completed"
+                },
+                {
+                  "kind": "variable",
+                  "key": "r274.ferry.departure-supply",
+                  "operator": "missing"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "giveItem",
+                  "itemId": "item.huichun-gao",
+                  "quantity": 1
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "npcId": "char.bai-luzhou",
+                  "delta": 2
+                },
+                {
+                  "kind": "setVariable",
+                  "key": "r274.ferry.departure-supply",
+                  "value": "escort"
+                }
+              ]
+            },
+            {
+              "text": "眼下先不领，稍后再来。",
+              "nextNodeId": "greet"
+            }
+          ]
+        },
+        {
+          "id": "r274-ferry-supply-pier",
+          "confirmEffects": true,
+          "text": "白鹭洲望了望清净的桥头：「两日没白等，新桥稳了，索银人也走了。工匠托我留一丸清心丸，给你上山调息。你肯先做这番费时的活，我记着。」",
+          "options": [
+            {
+              "text": "收下出发补给，记住这份人情。",
+              "nextNodeId": "r274-ferry-supply-receipt",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r31-pier-toll-clearing",
+                  "status": "completed"
+                },
+                {
+                  "kind": "variable",
+                  "key": "r274.ferry.departure-supply",
+                  "operator": "missing"
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "giveItem",
+                  "itemId": "item.qingxin-wan",
+                  "quantity": 1
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "npcId": "char.bai-luzhou",
+                  "delta": 3
+                },
+                {
+                  "kind": "setVariable",
+                  "key": "r274.ferry.departure-supply",
+                  "value": "repair"
+                }
+              ]
+            },
+            {
+              "text": "眼下先不领，稍后再来。",
+              "nextNodeId": "greet"
+            }
+          ]
+        },
+        {
+          "id": "r274-ferry-supply-receipt",
+          "text": "白鹭洲把药包递过来：「云岭的石阶不短。伤了便敷药，气短便调息；到山上别硬撑。药已收妥，按B在背包里查看。」"
+        },
+        {
+          "id": "r274-ferry-supply-collected",
+          "text": "白鹭洲指了指渡籍：「你的出发药包已经领过。桥路各有难处，往后再来，就把沿途的新消息说给我听。」"
         }
       ]
     }

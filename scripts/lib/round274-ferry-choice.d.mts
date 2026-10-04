@@ -1,0 +1,11 @@
+import type { EnemyBehaviorStep } from '../../src/engine/turn-based-combat';
+import type { DialogueOptionData, DialogueNodeData } from '../../src/engine/dialogue-graph';
+export const pierId: string;
+export const escortId: string;
+export const supplyKey: string;
+export const pierBehavior: EnemyBehaviorStep[];
+export const escortBehavior: EnemyBehaviorStep[];
+export const supplyOptions: DialogueOptionData[];
+export const supplyNodes: DialogueNodeData[];
+export function repairEncountersRaw(raw: string): string;
+export function repairDialoguesRaw(raw: string): string;
