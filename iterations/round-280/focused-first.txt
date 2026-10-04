@@ -1,0 +1,73 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round276-cloud-challenge.test.ts (15 tests | 2 failed) 731ms
+   ❯ Round276 local investigation and authors remain bounded (7)
+     × data/base/dialogues/round-74-cloud-ridge-conversations.json replays exact current records and keeps LF/CRLF byte idempotence 78ms
+     × CLI preflights both resources before any write, is cwd independent and idempotent 394ms
+ ❯ tests/round177-cloud-quest-chain.test.ts (3 tests | 1 failed) 17ms
+   ❯ Round 177 cloud-ridge discovery to quest chain (3)
+     × offers quests only in their authored states and preserves the repair boundary in dialogue 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round177-cloud-quest-chain.test.ts > Round 177 cloud-ridge discovery to quest chain > offers quests only in their authored states and preserves the repair boundary in dialogue
+AssertionError: expected '「客舍东坡断口在(72,42)，拦路客在(75,42)。Q选断索清桥、N看…' to contain '先核断口、再清拦路客'
+
+Expected: "先核断口、再清拦路客"
+Received: "「客舍东坡断口在(72,42)，拦路客在(75,42)。Q选断索清桥、N看可走路线，绕屋沿山径，走相邻格E先查断口再挑战。头目先短打，沉肩绷索时准备重击；步云履花一回合与内力卸蓄势，换气时可进攻。伤后用膏、气短用丸；客舍有有限补给。清退不等于修索。」"
+
+ ❯ tests/round177-cloud-quest-chain.test.ts:67:42
+     65|     expect(hasQuestState(bridgeComplete, 'quest.r74-cloud-bridge', 'co…
+     66|     expect(node('marks-complete').text).toContain('接下来去断索悬桥查拦路的人');
+     67|     expect(node('bridge-accepted').text).toContain('先核断口、再清拦路客');
+       |                                          ^
+     68|     expect(node('bridge-complete').text).toContain('护索尚待修补');
+     69|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/round276-cloud-challenge.test.ts > Round276 local investigation and authors remain bounded > data/base/dialogues/round-74-cloud-ridge-conversations.json replays exact current records and keeps LF/CRLF byte idempotence
+Error: 本地回报文本重复或漂移，请人工复核
+ ❯ repairDialogueRaw scripts/lib/round276-cloud-challenge.mjs:65:42
+     63|     const oldCount=next.split(before).length-1,newCount=next.split(aft…
+     64|     if(oldCount===0&&newCount===1) continue;
+     65|     if(oldCount!==1||newCount!==0) throw Error('本地回报文本重复或漂移，请人工复核');
+       |                                          ^
+     66|     next=next.replace(before,after);
+     67|   }
+
+ Test Files  2 failed | 1 passed (3)
+      Tests  3 failed | 27 passed (30)
+   Start at  17:41:42
+   Duration  10.52s (tests 96%, transform 3%, import 1%)
+
+ ❯ tests/round276-cloud-challenge.test.ts:30:361
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/round276-cloud-challenge.test.ts > Round276 local investigation and authors remain bounded > CLI preflights both resources before any write, is cwd independent and idempotent
+Error: Command failed: D:\nvm4w\nodejs\node.exe C:\Users\Hitao\AppData\Local\Temp\wuxia-r276-63PkiZ\scripts\apply-round276.mjs
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r276-63PkiZ/scripts/lib/round276-cloud-challenge.mjs:65
+    if(oldCount!==1||newCount!==0) throw Error('本地回报文本重复或漂移，请人工复核');
+                                         ^
+
+Error: 本地回报文本重复或漂移，请人工复核
+    at repairDialogueRaw (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r276-63PkiZ/scripts/lib/round276-cloud-challenge.mjs:65:42)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r276-63PkiZ/scripts/apply-round276.mjs:4:133
+    at Array.map (<anonymous>)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r276-63PkiZ/scripts/apply-round276.mjs:4:22
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:647:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.18.0
+
+ ❯ repairDialogueRaw C:/Users/Hitao/AppData/Local/Temp/wuxia-r276-63PkiZ/scripts/lib/round276-cloud-challenge.mjs:65:42
+ ❯ C:/Users/Hitao/AppData/Local/Temp/wuxia-r276-63PkiZ/scripts/apply-round276.mjs:4:133
+ ❯ C:/Users/Hitao/AppData/Local/Temp/wuxia-r276-63PkiZ/scripts/apply-round276.mjs:4:22
+ ❯ run tests/round276-cloud-challenge.test.ts:33:558
+
+ ❯ tests/round276-cloud-challenge.test.ts:33:803
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯

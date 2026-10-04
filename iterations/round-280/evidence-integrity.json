@@ -1,0 +1,1869 @@
+{
+  "candidate": "round280-cloud-return-on-bff5245",
+  "frozenFileCount": 272,
+  "runtimeUnchanged": true,
+  "exports": [
+    {
+      "file": "iterations/round-280/escort-c1-return.json",
+      "sha256": "5a1ff3ef36ff29a38c23548408d1329e1eb17cf87dc6f698318ebdc057619a73",
+      "downloadMatches": true,
+      "sourceSlotId": "slot-3",
+      "savedAt": "2026-10-04T09:50:30.822Z",
+      "exportedAt": "2026-10-04T09:51:25.476Z",
+      "player": {
+        "level": 8,
+        "experience": 806,
+        "baseAttributes": {
+          "body": 23,
+          "force": 20,
+          "agility": 14,
+          "insight": 15,
+          "resolve": 14
+        },
+        "healthCurrent": 185,
+        "qiCurrent": 118,
+        "martialArtIds": [
+          "skill.jianghu-sanshou",
+          "skill.tuna-yangqi-jue",
+          "skill.r32-yunyin-caomu-xinfa",
+          "skill.r32-yunyin-buyun-lu"
+        ],
+        "factionMembership": {
+          "factionId": "faction.yunyin-shanzhuang",
+          "masterNpcId": "char.wen-suxin"
+        },
+        "cultivationPoints": 9,
+        "unlockedMeridianNodeIds": []
+      },
+      "inventory": {
+        "currency": 395,
+        "capacity": 12,
+        "stacks": [
+          {
+            "itemId": "item.xisui-canpian",
+            "quantity": 1
+          },
+          {
+            "itemId": "item.huichun-gao",
+            "quantity": 2
+          },
+          {
+            "itemId": "item.cangya-gen",
+            "quantity": 2
+          }
+        ],
+        "equipped": {}
+      },
+      "elapsedGameMinutes": 985,
+      "quests": {
+        "states": [
+          {
+            "questId": "quest.r79-tide-chart",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r79-white-beacon",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r82-follow-the-tide",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r82-read-tide-gauge",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r83-net-recovery",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r83-defeat-tide-wake-looters",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r83-night-channel",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r83-discover-night-channel",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r84-lantern-ledger",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r84-read-windward-beacon",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r85-low-tide-channel",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r85-land-on-tide-isle",
+                "value": 0
+              },
+              {
+                "id": "objective.r85-survey-low-tide-channel",
+                "value": 0
+              },
+              {
+                "id": "objective.r85-return-water-level-record",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r87-fog-pilot-ledger",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r87-land-on-southwest-isles",
+                "value": 0
+              },
+              {
+                "id": "objective.r87-light-mist-signal",
+                "value": 0
+              },
+              {
+                "id": "objective.r87-return-fog-pilot-ledger",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r89-east-channel-echo",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r89-check-channel-mark",
+                "value": 0
+              },
+              {
+                "id": "objective.r89-report-channel-echo",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r91-goose-vigil",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r91-arrive-cloud-north-terrace",
+                "value": 0
+              },
+              {
+                "id": "objective.r91-watch-goose-terrace",
+                "value": 0
+              },
+              {
+                "id": "objective.r91-report-nie-qiyan",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r92-snow-beacon",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r92-arrive-north-pass",
+                "value": 0
+              },
+              {
+                "id": "objective.r92-verify-snow-beacon",
+                "value": 0
+              },
+              {
+                "id": "objective.r101-clear-beacon-raider",
+                "value": 0
+              },
+              {
+                "id": "objective.r92-report-gu-zhaoxue",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r93-boundary-mark",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r93-arrive-snow-pine-valley",
+                "value": 0
+              },
+              {
+                "id": "objective.r93-survey-old-mark",
+                "value": 0
+              },
+              {
+                "id": "objective.r93-report-liu-xunjing",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r94-snowline-signal",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r94-enter-east-gate",
+                "value": 0
+              },
+              {
+                "id": "objective.r94-read-east-beacon",
+                "value": 0
+              },
+              {
+                "id": "objective.r94-report-east-beacon",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r94-homeward-lantern",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r94-enter-sails",
+                "value": 0
+              },
+              {
+                "id": "objective.r94-survey-lantern",
+                "value": 0
+              },
+              {
+                "id": "objective.r94-report-lantern",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r97-tide-ledger",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r97-read-tide-mark",
+                "value": 0
+              },
+              {
+                "id": "objective.r97-report-tide-ledger",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r97-beacon-relight",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r97-copy-lantern-verse",
+                "value": 0
+              },
+              {
+                "id": "objective.r97-relight-beacon",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r96-reef-lantern",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r96-read-lantern",
+                "value": 0
+              },
+              {
+                "id": "objective.r96-report-lantern",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r96-atoll-reply",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r96-copy-verse",
+                "value": 0
+              },
+              {
+                "id": "objective.r96-deliver-reply",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r95-windbell-route",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r95-find-windbell",
+                "value": 0
+              },
+              {
+                "id": "objective.r95-report-windbell",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r95-east-tide-course",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r95-read-tide-gauge",
+                "value": 0
+              },
+              {
+                "id": "objective.r95-report-tide-course",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.round-07-medicine-run",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.round-07-three-ointments",
+                "value": 3
+              },
+              {
+                "id": "objective.r271-medicine-delivery",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.round-07-clear-alley",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.round-07-defeat-blade",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-teastall-herbal-water",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-teastall-herbs",
+                "value": 4
+              },
+              {
+                "id": "objective.r271-teastall-delivery",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-bookshop-mothproof",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-bookshop-petals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-peddler-errand",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-peddler-message",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-roadside-note",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-roadside-letter",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-herbal-inquiry",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-herbal-question",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-herbal-stocktaking",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-root-stock",
+                "value": 3
+              },
+              {
+                "id": "objective.r104-formula",
+                "value": 1
+              },
+              {
+                "id": "objective.r104-brew",
+                "value": 1
+              },
+              {
+                "id": "objective.r104-heal",
+                "value": 1
+              },
+              {
+                "id": "objective.r104-medicine-report",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-ferry-ledger",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-ledger-transcript",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-academy-nightclass",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-nightclass-pills",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-mist-shore-watch",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-shore-prowler",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-caravan-provisioning",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-caravan-pill",
+                "value": 1
+              },
+              {
+                "id": "objective.r31-caravan-ferry-time",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-guard-the-caravan",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-caravan-ambush",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-mend-the-pier",
+            "status": "failed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-pier-ironsand",
+                "value": 0
+              },
+              {
+                "id": "objective.r31-pier-leather",
+                "value": 0
+              },
+              {
+                "id": "objective.r273-pier-delivery",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-caravan-gratitude",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-gratitude-escort",
+                "value": 1
+              },
+              {
+                "id": "objective.r31-gratitude-ferryman",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-pier-toll-clearing",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-pier-robber",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-river-lantern-promise",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-lantern-petals",
+                "value": 0
+              },
+              {
+                "id": "objective.r31-lantern-appointment",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-wharf-ears",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-ears-bladeyard",
+                "value": 0
+              },
+              {
+                "id": "objective.r31-ears-bookshop",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-blade-quench-stock",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-quench-ironsand",
+                "value": 0
+              },
+              {
+                "id": "objective.r104-forge",
+                "value": 0
+              },
+              {
+                "id": "objective.r104-equip",
+                "value": 0
+              },
+              {
+                "id": "objective.r104-challenge",
+                "value": 0
+              },
+              {
+                "id": "objective.r104-forge-report",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-mentor-review",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-review-herbalist",
+                "value": 0
+              },
+              {
+                "id": "objective.r31-review-escort",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r42-ledger-audit",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r42-audit-ledger-copy",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r42-two-witnesses",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r42-gu-tide-account",
+                "value": 0
+              },
+              {
+                "id": "objective.r42-zhu-seal-account",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r42-seal-rubbing",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r42-seal-rubbing",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r42-open-register",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r42-public-register",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r42-protect-witness",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r42-protect-witness",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r43-tingyu-eave-rain",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r43-tingyu-compare",
+                "value": 0
+              },
+              {
+                "id": "objective.r103-tingyu-ridge-sight",
+                "value": 0
+              },
+              {
+                "id": "objective.r103-tingyu-report",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r43-tiezhang-stone-post",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r43-tiezhang-ask-gu",
+                "value": 0
+              },
+              {
+                "id": "objective.r103-tiezhang-clear-road",
+                "value": 0
+              },
+              {
+                "id": "objective.r103-tiezhang-report",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r43-yunyin-herb-road",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r43-yunyin-ask-rong",
+                "value": 0
+              },
+              {
+                "id": "objective.r103-yunyin-well-check",
+                "value": 0
+              },
+              {
+                "id": "objective.r103-yunyin-prepare-ointment",
+                "value": 0
+              },
+              {
+                "id": "objective.r103-yunyin-report",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r43-hanshan-copybook",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r43-hanshan-ask-shen",
+                "value": 0
+              },
+              {
+                "id": "objective.r103-hanshan-old-mark-check",
+                "value": 0
+              },
+              {
+                "id": "objective.r103-hanshan-report",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r43-panzhou-return-tide",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r43-panzhou-ask-bai",
+                "value": 0
+              },
+              {
+                "id": "objective.r103-panzhou-defend-netters",
+                "value": 0
+              },
+              {
+                "id": "objective.r103-panzhou-report",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r44-post-first",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r44-confirm-post",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r44-ledger-first",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r44-confirm-ledger",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r56-north-water-gauge",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r56-north-water-gauge",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r56-south-waterway-survey",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r56-south-waterway-mark",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r58-market-discovery",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r58-market-discovery",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r58-market-stall-pact",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r58-market-stall-leather",
+                "value": 0
+              },
+              {
+                "id": "objective.r58-market-stall-layout",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r58-market-toll-squabble",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r58-market-toll-claimer",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r58-south-hamlet-survey",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r58-south-hamlet-arrival",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r58-south-hamlet-supply",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r58-south-hamlet-roots",
+                "value": 0
+              },
+              {
+                "id": "objective.r58-south-hamlet-peddler",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r58-pond-bandit-camp",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r58-pond-fake-escort",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r62-north-pass-marks",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r62-pass-marks",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r62-post-ledger",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r62-suyan-ledger",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r62-clear-ridge-road",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r62-roadblock",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r67-well-waterline",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r67-well-waterline",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r74-cloud-marks",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r74-cloud-marks",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.r74-cloud-bridge",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r74-cloud-bridge",
+                "value": 1
+              }
+            ]
+          }
+        ],
+        "trackedQuestId": null
+      },
+      "dialogueVariables": [
+        {
+          "key": "r274.ferry.departure-supply",
+          "value": "escort"
+        },
+        {
+          "key": "r279.road-exchange",
+          "value": "qingxin-wan"
+        }
+      ],
+      "indexMatches": true
+    },
+    {
+      "file": "iterations/round-280/repair-c1-return.json",
+      "sha256": "493d0a3a8da78e1ba0fc0bfc4aa1be4dd12fe3bc1609e2d48c5020742cada943",
+      "downloadMatches": true,
+      "sourceSlotId": "slot-3",
+      "savedAt": "2026-10-04T09:55:22.828Z",
+      "exportedAt": "2026-10-04T10:00:51.272Z",
+      "player": {
+        "level": 8,
+        "experience": 794,
+        "baseAttributes": {
+          "body": 23,
+          "force": 20,
+          "agility": 14,
+          "insight": 15,
+          "resolve": 14
+        },
+        "healthCurrent": 189,
+        "qiCurrent": 121,
+        "martialArtIds": [
+          "skill.jianghu-sanshou",
+          "skill.tuna-yangqi-jue",
+          "skill.r32-yunyin-caomu-xinfa",
+          "skill.r32-yunyin-buyun-lu"
+        ],
+        "factionMembership": {
+          "factionId": "faction.yunyin-shanzhuang",
+          "masterNpcId": "char.wen-suxin"
+        },
+        "cultivationPoints": 9,
+        "unlockedMeridianNodeIds": []
+      },
+      "inventory": {
+        "currency": 362,
+        "capacity": 12,
+        "stacks": [
+          {
+            "itemId": "item.xisui-canpian",
+            "quantity": 1
+          },
+          {
+            "itemId": "item.qingxin-wan",
+            "quantity": 2
+          },
+          {
+            "itemId": "item.cangya-gen",
+            "quantity": 2
+          }
+        ],
+        "equipped": {}
+      },
+      "elapsedGameMinutes": 4067,
+      "quests": {
+        "states": [
+          {
+            "questId": "quest.r79-tide-chart",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r79-white-beacon",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r82-follow-the-tide",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r82-read-tide-gauge",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r83-net-recovery",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r83-defeat-tide-wake-looters",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r83-night-channel",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r83-discover-night-channel",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r84-lantern-ledger",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r84-read-windward-beacon",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r85-low-tide-channel",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r85-land-on-tide-isle",
+                "value": 0
+              },
+              {
+                "id": "objective.r85-survey-low-tide-channel",
+                "value": 0
+              },
+              {
+                "id": "objective.r85-return-water-level-record",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r87-fog-pilot-ledger",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r87-land-on-southwest-isles",
+                "value": 0
+              },
+              {
+                "id": "objective.r87-light-mist-signal",
+                "value": 0
+              },
+              {
+                "id": "objective.r87-return-fog-pilot-ledger",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r89-east-channel-echo",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r89-check-channel-mark",
+                "value": 0
+              },
+              {
+                "id": "objective.r89-report-channel-echo",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r91-goose-vigil",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r91-arrive-cloud-north-terrace",
+                "value": 0
+              },
+              {
+                "id": "objective.r91-watch-goose-terrace",
+                "value": 0
+              },
+              {
+                "id": "objective.r91-report-nie-qiyan",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r92-snow-beacon",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r92-arrive-north-pass",
+                "value": 0
+              },
+              {
+                "id": "objective.r92-verify-snow-beacon",
+                "value": 0
+              },
+              {
+                "id": "objective.r101-clear-beacon-raider",
+                "value": 0
+              },
+              {
+                "id": "objective.r92-report-gu-zhaoxue",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r93-boundary-mark",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r93-arrive-snow-pine-valley",
+                "value": 0
+              },
+              {
+                "id": "objective.r93-survey-old-mark",
+                "value": 0
+              },
+              {
+                "id": "objective.r93-report-liu-xunjing",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r94-snowline-signal",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r94-enter-east-gate",
+                "value": 0
+              },
+              {
+                "id": "objective.r94-read-east-beacon",
+                "value": 0
+              },
+              {
+                "id": "objective.r94-report-east-beacon",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r94-homeward-lantern",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r94-enter-sails",
+                "value": 0
+              },
+              {
+                "id": "objective.r94-survey-lantern",
+                "value": 0
+              },
+              {
+                "id": "objective.r94-report-lantern",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r97-tide-ledger",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r97-read-tide-mark",
+                "value": 0
+              },
+              {
+                "id": "objective.r97-report-tide-ledger",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r97-beacon-relight",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r97-copy-lantern-verse",
+                "value": 0
+              },
+              {
+                "id": "objective.r97-relight-beacon",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r96-reef-lantern",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r96-read-lantern",
+                "value": 0
+              },
+              {
+                "id": "objective.r96-report-lantern",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r96-atoll-reply",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r96-copy-verse",
+                "value": 0
+              },
+              {
+                "id": "objective.r96-deliver-reply",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r95-windbell-route",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r95-find-windbell",
+                "value": 0
+              },
+              {
+                "id": "objective.r95-report-windbell",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r95-east-tide-course",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r95-read-tide-gauge",
+                "value": 0
+              },
+              {
+                "id": "objective.r95-report-tide-course",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.round-07-medicine-run",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.round-07-three-ointments",
+                "value": 3
+              },
+              {
+                "id": "objective.r271-medicine-delivery",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.round-07-clear-alley",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.round-07-defeat-blade",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-teastall-herbal-water",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-teastall-herbs",
+                "value": 4
+              },
+              {
+                "id": "objective.r271-teastall-delivery",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-bookshop-mothproof",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-bookshop-petals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-peddler-errand",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-peddler-message",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-roadside-note",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-roadside-letter",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-herbal-inquiry",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-herbal-question",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-herbal-stocktaking",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-root-stock",
+                "value": 3
+              },
+              {
+                "id": "objective.r104-formula",
+                "value": 1
+              },
+              {
+                "id": "objective.r104-brew",
+                "value": 1
+              },
+              {
+                "id": "objective.r104-heal",
+                "value": 1
+              },
+              {
+                "id": "objective.r104-medicine-report",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-ferry-ledger",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-ledger-transcript",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-academy-nightclass",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-nightclass-pills",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-mist-shore-watch",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-shore-prowler",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-caravan-provisioning",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-caravan-pill",
+                "value": 1
+              },
+              {
+                "id": "objective.r31-caravan-ferry-time",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-guard-the-caravan",
+            "status": "failed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-caravan-ambush",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-mend-the-pier",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-pier-ironsand",
+                "value": 3
+              },
+              {
+                "id": "objective.r31-pier-leather",
+                "value": 2
+              },
+              {
+                "id": "objective.r273-pier-delivery",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-caravan-gratitude",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-gratitude-escort",
+                "value": 0
+              },
+              {
+                "id": "objective.r31-gratitude-ferryman",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-pier-toll-clearing",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-pier-robber",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-river-lantern-promise",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-lantern-petals",
+                "value": 0
+              },
+              {
+                "id": "objective.r31-lantern-appointment",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-wharf-ears",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-ears-bladeyard",
+                "value": 0
+              },
+              {
+                "id": "objective.r31-ears-bookshop",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-blade-quench-stock",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-quench-ironsand",
+                "value": 0
+              },
+              {
+                "id": "objective.r104-forge",
+                "value": 0
+              },
+              {
+                "id": "objective.r104-equip",
+                "value": 0
+              },
+              {
+                "id": "objective.r104-challenge",
+                "value": 0
+              },
+              {
+                "id": "objective.r104-forge-report",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-mentor-review",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-review-herbalist",
+                "value": 0
+              },
+              {
+                "id": "objective.r31-review-escort",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r42-ledger-audit",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r42-audit-ledger-copy",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r42-two-witnesses",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r42-gu-tide-account",
+                "value": 0
+              },
+              {
+                "id": "objective.r42-zhu-seal-account",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r42-seal-rubbing",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r42-seal-rubbing",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r42-open-register",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r42-public-register",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r42-protect-witness",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r42-protect-witness",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r43-tingyu-eave-rain",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r43-tingyu-compare",
+                "value": 0
+              },
+              {
+                "id": "objective.r103-tingyu-ridge-sight",
+                "value": 0
+              },
+              {
+                "id": "objective.r103-tingyu-report",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r43-tiezhang-stone-post",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r43-tiezhang-ask-gu",
+                "value": 0
+              },
+              {
+                "id": "objective.r103-tiezhang-clear-road",
+                "value": 0
+              },
+              {
+                "id": "objective.r103-tiezhang-report",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r43-yunyin-herb-road",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r43-yunyin-ask-rong",
+                "value": 0
+              },
+              {
+                "id": "objective.r103-yunyin-well-check",
+                "value": 0
+              },
+              {
+                "id": "objective.r103-yunyin-prepare-ointment",
+                "value": 0
+              },
+              {
+                "id": "objective.r103-yunyin-report",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r43-hanshan-copybook",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r43-hanshan-ask-shen",
+                "value": 0
+              },
+              {
+                "id": "objective.r103-hanshan-old-mark-check",
+                "value": 0
+              },
+              {
+                "id": "objective.r103-hanshan-report",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r43-panzhou-return-tide",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r43-panzhou-ask-bai",
+                "value": 0
+              },
+              {
+                "id": "objective.r103-panzhou-defend-netters",
+                "value": 0
+              },
+              {
+                "id": "objective.r103-panzhou-report",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r44-post-first",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r44-confirm-post",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r44-ledger-first",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r44-confirm-ledger",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r56-north-water-gauge",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r56-north-water-gauge",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r56-south-waterway-survey",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r56-south-waterway-mark",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r58-market-discovery",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r58-market-discovery",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r58-market-stall-pact",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r58-market-stall-leather",
+                "value": 0
+              },
+              {
+                "id": "objective.r58-market-stall-layout",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r58-market-toll-squabble",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r58-market-toll-claimer",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r58-south-hamlet-survey",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r58-south-hamlet-arrival",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r58-south-hamlet-supply",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r58-south-hamlet-roots",
+                "value": 0
+              },
+              {
+                "id": "objective.r58-south-hamlet-peddler",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r58-pond-bandit-camp",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r58-pond-fake-escort",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r62-north-pass-marks",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r62-pass-marks",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r62-post-ledger",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r62-suyan-ledger",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r62-clear-ridge-road",
+            "status": "locked",
+            "objectiveCounts": [
+              {
+                "id": "objective.r62-roadblock",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r67-well-waterline",
+            "status": "offered",
+            "objectiveCounts": [
+              {
+                "id": "objective.r67-well-waterline",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r74-cloud-marks",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r74-cloud-marks",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.r74-cloud-bridge",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r74-cloud-bridge",
+                "value": 1
+              }
+            ]
+          }
+        ],
+        "trackedQuestId": null
+      },
+      "dialogueVariables": [
+        {
+          "key": "r274.ferry.departure-supply",
+          "value": "repair"
+        },
+        {
+          "key": "r279.road-exchange",
+          "value": "iron-sand"
+        }
+      ],
+      "indexMatches": true
+    }
+  ]
+}

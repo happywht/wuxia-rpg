@@ -27,3 +27,6 @@ iterations/round-279/repair-road-exchange.json -text
 iterations/round-279/escort-final-c0-arrival.json -text
 
 iterations/round-279/repair-final-c0-arrival.json -text
+
+iterations/round-280/escort-c1-return.json -text
+iterations/round-280/repair-c1-return.json -text

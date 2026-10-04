@@ -73,3 +73,9 @@ Lv8/XP714/371银/208命121气/75,42/elapsed1027；膏1丸1根2残篇1，云阶co
 ## Round279 核验状态
 
 两侧最新 C0 位于 iterations/round-279/escort-final-c0-arrival.json 与 repair-final-c0-arrival.json；独立 road-escort/road-repair QA、最终候选 round279-final-inspection-on-51f3355、来源槽三，正常保存与标题读回，不覆盖原槽一二。
+
+## Round280 当前增量证据
+
+云岭挑战接取明确断口与挑战坐标、Q/N导航、蓄势征兆和有限补给；回报说明奖励已到账、清退不等于修索、本次无需返回渡口。两侧从Round279真实C0按键推进124格、调查、战斗、回客舍报告，槽三明确覆盖后标题Continue读回并F8原样导出。护送Lv8/XP806/185命118气/395银/膏2；修桥Lv8/XP794/189命121气/362银/膏0丸2，最后一膏实际恢复25命。没有赠品或修改存档。198文件1789测试、102资源Schema/MOD/类型/两审计/Vite通过；272运行文件冻结校验及下载原样校验见本轮evidence-integrity.json。完整新游戏同候选及真人60—90分钟仍待，P1未放行，P2不启动。
+
+原始检查点：iterations/round-280/escort-c1-return.json、repair-c1-return.json。来源均slot-3；明确确认覆盖，父C0原样保留Round279。

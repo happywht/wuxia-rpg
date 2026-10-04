@@ -1,0 +1,30 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round177-cloud-quest-chain.test.ts (3 tests | 1 failed) 11ms
+   ❯ Round 177 cloud-ridge discovery to quest chain (3)
+     × offers quests only in their authored states and preserves the repair boundary in dialogue 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round177-cloud-quest-chain.test.ts > Round 177 cloud-ridge discovery to quest chain > offers quests only in their authored states and preserves the repair boundary in dialogue
+AssertionError: expected '「客舍东坡断口在(72,42)，拦路客在(75,42)。Q选断索清桥、N看…' to contain '先核断口、再清拦路客'
+
+Expected: "先核断口、再清拦路客"
+Received: "「客舍东坡断口在(72,42)，拦路客在(75,42)。Q选断索清桥、N看可走路线，绕屋沿山径，走相邻格E先查断口再挑战。头目先短打，沉肩绷索时准备重击；步云履花一回合与内力卸蓄势，换气时可进攻。伤后用膏、气短用丸；客舍有有限补给。清退不等于修索。」"
+
+ ❯ tests/round177-cloud-quest-chain.test.ts:67:42
+     65|     expect(hasQuestState(bridgeComplete, 'quest.r74-cloud-bridge', 'co…
+     66|     expect(node('marks-complete').text).toContain('接下来去断索悬桥查拦路的人');
+     67|     expect(node('bridge-accepted').text).toContain('先核断口、再清拦路客');
+       |                                          ^
+     68|     expect(node('bridge-complete').text).toContain('护索尚待修补');
+     69|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 29 passed (30)
+   Start at  17:42:10
+   Duration  10.78s (tests 96%, transform 3%, import 1%)

@@ -14,12 +14,14 @@ export const dialoguePatches = [
   {
     "id": "bridge-accepted",
     "before": "「悬桥在栈道东侧，拦路的人拆了两段护索。」她指向山坳，「确认没有人被困，再把路清出来。」",
-    "after": "「悬桥在客舍东侧。头目先以短打试探，沉肩绷索时要重击：步云履须花一回合和内力准备，可卸这一击的蓄势；换气时他不出手，正好进攻。先核断口、再清拦路客，伤后用膏、气短用丸，不必满气浪费。清开山径也不等于修好护索。」她圈出东坡。"
+    "previous": "「悬桥在客舍东侧。头目先以短打试探，沉肩绷索时要重击：步云履须花一回合和内力准备，可卸这一击的蓄势；换气时他不出手，正好进攻。先核断口、再清拦路客，伤后用膏、气短用丸，不必满气浪费。清开山径也不等于修好护索。」她圈出东坡。",
+    "after": "「客舍东坡断口在(72,42)，拦路客在(75,42)。Q选断索清桥、N看可走路线，绕屋沿山径，走相邻格E，先核断口、再清拦路客。头目先短打，沉肩绷索时准备重击；步云履花一回合与内力卸蓄势，换气时可进攻。伤后用膏、气短用丸；客舍有有限补给。清退不等于修索。」"
   },
   {
     "id": "bridge-complete",
     "before": "沈雨霁在图上划掉路障：「悬桥边的拦路客已散，护索还要另行修补。你能走过这一路，不等于每个后来人都能不看脚下。」",
-    "after": "沈雨霁在图上划掉路障：「石阶指出旧索转向，断口也看到了拦路的痕迹。你清退了头目，酬劳已按差事到账；护索尚待修补，不能把胜负当成修索。如今本地这两件事有了答案，下一趟再选北台或东行；残篇的三地对照仍需更簿与井壁，不必仅为这次回報返渡口。」"
+    "previous": "沈雨霁在图上划掉路障：「石阶指出旧索转向，断口也看到了拦路的痕迹。你清退了头目，酬劳已按差事到账；护索尚待修补，不能把胜负当成修索。如今本地这两件事有了答案，下一趟再选北台或东行；残篇的三地对照仍需更簿与井壁，不必仅为这次回報返渡口。」",
+    "after": "沈雨霁核对刻痕与断口：「你查清旧索转向、清退拦路客；战斗与差事的经验、银两已经到账，复谈不会再领。回客舍是合上这两份线索、查看有限补给，不是重新交奖励。护索尚待修补。下一趟可选北台或东行；残篇三地对照仍需更簿与井壁，不必为本次回报返回渡口。」"
   }
 ];
 const same = (a,b) => JSON.stringify(a) === JSON.stringify(b);
@@ -56,10 +58,10 @@ export function repairDialogueRaw(raw) {
   let next=raw;
   for(const p of dialoguePatches) {
     const node=unique(dialogue.nodes,n=>n.id===p.id);
-    if(![p.before,p.after].includes(node.text)) throw Error('本地回报已漂移，请人工复核');
-    const before=JSON.stringify(p.before),after=JSON.stringify(p.after);
+    if(![p.before,p.previous,p.after].includes(node.text)) throw Error('本地回报已漂移，请人工复核');
+    const before=JSON.stringify(node.text),after=JSON.stringify(p.after);
     const oldCount=next.split(before).length-1,newCount=next.split(after).length-1;
-    if(oldCount===0&&newCount===1) continue;
+    if(node.text===p.after&&newCount===1) continue;
     if(oldCount!==1||newCount!==0) throw Error('本地回报文本重复或漂移，请人工复核');
     next=next.replace(before,after);
   }
