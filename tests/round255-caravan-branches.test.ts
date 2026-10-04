@@ -60,12 +60,16 @@ describe('Round255 药队路线后果', () => {
     expect(success.journal.states.get(ids.toll)?.status).toBe('locked');
   });
 
-  it('修桥材料完成只留下加固见闻并开放通渡；护送路线保持封止', () => {
+  it('修桥材料只推进备料不结案；当面交付（R273）后才留加固见闻并开放通渡；护送路线保持封止', () => {
     const { quests, journal } = readyJournal();
     const accepted = acceptQuest(quests, journal, ids.pier);
     expect(accepted.ok && accepted.update.failedQuestIds).toContain(ids.guard);
+    // R273：备齐两种料不再持有即结案；乱序购买（先韧皮后铁砂）也都能计数。
+    applyQuestSignal(quests, journal, { type: 'item-count', itemId: 'item.tough-leather', quantity: 2 });
     applyQuestSignal(quests, journal, { type: 'item-count', itemId: 'item.iron-sand', quantity: 3 });
-    const finish = applyQuestSignal(quests, journal, { type: 'item-count', itemId: 'item.tough-leather', quantity: 2 });
+    expect(journal.states.get(ids.pier)?.status).toBe('active');
+    expect([...journal.states.get(ids.pier)!.objectiveCounts.values()]).toEqual([3, 2, 0]);
+    const finish = applyQuestSignal(quests, journal, { type: 'knowledge-discovery', nodeId: ids.reinforced });
     expect(finish.completed.find((entry) => entry.questId === ids.pier)?.discoverKnowledgeNodeIds).toEqual([ids.reinforced]);
     expect(journal.states.get(ids.toll)?.status).toBe('offered');
     expect(journal.states.get(ids.gratitude)?.status).toBe('locked');

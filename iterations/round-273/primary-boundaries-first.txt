@@ -1,0 +1,74 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round273-review-boundaries.test.ts (4 tests | 3 failed) 9ms
+   ❯ Primary Round273 review of ordered material boundaries (2)
+     × does not pre-fill a future collect stage across a required report 5ms
+     × future materials sold before the previous stage is ready are not falsely displayed as held 1ms
+   ❯ Primary Round273 review of cumulative time transaction (2)
+     × refuses cumulative overflow and leaves the live clock unchanged 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round273-review-boundaries.test.ts > Primary Round273 review of ordered material boundaries > does not pre-fill a future collect stage across a required report
+AssertionError: expected 2 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 2
+
+ ❯ tests/round273-review-boundaries.test.ts:25:37
+     23|     const f = fixture(true);
+     24|     applyQuestSignal(f.quests, f.journal, { type: 'item-count', itemId…
+     25|     expect(f.counts.get('leather')).toBe(0);
+       |                                     ^
+     26|     reconcileQuestFacts(f.quests, f.journal, { itemCounts: new Map([['…
+     27|     expect(f.counts.get('leather')).toBe(0);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/round273-review-boundaries.test.ts > Primary Round273 review of ordered material boundaries > future materials sold before the previous stage is ready are not falsely displayed as held
+AssertionError: expected 2 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 2
+
+ ❯ tests/round273-review-boundaries.test.ts:33:37
+     31|     applyQuestSignal(f.quests, f.journal, { type: 'item-count', itemId…
+     32|     applyQuestSignal(f.quests, f.journal, { type: 'item-count', itemId…
+     33|     expect(f.counts.get('leather')).toBe(0);
+       |                                     ^
+     34|     reconcileQuestFacts(f.quests, f.journal, { itemCounts: new Map([['…
+     35|     reconcileQuestFacts(f.quests, f.journal, { itemCounts: new Map() }…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/round273-review-boundaries.test.ts > Primary Round273 review of cumulative time transaction > refuses cumulative overflow and leaves the live clock unchanged
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/round273-review-boundaries.test.ts:58:23
+     56|     const start = Number.MAX_SAFE_INTEGER - 100, c = context(start);
+     57|     const result = applyDialogueEffects([{ kind: 'advanceTime', minute…
+     58|     expect(result.ok).toBe(false);
+       |                       ^
+     59|     expect(c.clock!.elapsedMinutes).toBe(start);
+     60|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 1 passed (4)
+   Start at  10:17:31
+   Duration  413ms (transform 77%, import 15%, tests 4%, worker 4%)

@@ -696,6 +696,19 @@ export function abandonQuest(journal: QuestJournal, questId: string): QuestActio
 }
 
 /** Applies one objective/failure event to every currently active quest. */
+/** Only consecutive material requirements share preparation counts. Later
+ * stages across a report/discovery/craft still require their declared order. */
+function pendingCollectionPeers(quest: QuestData, pending: QuestObjectiveData | undefined): Set<string> {
+  const ids = new Set<string>();
+  if (pending?.kind !== 'collectItem') return ids;
+  for (let i = quest.objectives.indexOf(pending) + 1; i < quest.objectives.length; i++) {
+    const objective = quest.objectives[i]!;
+    if (objective.kind !== 'collectItem') break;
+    ids.add(objective.id);
+  }
+  return ids;
+}
+
 export function applyQuestSignal(
   quests: ReadonlyMap<string, QuestData>,
   journal: QuestJournal,
@@ -717,8 +730,18 @@ export function applyQuestSignal(
 
     const pending = quest.orderedObjectives ? quest.objectives.find(objective =>
       (state.objectiveCounts.get(objective.id) ?? 0) < objective.requiredCount) : undefined;
+    const collectionPeers = pendingCollectionPeers(quest, pending);
     for (const objective of quest.objectives) {
-      if (quest.orderedObjectives && objective !== pending) continue;
+      if (quest.orderedObjectives && objective !== pending) {
+        if (collectionPeers.has(objective.id) && signal.type === 'item-count' && objective.targetId === signal.itemId) {
+          const quantity = Number.isSafeInteger(signal.quantity) ? Math.max(0, signal.quantity) : 0;
+          const next = Math.min(objective.requiredCount, quantity);
+          if (next !== (state.objectiveCounts.get(objective.id) ?? 0)) {
+            state.objectiveCounts.set(objective.id, next); changed = true;
+          }
+        }
+        continue;
+      }
       const current = state.objectiveCounts.get(objective.id) ?? 0;
       let next = current;
       if (objective.kind === 'collectItem' && signal.type === 'item-count' && objective.targetId === signal.itemId) {
@@ -810,8 +833,18 @@ export function reconcileQuestFacts(
       if (state?.status !== 'active') continue;
       const pending = quest.orderedObjectives ? quest.objectives.find(objective =>
         (state.objectiveCounts.get(objective.id) ?? 0) < objective.requiredCount) : undefined;
+      const collectionPeers = pendingCollectionPeers(quest, pending);
       for (const objective of quest.objectives) {
-        if (quest.orderedObjectives && objective !== pending) continue;
+        if (quest.orderedObjectives && objective !== pending) {
+          if (collectionPeers.has(objective.id) && facts.itemCounts !== undefined) {
+            const quantity = facts.itemCounts.get(objective.targetId) ?? 0;
+            const next = Math.min(objective.requiredCount, Number.isSafeInteger(quantity) ? Math.max(0, quantity) : 0);
+            if (next !== (state.objectiveCounts.get(objective.id) ?? 0)) {
+              state.objectiveCounts.set(objective.id, next); changed = true; passChanged = true;
+            }
+          }
+          continue;
+        }
         const current = state.objectiveCounts.get(objective.id) ?? 0;
         let next = current;
         if (objective.kind === 'discoverKnowledge' && facts.knownKnowledgeNodeIds?.has(objective.targetId)) next = objective.requiredCount;

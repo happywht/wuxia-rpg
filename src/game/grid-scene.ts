@@ -2959,6 +2959,15 @@ export class GridScene extends Phaser.Scene {
     if (clock === null || !clock.advance(minutes)) {
       return;
     }
+    this.refreshAfterClockChange();
+  }
+
+  /**
+   * Single reusable refresh after any world-clock change (wait key, travel,
+   * dialogue `advanceTime` commit): HUD line, daylight wash, weather/tide
+   * presentation and NPC schedules all follow the new moment.
+   */
+  private refreshAfterClockChange(): void {
     this.updateTimeHud();
     this.updateDaylight(true);
     this.updateClimatePresentation(true);
@@ -4473,6 +4482,7 @@ export class GridScene extends Phaser.Scene {
         panelReady: this.battlePanel !== null && !this.battlePanel.isOpen && !this.dialogueBattlePending,
       },
       teleportReadiness: this.buildDialogueTeleportReadiness(),
+      clock: this.clock ?? undefined,
     };
   }
 
@@ -4505,6 +4515,14 @@ export class GridScene extends Phaser.Scene {
       }
       if (result.summary.questUpdate.changed) {
         this.applyQuestUpdate(result.summary.questUpdate);
+      }
+      // Round 273: a committed `advanceTime` already moved the shared clock
+      // inside the transaction; this is only the presentation refresh (HUD,
+      // daylight, weather/tide, NPC schedules, guidance) — skipping it can
+      // never skip the cost itself, which is saved with the run.
+      if ((result.summary.timeAdvancedMinutes ?? 0) > 0) {
+        this.refreshAfterClockChange();
+        this.refreshNavigationGuide();
       }
       if (this.companionState.activeCompanionId !== companionBefore) {
         this.refreshNpcPlacements();

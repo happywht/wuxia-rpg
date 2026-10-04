@@ -296,10 +296,12 @@
     {
       "id": "quest.r31-mend-the-pier",
       "name": "先修栈桥",
-      "description": "白鹭洲不赞成硬闯：旧栈桥的桩脚早就酥了，重载药队一上去便是塌。他要用熟铁砂补桩、韧皮捆扎，先把桥修牢，药队宁可等两日走旱桥。备齐三份熟铁砂与两捆韧皮料，工钱他出。",
+      "description": "白鹭洲不赞成硬闯：旧栈桥的桩脚早就酥了，重载药队一上去便是塌。他要用熟铁砂补桩、韧皮捆扎，先把桥修牢，药队宁可等两日走旱桥。备齐三份熟铁砂与两捆韧皮料后，回到渡口按F与白鹭洲交谈、当面交料并确认动工，工期两日、完工结算，工钱他出。",
       "giverNpcId": "char.bai-luzhou",
       "exclusiveGroupId": "branch.ferry-priority",
-      "prerequisiteQuestIds": ["quest.r31-caravan-provisioning"],
+      "prerequisiteQuestIds": [
+        "quest.r31-caravan-provisioning"
+      ],
       "objectives": [
         {
           "id": "objective.r31-pier-ironsand",
@@ -314,9 +316,24 @@
           "targetId": "item.tough-leather",
           "requiredCount": 2,
           "text": "备齐两捆韧皮料捆扎"
+        },
+        {
+          "id": "objective.r273-pier-delivery",
+          "kind": "discoverKnowledge",
+          "targetId": "event.r31-pier-reinforced",
+          "requiredCount": 1,
+          "navigationNpcId": "char.bai-luzhou",
+          "text": "回白鹭洲处按F交料并确认动工（熟铁砂×3、韧皮×2；工期两日）"
         }
       ],
-      "rewards": { "experience": 35, "currency": 38, "discoverKnowledgeNodeIds": ["event.r31-pier-reinforced"] }
+      "rewards": {
+        "experience": 35,
+        "currency": 38,
+        "discoverKnowledgeNodeIds": [
+          "event.r31-pier-reinforced"
+        ]
+      },
+      "orderedObjectives": true
     },
     {
       "id": "quest.r31-caravan-gratitude",

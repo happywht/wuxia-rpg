@@ -81,6 +81,12 @@ import { dismissCompanion, recruitCompanion, type CompanionData, type CompanionS
 import { preflightDialogueBattle, type DialogueBattleReadiness } from './dialogue-battle-request';
 import { preflightDialogueTeleport, type DialogueTeleportRequest, type DialogueTeleportReadiness } from './dialogue-teleport-request';
 import {
+  formatDialogueAdvanceMinutes,
+  preflightDialogueTime,
+  StagedDialogueClock,
+  type DialogueClockPort,
+} from './dialogue-time-request';
+import {
   type DialogueVariableValue,
   DIALOGUE_VARIABLE_LEDGER_MAX_ENTRIES,
   isDialogueVariableConditionMet,
@@ -130,6 +136,12 @@ export interface DialogueRuntimeContext {
   dialogueVariables?: Map<string, DialogueVariableValue>;
   battleReadiness?: DialogueBattleReadiness;
   teleportReadiness?: DialogueTeleportReadiness;
+  /**
+   * Live world clock the `advanceTime` effect commits into atomically (Round
+   * 273). Absent in legacy headless consumers — authored time costs then
+   * refuse with a readable reason instead of silently dropping.
+   */
+  clock?: DialogueClockPort;
 }
 
 // ---------------------------------------------------------------------------
@@ -448,6 +460,8 @@ export interface DialogueEffectSummary {
   /** One deferred external action; no battle is opened during staging. */
   battleRequest?: { encounterId: string };
   teleportRequest?: DialogueTeleportRequest;
+  /** World minutes already committed into the transaction clock (Round 273). */
+  timeAdvancedMinutes?: number;
   lines: readonly string[];
   /** Aggregated quest transitions for HUD settlement (rewards, notices). */
   questUpdate: QuestUpdateResult;
@@ -603,6 +617,10 @@ function validateEffect(
     const result = preflightDialogueTeleport(effect, context.teleportReadiness, context.companionState?.activeCompanionId ?? null);
     return result.ok ? null : result.reason;
   }
+  if (effect.kind === 'advanceTime') {
+    const result = preflightDialogueTime(effect, context.clock);
+    return result.ok ? null : result.reason;
+  }
   if (effect.kind === 'startBattle') {
     const result = preflightDialogueBattle(effect.encounterId, context.battleReadiness);
     return result.ok ? null : result.reason;
@@ -756,12 +774,20 @@ export function applyDialogueEffects(
   context: DialogueRuntimeContext,
 ): DialogueEffectResult {
   if (effects.filter(effect => effect.kind === 'teleport' || effect.kind === 'startBattle').length > 1) return { ok: false, reason: '一次交谈只能发起一项挑战或引路' };
+  const firstTimeEffect = effects.find(effect => effect.kind === 'advanceTime');
+  if (firstTimeEffect?.kind === 'advanceTime') {
+    const readiness = preflightDialogueTime(firstTimeEffect, context.clock);
+    if (!readiness.ok) return readiness;
+  }
   let battleRequest: { encounterId: string } | undefined;
   let teleportRequest: DialogueTeleportRequest | undefined;
   // Run the declared sequence against an isolated working copy. Each next
   // effect sees earlier staged changes (so duplicate grants/accepts cannot
   // pass against stale state); a refusal simply discards the whole copy.
   const staged = cloneRuntimeContext(context);
+  const stagedClock = context.clock === undefined ? undefined : new StagedDialogueClock(context.clock.elapsedMinutes);
+  if (stagedClock !== undefined) staged.clock = stagedClock;
+  let timeAdvancedMinutes = 0;
   const lines: string[] = [];
   const questUpdate: {
     changed: boolean;
@@ -779,6 +805,16 @@ export function applyDialogueEffects(
       case 'teleport':
         teleportRequest = { mapResourceId: effect.mapResourceId, col: effect.col, row: effect.row, travelMinutes: effect.travelMinutes };
         break;
+      case 'advanceTime': {
+        // Staged only: the real clock advances with the final commit, so a
+        // later refusal in this option discards the whole time cost.
+        if (stagedClock === undefined || !stagedClock.advance(effect.minutes)) {
+          return { ok: false, reason: '世界时间无法推进，整笔回滚' };
+        }
+        timeAdvancedMinutes += effect.minutes;
+        lines.push(formatDialogueAdvanceMinutes(effect.minutes));
+        break;
+      }
       case 'startBattle':
         battleRequest = { encounterId: effect.encounterId };
         break;
@@ -1007,7 +1043,18 @@ export function applyDialogueEffects(
     const result = preflightDialogueTeleport(teleportRequest, staged.teleportReadiness, staged.companionState?.activeCompanionId ?? null);
     if (!result.ok) return result;
   }
+  if (stagedClock !== undefined && stagedClock.elapsedMinutes !== (context.clock?.elapsedMinutes ?? stagedClock.elapsedMinutes)) {
+    if (context.clock === undefined || !stagedClock.commitTo(context.clock)) {
+      return { ok: false, reason: '世界时间无法推进，整笔回滚' };
+    }
+  }
   commitRuntimeContext(context, staged);
 
-  return { ok: true, summary: { lines, questUpdate, ...(battleRequest === undefined ? {} : { battleRequest }), ...(teleportRequest === undefined ? {} : { teleportRequest }) } };
+  return { ok: true, summary: {
+    lines,
+    questUpdate,
+    ...(battleRequest === undefined ? {} : { battleRequest }),
+    ...(teleportRequest === undefined ? {} : { teleportRequest }),
+    ...(timeAdvancedMinutes > 0 ? { timeAdvancedMinutes } : {}),
+  } };
 }

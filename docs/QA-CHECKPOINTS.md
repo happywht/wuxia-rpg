@@ -24,6 +24,16 @@ F8工作台使用DOM表单，打开时暂停活动场景并阻止游戏输入；
 
 确认页面展示来源运行/candidate/stage/角色与目标运行。JSON/元数据/存档协议不合法或存储不可读时拒绝写入；单文件上限2MiB。只导入自己记录的测试文件，保留原文件以便恢复QA进度。两角色成功导入共同点不等于两条剧情已经验证。
 
-## 本轮真实起点
+## 可复用真实检查点
+
+当前逐段状态只在CURRENT-ACCEPTANCE维护。以下文件均由正常QA输入、保存、标题Continue读回后导出；导入后先核对元数据和资源，资料改动须续验受影响段。
+
+- Round271 J0：`iterations/round-271/j0-delivery.json`，两次实际交付后的新开场。
+- Round272 F0：`iterations/round-272/f0-crafting.json`，实际出镇/炼药/巡岸/用药/师承后的续行点。
+- Round273 F1基线：`iterations/round-273/f1-common-before-choice-baseline.json`，明确交丹约时、两条分支尚未选；candidate是c600752基线，新修桥规则须另行载入验证。
+
+### 旧Round270兼容起点
 
 Round270：`iterations/round-270/j0-opening.json` 来自QA `journey-20261004` 正常槽一，候选 `round270-worktree-on-87271e1`，阶段 `j0-opening`。已在独立 `journey-20261004-copycheck` 导入并正常读回。其任务包含误接的可选「南麓寻村」，保留事实，不删除或改造测试状态。详情与局限见本轮 playtest/verification；后续资料变化若影响开场交付条件，应补走新的真实QA起点。
+
+- Round273修桥成本：iterations/round-273/f2-repair-cost-before-toll.json，独立journey-20261004-repair从F1复制，正常采购、交料、两日施工、保存空槽二并标题读回；尚未清桥头或认定F2完整。

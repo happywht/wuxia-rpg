@@ -3,3 +3,6 @@ iterations/round-270/j0-opening.json -text
 iterations/round-271/j0-delivery.json -text
 
 iterations/round-272/f0-crafting.json -text
+
+iterations/round-273/f1-common-before-choice-baseline.json -text
+iterations/round-273/f2-repair-cost-before-toll.json -text

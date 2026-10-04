@@ -17,6 +17,7 @@
 import { readFileSync } from 'node:fs';
 import { repairDialoguesRaw as applyJourneyDelivery } from '../scripts/lib/round271-journey-delivery.mjs';
 import { repairDialogueFacts } from '../scripts/lib/round272-journey-facts.mjs';
+import { repairDialoguesRaw as applyPierDelivery } from '../scripts/lib/round273-pier-delivery.mjs';
 import { escortNode, escortArrived, escortOption } from '../scripts/lib/round149-bookshop-escort.mjs';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
@@ -326,7 +327,7 @@ describe('Round130 Hanshan practice briefs (real assembled data)', () => {
       ferryMaster.nodes = ferryMaster.nodes.filter((node: { id: string }) => !laterNodeIds.has(node.id));
       const ferryGreet = ferryMaster.nodes.find((node: { id: string }) => node.id === ferryMaster.startNodeId);
       ferryGreet.options = ferryGreet.options.filter((option: { nextNodeId: string }) => !laterNodeIds.has(option.nextNodeId));
-      expect(JSON.parse(chained30)).toEqual(current30);
+      expect(JSON.parse(applyPierDelivery(chained30))).toEqual(current30);
       expect(chained03).toContain('r130-hanshan-paper-route');
       expect(chained03).toContain('一份十五两、自购两份共三十两'); // R128 intact.
       expect(chained03).toContain('r129-tiezhang-practice-brief'); // R129 intact.

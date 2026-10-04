@@ -33,6 +33,7 @@ import {
   isFiniteDialogueVariableValue,
   isSafeDialogueVariableKey,
 } from './dialogue-variables';
+import { MAX_DIALOGUE_ADVANCE_MINUTES } from './dialogue-time-request';
 
 /**
  * Condition-bound mirrors of the social ranges (single source of truth in
@@ -102,7 +103,8 @@ export type DialogueEffectData =
   | { kind: 'dismissCompanion' }
   | { kind: 'setVariable'; key: string; value: DialogueVariableValue }
   | { kind: 'startBattle'; encounterId: string }
-  | { kind: 'teleport'; mapResourceId: string; col: number; row: number; travelMinutes: number };
+  | { kind: 'teleport'; mapResourceId: string; col: number; row: number; travelMinutes: number }
+  | { kind: 'advanceTime'; minutes: number };
 
 /** One player-selectable branch leading to another node. */
 export interface DialogueOptionData {
@@ -430,6 +432,11 @@ function parseEffect(raw: unknown): DialogueEffectData | null {
       return encounterId !== null && encounterId.length <= 64
         ? { kind: 'startBattle', encounterId }
         : null;
+    }
+    case 'advanceTime': {
+      if (!hasOnlyKeys(source, ['kind', 'minutes'])) return null;
+      const minutes = requireIntegerInRange(source.minutes, 1, MAX_DIALOGUE_ADVANCE_MINUTES);
+      return minutes !== null ? { kind: 'advanceTime', minutes } : null;
     }
     case 'setVariable': {
       if (!hasOnlyKeys(source, ['kind', 'key', 'value'])) return null;

@@ -422,6 +422,7 @@
         },
         {"type":"object","additionalProperties":false,"required":["kind","encounterId"],"properties":{"kind":{"const":"startBattle"},"encounterId":{"type":"string","minLength":1,"maxLength":64}}},
         {"type":"object","additionalProperties":false,"required":["kind","mapResourceId","col","row","travelMinutes"],"properties":{"kind":{"const":"teleport"},"mapResourceId":{"type":"string","minLength":1,"maxLength":64},"col":{"type":"integer","minimum":0,"maximum":4095},"row":{"type":"integer","minimum":0,"maximum":4095},"travelMinutes":{"type":"integer","minimum":0,"maximum":10080}}},
+        {"type":"object","additionalProperties":false,"required":["kind","minutes"],"properties":{"kind":{"const":"advanceTime"},"minutes":{"type":"integer","minimum":1,"maximum":10080,"description":"世界时间前进的分钟数（Round 273）：事务内原子计入，任一效果拒绝则整笔回滚、时钟不动；只推进时间，不移动角色。"}}},
         {
           "description": "在本局变量簿记录或覆盖一个键值（Round 147）：键为字母开头、至多 64 字符的安全键（拒绝 prototype 类键名）；值为布尔、有限数或短字符串之一。变量簿至多 64 个不同键，写满后拒绝新增键、旧键仍可覆盖；与其他效果同事务提交，任一失败不写入。",
           "type": "object",

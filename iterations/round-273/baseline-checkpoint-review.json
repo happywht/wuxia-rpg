@@ -1,0 +1,31 @@
+{
+  "candidate": "round273-f1-baseline-on-c600752",
+  "qaRun": "journey-20261004-delivery",
+  "stage": "f1-common-before-choice",
+  "sourceSlot": "slot-2",
+  "bytes": 36364,
+  "sha256": "1e32dc9a5363c6392bdfe632c5d2b4a64ca6b8cd9a0db34584167fc4c7a1c8bb",
+  "downloadBytesEqual": true,
+  "level": 6,
+  "xp": 464,
+  "money": 241,
+  "pillQuantity": 0,
+  "elapsed": 355,
+  "common": [
+    {
+      "id": "quest.r31-caravan-provisioning",
+      "status": "completed"
+    },
+    {
+      "id": "quest.r31-guard-the-caravan",
+      "status": "offered"
+    },
+    {
+      "id": "quest.r31-mend-the-pier",
+      "status": "offered"
+    }
+  ],
+  "appointmentKnown": true,
+  "repairKnown": false,
+  "escortKnown": false
+}

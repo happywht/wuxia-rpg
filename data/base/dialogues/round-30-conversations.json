@@ -1463,6 +1463,43 @@
             {
               "text": "渡口与青帆之间，有回程班船吗？",
               "nextNodeId": "r126-coastal-service"
+            },
+            {
+              "text": "修桥的料备齐了：熟铁砂×3、韧皮×2，请渡董安排动工。",
+              "nextNodeId": "r273-pier-delivery-confirm",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r31-mend-the-pier",
+                  "status": "active"
+                },
+                {
+                  "kind": "itemCount",
+                  "itemId": "item.iron-sand",
+                  "minCount": 3
+                },
+                {
+                  "kind": "itemCount",
+                  "itemId": "item.tough-leather",
+                  "minCount": 2
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r31-pier-reinforced",
+                  "isKnown": false
+                }
+              ]
+            },
+            {
+              "text": "渡董，修桥的料要怎么交、工期怎么算？",
+              "nextNodeId": "r273-pier-progress",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r31-mend-the-pier",
+                  "status": "active"
+                }
+              ]
             }
           ]
         },
@@ -1691,6 +1728,49 @@
           "options": [
             { "text": "我去查查桥头的动静。", "nextNodeId": "greet" }
           ]
+        },
+        {
+          "id": "r273-pier-delivery-confirm",
+          "confirmEffects": true,
+          "text": "白鹭洲把工单压在渡籍旁：「熟铁砂三份、韧皮两捆，料要交给工匠。你点头，我就安排动工；工期两日，桥修好再走旱路。工钱我出。想清楚，别让药队白等。」",
+          "options": [
+            {
+              "text": "当场交料，即日动工（熟铁砂×3、韧皮×2，工期两日）。",
+              "nextNodeId": "r273-pier-delivered",
+              "effects": [
+                {
+                  "kind": "takeItem",
+                  "itemId": "item.iron-sand",
+                  "quantity": 3
+                },
+                {
+                  "kind": "takeItem",
+                  "itemId": "item.tough-leather",
+                  "quantity": 2
+                },
+                {
+                  "kind": "advanceTime",
+                  "minutes": 2880
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r31-pier-reinforced"
+                }
+              ]
+            },
+            {
+              "text": "先不动工，容我再想想。",
+              "nextNodeId": "greet"
+            }
+          ]
+        },
+        {
+          "id": "r273-pier-progress",
+          "text": "白鹭洲翻开工单：「熟铁砂三份、韧皮两捆，到江南姜百味处买，共五十六银，渡口没这批料。备齐后回来按F交谈，选交料动工；你点头我才收料，工期两日，工钱我出。」"
+        },
+        {
+          "id": "r273-pier-delivered",
+          "text": "两日后，白鹭洲在渡籍上勾了「栈桥已加固」：「砂补了桩，韧皮也扎紧了，桥身稳了。只是桥头那伙索银人还没走；把他们清开，旱桥才好通药担。你的谢仪先结清。」"
         }
       ]
     }

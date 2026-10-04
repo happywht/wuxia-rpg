@@ -1221,7 +1221,7 @@
       "fromId": "quest.r31-mend-the-pier",
       "toId": "event.r31-pier-reinforced",
       "relation": "rewards",
-      "summary": "备齐补桩与捆扎材料、完成修桥后，渡籍记下栈桥已加固。"
+      "summary": "备齐补桩与捆扎材料、经白鹭洲当面交料并两日工期完工后，渡籍记下栈桥已加固。"
     },
     {
       "id": "kg.edge.pier-toll-requires-mend-pier",
