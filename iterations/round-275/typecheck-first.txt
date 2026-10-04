@@ -1,0 +1,3 @@
+tests/round275-cloud-arrival.test.ts(10,30): error TS7016: Could not find a declaration file for module '../scripts/lib/round106-region-content.mjs'. 'D:/工作/城建院/2609/收心/wuxia-rpg/scripts/lib/round106-region-content.mjs' implicitly has an 'any' type.
+tests/round275-cloud-arrival.test.ts(26,3): error TS2740: Type '{ quests: Map<string, QuestData>; journal: QuestJournal; social: SocialState; knownKnowledgeNodeIds: Set<string>; knowledgeNodes: Map<...>; speakerNpcId: string; }' is missing the following properties from type 'DialogueRuntimeContext': items, inventory, character, factions, and 3 more.
+tests/round275-cloud-arrival.test.ts(38,56): error TS2339: Property 'effects' does not exist on type 'DialogueNodeData'.

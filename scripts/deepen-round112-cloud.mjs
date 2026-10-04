@@ -19,9 +19,15 @@ npcs.npcs.find(n=>n.id===CLOUD_SHOP.npcId).shopId=CLOUD_SHOP.id;write(npcPath,np
 const dialoguePath='data/base/dialogues/round-74-cloud-ridge-conversations.json',dialogues=read(dialoguePath),d=dialogues.conversations.find(d=>d.id==='dlg.r74-shen-yuji-cloud-ridge');
 if(!d)throw Error('Existing Cloud dialogue missing');
 const greet=d.nodes.find(n=>n.id===d.startNodeId);
-greet.options=greet.options.filter(o=>o.nextNodeId!=='r112-supplies');
-greet.options.push({text:'北行补给与石路怎么安排？',nextNodeId:'r112-supplies'});
-d.nodes=d.nodes.filter(n=>n.id!=='r112-supplies');d.nodes.push({id:'r112-supplies',text:CLOUD_SUPPLY_TEXT});write(dialoguePath,dialogues);
+const supplyOption={text:'北行补给与石路怎么安排？',nextNodeId:'r112-supplies'};
+const optionIndices=greet.options.flatMap((o,i)=>o.nextNodeId==='r112-supplies'?[i]:[]);
+const nodeIndices=d.nodes.flatMap((n,i)=>n.id==='r112-supplies'?[i]:[]);
+if(optionIndices.length>1||nodeIndices.length>1)throw Error('Existing Cloud supply entry duplicated');
+// Preserve historical ordering when a later author appends another layer.
+if(optionIndices.length)greet.options[optionIndices[0]]=supplyOption;else greet.options.push(supplyOption);
+const supplyNode={id:'r112-supplies',text:CLOUD_SUPPLY_TEXT};
+if(nodeIndices.length)d.nodes[nodeIndices[0]]=supplyNode;else d.nodes.push(supplyNode);
+write(dialoguePath,dialogues);
 const worldPath='data/base/world/world-map.json',world=read(worldPath),guide=world.regionGuides.find(g=>g.mapResourceId==='map.round-74-cloud-ridge');
 guide.advice=regionGuides.find(g=>g.mapResourceId===guide.mapResourceId).advice;write(worldPath,world);
 console.log('Round112: refined existing Cloud floor/path channels, limited paid shop and authored guide; all anchors retained.');

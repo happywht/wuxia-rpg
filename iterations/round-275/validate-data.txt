@@ -1,0 +1,5 @@
+
+> wuxia-rpg@0.0.1 validate:data
+> node scripts/validate-data.mjs
+
+通过：manifest Schema 与 100 个基础资源 Schema。

@@ -1,0 +1,131 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round112-cloud-routes-supply.test.ts (8 tests | 1 failed) 1956ms
+   ❯ Round112 existing Cloud Ridge paths, paving and limited provisions (8)
+     × incremental replay and R74→R76→R78 regeneration preserve the current cloud output and other maps 659ms
+ ❯ tests/round275-cloud-arrival.test.ts (12 tests | 3 failed) 499ms
+   ❯ Round275 actual world guidance (2)
+     × keeps all maps, gates, arrival coordinates, event rules and art unchanged 69ms
+   ❯ Round275 surgical authoring (6)
+     × data/base/world/world-map.json baseline replay, LF/CRLF and byte-idempotence 62ms
+     × CLI preflights all three resources before writing and is cwd-independent 74ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round112-cloud-routes-supply.test.ts > Round112 existing Cloud Ridge paths, paving and limited provisions > incremental replay and R74→R76→R78 regeneration preserve the current cloud output and other maps
+AssertionError: dialogues/round-74-cloud-ridge-conversations.json: expected '{\n  "conversations": [\n    {\n     …' to be '{\n  "conversations": [\n    {\n     …' // Object.is equality
+
+- Expected
++ Received
+
+@@ -243,14 +243,10 @@
+              {
+                "text": "先歇一会儿。",
+                "nextNodeId": "farewell"
+              },
+              {
+-               "text": "北行补给与石路怎么安排？",
+-               "nextNodeId": "r112-supplies"
+-             },
+-             {
+                "text": "渡口药队及时过桥，我带着伤药上山。",
+                "nextNodeId": "r275-escort-arrival",
+                "conditions": [
+                  {
+                    "kind": "questStatus",
+@@ -267,10 +263,14 @@
+                    "kind": "questStatus",
+                    "questId": "quest.r31-pier-toll-clearing",
+                    "status": "completed"
+                  }
+                ]
++             },
++             {
++               "text": "北行补给与石路怎么安排？",
++               "nextNodeId": "r112-supplies"
+              }
+            ]
+          },
+          {
+            "id": "marks-accepted",
+@@ -331,20 +331,20 @@
+          {
+            "id": "r105-carving-closed",
+            "text": "你已经亲口转述并得到回应。这一回关系后果已经记过，不能重复领认同；原判断和对方的取舍仍各自成立。"
+          },
+          {
+-           "id": "r112-supplies",
+-           "text": "沈雨霁指向寄存的备药匣：「E可按价买回春膏与清心丸，Q查看差事、F仍能问话。数量有限，售完本程不会自动补满。刻痕沿客舍西侧石路向北再折西，断桥走东侧石路；北行循主路到北台栈道，那里接雁回崖与照雪关。」"
+-         },
+-         {
+            "id": "r275-escort-arrival",
+            "text": "沈雨霁读了渡籍口信：「你先护药队过雾桥，带来的回春膏就留给伤后；B里敷药，看的是实际恢复。来云岭先接云阶辨刻，到西侧石阶核第三道刻痕，再谈断索拦路客。残篇三地对照另需铁嶂更簿与青岩井壁，不用今天为这份口信折返渡口。」"
+          },
+          {
+            "id": "r275-repair-arrival",
+            "text": "沈雨霁翻过渡籍口信：「你实交铁砂韧皮、等了两日，又清开桥头，渡口才记通渡。清心丸可在气短时调息；B核实际恢复，满气别浪费。这里先接云阶辨刻，核西侧石阶再处理断索。清退拦路客也不等于修索，三地对照可留后程，不必仅为听回报折返渡口。」"
++         },
++         {
++           "id": "r112-supplies",
++           "text": "沈雨霁指向寄存的备药匣：「E可按价买回春膏与清心丸，Q查看差事、F仍能问话。数量有限，售完本程不会自动补满。刻痕沿客舍西侧石路向北再折西，断桥走东侧石路；北行循主路到北台栈道，那里接雁回崖与照雪关。」"
+          }
+        ]
+      }
+    ]
+  }
+
+ ❯ tests/round112-cloud-routes-supply.test.ts:116:95
+    114|       const frozen=new Map([...world.maps.keys()].filter(id=>id!==CLOU…
+    115|       for(let i=0;i<2;i++)execFileSync(process.execPath,[join(temp,'sc…
+    116|       for(const file of targets)expect(readFileSync(join(temp,'data/ba…
+       |                                                                                               ^
+    117|       for(const name of ['generate-round74-cloud-ridge.mjs','generate-…
+    118|         execFileSync(process.execPath,[join(temp,'scripts',name)],{cwd…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/round275-cloud-arrival.test.ts > Round275 actual world guidance > keeps all maps, gates, arrival coordinates, event rules and art unchanged
+Error: spawnSync git ENOBUFS
+ ❯ baseline tests/round275-cloud-arrival.test.ts:16:28
+     14| const worldPath='data/base/world/world-map.json', arrivalPath='data/ba…
+     15| const raw=(p:string)=>readFileSync(join(root,p),'utf8');
+     16| const baseline=(p:string)=>execFileSync('git',['show','5ad5c8e:'+p],{e…
+       |                            ^
+     17| const world=JSON.parse(raw(worldPath));
+     18| const parsed=parseDialogueSet(JSON.parse(raw(arrivalPath)));
+ ❯ tests/round275-cloud-arrival.test.ts:56:64
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/round275-cloud-arrival.test.ts > Round275 surgical authoring > data/base/world/world-map.json baseline replay, LF/CRLF and byte-idempotence
+Error: spawnSync git ENOBUFS
+ ❯ baseline tests/round275-cloud-arrival.test.ts:16:28
+     14| const worldPath='data/base/world/world-map.json', arrivalPath='data/ba…
+     15| const raw=(p:string)=>readFileSync(join(root,p),'utf8');
+     16| const baseline=(p:string)=>execFileSync('git',['show','5ad5c8e:'+p],{e…
+       |                            ^
+     17| const world=JSON.parse(raw(worldPath));
+     18| const parsed=parseDialogueSet(JSON.parse(raw(arrivalPath)));
+ ❯ tests/round275-cloud-arrival.test.ts:75:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/round275-cloud-arrival.test.ts > Round275 surgical authoring > CLI preflights all three resources before writing and is cwd-independent
+Error: spawnSync git ENOBUFS
+ ❯ baseline tests/round275-cloud-arrival.test.ts:16:28
+     14| const worldPath='data/base/world/world-map.json', arrivalPath='data/ba…
+     15| const raw=(p:string)=>readFileSync(join(root,p),'utf8');
+     16| const baseline=(p:string)=>execFileSync('git',['show','5ad5c8e:'+p],{e…
+       |                            ^
+     17| const world=JSON.parse(raw(worldPath));
+     18| const parsed=parseDialogueSet(JSON.parse(raw(arrivalPath)));
+ ❯ tests/round275-cloud-arrival.test.ts:97:84
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  2 failed | 3 passed (5)
+      Tests  4 failed | 44 passed (48)
+   Start at  11:39:01
+   Duration  5.67s (tests 83%, import 10%, transform 8%)

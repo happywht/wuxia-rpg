@@ -43,3 +43,9 @@ Round270：`iterations/round-270/j0-opening.json` 来自QA `journey-20261004` �
 独立journey-20261004-escort槽二与journey-20261004-repair槽三，均候选round274-worktree-on-baa5ebe，从同一F1续验；原下载字节/hash见本轮playtest。文件iterations/round-274/f2-escort.json与f2-repair.json可恢复，上山应另设空槽或新运行，保留共同点与成本点。
 
 当前发现计数来自已保存的实际首次发现，启动不得据已知目录数补高。实际曾发现护送载荷15而目录非公开16，旧启动会多发40XP/25银；修复后重新标题读回326银与646XP。旧档缺计数按现有v1协议0继续，已解锁成就仍保留，真实后续首次发现可正常计数。
+
+## Round275 两侧C0到达
+
+新独立journey-20261004-cloud-escort与journey-20261004-cloud-repair各槽一保留导入F2，正常走两关上山/对话/用药/接云阶后存空槽二、标题Continue读回并导出；槽三留C1。candidate round275-worktree-on-5ad5c8e，文件iterations/round-275/c0-escort-arrival.json与c0-repair-arrival.json，stage分别c0-escort-arrival/c0-repair-arrival。原Download字节与SHA见playtest/branch-comparison；只读导出，不修改载荷制造进度。
+
+护送Lv7/XP686/351银/190命110气、膏1丸1/elapsed917；修桥Lv7/XP674/326银/188命110气、膏0丸2铁1/elapsed3893。均云岭40,43，云阶任务active且刻痕0/1；互斥及出发变量保留。护送本次发现水尺等新见闻后成就实际+40XP25银，与Round274启动错误补计数不同，读回相符。两侧清心丸未用、商店未买，不将未发生消费算作制作/策略通过。

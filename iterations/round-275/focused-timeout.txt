@@ -1,0 +1,27 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round275-cloud-arrival.test.ts (12 tests | 1 failed) 8971ms
+   ❯ Round275 surgical authoring (6)
+     × CLI preflights all three resources before writing and is cwd-independent 8408ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round275-cloud-arrival.test.ts > Round275 surgical authoring > CLI preflights all three resources before writing and is cwd-independent
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/round275-cloud-arrival.test.ts:92:3
+     90|     expect(()=>repairRegionSourceRaw(raw(regionPath).replace(guidePatc…
+     91|   });
+     92|   it('CLI preflights all three resources before writing and is cwd-ind…
+       |   ^
+     93|     const temp=mkdtempSync(join(tmpdir(),'wuxia-r275-'));
+     94|     try {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 47 passed (48)
+   Start at  11:40:33
+   Duration  10.93s (tests 91%, import 5%, transform 4%)
