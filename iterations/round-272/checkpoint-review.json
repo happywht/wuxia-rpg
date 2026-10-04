@@ -1,0 +1,27 @@
+{
+  "length": 36366,
+  "sha256": "2624efa067d14edad12088b501491e246811e9cf2d453742084658e86dc10e94",
+  "stage": "f0-crafting",
+  "level": 6,
+  "xp": 436,
+  "currency": 217,
+  "questStatuses": [
+    {
+      "id": "quest.r31-herbal-inquiry",
+      "status": "completed"
+    },
+    {
+      "id": "quest.r31-herbal-stocktaking",
+      "status": "completed"
+    },
+    {
+      "id": "quest.r31-mist-shore-watch",
+      "status": "completed"
+    },
+    {
+      "id": "quest.r31-caravan-provisioning",
+      "status": "offered"
+    }
+  ],
+  "downloadBytesEqual": true
+}

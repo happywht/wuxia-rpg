@@ -126,7 +126,7 @@ describe('Round271 数据与引用闭合', () => {
       expect(quest.objectives[0]!.text).toBe(
         questId === MEDICINE
           ? '备齐三份回春膏（可在江南姜百味处采买）'
-          : '备齐四株寒珠草（可采集，也可向江南姜百味采买）',
+          : '备齐寒珠草×4（江南姜百味处按E采买）',
       );
       expect(quest.objectives[1]).toMatchObject({
         kind: 'discoverKnowledge', targetId: eventNodeId, requiredCount: 1, navigationNpcId: navNpc,

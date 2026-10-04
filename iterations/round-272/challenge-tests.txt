@@ -1,0 +1,14 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round272-shore-challenge.test.ts (4 tests | 1 failed) 14ms
+   ❯ Round272 real mist-shore challenge (4)
+     × threatens the player even at zero enemy qi, and has readable attack/heavy/recovery cues 9ms
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 51 passed (52)
+   Start at  09:39:07
+   Duration  1.93s (tests 69%, transform 20%, import 10%, worker 1%)
+
+    Isolate  5 workers spawned · ~169ms startup each (spawn + environment, per file)
+             at least ~253ms faster with isolate: false — reuses workers across files instead of one per file

@@ -1,0 +1,33 @@
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r271-cli-iMBHho/scripts/lib/round271-journey-delivery.mjs:323
+      throw new Error(`对话 ${spec.conversationId} 交付选项/节点已变化，请人工复核。`);
+            ^
+
+Error: 对话 dlg.ma-shangyi-notice-board 交付选项/节点已变化，请人工复核。
+    at repairDialoguesRaw (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r271-cli-iMBHho/scripts/lib/round271-journey-delivery.mjs:323:13)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r271-cli-iMBHho/scripts/apply-round271.mjs:22:22
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:647:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.18.0
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round272-shore-challenge.test.ts > Round272 real mist-shore challenge > threatens the player even at zero enemy qi, and has readable attack/heavy/recovery cues
+AssertionError: expected +0 to be 4 // Object.is equality
+
+- Expected
++ Received
+
+- 4
++ 0
+
+ ❯ tests/round272-shore-challenge.test.ts:45:41
+     43|     battle.playerWait();
+     44|     expect(player.health.current).toBe(beforeRest);
+     45|     expect(battle.enemyView.qi.current).toBe(4);
+       |                                         ^
+     46|   });
+     47|   for (const level of [4, 6]) it(`level ${level}: guard trades turns a…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯

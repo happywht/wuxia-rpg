@@ -63,7 +63,10 @@
       "id": "encounter.mist-shore-prowler",
       "name": "雾夜探子",
       "mapResourceId": "map.round-10-mist-ferry",
-      "position": { "col": 5, "row": 6 },
+      "position": {
+        "col": 5,
+        "row": 6
+      },
       "profileId": "char.scribe-apprentice",
       "enemy": {
         "name": "斗笠探子",
@@ -74,12 +77,37 @@
           "insight": 6,
           "resolve": 5
         },
-        "health": 42,
+        "health": 72,
         "qi": 8,
-        "martialArtIds": ["skill.yunyin-shenfa"]
+        "martialArtIds": [
+          "skill.yunyin-shenfa",
+          "skill.jianghu-sanshou"
+        ],
+        "behavior": [
+          {
+            "kind": "art",
+            "artId": "skill.jianghu-sanshou",
+            "cue": "探子探出苇杆，试你的距离"
+          },
+          {
+            "kind": "art",
+            "artId": "skill.jianghu-sanshou",
+            "powerBonus": 10,
+            "guardDisruptsBonus": true,
+            "cue": "探子横压苇杆，准备重击"
+          },
+          {
+            "kind": "recoverQi",
+            "amount": 4,
+            "cue": "探子收杆换气，暂露空隙"
+          }
+        ]
       },
       "victoryExperience": 32,
-      "defeatRecovery": { "healthRatio": 0.65, "qiRatio": 0.65 },
+      "defeatRecovery": {
+        "healthRatio": 0.65,
+        "qiRatio": 0.65
+      },
       "repeatable": false,
       "texts": {
         "approach": "芦苇根处黑影一闪，雾夜探子按 E 拦下",

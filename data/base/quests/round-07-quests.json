@@ -56,7 +56,7 @@
           "kind": "collectItem",
           "targetId": "item.hanzhu-cao",
           "requiredCount": 4,
-          "text": "备齐四株寒珠草（可采集，也可向江南姜百味采买）"
+          "text": "备齐寒珠草×4（江南姜百味处按E采买）"
         },
         {
           "id": "objective.r271-teastall-delivery",
@@ -236,7 +236,7 @@
       "name": "雾夜巡岸",
       "description": "药队起运前夜，闻素心放心不下北岸雾里的动静——接连几晚有黑影沿芦苇根探路，像是替人踩点。替她巡这一夜；若真撞见探子，莫让他把消息带回去，若你反被制住，这趟巡岸便算扑空。",
       "giverNpcId": "char.wen-suxin",
-      "prerequisiteQuestIds": ["quest.r31-herbal-stocktaking"],
+      "prerequisiteQuestIds": ["quest.r31-herbal-inquiry"],
       "objectives": [
         {
           "id": "objective.r31-shore-prowler",

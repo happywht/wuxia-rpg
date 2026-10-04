@@ -18,7 +18,7 @@ if (!parsedQuests.ok) throw new Error(parsedQuests.errors.join('\n'));
 const quests = new Map(parsedQuests.set.quests.map((quest) => [quest.id, quest]));
 
 describe('Round263 药队共同前置链', () => {
-  it('orders inquiry, five medicine stages, shore watch, then caravan preparation', () => {
+  it('orders inquiry before parallel medicine and watch, and requires both for caravan preparation', () => {
     const inquiry = quests.get(questIds.inquiry)!;
     const stock = quests.get(questIds.stocktaking)!;
     const watch = quests.get(questIds.watch)!;
@@ -30,7 +30,7 @@ describe('Round263 药队共同前置链', () => {
     expect(stock.objectives.map((objective) => objective.kind)).toEqual([
       'collectItem', 'discoverKnowledge', 'craftRecipe', 'useItem', 'talkToNpc',
     ]);
-    expect(watch.prerequisiteQuestIds).toContain(questIds.stocktaking);
+    expect(watch.prerequisiteQuestIds).toEqual([questIds.inquiry]);
     expect(provisioning.prerequisiteQuestIds).toEqual([questIds.stocktaking, questIds.watch]);
     expect(quests.get('quest.r31-guard-the-caravan')?.exclusiveGroupId)
       .toBe(quests.get('quest.r31-mend-the-pier')?.exclusiveGroupId);
@@ -64,6 +64,7 @@ describe('Round263 药队共同前置链', () => {
     const journal = createQuestJournal(quests);
     const watch = quests.get(questIds.watch)!;
     const provisioning = quests.get(questIds.provisioning)!;
+    journal.states.get(questIds.inquiry)!.status = 'completed';
     journal.states.get(questIds.stocktaking)!.status = 'completed';
     applyQuestSignal(quests, journal, { type: 'npc-talk', npcId: 'char.wen-suxin' });
     expect(journal.states.get(watch.id)?.status).toBe('offered');

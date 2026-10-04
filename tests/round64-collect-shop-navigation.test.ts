@@ -135,12 +135,12 @@ describe('Round 64 collect objectives against assembled real data', () => {
     expect(resolution.target.objectiveText).toContain('姜百味处采买');
   });
 
-  it('explains the tea-stall item can be gathered or bought from its live seller', () => {
+  it('directs tea-stall stock to its real seller without a nonexistent harvest promise', () => {
     const quest = fixture.questsById.get('quest.r31-teastall-herbal-water');
     expect(quest).toBeDefined();
     const objective = quest!.objectives[0];
-    expect(objective?.text).toContain('可采集');
-    expect(objective?.text).toContain('姜百味采买');
+    expect(objective?.text).not.toContain('可采集');
+    expect(objective?.text).toContain('姜百味处按E采买');
 
     const resolution = resolveQuestNavigationTarget({
       quests: fixture.questsById as RealDataFixture['quests'],
@@ -157,7 +157,7 @@ describe('Round 64 collect objectives against assembled real data', () => {
     expect(resolution.target).toMatchObject({
       kind: 'collectItem',
       name: '姜百味百宝担',
-      objectiveText: '备齐四株寒珠草（可采集，也可向江南姜百味采买）',
+      objectiveText: '备齐寒珠草×4（江南姜百味处按E采买）',
       col: 45,
       row: 39,
       arrivalAction: 'shop',

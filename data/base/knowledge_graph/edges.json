@@ -1170,9 +1170,9 @@
     {
       "id": "kg.edge.mist-watch-requires-stocktaking",
       "fromId": "quest.r31-mist-shore-watch",
-      "toId": "quest.r31-herbal-stocktaking",
+      "toId": "quest.r31-herbal-inquiry",
       "relation": "requires",
-      "summary": "雾夜巡岸接在药庐清点之后，药队起运前夜才要巡岸。"
+      "summary": "问药后即可准备巡岸，与药庐实践并行；伤后可用自制药复核，封箱仍须两项完成。"
     },
     {
       "id": "kg.edge.provisioning-requires-stocktaking",

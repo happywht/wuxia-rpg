@@ -16,6 +16,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { repairDialoguesRaw as applyJourneyDelivery } from '../scripts/lib/round271-journey-delivery.mjs';
+import { repairDialogueFacts } from '../scripts/lib/round272-journey-facts.mjs';
 import { escortNode, escortArrived, escortOption } from '../scripts/lib/round149-bookshop-escort.mjs';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
@@ -316,7 +317,7 @@ describe('Round130 Hanshan practice briefs (real assembled data)', () => {
       bookshopGreet.options = bookshopGreet.options.filter((option: { nextNodeId: string }) => option.nextNodeId !== escortNode.id);
       bookshop.nodes = bookshop.nodes.filter((node: { id: string }) => node.id !== escortNode.id && node.id !== escortArrived.id);
       // Replay the approved R271 delivery layer as well; compare the whole authored tree.
-      expect(JSON.parse(applyJourneyDelivery(applyRelayWaitingDirections(applyCompanionTrust(chained03))))).toEqual(current03);
+      expect(JSON.parse(repairDialogueFacts(applyJourneyDelivery(applyRelayWaitingDirections(applyCompanionTrust(chained03)))))).toEqual(current03);
       // R254/R255/R261 extend the ferry-master conversation after this historical R130 replay baseline.
       const current30 = JSON.parse(readFileSync(join(root, 'data/base/dialogues/round-30-conversations.json'), 'utf8'));
       const ferryMaster = current30.conversations.find((entry: { id: string }) => entry.id === 'dlg.bai-luzhou-ferry-master');
