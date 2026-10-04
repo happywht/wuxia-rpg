@@ -2,8 +2,12 @@
 import { readFile, writeFile } from 'node:fs/promises';
 const root = new URL('../', import.meta.url);
 const read = async p => JSON.parse(await readFile(new URL(p, root), 'utf8'));
-const save = async (p, value) => writeFile(new URL(p, root),
-  (JSON.stringify(value, null, 2) + '\n').replace(/\n/g, p.includes('knowledge_graph/') ? '\r\n' : '\n'));
+const save = async (p, value) => {
+  const original = await readFile(new URL(p, root), 'utf8');
+  if (JSON.stringify(JSON.parse(original)) === JSON.stringify(value)) return;
+  const eol = original.includes('\r\n') ? '\r\n' : '\n';
+  await writeFile(new URL(p, root), (JSON.stringify(value, null, 2) + '\n').replace(/\n/g, eol));
+};
 const objective = (id, kind, targetId, text, extra = {}) => ({ id: `objective.r104-${id}`, kind, targetId, requiredCount: 1, text, ...extra });
 export const loops = [
   {

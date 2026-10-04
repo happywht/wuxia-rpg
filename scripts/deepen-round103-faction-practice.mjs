@@ -28,11 +28,19 @@ for (const name of ['round-03-conversations', 'round-30-conversations']) {
 
 // Machine-shaped knowledge-graph files go through parse/upsert/stringify,
 // written back with the CRLF endings these files ship with.
-const nodes = JSON.parse(await readText('knowledge_graph/nodes.json'));
-const edges = JSON.parse(await readText('knowledge_graph/edges.json'));
+const nodesRaw = await readText('knowledge_graph/nodes.json');
+const nodes = JSON.parse(nodesRaw);
+const edgesRaw = await readText('knowledge_graph/edges.json');
+const edges = JSON.parse(edgesRaw);
 deepenFactionPracticeKnowledge(nodes, edges);
-await writeText('knowledge_graph/nodes.json', JSON.stringify(nodes, null, 2).replace(/\n/g, '\r\n') + '\r\n');
-await writeText('knowledge_graph/edges.json', JSON.stringify(edges, null, 2).replace(/\n/g, '\r\n') + '\r\n');
+// Keep an already applied file byte-identical, including its original EOL.
+const serialize = (raw, value) => {
+  if (JSON.stringify(JSON.parse(raw)) === JSON.stringify(value)) return raw;
+  const eol = raw.includes('\r\n') ? '\r\n' : '\n';
+  return (JSON.stringify(value, null, 2) + '\n').replace(/\n/g, eol);
+};
+await writeText('knowledge_graph/nodes.json', serialize(nodesRaw, nodes));
+await writeText('knowledge_graph/edges.json', serialize(edgesRaw, edges));
 
 console.log(`Round103：${factionPracticeConfigs.length} 门派差事加有序地区实践与复命、师傅状态反馈与转抄、修习提示；实践见闻+声望5；地图/任务ID与原经验银两不变。`);
 
