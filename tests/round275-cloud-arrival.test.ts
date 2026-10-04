@@ -8,6 +8,7 @@ import { getVisibleOptions, type DialogueRuntimeContext } from '../src/engine/di
 import { createQuestJournal, parseQuestSet } from '../src/engine/quest-system';
 import { createSocialState } from '../src/engine/social-state';
 import { createFactionMembershipState } from '../src/engine/faction-system';
+import { dialoguePatches as challengePatches, repairDialogueRaw as applyCloudChallenge } from '../scripts/lib/round276-cloud-challenge.mjs';
 import { regionGuides } from '../scripts/lib/round106-region-content.mjs';
 import { guidePatches, eventPatches, arrivalNodes, arrivalOptions, repairWorldRaw, repairRegionSourceRaw, repairArrivalRaw } from '../scripts/lib/round275-cloud-arrival.mjs';
 const root=resolve('.');
@@ -47,6 +48,7 @@ describe('Round275 branch-aware arrival using real quest status',()=>{
     expect(c.nodes.find((n:{id:string})=>n.id===c.startNodeId).options.filter((o:{nextNodeId:string})=>arrivalOptions.some(w=>w.nextNodeId===o.nextNodeId))).toEqual(arrivalOptions);
     c.nodes=c.nodes.filter((n:{id:string})=>!arrivalNodes.some(w=>w.id===n.id));
     const g=c.nodes.find((n:{id:string})=>n.id===c.startNodeId);g.options=g.options.filter((o:{nextNodeId:string})=>!arrivalOptions.some(w=>w.nextNodeId===o.nextNodeId));
+    for(const p of challengePatches){const node=c.nodes.find((n:{id:string})=>n.id===p.id);expect(node.text).toBe(p.after);node.text=p.before;}
     expect(current).toEqual(original);
     expect(conversation.nodes.find(n=>n.id==='r112-supplies')!.text).toContain('数量有限');
   });
@@ -72,7 +74,8 @@ describe('Round275 actual world guidance',()=>{
 });
 describe('Round275 surgical authoring',()=>{
   for(const [path,repair] of [[worldPath,repairWorldRaw],[arrivalPath,repairArrivalRaw],[regionPath,repairRegionSourceRaw]] as const)it(path+' baseline replay, LF/CRLF and byte-idempotence',()=>{
-    const next=repair(baseline(path));
+    const repaired=repair(baseline(path));
+    const next=path===arrivalPath?applyCloudChallenge(repaired):repaired;
     expect(next.replace(/\r\n/g,'\n')).toBe(raw(path).replace(/\r\n/g,'\n'));
     for(const eol of ['\n','\r\n']){const input=raw(path).replace(/\r?\n/g,eol);expect(repair(input)).toBe(input);}
   });

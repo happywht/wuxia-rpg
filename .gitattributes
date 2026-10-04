@@ -10,3 +10,6 @@ iterations/round-274/f2-escort.json -text
 iterations/round-274/f2-repair.json -text
 iterations/round-275/c0-escort-arrival.json -text
 iterations/round-275/c0-repair-arrival.json -text
+
+iterations/round-276/c1-escort-local-journey.json -text
+iterations/round-276/c1-repair-local-journey.json -text

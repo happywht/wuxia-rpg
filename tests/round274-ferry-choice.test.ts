@@ -14,6 +14,7 @@ import { createSocialState, getRelationship } from '../src/engine/social-state';
 import { createFactionMembershipState } from '../src/engine/faction-system';
 import { DIALOGUE_VARIABLE_LEDGER_MAX_ENTRIES } from '../src/engine/dialogue-variables';
 import { captureSaveSnapshot, parseSaveSnapshot, planSnapshotRestore, restoreRunState } from '../src/engine/save-system';
+import { repairEncounterRaw as applyCloudChallenge } from '../scripts/lib/round276-cloud-challenge.mjs';
 import { escortId, pierId, escortBehavior, pierBehavior, supplyKey, supplyNodes, repairEncountersRaw, repairDialoguesRaw } from '../scripts/lib/round274-ferry-choice.mjs';
 const root=resolve('.');
 const raw=(p:string)=>readFileSync(join(root,p),'utf8');
@@ -77,7 +78,7 @@ describe('Round274 existing choice threats',()=>{
     const expected=structuredClone(baseline);
     for(const [id,behavior] of [[pierId,pierBehavior],[escortId,escortBehavior]] as const){const e=expected.encounters.find((e:{id:string})=>e.id===id);e.enemy.behavior=behavior;if(id===pierId)e.enemy.martialArtIds.push('skill.jianghu-sanshou');}
     expect(JSON.parse(repairEncountersRaw(JSON.stringify(baseline,null,2)))).toEqual(expected);
-    expect(expected).toEqual(parse('data/base/battles/round-05-encounters.json'));
+    expect(JSON.parse(applyCloudChallenge(JSON.stringify(expected,null,2)))).toEqual(parse('data/base/battles/round-05-encounters.json'));
   });
 });
 describe('Round274 explicit differing supply and persistent consequences',()=>{

@@ -63,9 +63,9 @@ describe('Round 177 cloud-ridge discovery to quest chain', () => {
     expect(hasQuestState(offerBridge, 'quest.r74-cloud-bridge', 'offered')).toBe(true);
     expect(hasQuestState(markComplete, 'quest.r74-cloud-marks', 'completed')).toBe(true);
     expect(hasQuestState(bridgeComplete, 'quest.r74-cloud-bridge', 'completed')).toBe(true);
-    expect(node('marks-complete').text).toContain('先到断索悬桥看看');
-    expect(node('bridge-accepted').text).toContain('确认没有人被困');
-    expect(node('bridge-complete').text).toContain('护索还要另行修补');
+    expect(node('marks-complete').text).toContain('接下来去断索悬桥查拦路的人');
+    expect(node('bridge-accepted').text).toContain('先核断口、再清拦路客');
+    expect(node('bridge-complete').text).toContain('护索尚待修补');
   });
 
   it('keeps event, character, quest, and place relationships represented in the knowledge graph', () => {

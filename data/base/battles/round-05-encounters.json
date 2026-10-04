@@ -390,17 +390,51 @@
       "id": "encounter.r74-cloud-bridge-bandits",
       "name": "断索悬桥拦路客",
       "mapResourceId": "map.round-74-cloud-ridge",
-      "position": { "col": 76, "row": 42 },
+      "position": {
+        "col": 76,
+        "row": 42
+      },
       "profileId": "char.scribe-apprentice",
       "enemy": {
         "name": "拦索头目",
-        "attributes": { "body": 9, "force": 10, "agility": 8, "insight": 5, "resolve": 7 },
+        "attributes": {
+          "body": 9,
+          "force": 10,
+          "agility": 8,
+          "insight": 5,
+          "resolve": 7
+        },
         "health": 64,
         "qi": 16,
-        "martialArtIds": ["skill.jianghu-sanshou", "skill.tiezhang-zhuanggong"]
+        "martialArtIds": [
+          "skill.jianghu-sanshou",
+          "skill.tiezhang-zhuanggong"
+        ],
+        "behavior": [
+          {
+            "kind": "art",
+            "artId": "skill.jianghu-sanshou",
+            "cue": "头目收索贴身，先试短打"
+          },
+          {
+            "kind": "art",
+            "artId": "skill.tiezhang-zhuanggong",
+            "powerBonus": 10,
+            "guardDisruptsBonus": true,
+            "cue": "头目沉肩绷索，准备重击"
+          },
+          {
+            "kind": "recoverQi",
+            "amount": 8,
+            "cue": "头目撑索换气，暂露空隙"
+          }
+        ]
       },
       "victoryExperience": 48,
-      "defeatRecovery": { "healthRatio": 0.6, "qiRatio": 0.6 },
+      "defeatRecovery": {
+        "healthRatio": 0.6,
+        "qiRatio": 0.6
+      },
       "repeatable": true,
       "texts": {
         "approach": "断索悬桥边有人拦住去路，按 E 应战",

@@ -49,3 +49,9 @@ Round270：`iterations/round-270/j0-opening.json` 来自QA `journey-20261004` �
 新独立journey-20261004-cloud-escort与journey-20261004-cloud-repair各槽一保留导入F2，正常走两关上山/对话/用药/接云阶后存空槽二、标题Continue读回并导出；槽三留C1。candidate round275-worktree-on-5ad5c8e，文件iterations/round-275/c0-escort-arrival.json与c0-repair-arrival.json，stage分别c0-escort-arrival/c0-repair-arrival。原Download字节与SHA见playtest/branch-comparison；只读导出，不修改载荷制造进度。
 
 护送Lv7/XP686/351银/190命110气、膏1丸1/elapsed917；修桥Lv7/XP674/326银/188命110气、膏0丸2铁1/elapsed3893。均云岭40,43，云阶任务active且刻痕0/1；互斥及出发变量保留。护送本次发现水尺等新见闻后成就实际+40XP25银，与Round274启动错误补计数不同，读回相符。两侧清心丸未用、商店未买，不将未发生消费算作制作/策略通过。
+
+## Round276 两侧C1本地收束
+
+同一两个cloud QA-run，保留槽一F2与槽二C0，正常调查/挑战/伤后用药/报告→保存空槽三→标题Continue读回→B资源/F复谈/E库存→F8导出。candidate round276-worktree-on-2a5941e，文件iterations/round-276/c1-escort-local-journey.json与c1-repair-local-journey.json，stage分别c1-escort-local-journey/c1-repair-local-journey。
+
+护送Lv8/XP806/403银/209命130气、无膏无丸/elapsed1063；修桥Lv8/XP794/348银/209命130气、丸1铁1无膏/elapsed4017。两侧根2残篇1，实际战胜计数4、云阶/断索completed、原互斥失败端及出发变量保留。药铺护送膏3丸2，修桥膏1丸2，读回不补库存。下载=disk=index字节核对与SHA见本轮记录。C1仅本地收束，后续同候选全段及体验计时仍待。

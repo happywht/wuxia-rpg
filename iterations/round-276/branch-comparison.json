@@ -1,0 +1,326 @@
+{
+  "candidate": "round276-worktree-on-2a5941e",
+  "authority": "normal UI input → empty slot-3 save → title Continue → readback → raw F8 export",
+  "branches": {
+    "escort": {
+      "qaRun": "journey-20261004-cloud-escort",
+      "sourceSlotId": "slot-3",
+      "savedAt": "2026-10-04T04:29:22.733Z",
+      "exportedAt": "2026-10-04T04:31:08.628Z",
+      "bytes": 37418,
+      "sha256": "08E31C65D0F86CAE2F01E14EB05B8FAE5DFEBF6B060446A03456D1AB522F9705",
+      "map": "map.round-74-cloud-ridge",
+      "position": {
+        "col": 40,
+        "row": 43
+      },
+      "player": {
+        "level": 8,
+        "experience": 806,
+        "baseAttributes": {
+          "body": 23,
+          "force": 20,
+          "agility": 14,
+          "insight": 15,
+          "resolve": 14
+        },
+        "healthCurrent": 209,
+        "qiCurrent": 130,
+        "martialArtIds": [
+          "skill.jianghu-sanshou",
+          "skill.tuna-yangqi-jue",
+          "skill.r32-yunyin-caomu-xinfa",
+          "skill.r32-yunyin-buyun-lu"
+        ],
+        "factionMembership": {
+          "factionId": "faction.yunyin-shanzhuang",
+          "masterNpcId": "char.wen-suxin"
+        },
+        "cultivationPoints": 9,
+        "unlockedMeridianNodeIds": []
+      },
+      "inventory": {
+        "currency": 403,
+        "capacity": 12,
+        "stacks": [
+          {
+            "itemId": "item.xisui-canpian",
+            "quantity": 1
+          },
+          {
+            "itemId": "item.cangya-gen",
+            "quantity": 2
+          }
+        ],
+        "equipped": {}
+      },
+      "elapsed": 1063,
+      "delta": {
+        "elapsed": 146,
+        "experience": 120,
+        "currency": 52,
+        "health": 19,
+        "qi": 20
+      },
+      "newKnowledgeNodes": [
+        "quest.r74-cloud-marks",
+        "event.r74-cloud-inscription",
+        "place.r74-cloud-markers",
+        "event.r74-cloud-bridge",
+        "place.r74-cloud-bridge",
+        "quest.r74-cloud-bridge"
+      ],
+      "achievement": {
+        "unlockedIds": [
+          "achievement.first-promise",
+          "achievement.first-breath",
+          "achievement.footprints-known",
+          "achievement.first-elixir",
+          "achievement.find-a-home",
+          "achievement.first-victories",
+          "achievement.river-of-stories"
+        ],
+        "battleVictories": 4,
+        "equipmentCrafts": 0,
+        "alchemyCrafts": 1,
+        "discoveredKnowledge": 29
+      },
+      "variables": [
+        {
+          "key": "r274.ferry.departure-supply",
+          "value": "escort"
+        }
+      ],
+      "cloudShop": {
+        "shopId": "shop.r112-cloud-waystation",
+        "stock": [
+          {
+            "itemId": "item.huichun-gao",
+            "quantity": 3
+          },
+          {
+            "itemId": "item.qingxin-wan",
+            "quantity": 2
+          }
+        ]
+      },
+      "quests": {
+        "trackedQuestId": null,
+        "states": [
+          {
+            "questId": "quest.r31-guard-the-caravan",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-caravan-ambush",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-mend-the-pier",
+            "status": "failed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-pier-ironsand",
+                "value": 0
+              },
+              {
+                "id": "objective.r31-pier-leather",
+                "value": 0
+              },
+              {
+                "id": "objective.r273-pier-delivery",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r74-cloud-marks",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r74-cloud-marks",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.r74-cloud-bridge",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r74-cloud-bridge",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "repair": {
+      "qaRun": "journey-20261004-cloud-repair",
+      "sourceSlotId": "slot-3",
+      "savedAt": "2026-10-04T04:29:23.616Z",
+      "exportedAt": "2026-10-04T04:31:23.825Z",
+      "bytes": 37636,
+      "sha256": "80E29BDD98878FF060FBDD00A4427C8BE2293A5F777321F90D9AD75AD5175B30",
+      "map": "map.round-74-cloud-ridge",
+      "position": {
+        "col": 40,
+        "row": 43
+      },
+      "player": {
+        "level": 8,
+        "experience": 794,
+        "baseAttributes": {
+          "body": 23,
+          "force": 20,
+          "agility": 14,
+          "insight": 15,
+          "resolve": 14
+        },
+        "healthCurrent": 209,
+        "qiCurrent": 130,
+        "martialArtIds": [
+          "skill.jianghu-sanshou",
+          "skill.tuna-yangqi-jue",
+          "skill.r32-yunyin-caomu-xinfa",
+          "skill.r32-yunyin-buyun-lu"
+        ],
+        "factionMembership": {
+          "factionId": "faction.yunyin-shanzhuang",
+          "masterNpcId": "char.wen-suxin"
+        },
+        "cultivationPoints": 9,
+        "unlockedMeridianNodeIds": []
+      },
+      "inventory": {
+        "currency": 348,
+        "capacity": 12,
+        "stacks": [
+          {
+            "itemId": "item.xisui-canpian",
+            "quantity": 1
+          },
+          {
+            "itemId": "item.qingxin-wan",
+            "quantity": 1
+          },
+          {
+            "itemId": "item.cangya-gen",
+            "quantity": 2
+          },
+          {
+            "itemId": "item.iron-sand",
+            "quantity": 1
+          }
+        ],
+        "equipped": {}
+      },
+      "elapsed": 4017,
+      "delta": {
+        "elapsed": 124,
+        "experience": 120,
+        "currency": 22,
+        "health": 21,
+        "qi": 20
+      },
+      "newKnowledgeNodes": [
+        "quest.r74-cloud-marks",
+        "event.r74-cloud-inscription",
+        "place.r74-cloud-markers",
+        "event.r74-cloud-bridge",
+        "place.r74-cloud-bridge",
+        "quest.r74-cloud-bridge"
+      ],
+      "achievement": {
+        "unlockedIds": [
+          "achievement.first-promise",
+          "achievement.first-breath",
+          "achievement.footprints-known",
+          "achievement.first-elixir",
+          "achievement.find-a-home",
+          "achievement.river-of-stories",
+          "achievement.first-victories"
+        ],
+        "battleVictories": 4,
+        "equipmentCrafts": 0,
+        "alchemyCrafts": 1,
+        "discoveredKnowledge": 32
+      },
+      "variables": [
+        {
+          "key": "r274.ferry.departure-supply",
+          "value": "repair"
+        }
+      ],
+      "cloudShop": {
+        "shopId": "shop.r112-cloud-waystation",
+        "stock": [
+          {
+            "itemId": "item.huichun-gao",
+            "quantity": 1
+          },
+          {
+            "itemId": "item.qingxin-wan",
+            "quantity": 2
+          }
+        ]
+      },
+      "quests": {
+        "trackedQuestId": null,
+        "states": [
+          {
+            "questId": "quest.r31-guard-the-caravan",
+            "status": "failed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-caravan-ambush",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "questId": "quest.r31-mend-the-pier",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r31-pier-ironsand",
+                "value": 3
+              },
+              {
+                "id": "objective.r31-pier-leather",
+                "value": 2
+              },
+              {
+                "id": "objective.r273-pier-delivery",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.r74-cloud-marks",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r74-cloud-marks",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "questId": "quest.r74-cloud-bridge",
+            "status": "completed",
+            "objectiveCounts": [
+              {
+                "id": "objective.r74-cloud-bridge",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
