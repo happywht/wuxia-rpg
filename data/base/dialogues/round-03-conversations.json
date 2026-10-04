@@ -249,6 +249,64 @@
               "conditions": [
                 { "kind": "questStatus", "questId": "quest.r58-south-hamlet-supply", "status": "completed" }
               ]
+            },
+            {
+              "text": "贞娘，四株寒珠草备齐了，这就当面交给您。",
+              "nextNodeId": "r271-teastall-delivered",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r31-teastall-herbal-water",
+                  "status": "active"
+                },
+                {
+                  "kind": "itemCount",
+                  "itemId": "item.hanzhu-cao",
+                  "minCount": 4
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r271-teastall-delivered",
+                  "isKnown": false
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "takeItem",
+                  "itemId": "item.hanzhu-cao",
+                  "quantity": 4
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "npcId": "char.lu-zhenniang",
+                  "delta": 3
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r271-teastall-delivered"
+                }
+              ]
+            },
+            {
+              "text": "贞娘，凉汤要用的草，要怎么交给你？",
+              "nextNodeId": "r271-teastall-progress",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.r31-teastall-herbal-water",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "贞娘，上次交去的草，凉汤熬得如何？",
+              "nextNodeId": "r271-teastall-echo",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r271-teastall-delivered"
+                }
+              ]
             }
           ]
         },
@@ -305,6 +363,18 @@
         {
           "id": "r58-supply-done",
           "text": "陆贞娘把茶碗往前推了推：「料收齐了，姜百味那头也应下了。等药散配出来，南麓的人便能少受些罪——这份跑腿的心，茶棚里替你记一笔。」"
+        },
+        {
+          "id": "r271-teastall-progress",
+          "text": "陆贞娘把茶碗码好：「寒珠草要四株。备齐后回来按F交谈，选交草，我便点收下锅，凉汤的差事也在这里结算。按E可看差事名录。」"
+        },
+        {
+          "id": "r271-teastall-delivered",
+          "text": "陆贞娘接过四株寒珠草，一株株抖去根泥：「四株实收，凉汤这就续上。差事算结了，谢仪照旧，这份细心我记在茶账上。」"
+        },
+        {
+          "id": "r271-teastall-echo",
+          "text": "陆贞娘指了指灶上的大桶：「你交来的四株寒珠草都下了汤，赶路的药队也分到了一桶。入夏这口凉汤里有你的一份力气，路过只管来喝。」"
         }
       ]
     },
@@ -1059,6 +1129,64 @@
                   "status": "completed"
                 }
               ]
+            },
+            {
+              "text": "三份回春膏备齐了，这就当面交给你送去。",
+              "nextNodeId": "r271-medicine-delivered",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.round-07-medicine-run",
+                  "status": "active"
+                },
+                {
+                  "kind": "itemCount",
+                  "itemId": "item.huichun-gao",
+                  "minCount": 3
+                },
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r271-medicine-delivered",
+                  "isKnown": false
+                }
+              ],
+              "effects": [
+                {
+                  "kind": "takeItem",
+                  "itemId": "item.huichun-gao",
+                  "quantity": 3
+                },
+                {
+                  "kind": "adjustRelationship",
+                  "npcId": "char.ma-shangyi",
+                  "delta": 3
+                },
+                {
+                  "kind": "discoverKnowledgeNode",
+                  "nodeId": "event.r271-medicine-delivered"
+                }
+              ]
+            },
+            {
+              "text": "马叔，送药的差事，药要怎么交给你？",
+              "nextNodeId": "r271-medicine-progress",
+              "conditions": [
+                {
+                  "kind": "questStatus",
+                  "questId": "quest.round-07-medicine-run",
+                  "status": "active"
+                }
+              ]
+            },
+            {
+              "text": "马叔，上次交去的那批药，伤者用得如何？",
+              "nextNodeId": "r271-medicine-echo",
+              "conditions": [
+                {
+                  "kind": "knowledgeKnown",
+                  "nodeId": "event.r271-medicine-delivered"
+                }
+              ]
             }
           ]
         },
@@ -1203,6 +1331,18 @@
         {
           "id": "leave",
           "text": "不妨事，路上留神便好。"
+        },
+        {
+          "id": "r271-medicine-progress",
+          "text": "马尚义压平告示：「伤者需要三份回春膏。备齐后回来按F交谈，选交药，我点收后便给几家送去，谢仪也在这里结算。你自己的伤药记得另留，按E可看差事名录。」"
+        },
+        {
+          "id": "r271-medicine-delivered",
+          "text": "马尚义当面点清三份回春膏，在旧账上勾了这笔：「三份实收，正好够巷口几家换药。差事这就算结了，谢仪照旧，这份跑腿的情我另记一笔。」"
+        },
+        {
+          "id": "r271-medicine-echo",
+          "text": "马尚义翻着旧账：「你交上来的那三份药都敷到了伤者疮口上，巷口几家总算睡得踏实。往后再想支援，告示上添药那条还作数——那是另算的捐助，不与这趟差事相混。」"
         }
       ]
     },

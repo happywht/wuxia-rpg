@@ -1,0 +1,5 @@
+
+> wuxia-rpg@0.0.1 smoke:round-27
+> node scripts/smoke-round-27.mjs
+
+通过：五条 Round 27 结局条件评估/边界、任务/善恶/关系/门派/声望/见闻分支、锁定提示与不可变性、MOD 引用隔离、终章格装配/邻接及完整世界加载。

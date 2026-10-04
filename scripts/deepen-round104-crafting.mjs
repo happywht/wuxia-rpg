@@ -24,7 +24,8 @@ export const loops = [
         text: '向容素青请教生肌散的炼法',
       },
       objective('brew', 'craftRecipe', 'alchemy.recipe.shengji-san', '备寒珠草×2、苍崖根×1与18银两，去渡口药炉炼生肌散'),
-      objective('heal', 'useItem', 'item.shengji-san-cu', '损耗后按I打开背包，实际使用一剂生肌散（任意品质；无恢复收益会保留药）', {
+      // Round 271: B opens the backpack; I is the encyclopedia catalogue.
+      objective('heal', 'useItem', 'item.shengji-san-cu', '损耗后按B打开背包，实际使用一剂生肌散（任意品质；无恢复收益会保留药）', {
         alternativeTargetIds: ['item.shengji-san-zhong', 'item.shengji-san-shang'],
       }),
       objective('medicine-report', 'talkToNpc', 'char.rong-su-qing', '回渡口向容素青复核炼药与疗伤'),
@@ -39,7 +40,7 @@ export const loops = [
     description: '先备熟铁砂两份，用青铜笔剑在渡口铁砧重理刃口，工钱24；穿戴中的旧剑须先卸下。锻成淬锋短剑后在背包装备，再击退渡口芦桥集口的旧例索钱人，回来向祝九弦复命。这是共通兵刃练习，不会自动授刀法或拜师。',
     objectives: [
       objective('forge', 'craftRecipe', 'forge.recipe.refine-bronze-pen-sword', '备青铜笔剑、熟铁砂×2与24银两，在渡口铁砧重理刃口（旧剑先卸下）'),
-      objective('equip', 'equipItem', 'item.qingtong-jian', '按I打开背包，装备锻成的淬锋短剑'),
+      objective('equip', 'equipItem', 'item.qingtong-jian', '按B打开背包，装备锻成的淬锋短剑'),
       objective('challenge', 'defeatEncounter', 'encounter.r58-market-toll-claimer', '装备淬锋短剑交手，击退渡口芦桥集口旧例索钱人', { requiredEquippedItemId: 'item.qingtong-jian' }),
       objective('forge-report', 'talkToNpc', 'char.zhu-jiuxian', '回渡口向祝九弦报告淬锋与交手'),
     ],

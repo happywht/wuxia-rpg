@@ -1,0 +1,17 @@
+
+> wuxia-rpg@0.0.1 test
+> vitest run tests/round271-departure-advice.test.ts tests/round106-regional-guide.test.ts tests/round106-guide-ui.test.ts
+
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+ ❯ tests/round271-departure-advice.test.ts (2 tests | 2 failed) 7ms
+   ❯ Round271 departure preparation uses real local stock and recipe costs (2)
+     × quotes the real medicine ingredients and labour before the player leaves town 4ms
+     × names a real merchant with stock for the proposed materials 2ms
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  2 failed | 29 passed (31)
+   Start at  08:27:06
+   Duration  4.24s (tests 78%, transform 17%, import 5%)
+

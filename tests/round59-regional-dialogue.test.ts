@@ -274,7 +274,7 @@ function visibleStartTargets(conversation: DialogueData, context: DialogueRuntim
 describe('Round 59 regional dialogue echoes', () => {
   it('parses real base data and assembles quests and dialogue references without warnings', () => {
     expect(graph.warnings).toEqual([]);
-    expect(graph.nodes.size).toBe(429); // R255 caravan-route outcomes + the R261 river-lantern appointment event.
+    expect(graph.nodes.size).toBe(431); // R255 caravan-route outcomes + R271 two hand-delivery events + the R261 river-lantern appointment event.
     expect(graph.nodes.has('event.r31-river-lantern-time-agreed')).toBe(true); // Stable id anchors the R261 addition.
     expect(questAssembly.warnings).toEqual([]);
     expect(questAssembly.quests.size).toBe(44);
@@ -340,8 +340,8 @@ describe('Round 59 regional dialogue echoes', () => {
       'dlg.shi-bei-mentor': 19, // +1 R129 no-effect complete route brief;  9 pre-existing + 4 echoes + 5 Round 103 practice entries
       'dlg.bai-luzhou-ferry-master': 26, // Prior 22 + R254 appointment + two R255 route responses + R261 river-lantern appointment.
       'dlg.zhu-jiuxian-mentor': 24, // prior 20 + three Round104 crafting responses
-      'dlg.ma-shangyi-notice-board': 5, // 3 pre-existing + 2 echoes
-      'dlg.lu-zhenniang-teastall': 9, // 7 pre-existing + 2 echoes
+      'dlg.ma-shangyi-notice-board': 8, // 3 pre-existing + 2 echoes + 3 R271 delivery entries (ready/progress/echo)
+      'dlg.lu-zhenniang-teastall': 12, // 7 pre-existing + 2 echoes + 3 R271 delivery entries (ready/progress/echo)
       'dlg.jiang-baiwei-peddler': 7, // 2 pre-existing + 2 echoes + 3 Round 98 journey entries
       'dlg.gu-yechen-roadside': 26, // R131 adds an eligible reinvitation without repeating social rewards.
     };

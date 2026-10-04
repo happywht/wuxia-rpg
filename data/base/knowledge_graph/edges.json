@@ -3812,6 +3812,34 @@
       "toId": "event.r105-road-sea-delivered",
       "relation": "knows",
       "summary": "接收回应，运行时仍须实际分享。"
+    },
+    {
+      "id": "kg.edge.r271-medicine-delivery",
+      "fromId": "quest.round-07-medicine-run",
+      "toId": "event.r271-medicine-delivered",
+      "relation": "rewards",
+      "summary": "巷口送药差事由马尚义当面点清三份回春膏后结案，并记下这次实际交付。"
+    },
+    {
+      "id": "kg.edge.r271-medicine-delivery-at",
+      "fromId": "event.r271-medicine-delivered",
+      "toId": "char.ma-shangyi",
+      "relation": "locatedAt",
+      "summary": "巷口伤药在镇内告示边交到马尚义手上。"
+    },
+    {
+      "id": "kg.edge.r271-teastall-delivery",
+      "fromId": "quest.r31-teastall-herbal-water",
+      "toId": "event.r271-teastall-delivered",
+      "relation": "rewards",
+      "summary": "茶棚凉汤差事由陆贞娘当面点清四株寒珠草后结案，并记下这次实际交付。"
+    },
+    {
+      "id": "kg.edge.r271-teastall-delivery-at",
+      "fromId": "event.r271-teastall-delivered",
+      "toId": "char.lu-zhenniang",
+      "relation": "locatedAt",
+      "summary": "寒珠草在茶棚当面交到陆贞娘手上。"
     }
   ]
 }

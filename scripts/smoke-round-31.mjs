@@ -56,7 +56,7 @@ try {
   ]);
 
   // ── 1. 数量与唯一性：2 项原始任务，R31 新增 18，R42 +5，R43 +5，R44 +2，R56 +2；任务/目标 id 全局唯一。
-  assert.equal(rawQuests.quests.length, 34, 'the base quest set holds 34 quests through Round 56');
+  assert.equal(rawQuests.quests.length, 44, 'the base quest set holds 44 quests through Round 67 (34 by R56 + 6 R58 + 3 R62 + 1 R67)');
   assert.deepEqual(
     rawQuests.quests.map((quest) => quest.id).filter((id) => id.startsWith('quest.r31-')).length,
     18,
@@ -71,10 +71,10 @@ try {
   const objectiveIds = rawQuests.quests.flatMap((quest) => quest.objectives.map((objective) => objective.id));
   assert.equal(new Set(objectiveIds).size, objectiveIds.length, 'objective ids stay globally unique');
   const kinds = new Set(rawQuests.quests.flatMap((quest) => quest.objectives.map((objective) => objective.kind)));
-  assert.deepEqual([...kinds].sort(), ['collectItem', 'defeatEncounter', 'discoverKnowledge', 'talkToNpc'], 'all four objective kinds are in use');
+  assert.deepEqual([...kinds].sort(), ['collectItem', 'craftRecipe', 'defeatEncounter', 'discoverKnowledge', 'equipItem', 'talkToNpc', 'useItem'], 'all seven objective kinds are in use (R104 adds the three action kinds)');
   const failQuests = rawQuests.quests.filter((quest) => (quest.failOnEncounterIds ?? []).length > 0);
-  assert.equal(failQuests.filter((quest) => !LEGACY_QUEST_IDS.includes(quest.id)).length, 3,
-    'Round 31 adds at least three quests with explicit fail encounters');
+  assert.ok(failQuests.filter((quest) => !LEGACY_QUEST_IDS.includes(quest.id)).length >= 3,
+    'Round 31 adds at least three quests with explicit fail encounters (later rounds add more)');
   const branchMembers = rawQuests.quests.filter((quest) => quest.exclusiveGroupId === BRANCH_GROUP);
   assert.equal(branchMembers.length, 2, 'the exclusive group holds exactly two branch choices');
   const prerequisiteKey = (quest) => [...(quest.prerequisiteQuestIds ?? [])].sort().join('|');
@@ -93,7 +93,7 @@ try {
   // ── 2. 解析：扩展协议（talkToNpc、exclusiveGroupId）通过防御解析。
   const parsedQuests = questEngine.parseQuestSet(rawQuests);
   assert.equal(parsedQuests.ok, true, `the extended quest set parses (${parsedQuests.ok ? '' : parsedQuests.errors.join('；')})`);
-  assert.equal(parsedQuests.set.quests.length, 34, 'all 34 quests parse');
+  assert.equal(parsedQuests.set.quests.length, 44, 'all 44 quests parse');
   const guardData = parsedQuests.set.quests.find((quest) => quest.id === 'quest.r31-guard-the-caravan');
   const mendData = parsedQuests.set.quests.find((quest) => quest.id === 'quest.r31-mend-the-pier');
   assert.equal(guardData.exclusiveGroupId, BRANCH_GROUP);
@@ -207,27 +207,55 @@ try {
   }
   assert.equal(loaded.ok, true, 'the full base world loads');
   const quests = loaded.world.assembly.quests;
-  assert.equal(quests.size, 34, 'every quest survives assembly');
+  assert.equal(quests.size, 65, 'every quest survives assembly (whole world incl. later regional quest files)');
   assert.deepEqual(
     loaded.world.optionalWarnings.filter((diagnostic) => diagnostic.origin === 'quest-assembly'),
     [],
     'no quest was disabled during assembly',
   );
   const assembledEncounters = loaded.world.assembly.encounters;
-  assert.equal(assembledEncounters.length, 4, 'the world places the legacy plus three new encounters');
+  // Round 31 时全世界仅 round-05 一个遭遇文件（4 个遭遇）；后续轮次加入地区
+  // 遭遇文件。装配数必须等于 manifest 全部 battle-encounters 资源的声明并集，
+  // 而不是沿用旧的固定计数。
+  const declaredEncounterIds = new Set();
+  for (const resource of rawManifest.resources) {
+    if (resource.schema !== 'battle-encounters') continue;
+    const resourceDoc = await readJson('data/base/' + resource.path);
+    for (const encounter of resourceDoc.encounters) declaredEncounterIds.add(encounter.id);
+  }
+  assert.equal(assembledEncounters.length, declaredEncounterIds.size,
+    'the world places exactly the encounters declared across every battle resource');
   for (const encounterId of NEW_ENCOUNTER_IDS) {
     assert.ok(assembledEncounters.some((encounter) => encounter.record.id === encounterId),
       `encounter "${encounterId}" survives assembly`);
   }
-  const giverIds = rawNpcs.npcs.filter((npc) => npc.questGiver === true).map((npc) => npc.id);
-  assert.equal(giverIds.length, 12, 'twelve NPCs publish tasks');
+  const giverIds = [];
+  for (const resource of rawManifest.resources) {
+    if (resource.schema !== 'npc-set') continue;
+    const resourceDoc = await readJson('data/base/' + resource.path);
+    for (const npc of resourceDoc.npcs) {
+      if (npc.questGiver === true) giverIds.push(npc.id);
+    }
+  }
+  assert.equal(new Set(giverIds).size, giverIds.length, 'quest giver ids stay unique across npc resources');
+  assert.ok(giverIds.length >= 12, 'the original twelve town givers keep publishing (later rounds add regional givers)');
   for (const quest of quests.values()) {
     assert.ok(giverIds.includes(quest.giverNpcId), `quest "${quest.id}" has a declared quest giver`);
   }
+  // 反向核对以"任务集中实际出现的发布人"为域：R62 的秦素砚只作谈话目标，
+  // 其 questGiver 标记当前没有对应差事（引擎允许空告示板）。用稳定 ID 记录
+  // 这一已知事实，其余标记发布人都必须实际发布至少一项差事。
+  const PUBLISHERS_WITHOUT_QUESTS = ['char.qin-suyan'];
   for (const giverId of giverIds) {
+    if (PUBLISHERS_WITHOUT_QUESTS.includes(giverId)) continue;
     assert.ok([...quests.values()].some((quest) => quest.giverNpcId === giverId),
       `giver "${giverId}" actually publishes at least one quest`);
   }
+  assert.equal(
+    giverIds.filter((giverId) => ![...quests.values()].some((quest) => quest.giverNpcId === giverId)).sort().join(','),
+    PUBLISHERS_WITHOUT_QUESTS.join(','),
+    'the flagged-but-unpublished giver list stays pinned to the known stable ids',
+  );
 
   // ── 5. 地图槽位：三个新遭遇格避开全部固定互动格与人物格，且从出生点可达。
   const maps = new Map();
@@ -324,25 +352,49 @@ try {
     const state = journal.states.get('quest.r31-teastall-herbal-water');
     assert.equal(state.objectiveCounts.get('objective.r31-teastall-herbs'), 2,
       'acceptance snapshots the current item quantity');
-    const done = questEngine.applyQuestSignal(quests, journal, { type: 'item-count', itemId: 'item.hanzhu-cao', quantity: 5 });
-    assert.equal(journal.states.get('quest.r31-teastall-herbal-water').status, 'completed');
+    // Round 271：备料目标只推进计数；只持有（含超额持有）不再结案。
+    const stocked = questEngine.applyQuestSignal(quests, journal, { type: 'item-count', itemId: 'item.hanzhu-cao', quantity: 5 });
+    assert.equal(journal.states.get('quest.r31-teastall-herbal-water').status, 'active',
+      'holding the required stock no longer settles the delivery quest');
     assert.equal(state.objectiveCounts.get('objective.r31-teastall-herbs'), 4, 'counts clamp to the declared requirement');
+    assert.equal(stocked.completed.length, 0);
+    // 面对面交付（交付见闻）一次性结案并只发一次奖励。
+    const done = questEngine.applyQuestSignal(quests, journal, { type: 'knowledge-discovery', nodeId: 'event.r271-teastall-delivered' });
+    assert.equal(journal.states.get('quest.r31-teastall-herbal-water').status, 'completed');
     assert.equal(done.completed.length, 1);
-    const again = questEngine.applyQuestSignal(quests, journal, { type: 'item-count', itemId: 'item.hanzhu-cao', quantity: 5 });
-    assert.equal(again.completed.length, 0, 'collect rewards are one-time as well');
+    const again = questEngine.applyQuestSignal(quests, journal, { type: 'knowledge-discovery', nodeId: 'event.r271-teastall-delivered' });
+    assert.equal(again.completed.length, 0, 'delivery rewards are one-time as well');
   }
 
   // ── 8. 战斗目标与失败原子性：败北失败任务并锁死其后续，胜绩无法复活已失败差事。
   const completeChainToBranch = (journal) => {
     let result = questEngine.acceptQuest(quests, journal, 'quest.round-07-medicine-run', new Map([['item.huichun-gao', 3]]));
     assert.equal(result.ok, true, 'medicine-run accepts with a full snapshot');
+    assert.equal(journal.states.get('quest.round-07-medicine-run').status, 'active',
+      'Round 271: a full stock snapshot no longer auto-completes medicine-run');
+    questEngine.applyQuestSignal(quests, journal, { type: 'knowledge-discovery', nodeId: 'event.r271-medicine-delivered' });
+    assert.equal(journal.states.get('quest.round-07-medicine-run').status, 'completed',
+      'the hand-delivery knowledge settles medicine-run exactly once');
     result = questEngine.acceptQuest(quests, journal, 'quest.r31-herbal-inquiry');
     assert.equal(result.ok, true, 'herbal-inquiry unlocks after medicine-run');
     questEngine.applyQuestSignal(quests, journal, { type: 'npc-talk', npcId: 'char.rong-su-qing' });
     assert.equal(journal.states.get('quest.r31-herbal-inquiry').status, 'completed', 'the talk objective completes the inquiry');
     result = questEngine.acceptQuest(quests, journal, 'quest.r31-herbal-stocktaking', new Map([['item.cangya-gen', 3]]));
     assert.equal(result.ok, true);
-    assert.equal(journal.states.get('quest.r31-herbal-stocktaking').status, 'completed', 'a full snapshot completes the stocktaking on acceptance');
+    // R104：清点差事改为有序五阶段（备根→问方→炼制→用药→复命）。以下用
+    // 合成引擎信号逐段推进，是有序协议烟测，不是真实玩家 QA；接取快照只
+    // 推进第一段，乱序信号不能跳段。
+    const stocktakingState = journal.states.get('quest.r31-herbal-stocktaking');
+    assert.equal(stocktakingState.status, 'active', 'a full stock snapshot no longer auto-completes the ordered stocktaking');
+    const outOfOrder = questEngine.applyQuestSignal(quests, journal, { type: 'npc-talk', npcId: 'char.rong-su-qing' });
+    assert.equal(stocktakingState.status, 'active', 'an out-of-order report never skips the ordered checklist');
+    assert.equal(outOfOrder.completed.length, 0);
+    questEngine.applyQuestSignal(quests, journal, { type: 'knowledge-discovery', nodeId: 'event.formula-shengji-san' });
+    questEngine.applyQuestSignal(quests, journal, { type: 'recipe-crafted', recipeId: 'alchemy.recipe.shengji-san' });
+    questEngine.applyQuestSignal(quests, journal, { type: 'item-used', itemId: 'item.shengji-san-cu' });
+    const stocktakingDone = questEngine.applyQuestSignal(quests, journal, { type: 'npc-talk', npcId: 'char.rong-su-qing' });
+    assert.equal(stocktakingState.status, 'completed', 'the five ordered stages settle the stocktaking exactly once');
+    assert.equal(stocktakingDone.completed.length, 1);
     assert.equal(journal.states.get('quest.r31-mist-shore-watch').status, 'offered', 'the night watch unlocks');
     return result;
   };
@@ -374,7 +426,11 @@ try {
     const provisioning = questEngine.acceptQuest(quests, journal, 'quest.r31-caravan-provisioning', new Map([['item.wuji-dan', 1]]));
     assert.equal(provisioning.ok, true);
     assert.deepEqual(provisioning.update.failedQuestIds, [], 'the provisioning quest belongs to no exclusive group');
+    // R254：起运差事改为"备丹＋当面约定"两目标。普通交谈不构成约定
+    // （合成引擎信号烟测）；只有约定见闻结案。
     questEngine.applyQuestSignal(quests, journal, { type: 'npc-talk', npcId: 'char.bai-luzhou' });
+    assert.equal(journal.states.get('quest.r31-caravan-provisioning').status, 'active', 'an ordinary talk never records the departure appointment');
+    questEngine.applyQuestSignal(quests, journal, { type: 'knowledge-discovery', nodeId: 'event.r31-caravan-time-agreed' });
     assert.equal(journal.states.get('quest.r31-caravan-provisioning').status, 'completed');
     assert.equal(journal.states.get('quest.r31-guard-the-caravan').status, 'offered', 'branch A is offered');
     assert.equal(journal.states.get('quest.r31-mend-the-pier').status, 'offered', 'branch B is offered');
@@ -403,7 +459,8 @@ try {
     questEngine.acceptQuest(quests, journal, 'quest.r31-mist-shore-watch');
     questEngine.applyQuestSignal(quests, journal, { type: 'encounter-victory', encounterId: 'encounter.mist-shore-prowler' });
     questEngine.acceptQuest(quests, journal, 'quest.r31-caravan-provisioning', new Map([['item.wuji-dan', 1]]));
-    questEngine.applyQuestSignal(quests, journal, { type: 'npc-talk', npcId: 'char.bai-luzhou' });
+    // R254 约定语义：普通交谈不结案，约定见闻才结案（见上）。
+    questEngine.applyQuestSignal(quests, journal, { type: 'knowledge-discovery', nodeId: 'event.r31-caravan-time-agreed' });
     const chose = questEngine.acceptQuest(quests, journal, 'quest.r31-mend-the-pier');
     assert.equal(chose.ok, true);
     assert.deepEqual(chose.update.failedQuestIds, ['quest.r31-guard-the-caravan'],
@@ -447,7 +504,8 @@ try {
     questEngine.acceptQuest(quests, journal, 'quest.r31-mist-shore-watch');
     questEngine.applyQuestSignal(quests, journal, { type: 'encounter-victory', encounterId: 'encounter.mist-shore-prowler' });
     questEngine.acceptQuest(quests, journal, 'quest.r31-caravan-provisioning', new Map([['item.wuji-dan', 1]]));
-    questEngine.applyQuestSignal(quests, journal, { type: 'npc-talk', npcId: 'char.bai-luzhou' });
+    // R254 约定语义：普通交谈不结案，约定见闻才结案（见上）。
+    questEngine.applyQuestSignal(quests, journal, { type: 'knowledge-discovery', nodeId: 'event.r31-caravan-time-agreed' });
     questEngine.acceptQuest(quests, journal, 'quest.r31-guard-the-caravan');
     questEngine.applyQuestSignal(quests, journal, { type: 'encounter-victory', encounterId: 'encounter.ferry-reed-ambush' });
     questEngine.acceptQuest(quests, journal, 'quest.r31-caravan-gratitude');
@@ -511,7 +569,7 @@ try {
     assert.equal(restoredLegacy.journal.states.get('quest.r31-caravan-gratitude').status, 'locked');
   }
 
-  console.info('[round-31] 任务链烟测通过：34 项任务（2 项原始任务、R31 新增恰 18、R42/R43 各新增 5、R44/R56 各新增 2）数量与全局 id 唯一、四型目标与互斥组结构解析、坏引用逐条隔离与互斥组整组校验（坏成员/前置不一/单成员均不留假单选）、完整世界装配零任务警告、三新遭遇槽位避让全部固定格且可达、谈话信号只认真实对话且接取不自动完成、物品接取快照与单次奖励、败北失败原子锁链、互斥分支确定性失败报告/幂等拒绝/双向各自后续、npc-talk 唯一入口源码断言、v1 快照往返与 R31 前旧档免迁移恢复。');
+  console.info('[round-31] 任务链烟测通过：44 项任务（R56 前 34 项＋R58/R62/R67 追加 10 项）数量与全局 id 唯一、七型目标与互斥组结构解析、坏引用逐条隔离与互斥组整组校验（坏成员/前置不一/单成员均不留假单选）、完整世界装配（65 项任务/全 manifest 遭遇并集/全 manifest 发布人）零任务警告、三新遭遇槽位避让全部固定格且可达、谈话信号只认真实对话且接取不自动完成、R271 显式交付（备料不结案、交付见闻一次性结案，含送药差事前置链）、R104 有序五阶段清点逐段推进且乱序不可跳段、R254 起运约定（普通交谈不结案）、物品接取快照与单次奖励、败北失败原子锁链、互斥分支确定性失败报告/幂等拒绝/双向各自后续、npc-talk 唯一入口源码断言、v1 快照往返与 R31 前旧档免迁移恢复。以上为合成引擎信号烟测，非真实玩家 QA。');
 } finally {
   globalThis.fetch = originalFetch;
   await server.close();

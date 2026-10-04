@@ -3,7 +3,7 @@
     {
       "id": "quest.round-07-medicine-run",
       "name": "巷口送药",
-      "description": "镇西几户人家被巷口的刀客惊扰，伤者缺药。替马尚义备齐回春膏，他会把药送去安置伤者。",
+      "description": "镇西几户人家被巷口的刀客惊扰，伤者缺药。替马尚义备齐回春膏，回到镇内告示边按F与他交谈、当面交付三份，他会把药送去安置伤者。",
       "giverNpcId": "char.ma-shangyi",
       "objectives": [
         {
@@ -12,9 +12,21 @@
           "targetId": "item.huichun-gao",
           "requiredCount": 3,
           "text": "备齐三份回春膏（可在江南姜百味处采买）"
+        },
+        {
+          "id": "objective.r271-medicine-delivery",
+          "kind": "discoverKnowledge",
+          "targetId": "event.r271-medicine-delivered",
+          "requiredCount": 1,
+          "navigationNpcId": "char.ma-shangyi",
+          "text": "回马尚义处按F交付回春膏×3（按E看差事名录）"
         }
       ],
-      "rewards": { "experience": 15, "currency": 18 }
+      "rewards": {
+        "experience": 15,
+        "currency": 18
+      },
+      "orderedObjectives": true
     },
     {
       "id": "quest.round-07-clear-alley",
@@ -36,7 +48,7 @@
     {
       "id": "quest.r31-teastall-herbal-water",
       "name": "茶棚凉汤",
-      "description": "入夏后茶棚的凉汤走俏，陆贞娘惯用寒珠草提味败火，岸边湿地的草却被夜雨打烂了一片。替她备来四株，回头给赶路的药队也留一桶。",
+      "description": "入夏后茶棚的凉汤走俏，陆贞娘惯用寒珠草提味败火，岸边湿地的草却被夜雨打烂了一片。替她备来四株，回到茶棚按F与她交谈、当面交付，回头给赶路的药队也留一桶。",
       "giverNpcId": "char.lu-zhenniang",
       "objectives": [
         {
@@ -45,9 +57,21 @@
           "targetId": "item.hanzhu-cao",
           "requiredCount": 4,
           "text": "备齐四株寒珠草（可采集，也可向江南姜百味采买）"
+        },
+        {
+          "id": "objective.r271-teastall-delivery",
+          "kind": "discoverKnowledge",
+          "targetId": "event.r271-teastall-delivered",
+          "requiredCount": 1,
+          "navigationNpcId": "char.lu-zhenniang",
+          "text": "回茶棚找陆贞娘，按F交付寒珠草×4（按E看差事名录）"
         }
       ],
-      "rewards": { "experience": 18, "currency": 15 }
+      "rewards": {
+        "experience": 18,
+        "currency": 15
+      },
+      "orderedObjectives": true
     },
     {
       "id": "quest.r31-bookshop-mothproof",
@@ -150,7 +174,7 @@
           "kind": "useItem",
           "targetId": "item.shengji-san-cu",
           "requiredCount": 1,
-          "text": "损耗后按I打开背包，实际使用一剂生肌散（任意品质；无恢复收益会保留药）",
+          "text": "损耗后按B打开背包，实际使用一剂生肌散（任意品质；无恢复收益会保留药）",
           "alternativeTargetIds": [
             "item.shengji-san-zhong",
             "item.shengji-san-shang"
@@ -413,7 +437,7 @@
           "kind": "equipItem",
           "targetId": "item.qingtong-jian",
           "requiredCount": 1,
-          "text": "按I打开背包，装备锻成的淬锋短剑"
+          "text": "按B打开背包，装备锻成的淬锋短剑"
         },
         {
           "id": "objective.r104-challenge",

@@ -1,0 +1,249 @@
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r271-cli-6yrk2G/scripts/lib/round271-journey-delivery.mjs:323
+      throw new Error(`对话 ${spec.conversationId} 交付选项/节点已变化，请人工复核。`);
+            ^
+
+Error: 对话 dlg.ma-shangyi-notice-board 交付选项/节点已变化，请人工复核。
+    at repairDialoguesRaw (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r271-cli-6yrk2G/scripts/lib/round271-journey-delivery.mjs:323:13)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r271-cli-6yrk2G/scripts/apply-round271.mjs:22:22
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:647:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.18.0
+round129 refused (file untouched): r129-gu-iron-route 文本被改动，请人工复核。
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-EHCLNo/scripts/lib/round129-iron-practice-brief.mjs:132
+    throw new Error(`${brief.nodeId} 文本被改动，请人工复核。`);
+          ^
+
+Error: r129-gu-iron-route 文本被改动，请人工复核。
+    at verifyApplied (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-EHCLNo/scripts/lib/round129-iron-practice-brief.mjs:132:11)
+    at addOne (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-EHCLNo/scripts/lib/round129-iron-practice-brief.mjs:88:5)
+    at addIronPracticeBriefs (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-EHCLNo/scripts/lib/round129-iron-practice-brief.mjs:59:11)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-EHCLNo/scripts/apply-round129.mjs:20:9
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:647:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.18.0
+round130 refused round-30-conversations.json (file untouched): r130-hanshan-practice-brief 文本被改动，请人工复核。
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-KhDZb5/scripts/lib/round130-hanshan-practice-brief.mjs:147
+    throw new Error(`${brief.nodeId} 文本被改动，请人工复核。`);
+          ^
+
+Error: r130-hanshan-practice-brief 文本被改动，请人工复核。
+    at verifyApplied (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-KhDZb5/scripts/lib/round130-hanshan-practice-brief.mjs:147:11)
+    at addOne (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-KhDZb5/scripts/lib/round130-hanshan-practice-brief.mjs:86:5)
+    at addHanshanBriefs (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-KhDZb5/scripts/lib/round130-hanshan-practice-brief.mjs:62:15)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-KhDZb5/scripts/apply-round130.mjs:20:11
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:647:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.18.0
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round130-hanshan-practice-brief.test.ts > Round130 Hanshan practice briefs (real assembled data) > cross-round replays from the fixed baseline keep every addition (R128→R129→R130→R103/R127)
+AssertionError: expected { conversations: [ { …(3) }, …(8) ] } to deeply equal { conversations: [ { …(3) }, …(8) ] }
+
+- Expected
++ Received
+
+@@ -305,69 +305,11 @@
+                  },
+                ],
+                "nextNodeId": "r58-supply-done",
+                "text": "贞娘，苍崖根交割了，捎药的事办妥了。",
+              },
+-             {
+-               "conditions": [
+-                 {
+-                   "kind": "questStatus",
+-                   "questId": "quest.r31-teastall-herbal-water",
+-                   "status": "active",
+-                 },
+-                 {
+-                   "itemId": "item.hanzhu-cao",
+-                   "kind": "itemCount",
+-                   "minCount": 4,
+-                 },
+-                 {
+-                   "isKnown": false,
+-                   "kind": "knowledgeKnown",
+-                   "nodeId": "event.r271-teastall-delivered",
+-                 },
+-               ],
+-               "effects": [
+-                 {
+-                   "itemId": "item.hanzhu-cao",
+-                   "kind": "takeItem",
+-                   "quantity": 4,
+-                 },
+-                 {
+-                   "delta": 3,
+-                   "kind": "adjustRelationship",
+-                   "npcId": "char.lu-zhenniang",
+-                 },
+-                 {
+-                   "kind": "discoverKnowledgeNode",
+-                   "nodeId": "event.r271-teastall-delivered",
+-                 },
+-               ],
+-               "nextNodeId": "r271-teastall-delivered",
+-               "text": "贞娘，四株寒珠草备齐了，这就当面交给您。",
+-             },
+-             {
+-               "conditions": [
+-                 {
+-                   "kind": "questStatus",
+-                   "questId": "quest.r31-teastall-herbal-water",
+-                   "status": "active",
+-                 },
+-               ],
+-               "nextNodeId": "r271-teastall-progress",
+-               "text": "贞娘，凉汤要用的草，要怎么交给你？",
+-             },
+-             {
+-               "conditions": [
+-                 {
+-                   "kind": "knowledgeKnown",
+-                   "nodeId": "event.r271-teastall-delivered",
+-                 },
+            ],
+-               "nextNodeId": "r271-teastall-echo",
+-               "text": "贞娘，上次交去的草，凉汤熬得如何？",
+-             },
+-           ],
+            "text": "客官走累了吧？粗茶两文一碗，坐下歇歇脚。今儿湖上雾重，怕是散不开了。",
+          },
+          {
+            "id": "strangers",
+            "options": [
+@@ -425,22 +367,10 @@
+            "text": "陆贞娘往灶上添了勺水：「还差两份苍崖根——村里沿水路做工的人，胳膊腿被芦苇划开是常事，药队配散就指望这味。料齐了便去寻姜百味，让他按新查明的旧路捎，别再叫药停在镇口。」",
+          },
+          {
+            "id": "r58-supply-done",
+            "text": "陆贞娘把茶碗往前推了推：「料收齐了，姜百味那头也应下了。等药散配出来，南麓的人便能少受些罪——这份跑腿的心，茶棚里替你记一笔。」",
+-         },
+-         {
+-           "id": "r271-teastall-progress",
+-           "text": "陆贞娘把茶碗码好：「寒珠草要四株。备齐后回来按F交谈，选交草，我便点收下锅，凉汤的差事也在这里结算。按E可看差事名录。」",
+-         },
+-         {
+-           "id": "r271-teastall-delivered",
+-           "text": "陆贞娘接过四株寒珠草，一株株抖去根泥：「四株实收，凉汤这就续上。差事算结了，谢仪照旧，这份细心我记在茶账上。」",
+-         },
+-         {
+-           "id": "r271-teastall-echo",
+-           "text": "陆贞娘指了指灶上的大桶：「你交来的四株寒珠草都下了汤，赶路的药队也分到了一桶。入夏这口凉汤里有你的一份力气，路过只管来喝。」",
+          },
+        ],
+        "startNodeId": "greet",
+      },
+      {
+@@ -1237,70 +1167,12 @@
+                    "status": "completed",
+                  },
+                ],
+                "nextNodeId": "r58-hamlet-survey-done",
+                "text": "马叔，南麓村口的旧路记清了。",
+-             },
+-             {
+-               "conditions": [
+-                 {
+-                   "kind": "questStatus",
+-                   "questId": "quest.round-07-medicine-run",
+-                   "status": "active",
+-                 },
+-                 {
+-                   "itemId": "item.huichun-gao",
+-                   "kind": "itemCount",
+-                   "minCount": 3,
+-                 },
+-                 {
+-                   "isKnown": false,
+-                   "kind": "knowledgeKnown",
+-                   "nodeId": "event.r271-medicine-delivered",
+-                 },
+-               ],
+-               "effects": [
+-                 {
+-                   "itemId": "item.huichun-gao",
+-                   "kind": "takeItem",
+-                   "quantity": 3,
+-                 },
+-                 {
+-                   "delta": 3,
+-                   "kind": "adjustRelationship",
+-                   "npcId": "char.ma-shangyi",
+              },
+-                 {
+-                   "kind": "discoverKnowledgeNode",
+-                   "nodeId": "event.r271-medicine-delivered",
+-                 },
+            ],
+-               "nextNodeId": "r271-medicine-delivered",
+-               "text": "三份回春膏备齐了，这就当面交给你送去。",
+-             },
+-             {
+-               "conditions": [
+-                 {
+-                   "kind": "questStatus",
+-                   "questId": "quest.round-07-medicine-run",
+-                   "status": "active",
+-                 },
+-               ],
+-               "nextNodeId": "r271-medicine-progress",
+-               "text": "马叔，送药的差事，药要怎么交给你？",
+-             },
+-             {
+-               "conditions": [
+-                 {
+-                   "kind": "knowledgeKnown",
+-                   "nodeId": "event.r271-medicine-delivered",
+-                 },
+-               ],
+-               "nextNodeId": "r271-medicine-echo",
+-               "text": "马叔，上次交去的那批药，伤者用得如何？",
+-             },
+-           ],
+            "text": "马尚义把一卷新旧不一的告示压在石上：「镇里大事小事，都有人托我问个明白。你若想替人跑腿，看看有没有合意的差事。」",
+          },
+          {
+            "id": "board",
+            "options": [
+@@ -1440,22 +1312,10 @@
+            "text": "马尚义在旧账上勾了一笔：「路认清就好。贞娘已说要给药队配散，你把村口的情形也告诉姜百味一声——差事一环扣一环，往后南边的药就不用我挨家捎话了。」",
+          },
+          {
+            "id": "leave",
+            "text": "不妨事，路上留神便好。",
+-         },
+-         {
+-           "id": "r271-medicine-progress",
+-           "text": "马尚义压平告示：「伤者需要三份回春膏。备齐后回来按F交谈，选交药，我点收后便给几家送去，谢仪也在这里结算。你自己的伤药记得另留，按E可看差事名录。」",
+-         },
+-         {
+-           "id": "r271-medicine-delivered",
+-           "text": "马尚义当面点清三份回春膏，在旧账上勾了这笔：「三份实收，正好够巷口几家换药。差事这就算结了，谢仪照旧，这份跑腿的情我另记一笔。」",
+-         },
+-         {
+-           "id": "r271-medicine-echo",
+-           "text": "马尚义翻着旧账：「你交上来的那三份药都敷到了伤者疮口上，巷口几家总算睡得踏实。往后再想支援，告示上添药那条还作数——那是另算的捐助，不与这趟差事相混。」",
+          },
+        ],
+        "startNodeId": "greet",
+      },
+      {
+
+ ❯ tests/round130-hanshan-practice-brief.test.ts:317:87
+    315|       bookshopGreet.options = bookshopGreet.options.filter((option: { …
+    316|       bookshop.nodes = bookshop.nodes.filter((node: { id: string }) =>…
+    317|       expect(JSON.parse(applyRelayWaitingDirections(applyCompanionTrus…
+       |                                                                                       ^
+    318|       // R254/R255/R261 extend the ferry-master conversation after thi…
+    319|       const current30 = JSON.parse(readFileSync(join(root, 'data/base/…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

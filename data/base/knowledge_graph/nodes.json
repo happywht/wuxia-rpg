@@ -3017,6 +3017,20 @@
       "title": "同行护航转述已说明",
       "summary": "玩家亲口向另一地区人物说明，NPC记忆和单次关系后果保存；不生成实体信件，不替代实地调查。",
       "knownByDefault": false
+    },
+    {
+      "id": "event.r271-medicine-delivered",
+      "kind": "event",
+      "title": "巷口伤药已当面交付",
+      "summary": "玩家备齐三份回春膏后，在镇内告示边与马尚义按F交谈、当面点清交付；仅此一次交付结案送药差事，普通交谈与只持有药材都不构成交付。",
+      "knownByDefault": false
+    },
+    {
+      "id": "event.r271-teastall-delivered",
+      "kind": "event",
+      "title": "茶棚寒珠草已当面交付",
+      "summary": "玩家备齐四株寒珠草后，回茶棚与陆贞娘按F交谈、当面点清交付；仅此一次交付结案凉汤差事，普通交谈与只采买持有都不构成交付。",
+      "knownByDefault": false
     }
   ]
 }

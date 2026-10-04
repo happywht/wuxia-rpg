@@ -1,0 +1,27 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/round271-departure-advice.test.ts > Round271 departure preparation uses real local stock and recipe costs > quotes the real medicine ingredients and labour before the player leaves town
+TypeError: Cannot read properties of undefined (reading 'recipes')
+ ❯ tests/round271-departure-advice.test.ts:17:32
+     15|     const parsed = parseAlchemySet(read('data/base/alchemy/round-25-al…
+     16|     if (!parsed.ok) throw Error('real alchemy data refused');
+     17|     const recipe = parsed.data.recipes.find(row => row.id === 'alchemy…
+       |                                ^
+     18|     expect(recipe.currencyCost).toBe(18);
+     19|     expect(recipe.ingredients).toEqual([
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/round271-departure-advice.test.ts > Round271 departure preparation uses real local stock and recipe costs > names a real merchant with stock for the proposed materials
+TypeError: Cannot read properties of undefined (reading 'shops')
+ ❯ tests/round271-departure-advice.test.ts:34:30
+     32|     const itemSet = parseItemSet(read('data/base/items/round-06-items.…
+     33|     if (!parsed.ok || !itemSet.ok) throw Error('real shop/item data re…
+     34|     const shop = parsed.data.shops.find(row => row.npcId === 'char.jia…
+       |                              ^
+     35|     for (const itemId of ['item.hanzhu-cao', 'item.cangya-gen', 'item.…
+     36|       expect(shop.stock.some(row => row.itemId === itemId && row.quant…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

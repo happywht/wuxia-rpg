@@ -1,0 +1,3 @@
+# Preserve exact downloaded QA evidence bytes, including line endings.
+iterations/round-270/j0-opening.json -text
+iterations/round-271/j0-delivery.json -text

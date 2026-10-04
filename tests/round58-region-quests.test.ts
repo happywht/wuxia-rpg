@@ -99,8 +99,8 @@ describe('Round 58 regional quest chains', () => {
     expect(assembly.warnings).toEqual([]);
     expect(assembly.quests.size).toBe(44);
     expect(graph.warnings).toEqual([]);
-    expect(nodeParse.data.nodes).toHaveLength(429); // R255 route outcomes + R261 river-lantern appointment event; prior relays remain.
-    expect(edgeParse.data.edges).toHaveLength(544); // R255 reward edges + the two R261 river-lantern appointment edges.
+    expect(nodeParse.data.nodes).toHaveLength(431); // R255 route outcomes + R261 river-lantern appointment event + the two R271 hand-delivery events.
+    expect(edgeParse.data.edges).toHaveLength(548); // R255 reward edges + the two R261 river-lantern appointment edges + the four R271 delivery edges.
     // Stable ids anchor the R261 appointment addition instead of trusting the count alone.
     expect(nodeParse.data.nodes.map((node) => node.id)).toContain('event.r31-river-lantern-time-agreed');
     const edgeIds = edgeParse.data.edges.map((edge) => edge.id);
@@ -219,9 +219,16 @@ describe('Round 58 regional quest chains', () => {
       type: 'encounter-victory', encounterId: 'encounter.r58-market-toll-claimer',
     }).completed.map((entry) => entry.questId)).toEqual(['quest.r58-market-toll-squabble']);
 
+    // Round 271：送药差事改为有序“备料→当面交付”。备齐三份只推进备料，
+    // 不再持有即结案；记录交付见闻后才一次性结算并解锁南麓链。
     expect(acceptQuest(assembly.quests, journal, 'quest.round-07-medicine-run', new Map([
       ['item.huichun-gao', 3],
-    ])).update.completed.map((entry) => entry.questId)).toEqual(['quest.round-07-medicine-run']);
+    ])).update.completed).toEqual([]);
+    expect(journal.states.get('quest.round-07-medicine-run')?.status).toBe('active');
+    expect(journal.states.get('quest.r58-south-hamlet-survey')?.status).toBe('locked');
+    expect(applyQuestSignal(assembly.quests, journal, {
+      type: 'knowledge-discovery', nodeId: 'event.r271-medicine-delivered',
+    }).completed.map((entry) => entry.questId)).toEqual(['quest.round-07-medicine-run']);
     expect(journal.states.get('quest.r58-south-hamlet-survey')?.status).toBe('offered');
     expect(acceptQuest(assembly.quests, journal, 'quest.r58-south-hamlet-survey').ok).toBe(true);
     expect(applyQuestSignal(assembly.quests, journal, {

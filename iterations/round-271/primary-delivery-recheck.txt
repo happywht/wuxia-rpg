@@ -1,0 +1,21 @@
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r271-cli-2tivln/scripts/lib/round271-journey-delivery.mjs:323
+      throw new Error(`对话 ${spec.conversationId} 交付选项/节点已变化，请人工复核。`);
+            ^
+
+Error: 对话 dlg.ma-shangyi-notice-board 交付选项/节点已变化，请人工复核。
+    at repairDialoguesRaw (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r271-cli-2tivln/scripts/lib/round271-journey-delivery.mjs:323:13)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r271-cli-2tivln/scripts/apply-round271.mjs:22:22
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:647:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.18.0
+
+ Test Files  2 passed (2)
+      Tests  16 passed (16)
+   Start at  08:59:54
+   Duration  1.57s (tests 68%, transform 25%, import 7%, worker 1%)
+

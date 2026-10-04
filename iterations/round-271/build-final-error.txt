@@ -1,0 +1,47 @@
+round129 refused (file untouched): r129-gu-iron-route 文本被改动，请人工复核。
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-VFydj7/scripts/lib/round129-iron-practice-brief.mjs:132
+    throw new Error(`${brief.nodeId} 文本被改动，请人工复核。`);
+          ^
+
+Error: r129-gu-iron-route 文本被改动，请人工复核。
+    at verifyApplied (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-VFydj7/scripts/lib/round129-iron-practice-brief.mjs:132:11)
+    at addOne (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-VFydj7/scripts/lib/round129-iron-practice-brief.mjs:88:5)
+    at addIronPracticeBriefs (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-VFydj7/scripts/lib/round129-iron-practice-brief.mjs:59:11)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r129-runner-VFydj7/scripts/apply-round129.mjs:20:9
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:647:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.18.0
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r271-cli-v6sfQw/scripts/lib/round271-journey-delivery.mjs:323
+      throw new Error(`对话 ${spec.conversationId} 交付选项/节点已变化，请人工复核。`);
+            ^
+
+Error: 对话 dlg.ma-shangyi-notice-board 交付选项/节点已变化，请人工复核。
+    at repairDialoguesRaw (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r271-cli-v6sfQw/scripts/lib/round271-journey-delivery.mjs:323:13)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r271-cli-v6sfQw/scripts/apply-round271.mjs:22:22
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:647:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.18.0
+round130 refused round-30-conversations.json (file untouched): r130-hanshan-practice-brief 文本被改动，请人工复核。
+file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-Jfpe1l/scripts/lib/round130-hanshan-practice-brief.mjs:147
+    throw new Error(`${brief.nodeId} 文本被改动，请人工复核。`);
+          ^
+
+Error: r130-hanshan-practice-brief 文本被改动，请人工复核。
+    at verifyApplied (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-Jfpe1l/scripts/lib/round130-hanshan-practice-brief.mjs:147:11)
+    at addOne (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-Jfpe1l/scripts/lib/round130-hanshan-practice-brief.mjs:86:5)
+    at addHanshanBriefs (file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-Jfpe1l/scripts/lib/round130-hanshan-practice-brief.mjs:62:15)
+    at file:///C:/Users/Hitao/AppData/Local/Temp/wuxia-r130-runner-Jfpe1l/scripts/apply-round130.mjs:20:11
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:647:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+
+Node.js v22.18.0
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.

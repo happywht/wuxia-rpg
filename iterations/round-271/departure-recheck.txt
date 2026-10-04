@@ -1,0 +1,13 @@
+
+> wuxia-rpg@0.0.1 test
+> vitest run tests/round271-departure-advice.test.ts tests/round106-regional-guide.test.ts tests/round106-guide-ui.test.ts
+
+
+ RUN  v5.0.2 D:/工作/城建院/2609/收心/wuxia-rpg
+
+
+ Test Files  3 passed (3)
+      Tests  31 passed (31)
+   Start at  08:27:34
+   Duration  3.76s (tests 75%, transform 18%, import 6%)
+
