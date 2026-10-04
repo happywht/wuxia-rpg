@@ -1,0 +1,16 @@
+{
+  "candidate": "bf0e8d70f608816c7ed0127e540c39a0d4cc0268",
+  "parent": "2280b58f1302b02e854ca28fc52fa96ed434d529",
+  "runtimeSourceDelta": 0,
+  "fullPackageExit": 0,
+  "testFiles": 199,
+  "tests": 1794,
+  "resourceSchemas": 102,
+  "verifiedPackageFiles": 166,
+  "archiveBytes": 1545656,
+  "archiveSha256": "514105af8bcd8eeaebd7826f7f6b09037566ad1307d90ff818642ffc0985444b",
+  "qaWorkbenchAbsent": true,
+  "subpathSmokePassed": true,
+  "actualBrowserOrigin": "http://127.0.0.1:5311/",
+  "actualBrowserStart": "normal new game, no QA import"
+}

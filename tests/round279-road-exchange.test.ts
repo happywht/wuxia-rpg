@@ -581,8 +581,8 @@ describe('Round279 作者源：幂等/漂移拒绝/EOL/静态文件/CLI 沙盒',
       writeFileSync(join(workspace, 'data/base/manifest.json'), baseline('data/base/manifest.json'));
       // 基线指南源尚是 R275 云岭串——先挂 R278 渡口改写，避免与 51f3355 的渡口串不符。
       const { repairRegionGuideSourceRaw: r278Guide, FERRY_ADVICE_AFTER } = await import('../scripts/lib/round278-shore-boat.mjs');
-      // git 基线是 LF、工作区该源为 CRLF——先按工作区行尾归一再挂 R278/R279 替换。
-      const guideWithBoat = r278Guide(baseline('scripts/lib/round106-region-content.mjs').replace(/\r?\n/g, '\r\n'));
+      // Historical bytes are normalized to the actual checkout EOL, then protected exactly.
+      const guideWithBoat = r278Guide(baseline('scripts/lib/round106-region-content.mjs').replace(/\r?\n/g, raw('scripts/lib/round106-region-content.mjs').includes('\r\n') ? '\r\n' : '\n'));
       expect(guideWithBoat.includes(FERRY_ADVICE_AFTER)).toBe(true);
       writeFileSync(join(workspace, 'scripts/lib/round106-region-content.mjs'), guideWithBoat);
       // 世界也需含 r278 门与渡口指南（R278 层先于 R279）。

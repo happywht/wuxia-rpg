@@ -1,0 +1,142 @@
+diff --git a/scripts/deepen-round103-faction-practice.mjs b/scripts/deepen-round103-faction-practice.mjs
+index e70e4fa..8a65927 100644
+--- a/scripts/deepen-round103-faction-practice.mjs
++++ b/scripts/deepen-round103-faction-practice.mjs
+@@ -28,11 +28,19 @@ for (const name of ['round-03-conversations', 'round-30-conversations']) {
+
+ // Machine-shaped knowledge-graph files go through parse/upsert/stringify,
+ // written back with the CRLF endings these files ship with.
+-const nodes = JSON.parse(await readText('knowledge_graph/nodes.json'));
+-const edges = JSON.parse(await readText('knowledge_graph/edges.json'));
++const nodesRaw = await readText('knowledge_graph/nodes.json');
++const nodes = JSON.parse(nodesRaw);
++const edgesRaw = await readText('knowledge_graph/edges.json');
++const edges = JSON.parse(edgesRaw);
+ deepenFactionPracticeKnowledge(nodes, edges);
+-await writeText('knowledge_graph/nodes.json', JSON.stringify(nodes, null, 2).replace(/\n/g, '\r\n') + '\r\n');
+-await writeText('knowledge_graph/edges.json', JSON.stringify(edges, null, 2).replace(/\n/g, '\r\n') + '\r\n');
++// Keep an already applied file byte-identical, including its original EOL.
++const serialize = (raw, value) => {
++  if (JSON.stringify(JSON.parse(raw)) === JSON.stringify(value)) return raw;
++  const eol = raw.includes('\r\n') ? '\r\n' : '\n';
++  return (JSON.stringify(value, null, 2) + '\n').replace(/\n/g, eol);
++};
++await writeText('knowledge_graph/nodes.json', serialize(nodesRaw, nodes));
++await writeText('knowledge_graph/edges.json', serialize(edgesRaw, edges));
+
+ console.log(`Round103：${factionPracticeConfigs.length} 门派差事加有序地区实践与复命、师傅状态反馈与转抄、修习提示；实践见闻+声望5；地图/任务ID与原经验银两不变。`);
+
+diff --git a/scripts/deepen-round104-crafting.mjs b/scripts/deepen-round104-crafting.mjs
+index 2435a9a..6a8f25b 100644
+--- a/scripts/deepen-round104-crafting.mjs
++++ b/scripts/deepen-round104-crafting.mjs
+@@ -2,8 +2,12 @@
+ import { readFile, writeFile } from 'node:fs/promises';
+ const root = new URL('../', import.meta.url);
+ const read = async p => JSON.parse(await readFile(new URL(p, root), 'utf8'));
+-const save = async (p, value) => writeFile(new URL(p, root),
+-  (JSON.stringify(value, null, 2) + '\n').replace(/\n/g, p.includes('knowledge_graph/') ? '\r\n' : '\n'));
++const save = async (p, value) => {
++  const original = await readFile(new URL(p, root), 'utf8');
++  if (JSON.stringify(JSON.parse(original)) === JSON.stringify(value)) return;
++  const eol = original.includes('\r\n') ? '\r\n' : '\n';
++  await writeFile(new URL(p, root), (JSON.stringify(value, null, 2) + '\n').replace(/\n/g, eol));
++};
+ const objective = (id, kind, targetId, text, extra = {}) => ({ id: `objective.r104-${id}`, kind, targetId, requiredCount: 1, text, ...extra });
+ export const loops = [
+   {
+diff --git a/scripts/lib/release-candidate.d.mts b/scripts/lib/release-candidate.d.mts
+new file mode 100644
+index 0000000..77c8b25
+--- /dev/null
++++ b/scripts/lib/release-candidate.d.mts
+@@ -0,0 +1 @@
++export function verifyReleaseCandidate(manifest: unknown, files: Array<{path: string; content: Uint8Array}>, expectedCommit: string): {sourceCommit: string; verifiedFiles: number};
+diff --git a/scripts/lib/release-candidate.mjs b/scripts/lib/release-candidate.mjs
+new file mode 100644
+index 0000000..6f99e8e
+--- /dev/null
++++ b/scripts/lib/release-candidate.mjs
+@@ -0,0 +1,24 @@
++import { createHash } from 'node:crypto';
++
++/** Validate an extracted release against an independently selected source commit. */
++export function verifyReleaseCandidate(manifest, files, expectedCommit) {
++  if (!/^[0-9a-f]{40}$/i.test(expectedCommit ?? '')) throw new Error('expectedCommit must be a full Git SHA');
++  if (manifest?.formatVersion !== 1 || manifest.sourceCommit !== expectedCommit) throw new Error('release source commit does not match candidate');
++  if (!Array.isArray(manifest.files) || manifest.files.length === 0 || !Array.isArray(files)) throw new Error('missing release files');
++  const seen = new Set();
++  const actual = new Map();
++  const safe = p => typeof p === 'string' && p.split('/').every(s => /^[A-Za-z0-9_-][A-Za-z0-9._-]*$/.test(s));
++  for (const file of files) {
++    if (!safe(file.path) || actual.has(file.path) || !(file.content instanceof Uint8Array)) throw new Error('invalid or duplicate extracted file');
++    actual.set(file.path, file.content);
++  }
++  for (const entry of manifest.files) {
++    if (!safe(entry.path) || entry.path === 'release-manifest.json' || seen.has(entry.path)) throw new Error('invalid or duplicate manifest path');
++    seen.add(entry.path);
++    const bytes = actual.get(entry.path);
++    if (!bytes || bytes.byteLength !== entry.bytes || createHash('sha256').update(bytes).digest('hex') !== entry.sha256) throw new Error(`release file mismatch: ${entry.path}`);
++  }
++  for (const path of actual.keys()) if (path !== 'release-manifest.json' && !seen.has(path)) throw new Error(`unlisted release file: ${path}`);
++  for (const path of ['index.html','base/manifest.json','THIRD-PARTY-NOTICES.md']) if (!seen.has(path)) throw new Error(`missing required release file: ${path}`);
++  return {sourceCommit: expectedCommit, verifiedFiles: seen.size};
++}
+diff --git a/scripts/verify-release-candidate.mjs b/scripts/verify-release-candidate.mjs
+new file mode 100644
+index 0000000..58ac98e
+--- /dev/null
++++ b/scripts/verify-release-candidate.mjs
+@@ -0,0 +1,18 @@
++import {readFile,readdir} from 'node:fs/promises';
++import path from 'node:path';
++import {verifyReleaseCandidate} from './lib/release-candidate.mjs';
++const [root,commit]=process.argv.slice(2);
++if(!root||!commit)throw Error('Usage: node scripts/verify-release-candidate.mjs <extracted package directory> <full candidate SHA>');
++async function walk(dir,prefix=''){
++ const files=[];
++ for(const e of await readdir(dir,{withFileTypes:true})){
++  const p=prefix+e.name;
++  if(e.isSymbolicLink())throw Error('symlink forbidden: '+p);
++  if(e.isDirectory())files.push(...await walk(path.join(dir,e.name),p+'/'));
++  else if(e.isFile())files.push({path:p,content:await readFile(path.join(dir,e.name))});
++  else throw Error('unsupported file: '+p);
++ }
++ return files;
++}
++const manifest=JSON.parse(await readFile(path.join(root,'release-manifest.json'),'utf8'));
++console.log(JSON.stringify(verifyReleaseCandidate(manifest,await walk(root),commit),null,2));
+diff --git a/tests/round279-road-exchange.test.ts b/tests/round279-road-exchange.test.ts
+index b36e330..144af3a 100644
+--- a/tests/round279-road-exchange.test.ts
++++ b/tests/round279-road-exchange.test.ts
+@@ -581,8 +581,8 @@ describe('Round279 作者源：幂等/漂移拒绝/EOL/静态文件/CLI 沙盒',
+       writeFileSync(join(workspace, 'data/base/manifest.json'), baseline('data/base/manifest.json'));
+       // 基线指南源尚是 R275 云岭串——先挂 R278 渡口改写，避免与 51f3355 的渡口串不符。
+       const { repairRegionGuideSourceRaw: r278Guide, FERRY_ADVICE_AFTER } = await import('../scripts/lib/round278-shore-boat.mjs');
+-      // git 基线是 LF、工作区该源为 CRLF——先按工作区行尾归一再挂 R278/R279 替换。
+-      const guideWithBoat = r278Guide(baseline('scripts/lib/round106-region-content.mjs').replace(/\r?\n/g, '\r\n'));
++      // Historical bytes are normalized to the actual checkout EOL, then protected exactly.
++      const guideWithBoat = r278Guide(baseline('scripts/lib/round106-region-content.mjs').replace(/\r?\n/g, raw('scripts/lib/round106-region-content.mjs').includes('\r\n') ? '\r\n' : '\n'));
+       expect(guideWithBoat.includes(FERRY_ADVICE_AFTER)).toBe(true);
+       writeFileSync(join(workspace, 'scripts/lib/round106-region-content.mjs'), guideWithBoat);
+       // 世界也需含 r278 门与渡口指南（R278 层先于 R279）。
+diff --git a/tests/round281-release-candidate.test.ts b/tests/round281-release-candidate.test.ts
+new file mode 100644
+index 0000000..c76cca1
+--- /dev/null
++++ b/tests/round281-release-candidate.test.ts
+@@ -0,0 +1,13 @@
++import {createHash} from 'node:crypto';
++import {describe,it,expect} from 'vitest';
++import {verifyReleaseCandidate} from '../scripts/lib/release-candidate.mjs';
++const sha='1'.repeat(40);
++const files=['index.html','base/manifest.json','THIRD-PARTY-NOTICES.md'].map(path=>({path,content:Buffer.from(path)}));
++const manifest=()=>({formatVersion:1,sourceCommit:sha,files:files.map(f=>({path:f.path,bytes:f.content.length,sha256:createHash('sha256').update(f.content).digest('hex')}))});
++describe('release candidate provenance',()=>{
++ it('verifies every extracted byte against an independently chosen commit',()=>expect(verifyReleaseCandidate(manifest(),files,sha)).toEqual({sourceCommit:sha,verifiedFiles:3}));
++ it('rejects absent or wrong source stamps and abbreviated expected hashes',()=>{for(const value of [null,'2'.repeat(40)])expect(()=>verifyReleaseCandidate({...manifest(),sourceCommit:value},files,sha)).toThrow('commit');expect(()=>verifyReleaseCandidate(manifest(),files,'123')).toThrow('SHA');});
++ it('rejects tampered content and declared size',()=>{expect(()=>verifyReleaseCandidate(manifest(),[{...files[0]!,content:Buffer.from('bad')},...files.slice(1)],sha)).toThrow('mismatch');const m=manifest();m.files[0]!!.bytes++;expect(()=>verifyReleaseCandidate(m,files,sha)).toThrow('mismatch');});
++ it('rejects extra extracted files and duplicates',()=>{expect(()=>verifyReleaseCandidate(manifest(),[...files,{path:'secret.txt',content:Buffer.from('x')}],sha)).toThrow('unlisted');expect(()=>verifyReleaseCandidate(manifest(),[...files,files[0]!],sha)).toThrow('duplicate');const m=manifest();m.files.push(m.files[0]!!);expect(()=>verifyReleaseCandidate(m,files,sha)).toThrow('duplicate');});
++ it('rejects traversal paths and omitted critical payload',()=>{const m=manifest();m.files[0]!!.path='../index.html';expect(()=>verifyReleaseCandidate(m,files,sha)).toThrow('path');const n=manifest();n.files.shift();expect(()=>verifyReleaseCandidate(n,files.slice(1),sha)).toThrow('required');});
++});

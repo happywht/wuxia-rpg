@@ -1,0 +1,5 @@
+import fs from 'node:fs';import crypto from 'node:crypto';
+const archive='../wuxia-clean-git-round281/release/wuxia-rpg-web-0.0.1.tgz';const bytes=fs.readFileSync(archive);
+const proof={candidate:fs.readFileSync('iterations/round-281/candidate-sha.txt','utf8').trim(),parent:'2280b58f1302b02e854ca28fc52fa96ed434d529',runtimeSourceDelta:0,fullPackageExit:0,testFiles:199,tests:1794,resourceSchemas:102,verifiedPackageFiles:166,archiveBytes:bytes.length,archiveSha256:crypto.createHash('sha256').update(bytes).digest('hex'),qaWorkbenchAbsent:true,subpathSmokePassed:true,actualBrowserOrigin:'http://127.0.0.1:5311/',actualBrowserStart:'normal new game, no QA import'};
+fs.writeFileSync('iterations/round-281/release-evidence.json',JSON.stringify(proof,null,2)+'\n');
+fs.appendFileSync('iterations/round-281/implementation-notes.md','\n最终冻结bf0e8d7完整package:release退出0；199文件1794测试、102资源、类型与审计、chunk审计、166文件归档/子路径HTTP smoke通过。实际包1545656字节，SHA514105af8bcd8eeaebd7826f7f6b09037566ad1307d90ff818642ffc0985444b。新独立来源验证CLI通过；生产JS无QA工作台/检查点格式。来源以单独verification标签保留，不把主文档提交冒充打包源码。\n');

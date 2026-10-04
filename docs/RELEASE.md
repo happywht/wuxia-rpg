@@ -47,3 +47,19 @@ Round 50 另提供仓库验收命令 `npm run audit:final`。它需要完整 Git
 ## Round279 核验状态
 
 GitHub https://github.com/happywht/wuxia-rpg 已上传至 Round278（51f3355）；round278-baseline 为预发布源码基线，未部署 Pages。初次隔离发行验证失败，后续证实原始LF七组130/132通过，两个遗漏历史基线核验补入后12/12通过。尚需完整干净 package:release，不能声称稳定包通过。
+
+## Round281：锁定源码与干净复现
+
+完整回归包含历史迁移保护，构建需完整Git历史；裸源码归档及默认浅克隆不能代替干净Git checkout。CI两工作流设置fetch-depth: 0。先git clone、checkout完整候选SHA、npm ci；设置GITHUB_SHA为同一SHA后执行npm run package:release。打包成功后将tgz解包到独立目录，执行 `node scripts/verify-release-candidate.mjs <package目录> <完整候选SHA>`，独立核对来源SHA、全部文件字节数与哈希、额外文件及关键运行文件。不能信任仅显示版本号的包；本地默认sourceCommit=null的便捷包不满足锁定候选验收。
+
+本轮先验证2280b58候选；自动校验通过仍须HTTP独立实启和正常存读，完整旅程未验不得宣布稳定发行。
+
+## Round281 当前增量证据
+
+干净Git候选bf0e8d70f608816c7ed0127e540c39a0d4cc0268（2280b58加7项工程文件，src/data零差异）完整package:release退出0：199文件1794测试、102资源Schema/MOD/类型/两文档审计/生产chunk审计/166文件归档与子路径HTTP smoke通过。修复R103/R104强制CRLF改写及R279沙盒固定CRLF，两CI改全历史checkout；首次失败日志保留。新增独立源码SHA/逐文件大小哈希/额外文件校验CLI与5项测试。
+
+独立解包端口5311正常新游戏抄书学徒，E接茶棚凉汤，左移1格到42,37，向下受地形阻挡未移动（世界08:01）；正常空槽一保存18:18:50，刷新标题Continue读回，B核对Lv1/83命53气/120银/膏2丸1/旧残篇1，Q凉汤active0/4未结算。无QA导入、赠品或隐藏状态写入，发行JS无工作台。此为开局启动检查点，不是完整J0或P1旅程。
+
+发行归档1545656字节，SHA256514105af8bcd8eeaebd7826f7f6b09037566ad1307d90ff818642ffc0985444b；来源另以round281-verification标签绑定，主round提交包括补充证据/文档/CI配置，不能把不同提交冒充同一包。完整同候选新游戏到C1与关键选择两侧、真人60—90分钟仍待；P1未放行，P2不启动。
+
+验证预发布：https://github.com/happywht/wuxia-rpg/releases/tag/round281-verification 。非完整旅程稳定发行；Pages未部署。

@@ -1,0 +1,16 @@
+
+> wuxia-rpg@0.0.1 typecheck
+> tsc --noEmit
+
+tests/round281-release-candidate.test.ts(10,101): error TS2322: Type '{ content: Buffer<ArrayBuffer>; path?: string | undefined; }' is not assignable to type '{ path: string; content: Uint8Array<ArrayBufferLike>; }'.
+  Types of property 'path' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+tests/round281-release-candidate.test.ts(10,206): error TS2532: Object is possibly 'undefined'.
+tests/round281-release-candidate.test.ts(11,230): error TS2322: Type '{ path: string; content: Buffer<ArrayBuffer>; } | undefined' is not assignable to type '{ path: string; content: Uint8Array<ArrayBufferLike>; }'.
+  Type 'undefined' is not assignable to type '{ path: string; content: Uint8Array<ArrayBufferLike>; }'.
+tests/round281-release-candidate.test.ts(11,239): error TS2322: Type '{ path: string; content: Buffer<ArrayBuffer>; } | undefined' is not assignable to type '{ path: string; content: Uint8Array<ArrayBufferLike>; }'.
+  Type 'undefined' is not assignable to type '{ path: string; content: Uint8Array<ArrayBufferLike>; }'.
+tests/round281-release-candidate.test.ts(11,308): error TS2345: Argument of type '{ path: string; bytes: number; sha256: string; } | undefined' is not assignable to parameter of type '{ path: string; bytes: number; sha256: string; }'.
+  Type 'undefined' is not assignable to type '{ path: string; bytes: number; sha256: string; }'.
+tests/round281-release-candidate.test.ts(12,84): error TS2532: Object is possibly 'undefined'.
